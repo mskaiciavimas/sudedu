@@ -13,7 +13,7 @@ function generateCombinations() {
             }
           }
         }
-        controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 2);
+        controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
       }
     } else if (controller.modeChoice2 === 'viena') {
       if (controller.modeChoice3 === 'neper') {
