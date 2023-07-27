@@ -31,6 +31,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 			controller.equation = `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = `;
 		} else if (controller.randomSelection[2] === 'division') {
 			controller.equation = `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = `;
+    } 
     } else {
       controller.equation = 'Puiku!';
       controller.result = ['', '', '', '', ''];
@@ -44,7 +45,6 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     }
     localStorage.setItem('controller', JSON.stringify(controller))
 	}
-}
 
   function triggerFireworks () {
     fireworksDiv.innerHTML = '<img src="images/fireworks.gif" style="width: 500px; height: auto;" id="fireworks">';
@@ -103,6 +103,15 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${userAnswer}`];
         } else {
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${userAnswer}`];
+          controller.mistakesTracker++;
+          recordMistakes(); 
+        }
+      } else if (controller.randomSelection[2] === 'division') {
+        if (userAnswer === controller.randomSelection[0] / controller.randomSelection[1]) {
+          controller.combinations.splice(indexToRemove, 1);
+          controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer}`];
+        } else {
+          controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer}`];
           controller.mistakesTracker++;
           recordMistakes(); 
         }
