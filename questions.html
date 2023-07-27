@@ -187,9 +187,18 @@
 			answerInputElement.focus();
 		}
 
-		const metaViewport = document.querySelector(‘#viewport’)
-		metaViewport.setAttribute(‘content’, ‘width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0’)
+		    function setLayoutViewportToVisualViewport() {
+      var viewportWidth = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+      var viewportHeight = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+      var scale = viewportWidth / window.screen.width;
+      var content = "width=" + viewportWidth + ", initial-scale=" + scale;
+      var viewportMeta = document.getElementById("viewport-meta");
+      viewportMeta.setAttribute("content", content);
+    }
 
+    // Call the function when the page loads and whenever the window is resized
+    window.onload = setLayoutViewportToVisualViewport;
+    window.onresize = setLayoutViewportToVisualViewport;
 	</script>
 </body>
 
