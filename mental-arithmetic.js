@@ -51,7 +51,9 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     }
   
     function formatEquation () { 
+    if (controller.result[0] === "Correct") {
 		controller.randomSelection = controller.combinations[Math.floor(Math.random() * controller.combinations.length)];
+    };
 		if (controller.randomSelection[2] === 'addition') {
 			controller.equation = `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = `;
 		} else if (controller.randomSelection[2] === 'subtraction') {
