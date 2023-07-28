@@ -186,6 +186,21 @@
 			answerInputElement.value = '';
 			answerInputElement.focus();
 		}
+
+		  window.addEventListener('resize', () => {
+    const htmlElement = document.querySelector('html');
+    const bodyElement = document.querySelector('body');
+
+    // Adjust the height of <html> and <body> elements to 100%
+    htmlElement.style.height = '100%';
+    bodyElement.style.height = '90%';
+
+    // Reset the height after the next animation frame
+    window.requestAnimationFrame(() => {
+      htmlElement.style.height = '';
+      bodyElement.style.height = '';
+    });
+  });
 	</script>
 </body>
 
