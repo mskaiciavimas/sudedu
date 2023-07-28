@@ -57,7 +57,7 @@
 				<div class="row">
 					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
 						<div class="d-flex justify-content-start align-items-center">
-							<button class="btn btn-primary question-submit-button" style="display: none;">Tikrintis</button>
+							<button class="btn btn-primary question-submit-button" style="display: none;">Tikrinti</button>
 						</div>
 						<div id="reset-mistake-buttons" class="col-12 justify-content-center align-items-center"
 							style="display: none;">
@@ -186,25 +186,25 @@
 			answerInputElement.value = '';
 			answerInputElement.focus();
 		}
+	</script>
 
-  let originalHeight = window.innerHeight;
-
+<script src="node_modules/virtual-keyboard-height/dist/virtual-keyboard-height.min.js"></script>
+<script>
   const adjustViewport = () => {
-    const currentHeight = window.innerHeight;
-    const heightDifference = originalHeight - currentHeight;
-    if (heightDifference > 200) {
+    const keyboardHeight = window.VKeyboardHeight.getHeight();
+    if (keyboardHeight > 0) {
       // Keyboard is open, adjust the viewport
-      document.documentElement.style.height = `${currentHeight}px`;
+      document.documentElement.style.height = `calc(100% - ${keyboardHeight}px)`;
     } else {
       // Keyboard is closed, reset the viewport
       document.documentElement.style.height = '';
     }
   };
 
-  // Listen for the focusin and focusout events to detect keyboard opening and closing
-  document.addEventListener('focusin', adjustViewport);
-  document.addEventListener('focusout', adjustViewport);
-	</script>
+  // Listen for the keyboardHeightChanged event to detect keyboard opening and closing
+  window.addEventListener('keyboardHeightChanged', adjustViewport);
+</script>
+	
 </body>
 
 </html>
