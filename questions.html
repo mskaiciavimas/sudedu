@@ -187,24 +187,6 @@
 			answerInputElement.focus();
 		}
 	</script>
-
-<script src="node_modules/virtual-keyboard-height/dist/virtual-keyboard-height.min.js"></script>
-<script>
-  const adjustViewport = () => {
-    const keyboardHeight = window.VKeyboardHeight.getHeight();
-    if (keyboardHeight > 0) {
-      // Keyboard is open, adjust the viewport
-      document.documentElement.style.height = `calc(100% - ${keyboardHeight}px)`;
-    } else {
-      // Keyboard is closed, reset the viewport
-      document.documentElement.style.height = '';
-    }
-  };
-
-  // Listen for the keyboardHeightChanged event to detect keyboard opening and closing
-  window.addEventListener('keyboardHeightChanged', adjustViewport);
-</script>
-	
 </body>
 
 </html>
