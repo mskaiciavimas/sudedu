@@ -241,16 +241,10 @@
 			questionNumberInputElement.style.display = "none";
 			startQuestionsTimerButtonElement.style.display = "none";
 			startQuestionsNumberButtonElement.style.display = "none";
-      controller = JSON.parse(localStorage.getItem('controller'));
-      controller.result = ['', '', '', '', '']
-			controller.currentMistakes = [];
-			controller.mistakesTracker = 0;
-			controller.correctAnswerTracker = 0;
-			controller.equation = '';
-      controller.randomSelection = [];
-      controller.correctAnswerTracker = 0;
-      localStorage.setItem('controller', JSON.stringify(controller));
-      displayEquation();
+      if (localStorage.getItem("startTime")) {
+				localStorage.removeItem("startTime");
+			}
+      upperLineElement.setAttribute("style", "background-color: #FAEDCD")
 			
 			stylePage()
 		};
@@ -282,6 +276,13 @@
       if (!controller.timerLimit) {
         controller.timerLimit = 5;
       }
+      controller.result = ['', '', '', '', '']
+			controller.currentMistakes = [];
+			controller.mistakesTracker = 0;
+			controller.correctAnswerTracker = 0;
+			controller.equation = '';
+      controller.randomSelection = [];
+      controller.correctAnswerTracker = 0;
 			generateCombinations();
 			localStorage.setItem('controller', JSON.stringify(controller));
       redirectToQuestions();
@@ -294,13 +295,17 @@
       if (!controller.questionNumber) {
         controller.questionNumber = 20;
       }
+      controller.result = ['', '', '', '', '']
+			controller.currentMistakes = [];
+			controller.mistakesTracker = 0;
+			controller.correctAnswerTracker = 0;
+			controller.equation = '';
+      controller.randomSelection = [];
+      controller.correctAnswerTracker = 0;
 			generateCombinations();
       if (controller.combinations.length > controller.questionNumber) {
         controller.combinations = controller.combinations.sort(() => 0.5 - Math.random()).slice(0, controller.questionNumber);
       }
-      if (localStorage.getItem("startTime")) {
-				localStorage.removeItem("startTime");
-			}
 			localStorage.setItem('controller', JSON.stringify(controller));
       redirectToQuestions();
 
