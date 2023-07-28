@@ -276,6 +276,9 @@
       if (!controller.timerLimit) {
         controller.timerLimit = 5;
       }
+      if (localStorage.getItem("startTime")) {
+      localStorage.removeItem("startTime");
+    }
       controller.result = ['', '', '', '', '']
 			controller.currentMistakes = [];
 			controller.mistakesTracker = 0;
@@ -295,6 +298,9 @@
       if (!controller.questionNumber) {
         controller.questionNumber = 20;
       }
+      if (localStorage.getItem("startTime")) {
+      localStorage.removeItem("startTime");
+    }
       controller.result = ['', '', '', '', '']
 			controller.currentMistakes = [];
 			controller.mistakesTracker = 0;
