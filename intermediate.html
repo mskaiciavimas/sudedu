@@ -90,6 +90,9 @@
     font-size: 1.25rem;
     width: 50vw !important;
   }
+  .mode-choice-message {
+    padding-bottom: 0 !important;
+  }
   }
 
   
@@ -124,7 +127,7 @@
 			<div class="row middle-line d-flex align-items-center justify-content-center">
 				<div class="row d-flex align-items-center justify-content-center">
           <div class="col12 justify-content-center align-items-center equation-answer-div">
-            <h2 class="mode-choice-message text-center" style="font-weight: bold; padding-top: 20px; font-size: 3rem;"></h2>
+            <h2 class="mode-choice-message text-center" style="font-weight: bold; padding-top: 20px; font-size: 2.5rem; padding-bottom: 20px;"></h2>
             <label class="equation text-nowrap" for="answer-field" style="display: none;"></label>
             <div class="answer-field-div">
               <div id="answer-field" class="answer-field">
@@ -293,7 +296,7 @@
       }
 			generateCombinations();
       if (controller.combinations.length > controller.questionNumber) {
-        controller.combinations = controller.combinations.slice(0, controller.questionNumber);
+        controller.combinations = controller.combinations.sort(() => 0.5 - Math.random()).slice(0, controller.questionNumber);
       }
       if (localStorage.getItem("startTime")) {
 				localStorage.removeItem("startTime");
