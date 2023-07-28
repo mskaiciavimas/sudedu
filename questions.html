@@ -3,7 +3,7 @@
 
 <head>
 	<title>Mintinis Skai&#x10D;iavimas</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -57,7 +57,7 @@
 				<div class="row">
 					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
 						<div class="d-flex justify-content-start align-items-center">
-							<button class="btn btn-primary question-submit-button" style="display: none;">Tikrinti</button>
+							<button class="btn btn-primary question-submit-button" style="display: none;">Tikrintis</button>
 						</div>
 						<div id="reset-mistake-buttons" class="col-12 justify-content-center align-items-center"
 							style="display: none;">
@@ -187,31 +187,6 @@
 			answerInputElement.focus();
 		}
 	</script>
-	  <script>
-    function updateHtmlSize() {
-      const contentDiv = document.querySelector('.content');
-      const contentRect = contentDiv.getBoundingClientRect();
-      const contentHeight = contentRect.height;
-      const visualViewportHeight = window.innerHeight;
-      const layoutViewportHeight = window.visualViewport.height;
-
-      // Calculate the height of the keyboard (difference between visual and layout viewport heights)
-      const keyboardHeight = visualViewportHeight - layoutViewportHeight;
-
-      // Adjust the HTML height based on the content height and the keyboard height
-      document.documentElement.style.height = contentHeight - keyboardHeight + 'px';
-    }
-
-    // Initial setup
-    updateHtmlSize();
-
-    // Event listener for changes in content dimensions
-    window.addEventListener('resize', updateHtmlSize);
-    window.addEventListener('orientationchange', updateHtmlSize);
-
-    // Event listener to detect when the keyboard is opened or closed
-    window.visualViewport.addEventListener('resize', updateHtmlSize);
-  </script>
 </body>
 
 </html>
