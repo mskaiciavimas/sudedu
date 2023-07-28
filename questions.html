@@ -57,7 +57,7 @@
 				<div class="row">
 					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
 						<div class="d-flex justify-content-start align-items-center">
-							<button class="btn btn-primary question-submit-button" style="display: none;">Tikrinti</button>
+							<button class="btn btn-primary question-submit-button" style="display: none;">Tikrintis</button>
 						</div>
 						<div id="reset-mistake-buttons" class="col-12 justify-content-center align-items-center"
 							style="display: none;">
@@ -187,20 +187,23 @@
 			answerInputElement.focus();
 		}
 
-		  window.addEventListener('resize', () => {
-    const htmlElement = document.querySelector('html');
-    const bodyElement = document.querySelector('body');
+  let originalHeight = window.innerHeight;
 
-    // Adjust the height of <html> and <body> elements to 100%
-    htmlElement.style.height = '100%';
-    bodyElement.style.height = '90%';
+  const adjustViewport = () => {
+    const currentHeight = window.innerHeight;
+    const heightDifference = originalHeight - currentHeight;
+    if (heightDifference > 200) {
+      // Keyboard is open, adjust the viewport
+      document.documentElement.style.height = `${currentHeight}px`;
+    } else {
+      // Keyboard is closed, reset the viewport
+      document.documentElement.style.height = '';
+    }
+  };
 
-    // Reset the height after the next animation frame
-    window.requestAnimationFrame(() => {
-      htmlElement.style.height = '';
-      bodyElement.style.height = '';
-    });
-  });
+  // Listen for the focusin and focusout events to detect keyboard opening and closing
+  document.addEventListener('focusin', adjustViewport);
+  document.addEventListener('focusout', adjustViewport);
 	</script>
 </body>
 
