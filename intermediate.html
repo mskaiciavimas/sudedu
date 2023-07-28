@@ -283,6 +283,9 @@
         controller.questionNumber = 20;
       }
 			generateCombinations();
+      if (controller.combinations.length > controller.questionNumber) {
+        controller.combinations = controller.combinations.slice(0, controller.questionNumber);
+      }
       if (localStorage.getItem("startTime")) {
 				localStorage.removeItem("startTime");
 			}

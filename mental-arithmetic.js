@@ -36,13 +36,16 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
         formatFinalMessage()
       }
     } else if (controller.modeChoice4 === 'questionNumber') {
-      if (controller.combinations.length === 0 && controller.mistakesTracker + controller.correctAnswerTracker < controller.questionNumber && controller.equation !== 'Puiku!' && controller.equation !== 'Gerai!') {
+      if (controller.combinations.length === 0 && controller.correctAnswerTracker < controller.questionNumber && controller.equation !== 'Puiku!' && controller.equation !== 'Gerai!') {
         generateCombinations()
+        if (controller.combinations.length > controller.questionNumber - controller.correctAnswerTracker) {
+          controller.combinations = controller.combinations.slice(0, controller.questionNumber - controller.correctAnswerTracker);
+        }
       }
-      if (controller.combinations.length > 0 && controller.mistakesTracker + controller.correctAnswerTracker < controller.questionNumber && controller.equation !== 'Puiku!' && controller.equation !== 'Gerai!') {
+      if (controller.combinations.length > 0 && controller.correctAnswerTracker < controller.questionNumber && controller.equation !== 'Puiku!' && controller.equation !== 'Gerai!') {
         formatEquation()
       }
-      if (controller.mistakesTracker + controller.correctAnswerTracker === controller.questionNumber) {
+      if (controller.correctAnswerTracker === controller.questionNumber) {
         formatFinalMessage()
       }
     }
@@ -172,6 +175,9 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
   function restartEquations () {
     controller.currentMistakes = [];
     generateCombinations();
+    if (controller.combinations.length > controller.questionNumber) {
+      controller.combinations = controller.combinations.slice(0, controller.questionNumber);
+    }
     controller.result = ['', '', '', '', ''];
     controller.equation = '';
     controller.mistakesTracker = 0;
