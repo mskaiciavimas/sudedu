@@ -57,7 +57,7 @@
 				<div class="row">
 					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
 						<div class="d-flex justify-content-start align-items-center">
-							<button class="btn btn-primary question-submit-button" style="display: none;">Tikrintis</button>
+							<button class="btn btn-primary question-submit-button" style="display: none;">Tikrinti</button>
 						</div>
 						<div id="reset-mistake-buttons" class="col-12 justify-content-center align-items-center"
 							style="display: none;">
@@ -189,11 +189,14 @@
 	</script>
 	  <script>
     function updateHtmlSize() {
-      const contentDiv = document.querySelector('html');
+      const contentDiv = document.querySelector('.content');
       const contentRect = contentDiv.getBoundingClientRect();
       const contentHeight = contentRect.height;
 
-      document.documentElement.style.height = contentHeight + 'px';
+      // Adjust the HTML height only when the keyboard is closed
+      if (!window.visualViewport.height) {
+        document.documentElement.style.height = contentHeight + 'px';
+      }
     }
 
     // Initial setup
@@ -202,6 +205,9 @@
     // Event listener for changes in content dimensions
     window.addEventListener('resize', updateHtmlSize);
     window.addEventListener('orientationchange', updateHtmlSize);
+
+    // Event listener to detect when the keyboard is opened or closed
+    window.visualViewport.addEventListener('resize', updateHtmlSize);
   </script>
 </body>
 
