@@ -109,6 +109,8 @@
 				window.location.href = "index.html";
 			}
 			document.querySelector('#template-container').removeAttribute('hidden');
+			formEquation();
+			displayEquation();
 			document.getElementById('answer').focus();
 			stylePage()
 		};
@@ -145,7 +147,11 @@
 			if (controller.equation !== "Puiku!" && controller.equation !== "Gerai!") {
 				answerInputElement.style.display = "flex";
 				questionsSubmitButtonElement.style.display = "flex";
-				startTimer();
+				if (controller.modeChoice4 === 'timer') {
+					countDown();
+				} else if (controller.modeChoice4 === 'questionNumber') {
+					startTimer();
+				}
 			} else {
 				resetMistakeButtonsElement.style.display = "flex";
 				answerFieldDivElement.style.display = "none";
@@ -186,6 +192,7 @@
 			answerInputElement.value = '';
 			answerInputElement.focus();
 		}
+	</script>
 	</script>
 </body>
 

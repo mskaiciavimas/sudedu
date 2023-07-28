@@ -5,12 +5,15 @@ let controller = {
 	modeChoice: '',
 	modeChoice2: '',
   modeChoice3: [],
+  modeChoice4: '',
+  timerLimit: 0,
+  questionNumber: 0,
 	selectedNumbers: [],
 	randomSelection: [],
 	combinations: [],
 	equation: '',
   result: ['', '', '', '', ''],
-	totalQuestions: 0
+	correctAnswerTracker: 0,
 }
 
 const fireworksDiv = document.querySelector('#fireworks-div');
@@ -21,7 +24,30 @@ let answerTrackerElement = document.querySelector('#answer-tracker');
 let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 
 	function formEquation () {
-    if (controller.combinations.length > 0) {
+    let remainingTime = parseInt(localStorage.getItem('remainingTime'));
+    if (controller.modeChoice4 === 'timer') {
+      if (controller.combinations.length === 0 && remainingTime > 0 && controller.equation !== 'Puiku!' && controller.equation !== 'Gerai!') {
+        generateCombinations()
+      }
+      if (controller.combinations.length > 0 && remainingTime > 0 && controller.equation !== 'Puiku!' && controller.equation !== 'Gerai!') {
+        formatEquation()
+      }
+      if (remainingTime <= 0) {
+        formatFinalMessage()
+      }
+    } else if (controller.modeChoice4 === 'questionNumber') {
+      if (controller.combinations.length === 0 && controller.mistakesTracker + controller.correctAnswerTracker < controller.questionNumber && controller.equation !== 'Puiku!' && controller.equation !== 'Gerai!') {
+        generateCombinations()
+      }
+      if (controller.combinations.length > 0 && controller.mistakesTracker + controller.correctAnswerTracker < controller.questionNumber && controller.equation !== 'Puiku!' && controller.equation !== 'Gerai!') {
+        formatEquation()
+      }
+      if (controller.mistakesTracker + controller.correctAnswerTracker === controller.questionNumber) {
+        formatFinalMessage()
+      }
+    }
+  
+    function formatEquation () { 
 		controller.randomSelection = controller.combinations[Math.floor(Math.random() * controller.combinations.length)];
 		if (controller.randomSelection[2] === 'addition') {
 			controller.equation = `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = `;
@@ -32,19 +58,21 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 		} else if (controller.randomSelection[2] === 'division') {
 			controller.equation = `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = `;
     } 
-    } else {
+    } 
+
+    function formatFinalMessage () {
+      if (controller.equation !== 'Puiku!' && controller.mistakesTracker === 0 && controller.correctAnswerTracker > 0 ) {
+        triggerFireworks();
+      }
       controller.equation = 'Puiku!';
       controller.result = ['', '', '', '', ''];
       answerFieldDivElement.style.display = "none";
       questionsSubmitButtonElement.style.display = "none";
       resetMistakeButtonsElement.style.display = "flex";
       clearInterval(timerInterval);
-      if (controller.mistakesTracker === 0) {
-        triggerFireworks();
-      }
     }
     localStorage.setItem('controller', JSON.stringify(controller))
-	}
+}
 
   function triggerFireworks () {
     fireworksDiv.innerHTML = '<img src="images/fireworks.gif" style="width: 500px; height: auto;" id="fireworks">';
@@ -66,7 +94,11 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
       upperLineElement.setAttribute("style", "background-color: #FAEDCD")
     };
     previousEquationElement.innerHTML = controller.result[4];
-    answerTrackerElement.innerHTML = `Atsakei: ${controller.totalQuestions - controller.combinations.length}/${controller.totalQuestions}`;
+    if (controller.modeChoice4 === 'timer') {
+    answerTrackerElement.innerHTML = `Atsakei: ${controller.correctAnswerTracker}`;
+    } else if (controller.modeChoice4 === 'questionNumber') {
+    answerTrackerElement.innerHTML = `Atsakei: ${controller.correctAnswerTracker}/${controller.questionNumber}`;
+    }
     mistakeTrackerElement.innerHTML = `Suklydai: ${controller.mistakesTracker}`;
     answerInputElement.focus();
   }
@@ -82,6 +114,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     if (controller.randomSelection[2] === 'addition') {
       if (userAnswer === controller.randomSelection[0] + controller.randomSelection[1]) {
         controller.combinations.splice(indexToRemove, 1);
+        controller.correctAnswerTracker++;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
       } else {
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
@@ -91,6 +124,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
      } else if (controller.randomSelection[2] === 'subtraction') {
       if (userAnswer === controller.randomSelection[0] - controller.randomSelection[1]) {
         controller.combinations.splice(indexToRemove, 1);
+        controller.correctAnswerTracker++;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
       } else {
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
@@ -100,6 +134,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
       } else if (controller.randomSelection[2] === 'multiplication') {
         if (userAnswer === controller.randomSelection[0] * controller.randomSelection[1]) {
           controller.combinations.splice(indexToRemove, 1);
+          controller.correctAnswerTracker++;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${userAnswer}`];
         } else {
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${userAnswer}`];
@@ -109,6 +144,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
       } else if (controller.randomSelection[2] === 'division') {
         if (userAnswer === controller.randomSelection[0] / controller.randomSelection[1]) {
           controller.combinations.splice(indexToRemove, 1);
+          controller.correctAnswerTracker++;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer}`];
         } else {
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer}`];
@@ -139,6 +175,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     controller.result = ['', '', '', '', ''];
     controller.equation = '';
     controller.mistakesTracker = 0;
+    controller.correctAnswerTracker = 0;
     answerFieldDivElement.style.display = "flex";
     questionsSubmitButtonElement.style.display = "flex";
     resetMistakeButtonsElement.style.display = "none";
@@ -146,14 +183,18 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     if (localStorage.getItem("startTime")) {
       localStorage.removeItem("startTime");
     }
-    startTimer()
+    if (controller.modeChoice4 === 'timer') {
+      countDown();
+    } else if (controller.modeChoice4 === 'questionNumber') {
+      startTimer()
+    }
     formEquation();
     displayEquation();
     disableFireworks();
   }
 
   function stopEquations () {
-    if (controller.combinations.length > 0) {
+    if (controller.equation !== 'Puiku!') {
     controller.equation = 'Gerai!';
     controller.result = ['', '', '', '', ''];
 
@@ -164,6 +205,10 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     clearInterval(timerInterval);
     displayEquation()
   }
+}
+
+function redirectToIntermediate() {
+  window.location.href = "intermediate.html";
 }
 
   function redirectToQuestions() {
@@ -318,6 +363,46 @@ function startTimer() {
       minutes.toString().padStart(2, "0") +
       ":" +
       seconds.toString().padStart(2, "0");
+  }
+
+  updateTimer();
+
+  timerInterval = setInterval(updateTimer, 1000);
+}
+
+function countDown () {
+  const timerLimit = controller.timerLimit * 60;
+
+  let startTime = new Date().getTime() + timerLimit * 1000; // Calculate the end time
+  localStorage.setItem("startTime", startTime);
+
+  function updateTimer() {
+    let currentTime = new Date().getTime();
+    let remainingTime = startTime - currentTime;
+
+    if (remainingTime <= 0) {
+      // If the timer has ended, clear the interval and display "00:00:00"
+      clearInterval(timerInterval);
+      timerDisplay.textContent = "00:00:00";
+      localStorage.setItem('remainingTime', remainingTime);
+      formEquation();
+      displayEquation();
+      localStorage.removeItem("startTime");
+    } else {
+      // Calculate hours, minutes, and seconds from the remaining time
+      var hours = Math.floor(remainingTime / 3600000);
+      var minutes = Math.floor((remainingTime % 3600000) / 60000);
+      var seconds = Math.floor((remainingTime % 60000) / 1000);
+
+      // Update the timer display
+      timerDisplay.textContent =
+        hours.toString().padStart(2, "0") +
+        ":" +
+        minutes.toString().padStart(2, "0") +
+        ":" +
+        seconds.toString().padStart(2, "0");
+        localStorage.setItem('remainingTime', remainingTime);
+    }
   }
 
   updateTimer();
