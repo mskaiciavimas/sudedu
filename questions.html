@@ -192,11 +192,14 @@
       const contentDiv = document.querySelector('.content');
       const contentRect = contentDiv.getBoundingClientRect();
       const contentHeight = contentRect.height;
+      const visualViewportHeight = window.innerHeight;
+      const layoutViewportHeight = window.visualViewport.height;
 
-      // Adjust the HTML height only when the keyboard is closed
-      if (!window.visualViewport.height) {
-        document.documentElement.style.height = contentHeight + 'px';
-      }
+      // Calculate the height of the keyboard (difference between visual and layout viewport heights)
+      const keyboardHeight = visualViewportHeight - layoutViewportHeight;
+
+      // Adjust the HTML height based on the content height and the keyboard height
+      document.documentElement.style.height = contentHeight + keyboardHeight + 'px';
     }
 
     // Initial setup
