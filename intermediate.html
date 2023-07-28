@@ -231,7 +231,6 @@
 				window.location.href = "index.html";
 			}
 			document.querySelector('#template-container').removeAttribute('hidden');
-      displayEquation();
       modeChoiceMessageElement.innerHTML = "NUSTATYTI";
       modeChoice4DIv.style.display = "flex";
 			timerInputDivElement.style.display = "none";
@@ -239,6 +238,16 @@
 			questionNumberInputElement.style.display = "none";
 			startQuestionsTimerButtonElement.style.display = "none";
 			startQuestionsNumberButtonElement.style.display = "none";
+      controller = JSON.parse(localStorage.getItem('controller'));
+      controller.result = ['', '', '', '', '']
+			controller.currentMistakes = [];
+			controller.mistakesTracker = 0;
+			controller.correctAnswerTracker = 0;
+			controller.equation = '';
+      controller.randomSelection = [];
+      controller.correctAnswerTracker = 0;
+      localStorage.setItem('controller', JSON.stringify(controller));
+      displayEquation();
 			
 			stylePage()
 		};

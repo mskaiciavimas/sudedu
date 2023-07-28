@@ -104,16 +104,7 @@
 	<script src="mental-arithmetic-combinations.js"></script>
 
 	<script>
-		window.onload = function () {
-			if (localStorage.getItem('controller') === null) {
-				window.location.href = "index.html";
-			}
-			document.querySelector('#template-container').removeAttribute('hidden');
-			formEquation();
-			displayEquation();
-			document.getElementById('answer').focus();
-			stylePage()
-		};
+		const answerFieldDivElement = document.querySelector('.answer-field-div')
 
 		const restratButtonElement = document.querySelector('.restart-button');
 		restratButtonElement.addEventListener("click", restartEquations);
@@ -139,10 +130,13 @@
 		} 
 		}
 
-
-		answerFieldDivElement = document.querySelector('.answer-field-div')
-		document.addEventListener("DOMContentLoaded", function () {
+		window.onload = function () {
+			if (localStorage.getItem('controller') === null) {
+				window.location.href = "index.html";
+			}
+			document.querySelector('#template-container').removeAttribute('hidden');
 			controller = JSON.parse(localStorage.getItem('controller'));
+			formEquation();
 			displayEquation();
 			if (controller.equation !== "Puiku!" && controller.equation !== "Gerai!") {
 				answerInputElement.style.display = "flex";
@@ -157,8 +151,9 @@
 				answerFieldDivElement.style.display = "none";
 				timerDisplay.textContent = localStorage.getItem("elapsedTime");
 			}
-		});
-
+			document.getElementById('answer').focus();
+			stylePage()
+		};
 
 		let answerInputElement = document.querySelector('#answer');
 		answerInputElement.setAttribute("inputmode", "numeric");
