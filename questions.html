@@ -16,7 +16,7 @@
 </head>
 
 <body>
-	<div class="container" id="template-container"
+	<div class="container content" id="template-container"
 		style="display: flex; flex-direction: column; justify-content: space-between;" hidden>
 		<div class="row d-flex align-items-start">
 			<div class="col-10 d-flex">
@@ -57,7 +57,7 @@
 				<div class="row">
 					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
 						<div class="d-flex justify-content-start align-items-center">
-							<button class="btn btn-primary question-submit-button" style="display: none;">Tikrinti</button>
+							<button class="btn btn-primary question-submit-button" style="display: none;">Tikrintis</button>
 						</div>
 						<div id="reset-mistake-buttons" class="col-12 justify-content-center align-items-center"
 							style="display: none;">
@@ -187,6 +187,22 @@
 			answerInputElement.focus();
 		}
 	</script>
+	  <script>
+    function updateHtmlSize() {
+      const contentDiv = document.querySelector('.content');
+      const contentRect = contentDiv.getBoundingClientRect();
+      const contentHeight = contentRect.height;
+
+      document.documentElement.style.height = contentHeight + 'px';
+    }
+
+    // Initial setup
+    updateHtmlSize();
+
+    // Event listener for changes in content dimensions
+    window.addEventListener('resize', updateHtmlSize);
+    window.addEventListener('orientationchange', updateHtmlSize);
+  </script>
 </body>
 
 </html>
