@@ -124,7 +124,7 @@
 			</div>
 		</div>
 		<div class="row d-flex align-items-end">
-			<div class="col-12 d-flex justify-content-end align-items-end summary-button-div" style="display: inline-block;">
+			<div class="col-12 d-flex justify-content-end align-items-end summary-button-div" style="display: inline-block; visibility: hidden;">
 				<button class="btn btn-primary summary-button">Da&#x17E;niausios klaidos</button>
 			</div>
 		</div>
@@ -358,6 +358,9 @@
 			selectedNumberElement.selectedIndex = 0;
 			selectedNumber2Element.selectedIndex = 0;
 			modeChoice3Element.selectedIndex = 0;
+			if (localStorage.getItem('controller') !== null) {
+			  summaryButtonElement.style.visibility = "visible";
+			};
 			document.querySelector('#template-container').removeAttribute('hidden');
 		};
 	</script>
