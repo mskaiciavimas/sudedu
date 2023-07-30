@@ -184,6 +184,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     controller.equation = '';
     controller.mistakesTracker = 0;
     controller.correctAnswerTracker = 0;
+    controller.randomSelection = [];	  
     answerFieldDivElement.style.display = "flex";
     questionsSubmitButtonElement.style.display = "flex";
     resetMistakeButtonsElement.style.display = "none";
@@ -205,6 +206,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     if (controller.equation !== 'Puiku!') {
     controller.equation = 'Gerai!';
     controller.result = ['', '', '', '', ''];
+    controller.randomSelection = []; 
 
     answerFieldDivElement.style.display = "none";
     questionsSubmitButtonElement.style.display = "none";
