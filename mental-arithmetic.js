@@ -216,11 +216,11 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 }
 
 function redirectToIntermediate() {
-  window.location.href = "./intermediate";
+  window.location.href = "./pasirink";
 }
 
   function redirectToQuestions() {
-    window.location.href = "./questions";
+    window.location.href = "./uzduotys";
   }
 
   function redirectToIndex() {
@@ -228,7 +228,7 @@ function redirectToIntermediate() {
     window.location.href = "./";
   }
   function redirectToSummary () {
-    window.location.href = "./summary";
+    window.location.href = "./klaidos";
   }
 
  // Function to calculate bar color based on the number of mistakes
