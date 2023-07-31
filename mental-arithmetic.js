@@ -6,6 +6,8 @@ let controller = {
 	modeChoice2: '',
   modeChoice3: [],
   modeChoice4: '',
+  modeChoice5: '',
+  modeChoice6: '',
   timerLimit: 0,
   questionNumber: 0,
 	selectedNumbers: [],
@@ -17,11 +19,7 @@ let controller = {
 }
 
 const fireworksDiv = document.querySelector('#fireworks-div');
-let equationElement = document.querySelector('.equation');
-let upperLineElement = document.querySelector('.upper-line');
-let previousEquationElement = document.querySelector('.previous-equation');
-let answerTrackerElement = document.querySelector('#answer-tracker');
-let mistakeTrackerElement = document.querySelector('#mistake-tracker');
+
 
 	function formEquation () {
     let remainingTime = parseInt(localStorage.getItem('remainingTime'));
@@ -71,9 +69,6 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
       }
       controller.equation = 'Puiku!';
       controller.result = ['', '', '', '', ''];
-      answerFieldDivElement.style.display = "none";
-      questionsSubmitButtonElement.style.display = "none";
-      resetMistakeButtonsElement.style.display = "flex";
       clearInterval(timerInterval);
     }
     localStorage.setItem('controller', JSON.stringify(controller))
@@ -90,26 +85,41 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 
   function displayEquation () {
     controller = JSON.parse(localStorage.getItem('controller'));
-    equationElement.innerHTML = controller.equation;
-    if (controller.result[0] === 'Incorrect') {
-      upperLineElement.setAttribute("style", "background-color: #D57E7E")
-    } else if (controller.result[0] === 'Correct') {
-      upperLineElement.setAttribute("style", "background-color: #B6C867")
-    } else {
-      upperLineElement.setAttribute("style", "background-color: #FAEDCD")
-    };
-    previousEquationElement.innerHTML = controller.result[4];
-    if (controller.modeChoice4 === 'timer') {
-    answerTrackerElement.innerHTML = `Atsakei: ${controller.correctAnswerTracker}`;
-    } else if (controller.modeChoice4 === 'questionNumber') {
-    answerTrackerElement.innerHTML = `Atsakei: ${controller.correctAnswerTracker}/${controller.questionNumber}`;
+
+
+    fullEquationRowElement.innerHTML = '<div class="col12 d-flex justify-content-center align-items-center"><label class="equation text-nowrap" for="answer-field"></label><div class="answer-field-div"><div id="answer-field" class="answer-field"><input type="text" id="answer" name="answer" class="form-control text-center answer-input" placeholder="" autofocus autocomplete="off"></div></div></div>'
+
+    document.querySelector('#answer').setAttribute("inputmode", "numeric");
+
+
+    if (controller.equation === "Puiku!" || controller.equation === "Gerai!") {
+      document.querySelector('.answer-field-div').style.display = "none";
+      document.querySelector('.question-submit-button').style.display = "none";
+      document.querySelector('#reset-mistake-buttons').style.display = "flex";
     }
-    mistakeTrackerElement.innerHTML = `Suklydai: ${controller.mistakesTracker}`;
-    answerInputElement.focus();
+
+
+
+    document.querySelector('.equation').innerHTML = controller.equation;
+    if (controller.result[0] === 'Incorrect') {
+      document.querySelector('.upper-line').setAttribute("style", "background-color: #D57E7E")
+    } else if (controller.result[0] === 'Correct') {
+      document.querySelector('.upper-line').setAttribute("style", "background-color: #B6C867")
+    } else {
+      document.querySelector('.upper-line').setAttribute("style", "background-color: #FAEDCD")
+    };
+    document.querySelector('.previous-equation').innerHTML = controller.result[4];
+    if (controller.modeChoice4 === 'timer') {
+    document.querySelector('#answer-tracker').innerHTML = `Atsakei: ${controller.correctAnswerTracker}`;
+    } else if (controller.modeChoice4 === 'questionNumber') {
+    document.querySelector('#answer-tracker').innerHTML = `Atsakei: ${controller.correctAnswerTracker}/${controller.questionNumber}`;
+    }
+    document.querySelector('#mistake-tracker').innerHTML = `Suklydai: ${controller.mistakesTracker}`;
+    document.querySelector('#answer').focus();
   }
 
   function checkAnswer () {
-    userAnswer = Number(answerInputElement.value);
+    userAnswer = Number(document.querySelector('#answer').value);
     const indexToRemove = controller.combinations.findIndex(
       (item) =>
         item[0] === controller.randomSelection[0] &&
@@ -184,11 +194,11 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     controller.equation = '';
     controller.mistakesTracker = 0;
     controller.correctAnswerTracker = 0;
-    controller.randomSelection = [];	  
-    answerFieldDivElement.style.display = "flex";
-    questionsSubmitButtonElement.style.display = "flex";
-    resetMistakeButtonsElement.style.display = "none";
-    answerInputElement.style.display = "flex";
+    controller.randomSelection = [];
+    document.querySelector('.answer-field-div').style.display = "flex";
+    document.querySelector('.question-submit-button').style.display = "flex";
+    document.querySelector('#reset-mistake-buttons').style.display = "none";
+    document.querySelector('#answer').style.display = "flex";
     if (localStorage.getItem("startTime")) {
       localStorage.removeItem("startTime");
     }
@@ -206,11 +216,12 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     if (controller.equation !== 'Puiku!') {
     controller.equation = 'Gerai!';
     controller.result = ['', '', '', '', ''];
+    controller.combinations = [];
     controller.randomSelection = []; 
 
-    answerFieldDivElement.style.display = "none";
-    questionsSubmitButtonElement.style.display = "none";
-    resetMistakeButtonsElement.style.display = "flex";
+    document.querySelector('.answer-field-div').style.display = "none";
+    document.querySelector('.question-submit-button').style.display = "none";
+    document.querySelector('#reset-mistake-buttons').style.display = "flex";
     localStorage.setItem('controller', JSON.stringify(controller))
     clearInterval(timerInterval);
     displayEquation()
@@ -218,19 +229,19 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 }
 
 function redirectToIntermediate() {
-  window.location.href = "./pasirink";
+  window.location.href = "intermediate.html";
 }
 
   function redirectToQuestions() {
-    window.location.href = "./uzduotys";
+    window.location.href = "questions.html";
   }
 
   function redirectToIndex() {
     localStorage.setItem('controller', JSON.stringify(controller))
-    window.location.href = "./";
+    window.location.href = "index.html";
   }
   function redirectToSummary () {
-    window.location.href = "./klaidos";
+    window.location.href = "summary.html";
   }
 
  // Function to calculate bar color based on the number of mistakes

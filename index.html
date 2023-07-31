@@ -35,6 +35,16 @@
 					<div class="d-flex flex-column align-items-center">
 						<label class="mode-choice-label" for="mode_choice">PRAKTIKUOTIS</label>
 						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
+							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_5"
+								id="mode_choice_5">
+								<option value="skaitiniai">SKAITINIS REIŠKINYS</option>
+								<option value="nezinomieji">LYGTYS SU NEŽINOMAISIAIS</option>
+							</select>
+						</div>
+						<div class="row">
+							<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
+						</div>
+						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
 							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice"
 								id="mode_choice">
 								<option value="sudetis">SUD&#x116;T&#x12E;</option>
@@ -44,6 +54,15 @@
 								<option value="dalyba">DALYB&#x104;</option>
 								<option value="daugyba ir dalyba">DAUGYB&#x104; IR DALYB&#x104;</option>
 								<option value="visi">VISUS</option>
+							</select>
+						</div>
+						<div class="row">
+							<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
+						</div>
+						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
+							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_6"
+								id="mode_choice_6">
+								<option value="demuo">NEŽINOMAS DĖMUO</option>
 							</select>
 						</div>
 						<div class="row">
@@ -147,6 +166,8 @@
 		let selectedNumber2Element = document.querySelector('#selected_number_2');
 		let modeChoice3Element = document.querySelector('#mode_choice_3');
 		let emptySpaceholder = document.querySelector('#placeholder-bottom');
+		let modeChoice5Element = document.querySelector('#mode_choice_5');
+		let modeChoice6Element = document.querySelector('#mode_choice_6');
 
 		modeChoiceElement.addEventListener('change', function () {
 			function toggleVisibility(element, isVisible) {
@@ -329,11 +350,15 @@
 			modeChoice2Selection = modeChoice2Element.value;
 			selectedNumbers = [selectedNumberElement.value, selectedNumber2Element.value].sort();
 			modeChoice3Selection = modeChoice3Element.value;
+			modeChoice5Selection = modeChoice5Element.value;
+			modeChoice6Selection = modeChoice6Element.value;
 
 			controller.modeChoice = modeChoiceSelection;
 			controller.modeChoice2 = modeChoice2Selection;
 			controller.selectedNumbers = selectedNumbers;
 			controller.modeChoice3 = modeChoice3Selection;
+			controller.modeChoice5 = modeChoice5Selection;
+			controller.modeChoice6 = modeChoice6Selection;
 			controller.result = ['', '', '', '', '']
 
 			localStorage.setItem('controller', JSON.stringify(controller))
@@ -358,8 +383,10 @@
 			selectedNumberElement.selectedIndex = 0;
 			selectedNumber2Element.selectedIndex = 0;
 			modeChoice3Element.selectedIndex = 0;
+			modeChoice5Element.selectedIndex = 0;
+			modeChoice6Element.selectedIndex = 0;
 			if (localStorage.getItem('controller') !== null) {
-			  summaryButtonElement.style.visibility = "visible";
+				summaryButtonElement.style.visibility = "visible";
 			};
 			document.querySelector('#template-container').removeAttribute('hidden');
 		};
