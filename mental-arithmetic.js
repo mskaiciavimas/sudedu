@@ -89,12 +89,13 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 
   function displayEquation () {
     controller = JSON.parse(localStorage.getItem('controller'));
+    console.log(controller.modeChoice5)
 
     if (controller.modeChoice5 === 'skaitiniai') {
-    equationPart1Element.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label>'
+      equationPart1Element.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label>'
     } else if (controller.modeChoice5 === 'nezinomieji') {
       equationPart2Element.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label>'
-      }
+    }
 
 
 
