@@ -89,7 +89,7 @@ const fireworksDiv = document.querySelector('#fireworks-div');
 
     fullEquationRowElement.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label><div class="answer-field-div"><div id="answer-field" class="answer-field"><input type="text" id="answer" name="answer" class="form-control text-center answer-input" placeholder="" autofocus autocomplete="off"></div></div>'
 
-    //document.querySelector('#answer').focus();
+    document.querySelector('#answer').focus({ preventScroll: true });
 
     document.querySelector('#answer').setAttribute("inputmode", "numeric");
 
