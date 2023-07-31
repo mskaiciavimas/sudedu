@@ -86,11 +86,33 @@ const fireworksDiv = document.querySelector('#fireworks-div');
   function displayEquation () {
     controller = JSON.parse(localStorage.getItem('controller'));
 
-// Store the current scroll position before focusing on the input field
 const scrollYPosition = window.scrollY;
 
-// Update the content and insert the new input field
-fullEquationRowElement.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label><div class="answer-field-div"><div id="answer-field" class="answer-field"><input type="text" id="answer" name="answer" class="form-control text-center answer-input" placeholder="" autocomplete="off"></div></div>'
+// Create the new elements
+const equationLabel = document.createElement('label');
+equationLabel.className = 'equation text-nowrap';
+equationLabel.setAttribute('for', 'answer-field');
+
+const answerFieldDiv = document.createElement('div');
+answerFieldDiv.className = 'answer-field-div';
+
+const answerField = document.createElement('div');
+answerField.id = 'answer-field';
+answerField.className = 'answer-field';
+
+const answerInput = document.createElement('input');
+answerInput.type = 'text';
+answerInput.id = 'answer';
+answerInput.name = 'answer';
+answerInput.className = 'form-control text-center answer-input';
+answerInput.placeholder = '';
+answerInput.setAttribute('autocomplete', 'off');
+
+// Assemble the elements
+answerField.appendChild(answerInput);
+answerFieldDiv.appendChild(answerField);
+fullEquationRowElement.appendChild(equationLabel);
+fullEquationRowElement.appendChild(answerFieldDiv);
 
 // Focus on the input field without scrolling to it
 document.querySelector('#answer').focus({ preventScroll: true });
@@ -100,6 +122,7 @@ window.scrollTo(0, scrollYPosition);
 
 // Set the inputmode and other configurations for the input field
 document.querySelector('#answer').setAttribute('inputmode', 'numeric');
+
 
 
     document.querySelector('#answer').setAttribute("inputmode", "numeric");
