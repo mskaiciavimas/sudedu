@@ -42,7 +42,18 @@
 			</div>
 			<div class="row middle-line">
 				<div class="row">
-					<div class="col12 d-flex justify-content-center align-items-center full-equation">
+					<div class="col12 d-flex justify-content-center align-items-center">
+						<div class="equation_part_1">
+						<label class="equation text-nowrap" for="answer-field"></label>
+					</div>
+						<div class="answer-field-div">
+							<div id="answer-field" class="answer-field">
+								<input type="text" id="answer" name="answer" class="form-control text-center answer-input"
+									placeholder="" autofocus autocomplete="off" style="display: none;">
+							</div>
+						</div>
+						<div class="equation_part_2">
+						</div>
 					</div>
 				</div>
 
@@ -96,24 +107,40 @@
 	<script src="mental-arithmetic-combinations.js"></script>
 
 	<script>
+		const answerFieldDivElement = document.querySelector('.answer-field-div')
 
-		document.querySelector('.restart-button').addEventListener("click", restartEquations);
+		const restratButtonElement = document.querySelector('.restart-button');
+		restratButtonElement.addEventListener("click", restartEquations);
+
+		const resetButtonElement = document.querySelector('.reset-button');
+		resetButtonElement.addEventListener("click", redirectToIndex);
+
+		const mistakesButtonElement = document.querySelector('.summary-button');
+		mistakesButtonElement.addEventListener("click", () => {
+			localStorage.setItem("elapsedTime", timerDisplay.textContent);
+		})
+		mistakesButtonElement.addEventListener("click", redirectToSummary);
+
+		const resetMistakeButtonsElement = document.querySelector('#reset-mistake-buttons');
+		const stopButtonElement = document.querySelector('.stop-button');
+		stopButtonElement.addEventListener("click", stopEquations)
+
+		const linkElement = document.querySelector("#questionsStyleSheet");
 
 		document.querySelector('.reset-button').addEventListener("click", redirectToIndex);
 
-		document.querySelector('.summary-button').addEventListener("click", () => {
+		mistakesButtonElement.addEventListener("click", () => {
 			localStorage.setItem("elapsedTime", timerDisplay.textContent);
 		})
-		document.querySelector('.summary-button').addEventListener("click", redirectToSummary);
-
-		document.querySelector('.stop-button').addEventListener("click", stopEquations)
+		mistakesButtonElement.addEventListener("click", redirectToSummary);
 
 
-		let fullEquationRowElement = document.querySelector(".full-equation");
+		let equationPart1Element = document.querySelector(".equation_part_1");
+		let equationPart2Element = document.querySelector(".equation_part_2");
 
 		function stylePage () {
 		if (controller.modeChoice2 === "tukst" || controller.modeChoice2 === "dtukst" || controller.modeChoice2 === "iki1000" || controller.modeChoice2 === "iki10000") {
-			document.querySelector("#questionsStyleSheet").setAttribute("href", "questions-smaller.css");
+			linkElement.setAttribute("href", "questions-smaller.css");
 		} 
 		}
 
@@ -135,49 +162,48 @@
     displayEquation();
     
     if (controller.equation !== "Puiku!" && controller.equation !== "Gerai!") {
-        document.querySelector('#answer').style.display = "flex";
-        document.querySelector('.question-submit-button').style.display = "flex";
+			answerInputElement.style.display = "flex";
+			questionsSubmitButtonElement.style.display = "flex";
     } else {
-        document.querySelector('#reset-mistake-buttons').style.display = "flex";
+			resetMistakeButtonsElement.style.display = "flex";
         document.querySelector('.answer-field-div').style.display = "none";
         timerDisplay.textContent = localStorage.getItem("elapsedTime");
     }
-
-    // Event delegation for parentElement
-    let parentElement = document.querySelector('.full-equation');
-    parentElement.addEventListener("input", function (event) {
-        if (event.target.matches('#answer')) {
-            const sanitizedValue = event.target.value.replace(/[^0-9]/g, '');
-            event.target.value = sanitizedValue;
-        }
-    });
-
-    parentElement.addEventListener("keydown", function (event) {
-        if (event.target.matches('#answer') && event.key === "Enter") {
-            if (event.target.value.trim() !== "") {
-                checkAnswer();
-                clearAnswerField();
-            }
-        }
-    });
-
-    // Direct event listener for clicking the button
-    document.querySelector('.question-submit-button').addEventListener("click", function () {
-        if (document.querySelector('#answer').value.trim() !== "") {
-            checkAnswer();
-            clearAnswerField();
-        }
-    });
-
-    // document.getElementById('answer').focus();
+		document.querySelector('#answer').focus();
     stylePage();
 };
 
+let answerInputElement = document.querySelector('#answer');
+		answerInputElement.setAttribute("inputmode", "numeric");
 
+		// Sanitize input field value on input event
+		answerInputElement.addEventListener("input", function (event) {
+			const sanitizedValue = event.target.value.replace(/[^0-9]/g, '');
+			event.target.value = sanitizedValue;
+		});
+
+		// Add event listener to checkAnswer function with condition
+		let questionsSubmitButtonElement = document.querySelector('.question-submit-button')
+		questionsSubmitButtonElement.addEventListener("click", function () {
+			if (answerInputElement.value.trim() !== "") {
+				checkAnswer();
+				clearAnswerField();
+			}
+		});
+
+		// Handle "Enter" key press with condition
+		answerInputElement.addEventListener("keydown", function (event) {
+			if (event.key === "Enter") {
+				if (answerInputElement.value.trim() !== "") {
+					checkAnswer();
+					clearAnswerField();
+				}
+			}
+		});
 
 		function clearAnswerField() {
-			document.querySelector('#answer').value = '';
-			// document.querySelector('#answer').focus();
+			answerInputElement.value = '';
+			answerInputElement.focus();
 		}
 	</script>
 	</script>

@@ -19,6 +19,10 @@ let controller = {
 }
 
 const fireworksDiv = document.querySelector('#fireworks-div');
+let upperLineElement = document.querySelector('.upper-line');
+let previousEquationElement = document.querySelector('.previous-equation');
+let answerTrackerElement = document.querySelector('#answer-tracker');
+let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 
 
 	function formEquation () {
@@ -86,39 +90,40 @@ const fireworksDiv = document.querySelector('#fireworks-div');
   function displayEquation () {
     controller = JSON.parse(localStorage.getItem('controller'));
 
-    fullEquationRowElement.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label><div class="answer-field-div"><div id="answer-field" class="answer-field"><input type="text" id="answer" name="answer" class="form-control text-center answer-input" placeholder="" autocomplete="off"></div></div>'
+    equationPart1Element.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label>'
 
-    document.querySelector('#answer').focus();
-    document.querySelector('#answer').setAttribute("inputmode", "numeric");
+
+
+
 
     if (controller.equation === "Puiku!" || controller.equation === "Gerai!") {
-      document.querySelector('.answer-field-div').style.display = "none";
-      document.querySelector('.question-submit-button').style.display = "none";
-      document.querySelector('#reset-mistake-buttons').style.display = "flex";
+      answerFieldDivElement.style.display = "none";
+      questionsSubmitButtonElement.style.display = "none";
+      resetMistakeButtonsElement.style.display = "flex";
     }
 
 
 
     document.querySelector('.equation').innerHTML = controller.equation;
     if (controller.result[0] === 'Incorrect') {
-      document.querySelector('.upper-line').setAttribute("style", "background-color: #D57E7E")
+      upperLineElement.setAttribute("style", "background-color: #D57E7E")
     } else if (controller.result[0] === 'Correct') {
-      document.querySelector('.upper-line').setAttribute("style", "background-color: #B6C867")
+      upperLineElement.setAttribute("style", "background-color: #B6C867")
     } else {
-      document.querySelector('.upper-line').setAttribute("style", "background-color: #FAEDCD")
+      upperLineElement.setAttribute("style", "background-color: #FAEDCD")
     };
-    document.querySelector('.previous-equation').innerHTML = controller.result[4];
+    previousEquationElement.innerHTML = controller.result[4];
     if (controller.modeChoice4 === 'timer') {
-    document.querySelector('#answer-tracker').innerHTML = `Atsakei: ${controller.correctAnswerTracker}`;
+      answerTrackerElement.innerHTML = `Atsakei: ${controller.correctAnswerTracker}`;
     } else if (controller.modeChoice4 === 'questionNumber') {
-    document.querySelector('#answer-tracker').innerHTML = `Atsakei: ${controller.correctAnswerTracker}/${controller.questionNumber}`;
+      answerTrackerElement.innerHTML = `Atsakei: ${controller.correctAnswerTracker}/${controller.questionNumber}`;
     }
-    document.querySelector('#mistake-tracker').innerHTML = `Suklydai: ${controller.mistakesTracker}`;
-    // document.querySelector('#answer').focus();
+    mistakeTrackerElement.innerHTML = `Suklydai: ${controller.mistakesTracker}`;
+    answerInputElement.focus();
   }
 
   function checkAnswer () {
-    userAnswer = Number(document.querySelector('#answer').value);
+    userAnswer = Number(answerInputElement.value);
     const indexToRemove = controller.combinations.findIndex(
       (item) =>
         item[0] === controller.randomSelection[0] &&
@@ -194,10 +199,10 @@ const fireworksDiv = document.querySelector('#fireworks-div');
     controller.mistakesTracker = 0;
     controller.correctAnswerTracker = 0;
     controller.randomSelection = [];
-    document.querySelector('.answer-field-div').style.display = "flex";
-    document.querySelector('.question-submit-button').style.display = "flex";
-    document.querySelector('#reset-mistake-buttons').style.display = "none";
-    document.querySelector('#answer').style.display = "flex";
+    answerFieldDivElement.style.display = "flex";
+    questionsSubmitButtonElement.style.display = "flex";
+    resetMistakeButtonsElement.style.display = "none";
+    answerInputElement.style.display = "flex";
     if (localStorage.getItem("startTime")) {
       localStorage.removeItem("startTime");
     }
@@ -219,8 +224,8 @@ const fireworksDiv = document.querySelector('#fireworks-div');
     controller.randomSelection = []; 
 
     document.querySelector('.answer-field-div').style.display = "none";
-    document.querySelector('.question-submit-button').style.display = "none";
-    document.querySelector('#reset-mistake-buttons').style.display = "flex";
+    questionsSubmitButtonElement.style.display = "none";
+    resetMistakeButtonsElement.style.display = "flex";
     localStorage.setItem('controller', JSON.stringify(controller))
     clearInterval(timerInterval);
     displayEquation()
