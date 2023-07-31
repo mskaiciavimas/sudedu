@@ -88,47 +88,46 @@ const fireworksDiv = document.querySelector('#fireworks-div');
 
 const scrollYPosition = window.scrollY;
 
-// Create the new elements
-const equationLabel = document.createElement('label');
-equationLabel.className = 'equation text-nowrap';
-equationLabel.setAttribute('for', 'answer-field');
+// Check if the input field with id "answer" already exists
+let answerInput = document.querySelector('#answer');
 
-const answerFieldDiv = document.createElement('div');
-answerFieldDiv.className = 'answer-field-div';
+if (!answerInput) {
+  // If it doesn't exist, create the new input element
+  answerInput = document.createElement('input');
+  answerInput.type = 'text';
+  answerInput.id = 'answer';
+  answerInput.name = 'answer';
+  answerInput.className = 'form-control text-center answer-input';
+  answerInput.placeholder = '';
+  answerInput.setAttribute('autocomplete', 'off');
 
-const answerField = document.createElement('div');
-answerField.id = 'answer-field';
-answerField.className = 'answer-field';
+  // Create and assemble the other elements
+  const equationLabel = document.createElement('label');
+  equationLabel.className = 'equation text-nowrap';
+  equationLabel.setAttribute('for', 'answer-field');
 
-const answerInput = document.createElement('input');
-answerInput.type = 'text';
-answerInput.id = 'answer';
-answerInput.name = 'answer';
-answerInput.className = 'form-control text-center answer-input';
-answerInput.placeholder = '';
-answerInput.setAttribute('autocomplete', 'off');
+  const answerFieldDiv = document.createElement('div');
+  answerFieldDiv.className = 'answer-field-div';
 
-// Assemble the elements
-answerField.appendChild(answerInput);
-answerFieldDiv.appendChild(answerField);
-equationLabel.insertAdjacentHTML('afterend', answerFieldDiv.outerHTML);
+  const answerField = document.createElement('div');
+  answerField.id = 'answer-field';
+  answerField.className = 'answer-field';
 
-// Replace the existing content with the new content
-fullEquationRowElement.replaceChild(equationLabel, fullEquationRowElement.querySelector('.equation'));
+  answerField.appendChild(answerInput);
+  answerFieldDiv.appendChild(answerField);
+  fullEquationRowElement.appendChild(equationLabel);
+  fullEquationRowElement.appendChild(answerFieldDiv);
+}
 
 // Focus on the input field without scrolling to it
-document.querySelector('#answer').focus({ preventScroll: true });
+answerInput.focus({ preventScroll: true });
 
 // After the focus, reset the scroll position to the previously stored value
 window.scrollTo(0, scrollYPosition);
 
 // Set the inputmode and other configurations for the input field
-document.querySelector('#answer').setAttribute('inputmode', 'numeric');
+answerInput.setAttribute('inputmode', 'numeric');
 
-
-
-
-    document.querySelector('#answer').setAttribute("inputmode", "numeric");
 
 
     if (controller.equation === "Puiku!" || controller.equation === "Gerai!") {
