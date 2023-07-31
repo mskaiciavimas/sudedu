@@ -111,8 +111,10 @@ answerInput.setAttribute('autocomplete', 'off');
 // Assemble the elements
 answerField.appendChild(answerInput);
 answerFieldDiv.appendChild(answerField);
-fullEquationRowElement.appendChild(equationLabel);
-fullEquationRowElement.appendChild(answerFieldDiv);
+equationLabel.insertAdjacentHTML('afterend', answerFieldDiv.outerHTML);
+
+// Replace the existing content with the new content
+fullEquationRowElement.replaceChild(equationLabel, fullEquationRowElement.querySelector('.equation'));
 
 // Focus on the input field without scrolling to it
 document.querySelector('#answer').focus({ preventScroll: true });
@@ -122,6 +124,7 @@ window.scrollTo(0, scrollYPosition);
 
 // Set the inputmode and other configurations for the input field
 document.querySelector('#answer').setAttribute('inputmode', 'numeric');
+
 
 
 
