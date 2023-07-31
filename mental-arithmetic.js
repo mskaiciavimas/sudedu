@@ -85,46 +85,15 @@ const fireworksDiv = document.querySelector('#fireworks-div');
 
   function displayEquation () {
     controller = JSON.parse(localStorage.getItem('controller'));
-
-
     const scrollYPosition = window.scrollY;
 
-    // Check if the input field with id "answer" already exists
-    let answerInput = document.querySelector('#answer');
-    const answerFieldDiv = document.createElement('div');
-    fullEquationRowElement.innerHTML = '';
-    
-      // If it doesn't exist, create the new input element
-      answerInput = document.createElement('input');
-      answerInput.type = 'text';
-      answerInput.id = 'answer';
-      answerInput.name = 'answer';
-      answerInput.className = 'form-control text-center answer-input';
-      answerInput.placeholder = '';
-      answerInput.setAttribute('autocomplete', 'off');
-      const answerField = document.createElement('div');
-      answerField.id = 'answer-field';
-      answerField.className = 'answer-field';
-      answerField.appendChild(answerInput);
-      answerFieldDiv.className = 'answer-field-div';
 
-      // Create and assemble the other elements
-      const equationLabel = document.createElement('label');
-      equationLabel.className = 'equation text-nowrap';
-      equationLabel.setAttribute('for', 'answer-field');
+    fullEquationRowElement.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label><div class="answer-field-div"><div id="answer-field" class="answer-field"><input type="text" id="answer" name="answer" class="form-control text-center answer-input" placeholder="" autocomplete="off"></div></div>'
 
-      fullEquationRowElement.appendChild(equationLabel);
-      fullEquationRowElement.appendChild(answerFieldDiv);
-      answerFieldDiv.appendChild(answerField);
-    
-    // Focus on the input field without scrolling to it
-    answerInput.focus();
-    
-    // After the focus, reset the scroll position to the previously stored value
     window.scrollTo(0, scrollYPosition);
-    
-    // Set the inputmode and other configurations for the input field
-    answerInput.setAttribute('inputmode', 'numeric');
+
+    document.querySelector('#answer').focus();
+    document.querySelector('#answer').setAttribute("inputmode", "numeric");
 
 
 
