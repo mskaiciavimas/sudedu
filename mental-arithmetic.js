@@ -92,7 +92,13 @@ const fireworksDiv = document.querySelector('#fireworks-div');
 
     window.scrollTo(0, scrollYPosition);
 
-    document.querySelector('#answer').focus();
+window.scrollTo(0, scrollYPosition);
+
+// Delay setting the focus on the input element
+setTimeout(() => {
+  document.querySelector('#answer').focus();
+}, 100); 
+	  
     document.querySelector('#answer').setAttribute("inputmode", "numeric");
 
 
