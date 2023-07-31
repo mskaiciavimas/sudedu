@@ -41,8 +41,9 @@
 				<p class="previous-equation">
 			</div>
 			<div class="row middle-line">
-				<div class="row full-equation-row">
-
+				<div class="row">
+					<div class="col12 d-flex justify-content-center align-items-center full-equation">
+					</div>
 				</div>
 
 				<div class="row">
@@ -108,7 +109,7 @@
 		document.querySelector('.stop-button').addEventListener("click", stopEquations)
 
 
-		let fullEquationRowElement = document.querySelector(".full-equation-row");
+		let fullEquationRowElement = document.querySelector(".full-equation");
 
 		function stylePage () {
 		if (controller.modeChoice2 === "tukst" || controller.modeChoice2 === "dtukst" || controller.modeChoice2 === "iki1000" || controller.modeChoice2 === "iki10000") {
@@ -143,7 +144,7 @@
     }
 
     // Event delegation for parentElement
-    let parentElement = document.querySelector('.full-equation-row');
+    let parentElement = document.querySelector('.full-equation');
     parentElement.addEventListener("input", function (event) {
         if (event.target.matches('#answer')) {
             const sanitizedValue = event.target.value.replace(/[^0-9]/g, '');

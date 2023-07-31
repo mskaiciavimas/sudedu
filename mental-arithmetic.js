@@ -87,7 +87,7 @@ const fireworksDiv = document.querySelector('#fireworks-div');
     controller = JSON.parse(localStorage.getItem('controller'));
 
 
-    fullEquationRowElement.innerHTML = '<div class="col12 d-flex justify-content-center align-items-center"><label class="equation text-nowrap" for="answer-field"></label><div class="answer-field-div"><div id="answer-field" class="answer-field"><input type="text" id="answer" name="answer" class="form-control text-center answer-input" placeholder="" autofocus autocomplete="off"></div></div></div>'
+    fullEquationRowElement.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label><div class="answer-field-div"><div id="answer-field" class="answer-field"><input type="text" id="answer" name="answer" class="form-control text-center answer-input" placeholder="" autofocus autocomplete="off"></div></div>'
 
     document.querySelector('#answer').setAttribute("inputmode", "numeric");
 
