@@ -87,41 +87,39 @@ const fireworksDiv = document.querySelector('#fireworks-div');
     controller = JSON.parse(localStorage.getItem('controller'));
 
 // Check if the input field with id "answer" already exists
-let answerInput = document.querySelector('#answer');
+    let answerInput = document.querySelector('#answer');
+    const answerFieldDiv = document.createElement('div');
+    fullEquationRowElement.innerHTML = '';
+    
+      // If it doesn't exist, create the new input element
+      answerInput = document.createElement('input');
+      answerInput.type = 'text';
+      answerInput.id = 'answer';
+      answerInput.name = 'answer';
+      answerInput.className = 'form-control text-center answer-input';
+      answerInput.placeholder = '';
+      answerInput.setAttribute('autocomplete', 'off');
+      const answerField = document.createElement('div');
+      answerField.id = 'answer-field';
+      answerField.className = 'answer-field';
+      answerField.appendChild(answerInput);
+      answerFieldDiv.className = 'answer-field-div';
 
-if (!answerInput) {
-  // If it doesn't exist, create the new input element
-  answerInput = document.createElement('input');
-  answerInput.type = 'text';
-  answerInput.id = 'answer';
-  answerInput.name = 'answer';
-  answerInput.className = 'form-control text-center answer-input';
-  answerInput.placeholder = '';
-  answerInput.setAttribute('autocomplete', 'off');
+      // Create and assemble the other elements
+      const equationLabel = document.createElement('label');
+      equationLabel.className = 'equation text-nowrap';
+      equationLabel.setAttribute('for', 'answer-field');
 
-  // Create and assemble the other elements
-  const equationLabel = document.createElement('label');
-  equationLabel.className = 'equation text-nowrap';
-  equationLabel.setAttribute('for', 'answer-field');
+      fullEquationRowElement.appendChild(equationLabel);
+      fullEquationRowElement.appendChild(answerFieldDiv);
+      answerFieldDiv.appendChild(answerField);
+    
+    // Focus on the input field without scrolling to it
+    answerInput.focus();
 
-  const answerFieldDiv = document.createElement('div');
-  answerFieldDiv.className = 'answer-field-div';
-
-  const answerField = document.createElement('div');
-  answerField.id = 'answer-field';
-  answerField.className = 'answer-field';
-
-  answerField.appendChild(answerInput);
-  answerFieldDiv.appendChild(answerField);
-  fullEquationRowElement.appendChild(equationLabel);
-  fullEquationRowElement.appendChild(answerFieldDiv);
-}
-
-// Focus on the input field without scrolling to it
-answerInput.focus();
-
-// Set the inputmode and other configurations for the input field
-answerInput.setAttribute('inputmode', 'numeric');
+    
+    // Set the inputmode and other configurations for the input field
+    answerInput.setAttribute('inputmode', 'numeric');
 
 
 
