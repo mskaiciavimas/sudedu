@@ -115,7 +115,7 @@ const fireworksDiv = document.querySelector('#fireworks-div');
     document.querySelector('#answer-tracker').innerHTML = `Atsakei: ${controller.correctAnswerTracker}/${controller.questionNumber}`;
     }
     document.querySelector('#mistake-tracker').innerHTML = `Suklydai: ${controller.mistakesTracker}`;
-    document.querySelector('#answer').focus();
+    // document.querySelector('#answer').focus();
   }
 
   function checkAnswer () {
