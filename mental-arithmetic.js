@@ -14,6 +14,7 @@ let controller = {
 	randomSelection: [],
 	combinations: [],
 	equation: '',
+  equation2: '',
   result: ['', '', '', '', ''],
 	correctAnswerTracker: 0,
 }
@@ -53,9 +54,11 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     }
   
     function formatEquation () { 
+    console.log(controller.result)
     if (controller.result[0] === "Correct" && controller.result[1] === controller.randomSelection[0] && controller.result[2] === controller.randomSelection[1] || controller.randomSelection.length === 0) {
 		controller.randomSelection = controller.combinations[Math.floor(Math.random() * controller.combinations.length)];
     };
+    if (controller.modeChoice5 === "skaitiniai") {
 		if (controller.randomSelection[2] === 'addition') {
 			controller.equation = `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = `;
 		} else if (controller.randomSelection[2] === 'subtraction') {
@@ -65,6 +68,37 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 		} else if (controller.randomSelection[2] === 'division') {
 			controller.equation = `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = `;
     } 
+    } else if (controller.modeChoice5 === "nezinomieji") {
+      if (controller.randomSelection[2] === 'addition') {
+
+        if (controller.randomSelection[3]) {
+          if (controller.randomSelection[3] === 'first') {
+            controller.equation = ``;
+            controller.equation2 = ` + ${controller.randomSelection[0]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`
+          } else if (controller.randomSelection[3] === 'second') {
+            controller.equation = `${controller.randomSelection[0]} + `;
+            controller.equation2 = `= ${controller.randomSelection[0] + controller.randomSelection[1]}`
+          }
+        } else {
+          const randomNum = Math.random();
+          if (randomNum < 0.5) {
+          controller.randomSelection.push("first");
+          controller.equation = ``;
+          controller.equation2 = ` + ${controller.randomSelection[0]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`;
+        } else {
+          controller.randomSelection.push("second");
+          controller.equation = `${controller.randomSelection[0]} + `;
+          controller.equation2 = `= ${controller.randomSelection[0] + controller.randomSelection[1]}`;
+        }
+        }
+      }
+      } else if (controller.randomSelection[2] === 'subtraction') {
+        controller.equation = `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = `;
+      } else if (controller.randomSelection[2] === 'multiplication') {
+        controller.equation = `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = `;
+      } else if (controller.randomSelection[2] === 'division') {
+        controller.equation = `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = `;
+    }
     } 
 
     function formatFinalMessage () {
@@ -78,6 +112,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     localStorage.setItem('controller', JSON.stringify(controller))
 }
 
+
   function triggerFireworks () {
     fireworksDiv.innerHTML = '<img src="images/fireworks.gif" style="width: 500px; height: auto;" id="fireworks">';
     setTimeout(disableFireworks, 4500);
@@ -89,16 +124,17 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 
   function displayEquation () {
     controller = JSON.parse(localStorage.getItem('controller'));
-    console.log(controller.modeChoice5)
 
     if (controller.modeChoice5 === 'skaitiniai') {
+      controller.equation2 = '';
       equationPart1Element.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label>'
+      equationPart2Element.innerHTML = '<label class="equation_2 text-nowrap" for="answer-field"></label>'
     } else if (controller.modeChoice5 === 'nezinomieji') {
-      equationPart2Element.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label>'
+      if (controller.modeChoice6 ==='demuo') {
+      equationPart1Element.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label>'
+      equationPart2Element.innerHTML = '<label class="equation_2 text-nowrap" for="answer-field"></label>'
+      }
     }
-
-
-
 
 
     if (controller.equation === "Puiku!" || controller.equation === "Gerai!") {
@@ -110,6 +146,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 
 
     document.querySelector('.equation').innerHTML = controller.equation;
+    document.querySelector('.equation_2').innerHTML = controller.equation2;
     if (controller.result[0] === 'Incorrect') {
       upperLineElement.setAttribute("style", "background-color: #D57E7E")
     } else if (controller.result[0] === 'Correct') {
@@ -135,6 +172,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
         item[1] === controller.randomSelection[1] &&
         item[2] === controller.randomSelection[2]
     );
+    if (controller.modeChoice5 === "skaitiniai") {
     if (controller.randomSelection[2] === 'addition') {
       if (userAnswer === controller.randomSelection[0] + controller.randomSelection[1]) {
         controller.combinations.splice(indexToRemove, 1);
@@ -176,6 +214,28 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
           recordMistakes(); 
         }
       }
+    } else if (controller.modeChoice5 === "nezinomieji") {
+      if (controller.randomSelection[2] === 'addition') {
+        if (userAnswer + controller.randomSelection[0] === controller.randomSelection[0] + controller.randomSelection[1]) {
+          controller.correctAnswerTracker++;
+          console.log(controller.randomSelection)
+          if (controller.randomSelection[3] === "first") {
+          controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+ first", `${userAnswer} + ${controller.randomSelection[0]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
+          } else if (controller.randomSelection[3] === "second") {
+            controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+ second", `${controller.randomSelection[0]} + ${userAnswer} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
+          }
+          controller.combinations.splice(indexToRemove, 1);
+        } else {
+          if (controller.randomSelection[3] === "first") {
+          controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+ first", `${userAnswer} + ${controller.randomSelection[0]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`];
+        } else if (controller.randomSelection[3] === "second") {
+          controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+ second", `${controller.randomSelection[0]} + ${userAnswer} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
+        }
+          controller.mistakesTracker++;
+          recordMistakes(); 
+      } 
+    }
+  }
       
 
         function recordMistakes () {
@@ -201,6 +261,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     }
     controller.result = ['', '', '', '', ''];
     controller.equation = '';
+    controller.equation2 = '';
     controller.mistakesTracker = 0;
     controller.correctAnswerTracker = 0;
     controller.randomSelection = [];
