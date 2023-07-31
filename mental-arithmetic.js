@@ -86,7 +86,10 @@ const fireworksDiv = document.querySelector('#fireworks-div');
   function displayEquation () {
     controller = JSON.parse(localStorage.getItem('controller'));
 
-// Check if the input field with id "answer" already exists
+
+    const scrollYPosition = window.scrollY;
+
+    // Check if the input field with id "answer" already exists
     let answerInput = document.querySelector('#answer');
     const answerFieldDiv = document.createElement('div');
     fullEquationRowElement.innerHTML = '';
@@ -116,7 +119,9 @@ const fireworksDiv = document.querySelector('#fireworks-div');
     
     // Focus on the input field without scrolling to it
     answerInput.focus();
-
+    
+    // After the focus, reset the scroll position to the previously stored value
+    window.scrollTo(0, scrollYPosition);
     
     // Set the inputmode and other configurations for the input field
     answerInput.setAttribute('inputmode', 'numeric');
