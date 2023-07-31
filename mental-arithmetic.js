@@ -86,22 +86,9 @@ const fireworksDiv = document.querySelector('#fireworks-div');
   function displayEquation () {
     controller = JSON.parse(localStorage.getItem('controller'));
 
-fullEquationRowElement.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label><div class="answer-field-div"><div id="answer-field" class="answer-field"><input type="text" id="answer" name="answer" class="form-control text-center answer-input" placeholder="" autocomplete="off"></div></div>'
+    fullEquationRowElement.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label><div class="answer-field-div"><div id="answer-field" class="answer-field"><input type="text" id="answer" name="answer" class="form-control text-center answer-input" placeholder="" autocomplete="off"></div></div>'
 
-// Hide the document body to avoid flickering while re-rendering
-document.body.style.visibility = 'hidden';
-
-// Scroll to the desired position
-window.scrollTo(0, scrollYPosition);
-
-// Reveal the document body after a short delay
-setTimeout(() => {
-  document.body.style.visibility = 'visible';
-  
-  // Focus on the input element
-  document.querySelector('#answer').focus();
-}, 100); // Adjust the delay time as needed, 100 milliseconds is just an example.
-	  
+    document.querySelector('#answer').focus();
     document.querySelector('#answer').setAttribute("inputmode", "numeric");
 
     if (controller.equation === "Puiku!" || controller.equation === "Gerai!") {
