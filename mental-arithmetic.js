@@ -97,7 +97,7 @@ window.scrollTo(0, scrollYPosition);
 // Delay setting the focus on the input element
 setTimeout(() => {
   document.querySelector('#answer').focus();
-}, 10); 
+}, 1); 
 	  
     document.querySelector('#answer').setAttribute("inputmode", "numeric");
 
