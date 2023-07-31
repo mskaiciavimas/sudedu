@@ -90,7 +90,11 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
   function displayEquation () {
     controller = JSON.parse(localStorage.getItem('controller'));
 
+    if (controller.modeChoice5 === 'skaitiniai') {
     equationPart1Element.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label>'
+    } else if (controller.modeChoice5 === 'nezinomieji') {
+      equationPart2Element.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label>'
+      }
 
 
 
@@ -205,7 +209,10 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     answerInputElement.style.display = "flex";
     if (localStorage.getItem("startTime")) {
       localStorage.removeItem("startTime");
-    }
+    };
+    if (localStorage.getItem("remainingTime")) {
+      localStorage.removeItem("remainingTime");
+    };
     if (controller.modeChoice4 === 'timer') {
       countDown();
     } else if (controller.modeChoice4 === 'questionNumber') {
@@ -395,24 +402,28 @@ function startTimer() {
   timerInterval = setInterval(updateTimer, 1000);
 }
 
-function countDown () {
+function countDown() {
   const timerLimit = controller.timerLimit * 60;
 
-  let startTime = new Date().getTime() + timerLimit * 1000; // Calculate the end time
-  localStorage.setItem("startTime", startTime);
+  // Check if there is remaining time stored in the memory
+  let remainingTime = parseInt(localStorage.getItem("remainingTime"), 10);
+  
+  // If there is no remaining time, set it to the total time
+  if (!remainingTime) {
+    remainingTime = timerLimit * 1000;
+    localStorage.setItem("remainingTime", remainingTime);
+  }
 
   function updateTimer() {
-    let currentTime = new Date().getTime();
-    let remainingTime = startTime - currentTime;
+    remainingTime -= 1000;
 
     if (remainingTime <= 0) {
       // If the timer has ended, clear the interval and display "00:00:00"
       clearInterval(timerInterval);
       timerDisplay.textContent = "00:00:00";
-      localStorage.setItem('remainingTime', remainingTime);
+      localStorage.removeItem("remainingTime");
       formEquation();
       displayEquation();
-      localStorage.removeItem("startTime");
     } else {
       // Calculate hours, minutes, and seconds from the remaining time
       var hours = Math.floor(remainingTime / 3600000);
@@ -426,11 +437,15 @@ function countDown () {
         minutes.toString().padStart(2, "0") +
         ":" +
         seconds.toString().padStart(2, "0");
-        localStorage.setItem('remainingTime', remainingTime);
+
+      // Store the remaining time in the memory
+      localStorage.setItem("remainingTime", remainingTime);
     }
   }
 
+  // Call updateTimer initially to start the countdown
   updateTimer();
 
+  // Set up the timer interval to call updateTimer every second
   timerInterval = setInterval(updateTimer, 1000);
 }
