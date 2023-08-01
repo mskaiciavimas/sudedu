@@ -28,6 +28,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 
 	function formEquation () {
     let remainingTime = parseInt(localStorage.getItem('remainingTime'));
+    console.log(remainingTime)
     if (controller.modeChoice4 === 'timer') {
       if (controller.combinations.length === 0 && remainingTime > 0 && controller.equation !== 'Puiku!' && controller.equation !== 'Gerai!') {
         generateCombinations()
@@ -649,11 +650,12 @@ function countDown() {
 
     if (remainingTime <= 0) {
       // If the timer has ended, clear the interval and display "00:00:00"
+      localStorage.setItem("remainingTime", remainingTime);
       clearInterval(timerInterval);
       timerDisplay.textContent = "00:00:00";
-      localStorage.removeItem("remainingTime");
       formEquation();
       displayEquation();
+      localStorage.removeItem("remainingTime");
     } else {
       // Calculate hours, minutes, and seconds from the remaining time
       var hours = Math.floor(remainingTime / 3600000);
