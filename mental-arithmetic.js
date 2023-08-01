@@ -54,7 +54,6 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     }
   
     function formatEquation () { 
-    console.log(controller.result)
     if (controller.result[0] === "Correct" && controller.result[1] === controller.randomSelection[0] && controller.result[2] === controller.randomSelection[1] || controller.randomSelection.length === 0) {
 		controller.randomSelection = controller.combinations[Math.floor(Math.random() * controller.combinations.length)];
     };
@@ -74,7 +73,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
         if (controller.randomSelection[3]) {
           if (controller.randomSelection[3] === 'first') {
             controller.equation = ``;
-            controller.equation2 = ` + ${controller.randomSelection[0]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`
+            controller.equation2 = ` + ${controller.randomSelection[1]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`
           } else if (controller.randomSelection[3] === 'second') {
             controller.equation = `${controller.randomSelection[0]} + `;
             controller.equation2 = `= ${controller.randomSelection[0] + controller.randomSelection[1]}`
@@ -84,28 +83,112 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
           if (randomNum < 0.5) {
           controller.randomSelection.push("first");
           controller.equation = ``;
-          controller.equation2 = ` + ${controller.randomSelection[0]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`;
+          controller.equation2 = ` + ${controller.randomSelection[1]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`;
         } else {
           controller.randomSelection.push("second");
           controller.equation = `${controller.randomSelection[0]} + `;
           controller.equation2 = `= ${controller.randomSelection[0] + controller.randomSelection[1]}`;
         }
         }
-      }
       } else if (controller.randomSelection[2] === 'subtraction') {
-        controller.equation = `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = `;
+        
+        if (controller.randomSelection[3]) {
+          if (controller.randomSelection[3] === 'first') {
+            controller.equation = ``;
+            controller.equation2 = ` - ${controller.randomSelection[1]} = ${controller.randomSelection[0] - controller.randomSelection[1]}`
+          } else if (controller.randomSelection[3] === 'second') {
+            controller.equation = `${controller.randomSelection[0]} - `;
+            controller.equation2 = `= ${controller.randomSelection[0] - controller.randomSelection[1]}`
+          }
+        } else {
+          if (controller.modeChoice === 'visi' || controller.modeChoice === 'sudetis ir atimtis') {
+            const randomNum = Math.random();
+            if (randomNum < 0.5) {
+            controller.randomSelection.push("first");
+            controller.equation = ``;
+            controller.equation2 = ` - ${controller.randomSelection[1]} = ${controller.randomSelection[0] - controller.randomSelection[1]}`;
+          } else {
+            controller.randomSelection.push("second");
+            controller.equation = `${controller.randomSelection[0]} - `;
+            controller.equation2 = `= ${controller.randomSelection[0] - controller.randomSelection[1]}`
+          }
+          }
+          if (controller.modeChoice6 === "turinys") {
+            controller.randomSelection.push("first");
+            controller.equation = ``;
+            controller.equation2 = ` - ${controller.randomSelection[1]} = ${controller.randomSelection[0] - controller.randomSelection[1]}`;
+          } else if (controller.modeChoice6 === 'ateminys') {
+            controller.randomSelection.push("second");
+            controller.equation = `${controller.randomSelection[0]} - `;
+            controller.equation2 = `= ${controller.randomSelection[0] - controller.randomSelection[1]}`
+          }
+        }
+
       } else if (controller.randomSelection[2] === 'multiplication') {
-        controller.equation = `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = `;
+        
+        if (controller.randomSelection[3]) {
+          if (controller.randomSelection[3] === 'first') {
+            controller.equation = ``;
+            controller.equation2 = ` \u00D7 ${controller.randomSelection[1]} = ${controller.randomSelection[0] * controller.randomSelection[1]}`
+          } else if (controller.randomSelection[3] === 'second') {
+            controller.equation = `${controller.randomSelection[0]} \u00D7 `;
+            controller.equation2 = `= ${controller.randomSelection[0] * controller.randomSelection[1]}`;
+          }
+        } else {
+          const randomNum = Math.random();
+          if (randomNum < 0.5) {
+          controller.randomSelection.push("first");
+          controller.equation = ``;
+          controller.equation2 = ` \u00D7 ${controller.randomSelection[1]} = ${controller.randomSelection[0] * controller.randomSelection[1]}`
+        } else {
+          controller.randomSelection.push("second");
+          controller.equation = `${controller.randomSelection[0]} \u00D7 `;
+          controller.equation2 = `= ${controller.randomSelection[0] * controller.randomSelection[1]}`;
+        }
+        }
+
       } else if (controller.randomSelection[2] === 'division') {
-        controller.equation = `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = `;
+          if (controller.randomSelection[3]) {
+            if (controller.randomSelection[3] === 'first') {
+              controller.equation = ``;
+              controller.equation2 = ` \uA789 ${controller.randomSelection[1]} = ${controller.randomSelection[0] / controller.randomSelection[1]}`
+            } else if (controller.randomSelection[3] === 'second') {
+              controller.equation = `${controller.randomSelection[0]} \uA789 `;
+              controller.equation2 = `= ${controller.randomSelection[0] / controller.randomSelection[1]}`
+            }
+          } else {
+            if (controller.modeChoice === 'visi' || controller.modeChoice === 'daugyba ir dalyba') {
+              const randomNum = Math.random();
+              if (randomNum < 0.5) {
+              controller.randomSelection.push("first");
+              controller.equation = ``;
+              controller.equation2 = ` \uA789 ${controller.randomSelection[1]} = ${controller.randomSelection[0] / controller.randomSelection[1]}`
+            } else {
+              controller.randomSelection.push("second");
+              controller.equation = `${controller.randomSelection[0]} \uA789 `;
+              controller.equation2 = `= ${controller.randomSelection[0] / controller.randomSelection[1]}`
+            }
+            }
+            if (controller.modeChoice6 === "dalinys") {
+              controller.randomSelection.push("first");
+              controller.equation = ``;
+              controller.equation2 = ` \uA789 ${controller.randomSelection[1]} = ${controller.randomSelection[0] / controller.randomSelection[1]}`
+            } else if (controller.modeChoice6 === 'daliklis') {
+              controller.randomSelection.push("second");
+              controller.equation = `${controller.randomSelection[0]} \uA789 `;
+              controller.equation2 = `= ${controller.randomSelection[0] / controller.randomSelection[1]}`
+            }
+          }
     }
-    } 
+  }
+}
 
     function formatFinalMessage () {
       if (controller.equation !== 'Puiku!' && controller.mistakesTracker === 0 && controller.correctAnswerTracker > 0 ) {
         triggerFireworks();
       }
       controller.equation = 'Puiku!';
+      controller.equation2 = '';
       controller.result = ['', '', '', '', ''];
       clearInterval(timerInterval);
     }
@@ -125,28 +208,20 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
   function displayEquation () {
     controller = JSON.parse(localStorage.getItem('controller'));
 
-    if (controller.modeChoice5 === 'skaitiniai') {
-      controller.equation2 = '';
-      equationPart1Element.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label>'
-      equationPart2Element.innerHTML = '<label class="equation_2 text-nowrap" for="answer-field"></label>'
-    } else if (controller.modeChoice5 === 'nezinomieji') {
-      if (controller.modeChoice6 ==='demuo') {
-      equationPart1Element.innerHTML = '<label class="equation text-nowrap" for="answer-field"></label>'
-      equationPart2Element.innerHTML = '<label class="equation_2 text-nowrap" for="answer-field"></label>'
-      }
-    }
-
-
     if (controller.equation === "Puiku!" || controller.equation === "Gerai!") {
       answerFieldDivElement.style.display = "none";
       questionsSubmitButtonElement.style.display = "none";
       resetMistakeButtonsElement.style.display = "flex";
     }
 
+    if (controller.modeChoice5 === 'skaitiniai') {
+    equationElement.innerHTML = controller.equation;
+    equation2Element.innerHTML = '';
+    } else if (controller.modeChoice5 === 'nezinomieji') {
+      equationElement.innerHTML = controller.equation;
+      equation2Element.innerHTML = controller.equation2;
+    };
 
-
-    document.querySelector('.equation').innerHTML = controller.equation;
-    document.querySelector('.equation_2').innerHTML = controller.equation2;
     if (controller.result[0] === 'Incorrect') {
       upperLineElement.setAttribute("style", "background-color: #D57E7E")
     } else if (controller.result[0] === 'Correct') {
@@ -216,26 +291,95 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
       }
     } else if (controller.modeChoice5 === "nezinomieji") {
       if (controller.randomSelection[2] === 'addition') {
-        if (userAnswer + controller.randomSelection[0] === controller.randomSelection[0] + controller.randomSelection[1]) {
-          controller.correctAnswerTracker++;
-          console.log(controller.randomSelection)
-          if (controller.randomSelection[3] === "first") {
-          controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+ first", `${userAnswer} + ${controller.randomSelection[0]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
-          } else if (controller.randomSelection[3] === "second") {
-            controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+ second", `${controller.randomSelection[0]} + ${userAnswer} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
+        if (controller.randomSelection[3] === "first") {
+          if (userAnswer === controller.randomSelection[0]) {
+            controller.correctAnswerTracker++;
+            controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+ first", `${userAnswer} + ${controller.randomSelection[1]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
+            controller.combinations.splice(indexToRemove, 1);
+          } else {
+            controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+ first", `${userAnswer} + ${controller.randomSelection[1]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`];
+            controller.mistakesTracker++;
+            recordMistakes(); 
           }
+        } else if (controller.randomSelection[3] === "second") {
+          if (userAnswer === controller.randomSelection[1]) {
+            controller.correctAnswerTracker++;
+            controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+ second", `${controller.randomSelection[0]} + ${userAnswer} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
+            controller.combinations.splice(indexToRemove, 1);
+          } else {
+            controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+ second", `${controller.randomSelection[0]} + ${userAnswer} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
+            controller.mistakesTracker++;
+            recordMistakes(); 
+          }
+        }
+    } else if (controller.randomSelection[2] === 'subtraction') {
+      if (controller.randomSelection[3] === "first") {
+        if (userAnswer === controller.randomSelection[0]) {
+          controller.correctAnswerTracker++;
+          controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "- first", `${userAnswer} - ${controller.randomSelection[1]} = ${controller.randomSelection[0] - controller.randomSelection[1]}`]; 
           controller.combinations.splice(indexToRemove, 1);
         } else {
-          if (controller.randomSelection[3] === "first") {
-          controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+ first", `${userAnswer} + ${controller.randomSelection[0]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`];
-        } else if (controller.randomSelection[3] === "second") {
-          controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+ second", `${controller.randomSelection[0]} + ${userAnswer} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
-        }
+          controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "- first", `${userAnswer} - ${controller.randomSelection[1]} = ${controller.randomSelection[0] - controller.randomSelection[1]}`]; 
           controller.mistakesTracker++;
           recordMistakes(); 
-      } 
+        }
+      } else if (controller.randomSelection[3] === "second") {
+        if (userAnswer === controller.randomSelection[1]) {
+          controller.correctAnswerTracker++;
+          controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "- second", `${controller.randomSelection[0]} - ${userAnswer} = ${controller.randomSelection[0] - controller.randomSelection[1]}`]; 
+          controller.combinations.splice(indexToRemove, 1);
+        } else {
+          controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "- second", `${controller.randomSelection[0]} - ${userAnswer} = ${controller.randomSelection[0] - controller.randomSelection[1]}`];  
+          controller.mistakesTracker++;
+          recordMistakes(); 
+        }
+      }
+    } else if (controller.randomSelection[2] === 'multiplication') {
+      if (controller.randomSelection[3] === "first") {
+        if (userAnswer === controller.randomSelection[0]) {
+          controller.correctAnswerTracker++;
+          controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7 first", `${userAnswer} \u00D7 ${controller.randomSelection[1]} = ${controller.randomSelection[0] * controller.randomSelection[1]}`]; 
+          controller.combinations.splice(indexToRemove, 1);
+        } else {
+          controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7 first", `${userAnswer} \u00D7 ${controller.randomSelection[1]} = ${controller.randomSelection[0] * controller.randomSelection[1]}`]; 
+          controller.mistakesTracker++;
+          recordMistakes(); 
+        }
+      } else if (controller.randomSelection[3] === "second") {
+        if (userAnswer === controller.randomSelection[1]) {
+          controller.correctAnswerTracker++;
+          controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7 first", `${controller.randomSelection[0]} \u00D7 ${userAnswer} = ${controller.randomSelection[0] * controller.randomSelection[1]}`]; 
+          controller.combinations.splice(indexToRemove, 1);
+        } else {
+          controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7 first", `${controller.randomSelection[0]} \u00D7 ${userAnswer} = ${controller.randomSelection[0] * controller.randomSelection[1]}`];  
+          controller.mistakesTracker++;
+          recordMistakes(); 
+        }
+      }
+  } else if (controller.randomSelection[2] === 'division') {
+    if (controller.randomSelection[3] === "first") {
+      if (userAnswer === controller.randomSelection[0]) {
+        controller.correctAnswerTracker++;
+        controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${userAnswer} \uA789 ${controller.randomSelection[1]} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
+        controller.combinations.splice(indexToRemove, 1);
+      } else {
+        controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${userAnswer} \uA789 ${controller.randomSelection[1]} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
+        controller.mistakesTracker++;
+        recordMistakes(); 
+      }
+    } else if (controller.randomSelection[3] === "second") {
+      if (userAnswer === parseInt(controller.randomSelection[1])) {
+        controller.correctAnswerTracker++;
+        controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${controller.randomSelection[0]} \uA789 ${userAnswer} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
+        controller.combinations.splice(indexToRemove, 1);
+      } else {
+        controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${controller.randomSelection[0]} \uA789 ${userAnswer} = ${controller.randomSelection[0] / controller.randomSelection[1]}`];  
+        controller.mistakesTracker++;
+        recordMistakes(); 
+      }
     }
   }
+}
       
 
         function recordMistakes () {
@@ -288,6 +432,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
   function stopEquations () {
     if (controller.equation !== 'Puiku!') {
     controller.equation = 'Gerai!';
+    controller.equation2 = '';
     controller.result = ['', '', '', '', ''];
     controller.combinations = [];
     controller.randomSelection = []; 
@@ -353,14 +498,37 @@ function generateSummaryTable(type) {
         } else if (mistake[2] === "division") {
           action = '\uA789';
         }
+
+        function parseOperator(operatorString) {
+          const operatorMap = {
+            "+": "+",
+            "-": "-",
+            "\u00D7": "*",
+            "\uA789": "/",
+          };
+        
+          return operatorMap[operatorString] || null;
+        }
         
       
+        let firstAsIs = '';
+        let swappedOrder = '';
         // If action is "/" or "*", create both order variations for first_number and second_number
-        const firstAsIs = `${first_number} ${action} ${second_number}`;
-        const swappedOrder = `${second_number} ${action} ${first_number}`;
+        if (mistake[3]) {
+          if (mistake[3] === "first") {
+              result = eval(`${first_number} ${parseOperator(action)} ${second_number}`);
+              firstAsIs = `&#x25fb ${action}  ${second_number} = ${result}`;
+          } else if (mistake[3] === "second") {
+            result = eval(`${first_number} ${parseOperator(action)} ${second_number}`);
+            firstAsIs = `${first_number} ${action} &#x25fb = ${result}`;
+          }
+        } else {
+        firstAsIs = `${first_number} ${action} ${second_number} = &#x25fb`;
+        swappedOrder = `${second_number} ${action} ${first_number} = &#x25fb`;
+        }
       
         // Check if the action is "/" or "*" and update the accumulator accordingly
-        if (action === "\uA789" || action === "\u00D7") {
+        if ((action === "\uA789" || action === "\u00D7") && (!mistake[3])) {
           if (acc[firstAsIs]) {
             acc[firstAsIs] += 1;
           } else if (acc[swappedOrder]) {
@@ -370,7 +538,7 @@ function generateSummaryTable(type) {
           }
         } else {
           // For other actions, follow the previous behavior
-          const veiksmas = `${first_number} ${action} ${second_number}`;
+          const veiksmas = `${firstAsIs}`;
           acc[veiksmas] = (acc[veiksmas] || 0) + 1;
         }
       

@@ -34,13 +34,6 @@
 				<div class="row">
 					<div class="d-flex flex-column align-items-center">
 						<label class="mode-choice-label" for="mode_choice">PRAKTIKUOTIS</label>
-						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
-							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_5"
-								id="mode_choice_5">
-								<option value="skaitiniai">SKAITINIS REIŠKINYS</option>
-								<option value="nezinomieji">LYGTYS SU NEŽINOMAISIAIS</option>
-							</select>
-						</div>
 						<div class="row">
 							<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
 						</div>
@@ -54,15 +47,6 @@
 								<option value="dalyba">DALYB&#x104;</option>
 								<option value="daugyba ir dalyba">DAUGYB&#x104; IR DALYB&#x104;</option>
 								<option value="visi">VISUS</option>
-							</select>
-						</div>
-						<div class="row">
-							<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
-						</div>
-						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
-							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_6"
-								id="mode_choice_6">
-								<option value="demuo">NEŽINOMAS DĖMUO</option>
 							</select>
 						</div>
 						<div class="row">
@@ -130,6 +114,20 @@
 								</select>
 							</div>
 						</div>
+						<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
+						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
+							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_5"
+								id="mode_choice_5">
+								<option value="skaitiniai">SKAITINIS REIŠKINYS</option>
+								<option value="nezinomieji">LYGTYS SU NEŽINOMAISIAIS</option>
+							</select>
+						</div>
+						<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
+						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
+							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_6"
+								id="mode_choice_6" style="display: none;">
+							</select>
+						</div>
 						<div class="row">
 							<div class="col-sm-12 empty-placeholder-before-submit"></div>
 						</div>
@@ -169,8 +167,13 @@
 		let modeChoice5Element = document.querySelector('#mode_choice_5');
 		let modeChoice6Element = document.querySelector('#mode_choice_6');
 
-		modeChoiceElement.addEventListener('change', function () {
-			function toggleVisibility(element, isVisible) {
+
+			function handleModeChoiceChange() {
+				let modeChoiceSelection = modeChoiceElement.value;
+				let modeChoice2Selection = modeChoice2Element.value;
+				let modeChoice5Selection = modeChoice5Element.value;
+
+				function toggleVisibility(element, isVisible) {
 				if (isVisible) {
 					element.style.display = 'block';
 				} else {
@@ -178,9 +181,6 @@
 				}
 			}
 
-			function handleModeChoiceChange() {
-				let modeChoiceSelection = modeChoiceElement.value;
-				let modeChoice2Selection = modeChoice2Element.value;
 				if (
 					(modeChoiceSelection === 'daugyba' && (modeChoice2Selection !== 'pil10' && modeChoice2Selection !== 'pil100')) || (modeChoiceSelection === 'dalyba' && (modeChoice2Selection !== 'pil10' && modeChoice2Selection !== 'pil100')) || (modeChoiceSelection === 'daugyba ir dalyba' && (modeChoice2Selection !== 'pil10' && modeChoice2Selection !== 'pil100'))) {
 					toggleVisibility(numberLabel, true);
@@ -209,17 +209,25 @@
 					toggleVisibility(modeChoice3Element, false);
 					toggleVisibility(emptySpaceholder, false);
 				}
+				if (modeChoice5Selection === 'skaitiniai') {
+					toggleVisibility(modeChoice6Element, false)
+				} else if (modeChoice5Selection === 'nezinomieji')
+				 if (modeChoiceSelection !== 'sudetis' && modeChoiceSelection !== 'sudetis ir atimtis' && modeChoiceSelection !== 'daugyba' && modeChoiceSelection !== 'daugyba ir dalyba' && modeChoiceSelection !== 'visi') {
+					toggleVisibility(modeChoice6Element, true)
+				} else {
+					toggleVisibility(modeChoice6Element, false)
+				}
 			}
 			modeChoiceElement.addEventListener('change', handleModeChoiceChange);
 			modeChoice2Element.addEventListener('change', handleModeChoiceChange);
-			handleModeChoiceChange();
-		});
+			modeChoice5Element.addEventListener('change', handleModeChoiceChange);
 
 		function updateModeChoice2() {
 			let modeChoiceSelection = modeChoiceElement.value;
 			let modeChoice2Selection = modeChoice2Element.value;
 
 			modeChoice2Element.innerHTML = "";
+			modeChoice6Element.innerHTML = "";
 
 			if (modeChoiceSelection === "sudetis") {
 				modeChoice2Element.innerHTML += '<option value="viena10">VIENAŽENKLIŲ SKAIČIŲ IKI 10</option>';
@@ -237,6 +245,8 @@
 				modeChoice2Element.innerHTML += '<option value="dvi">DVIŽENKLIŲ SKAIČIŲ IKI 100</option>';
 				modeChoice2Element.innerHTML += '<option value="tukst">SKAIČIŲ IKI 1000</option>';
 				modeChoice2Element.innerHTML += '<option value="dtukst">SKAIČIŲ IKI 10000</option>';
+				modeChoice6Element.innerHTML += '<option value="turinys">NEŽINOMAS TURINYS</option>';
+				modeChoice6Element.innerHTML += '<option value="ateminys">NEŽINOMAS ATĖMINYS</option>';
 
 			} else if (modeChoiceSelection === "sudetis ir atimtis") {
 				modeChoice2Element.innerHTML += '<option value="viena10">VIENAŽENKLIŲ SKAIČIŲ IKI 10</option>';
@@ -251,6 +261,8 @@
 				modeChoice2Element.innerHTML += '<option value="dauglent">DAUGYBOS LENTELĖ</option>';
 				modeChoice2Element.innerHTML += '<option value="pil10">IŠ PILNŲ DEŠIMČIŲ</option>';
 				modeChoice2Element.innerHTML += '<option value="pil100">IŠ PILNŲ ŠIMTŲ</option>';
+				modeChoice6Element.innerHTML += '<option value="dalinys">NEŽINOMAS DALINYS</option>';
+				modeChoice6Element.innerHTML += '<option value="daliklis">NEŽINOMAS DALIKLIS</option>';
 
 			} else if (modeChoiceSelection === "visi") {
 				modeChoice2Element.innerHTML += '<option value="iki10">IKI 10</option>';
@@ -363,8 +375,6 @@
 
 			localStorage.setItem('controller', JSON.stringify(controller))
 			redirectToIntermediate()
-
-
 		}
 
 		let submitButtonElement = document.querySelector('.submit-button');

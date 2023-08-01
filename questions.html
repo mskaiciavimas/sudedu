@@ -40,18 +40,17 @@
 			<div class="col-6 upper-line d-flex justify-content-center align-items-center">
 				<p class="previous-equation">
 			</div>
-			<div class="row middle-line">
+			<div class="row middle-line d-flex align-items-center justify-content-center">
 				<div class="row">
 					<div class="col12 d-flex justify-content-center align-items-center">
-						<div class="equation_part_1">
-					</div>
+							<label class="equation text-nowrap" for="answer-field"></label>
 						<div class="answer-field-div">
 							<div id="answer-field" class="answer-field">
 								<input type="text" id="answer" name="answer" class="form-control text-center answer-input"
 									placeholder="" autofocus autocomplete="off" style="display: none;">
 							</div>
 						</div>
-						<div class="equation_part_2"></div>
+							<label class="equation_2 text-nowrap" for="answer-field"></label>
 					</div>
 				</div>
 
@@ -133,8 +132,8 @@
 		mistakesButtonElement.addEventListener("click", redirectToSummary);
 
 
-		let equationPart1Element = document.querySelector(".equation_part_1");
-		let equationPart2Element = document.querySelector(".equation_part_2");
+		let equationElement = document.querySelector(".equation");
+		let equation2Element = document.querySelector(".equation_2");
 
 		function stylePage () {
 		if (controller.modeChoice2 === "tukst" || controller.modeChoice2 === "dtukst" || controller.modeChoice2 === "iki1000" || controller.modeChoice2 === "iki10000") {
