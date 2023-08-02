@@ -28,7 +28,6 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 
 	function formEquation () {
     let remainingTime = parseInt(localStorage.getItem('remainingTime'));
-    console.log(remainingTime)
     if (controller.modeChoice4 === 'timer') {
       if (controller.combinations.length === 0 && remainingTime > 0 && controller.equation !== 'Puiku!' && controller.equation !== 'Gerai!') {
         generateCombinations()
