@@ -273,7 +273,13 @@
       equationAnswerDivElement.style.display = "none";
 		});
 
-		startQuestionsTimerButtonElement.addEventListener('click', function(event) {
+		startQuestionsTimerButtonElement.addEventListener('click', startQuestionsTimer)
+    timerInputElement.addEventListener("keydown", function (event) {
+			if (event.key === "Enter") {
+        startQuestionsTimer()
+      }});
+    
+      function startQuestionsTimer () {
 			controller = JSON.parse(localStorage.getItem('controller'));
 			controller.timerLimit = parseInt(timerInputElement.value);
       if (!controller.timerLimit) {
@@ -295,9 +301,15 @@
 			localStorage.setItem('controller', JSON.stringify(controller));
       redirectToQuestions();
 
-		});
+		};
 
-		startQuestionsNumberButtonElement.addEventListener('click', function(event) {
+		startQuestionsNumberButtonElement.addEventListener('click', startQuestionsNumber)
+    questionNumberInputElement.addEventListener("keydown", function (event) {
+			if (event.key === "Enter") {
+        startQuestionsNumber()
+      }});
+    
+      function startQuestionsNumber () {
 			controller = JSON.parse(localStorage.getItem('controller'));
 			controller.questionNumber = parseInt(questionNumberInputElement.value);
       if (!controller.questionNumber) {
@@ -321,7 +333,7 @@
 			localStorage.setItem('controller', JSON.stringify(controller));
       redirectToQuestions();
 
-		})
+		}
 
 		function stylePage () {
 		if (controller.modeChoice2 === "tukst" || controller.modeChoice2 === "dtukst" || controller.modeChoice2 === "iki1000" || controller.modeChoice2 === "iki10000") {

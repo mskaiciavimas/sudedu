@@ -191,10 +191,15 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
       const computedFontSizeInPx = getComputedStyle(equationElement).fontSize;
       const rootFontSizeInPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
       const computedFontSizeInRem = parseFloat(computedFontSizeInPx) / rootFontSizeInPx;
-      const newFontSizeInRem = computedFontSizeInRem - 1;
+      let newFontSizeInRem = computedFontSizeInRem - 1;
+      if (newFontSizeInRem < 2) {
+        newFontSizeInRem = 2;
+      }
       equationElement.style.fontSize = newFontSizeInRem + 'rem';
-      equationElement.style.paddingTop = '1rem';
-      equationElement.style.paddingBottom = '14px';
+      if (newFontSizeInRem > 2) {
+        equationElement.style.paddingTop = '1rem';
+        equationElement.style.paddingBottom = '14px';
+      }
       if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.95) {
         controller.equation = 'Puikiai skaičiuoji!';
       } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.7) {
@@ -457,10 +462,15 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
       const computedFontSizeInPx = getComputedStyle(equationElement).fontSize;
       const rootFontSizeInPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
       const computedFontSizeInRem = parseFloat(computedFontSizeInPx) / rootFontSizeInPx;
-      const newFontSizeInRem = computedFontSizeInRem - 1;
+      let newFontSizeInRem = computedFontSizeInRem - 1;
+      if (newFontSizeInRem < 2) {
+        newFontSizeInRem = 2;
+      }
       equationElement.style.fontSize = newFontSizeInRem + 'rem';
-      equationElement.style.paddingTop = '1rem';
-      equationElement.style.paddingBottom = '14px';
+      if (newFontSizeInRem > 2) {
+        equationElement.style.paddingTop = '1rem';
+        equationElement.style.paddingBottom = '14px';
+      }
       if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.95) {
         controller.equation = 'Puikiai skaičiuoji!';
       } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.7) {
