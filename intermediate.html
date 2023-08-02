@@ -290,6 +290,7 @@
       controller.equation2 = '';
       controller.randomSelection = [];
       controller.correctAnswerTracker = 0;
+      controller.questionsStopped = false;
 			generateCombinations();
 			localStorage.setItem('controller', JSON.stringify(controller));
       redirectToQuestions();
@@ -312,6 +313,7 @@
 			controller.equation = '';
       controller.randomSelection = [];
       controller.correctAnswerTracker = 0;
+      controller.questionsStopped = false;
 			generateCombinations();
       if (controller.combinations.length > controller.questionNumber) {
         controller.combinations = controller.combinations.sort(() => 0.5 - Math.random()).slice(0, controller.questionNumber);

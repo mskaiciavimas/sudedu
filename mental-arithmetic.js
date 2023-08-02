@@ -17,6 +17,7 @@ let controller = {
   equation2: '',
   result: ['', '', '', '', ''],
 	correctAnswerTracker: 0,
+  questionsStopped: false
 }
 
 const fireworksDiv = document.querySelector('#fireworks-div');
@@ -29,23 +30,23 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 	function formEquation () {
     let remainingTime = parseInt(localStorage.getItem('remainingTime'));
     if (controller.modeChoice4 === 'timer') {
-      if (controller.combinations.length === 0 && remainingTime > 0 && controller.equation !== 'Puikiai skaičiuoji!' && controller.equation !== 'Tobulėji! Pirmyn!' && controller.equation !== 'Mokaisi! Nesustok!'&& controller.equation !== 'Pasikartok su pagalba!' && controller.equation !== 'Bandyk dar kartą') {
+      if (controller.combinations.length === 0 && remainingTime > 0 && !controller.questionsStopped) {
         generateCombinations()
       }
-      if (controller.combinations.length > 0 && remainingTime > 0 && controller.equation !== 'Puikiai skaičiuoji!' && controller.equation !== 'Tobulėji! Pirmyn!' && controller.equation !== 'Mokaisi! Nesustok!'&& controller.equation !== 'Pasikartok su pagalba!' && controller.equation !== 'Bandyk dar kartą') {
+      if (controller.combinations.length > 0 && remainingTime > 0 && !controller.questionsStopped) {
         formatEquation()
       }
       if (remainingTime <= 0) {
         formatFinalMessage()
       }
     } else if (controller.modeChoice4 === 'questionNumber') {
-      if (controller.combinations.length === 0 && controller.correctAnswerTracker < controller.questionNumber && controller.equation !== 'Puikiai skaičiuoji!' && controller.equation !== 'Tobulėji! Pirmyn!' && controller.equation !== 'Mokaisi! Nesustok!'&& controller.equation !== 'Pasikartok su pagalba!' && controller.equation !== 'Bandyk dar kartą') {
+      if (controller.combinations.length === 0 && controller.correctAnswerTracker < controller.questionNumber && !controller.questionsStopped) {
         generateCombinations()
         if (controller.combinations.length > controller.questionNumber - controller.correctAnswerTracker) {
           controller.combinations = controller.combinations.slice(0, controller.questionNumber - controller.correctAnswerTracker);
         }
       }
-      if (controller.combinations.length > 0 && controller.correctAnswerTracker < controller.questionNumber && controller.equation !== 'Puikiai skaičiuoji!' && controller.equation !== 'Tobulėji! Pirmyn!' && controller.equation !== 'Mokaisi! Nesustok!'&& controller.equation !== 'Pasikartok su pagalba!' && controller.equation !== 'Bandyk dar kartą') {
+      if (controller.combinations.length > 0 && controller.correctAnswerTracker < controller.questionNumber && !controller.questionsStopped) {
         formatEquation()
       }
       if (controller.correctAnswerTracker === controller.questionNumber) {
@@ -184,7 +185,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 }
 
     function formatFinalMessage () {
-      if (controller.equation !== 'Puikiai skaičiuoji!' && controller.mistakesTracker === 0 && controller.correctAnswerTracker >= 10) {
+      if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.correctAnswerTracker >= 10) {
         triggerFireworks();
       }
       const computedFontSizeInPx = getComputedStyle(equationElement).fontSize;
@@ -207,6 +208,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
       };
       controller.equation2 = '';
       controller.result = ['', '', '', '', ''];
+      controller.questionsStopped = true;
       clearInterval(timerInterval);
     }
     localStorage.setItem('controller', JSON.stringify(controller))
@@ -225,7 +227,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
   function displayEquation () {
     controller = JSON.parse(localStorage.getItem('controller'));
 
-    if (controller.equation === 'Puikiai skaičiuoji!' || controller.equation === 'Tobulėji! Pirmyn!' || controller.equation === 'Mokaisi! Nesustok!' || controller.equation === 'Pasikartok su pagalba!' || controller.equation === 'Bandyk dar kartą') {
+    if (controller.questionsStopped) {
       answerFieldDivElement.style.display = "none";
       questionsSubmitButtonElement.style.display = "none";
       resetMistakeButtonsElement.style.display = "flex";
@@ -430,6 +432,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     controller.mistakesTracker = 0;
     controller.correctAnswerTracker = 0;
     controller.randomSelection = [];
+    controller.questionsStopped = false;
     answerFieldDivElement.style.display = "flex";
     questionsSubmitButtonElement.style.display = "flex";
     resetMistakeButtonsElement.style.display = "none";
@@ -450,7 +453,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
   }
 
   function stopEquations () {
-    if (controller.equation !== 'Puikiai skaičiuoji!' && controller.equation !== 'Tobulėji! Pirmyn!' && controller.equation !== 'Mokaisi! Nesustok!' && controller.equation !== 'Pasikartok su pagalba!' && controller.equation !== 'Bandyk dar kartą') {
+    if (!controller.questionsStopped) {
       const computedFontSizeInPx = getComputedStyle(equationElement).fontSize;
       const rootFontSizeInPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
       const computedFontSizeInRem = parseFloat(computedFontSizeInPx) / rootFontSizeInPx;
@@ -473,6 +476,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     controller.result = ['', '', '', '', ''];
     controller.combinations = [];
     controller.randomSelection = []; 
+    controller.questionsStopped = true;
 
     document.querySelector('.answer-field-div').style.display = "none";
     questionsSubmitButtonElement.style.display = "none";
