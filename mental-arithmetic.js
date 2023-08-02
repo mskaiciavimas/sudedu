@@ -29,23 +29,23 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 	function formEquation () {
     let remainingTime = parseInt(localStorage.getItem('remainingTime'));
     if (controller.modeChoice4 === 'timer') {
-      if (controller.combinations.length === 0 && remainingTime > 0 && controller.equation !== 'Puiku!' && controller.equation !== 'Gerai!') {
+      if (controller.combinations.length === 0 && remainingTime > 0 && controller.equation !== 'Puikiai skaičiuoji!' && controller.equation !== 'Tobulėji! Pirmyn!' && controller.equation !== 'Mokaisi! Nesustok!'&& controller.equation !== 'Pasikartok su pagalba!' && controller.equation !== 'Bandyk dar kartą') {
         generateCombinations()
       }
-      if (controller.combinations.length > 0 && remainingTime > 0 && controller.equation !== 'Puiku!' && controller.equation !== 'Gerai!') {
+      if (controller.combinations.length > 0 && remainingTime > 0 && controller.equation !== 'Puikiai skaičiuoji!' && controller.equation !== 'Tobulėji! Pirmyn!' && controller.equation !== 'Mokaisi! Nesustok!'&& controller.equation !== 'Pasikartok su pagalba!' && controller.equation !== 'Bandyk dar kartą') {
         formatEquation()
       }
       if (remainingTime <= 0) {
         formatFinalMessage()
       }
     } else if (controller.modeChoice4 === 'questionNumber') {
-      if (controller.combinations.length === 0 && controller.correctAnswerTracker < controller.questionNumber && controller.equation !== 'Puiku!' && controller.equation !== 'Gerai!') {
+      if (controller.combinations.length === 0 && controller.correctAnswerTracker < controller.questionNumber && controller.equation !== 'Puikiai skaičiuoji!' && controller.equation !== 'Tobulėji! Pirmyn!' && controller.equation !== 'Mokaisi! Nesustok!'&& controller.equation !== 'Pasikartok su pagalba!' && controller.equation !== 'Bandyk dar kartą') {
         generateCombinations()
         if (controller.combinations.length > controller.questionNumber - controller.correctAnswerTracker) {
           controller.combinations = controller.combinations.slice(0, controller.questionNumber - controller.correctAnswerTracker);
         }
       }
-      if (controller.combinations.length > 0 && controller.correctAnswerTracker < controller.questionNumber && controller.equation !== 'Puiku!' && controller.equation !== 'Gerai!') {
+      if (controller.combinations.length > 0 && controller.correctAnswerTracker < controller.questionNumber && controller.equation !== 'Puikiai skaičiuoji!' && controller.equation !== 'Tobulėji! Pirmyn!' && controller.equation !== 'Mokaisi! Nesustok!'&& controller.equation !== 'Pasikartok su pagalba!' && controller.equation !== 'Bandyk dar kartą') {
         formatEquation()
       }
       if (controller.correctAnswerTracker === controller.questionNumber) {
@@ -184,10 +184,27 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 }
 
     function formatFinalMessage () {
-      if (controller.equation !== 'Puiku!' && controller.mistakesTracker === 0 && controller.correctAnswerTracker > 0 ) {
+      if (controller.equation !== 'Puikiai skaičiuoji!' && controller.mistakesTracker === 0 && controller.correctAnswerTracker >= 10) {
         triggerFireworks();
       }
-      controller.equation = 'Puiku!';
+      const computedFontSizeInPx = getComputedStyle(equationElement).fontSize;
+      const rootFontSizeInPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      const computedFontSizeInRem = parseFloat(computedFontSizeInPx) / rootFontSizeInPx;
+      const newFontSizeInRem = computedFontSizeInRem - 1;
+      equationElement.style.fontSize = newFontSizeInRem + 'rem';
+      equationElement.style.paddingTop = '1rem';
+      equationElement.style.paddingBottom = '14px';
+      if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.95) {
+        controller.equation = 'Puikiai skaičiuoji!';
+      } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.7) {
+        controller.equation = 'Tobulėji! Pirmyn!';
+      } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.6) {
+        controller.equation = 'Mokaisi! Nesustok!';
+      } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker)) {
+        controller.equation = 'Pasikartok su pagalba!';
+      } else {
+        controller.equation = 'Bandyk dar kartą!';        
+      };
       controller.equation2 = '';
       controller.result = ['', '', '', '', ''];
       clearInterval(timerInterval);
@@ -208,7 +225,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
   function displayEquation () {
     controller = JSON.parse(localStorage.getItem('controller'));
 
-    if (controller.equation === "Puiku!" || controller.equation === "Gerai!") {
+    if (controller.equation === 'Puikiai skaičiuoji!' || controller.equation === 'Tobulėji! Pirmyn!' || controller.equation === 'Mokaisi! Nesustok!' || controller.equation === 'Pasikartok su pagalba!' || controller.equation === 'Bandyk dar kartą') {
       answerFieldDivElement.style.display = "none";
       questionsSubmitButtonElement.style.display = "none";
       resetMistakeButtonsElement.style.display = "flex";
@@ -231,9 +248,9 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     };
     previousEquationElement.innerHTML = controller.result[4];
     if (controller.modeChoice4 === 'timer') {
-      answerTrackerElement.innerHTML = `Atsakei: ${controller.correctAnswerTracker}`;
+      answerTrackerElement.innerHTML = `Atlikai: ${controller.correctAnswerTracker}`;
     } else if (controller.modeChoice4 === 'questionNumber') {
-      answerTrackerElement.innerHTML = `Atsakei: ${controller.correctAnswerTracker}/${controller.questionNumber}`;
+      answerTrackerElement.innerHTML = `Atlikai: ${controller.correctAnswerTracker}/${controller.questionNumber}`;
     }
     mistakeTrackerElement.innerHTML = `Suklydai: ${controller.mistakesTracker}`;
     answerInputElement.focus();
@@ -398,6 +415,10 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
   }
 
   function restartEquations () {
+    disableFireworks();
+    equationElement.style.fontSize = '';
+    equationElement.style.paddingTop = '0rem';
+    equationElement.style.paddingBottom = '6px';
     controller.currentMistakes = [];
     generateCombinations();
     if (controller.combinations.length > controller.questionNumber) {
@@ -426,12 +447,28 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     }
     formEquation();
     displayEquation();
-    disableFireworks();
   }
 
   function stopEquations () {
-    if (controller.equation !== 'Puiku!') {
-    controller.equation = 'Gerai!';
+    if (controller.equation !== 'Puikiai skaičiuoji!' && controller.equation !== 'Tobulėji! Pirmyn!' && controller.equation !== 'Mokaisi! Nesustok!' && controller.equation !== 'Pasikartok su pagalba!' && controller.equation !== 'Bandyk dar kartą') {
+      const computedFontSizeInPx = getComputedStyle(equationElement).fontSize;
+      const rootFontSizeInPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      const computedFontSizeInRem = parseFloat(computedFontSizeInPx) / rootFontSizeInPx;
+      const newFontSizeInRem = computedFontSizeInRem - 1;
+      equationElement.style.fontSize = newFontSizeInRem + 'rem';
+      equationElement.style.paddingTop = '1rem';
+      equationElement.style.paddingBottom = '14px';
+      if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.95) {
+        controller.equation = 'Puikiai skaičiuoji!';
+      } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.7) {
+        controller.equation = 'Tobulėji! Pirmyn!';
+      } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.6) {
+        controller.equation = 'Mokaisi! Nesustok!';
+      } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker)) {
+        controller.equation = 'Pasikartok su pagalba!';
+      } else {
+        controller.equation = 'Bandyk dar kartą!';        
+      }
     controller.equation2 = '';
     controller.result = ['', '', '', '', ''];
     controller.combinations = [];
@@ -589,7 +626,7 @@ function generateSummaryTable(type) {
   } else {
       // Display a message when there are no mistakes
       const summaryTableOuterDivElement = document.querySelector("#summary-table-outer-div");
-      summaryTableOuterDivElement.innerHTML = "<h2>Nepadarei klaid&#x173;! &#x160;aunu!</h2>";
+      summaryTableOuterDivElement.innerHTML = "<h2>Nėra klaidų!</h2>";
   }
 }
 

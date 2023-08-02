@@ -142,10 +142,10 @@
               <div class="col-12 justify-content-center align-items-center modeChoice4-div" style="padding-bottom: 20px;">
                 <div class="row d-flex align-items-center justify-content-center"> <!-- Missing outer row element -->
                   <div class="col-sm-6 col-12 d-flex justify-content-center">
-                    <button class="btn btn-primary set-timer-button time-question-buttons">Laiko limitą</button>
+                    <button class="btn btn-primary set-timer-button time-question-buttons">Laiko trukmę</button>
                   </div>
                   <div class="col-sm-6 col-12 d-flex justify-content-center">
-                    <button class="btn btn-primary set-question-number-button time-question-buttons" style="white-space: nowrap;">Klausimų skaičių</button>
+                    <button class="btn btn-primary set-question-number-button time-question-buttons" style="white-space: nowrap;">Veiksmų kiekį</button>
                   </div>
                 </div>
               </div>
@@ -164,13 +164,13 @@
           </div>
           <div class="question-number-input-div row justify-content-center align-items-center">
           <div class="col-12 d-flex justify-content-center">
-            <h3 style="padding-bottom: 15px; font-size: 2rem;">ATSAKYTI</h3>
+            <h3 style="padding-bottom: 15px; font-size: 2rem;">ATLIKTI</h3>
           </div> 
           <div class="col-6 d-flex justify-content-end">
 							<input type="number" id="question-number-input" min="1" max="200" step="1" value="20">
 							</div>
               <div class="col-6 d-flex d-flex justify-content-start">
-                <h3 class="answer-number-label">klausimų</h3>
+                <h3 class="answer-number-label">veiksmų</h3>
               </div>
               </div>
 							<div class="row d-flex justify-content-center align-items-center start-buttons" style="padding-top: 15px;">
@@ -234,7 +234,7 @@
 				window.location.href = "index.html";
 			}
 			document.querySelector('#template-container').removeAttribute('hidden');
-      modeChoiceMessageElement.innerHTML = "NUSTATYTI";
+      modeChoiceMessageElement.innerHTML = "PASIRINKITE";
       modeChoice4DIv.style.display = "flex";
 			timerInputDivElement.style.display = "none";
       questionNumberDivElement.style.display = "none";
@@ -340,11 +340,11 @@
 
     questionNumberInputElement.addEventListener("input", function(event) {
       if (parseInt(questionNumberInputElement.value) === 1 || parseInt(questionNumberInputElement.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElement.value) !== 11) {
-        answerNumberLabelElement.innerHTML = 'klausimą';
+        answerNumberLabelElement.innerHTML = 'veiksmą';
       } else if ((parseInt(questionNumberInputElement.value) > 1 && parseInt(questionNumberInputElement.value) < 10) || (parseInt(questionNumberInputElement.value) > 20 && parseInt(questionNumberInputElement.value.slice(-1)[0]) !== 0))  {
-        answerNumberLabelElement.innerHTML = 'klausimus';
+        answerNumberLabelElement.innerHTML = 'veiksmus';
       } else if (parseInt(questionNumberInputElement.value) >= 10) {
-        answerNumberLabelElement.innerHTML = 'klausimų';
+        answerNumberLabelElement.innerHTML = 'veiksmų';
       }
     })
 
@@ -371,7 +371,7 @@
     } else if (value > max) {
       input.value = max; // Restrict input to max value
       timerLabelElement.innerHTML = 'minučių';
-      answerNumberLabelElement.innerHTML = 'klausimų';
+      answerNumberLabelElement.innerHTML = 'veiksmų';
     }
   }
 

@@ -46,7 +46,7 @@
 								<option value="daugyba">DAUGYB&#x104;</option>
 								<option value="dalyba">DALYB&#x104;</option>
 								<option value="daugyba ir dalyba">DAUGYB&#x104; IR DALYB&#x104;</option>
-								<option value="visi">VISUS</option>
+								<option value="visi">ĮVAIRIUS VEIKSMUS</option>
 							</select>
 						</div>
 						<div class="row">
@@ -118,14 +118,15 @@
 						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
 							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_5"
 								id="mode_choice_5">
-								<option value="skaitiniai">SKAITINIS REIŠKINYS</option>
-								<option value="nezinomieji">LYGTYS SU NEŽINOMAISIAIS</option>
+								<option value="skaitiniai">SKAITINĖ LYGYBĖ</option>
+								<option value="nezinomieji">SKAITINĖ LYGYBĖ SU NEŽINOMUOJU</option>
 							</select>
 						</div>
 						<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
 						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
 							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_6"
 								id="mode_choice_6" style="display: none;">
+								<option value="turinys">NEŽINOMAS DĖMUO</option>
 							</select>
 						</div>
 						<div class="row">
@@ -216,11 +217,8 @@
 				}
 				if (modeChoice5Selection === 'skaitiniai') {
 					toggleVisibility(modeChoice6Element, false)
-				} else if (modeChoice5Selection === 'nezinomieji')
-				 if (modeChoiceSelection !== 'sudetis' && modeChoiceSelection !== 'sudetis ir atimtis' && modeChoiceSelection !== 'daugyba' && modeChoiceSelection !== 'daugyba ir dalyba' && modeChoiceSelection !== 'visi') {
-					toggleVisibility(modeChoice6Element, true)
-				} else {
-					toggleVisibility(modeChoice6Element, false)
+				} else if (modeChoice5Selection === 'nezinomieji') {
+					toggleVisibility(modeChoice6Element, true)					
 				}
 			}
 			modeChoiceElement.addEventListener('change', handleModeChoiceChange);
@@ -242,6 +240,7 @@
 				modeChoice2Element.innerHTML += '<option value="dvi">DVIŽENKLIŲ SKAIČIŲ IKI 100</option>';
 				modeChoice2Element.innerHTML += '<option value="tukst">SKAIČIŲ IKI 1000</option>';
 				modeChoice2Element.innerHTML += '<option value="dtukst">SKAIČIŲ IKI 10000</option>';
+				modeChoice6Element.innerHTML += '<option value="turinys">NEŽINOMAS DĖMUO</option>';
 
 			} else if (modeChoiceSelection === "atimtis") {
 				modeChoice2Element.innerHTML += '<option value="viena10">VIENAŽENKLIŲ SKAIČIŲ IKI 10</option>';
@@ -261,13 +260,26 @@
 				modeChoice2Element.innerHTML += '<option value="dvi">DVIŽENKLIŲ SKAIČIŲ IKI 100</option>';
 				modeChoice2Element.innerHTML += '<option value="tukst">SKAIČIŲ IKI 1000</option>';
 				modeChoice2Element.innerHTML += '<option value="dtukst">SKAIČIŲ IKI 10000</option>';
+				modeChoice6Element.innerHTML += '<option value="turinys">NEŽINOMAS DĖMUO/TURINYS/ATĖMINYS</option>';
 
-			} else if (modeChoiceSelection === "daugyba" || modeChoiceSelection === "dalyba" || modeChoiceSelection === "daugyba ir dalyba") {
+			} else if (modeChoiceSelection === "daugyba") {
 				modeChoice2Element.innerHTML += '<option value="dauglent">DAUGYBOS LENTELĖ</option>';
+				modeChoice2Element.innerHTML += '<option value="pil10">IŠ PILNŲ DEŠIMČIŲ</option>';
+				modeChoice2Element.innerHTML += '<option value="pil100">IŠ PILNŲ ŠIMTŲ</option>';
+				modeChoice6Element.innerHTML += '<option value="dalinys">NEŽINOMAS DAUGINAMASIS</option>';
+
+			} else if (modeChoiceSelection === "dalyba") {
+				modeChoice2Element.innerHTML += '<option value="dauglent">IŠ DAUGYBOS LENTELĖS</option>';
 				modeChoice2Element.innerHTML += '<option value="pil10">IŠ PILNŲ DEŠIMČIŲ</option>';
 				modeChoice2Element.innerHTML += '<option value="pil100">IŠ PILNŲ ŠIMTŲ</option>';
 				modeChoice6Element.innerHTML += '<option value="dalinys">NEŽINOMAS DALINYS</option>';
 				modeChoice6Element.innerHTML += '<option value="daliklis">NEŽINOMAS DALIKLIS</option>';
+
+			} else if (modeChoiceSelection === "daugyba ir dalyba") {
+				modeChoice2Element.innerHTML += '<option value="dauglent">IŠ DAUGYBOS LENTELĖS</option>';
+				modeChoice2Element.innerHTML += '<option value="pil10">IŠ PILNŲ DEŠIMČIŲ</option>';
+				modeChoice2Element.innerHTML += '<option value="pil100">IŠ PILNŲ ŠIMTŲ</option>';
+				modeChoice6Element.innerHTML += '<option value="dalinys">NEŽINOMAS DAUGINAMASIS/DALINYS/DALIKLIS</option>';
 
 			} else if (modeChoiceSelection === "visi") {
 				modeChoice2Element.innerHTML += '<option value="iki10">IKI 10</option>';
@@ -275,6 +287,7 @@
 				modeChoice2Element.innerHTML += '<option value="iki100">IKI 100</option>';
 				modeChoice2Element.innerHTML += '<option value="iki1000">IKI 1000</option>';
 				modeChoice2Element.innerHTML += '<option value="iki10000">IKI 10000</option>';
+				modeChoice6Element.innerHTML += '<option value="dalinys">NEŽINOMAS DĖMUO/TURINYS/ATĖMINUS/DAUGINAMASIS/DALINYS/DALIKLIS</option>';
 			}
 		}
 
