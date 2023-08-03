@@ -498,19 +498,19 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 }
 
 function redirectToIntermediate() {
-  window.location.href = "intermediate.html";
+  window.location.href = "./pasirinkimai";
 }
 
   function redirectToQuestions() {
-    window.location.href = "questions.html";
+    window.location.href = "./veiksmai";
   }
 
   function redirectToIndex() {
     localStorage.setItem('controller', JSON.stringify(controller))
-    window.location.href = "index.html";
+    window.location.href = "./";
   }
   function redirectToSummary () {
-    window.location.href = "summary.html";
+    window.location.href = "./klaidos";
   }
 
  // Function to calculate bar color based on the number of mistakes
