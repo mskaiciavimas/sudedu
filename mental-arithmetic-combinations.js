@@ -244,7 +244,7 @@ function generateCombinations() {
           }
         }
         questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
-        controller.combinations = questionPool2.concat(questionPool3);
+        controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
       }
     } else if (controller.modeChoice2 === 'lent') {
       if (controller.modeChoice3 === 'per10') {
@@ -283,7 +283,7 @@ function generateCombinations() {
             }
           }
           questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
-          controller.combinations = questionPool2.concat(questionPool3);
+          controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
         }
       } else if (controller.modeChoice2 === 'dvivien') {
         if (controller.modeChoice3 === 'neper') {
@@ -304,7 +304,7 @@ function generateCombinations() {
               }
             }
             questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
-            controller.combinations = questionPool2.concat(questionPool3);
+            controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
         } else if (controller.modeChoice3 === 'per10') {
           for (let number1 = 10; number1 <= 99; number1++) {
             for (let number2 = 1; number2 <= 9; number2++) {
@@ -323,7 +323,7 @@ function generateCombinations() {
             }
           }
           questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
-          controller.combinations = questionPool2.concat(questionPool3);
+          controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
         }
       }
         else if (controller.modeChoice2 === 'dvi') {
@@ -345,7 +345,7 @@ function generateCombinations() {
               }
             }
             questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
-            controller.combinations = questionPool2.concat(questionPool3);
+            controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
             
             } else if (controller.modeChoice3 === 'per10') {
               for (let number1 = 10; number1 <= 99; number1++) {
@@ -365,7 +365,7 @@ function generateCombinations() {
                 }
               }
               questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
-              controller.combinations = questionPool2.concat(questionPool3);
+              controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
             }
            } else if (controller.modeChoice2 === 'tukst') {
             if (controller.modeChoice3 === 'neper') {
@@ -385,7 +385,7 @@ function generateCombinations() {
                 }
               }
               questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
-              controller.combinations = questionPool2.concat(questionPool3);
+              controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
 
             } else if (controller.modeChoice3 === 'per10') {
                 while (questionPool2.length < 10) {
@@ -404,7 +404,7 @@ function generateCombinations() {
                 }
               }
               questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
-              controller.combinations = questionPool2.concat(questionPool3);
+              controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
           }
         } 
         
@@ -426,7 +426,7 @@ function generateCombinations() {
                   }
                 }
                 questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
-                controller.combinations = questionPool2.concat(questionPool3);
+                controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
 
               } else if (controller.modeChoice3 === 'per10') {
                   while (questionPool2.length < 10) {
@@ -445,7 +445,7 @@ function generateCombinations() {
                   }
                 }
                 questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
-                controller.combinations = questionPool2.concat(questionPool3);
+                controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
             }
           } 
 /*MULTIPLICATION*/          
@@ -458,7 +458,7 @@ function generateCombinations() {
         questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
       }
     }
-    controller.combinations = questionPool;
+    controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
   } else if (controller.modeChoice2 === 'pil10') {
     for (let number1 = 1; number1 <= 10; number1++) {
       for (let number2 = 10; number2 <= 90; number2+=10) {
@@ -487,7 +487,7 @@ function generateCombinations() {
         questionPool.push([parseInt(number1 * number2), parseInt(number1), "division"]);
       }
     }
-    controller.combinations = questionPool;
+    controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
   } else if (controller.modeChoice2 === 'pil10') {
     for (let number1 = 1; number1 <= 10; number1++) {
       for (let number2 = 1; number2 <= 9; number2++) {
@@ -518,7 +518,7 @@ function generateCombinations() {
         questionPool3.push([parseInt(number1 * number2), parseInt(number1), "division"]);
       }
   }
-    controller.combinations = questionPool2.concat(questionPool3);
+    controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
   } else if (controller.modeChoice2 === 'pil10') {
     for (let number1 = 1; number1 <= 10; number1++) {
       for (let number2 = 10; number2 <= 90; number2+=10) {
@@ -533,7 +533,7 @@ function generateCombinations() {
     }
     questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
     questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
-    controller.combinations = questionPool2.concat(questionPool3);
+    controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
   } else if (controller.modeChoice2 === 'pil100') {
     for (let number1 = 1; number1 <= 10; number1++) {
       for (let number2 = 100; number2 <= 900; number2+=100) {
@@ -548,7 +548,7 @@ function generateCombinations() {
     }
     questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
     questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
-    controller.combinations = questionPool2.concat(questionPool3);
+    controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
   }
 /*ALL*/
 } else if (controller.modeChoice === "visi") {
@@ -569,7 +569,7 @@ function generateCombinations() {
     }
     questionPool = questionPool.sort(() => 0.5 - Math.random()).slice(0, 10);
     questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
-    controller.combinations = questionPool.concat(questionPool2);
+    controller.combinations = questionPool.concat(questionPool2).sort(() => 0.5 - Math.random()).slice(0, 20);
   } else if (controller.modeChoice2 === "iki20") {
       for (let number1 = 1; number1 <= 19; number1++) {
         for (let number2 = 1; number2 <= 19; number2++) {
@@ -587,7 +587,7 @@ function generateCombinations() {
       }
       questionPool = questionPool.sort(() => 0.5 - Math.random()).slice(0, 10);
       questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
-      controller.combinations = questionPool.concat(questionPool2);
+      controller.combinations = questionPool.concat(questionPool2).sort(() => 0.5 - Math.random()).slice(0, 20);
   } else if (controller.modeChoice2 === "iki100") {
     questionPool4 = [];
     for (let number1 = 1; number1 <= 99; number1++) {
@@ -623,7 +623,7 @@ function generateCombinations() {
     questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 5);
     questionPool4 = questionPool4.sort(() => 0.5 - Math.random()).slice(0, 5);    
 
-    controller.combinations = questionPool.concat(questionPool2, questionPool3, questionPool4);
+    controller.combinations = questionPool.concat(questionPool2, questionPool3, questionPool4).sort(() => 0.5 - Math.random()).slice(0, 20);
     } else if (controller.modeChoice2 === "iki1000") {
       questionPool4 = [];
 
@@ -667,7 +667,7 @@ function generateCombinations() {
       questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 5);
       questionPool4 = questionPool4.sort(() => 0.5 - Math.random()).slice(0, 5);    
   
-      controller.combinations = questionPool.concat(questionPool2, questionPool3, questionPool4);
+      controller.combinations = questionPool.concat(questionPool2, questionPool3, questionPool4).sort(() => 0.5 - Math.random()).slice(0, 20);
       } else if (controller.modeChoice2 === "iki10000") {
         questionPool4 = [];
   
@@ -711,7 +711,7 @@ function generateCombinations() {
         questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 5);
         questionPool4 = questionPool4.sort(() => 0.5 - Math.random()).slice(0, 5);    
     
-        controller.combinations = questionPool.concat(questionPool2, questionPool3, questionPool4);
+        controller.combinations = questionPool.concat(questionPool2, questionPool3, questionPool4).sort(() => 0.5 - Math.random()).slice(0, 20);
         }
   }
     }
