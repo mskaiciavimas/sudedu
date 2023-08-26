@@ -170,11 +170,11 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
               controller.equation2 = `= ${controller.randomSelection[0] / controller.randomSelection[1]}`
             }
             }
-            if (controller.modeChoice6 === "dalinys") {
+            if (!controller.randomSelection[3] && controller.modeChoice6 === "dalinys") {
               controller.randomSelection.push("first");
               controller.equation = ``;
               controller.equation2 = ` \uA789 ${controller.randomSelection[1]} = ${controller.randomSelection[0] / controller.randomSelection[1]}`
-            } else if (controller.modeChoice6 === 'daliklis') {
+            } else if (!controller.randomSelection[3] && controller.modeChoice6 === 'daliklis') {
               controller.randomSelection.push("second");
               controller.equation = `${controller.randomSelection[0]} \uA789 `;
               controller.equation2 = `= ${controller.randomSelection[0] / controller.randomSelection[1]}`
