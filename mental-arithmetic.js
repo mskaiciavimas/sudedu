@@ -114,7 +114,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
             controller.equation2 = `= ${controller.randomSelection[0] - controller.randomSelection[1]}`
           }
           }
-          if (controller.modeChoice6 === "turinys") {
+          else if (controller.modeChoice6 === "turinys") {
             controller.randomSelection.push("first");
             controller.equation = ``;
             controller.equation2 = ` - ${controller.randomSelection[1]} = ${controller.randomSelection[0] - controller.randomSelection[1]}`;
