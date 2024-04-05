@@ -72,7 +72,7 @@
 				<div class="row">
 					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
 						<div class="d-flex justify-content-start align-items-center">
-							<button class="btn btn-primary question-submit-button" style="display: none;" (mousedown)="preventKeyboardClosing(); $event.preventDefault()">Tikrinti</button>
+<button #submitBtn class="btn btn-primary question-submit-button" style="display: none;">Go</button>
 						</div>
 						<div id="reset-mistake-buttons" class="col-12 justify-content-center align-items-center"
 							style="display: none;">
@@ -248,7 +248,29 @@ answerRemainderInputElement.addEventListener('focus', function() {
     // Focus is on inputField2, so ensure the keyboard stays open
     answerInputElement.blur(); // Blur the first input field if it was focused
 });
+		    document.addEventListener("DOMContentLoaded", function() {
+      var submitBtn = document.getElementById('submitBtn');
+
+      submitBtn.addEventListener('click', function(event) {
+        stopEvent(event);
+      });
+
+      submitBtn.addEventListener('touchstart', function(event) {
+        stopEvent(event);
+        sendPressed();
+      });
+
+      function stopEvent(event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      function sendPressed() {
+        // ... send message routine
+      }
+    });
 	</script>
+		</script>
 
 </body>
 
