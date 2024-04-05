@@ -72,7 +72,7 @@
 				<div class="row">
 					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
 						<div class="d-flex justify-content-start align-items-center">
-							<button class="btn btn-primary question-submit-button" style="display: none;">go</button>
+							<button class="btn btn-primary question-submit-button" style="display: none;">Tikrinti</button>
 						</div>
 						<div id="reset-mistake-buttons" class="col-12 justify-content-center align-items-center"
 							style="display: none;">
@@ -239,8 +239,17 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 			answerInputElement.value = '';
 			answerRemainderInputElement.value = '';
 		}
+		answerInputElement.addEventListener('focus', function() {
+    // Focus is on inputField1, so ensure the keyboard stays open
+    answerRemainderInputElement.blur(); // Blur the second input field if it was focused
+});
+
+answerRemainderInputElement.addEventListener('focus', function() {
+    // Focus is on inputField2, so ensure the keyboard stays open
+    answerInputElement.blur(); // Blur the first input field if it was focused
+});
 	</script>
-	</script>
+
 </body>
 
 </html>
