@@ -119,16 +119,23 @@
 	<script src="mental-arithmetic-combinations.js"></script>
 
 	<script>
+$(document).ready(function () {
+            $('input').on('focusin', function (event) {
+                // Prevent scrolling if already focused on an input
+                if ($('input:focus').length > 1) {
+                    event.preventDefault();
+                    return;
+                }
 
-		editText1.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-    @Override
-    public void onFocusChange(View v, boolean hasFocus) {
-        if (!hasFocus) {
-            // Prevent losing focus
-            editText1.requestFocus();
-        }
-    }
-});
+                // Keep keyboard open by preventing the input from hiding
+                $('input').css('position', 'relative');
+            });
+
+            $('input').on('focusout', function () {
+                // Restore default input position when focus is lost
+                $('input').css('position', 'static');
+            });
+        });
 		const answerFieldDivElement = document.querySelector('.answer-field-div')
 
 		const restratButtonElement = document.querySelector('.restart-button');
