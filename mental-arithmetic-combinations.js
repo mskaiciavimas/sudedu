@@ -500,7 +500,7 @@ function generateCombinations() {
       while (numberDivides) {
       let randomNumber = Math.floor(Math.random() * 9) + 1;
       updatedValue = controller.combinations[i][0] + randomNumber;
-      if (updatedValue % controller.combinations[i][1] !== 0) {
+      if (updatedValue % controller.combinations[i][1] !== 0 && Math.floor(updatedValue / controller.combinations[i][1]) <= 10) {
           controller.combinations[i][0] = updatedValue;
           numberDivides = false
       }
