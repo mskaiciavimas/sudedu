@@ -72,7 +72,7 @@
 				<div class="row">
 					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
 						<div class="d-flex justify-content-start align-items-center">
-							<button class="btn btn-primary question-submit-button" style="display: none;">go</button>
+							<button class="btn btn-primary question-submit-button" style="display: none;">Tikrinti</button>
 						</div>
 						<div id="reset-mistake-buttons" class="col-12 justify-content-center align-items-center"
 							style="display: none;">
@@ -119,6 +119,16 @@
 	<script src="mental-arithmetic-combinations.js"></script>
 
 	<script>
+
+		$(document).ready(function () {
+            $('input').on('blur', function (event) {
+                // Check if the next focused element is another input field
+                if ($(event.relatedTarget).is('input')) {
+                    event.preventDefault();
+                    $(event.relatedTarget).focus();
+                }
+            });
+        });
 		const answerFieldDivElement = document.querySelector('.answer-field-div')
 
 		const restratButtonElement = document.querySelector('.restart-button');
