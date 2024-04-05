@@ -58,7 +58,7 @@
 						<div class="answer-field-div">
 							<div id="answer-field" class="answer-field">
 								<input type="text" id="answer" name="answer" class="form-control text-center answer-input"
-									placeholder="" autofocus autocomplete="off" style="display: none;">
+									placeholder=""  autocomplete="off" style="display: none;">
 							</div>
 							<div id="remainder-field" class="remainder-field">
 								<input type="text" id="remainder" name="remainder" class="form-control text-center remainder-input"
@@ -72,7 +72,7 @@
 				<div class="row">
 					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
 						<div class="d-flex justify-content-start align-items-center">
-							<button class="btn btn-primary question-submit-button" style="display: none;">Tikrinti</button>
+							<button class="btn btn-primary question-submit-button" style="display: none;">go</button>
 						</div>
 						<div id="reset-mistake-buttons" class="col-12 justify-content-center align-items-center"
 							style="display: none;">
@@ -239,6 +239,9 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 			answerInputElement.value = '';
 			answerRemainderInputElement.value = '';
 		}
+
+		answerInputElement.addEventListener("return",function(){answerRemainderInputElement.focus();}); 
+		answerRemainderInputElement.addEventListener("return",function(){answerInputElement.focus();});
 	</script>
 	</script>
 </body>
