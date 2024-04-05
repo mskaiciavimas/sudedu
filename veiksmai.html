@@ -58,7 +58,7 @@
 						<div class="answer-field-div">
 							<div id="answer-field" class="answer-field">
 								<input type="text" id="answer" name="answer" class="form-control text-center answer-input"
-									placeholder=""  autocomplete="off" style="display: none;">
+									placeholder="" autofocus autocomplete="off" style="display: none;">
 							</div>
 							<div id="remainder-field" class="remainder-field">
 								<input type="text" id="remainder" name="remainder" class="form-control text-center remainder-input"
@@ -72,7 +72,7 @@
 				<div class="row">
 					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
 						<div class="d-flex justify-content-start align-items-center">
-							<button class="btn btn-primary question-submit-button" style="display: none;">tikrinti</button>
+							<button class="btn btn-primary question-submit-button" style="display: none;">Tikrinti</button>
 						</div>
 						<div id="reset-mistake-buttons" class="col-12 justify-content-center align-items-center"
 							style="display: none;">
@@ -119,23 +119,6 @@
 	<script src="mental-arithmetic-combinations.js"></script>
 
 	<script>
-$(document).ready(function () {
-            $('input').on('focusin', function (event) {
-                // Prevent scrolling if already focused on an input
-                if ($('input:focus').length > 1) {
-                    event.preventDefault();
-                    return;
-                }
-
-                // Keep keyboard open by preventing the input from hiding
-                $('input').css('position', 'relative');
-            });
-
-            $('input').on('focusout', function () {
-                // Restore default input position when focus is lost
-                $('input').css('position', 'static');
-            });
-        });
 		const answerFieldDivElement = document.querySelector('.answer-field-div')
 
 		const restratButtonElement = document.querySelector('.restart-button');
@@ -256,9 +239,6 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 			answerInputElement.value = '';
 			answerRemainderInputElement.value = '';
 		}
-
-		answerInputElement.addEventListener("return",function(){answerRemainderInputElement.focus();}); 
-		answerRemainderInputElement.addEventListener("return",function(){answerInputElement.focus();});
 	</script>
 	</script>
 </body>
