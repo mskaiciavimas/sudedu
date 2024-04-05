@@ -72,7 +72,7 @@
 				<div class="row">
 					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
 						<div class="d-flex justify-content-start align-items-center">
-							<button class="btn btn-primary question-submit-button" style="display: none;">netikrinti</button>
+							<button class="btn btn-primary question-submit-button" style="display: none;">tikrinti</button>
 						</div>
 						<div id="reset-mistake-buttons" class="col-12 justify-content-center align-items-center"
 							style="display: none;">
@@ -120,15 +120,15 @@
 
 	<script>
 
-$(document).ready(function () {
-            $('input').on('blur', function (event) {
-                // Check if the next focused element is another input field or a button
-                if ($(event.relatedTarget).is('input') || $(event.relatedTarget).is('button')) {
-                    event.preventDefault();
-                    $(event.relatedTarget).focus();
-                }
-            });
-        });
+		editText1.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        if (!hasFocus) {
+            // Prevent losing focus
+            editText1.requestFocus();
+        }
+    }
+});
 		const answerFieldDivElement = document.querySelector('.answer-field-div')
 
 		const restratButtonElement = document.querySelector('.restart-button');
