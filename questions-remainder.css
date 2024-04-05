@@ -64,7 +64,7 @@ body {
 }
 
 #answer-field {
-  width: 16vw;
+  width: 14vw;
 }
 
 #answer {
@@ -77,9 +77,39 @@ body {
   outline: 3px solid #B6C867;
 }
 
+/* liekana */
+
 #remainder-field {
-  display: none;
+  display: block !important;
 }
+
+
+.remainder-input {
+  height: 6rem;
+  font-size: 5rem;
+  padding-top: 0px !important;
+}
+
+.remainder-input::placeholder {
+  font-size: 4rem;
+}
+
+#remainder-field {
+  width: 14vw;
+  padding-left: 2vw;
+}
+
+#remainder {
+  background-color: #FAEDCD;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+#remainder:focus,
+#remainder:active {
+  outline: 3px solid #B6C867;
+}
+
+/* liekana */
 
 #fireworks-div {
   position: fixed;
@@ -229,7 +259,11 @@ body {
   }
 
   #answer-field {
-    width: 18vw;
+    width: 14vw;
+  }
+
+  #remainder-field {
+    width: 14vw;
   }
 
   .question-submit-button {
@@ -247,7 +281,11 @@ body {
 	}
 
   #answer-field {
-    width: 22vw;
+    width: 16vw;
+  }
+
+  #remainder-field {
+    width: 16vw;
   }
 
   .question-submit-button {
@@ -279,8 +317,21 @@ body {
 		font-size: 3rem;
 	}
 
+  .remainder-input {
+		height: 3.5rem;
+		font-size: 3rem;
+	}
+
   #answer-field {
-    width: 18vw;
+    width: 16vw;
+  }
+
+  #remainder-field {
+    width: 16vw;
+  }
+
+  .remainder-input::placeholder {
+    font-size: 2.5rem;
   }
 
   .question-submit-button {
@@ -298,7 +349,11 @@ body {
   }
 
   #answer-field {
-    width: 24vw;
+    width: 19vw;
+  }
+
+  #remainder-field {
+    width: 19vw;
   }
 
   .question-submit-button {
@@ -329,6 +384,15 @@ body {
     font-size: 2rem;
   }
 
+  .remainder-input {
+    height: 2.5rem;
+    font-size: 2rem;
+  }
+
+  .remainder-input::placeholder {
+    font-size: 1.5rem;
+  }
+
   .previous-equation {
     font-size: 1.5rem;
   }
@@ -352,7 +416,11 @@ body {
   }
 
   #answer-field {
-    width: 27vw;
+    width: 22vw;
+  }
+
+  #remainder-field {
+    width: 22vw;
   }
 
   .question-submit-button {
@@ -378,6 +446,13 @@ body {
     padding-left: 5vw;
     padding-right: 5vw;
   }
+}
+
+@media (max-width: 350px) {
+  .remainder-input::placeholder {
+    font-size: 1.25rem;
+  }
+
 }
 
 @supports (-webkit-touch-callout: none) {

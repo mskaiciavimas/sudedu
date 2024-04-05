@@ -190,7 +190,7 @@
 			}
 
 				if (
-					(modeChoiceSelection === 'daugyba' && (modeChoice2Selection !== 'pil10' && modeChoice2Selection !== 'pil100')) || (modeChoiceSelection === 'dalyba' && (modeChoice2Selection !== 'pil10' && modeChoice2Selection !== 'pil100')) || (modeChoiceSelection === 'daugyba ir dalyba' && (modeChoice2Selection !== 'pil10' && modeChoice2Selection !== 'pil100'))) {
+					(modeChoiceSelection === 'daugyba' && (modeChoice2Selection !== 'pil10' && modeChoice2Selection !== 'pil100')) || (modeChoiceSelection === 'dalyba' && (modeChoice2Selection !== 'pil10' && modeChoice2Selection !== 'pil100' && modeChoice2Selection !== 'liekana')) || (modeChoiceSelection === 'daugyba ir dalyba' && (modeChoice2Selection !== 'pil10' && modeChoice2Selection !== 'pil100'))) {
 					toggleVisibility(numberLabel, true);
 					toggleVisibility(selectedNumberElement, true);
 					toggleVisibility(numberLabel2, true);
@@ -198,6 +198,7 @@
 					toggleVisibility(modeChoice3Element, false);
 					toggleVisibility(emptySpaceholder, true);
 					toggleVisibility(placeholderBeforeSkaitinisElement, true);
+					toggleVisibility(modeChoice5Element, true);
 				} else if (modeChoiceSelection === 'sudetis' || modeChoiceSelection === 'atimtis' || modeChoiceSelection === 'sudetis ir atimtis') {
 					toggleVisibility(numberLabel, false);
 					toggleVisibility(selectedNumberElement, false);
@@ -206,6 +207,17 @@
 					toggleVisibility(modeChoice3Element, true);
 					toggleVisibility(emptySpaceholder, true);
 					toggleVisibility(placeholderBeforeSkaitinisElement, true);
+					toggleVisibility(modeChoice5Element, true);
+				} else if (modeChoiceSelection === 'dalyba' && modeChoice2Selection === 'liekana') {
+					toggleVisibility(numberLabel, false);
+					toggleVisibility(selectedNumberElement, false);
+					toggleVisibility(numberLabel2, false);
+					toggleVisibility(selectedNumber2Element, false);
+					toggleVisibility(modeChoice3Element, false);
+					toggleVisibility(modeChoice5Element, false);
+					toggleVisibility(emptySpaceholder, false);
+					toggleVisibility(placeholderBeforeSkaitinisElement, false);
+					toggleVisibility(modeChoice6Element, false)
 				} else {
 					toggleVisibility(numberLabel, false);
 					toggleVisibility(selectedNumberElement, false);
@@ -214,16 +226,16 @@
 					toggleVisibility(modeChoice3Element, false);
 					toggleVisibility(emptySpaceholder, true);
 					toggleVisibility(placeholderBeforeSkaitinisElement, false);
-
+					toggleVisibility(modeChoice5Element, true);
 				}
 				if (modeChoiceSelection === 'visi') {
 					toggleVisibility(modeChoice3Element, false);
 					toggleVisibility(emptySpaceholder, false);
 					toggleVisibility(placeholderBeforeSkaitinisElement, true);
 				}
-				if (modeChoice5Selection === 'skaitiniai') {
+				if (modeChoice5Selection === 'skaitiniai' && modeChoice2Selection !== 'liekana') {
 					toggleVisibility(modeChoice6Element, false)
-				} else if (modeChoice5Selection === 'nezinomieji') {
+				} else if (modeChoice5Selection === 'nezinomieji' && modeChoice2Selection !== 'liekana') {
 					toggleVisibility(modeChoice6Element, true)					
 				}
 			}
@@ -276,6 +288,7 @@
 
 			} else if (modeChoiceSelection === "dalyba") {
 				modeChoice2Element.innerHTML += '<option value="dauglent">IŠ DAUGYBOS LENTELĖS</option>';
+				modeChoice2Element.innerHTML += '<option value="liekana">DALYBA SU LIEKANA</option>';
 				modeChoice2Element.innerHTML += '<option value="pil10">IŠ PILNŲ DEŠIMČIŲ</option>';
 				modeChoice2Element.innerHTML += '<option value="pil100">IŠ PILNŲ ŠIMTŲ</option>';
 				modeChoice6Element.innerHTML += '<option value="dalinys">NEŽINOMAS DALINYS</option>';
@@ -316,6 +329,8 @@
 
 			} else if (modeChoice2Selection === "lent" && modeChoiceSelection === "sudetis ir atimtis") {
 				modeChoice3Element.innerHTML += '<option value="per10">PERŽENGIANT/IŠARDANT DEŠIMTĮ</option>';
+			} else if (modeChoice2Selection === "liekana") {
+				modeChoice5Element.innerHTML = '<option value="skaitiniai">SKAITINĖ LYGYBĖ</option>';
 
 			} else if (modeChoice2Selection === "viena10" && modeChoiceSelection === "sudetis") {
 				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT DEŠIMTIES</option>';

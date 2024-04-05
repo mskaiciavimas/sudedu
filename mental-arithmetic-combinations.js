@@ -488,8 +488,26 @@ function generateCombinations() {
       }
     }
     controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
+  } else if (controller.modeChoice2 === 'liekana') {
+    for (let number1 = 2; number1 <= 10; number1++) {
+      for (let number2 = 2; number2 <= 9; number2++) {
+        questionPool.push([parseInt(number1 * number2), parseInt(number1), "division"]);
+      }
+    }
+    controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
+    for (let i = 0; i < controller.combinations.length; i++) {
+      let numberDivides = true;
+      while (numberDivides) {
+      let randomNumber = Math.floor(Math.random() * 9) + 1;
+      updatedValue = controller.combinations[i][0] + randomNumber;
+      if (updatedValue % controller.combinations[i][1] !== 0) {
+          controller.combinations[i][0] = updatedValue;
+          numberDivides = false
+      }
+    }
+  }
   } else if (controller.modeChoice2 === 'pil10') {
-    for (let number1 = 1; number1 <= 10; number1++) {
+    for (let number1 = 1; number1 <= 9; number1++) {
       for (let number2 = 1; number2 <= 9; number2++) {
         questionPool.push([parseInt(number1 * number2 * 10), parseInt(number1 * 10), "division"]);
       }

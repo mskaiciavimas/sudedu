@@ -27,6 +27,7 @@ let answerTrackerElement = document.querySelector('#answer-tracker');
 let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 
 
+
 	function formEquation () {
     let remainingTime = parseInt(localStorage.getItem('remainingTime'));
     if (controller.modeChoice4 === 'timer') {
@@ -238,9 +239,9 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
       resetMistakeButtonsElement.style.display = "flex";
     }
 
-    if (controller.modeChoice5 === 'skaitiniai') {
-    equationElement.innerHTML = controller.equation;
-    equation2Element.innerHTML = '';
+    if (controller.modeChoice5 === 'skaitiniai' || controller.modeChoice2 === 'liekana') {
+      equationElement.innerHTML = controller.equation;
+      equation2Element.innerHTML = '';
     } else if (controller.modeChoice5 === 'nezinomieji') {
       equationElement.innerHTML = controller.equation;
       equation2Element.innerHTML = controller.equation2;
@@ -265,6 +266,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 
   function checkAnswer () {
     userAnswer = Number(answerInputElement.value);
+    userAnswerRemainder = Number(answerRemainderInputElement.value);
     const indexToRemove = controller.combinations.findIndex(
       (item) =>
         item[0] === controller.randomSelection[0] &&
@@ -302,13 +304,23 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
           controller.mistakesTracker++;
           recordMistakes(); 
         }
-      } else if (controller.randomSelection[2] === 'division') {
+      } else if (controller.randomSelection[2] === 'division' && controller.modeChoice2 !== 'liekana') {
         if (userAnswer === controller.randomSelection[0] / controller.randomSelection[1]) {
           controller.combinations.splice(indexToRemove, 1);
           controller.correctAnswerTracker++;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer}`];
         } else {
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer}`];
+          controller.mistakesTracker++;
+          recordMistakes(); 
+        }
+      } else if (controller.randomSelection[2] === 'division' && controller.modeChoice2 === 'liekana') {
+        if (userAnswer === Math.floor(controller.randomSelection[0] / controller.randomSelection[1]) && userAnswerRemainder === controller.randomSelection[0] % controller.randomSelection[1]) {
+          controller.combinations.splice(indexToRemove, 1);
+          controller.correctAnswerTracker++;
+          controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer} (liek. ${userAnswerRemainder})`];
+        } else {
+          controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer} (liek. ${userAnswerRemainder})`];
           controller.mistakesTracker++;
           recordMistakes(); 
         }
@@ -498,11 +510,11 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 }
 
 function redirectToIntermediate() {
-  window.location.href = "./pasirinkimai";
+  window.location.href = "./pasirinkimai.html";
 }
 
   function redirectToQuestions() {
-    window.location.href = "./veiksmai";
+    window.location.href = "./veiksmai.html";
   }
 
   function redirectToIndex() {
@@ -510,7 +522,7 @@ function redirectToIntermediate() {
     window.location.href = "./";
   }
   function redirectToSummary () {
-    window.location.href = "./klaidos";
+    window.location.href = "./klaidos.html";
   }
 
  // Function to calculate bar color based on the number of mistakes
