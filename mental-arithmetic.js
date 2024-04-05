@@ -743,3 +743,9 @@ function countDown() {
   // Set up the timer interval to call updateTimer every second
   timerInterval = setInterval(updateTimer, 1000);
 }
+
+document.addEventListener('focusin', function(event) {
+    if (event.target.tagName.toLowerCase() === 'input') {
+        event.preventDefault();
+    }
+});
