@@ -283,7 +283,9 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
       answerTrackerElement.innerHTML = `Atlikai: ${controller.correctAnswerTracker}/${controller.questionNumber}`;
     }
     mistakeTrackerElement.innerHTML = `Suklydai: ${controller.mistakesTracker}`;
+    if (controller.modeChoice7 !== 'stulpeliu') {
     answerInputElement.focus();
+    }
   }
 
   function displayEquation () {
