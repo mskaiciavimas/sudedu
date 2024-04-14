@@ -33,10 +33,13 @@ body {
 
 .previous-equation {
   margin-bottom: 0px;
-  font-size: 4rem;
+  font-size: 3rem;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .middle-line {
+  min-height: 32vh;
   width: 60vw;
   background-color: #FAF1E6;
   padding-top: 45px;
@@ -45,16 +48,19 @@ body {
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
 }
 
+#invisibleRow {
+  display: block !important;
+}
+
 .equation,
 .equation_2 {
-  font-size: 5rem;
+  font-size: 4rem;
   padding-bottom: 6px;
 }
 
 .answer-field-div {
   display: flex;
   padding-left: 2vw;
-  padding-right: 2vw;
 }
 
 .answer-input {
@@ -341,11 +347,15 @@ body {
 
 @media (max-width: 767px) {  
   .upper-line {
-    width: 60vw;
+    width: 80vw;
+  }
+
+  #template-container {
+    max-width: none !important;
   }
 
   .middle-line {
-    width: 96vw;
+    width: 90vw;
   }
 
   #answer-field {
@@ -394,7 +404,7 @@ body {
   }
 
   .previous-equation {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
   }
 
   .reset-button-div {
@@ -408,19 +418,29 @@ body {
   }
 
   .middle-line {
-    width: 95vw;
+    width: 97vw;
   }
 
   .upper-line {
-    width: 85.5vw;
+    width: 86vw;
   }
 
   #answer-field {
-    width: 22vw;
+    width: 24vw;
+  }
+
+  #answer {
+    padding-left: 5px;
+    padding-right: 5px;
   }
 
   #remainder-field {
-    width: 22vw;
+    width: 17vw;
+  }
+
+  #remainder {
+    padding-left: 5px;
+    padding-right: 5px;
   }
 
   .question-submit-button {
@@ -440,11 +460,6 @@ body {
 
   .material-symbols-rounded {
     font-size: 3rem;
-  }
-
-  .answer-field-div {
-    padding-left: 5vw;
-    padding-right: 5vw;
   }
 }
 

@@ -8,9 +8,11 @@ let controller = {
   modeChoice4: '',
   modeChoice5: '',
   modeChoice6: '',
+  modeChoice7: '',
   timerLimit: 0,
   questionNumber: 0,
 	selectedNumbers: [],
+  withRemainder: false,
 	randomSelection: [],
 	combinations: [],
 	equation: '',
@@ -25,6 +27,10 @@ let upperLineElement = document.querySelector('.upper-line');
 let previousEquationElement = document.querySelector('.previous-equation');
 let answerTrackerElement = document.querySelector('#answer-tracker');
 let mistakeTrackerElement = document.querySelector('#mistake-tracker');
+let stulpeliuDivElement = document.querySelector('#stulpeliu-div');
+let divisionStulp1Element = document.querySelector('#division-stulp-1');
+let divisionStulp2Element = document.querySelector('#division-stulp-2');
+let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
 
 
 
@@ -60,18 +66,60 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 		controller.randomSelection = controller.combinations[Math.floor(Math.random() * controller.combinations.length)];
     };
     if (controller.modeChoice5 === "skaitiniai") {
-		if (controller.randomSelection[2] === 'addition') {
-			controller.equation = `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = `;
-		} else if (controller.randomSelection[2] === 'subtraction') {
-			controller.equation = `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = `;
-		} else if (controller.randomSelection[2] === 'multiplication') {
-			controller.equation = `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = `;
-		} else if (controller.randomSelection[2] === 'division') {
-			controller.equation = `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = `;
-    } 
+      if (controller.modeChoice7 === "eilute") {
+        if (controller.randomSelection[2] === 'addition') {
+          controller.equation = `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = `;
+        } else if (controller.randomSelection[2] === 'subtraction') {
+          controller.equation = `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = `;
+        } else if (controller.randomSelection[2] === 'multiplication') {
+          controller.equation = `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = `;
+        } else if (controller.randomSelection[2] === 'division') {
+          controller.equation = `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = `;
+        } 
+      } else if (controller.modeChoice7 === "stulpeliu") {
+        if (controller.randomSelection[2] === 'addition') {
+        const maxLength = 20; // Adjust as needed
+        const item1 = String(controller.randomSelection[0]);
+        const item2 = String(controller.randomSelection[1]);
+    
+        // Pad the items with appropriate spaces to align them
+        const paddedItem1 = item1.padStart(maxLength);
+        const paddedItem2 = item2.padStart(maxLength);
+    
+        // Concatenate the padded items
+        controller.equation = `<div class="demuo-turinys-ateminys" style="text-align: right;">${paddedItem1}</div><div class="demuo-turinys-ateminys" style="text-align: right;">${paddedItem2}</div>`;
+        } else if (controller.randomSelection[2] === 'subtraction') {
+        const maxLength = 20; // Adjust as needed
+        const item1 = String(controller.randomSelection[0]);
+        const item2 = String(controller.randomSelection[1]);
+    
+        // Pad the items with appropriate spaces to align them
+        const paddedItem1 = item1.padStart(maxLength);
+        const paddedItem2 = item2.padStart(maxLength);
+    
+        // Concatenate the padded items
+        controller.equation = `<div class="demuo-turinys-ateminys" style="text-align: right;">${paddedItem1}</div><div class="demuo-turinys-ateminys" style="text-align: right;">${paddedItem2}</div>`;
+      } else if (controller.randomSelection[2] === 'multiplication') {
+        const maxLength = 0; // Adjust as needed
+        const item1 = String(controller.randomSelection[0]);
+        const item2 = String(controller.randomSelection[1]);
+    
+        // Pad the items with appropriate spaces to align them
+        const paddedItem1 = item1.padStart(maxLength);
+        const paddedItem2 = item2.padStart(maxLength);
+    
+        // Concatenate the padded items
+        controller.equation = `<div class="daugiklis" style="text-align: right;">${paddedItem1}</div><div id="antras-daugiklis" class="daugiklis" style="text-align: right;">${paddedItem2}</div>`;
+      } else if (controller.randomSelection[2] === 'division') {
+        const item1 = String(controller.randomSelection[0]);
+        const item2 = String(controller.randomSelection[1]);
+    
+        // Concatenate the padded items
+        controller.equation = `<div id="dalinys-outer-div" style="display: flex; position: relative;"><div id='dalinys'>${item1}</div><div id='daliklis' style="border-bottom: 2px solid black; border-left: 2px solid black;">${item2}</div></div>`;
+      } 
+    }
     } else if (controller.modeChoice5 === "nezinomieji") {
       if (controller.randomSelection[2] === 'addition') {
-
         if (controller.randomSelection[3]) {
           if (controller.randomSelection[3] === 'first') {
             controller.equation = ``;
@@ -183,24 +231,21 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
           }
     }
   }
-}
+
+    }
 
     function formatFinalMessage () {
+      document.querySelector('#invisibleRow').style.display = "none";
       if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.correctAnswerTracker >= 10) {
         triggerFireworks();
       }
-      const computedFontSizeInPx = getComputedStyle(equationElement).fontSize;
-      const rootFontSizeInPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
-      const computedFontSizeInRem = parseFloat(computedFontSizeInPx) / rootFontSizeInPx;
-      let newFontSizeInRem = computedFontSizeInRem - 1;
-      if (newFontSizeInRem < 2) {
-        newFontSizeInRem = 2;
-      }
-      equationElement.style.fontSize = newFontSizeInRem + 'rem';
-      if (newFontSizeInRem > 2) {
-        equationElement.style.paddingTop = '1rem';
-        equationElement.style.paddingBottom = '14px';
-      }
+
+      setFontSize();
+      var contentContainerElement = document.getElementById('content-container');
+      contentContainerElement.style.width = '100%';
+      contentContainerElement.style.marginRight = '0';
+			contentContainerElement.style.marginLeft = '0';
+      
       if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.95) {
         controller.equation = 'Puikiai skaičiuoji!';
       } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.7) {
@@ -230,31 +275,8 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     fireworksDiv.innerHTML = '';
   }
 
-  function displayEquation () {
+  function updateScore () {
     controller = JSON.parse(localStorage.getItem('controller'));
-
-    if (controller.questionsStopped) {
-      answerFieldDivElement.style.display = "none";
-      questionsSubmitButtonElement.style.display = "none";
-      resetMistakeButtonsElement.style.display = "flex";
-    }
-
-    if (controller.modeChoice5 === 'skaitiniai' || controller.modeChoice2 === 'liekana') {
-      equationElement.innerHTML = controller.equation;
-      equation2Element.innerHTML = '';
-    } else if (controller.modeChoice5 === 'nezinomieji') {
-      equationElement.innerHTML = controller.equation;
-      equation2Element.innerHTML = controller.equation2;
-    };
-
-    if (controller.result[0] === 'Incorrect') {
-      upperLineElement.setAttribute("style", "background-color: #D57E7E")
-    } else if (controller.result[0] === 'Correct') {
-      upperLineElement.setAttribute("style", "background-color: #B6C867")
-    } else {
-      upperLineElement.setAttribute("style", "background-color: #FAEDCD")
-    };
-    previousEquationElement.innerHTML = controller.result[4];
     if (controller.modeChoice4 === 'timer') {
       answerTrackerElement.innerHTML = `Atlikai: ${controller.correctAnswerTracker}`;
     } else if (controller.modeChoice4 === 'questionNumber') {
@@ -264,8 +286,296 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     answerInputElement.focus();
   }
 
+  function displayEquation () {
+    controller = JSON.parse(localStorage.getItem('controller'));
+    var contentContainerElement = document.getElementById('content-container');
+		contentContainerElement.style.visibility = 'hidden';
+
+    if (!controller.questionsStopped) {
+		if (controller.modeChoice7 === 'stulpeliu' && controller.randomSelection[2] === 'division') {
+      linkElement.setAttribute("href", "questions-stulpeliu-div.css");
+    } else if (controller.modeChoice7 === 'stulpeliu') {
+			linkElement.setAttribute("href", "questions-stulpeliu.css");
+      var answerSeparator2 = document.getElementById('answer-separator-2');
+      answerSeparator2.style.display = 'block';
+    } else if (controller.withRemainder) {
+			linkElement.setAttribute("href", "questions-remainder.css");
+		} else if (controller.modeChoice2 === "tukst" || 
+    controller.modeChoice2 === "dtukst" || 
+    controller.modeChoice2 === "iki1000" || 
+    controller.modeChoice2 === "iki10000" || 
+    controller.modeChoice2 === "pil10" || 
+    controller.modeChoice2 === "pil100" ||
+    controller.modeChoice2 === "daugtrivien" ||
+    controller.modeChoice2 === "daugketvien" ||
+    controller.modeChoice2 === "daugtridvi" ||
+    controller.modeChoice2 === "daugketdvi" ||
+    controller.modeChoice2 === "daugdaug"
+  ) {
+			linkElement.setAttribute("href", "questions-smaller.css");
+		} else {
+      linkElement.setAttribute("href", "questions-bigger.css");
+    }
+  }   
+		
+
+    if (controller.questionsStopped) {
+      answerFieldDivElement.style.display = "none";
+      questionsSubmitButtonRowElement.style.display = "none";
+      resetMistakeButtonsElement.style.display = "flex";
+      contentContainerElement.style.visibility = 'visible';
+    }
+
+    if (controller.modeChoice7 === 'stulpeliu') {
+      equation2Element.style.display = "none";
+      equationElement.innerHTML = controller.equation;
+      equation2Element.innerHTML = '';
+    } else if (controller.modeChoice5 === 'skaitiniai' || controller.withRemainder) {
+      equation2Element.style.display = "none";
+      equationElement.innerHTML = controller.equation;
+      equation2Element.innerHTML = '';
+      contentContainerElement.style.visibility = 'visible';
+    } else if (controller.modeChoice5 === 'nezinomieji') {
+      equationElement.innerHTML = controller.equation;
+      equation2Element.style.display = "block";
+      equation2Element.innerHTML = controller.equation2;
+      contentContainerElement.style.visibility = 'visible';
+    };
+
+    if (controller.modeChoice7 === 'stulpeliu') {
+      // Need to adjust the modofier
+      fontSizeFullREM = 3*1.3;
+      stulpeliuDivElement.innerHTML = '';
+      divisionStulp1Element .innerHTML = '';
+      divisionStulp2Element .innerHTML = '';
+
+    var answerSeparator1 = document.getElementById('answer-separator-1');
+    var answerSeparator2 = document.getElementById('answer-separator-2');
+
+    arithmeticSymbol.style.display = 'block';
+    if (controller.questionsStopped) {
+      arithmeticSymbol.innerHTML = '';
+    } else if (controller.randomSelection[2] === 'addition') {
+      arithmeticSymbol.innerHTML = '+';
+    } else if (controller.randomSelection[2] === 'subtraction') {
+      arithmeticSymbol.innerHTML = '-';
+    } else if (controller.randomSelection[2] === 'multiplication') {
+      arithmeticSymbol.innerHTML = `\u00D7`;
+    } else if (controller.randomSelection[2] === 'division') {
+      arithmeticSymbol.innerHTML = ``;
+    } 
+      
+   if (controller.randomSelection[2] === 'multiplication') {
+    
+    if (!controller.questionsStopped) {
+      var digitNumber = (controller.randomSelection[1]).toString();
+  
+      var subAnswerNumber = 0;
+      if (digitNumber.length > 1) {
+          subAnswerNumber = parseInt(digitNumber.length);
+      }
+   
+    if (digitNumber.length > 1) {
+        // Add the symbol outside the loop for digitNumber.length - 1 times
+        var parentHeight = stulpeliuDivElement.clientHeight; // Get the height of the parent container
+        var increment = 100 / (digitNumber.length); // Calculate the increment for top position
+        
+        for (var i = 0; i < digitNumber.length; i++) {
+            // Add divs for input fields
+            if (i === 0) {
+              stulpeliuDivElement.innerHTML += '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-right: 0; margin-bottom: 10px;"><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></div>';
+            } else {
+            stulpeliuDivElement.innerHTML += '<div style="position: relative;"><div class="stulpeliu-symbol" style="position: absolute; left: calc((-0.65 * 3rem) + ' + (i*fontSizeFullREM*-0.9) + 'px); top: ' + -100 + '%;">+</div><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-right: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (i) + ')) !important; margin-bottom: 10px;"><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></div></div>';
+            }
+        }
+    }
+  }
+  }
+
+  if (controller.randomSelection[2] === 'division') {
+    
+    if (!controller.questionsStopped) {
+      var digitNumber = controller.randomSelection[1].toString();
+  
+      var subAnswerNumber = 0;
+      subAnswerNumber = parseInt((Math.floor(controller.randomSelection[0]/controller.randomSelection[1])).toString().length);
+ 
+      var counter = 0;
+      var offset = 0;
+      var tempOffset = 0;
+      var subtract = [];
+      var splitNumber1Str;
+      var splitNumber2Str;
+      var splitNumber1Str;
+      var interSplitNumber1Str;
+      var subtractedValue;
+      var halfpush = false;
+      var stopAddingTwoExtraDigits = false;
+      var partialSub = '';
+      let number1 = controller.randomSelection[0];
+      const number2 = controller.randomSelection[1];
+      const daliklisDigits = controller.randomSelection[1].toString().length;
+      for (var i = 0; i < subAnswerNumber*2; i++) {
+        tempOffset = 0;
+        if (counter === 1) {
+          if (subtract[1]) {
+            splitNumber1Str = number1.toString().slice(0, daliklisDigits+1);
+            splitNumber2Str = number1.toString().slice(daliklisDigits+1);
+            partialSub = (Number(splitNumber1Str) - subtract[0]).toString();
+          } else {
+            splitNumber1Str = number1.toString().slice(0, daliklisDigits);
+            splitNumber2Str = number1.toString().slice(daliklisDigits);
+            partialSub = (Number(splitNumber1Str) - subtract[0]).toString();
+          }
+          
+          subtractedValue = Number(partialSub + splitNumber2Str);
+ 
+          if (Number(partialSub) === 0 || partialSub.length === daliklisDigits-1) {
+            stopAddingTwoExtraDigits = true;
+          }
+
+          if (subtractedValue.toString().length === number1.toString().length) {
+            number1 = subtractedValue;
+
+          } else if (subtractedValue.toString().length < number1.toString().length) {
+            if (!halfpush) {
+            offset = offset + 1 * (Number(number1).toString().length - Number(subtractedValue).toString().length); 
+
+            } else {
+              halfpush = false;
+            }
+            number1 = subtractedValue;
+          }
+          counter--;
+        } else {
+          if (Number(number1) > number2) {
+            if (Number(number1.toString().slice(0, daliklisDigits)) < number2 && !stopAddingTwoExtraDigits) { 
+              subtract = [Math.floor(Number(number1.toString().slice(0, daliklisDigits+1)) / number2) * number2, true];
+              if (subtract[0].toString().length < daliklisDigits+1) {
+                offset = offset + 1;  
+                halfpush = true;
+              }
+            } else {
+              subtract = [Math.floor(Number(number1.toString().slice(0, daliklisDigits)) / number2) * number2, false]; 
+              stopAddingTwoExtraDigits = false;  
+            }
+            } else if (Number(number1) === number2) {
+              subtract = [number1, false];
+            } else if (Number(number1) < number2) {
+              subtract = [0, false];
+            }
+            if (i > 1) {
+              if (subtract[1]) {
+                interSplitNumber1Str = number1.toString().slice(0, daliklisDigits+1);
+              } else {
+                interSplitNumber1Str = number1.toString().slice(0, daliklisDigits)
+              }
+              if (interSplitNumber1Str.length > subtract[0].toString.length && !halfpush) {
+                tempOffset = 1 * (interSplitNumber1Str.length - subtract[0].toString().length);
+              }
+            }
+            counter++;
+        }
+
+        if (i === 0) {
+          divisionStulp1Element.innerHTML += '<div style="position: relative;"><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-underline" style="margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset) + ')) !important;"><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></div></div>';
+          var dalinysOuterDivElement = document.getElementById('dalinys-outer-div');
+          dalinysOuterDivElement.innerHTML += '<div style="position: absolute; left: calc((-1.5 * 1.95rem) + ' + (offset)*47 + 'px); top: 40% !important" class="stulpeliu-symbol-div">-</div>';
+        } else {
+          if (counter !== 0) {
+            divisionStulp2Element.innerHTML += '<div class="d-flex justify-content-center align-items-center"><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub stulpeliu-field-underline" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset+tempOffset) + ')) !important;"><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></div><div class="invisibleDiv" style="visibility: hidden; display: block;"></div></div>';
+          } else if (i+1 !== subAnswerNumber*2) {
+            divisionStulp2Element.innerHTML += '<div class="d-flex justify-content-center align-items-center">' +
+            '<div style="position: relative;">' +
+            '<div style="position: absolute; left: calc((-1.5 * 1.5rem) + ' + (offset)*60 + 'px);" class="stulpeliu-symbol-div">-</div>' +
+            '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset+tempOffset) + ')) !important;">' +
+            '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off">' +
+            '</div>' +
+            '</div>' +
+            '<div class="invisibleDiv" style="visibility: hidden; display: block;"></div>' +
+            '</div>';
+          } else {
+            divisionStulp2Element.innerHTML += '<div class="d-flex justify-content-center align-items-center">' +
+            '<div style="position: relative;">' +
+            '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset+tempOffset) + ')) !important;">' +
+            '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off">' +
+            '</div>' +
+            '</div>' +
+            '<div id="liek" class="invisibleDiv" style="visibility: hidden; display: block;">(liek.)</div>' +
+            '</div>';
+          }
+    }
+    
+
+
+    }
+}
+}
+    if (controller.randomSelection[2] !== 'division') {
+    answerSeparator2.style.display = 'block'
+    var element3 = document.querySelector('#stulpeliu-' + (subAnswerNumber - 1));
+    if (element3) {
+      answerSeparator1.style.display = 'block';
+    } else {
+      answerSeparator1.style.display = 'none';
+    }
+
+    if (controller.questionsStopped) {  
+      answerSeparator1.style.display = 'none';
+      answerSeparator2.style.display = 'none';
+    }
+    } else {
+      answerSeparator1.style.display = 'none';
+      answerSeparator2.style.display = 'none';
+    }
+
+    
+    if (controller.modeChoice7 === 'stulpeliu') {
+      setTimeout(function() {
+        if (!controller.questionsStopped) {
+          setMargins();
+        }
+      }, 100);
+    }
+
+      // Select all elements with the class 'stulpeliu-input'
+      const inputElements = document.querySelectorAll('.stulpeliu-input');
+
+      // Loop through each input element and add an event listener
+      inputElements.forEach(function(element) {
+          element.addEventListener('input', function(event) {
+              // Sanitize input field value on input event
+              const sanitizedValue = event.target.value.replace(/[^0-9]/g, '');
+              event.target.value = sanitizedValue;
+          });
+          element.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                checkAnswer();
+                clearAnswerField();
+            }
+          });
+      });
+
+    }
+
+    if (controller.result[0] === 'Incorrect') {
+      upperLineElement.setAttribute("style", "background-color: #D57E7E")
+    } else if (controller.result[0] === 'Correct') {
+      upperLineElement.setAttribute("style", "background-color: #B6C867")
+    } else {
+      upperLineElement.setAttribute("style", "background-color: #FAEDCD")
+    };
+    previousEquationElement.innerHTML = controller.result[4];
+    updateScore();
+    clearAnswerField();
+  }
+
+
+
   function checkAnswer () {
-    userAnswer = Number(answerInputElement.value);
+    var isCorrect = true;
+    userInput = answerInputElement.value.trim();
+    userAnswer = Number(userInput);
     userAnswerRemainder = Number(answerRemainderInputElement.value);
     const indexToRemove = controller.combinations.findIndex(
       (item) =>
@@ -273,7 +583,233 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
         item[1] === controller.randomSelection[1] &&
         item[2] === controller.randomSelection[2]
     );
-    if (controller.modeChoice5 === "skaitiniai") {
+
+    function middleLineCorrectAnswerColor () {
+      var middleLine = document.getElementById('middle-line');
+      middleLine.classList.add('pulse')
+      setTimeout(function() {
+        middleLine.classList.remove('pulse');
+    }, 800);
+    }
+
+    function removeError(element) { 
+      element.classList.remove('error'); 
+    };
+
+      function answerFieldColor(element, corectness) {
+        if (corectness === false) {
+          element.setAttribute("style", "background-color: #D57E7E")
+          clearTimeout(timeoutReference);
+          removeError(element)
+          element.classList.add('error')
+          var timeoutReference = setTimeout(function() {
+            removeError(element);
+        }, 500);
+        } else if (corectness === true) {
+          element.setAttribute("style", "background-color: #B6C867")
+        } else {
+          element.setAttribute("style", "background-color: #FAEDCD")
+        };
+      }
+
+      function flipNumber(number) {
+        var output = number.split('').reverse().join('');
+        return Number(output);
+    }
+
+    if (controller.modeChoice7 === "stulpeliu") {
+      if (controller.randomSelection[2] === 'multiplication') {
+
+      var expectedAnswer = controller.randomSelection[0] * controller.randomSelection[1];
+    
+      if (flipNumber(userInput) !== expectedAnswer) {
+        isCorrect = false;
+      }
+
+      answerFieldColor(answerInputElement, isCorrect);
+
+      var digitNumber = controller.randomSelection[1].toString();
+  
+      if (digitNumber.length > 1) {
+        for (var i = 0; i < digitNumber.length; i++) {
+          var localIsCorrect = true;
+          var reversedDigitNumber = digitNumber.split('').reverse().join('');
+          var digit = parseInt(reversedDigitNumber[i]);
+          if (document.getElementById(`stulpeliu-${i}`).value === '') {
+            localIsCorrect = false;
+            isCorrect = false;
+          }
+  
+          if (flipNumber(document.querySelector('#stulpeliu-' + i).value) !== digit * controller.randomSelection[0]) {
+            isCorrect = false;
+            localIsCorrect = false;
+          }
+          
+          if (document.querySelector('#stulpeliu-' + i).value === '') {
+            localIsCorrect = false;
+          }
+
+          answerFieldColor(document.querySelector('#stulpeliu-' + i), localIsCorrect);
+        }
+      }
+    
+      if (isCorrect) {
+        controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${flipNumber(userInput)}`];
+        controller.combinations.splice(indexToRemove, 1);
+        controller.correctAnswerTracker++;
+      } else {
+        controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${flipNumber(userInput)}`];
+        controller.mistakesTracker++;
+        recordMistakes(); 
+      }
+    
+    
+    } else if (controller.randomSelection[2] === 'division') {
+      var expectedAnswer = Math.floor(controller.randomSelection[0] / controller.randomSelection[1]);
+      var isCorrect = true;
+    
+      if (Number(userInput) !== expectedAnswer) {
+        isCorrect = false;
+        controller.mistakesTracker++;
+        recordMistakes();
+      } 
+      answerFieldColor(answerInputElement, isCorrect);
+        
+        var subAnswerNumber = 0;
+        subAnswerNumber = parseInt((Math.floor(controller.randomSelection[0]/controller.randomSelection[1])).toString().length);
+
+        var counter = 0;
+        var offset = 0;
+        var subtract = [];
+        var splitNumber1Str;
+        var splitNumber2Str;
+        var splitNumber1Str;
+        var subtractedValue;
+        var halfpush = false;
+        var stopAddingTwoExtraDigits = false;
+        var partialSub = 0;
+        let number1 = controller.randomSelection[0];
+        const number2 = controller.randomSelection[1];
+        const daliklisDigits = controller.randomSelection[1].toString().length;
+        for (var i = 0; i < subAnswerNumber*2; i++) {
+          var localIsCorrect = true;
+          divUserSubAnswer = Number(document.getElementById(`stulpeliu-${i}`).value);
+          if (document.getElementById(`stulpeliu-${i}`).value === '') {
+            localIsCorrect = false;
+            isCorrect = false;
+          }
+          if (i+1 === subAnswerNumber*2) {
+            if (divUserSubAnswer !== controller.randomSelection[0] % controller.randomSelection[1]) {
+              isCorrect = false;
+              localIsCorrect = false;
+            }
+          } else {
+          if (counter === 1) {
+            if (subtract[1]) {
+              splitNumber1Str = number1.toString().slice(0, daliklisDigits+1);
+              splitNumber2Str = number1.toString().slice(daliklisDigits+1);
+              partialSub = (Number(splitNumber1Str) - subtract[0]).toString();
+            } else {
+              splitNumber1Str = number1.toString().slice(0, daliklisDigits);
+              splitNumber2Str = number1.toString().slice(daliklisDigits);
+              partialSub = (Number(splitNumber1Str) - subtract[0]).toString();
+            }
+            if (Number(partialSub) >= number2) {
+              if (divUserSubAnswer !== Number(partialSub)) {
+                isCorrect = false;
+                localIsCorrect = false;
+              }
+            } else {
+              if (divUserSubAnswer !== Number(partialSub + splitNumber2Str[0])) {
+                isCorrect = false;
+                localIsCorrect = false;
+              }
+            }
+
+
+            subtractedValue = Number(partialSub + splitNumber2Str);
+
+            if (Number(partialSub) === 0 || partialSub.length === daliklisDigits-1) {
+              stopAddingTwoExtraDigits = true;
+            }
+
+            if (subtractedValue.toString().length === number1.toString().length) {
+              number1 = subtractedValue;
+            } else if (subtractedValue.toString().length < number1.toString().length) {
+              if (!halfpush) {
+              offset = offset + 1 * (Number(number1).toString().length - Number(subtractedValue).toString().length);  
+              } else {
+                halfpush = false;
+              }  
+              number1 = subtractedValue;
+            }
+            counter--;
+          } else {
+              if (Number(number1) > number2) {
+              if (Number(number1.toString().slice(0, daliklisDigits)) < number2 && !stopAddingTwoExtraDigits) {
+                subtract = [Math.floor(Number(number1.toString().slice(0, daliklisDigits+1)) / number2) * number2, true];
+                if (subtract[0].toString().length < daliklisDigits+1) {
+                  offset = offset + 1;  
+                  halfpush = true;
+                }
+              } else {
+                subtract = [Math.floor(Number(number1.toString().slice(0, daliklisDigits)) / number2) * number2, false];  
+                stopAddingTwoExtraDigits = false;      
+              }
+              } else if (Number(number1) === number2) {
+                subtract = [number1, false];
+              } else if (Number(number1) < number2) {
+                subtract = [0, false];
+              }
+              if (divUserSubAnswer !== subtract[0]) {
+                isCorrect = false;
+                localIsCorrect = false;
+              }
+              counter++;
+          }
+        }
+        answerFieldColor(document.querySelector('#stulpeliu-' + i), localIsCorrect);
+      }
+
+      if (isCorrect) {
+        controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], ":", `${controller.randomSelection[0]} : ${controller.randomSelection[1]} = ${userInput}`];
+        controller.combinations.splice(indexToRemove, 1);
+        controller.correctAnswerTracker++;
+      } else {
+        controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], ":", `${controller.randomSelection[0]} : ${controller.randomSelection[1]} = ${userInput}`];
+        controller.mistakesTracker++;
+        recordMistakes(); 
+      }
+
+    } else if (controller.randomSelection[2] === 'addition') {
+      if (flipNumber(userInput) === controller.randomSelection[0] + controller.randomSelection[1]) {
+        controller.combinations.splice(indexToRemove, 1);
+        controller.correctAnswerTracker++;
+        controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
+      } else {
+        controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
+        isCorrect = false;
+        controller.mistakesTracker++;
+        recordMistakes(); 
+      }
+      answerFieldColor(answerInputElement, isCorrect);
+     } else if (controller.randomSelection[2] === 'subtraction') {
+      if (flipNumber(userInput) === controller.randomSelection[0] - controller.randomSelection[1]) {
+        controller.combinations.splice(indexToRemove, 1);
+        controller.correctAnswerTracker++;
+        controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
+      } else {
+        controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
+        isCorrect = false;
+        controller.mistakesTracker++;
+        recordMistakes(); 
+      }
+      answerFieldColor(answerInputElement, isCorrect);
+     }
+      if (isCorrect) {
+        middleLineCorrectAnswerColor();
+      }
+     } else if (controller.modeChoice5 === "skaitiniai") {
     if (controller.randomSelection[2] === 'addition') {
       if (userAnswer === controller.randomSelection[0] + controller.randomSelection[1]) {
         controller.combinations.splice(indexToRemove, 1);
@@ -281,6 +817,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
       } else {
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
+        isCorrect = false;
         controller.mistakesTracker++;
         recordMistakes(); 
       }
@@ -291,6 +828,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
       } else {
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
+        isCorrect = false;
         controller.mistakesTracker++;
         recordMistakes(); 
       }
@@ -301,30 +839,38 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${userAnswer}`];
         } else {
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${userAnswer}`];
+          isCorrect = false;
           controller.mistakesTracker++;
           recordMistakes(); 
         }
-      } else if (controller.randomSelection[2] === 'division' && controller.modeChoice2 !== 'liekana') {
-        if (userAnswer === controller.randomSelection[0] / controller.randomSelection[1]) {
+      } else if (controller.randomSelection[2] === 'division') {
+        if (userAnswer !== Math.floor(controller.randomSelection[0] / controller.randomSelection[1])) {
+          isCorrect = false;
+        }
+        if (controller.withRemainder) {
+          if (userAnswerRemainder !== controller.randomSelection[0] % controller.randomSelection[1]) {
+            isCorrect = false;
+          }
+        }
+        if (isCorrect) {
           controller.combinations.splice(indexToRemove, 1);
           controller.correctAnswerTracker++;
+          if (controller.withRemainder) {
+            controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer} (liek. ${userAnswerRemainder})`];
+          } else {
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer}`];
+          }
         } else {
-          controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer}`];
+          if (controller.withRemainder) {
+            controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer} (liek. ${userAnswerRemainder})`];
+          } else {
+            controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer}`];
+          }
+          isCorrect = false;
           controller.mistakesTracker++;
           recordMistakes(); 
         }
-      } else if (controller.randomSelection[2] === 'division' && controller.modeChoice2 === 'liekana') {
-        if (userAnswer === Math.floor(controller.randomSelection[0] / controller.randomSelection[1]) && userAnswerRemainder === controller.randomSelection[0] % controller.randomSelection[1]) {
-          controller.combinations.splice(indexToRemove, 1);
-          controller.correctAnswerTracker++;
-          controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer} (liek. ${userAnswerRemainder})`];
-        } else {
-          controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer} (liek. ${userAnswerRemainder})`];
-          controller.mistakesTracker++;
-          recordMistakes(); 
-        }
-      }
+      } 
     } else if (controller.modeChoice5 === "nezinomieji") {
       if (controller.randomSelection[2] === 'addition') {
         if (controller.randomSelection[3] === "first") {
@@ -334,6 +880,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
             controller.combinations.splice(indexToRemove, 1);
           } else {
             controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+ first", `${userAnswer} + ${controller.randomSelection[1]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`];
+            isCorrect = false;
             controller.mistakesTracker++;
             recordMistakes(); 
           }
@@ -344,6 +891,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
             controller.combinations.splice(indexToRemove, 1);
           } else {
             controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+ second", `${controller.randomSelection[0]} + ${userAnswer} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
+            isCorrect = false;
             controller.mistakesTracker++;
             recordMistakes(); 
           }
@@ -356,6 +904,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
           controller.combinations.splice(indexToRemove, 1);
         } else {
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "- first", `${userAnswer} - ${controller.randomSelection[1]} = ${controller.randomSelection[0] - controller.randomSelection[1]}`]; 
+          isCorrect = false;
           controller.mistakesTracker++;
           recordMistakes(); 
         }
@@ -366,6 +915,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
           controller.combinations.splice(indexToRemove, 1);
         } else {
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "- second", `${controller.randomSelection[0]} - ${userAnswer} = ${controller.randomSelection[0] - controller.randomSelection[1]}`];  
+          isCorrect = false;
           controller.mistakesTracker++;
           recordMistakes(); 
         }
@@ -378,6 +928,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
           controller.combinations.splice(indexToRemove, 1);
         } else {
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7 first", `${userAnswer} \u00D7 ${controller.randomSelection[1]} = ${controller.randomSelection[0] * controller.randomSelection[1]}`]; 
+          isCorrect = false;
           controller.mistakesTracker++;
           recordMistakes(); 
         }
@@ -388,6 +939,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
           controller.combinations.splice(indexToRemove, 1);
         } else {
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7 first", `${controller.randomSelection[0]} \u00D7 ${userAnswer} = ${controller.randomSelection[0] * controller.randomSelection[1]}`];  
+          isCorrect = false;
           controller.mistakesTracker++;
           recordMistakes(); 
         }
@@ -400,6 +952,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
         controller.combinations.splice(indexToRemove, 1);
       } else {
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${userAnswer} \uA789 ${controller.randomSelection[1]} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
+        isCorrect = false;
         controller.mistakesTracker++;
         recordMistakes(); 
       }
@@ -409,7 +962,8 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${controller.randomSelection[0]} \uA789 ${userAnswer} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
         controller.combinations.splice(indexToRemove, 1);
       } else {
-        controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${controller.randomSelection[0]} \uA789 ${userAnswer} = ${controller.randomSelection[0] / controller.randomSelection[1]}`];  
+        controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${controller.randomSelection[0]} \uA789 ${userAnswer} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
+        isCorrect = false; 
         controller.mistakesTracker++;
         recordMistakes(); 
       }
@@ -418,31 +972,42 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 }
       
 
-        function recordMistakes () {
-        while (controller.currentMistakes.length > 29) {
-          controller.currentMistakes.splice(0, 1)
-        }
-        controller.currentMistakes.push(controller.randomSelection)
-        while (controller.totalMistakes.length > 29) {
-          controller.totalMistakes.splice(0, 1)
-        }
-        controller.totalMistakes.push(controller.randomSelection)
-      }
-    localStorage.setItem('controller', JSON.stringify(controller))
-    formEquation();
-    displayEquation();
+    function recordMistakes () {
+    while (controller.currentMistakes.length > 29) {
+      controller.currentMistakes.splice(0, 1)
+    }
+    controller.currentMistakes.push(controller.randomSelection)
+    while (controller.totalMistakes.length > 29) {
+      controller.totalMistakes.splice(0, 1)
+    }
+    controller.totalMistakes.push(controller.randomSelection)
+  }
+    localStorage.setItem('controller', JSON.stringify(controller));
+
+
+    if (isCorrect || controller.modeChoice7 !== "stulpeliu") {
+      formEquation();
+      displayEquation();
+      answerInputElement.setAttribute("style", "background-color: #FAEDCD")
+    } else {
+      updateScore();
+      setMargins();
+    }
   }
 
-  function restartEquations () {
+  function restartEquations () {	
     disableFireworks();
     equationElement.style.fontSize = '';
     equationElement.style.paddingTop = '0rem';
     equationElement.style.paddingBottom = '6px';
+    document.querySelector('#invisibleRow').style.display = "block";
     controller.currentMistakes = [];
     generateCombinations();
     if (controller.combinations.length > controller.questionNumber) {
       controller.combinations = controller.combinations.slice(0, controller.questionNumber);
     }
+    answerInputElement.value = '';
+    answerInputElement.setAttribute("style", "background-color: #FAEDCD")
     controller.result = ['', '', '', '', ''];
     controller.equation = '';
     controller.equation2 = '';
@@ -451,7 +1016,7 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     controller.randomSelection = [];
     controller.questionsStopped = false;
     answerFieldDivElement.style.display = "flex";
-    questionsSubmitButtonElement.style.display = "flex";
+    questionsSubmitButtonRowElement.style.display = "flex";
     resetMistakeButtonsElement.style.display = "none";
     answerInputElement.style.display = "flex";
     if (localStorage.getItem("startTime")) {
@@ -469,20 +1034,42 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     displayEquation();
   }
 
+  var smallScreen = window.matchMedia('(max-width: 768px)');
+  var mediumScreen = window.matchMedia('(min-width: 769px) and (max-width: 1024px)');
+  var largeScreen = window.matchMedia('(min-width: 1025px)');
+  
+  // Function to set font size based on screen size
+  function setFontSize() {
+      var smallScreen = window.matchMedia('(max-width: 649px)');
+      var mediumScreen = window.matchMedia('(min-width: 650px) and (max-width: 1199px)');
+      var largeScreen = window.matchMedia('(min-width: 1200px)');
+      if (smallScreen.matches) {
+          // Small screen
+          equationElement.style.fontSize = '2rem';
+      } else if (mediumScreen.matches) {
+          // Medium screen
+          equationElement.style.fontSize = '3rem';
+      } else if (largeScreen.matches) {
+          // Large screen
+          equationElement.style.fontSize = '4rem';
+      }
+  }
+
   function stopEquations () {
-    if (!controller.questionsStopped) {
-      const computedFontSizeInPx = getComputedStyle(equationElement).fontSize;
-      const rootFontSizeInPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
-      const computedFontSizeInRem = parseFloat(computedFontSizeInPx) / rootFontSizeInPx;
-      let newFontSizeInRem = computedFontSizeInRem - 1;
-      if (newFontSizeInRem < 2) {
-        newFontSizeInRem = 2;
-      }
-      equationElement.style.fontSize = newFontSizeInRem + 'rem';
-      if (newFontSizeInRem > 2) {
-        equationElement.style.paddingTop = '1rem';
-        equationElement.style.paddingBottom = '14px';
-      }
+      var answerSeparator1 = document.getElementById('answer-separator-1');
+      var answerSeparator2 = document.getElementById('answer-separator-2');
+      var contentContainerElement = document.getElementById('content-container');
+
+      contentContainerElement.style.width = '100%';
+      contentContainerElement.style.marginRight = '0';
+			contentContainerElement.style.marginLeft = '0';
+
+      answerSeparator1.style.display = 'none';
+      answerSeparator2.style.display = 'none';
+      arithmeticSymbol.innerHTML = '';
+      
+      setFontSize();
+    
       if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.95) {
         controller.equation = 'Puikiai skaičiuoji!';
       } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.7) {
@@ -500,13 +1087,13 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
     controller.randomSelection = []; 
     controller.questionsStopped = true;
 
+    document.querySelector('#invisibleRow').style.display = "none";
     document.querySelector('.answer-field-div').style.display = "none";
-    questionsSubmitButtonElement.style.display = "none";
+    questionsSubmitButtonRowElement.style.display = "none";
     resetMistakeButtonsElement.style.display = "flex";
     localStorage.setItem('controller', JSON.stringify(controller))
     clearInterval(timerInterval);
     displayEquation()
-  }
 }
 
 function redirectToIntermediate() {
@@ -743,9 +1330,3 @@ function countDown() {
   // Set up the timer interval to call updateTimer every second
   timerInterval = setInterval(updateTimer, 1000);
 }
-
-document.addEventListener('focusin', function(event) {
-    if (event.target.tagName.toLowerCase() === 'input') {
-        event.preventDefault();
-    }
-});

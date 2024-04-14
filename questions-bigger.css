@@ -33,9 +33,12 @@ body {
 .previous-equation {
   margin-bottom: 0px;
   font-size: 4rem;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .middle-line {
+  min-height: 32vh;
   width: 50vw;
   background-color: #FAF1E6;
   padding-top: 45px;
@@ -44,10 +47,19 @@ body {
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
 }
 
+#invisibleRow {
+  display: block !important;
+}
+
 .equation,
 .equation_2 {
   font-size: 5rem;
   padding-bottom: 6px;
+}
+
+.equation_2 {
+  padding-left: 1.5vw;
+  padding-right: 1.5vw;
 }
 
 .answer-field-div {
@@ -125,10 +137,6 @@ body {
   background-color: #01937C;
   border-color: #01937C;
   color: black;
-}
-
-.restart-div {
-  padding-left: 2vw;
 }
 
 .restart-button {
@@ -238,7 +246,6 @@ body {
 }
 
 @media (max-width: 1200px) {
-
   #answer-field {
     width: 18vw;
   }
@@ -279,6 +286,11 @@ body {
 
   .previous-equation {
     font-size: 3rem;
+  }
+
+  .equation_2 {
+    padding-left: 2vw;
+    padding-right: 2vw;
   }
 
   .middle-line {
@@ -323,6 +335,11 @@ body {
 
   .previous-equation {
     font-size: 2.5rem;
+  }
+
+  .equation_2 {
+    padding-left: 3.5vw;
+    padding-right: 3.5vw;
   }
 
   .reset-button-div {

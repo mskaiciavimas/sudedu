@@ -107,6 +107,13 @@
 								</select>
 							</div>
 						</div>
+						<div class="col-sm-12 empty-placeholder-after-number-options" id="empty-placeholder-after-numbers" style="display: none;"></div>
+						<div class="row d-flex justify-content-center align-items-center text-center remainder-div">
+						<label id="remainder-option" style="display: none;">
+							<input id="remainder-input" type="checkbox" name="myCheckbox"> DALYBA SU LIEKANA
+						</label>
+						</div>
+
 						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_3_div">
 							<div
 								class="col-12 d-flex justify-content-center align-items-center number_choice_div text-center mode_choice_3_div"
@@ -117,7 +124,7 @@
 								</select>
 							</div>
 						</div>
-						<div class="col-sm-12 empty-placeholder-between-options placeholder-before-skaitinis" id="empty-placeholder-top"></div>
+						<div class="col-sm-12 empty-placeholder-between-options placeholder-before-skaitinis" id="empty-placeholder-before-mode-choice-div-5"></div>
 						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
 							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_5"
 								id="mode_choice_5">
@@ -130,6 +137,13 @@
 							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_6"
 								id="mode_choice_6" style="display: none;">
 								<option value="turinys">NEŽINOMAS DĖMUO</option>
+							</select>
+						</div>
+						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
+							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_7"
+								id="mode_choice_7" style="display: block;">
+								<option value="eilute">EILUTE</option>
+								<option value="stulpeliu">STULPELIU</option>
 							</select>
 						</div>
 						<div class="row">
@@ -169,12 +183,14 @@
 		let selectedNumberElement = document.querySelector('#selected_number');
 		let numberLabel2 = document.querySelector('#number_label_2');
 		let selectedNumber2Element = document.querySelector('#selected_number_2');
+		let remainderOptionElement = document.querySelector('#remainder-option');
 		let modeChoice3Element = document.querySelector('#mode_choice_3');
 		let emptySpaceholder = document.querySelector('#placeholder-bottom');
 		let modeChoice5Element = document.querySelector('#mode_choice_5');
 		let modeChoice6Element = document.querySelector('#mode_choice_6');
+		let modeChoice7Element = document.querySelector('#mode_choice_7');
 		let placeholderBeforeSkaitinisElement = document.querySelector('.placeholder-before-skaitinis');
-
+		let placeholderAfterNumbersElement = document.querySelector('#empty-placeholder-after-numbers');
 
 			function handleModeChoiceChange() {
 				let modeChoiceSelection = modeChoiceElement.value;
@@ -189,8 +205,13 @@
 				}
 			}
 
+				if (modeChoice5Selection === 'skaitiniai') {
+					toggleVisibility(modeChoice7Element, true);
+				} else {
+					toggleVisibility(modeChoice7Element, false);
+				}
 				if (
-					(modeChoiceSelection === 'daugyba' && (modeChoice2Selection !== 'pil10' && modeChoice2Selection !== 'pil100')) || (modeChoiceSelection === 'dalyba' && (modeChoice2Selection !== 'pil10' && modeChoice2Selection !== 'pil100' && modeChoice2Selection !== 'liekana')) || (modeChoiceSelection === 'daugyba ir dalyba' && (modeChoice2Selection !== 'pil10' && modeChoice2Selection !== 'pil100'))) {
+					(modeChoiceSelection === 'daugyba' && (modeChoice2Selection !== 'pil10' && modeChoice2Selection !== 'pil100' && modeChoice2Selection !== 'daugdvivien' && modeChoice2Selection !== 'daugtrivien' && modeChoice2Selection !== 'daugketvien' && modeChoice2Selection !== 'daugtridvi' && modeChoice2Selection !== 'daugketdvi' && modeChoice2Selection !== 'daugdaug')) || (modeChoiceSelection === 'dalyba' && (modeChoice2Selection !== 'pil10' && modeChoice2Selection !== 'pil100' && modeChoice2Selection !== 'daugdvivien' && modeChoice2Selection !== 'daugtrivien' && modeChoice2Selection !== 'daugketvien' && modeChoice2Selection !== 'daugtridvi' && modeChoice2Selection !== 'daugketdvi' && modeChoice2Selection !== 'daugdaug')) || (modeChoiceSelection === 'daugyba ir dalyba' && (modeChoice2Selection !== 'daugdvivien' && modeChoice2Selection !== 'daugtrivien' && modeChoice2Selection !== 'daugketvien' && modeChoice2Selection !== 'daugtridvi' && modeChoice2Selection !== 'daugketdvi' && modeChoice2Selection !== 'daugdaug' && modeChoice2Selection !== 'pil10' && modeChoice2Selection !== 'pil100'))) {
 					toggleVisibility(numberLabel, true);
 					toggleVisibility(selectedNumberElement, true);
 					toggleVisibility(numberLabel2, true);
@@ -208,16 +229,6 @@
 					toggleVisibility(emptySpaceholder, true);
 					toggleVisibility(placeholderBeforeSkaitinisElement, true);
 					toggleVisibility(modeChoice5Element, true);
-				} else if (modeChoiceSelection === 'dalyba' && modeChoice2Selection === 'liekana') {
-					toggleVisibility(numberLabel, false);
-					toggleVisibility(selectedNumberElement, false);
-					toggleVisibility(numberLabel2, false);
-					toggleVisibility(selectedNumber2Element, false);
-					toggleVisibility(modeChoice3Element, false);
-					toggleVisibility(modeChoice5Element, false);
-					toggleVisibility(emptySpaceholder, false);
-					toggleVisibility(placeholderBeforeSkaitinisElement, false);
-					toggleVisibility(modeChoice6Element, false)
 				} else {
 					toggleVisibility(numberLabel, false);
 					toggleVisibility(selectedNumberElement, false);
@@ -228,20 +239,31 @@
 					toggleVisibility(placeholderBeforeSkaitinisElement, false);
 					toggleVisibility(modeChoice5Element, true);
 				}
+				if ((modeChoiceSelection === 'dalyba' || modeChoiceSelection === 'daugyba ir dalyba') && modeChoice2Selection === 'dauglent') {
+					toggleVisibility(remainderOptionElement, true);
+					toggleVisibility(placeholderBeforeSkaitinisElement, true);
+					toggleVisibility(placeholderAfterNumbersElement, true)
+				}
+				else if (modeChoiceSelection === 'dalyba' || modeChoiceSelection === 'daugyba ir dalyba') {
+					toggleVisibility(remainderOptionElement, true);
+					toggleVisibility(placeholderBeforeSkaitinisElement, true);
+					toggleVisibility(placeholderAfterNumbersElement, false)
+				}
+				else {
+					toggleVisibility(remainderOptionElement, false);
+					toggleVisibility(placeholderAfterNumbersElement, false)
+				}
 				if (modeChoiceSelection === 'visi') {
 					toggleVisibility(modeChoice3Element, false);
 					toggleVisibility(emptySpaceholder, false);
 					toggleVisibility(placeholderBeforeSkaitinisElement, true);
 				}
-				if (modeChoice5Selection === 'skaitiniai' && modeChoice2Selection !== 'liekana') {
+				if (modeChoice5Selection === 'skaitiniai') {
 					toggleVisibility(modeChoice6Element, false)
-				} else if (modeChoice5Selection === 'nezinomieji' && modeChoice2Selection !== 'liekana') {
+				} else if (modeChoice5Selection === 'nezinomieji') {
 					toggleVisibility(modeChoice6Element, true)					
 				}
 			}
-			modeChoiceElement.addEventListener('change', handleModeChoiceChange);
-			modeChoice2Element.addEventListener('change', handleModeChoiceChange);
-			modeChoice5Element.addEventListener('change', handleModeChoiceChange);
 
 		function updateModeChoice2() {
 			let modeChoiceSelection = modeChoiceElement.value;
@@ -282,13 +304,24 @@
 
 			} else if (modeChoiceSelection === "daugyba") {
 				modeChoice2Element.innerHTML += '<option value="dauglent">DAUGYBOS LENTELĖ</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdvivien">DVIŽENKLIO IR VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugtrivien">TRIŽENKLIO IR VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugketvien">KETURŽENKLIO IR VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugtridvi">TRIŽENKLIO IR DVIŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugketdvi">KETURŽENKLIO IR DVIŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdaug">DAUGIAŽENKLIŲ SKAIČIŲ</option>';
 				modeChoice2Element.innerHTML += '<option value="pil10">IŠ PILNŲ DEŠIMČIŲ</option>';
 				modeChoice2Element.innerHTML += '<option value="pil100">IŠ PILNŲ ŠIMTŲ</option>';
 				modeChoice6Element.innerHTML += '<option value="dalinys">NEŽINOMAS DAUGINAMASIS</option>';
 
 			} else if (modeChoiceSelection === "dalyba") {
 				modeChoice2Element.innerHTML += '<option value="dauglent">IŠ DAUGYBOS LENTELĖS</option>';
-				modeChoice2Element.innerHTML += '<option value="liekana">DALYBA SU LIEKANA</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdvivien">DVIŽENKLIO IŠ VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugtrivien">TRIŽENKLIO IŠ VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugketvien">KETURŽENKLIO IŠ VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugtridvi">TRIŽENKLIO IŠ DVIŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugketdvi">KETURŽENKLIO IŠ DVIŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdaug">DAUGIAŽENKLIŲ SKAIČIŲ</option>';
 				modeChoice2Element.innerHTML += '<option value="pil10">IŠ PILNŲ DEŠIMČIŲ</option>';
 				modeChoice2Element.innerHTML += '<option value="pil100">IŠ PILNŲ ŠIMTŲ</option>';
 				modeChoice6Element.innerHTML += '<option value="dalinys">NEŽINOMAS DALINYS</option>';
@@ -296,6 +329,12 @@
 
 			} else if (modeChoiceSelection === "daugyba ir dalyba") {
 				modeChoice2Element.innerHTML += '<option value="dauglent">IŠ DAUGYBOS LENTELĖS</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdvivien">DVIŽENKLIO IR VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugtrivien">TRIŽENKLIO IR VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugketvien">KETURŽENKLIO IR VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugtridvi">TRIŽENKLIO IR DVIŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugketdvi">KETURŽENKLIO IR DVIŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdaug">DAUGIAŽENKLIŲ SKAIČIŲ</option>';
 				modeChoice2Element.innerHTML += '<option value="pil10">IŠ PILNŲ DEŠIMČIŲ</option>';
 				modeChoice2Element.innerHTML += '<option value="pil100">IŠ PILNŲ ŠIMTŲ</option>';
 				modeChoice6Element.innerHTML += '<option value="dalinys">NEŽINOMAS DAUGINAMASIS/DALINYS/DALIKLIS</option>';
@@ -318,6 +357,9 @@
 			let modeChoice2Selection = modeChoice2Element.value;
 
 			modeChoice3Element.innerHTML = "";
+			modeChoice5Element.innerHTML = "";
+			modeChoice5Element.innerHTML += '<option value="skaitiniai">SKAITINĖ LYGYBĖ</option>';
+			modeChoice5Element.innerHTML += '<option value="nezinomieji">SKAITINĖ LYGYBĖ SU NEŽINOMUOJU</option>';
 
 			if (modeChoice2Selection === "viena" && modeChoiceSelection === "sudetis") {
 				modeChoice3Element.innerHTML += '<option value="neper">PERŽENGIANT DEŠIMTĮ</option>';
@@ -329,9 +371,6 @@
 
 			} else if (modeChoice2Selection === "lent" && modeChoiceSelection === "sudetis ir atimtis") {
 				modeChoice3Element.innerHTML += '<option value="per10">PERŽENGIANT/IŠARDANT DEŠIMTĮ</option>';
-			} else if (modeChoice2Selection === "liekana") {
-				modeChoice5Element.innerHTML = '<option value="skaitiniai">SKAITINĖ LYGYBĖ</option>';
-
 			} else if (modeChoice2Selection === "viena10" && modeChoiceSelection === "sudetis") {
 				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT DEŠIMTIES</option>';
 			} else if (modeChoice2Selection === "viena10" && modeChoiceSelection === "atimtis") {
@@ -393,6 +432,43 @@
 		modeChoiceElement.addEventListener('change', updateModeChoice3);
 		modeChoice2Element.addEventListener('change', updateModeChoice3);
 
+		function updateModeChoice7() {
+			let modeChoice5Selection = modeChoice5Element.value;
+			let modeChoice2Selection = modeChoice2Element.value;
+
+			if (modeChoice5Selection === 'nezinomieji') {
+				modeChoice7Element.innerHTML = '<option value="eilute">EILUTE</option>';
+			} else if (modeChoice5Selection === 'skaitiniai') {
+				modeChoice7Element.innerHTML = '';
+				modeChoice7Element.innerHTML += '<option value="eilute">EILUTE</option>';
+				modeChoice7Element.innerHTML += '<option value="stulpeliu">STULPELIU</option>';
+		}
+		}
+
+		modeChoiceElement.addEventListener('change', updateModeChoice7);
+		modeChoice5Element.addEventListener('change', updateModeChoice7);
+		modeChoice2Element.addEventListener('change', updateModeChoice7);
+
+		modeChoiceElement.addEventListener('change', handleModeChoiceChange);
+		modeChoice2Element.addEventListener('change', handleModeChoiceChange);
+		modeChoice5Element.addEventListener('change', handleModeChoiceChange);
+
+
+		var checkbox = document.getElementById("remainder-input");
+		function updateModeChoice5() {
+			if (checkbox.checked) {
+				modeChoice5Element.innerHTML = '<option value="skaitiniai">SKAITINĖ LYGYBĖ</option>';
+			} else {
+				modeChoice5Element.innerHTML = '';
+				modeChoice5Element.innerHTML += '<option value="skaitiniai">SKAITINĖ LYGYBĖ</option>';
+				modeChoice5Element.innerHTML += '<option value="nezinomieji">SKAITINĖ LYGYBĖ SU NEŽINOMUOJU</option>';
+			}
+		}
+
+		checkbox.addEventListener('change', updateModeChoice5);
+		checkbox.addEventListener('change', handleModeChoiceChange);
+		checkbox.addEventListener('change', updateModeChoice7);
+
 		function submitSelection() {
 			if (localStorage.getItem('controller') !== null) {
 				controller = JSON.parse(localStorage.getItem('controller'))
@@ -403,13 +479,18 @@
 			modeChoice3Selection = modeChoice3Element.value;
 			modeChoice5Selection = modeChoice5Element.value;
 			modeChoice6Selection = modeChoice6Element.value;
+			modeChoice7Selection = modeChoice7Element.value;
+
+			var checkbox = document.getElementById("remainder-input");
 
 			controller.modeChoice = modeChoiceSelection;
 			controller.modeChoice2 = modeChoice2Selection;
 			controller.selectedNumbers = selectedNumbers;
+			controller.withRemainder = checkbox.checked;
 			controller.modeChoice3 = modeChoice3Selection;
 			controller.modeChoice5 = modeChoice5Selection;
 			controller.modeChoice6 = modeChoice6Selection;
+			controller.modeChoice7 = modeChoice7Selection;
 			controller.result = ['', '', '', '', '']
 
 			localStorage.setItem('controller', JSON.stringify(controller))
@@ -426,19 +507,26 @@
 		};
 
 		window.onload = function () {
-			// Reset the selected options of the dropdowns
-			modeChoiceElement.selectedIndex = 0;
-			modeChoice2Element.selectedIndex = 0;
-			selectedNumberElement.selectedIndex = 0;
-			selectedNumber2Element.selectedIndex = 0;
-			modeChoice3Element.selectedIndex = 0;
-			modeChoice5Element.selectedIndex = 0;
-			modeChoice6Element.selectedIndex = 0;
 			if (localStorage.getItem('controller') !== null) {
 				summaryButtonElement.style.visibility = "visible";
 			};
 			document.querySelector('#template-container').removeAttribute('hidden');
 		};
+
+		window.addEventListener("pageshow", function() {
+    var selects = document.querySelectorAll('select');
+    selects.forEach(function(select) {
+        var selectedOption = select.querySelector('[selected]');
+        var selectedIndex = selectedOption ? Array.from(select.children).indexOf(selectedOption) : 0;
+        select.selectedIndex = selectedIndex;
+    });
+
+    var checkbox = document.getElementById('remainder-input');
+    if (checkbox) {
+        checkbox.checked = false; // Deselect the checkbox
+    }
+});
+
 	</script>
 </body>
 
