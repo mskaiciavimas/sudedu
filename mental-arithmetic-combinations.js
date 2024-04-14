@@ -566,8 +566,12 @@ function generateCombinations() {
         remainder = generateRandomNumber(1, number1)
       }
       dalinys = (number1 * number2) + remainder;
+      if (controller.withRemainder) {
+        if ((((number1 * number2) + remainder) % number1) !== 0) {
       if (dalinys <= 99 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
         questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+    }
     }
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
@@ -580,8 +584,12 @@ function generateCombinations() {
         remainder = generateRandomNumber(1, number1)
       }
       dalinys = (number1 * number2) + remainder;
+      if (controller.withRemainder) {
+        if ((((number1 * number2) + remainder) % number1) !== 0) {
       if (dalinys <= 999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
         questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+    }
     }
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
@@ -594,8 +602,12 @@ function generateCombinations() {
         remainder = generateRandomNumber(1, number1)
       }
       dalinys = (number1 * number2) + remainder;
+      if (controller.withRemainder) {
+        if ((((number1 * number2) + remainder) % number1) !== 0) {
       if (dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
         questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+    }
     }
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
@@ -608,8 +620,12 @@ function generateCombinations() {
         remainder = generateRandomNumber(1, number1)
       }
       dalinys = (number1 * number2) + remainder;
+      if (controller.withRemainder) {
+        if ((((number1 * number2) + remainder) % number1) !== 0) {
       if (dalinys <= 999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
         questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+    }
     }
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
@@ -622,8 +638,12 @@ function generateCombinations() {
         remainder = generateRandomNumber(1, number1)
       }
       dalinys = (number1 * number2) + remainder;
+      if (controller.withRemainder) {
+        if ((((number1 * number2) + remainder) % number1) !== 0) {
       if (dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
         questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+    }
     }
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
@@ -636,8 +656,12 @@ function generateCombinations() {
         remainder = generateRandomNumber(1, number1)
       }
       dalinys = (number1 * number2) + remainder;
+      if (controller.withRemainder) {
+        if ((((number1 * number2) + remainder) % number1) !== 0) {
       if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
         questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+    }
     }
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
@@ -666,7 +690,11 @@ function generateCombinations() {
         if (controller.withRemainder) {
           remainder = generateRandomNumber(1, number1*10)
         }
+        if (controller.withRemainder) {
+          if ((((number1 * number2 * 10) + remainder) % number1*10) !== 0) {
         questionPool.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
+          }
+        }
       }
     }
     controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
@@ -676,7 +704,11 @@ function generateCombinations() {
         if (controller.withRemainder) {
           remainder = generateRandomNumber(1, number1*100)
         }
+        if (controller.withRemainder) {
+          if ((((number1 * number2 * 100) + remainder) % number1 * 100) !== 0) {
         questionPool.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+          }
+        }
       }
     }
     controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
@@ -730,8 +762,12 @@ function generateCombinations() {
           remainder = generateRandomNumber(1, number1)
         }
         let dalinys = (number1 * number2) + remainder;
+        if (controller.withRemainder) {
+          if ((((number1 * number2) + remainder) % number1) !== 0) {
         if (dalinys <= 99 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
             questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        }
+      }
         }
     }
     controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
@@ -748,8 +784,12 @@ function generateCombinations() {
         remainder = generateRandomNumber(1, number1)
       }
       let dalinys = (number1 * number2) + remainder;
+      if (controller.withRemainder) {
+        if ((((number1 * number2) + remainder) % number1) !== 0) {
       if (dalinys <= 999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
           questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+    }
       }
   }
   controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
@@ -766,8 +806,12 @@ function generateCombinations() {
         remainder = generateRandomNumber(1, number1)
       }
       let dalinys = (number1 * number2) + remainder;
+      if (controller.withRemainder) {
+        if ((((number1 * number2) + remainder) % number1) !== 0) {
       if (dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
           questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+    }
       }
   }
   controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
@@ -784,8 +828,12 @@ while (questionPool3.length < 10) {
       remainder = generateRandomNumber(1, number1)
     }
     let dalinys = (number1 * number2) + remainder;
+    if (controller.withRemainder) {
+      if ((((number1 * number2) + remainder) % number1) !== 0) {
     if (dalinys <= 999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
         questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    }
+  }
     }
 }
 controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
@@ -802,8 +850,12 @@ while (questionPool3.length < 10) {
       remainder = generateRandomNumber(1, number1)
     }
     let dalinys = (number1 * number2) + remainder;
+    if (controller.withRemainder) {
+      if ((((number1 * number2) + remainder) % number1) !== 0) {
     if (dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
         questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    }
+  }
     }
 }
 controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
@@ -821,8 +873,12 @@ controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - M
         remainder = generateRandomNumber(1, number1)
       }
       let dalinys = (number1 * number2) + remainder;
+      if (controller.withRemainder) {
+        if ((((number1 * number2) + remainder) % number1) !== 0) {
       if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
           questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+    }
       }
   }
   controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
@@ -837,7 +893,11 @@ controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - M
         if (controller.withRemainder) {
           remainder = generateRandomNumber(1, number1*10)
         }
+        if (controller.withRemainder) {
+          if ((((number1 * number2 * 10) + remainder*10) % number1) !== 0) {
         questionPool3.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
+          }
+        }
       }
     }
     questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
@@ -854,7 +914,11 @@ controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - M
         if (controller.withRemainder) {
           remainder = generateRandomNumber(1, number1*100)
         }
+        if (controller.withRemainder) {
+          if ((((number1 * number2 * 100) + remainder) % number1*100) !== 0) {
         questionPool3.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+          }
+        }
       }
     }
     questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
@@ -969,8 +1033,12 @@ controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - M
             remainder = generateRandomNumber(1, number1)
           }
           let dalinys = (number1 * number2) + remainder;
+          if (controller.withRemainder) {
+            if ((((number1 * number2) + remainder) % number1) !== 0) {
           if (dalinys < 1000 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
               questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+          }
+        }
           }
       }
 
@@ -1026,8 +1094,12 @@ controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - M
               remainder = generateRandomNumber(1, number1)
             }
             let dalinys = (number1 * number2) + remainder;
+            if (controller.withRemainder) {
+              if ((((number1 * number2) + remainder) % number1) !== 0) {
             if (dalinys < 10000 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
                 questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+            }
+          }
             }
         }
   
