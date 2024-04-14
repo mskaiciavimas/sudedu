@@ -535,7 +535,7 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
         if (!controller.questionsStopped) {
           setMargins();
         }
-      }, 100);
+      }, 500);
     }
 
       // Select all elements with the class 'stulpeliu-input'
