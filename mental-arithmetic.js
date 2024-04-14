@@ -543,6 +543,7 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
 
       // Loop through each input element and add an event listener
       inputElements.forEach(function(element) {
+	  element.setAttribute("inputmode", "numeric");    
           element.addEventListener('input', function(event) {
               // Sanitize input field value on input event
               const sanitizedValue = event.target.value.replace(/[^0-9]/g, '');
