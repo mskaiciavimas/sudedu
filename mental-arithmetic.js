@@ -673,8 +673,6 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
     
       if (Number(userInput) !== expectedAnswer) {
         isCorrect = false;
-        controller.mistakesTracker++;
-        recordMistakes();
       } 
       answerFieldColor(answerInputElement, isCorrect);
         
