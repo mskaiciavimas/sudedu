@@ -4,10 +4,46 @@ function generateCombinations() {
   questionPool3 = [];
   questionPool4 = []
   remainder = 0;
+
+  function neperzengiant(number1, number2) {
+    num1 = number1.toString();
+    num2 = number2.toString();
+    const minDigits = Math.min(num1.length, num2.length);
+
+    let neper = true;
+    for (let i = 0; i < minDigits; i++) {
+        const digit1 = parseInt(num1[num1.length - i - 1]);
+        const digit2 = parseInt(num2[num2.length - i - 1]);
+
+        if (digit1 + digit2 >= 10) {
+            neper = false;
+            break;
+        }
+    }
+    return neper;
+  }
+
+  function neisardant (number1, number2) {
+    num1 = number1.toString();
+    num2 = number2.toString();
+    const minDigits = Math.min(num1.length, num2.length);
+
+    let neisard = true;
+    for (let i = 0; i <= minDigits; i++) {
+      const digit1 = parseInt(num1[num1.length - i]);
+      const digit2 = parseInt(num2[num2.length - i]);
+
+      if (digit1 < digit2) {
+        neisard = false
+        break;
+      }
+    }
+    return neisard;
+  }
+
   /*ADDITION*/
   if (controller.modeChoice === 'sudetis') {
     if (controller.modeChoice2 === 'viena10') {
-      if (controller.modeChoice3 === 'neper') {
         for (let number1 = 1; number1 <= 9; number1++) {
           for (let number2 = 1; number2 <= 9; number2++) {
              if (number1 + number2 <= 10) {
@@ -16,9 +52,7 @@ function generateCombinations() {
           }
         }
         controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-      }
     } else if (controller.modeChoice2 === 'viena') {
-      if (controller.modeChoice3 === 'neper') {
         for (let number1 = 1; number1 <= 9; number1++) {
           for (let number2 = 1; number2 <= 9; number2++) {
             if (11 <= number1 + number2 && number1 + number2 <= 19) {
@@ -27,99 +61,92 @@ function generateCombinations() {
           }
         }
           controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-      }
     } else if (controller.modeChoice2 === 'dvivien20') {
-      if (controller.modeChoice3 === 'neper') {
           for (let number1 = 10; number1 <= 19; number1++) {
             for (let number2 = 1; number2 <= 9; number2++) {
-              if (number1 + number2 <= 20) {
+              if (number1 + number2 < 20) {
                 questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
               }
             }
           }
           controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-        }
       } else if (controller.modeChoice2 === 'dvivien') {
-        if (controller.modeChoice3 === 'neper') {
             for (let number1 = 10; number1 <= 99; number1++) {
               for (let number2 = 1; number2 <= 9; number2++) {
-                if (parseInt(number1.toString()[1]) + number2 < 10 && number1 + number2 < 100) {
+                if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 <= 100) {
                   questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
                 }
               }
             }
-          } else if (controller.modeChoice3 === 'per10') {
-            for (let number1 = 10; number1 <= 99; number1++) {
-              for (let number2 = 1; number2 <= 9; number2++) {
-                if (parseInt(number1.toString()[1]) + number2 > 10 && number1 + number2 < 100) {
-                  questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
-                }
-              }
-            }
-          }
           controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
         } else if (controller.modeChoice2 === 'dvi') {
-          if (controller.modeChoice3 === 'neper') {
               for (let number1 = 10; number1 <= 99; number1++) {
                 for (let number2 = 10; number2 <= 99; number2++) {
-                  if (parseInt(number1.toString()[1]) + parseInt(number2.toString()[1]) < 10 && number1 + number2 < 100) {
+                  if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 <= 100) {
                     questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
                   }
                 }
               }
-            } else if (controller.modeChoice3 === 'per10') {
-              for (let number1 = 10; number1 <= 99; number1++) {
-                for (let number2 = 1; number2 <= 99; number2++) {
-                  if (parseInt(number1.toString()[1]) + parseInt(number2.toString()[1]) > 10 && number1 + number2 < 100) {
-                    questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
-                  }
-                }
-              }
-            } 
             controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
           } else if (controller.modeChoice2 === 'tukst') {
-            if (controller.modeChoice3 === 'neper') {
                 while (questionPool.length < 20) {
                   number1 = generateRandomNumber(101, 999);
                   number2 = generateRandomNumber(11, 999);
-                    if (parseInt(number1.toString().slice(-1)[0]) + parseInt(number2.toString().slice(-1)[0]) < 10 && parseInt(number1.toString().slice(-2)[0]) + parseInt(number2.toString().slice(-2)[0]) < 10 && number1 + number2 < 1000) {
+                    if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000) {
                       questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
                   }
                 }
-            } else if (controller.modeChoice3 === 'per10') {
-                  while (questionPool.length < 20) {
-                    number1 = generateRandomNumber(101, 999);
-                    number2 = generateRandomNumber(11, 999);
-                      if ((parseInt(number1.toString().slice(-1)[0]) + parseInt(number2.toString().slice(-1)[0]) > 10 || parseInt(number1.toString().slice(-2)[0]) + parseInt(number2.toString().slice(-2)[0]) > 10) && number1 + number2 < 1000) {
-                        questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
-                  }
-                }
-              }
               controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
             } else if (controller.modeChoice2 === 'dtukst') {
-              if (controller.modeChoice3 === 'neper') {
                   while (questionPool.length < 20) {
                     number1 = generateRandomNumber(1001, 9999);
                     number2 = generateRandomNumber(101, 9999);
-                      if (parseInt(number1.toString().slice(-1)[0]) + parseInt(number2.toString().slice(-1)[0]) < 10 && parseInt(number1.toString().slice(-2)[0]) + parseInt(number2.toString().slice(-2)[0]) < 10 && parseInt(number1.toString().slice(-3)[0]) + parseInt(number2.toString().slice(-3)[0]) < 10 &&number1 + number2 < 10000) {
+                      if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 10000) {
                         questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
                     }
                   }
-              } else if (controller.modeChoice3 === 'per10') {
-                    while (questionPool.length < 20) {
-                      number1 = generateRandomNumber(1001, 9999);
-                      number2 = generateRandomNumber(101, 9999);
-                        if ((parseInt(number1.toString().slice(-1)[0]) + parseInt(number2.toString().slice(-1)[0]) > 10 || parseInt(number1.toString().slice(-2)[0]) + parseInt(number2.toString().slice(-2)[0]) > 10 || parseInt(number1.toString().slice(-3)[0]) + parseInt(number2.toString().slice(-3)[0]) > 10) && number1 + number2 < 10000) {
-                          questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
-                    }
-                  }
-                }
                 controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-              } 
+            } else if (controller.modeChoice2 === 'mil') {
+              while (questionPool.length < 2) {
+                number1 = generateRandomNumber(100001, 999999);
+                number2 = generateRandomNumber(100001, 999999);
+                  if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
+                    questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                }
+              }
+              while (questionPool.length < 8) {
+                number1 = generateRandomNumber(100001, 999999);
+                number2 = generateRandomNumber(10001, 99999);
+                  if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
+                    questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                }
+              }
+              while (questionPool.length < 12) {
+                number1 = generateRandomNumber(100001, 999999);
+                number2 = generateRandomNumber(1001, 9999);
+                  if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
+                    questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                }
+              }
+              while (questionPool.length < 13) {
+                number1 = generateRandomNumber(100001, 999999);
+                number2 = generateRandomNumber(11, 99);
+                  if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
+                    questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                }
+              }
+              while (questionPool.length < 20) {
+                number1 = generateRandomNumber(1001, 999999);
+                number2 = generateRandomNumber(101, 999999);
+                  if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
+                    questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                }
+              }
+            controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
+          } 
       /*SUBTRACTION*/
       } else if (controller.modeChoice === 'atimtis') {
         if (controller.modeChoice2 === 'viena10') {
-          if (controller.modeChoice3 === "neper") {
             for (let number1 = 1; number1 <= 9; number1++) {
               for (let number2 = 1; number2 <= 9; number2++) {
                  if (number1 > number2) {
@@ -128,108 +155,97 @@ function generateCombinations() {
               }
             }
             controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-          }
 
         } else if (controller.modeChoice2 === 'dvivien20') {
-          if (controller.modeChoice3 === "neper") {
             for (let number1 = 10; number1 <= 19; number1++) {
               for (let number2 = 1; number2 <= 9; number2++) {
-                if (parseInt(number1.toString()[1]) > number2) {
+                if (neisardant(number1, number2) === controller.modeChoice3) {
                   questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
                 }
               }
             }
-          } if (controller.modeChoice3 === "per10") {
-            for (let number1 = 10; number1 <= 19; number1++) {
-              for (let number2 = 1; number2 <= 9; number2++) {
-                if (parseInt(number1.toString()[1]) < number2) {
-                  questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
-                }
-              }
-            }
-          }
             controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
       } else if (controller.modeChoice2 === 'dvivien') {
-        if (controller.modeChoice3 === "neper") {
           for (let number1 = 10; number1 <= 99; number1++) {
             for (let number2 = 1; number2 <= 9; number2++) {
-              if (parseInt(number1.toString()[1]) > number2) {
+              if (neisardant(number1, number2) === controller.modeChoice3) {
                 questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
               }
             }
           }
-        } if (controller.modeChoice3 === "per10") {
-          for (let number1 = 10; number1 <= 99; number1++) {
-            for (let number2 = 1; number2 <= 9; number2++) {
-              if (parseInt(number1.toString()[1]) < number2) {
-                questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
-              }
-            }
-          }
-        }
           controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
     } else if (controller.modeChoice2 === 'dvi') {
-      if (controller.modeChoice3 === "neper") {
         for (let number1 = 10; number1 <= 99; number1++) {
           for (let number2 = 10; number2 <= 99; number2++) {
-            if (parseInt(number1.toString()[1]) > parseInt(number2.toString()[1]) && parseInt(number1.toString()[0]) > parseInt(number2.toString()[0]) && number1 > number2) {
+            if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
               questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
             }
           }
         }
-      } if (controller.modeChoice3 === "per10") {
-        for (let number1 = 10; number1 <= 99; number1++) {
-          for (let number2 = 10; number2 <= 99; number2++) {
-            if (parseInt(number1.toString()[1]) < parseInt(number2.toString()[1]) && number1 > number2) {
-              questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
-            }
-          }
-        }
-      }
         controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
   } else if (controller.modeChoice2 === 'tukst') {
-    if (controller.modeChoice3 === "neper") {
       while (questionPool.length < 20) {
         number1 =generateRandomNumber(101, 999)
         number2 =generateRandomNumber(11, 999)
-        if (parseInt(number1.toString().slice(-1)[0]) > parseInt(number2.toString().slice(-1)[0]) && parseInt(number1.toString().slice(-2)[0]) > parseInt(number2.toString().slice(-2)[0]) && number1 > number2) {
+        if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
           questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
       }
     }
-    } if (controller.modeChoice3 === "per10") {
-      while (questionPool.length < 20) {
-        number1 =generateRandomNumber(101, 999)
-        number2 =generateRandomNumber(11, 999)
-        if ((parseInt(number1.toString().slice(-1)[0]) < parseInt(number2.toString().slice(-1)[0]) || parseInt(number1.toString().slice(-2)[0]) < parseInt(number2.toString().slice(-2)[0])) && number1 > number2) {
-          questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
-      }
-    }
-  }
       controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
     } else if (controller.modeChoice2 === 'dtukst') {
-      if (controller.modeChoice3 === "neper") {
         while (questionPool.length < 20) {
           number1 =generateRandomNumber(1001, 9999)
           number2 =generateRandomNumber(101, 9999)
-          if (parseInt(number1.toString().slice(-1)[0]) > parseInt(number2.toString().slice(-1)[0]) && parseInt(number1.toString().slice(-2)[0]) > parseInt(number2.toString().slice(-2)[0]) && parseInt(number1.toString().slice(-3)[0]) > parseInt(number2.toString().slice(-3)[0]) && number1 > number2) {
+          if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
             questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
         }
       }
-      } if (controller.modeChoice3 === "per10") {
-        while (questionPool.length < 20) {
-          number1 =generateRandomNumber(101, 999)
-          number2 =generateRandomNumber(11, 999)
-          if ((parseInt(number1.toString().slice(-1)[0]) < parseInt(number2.toString().slice(-1)[0]) || parseInt(number1.toString().slice(-2)[0]) < parseInt(number2.toString().slice(-2)[0]) || parseInt(number1.toString().slice(-3)[0]) < parseInt(number2.toString().slice(-3)[0])) && number1 > number2) {
-            questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
-        }
-      }
-    }
         controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
       }
+
+      else if (controller.modeChoice2 === 'mil') {
+        while (questionPool.length < 3) {
+          number1 =generateRandomNumber(100000, 1000000)
+          number2 =generateRandomNumber(101, 999)
+          if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
+            questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
+        }
+      }
+        while (questionPool.length < 8) {
+          number1 =generateRandomNumber(100000, 1000000)
+          number2 =generateRandomNumber(1001, 9999)
+          if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
+            questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
+        }
+      }
+        while (questionPool.length < 15) {
+          number1 =generateRandomNumber(100000, 1000000)
+          number2 =generateRandomNumber(10001, 99999)
+          if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
+            questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
+        }
+      }
+      while (questionPool.length < 19) {
+        number1 =generateRandomNumber(100000, 1000000)
+        number2 =generateRandomNumber(100001, 999999)
+        if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
+          questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
+      }
+    }
+    while (questionPool.length < 20) {
+      number1 =generateRandomNumber(10000, 99999)
+      number2 =generateRandomNumber(10001, 99999)
+      if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
+        questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
+    }
+  }
+
+        controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
+      }
+      
   /*ADDITION AND SUBTRACTION*/
   } else if (controller.modeChoice === 'sudetis ir atimtis') {
     if (controller.modeChoice2 === 'viena10') {
-      if (controller.modeChoice3 === 'neper') {
         for (let number1 = 1; number1 <= 9; number1++) {
           for (let number2 = 1; number2 <= 9; number2++) {
              if (number1 + number2 <= 10) {
@@ -247,9 +263,7 @@ function generateCombinations() {
         }
         questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
         controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-      }
     } else if (controller.modeChoice2 === 'lent') {
-      if (controller.modeChoice3 === 'per10') {
         for (let number1 = 2; number1 <= 9; number1++) {
           for (let number2 = 2; number2 <= 9; number2++) {
             if (number1 + number2 > 10) {
@@ -265,12 +279,10 @@ function generateCombinations() {
           }
         }
         controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random());
-      }
     } else if (controller.modeChoice2 === 'dvivien20') {
-      if (controller.modeChoice3 === 'neper') {
           for (let number1 = 10; number1 <= 19; number1++) {
             for (let number2 = 1; number2 <= 9; number2++) {
-              if (number1 + number2 <= 20) {
+              if (number1 + number2 < 20) {
                 questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
               }
             }
@@ -286,12 +298,10 @@ function generateCombinations() {
           }
           questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
           controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-        }
       } else if (controller.modeChoice2 === 'dvivien') {
-        if (controller.modeChoice3 === 'neper') {
             for (let number1 = 10; number1 <= 99; number1++) {
               for (let number2 = 1; number2 <= 9; number2++) {
-                if (parseInt(number1.toString()[1]) + number2 < 10 && number1 + number2 < 100) {
+                if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 100) {
                   questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
                 }
               }
@@ -300,39 +310,18 @@ function generateCombinations() {
   
             for (let number1 = 10; number1 <= 99; number1++) {
               for (let number2 = 1; number2 <= 9; number2++) {
-                if (parseInt(number1.toString()[1]) > number2) {
+                if (neisardant(number1, number2) === controller.modeChoice3) {
                   questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
                 }
               }
             }
             questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
             controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-        } else if (controller.modeChoice3 === 'per10') {
-          for (let number1 = 10; number1 <= 99; number1++) {
-            for (let number2 = 1; number2 <= 9; number2++) {
-              if (parseInt(number1.toString()[1]) + number2 > 10 && number1 + number2 < 100) {
-                questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
-              }
-            }
-          }
-          questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
-
-          for (let number1 = 10; number1 <= 99; number1++) {
-            for (let number2 = 1; number2 <= 9; number2++) {
-              if (parseInt(number1.toString()[1]) < number2) {
-                questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
-              }
-            }
-          }
-          questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
-          controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-        }
       }
         else if (controller.modeChoice2 === 'dvi') {
-          if (controller.modeChoice3 === 'neper') {
             for (let number1 = 10; number1 <= 99; number1++) {
               for (let number2 = 10; number2 <= 99; number2++) {
-                if (parseInt(number1.toString()[1]) + parseInt(number2.toString()[1]) < 10 && number1 + number2 < 100) {
+                if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 100) {
                   questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
                 }
               }
@@ -341,40 +330,18 @@ function generateCombinations() {
   
             for (let number1 = 10; number1 <= 99; number1++) {
               for (let number2 = 10; number2 <= 99; number2++) {
-                if (parseInt(number1.toString()[1]) > parseInt(number2.toString()[1]) && number1 > number2) {
+                if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
                   questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
                 }
               }
             }
             questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
             controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-            
-            } else if (controller.modeChoice3 === 'per10') {
-              for (let number1 = 10; number1 <= 99; number1++) {
-                for (let number2 = 10; number2 <= 99; number2++) {
-                  if (parseInt(number1.toString()[1]) + parseInt(number2.toString()[1]) > 10 && number1 + number2 < 100) {
-                    questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
-                  }
-                }
-              }
-              questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
-    
-              for (let number1 = 10; number1 <= 99; number1++) {
-                for (let number2 = 10; number2 <= 99; number2++) {
-                  if (parseInt(number1.toString()[1]) < parseInt(number2.toString()[1]) && number1 > number2) {
-                    questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
-                  }
-                }
-              }
-              questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
-              controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-            }
            } else if (controller.modeChoice2 === 'tukst') {
-            if (controller.modeChoice3 === 'neper') {
                 while (questionPool2.length < 10) {
                   number1 = generateRandomNumber(101, 999);
                   number2 = generateRandomNumber(11, 999);
-                    if (parseInt(number1.toString().slice(-1)[0]) + parseInt(number2.toString().slice(-1)[0]) < 10 && parseInt(number1.toString().slice(-2)[0]) + parseInt(number2.toString().slice(-2)[0]) < 10 &&number1 + number2 < 1000) {
+                    if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000) {
                       questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
                   }
                 }
@@ -382,40 +349,19 @@ function generateCombinations() {
                 while (questionPool3.length < 10) {
                   number1 =generateRandomNumber(101, 999)
                   number2 =generateRandomNumber(11, 999)
-                  if (parseInt(number1.toString().slice(-1)[0]) > parseInt(number2.toString().slice(-1)[0]) && parseInt(number1.toString().slice(-2)[0]) > parseInt(number2.toString().slice(-2)[0]) && number1 > number2) {
+                  if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
                     questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
                 }
               }
               questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
               controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-
-            } else if (controller.modeChoice3 === 'per10') {
-                while (questionPool2.length < 10) {
-                  number1 = generateRandomNumber(101, 999);
-                  number2 = generateRandomNumber(11, 999);
-                  if ((parseInt(number1.toString().slice(-1)[0]) + parseInt(number2.toString().slice(-1)[0]) > 10 || parseInt(number1.toString().slice(-2)[0]) + parseInt(number2.toString().slice(-2)[0]) > 10) && number1 + number2 < 1000) {
-                    questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
-                  }
-                }
-                questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
-                while (questionPool3.length < 10) {
-                  number1 =generateRandomNumber(101, 999)
-                  number2 =generateRandomNumber(11, 999)
-                  if ((parseInt(number1.toString().slice(-1)[0]) < parseInt(number2.toString().slice(-1)[0]) || parseInt(number1.toString().slice(-2)[0]) < parseInt(number2.toString().slice(-2)[0])) && number1 > number2) {
-                    questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
-                }
-              }
-              questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
-              controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-          }
         } 
         
         else if (controller.modeChoice2 === 'dtukst') {
-              if (controller.modeChoice3 === 'neper') {
                   while (questionPool2.length < 10) {
                     number1 = generateRandomNumber(1001, 9999);
                     number2 = generateRandomNumber(101, 9999);
-                      if (parseInt(number1.toString().slice(-1)[0]) + parseInt(number2.toString().slice(-1)[0]) < 10 && parseInt(number1.toString().slice(-2)[0]) + parseInt(number2.toString().slice(-2)[0]) < 10 && parseInt(number1.toString().slice(-3)[0]) + parseInt(number2.toString().slice(-3)[0]) < 10 &&number1 + number2 < 10000) {
+                      if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 10000) {
                         questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
                     }
                   }
@@ -423,33 +369,95 @@ function generateCombinations() {
                   while (questionPool3.length < 10) {
                     number1 =generateRandomNumber(1001, 9999)
                     number2 =generateRandomNumber(101, 9999)
-                    if (parseInt(number1.toString().slice(-1)[0]) > parseInt(number2.toString().slice(-1)[0]) && parseInt(number1.toString().slice(-2)[0]) > parseInt(number2.toString().slice(-2)[0]) && parseInt(number1.toString().slice(-3)[0]) > parseInt(number2.toString().slice(-3)[0]) && number1 > number2) {
+                    if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
                       questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
                   }
                 }
                 questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
                 controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-
-              } else if (controller.modeChoice3 === 'per10') {
-                  while (questionPool2.length < 10) {
-                    number1 = generateRandomNumber(1001, 9999);
-                    number2 = generateRandomNumber(101, 9999);
-                    if ((parseInt(number1.toString().slice(-1)[0]) + parseInt(number2.toString().slice(-1)[0]) > 10 || parseInt(number1.toString().slice(-2)[0]) + parseInt(number2.toString().slice(-2)[0]) > 10 || parseInt(number1.toString().slice(-3)[0]) + parseInt(number2.toString().slice(-3)[0]) > 10) && number1 + number2 < 10000) {
-                      questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
-                    }
-                  }
-                  questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
-                  while (questionPool3.length < 10) {
-                    number1 =generateRandomNumber(1001, 9999)
-                    number2 =generateRandomNumber(101, 9999)
-                    if ((parseInt(number1.toString().slice(-1)[0]) < parseInt(number2.toString().slice(-1)[0]) || parseInt(number1.toString().slice(-2)[0]) < parseInt(number2.toString().slice(-2)[0]) || parseInt(number1.toString().slice(-3)[0]) < parseInt(number2.toString().slice(-3)[0])) && number1 > number2) {
-                      questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
-                  }
-                }
-                questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
-                controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-            }
           } 
+
+          else if (controller.modeChoice2 === 'mil') {
+
+            while (questionPool2.length < 1) {
+              number1 = generateRandomNumber(100001, 999999);
+              number2 = generateRandomNumber(100001, 999999);
+                if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
+                  questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+              }
+            }
+            while (questionPool2.length < 4) {
+              number1 = generateRandomNumber(100001, 999999);
+              number2 = generateRandomNumber(10001, 99999);
+                if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
+                  questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+              }
+            }
+            while (questionPool2.length < 6) {
+              number1 = generateRandomNumber(100001, 999999);
+              number2 = generateRandomNumber(1001, 9999);
+                if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
+                  questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+              }
+            }
+            while (questionPool2.length < 7) {
+              number1 = generateRandomNumber(100001, 999999);
+              number2 = generateRandomNumber(11, 99);
+                if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
+                  questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+              }
+            }
+            while (questionPool2.length < 10) {
+              number1 = generateRandomNumber(1001, 999999);
+              number2 = generateRandomNumber(101, 999999);
+                if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
+                  questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+              }
+            }
+
+
+            questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
+
+
+            while (questionPool3.length < 1) {
+              number1 =generateRandomNumber(100000, 1000000)
+              number2 =generateRandomNumber(101, 999)
+              if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
+                questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+            }
+          }
+            while (questionPool3.length < 3) {
+              number1 =generateRandomNumber(100000, 1000000)
+              number2 =generateRandomNumber(1001, 9999)
+              if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
+                questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+            }
+          }
+            while (questionPool3.length < 6) {
+              number1 =generateRandomNumber(100000, 1000000)
+              number2 =generateRandomNumber(10001, 99999)
+              if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
+                questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+            }
+          }
+          while (questionPool3.length < 9) {
+            number1 =generateRandomNumber(100000, 1000000)
+            number2 =generateRandomNumber(100001, 999999)
+            if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
+              questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+          }
+        }
+        while (questionPool3.length < 10) {
+          number1 =generateRandomNumber(10000, 99999)
+          number2 =generateRandomNumber(10001, 99999)
+          if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
+            questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+        }
+      }
+
+          questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
+          controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
+    } 
 
 /*MULTIPLICATION*/          
 } else if (controller.modeChoice === 'daugyba') {
@@ -505,19 +513,6 @@ function generateCombinations() {
 
   }
   
-  
-  
-
-
-
-
-
-
-
-
-
-
-
   else if (controller.modeChoice2 === 'daugdaugvien') {
     while (questionPool.length < 6) {
 
@@ -631,7 +626,9 @@ function generateCombinations() {
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
+    if (number1 * number2 <= 1000000) {
     questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    }
 }
   while (questionPool3.length < 6) {
 
@@ -639,26 +636,13 @@ function generateCombinations() {
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
+    if (number1 * number2 <= 1000000) {
     questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    }
 }
 
   controller.combinations = questionPool.concat(questionPool2, questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
   }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   
   else if (controller.modeChoice2 === 'pil10') {
     for (let number1 = 1; number1 <= 10; number1++) {
@@ -771,12 +755,6 @@ function generateCombinations() {
 
   } 
   
-  
-  
-  
-  
-  
-  
   else if (controller.modeChoice2 === 'daugketvien') {
     while (questionPool.length < 10) {
       let number1 = generateRandomNumber(2, 9);
@@ -819,10 +797,6 @@ function generateCombinations() {
 
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
-
-
-
-
   } else if (controller.modeChoice2 === 'daugtridvi') {
     while (questionPool.length < 10) {
       let number1 = generateRandomNumber(11, 99);
@@ -863,11 +837,6 @@ function generateCombinations() {
 }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
-
-
-
-
-  
   } else if (controller.modeChoice2 === 'daugketdvi') {
     while (questionPool.length < 10) {
       let number1 = generateRandomNumber(11, 99);
@@ -910,7 +879,7 @@ function generateCombinations() {
 } 
   
   else if (controller.modeChoice2 === 'daugdaugvien') {
-    while (questionPool.length < 6) {
+    while (questionPool.length < 3) {
       let number1 = generateRandomNumber(2, 9);
       let number2 = generateRandomNumber(11, 99);
       if (controller.withRemainder) {
@@ -927,7 +896,7 @@ function generateCombinations() {
         }
     }
   }
-  while (questionPool.length < 14) {
+  while (questionPool.length < 11) {
     let number1 = generateRandomNumber(2, 9);
     let number2 = generateRandomNumber(101, 999);
     if (controller.withRemainder) {
@@ -944,7 +913,7 @@ function generateCombinations() {
       }
   }
 }
-while (questionPool.length < 20) {
+while (questionPool.length < 16) {
   let number1 = generateRandomNumber(2, 9);
   let number2 = generateRandomNumber(1001, 9999);
   if (controller.withRemainder) {
@@ -961,11 +930,45 @@ while (questionPool.length < 20) {
     }
 }
 }
+while (questionPool.length < 17) {
+  let number1 = generateRandomNumber(2, 9);
+  let number2 = generateRandomNumber(1001, 9999);
+  if (controller.withRemainder) {
+    remainder = generateRandomNumber(1, number1)
+  }
+  dalinys = (number1 * number2) + remainder;
+  if (dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
+    if (controller.withRemainder) {
+      if (dalinys % number1 !== 0) {
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+    } else {
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    }
+}
+}
+while (questionPool.length < 17) {
+  let number1 = generateRandomNumber(2, 9);
+  let number2 = generateRandomNumber(1001, 9999);
+  if (controller.withRemainder) {
+    remainder = generateRandomNumber(1, number1)
+  }
+  dalinys = (number1 * number2) + remainder;
+  if (10000 < dalinys && dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
+    if (controller.withRemainder) {
+      if (dalinys % number1 !== 0) {
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+    } else {
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    }
+}
+}
 
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 }
 
-else if (controller.modeChoice2 === 'daugdaugdvi') {
+  else if (controller.modeChoice2 === 'daugdaugdvi') {
   while (questionPool.length < 6) {
     let number1 = generateRandomNumber(11, 99);
     let number2 = generateRandomNumber(11, 99);
@@ -1021,12 +1024,6 @@ if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]
 controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 }
   
-  
-  
-  
-  
-  
-  
   else if (controller.modeChoice2 === 'daugdaug') {
     while (questionPool.length < 3) {
       let number1 = generateRandomNumber(2, 9);
@@ -1079,10 +1076,6 @@ while (questionPool.length < 10) {
     }
 }
 }
-
-
-
-
 
 while (questionPool.length < 13) {
   let number1 = generateRandomNumber(11, 99);
@@ -1138,10 +1131,7 @@ questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "
 }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
-
   }
-  
-  
   else if (controller.modeChoice2 === 'pil10') {
     for (let number1 = 1; number1 <= 9; number1++) {
       for (let number2 = 1; number2 <= 9; number2++) {
@@ -1432,7 +1422,212 @@ if (dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1])
 }
 }
 controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-} else if (controller.modeChoice2 === 'daugdaug') {
+} 
+
+
+
+
+
+else if (controller.modeChoice2 === 'daugdaugvien') {
+
+  while (questionPool2.length < 6) {
+
+    interNumbers = [generateRandomNumber(11, 99), generateRandomNumber(2, 9)];
+    number1 = Math.max(...interNumbers);
+    number2 = Math.min(...interNumbers);
+
+    questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+}
+while (questionPool2.length < 14) {
+
+  interNumbers = [generateRandomNumber(101, 999), generateRandomNumber(2, 9)];
+  number1 = Math.max(...interNumbers);
+  number2 = Math.min(...interNumbers);
+
+  questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+}
+
+while (questionPool2.length < 20) {
+
+  interNumbers = [generateRandomNumber(1001, 9999), generateRandomNumber(2, 9)];
+  number1 = Math.max(...interNumbers);
+  number2 = Math.min(...interNumbers);
+
+  questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+}
+
+
+
+while (questionPool3.length < 3) {
+  let number1 = generateRandomNumber(2, 9);
+  let number2 = generateRandomNumber(11, 99);
+  if (controller.withRemainder) {
+    remainder = generateRandomNumber(1, number1)
+  }
+  dalinys = (number1 * number2) + remainder;
+  if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
+    if (controller.withRemainder) {
+      if (dalinys % number1 !== 0) {
+    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+    } else {
+      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    }
+}
+}
+while (questionPool3.length < 11) {
+let number1 = generateRandomNumber(2, 9);
+let number2 = generateRandomNumber(101, 999);
+if (controller.withRemainder) {
+  remainder = generateRandomNumber(1, number1)
+}
+dalinys = (number1 * number2) + remainder;
+if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
+  if (controller.withRemainder) {
+    if (dalinys % number1 !== 0) {
+  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    }
+  } else {
+    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  }
+}
+}
+while (questionPool3.length < 16) {
+let number1 = generateRandomNumber(2, 9);
+let number2 = generateRandomNumber(1001, 9999);
+if (controller.withRemainder) {
+remainder = generateRandomNumber(1, number1)
+}
+dalinys = (number1 * number2) + remainder;
+if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
+if (controller.withRemainder) {
+  if (dalinys % number1 !== 0) {
+questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  }
+} else {
+  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+}
+}
+}
+while (questionPool3.length < 17) {
+let number1 = generateRandomNumber(2, 9);
+let number2 = generateRandomNumber(1001, 9999);
+if (controller.withRemainder) {
+remainder = generateRandomNumber(1, number1)
+}
+dalinys = (number1 * number2) + remainder;
+if (dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
+if (controller.withRemainder) {
+  if (dalinys % number1 !== 0) {
+questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  }
+} else {
+  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+}
+}
+}
+while (questionPool3.length < 17) {
+let number1 = generateRandomNumber(2, 9);
+let number2 = generateRandomNumber(1001, 9999);
+if (controller.withRemainder) {
+remainder = generateRandomNumber(1, number1)
+}
+dalinys = (number1 * number2) + remainder;
+if (10000 < dalinys && dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
+if (controller.withRemainder) {
+  if (dalinys % number1 !== 0) {
+questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  }
+} else {
+  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+}
+}
+}
+controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
+
+}
+
+else if (controller.modeChoice2 === 'daugdaugdvi') {
+
+  while (questionPool2.length < 6) {
+    interNumbers = [generateRandomNumber(11, 99), generateRandomNumber(11, 99)];
+    number1 = Math.max(...interNumbers);
+    number2 = Math.min(...interNumbers);
+
+    questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+}
+  while (questionPool2.length < 14) {
+    interNumbers = [generateRandomNumber(101, 999), generateRandomNumber(11, 99)];
+    number1 = Math.max(...interNumbers);
+    number2 = Math.min(...interNumbers);
+
+    questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+}
+  while (questionPool2.length < 20) {
+    interNumbers = [generateRandomNumber(1001, 9999), generateRandomNumber(11, 99)];
+    number1 = Math.max(...interNumbers);
+    number2 = Math.min(...interNumbers);
+
+    questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+  }
+
+  while (questionPool3.length < 6) {
+    let number1 = generateRandomNumber(11, 99);
+    let number2 = generateRandomNumber(11, 99);
+    if (controller.withRemainder) {
+      remainder = generateRandomNumber(1, number1)
+    }
+    dalinys = (number1 * number2) + remainder;
+    if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
+      if (controller.withRemainder) {
+        if (dalinys % number1 !== 0) {
+      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        }
+      } else {
+        questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+  }
+}
+while (questionPool3.length < 14) {
+  let number1 = generateRandomNumber(11, 99);
+  let number2 = generateRandomNumber(101, 999);
+  if (controller.withRemainder) {
+    remainder = generateRandomNumber(1, number1)
+  }
+  dalinys = (number1 * number2) + remainder;
+  if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
+    if (controller.withRemainder) {
+      if (dalinys % number1 !== 0) {
+    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+    } else {
+      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    }
+}
+}
+while (questionPool3.length < 20) {
+let number1 = generateRandomNumber(11, 99);
+let number2 = generateRandomNumber(1001, 9999);
+if (controller.withRemainder) {
+  remainder = generateRandomNumber(1, number1)
+}
+dalinys = (number1 * number2) + remainder;
+if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
+  if (controller.withRemainder) {
+    if (dalinys % number1 !== 0) {
+  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    }
+  } else {
+    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  }
+}
+}
+
+controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
+}
+
+
+else if (controller.modeChoice2 === 'daugdaug') {
   while (questionPool2.length < 2) {
 
     interNumbers = [generateRandomNumber(11, 99), generateRandomNumber(2, 9)];
@@ -1497,12 +1692,6 @@ while (questionPool2.length < 20) {
 
   questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
 }
-
-
-
-
-
-
 
 while (questionPool3.length < 3) {
   let number1 = generateRandomNumber(2, 9);
@@ -1608,7 +1797,44 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
 }
 }
   controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-  } else if (controller.modeChoice2 === 'pil10') {
+  } 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  else if (controller.modeChoice2 === 'pil10') {
     for (let number1 = 1; number1 <= 10; number1++) {
       for (let number2 = 10; number2 <= 90; number2+=10) {
         questionPool2.push([parseInt(number2), parseInt(number1), "multiplication"]);
@@ -1686,12 +1912,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
     controller.combinations = questionPool.concat(questionPool2).sort(() => 0.5 - Math.random()).slice(0, 20);
 
-
-
-
   } else if (controller.modeChoice2 === "iki20") {
-
-
     for (let number1 = 11; number1 <= 19; number1++) {
       for (let number2 = 1; number2 <= 9; number2++) {
         if (11 <= number1 + number2 && number1 + number2 <= 19) {
@@ -1711,7 +1932,6 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
         }
       }
     }
-
 
       for (let number1 = 11; number1 <= 19; number1++) {
         for (let number2 = 1; number2 <= 9; number2++) {
@@ -1739,73 +1959,28 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       let combinedPool2 = shuffledQuestionPool3.concat(shuffledQuestionPool4);
 
       controller.combinations = combinedPool.concat(combinedPool2).sort(() => 0.5 - Math.random()).slice(0, 20);
-
-      
-
-      
+    
   } else if (controller.modeChoice2 === "iki100") {
 
     for (let number1 = 11; number1 <= 99; number1++) {
       for (let number2 = 11; number2 <= 99; number2++) {
-        if (number1 + number2 <= 100) {
-          
-          const numStr1 = number1.toString();
-          const numStr2 = number2.toString();
-
-          const minDigits = Math.min(numStr1.length, numStr2.length);
-
-          let neper = true;
-          // Compare digits from the end of each number
-          for (let i = 1; i <= minDigits; i++) {
-            const digit1 = parseInt(numStr1[numStr1.length - i]);
-            const digit2 = parseInt(numStr2[numStr2.length - i]);
-
-            if (digit1 + digit2 >= 10) {
-              neper = false
-            }
-          }
-          if (neper) {
+        if (neperzengiant(number1, number2) && number1 + number2 <= 100) {
             if (Math.random() < 0.5) {
               questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
           } else {
               questionPool.push([parseInt(number2), parseInt(number1), "addition"]);
           }
-
-          }
         }
-
-
     }
         }
       
 
     for (let number1 = 11; number1 <= 99; number1++) {
       for (let number2 = 11; number2 <= 99; number2++) {
-        if (number1 + number2 <= 100) {
-
+        if (!neperzengiant(number1, number2) && number1 + number2 <= 100) {
           if (number1 + number2 <= 100) {
-          
-            const numStr1 = number1.toString();
-            const numStr2 = number2.toString();
-  
-            const minDigits = Math.min(numStr1.length, numStr2.length);
-  
-            let neper = true;
-            // Compare digits from the end of each number
-            for (let i = 1; i <= minDigits; i++) {
-              const digit1 = parseInt(numStr1[numStr1.length - i]);
-              const digit2 = parseInt(numStr2[numStr2.length - i]);
-  
-              if (digit1 + digit2 >= 10) {
-                neper = false
-              }
-            }
-            if (!neper) {
               questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
-  
-            }
           }
-
         }
       }
     }
@@ -1813,28 +1988,8 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
 
       for (let number1 = 11; number1 <= 99; number1++) {
         for (let number2 = 2; number2 <= 99; number2++) {
-          if (number1 > number2) {
-
-          const numStr1 = number1.toString();
-          const numStr2 = number2.toString();
-
-          const minDigits = Math.min(numStr1.length, numStr2.length);
-
-          let neper = true;
-          // Compare digits from the end of each number
-          for (let i = 1; i <= minDigits; i++) {
-            const digit1 = parseInt(numStr1[numStr1.length - i]);
-            const digit2 = parseInt(numStr2[numStr2.length - i]);
-
-            if (digit1 < digit2) {
-              neper = false
-            }
-          }
-          if (neper) {
+          if (neisardant(number1, number2) && number1 > number2) {
             questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
-
-          
-        }
         }
       }
     }
@@ -1842,25 +1997,8 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
 
       for (let number1 = 11; number1 <= 99; number1++) {
         for (let number2 = 2; number2 <= 99; number2++) {
-          if (number1 > number2) {
-            const numStr1 = number1.toString();
-            const numStr2 = number2.toString();
-  
-            const minDigits = Math.min(numStr1.length, numStr2.length);
-  
-            let neper = true;
-            // Compare digits from the end of each number
-            for (let i = 1; i <= minDigits; i++) {
-              const digit1 = parseInt(numStr1[numStr1.length - i]);
-              const digit2 = parseInt(numStr2[numStr2.length - i]);
-  
-              if (digit1 < digit2) {
-                neper = false
-              }
-            }
-            if (!neper) {
+          if (!neisardant(number1, number2) && number1 > number2) {
               questionPool4.push([parseInt(number1), parseInt(number2), "subtraction"]);
-          }
         }
         }
       }
@@ -1872,7 +2010,6 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       let shuffledQuestionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 1);
       let shuffledQuestionPool4 = questionPool4.sort(() => 0.5 - Math.random()).slice(0, 4);
       let combinedPool2 = shuffledQuestionPool3.concat(shuffledQuestionPool4);
-
 
     let combinedPool3 = [];
     for (let number1 = 2; number1 <= 9; number1++) {
@@ -1909,29 +2046,11 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       while (questionPool.length < 1) {
         number1 = generateRandomNumber(101, 999);
         number2 = generateRandomNumber(11, 999);
-          if (number1 + number2 < 1000) {
-            const numStr1 = number1.toString();
-            const numStr2 = number2.toString();
-  
-            const minDigits = Math.min(numStr1.length, numStr2.length);
-  
-            let neper = true;
-            // Compare digits from the end of each number
-            for (let i = 1; i <= minDigits; i++) {
-              const digit1 = parseInt(numStr1[numStr1.length - i]);
-              const digit2 = parseInt(numStr2[numStr2.length - i]);
-  
-              if (digit1 + digit2 >= 10) {
-                neper = false
-              }
-            }
-            if (neper) {
+          if (neperzengiant(number1, number2) && number1 + number2 <= 1000) {
               if (Math.random() < 0.5) {
                 questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
             } else {
                 questionPool.push([parseInt(number2), parseInt(number1), "addition"]);
-            }
-  
             }
       }
     }
@@ -1939,78 +2058,27 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     while (questionPool.length < 5) {
       number1 = generateRandomNumber(101, 999);
       number2 = generateRandomNumber(11, 999);
-        if (number1 + number2 < 1000) {
-          const numStr1 = number1.toString();
-          const numStr2 = number2.toString();
-
-          const minDigits = Math.min(numStr1.length, numStr2.length);
-
-          let neper = true;
-          // Compare digits from the end of each number
-          for (let i = 1; i <= minDigits; i++) {
-            const digit1 = parseInt(numStr1[numStr1.length - i]);
-            const digit2 = parseInt(numStr2[numStr2.length - i]);
-
-            if (digit1 + digit2 >= 10) {
-              neper = false
-            }
-          }
-          if (!neper) {
+        if (!neperzengiant(number1, number2) && number1 + number2 <= 1000) {
             questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
-
-          }
     }
   }
 
       while (questionPool2.length < 1) {
-        number1 =generateRandomNumber(101, 999)
-        number2 =generateRandomNumber(11, 999)
-        if (number1 > number2) {
-                    const numStr1 = number1.toString();
-          const numStr2 = number2.toString();
+        number1 = generateRandomNumber(101, 999);
+        number2 = generateRandomNumber(11, 999);
+        if (neisardant(number1, number2) && number1 > number2) {
 
-          const minDigits = Math.min(numStr1.length, numStr2.length);
-
-          let neper = true;
-          // Compare digits from the end of each number
-          for (let i = 1; i <= minDigits; i++) {
-            const digit1 = parseInt(numStr1[numStr1.length - i]);
-            const digit2 = parseInt(numStr2[numStr2.length - i]);
-
-            if (digit1 < digit2) {
-              neper = false
-            }
-          }
-          if (neper) {
             questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
 
-          
-        }
+        
     }
   }
 
   while (questionPool2.length < 5) {
-    number1 =generateRandomNumber(101, 999)
-    number2 =generateRandomNumber(11, 999)
-    if (number1 > number2) {
-      const numStr1 = number1.toString();
-      const numStr2 = number2.toString();
-
-      const minDigits = Math.min(numStr1.length, numStr2.length);
-
-      let neper = true;
-      // Compare digits from the end of each number
-      for (let i = 1; i <= minDigits; i++) {
-        const digit1 = parseInt(numStr1[numStr1.length - i]);
-        const digit2 = parseInt(numStr2[numStr2.length - i]);
-
-        if (digit1 < digit2) {
-          neper = false
-        }
-      }
-      if (!neper) {
+    number1 = generateRandomNumber(101, 999);
+    number2 = generateRandomNumber(11, 999);
+    if (!neisardant(number1, number2) && number1 > number2) {
         questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
-    }
 }
 }
 
@@ -2018,7 +2086,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
         interNumbers = [generateRandomNumber(11, 99), generateRandomNumber(2, 9)];
         number1 = Math.max(...interNumbers);
         number2 = Math.min(...interNumbers);
-        if (number1 * number2 < 1000) {
+        if (number1 * number2 <= 1000) {
         questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
         }
     }
@@ -2027,7 +2095,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       interNumbers = [generateRandomNumber(101, 999), generateRandomNumber(2, 9)];
       number1 = Math.max(...interNumbers);
       number2 = Math.min(...interNumbers);
-      if (number1 * number2 < 1000) {
+      if (number1 * number2 <= 1000) {
       questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
       }
   }
@@ -2088,159 +2156,54 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
         while (questionPool.length < 1) {
           number1 = generateRandomNumber(1001, 9999);
           number2 = generateRandomNumber(11, 9999);
-            if (number1 + number2 < 10000) {
-              const numStr1 = number1.toString();
-              const numStr2 = number2.toString();
-    
-              const minDigits = Math.min(numStr1.length, numStr2.length);
-    
-              let neper = true;
-              // Compare digits from the end of each number
-              for (let i = 1; i <= minDigits; i++) {
-                const digit1 = parseInt(numStr1[numStr1.length - i]);
-                const digit2 = parseInt(numStr2[numStr2.length - i]);
-    
-                if (digit1 + digit2 >= 10) {
-                  neper = false
-                }
-              }
-              if (neper) {
+            if (neperzengiant(number1, number2) && number1 + number2 < 10000) {
+
                 if (Math.random() < 0.5) {
                   questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
               } else {
                   questionPool.push([parseInt(number2), parseInt(number1), "addition"]);
               }
-    
-              }
+
         }
       }
   
       while (questionPool.length < 3) {
         number1 = generateRandomNumber(1001, 9999);
         number2 = generateRandomNumber(11, 999);
-          if (number1 + number2 < 10000) {
-            const numStr1 = number1.toString();
-            const numStr2 = number2.toString();
-  
-            const minDigits = Math.min(numStr1.length, numStr2.length);
-  
-            let neper = true;
-            // Compare digits from the end of each number
-            for (let i = 1; i <= minDigits; i++) {
-              const digit1 = parseInt(numStr1[numStr1.length - i]);
-              const digit2 = parseInt(numStr2[numStr2.length - i]);
-  
-              if (digit1 + digit2 >= 10) {
-                neper = false
-              }
-            }
-            if (!neper) {
+          if (!neperzengiant(number1, number2) && number1 + number2 <= 10000) {
               questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
-  
-            }
       }
     }
 
     while (questionPool.length < 5) {
       number1 = generateRandomNumber(101, 9999);
       number2 = generateRandomNumber(11, 9999);
-        if (number1 + number2 < 10000) {
-          const numStr1 = number1.toString();
-          const numStr2 = number2.toString();
-
-          const minDigits = Math.min(numStr1.length, numStr2.length);
-
-          let neper = true;
-          // Compare digits from the end of each number
-          for (let i = 1; i <= minDigits; i++) {
-            const digit1 = parseInt(numStr1[numStr1.length - i]);
-            const digit2 = parseInt(numStr2[numStr2.length - i]);
-
-            if (digit1 + digit2 >= 10) {
-              neper = false
-            }
-          }
-          if (!neper) {
+        if (!neperzengiant(number1, number2) && number1 + number2 <= 10000) {
             questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
-
-          }
     }
   }
   
         while (questionPool2.length < 1) {
           number1 =generateRandomNumber(1001, 9999)
           number2 =generateRandomNumber(11, 9999)
-          if (number1 > number2) {
-                      const numStr1 = number1.toString();
-            const numStr2 = number2.toString();
-  
-            const minDigits = Math.min(numStr1.length, numStr2.length);
-  
-            let neper = true;
-            // Compare digits from the end of each number
-            for (let i = 1; i <= minDigits; i++) {
-              const digit1 = parseInt(numStr1[numStr1.length - i]);
-              const digit2 = parseInt(numStr2[numStr2.length - i]);
-  
-              if (digit1 < digit2) {
-                neper = false
-              }
-            }
-            if (neper) {
+          if (neisardant(number1, number2) && number1 > number2) {
               questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
-  
-            
-          }
       }
     }
   
     while (questionPool2.length < 3) {
       number1 =generateRandomNumber(1001, 9999)
       number2 =generateRandomNumber(11, 999)
-      if (number1 > number2) {
-        const numStr1 = number1.toString();
-        const numStr2 = number2.toString();
-  
-        const minDigits = Math.min(numStr1.length, numStr2.length);
-  
-        let neper = true;
-        // Compare digits from the end of each number
-        for (let i = 1; i <= minDigits; i++) {
-          const digit1 = parseInt(numStr1[numStr1.length - i]);
-          const digit2 = parseInt(numStr2[numStr2.length - i]);
-  
-          if (digit1 < digit2) {
-            neper = false
-          }
-        }
-        if (!neper) {
+      if (!neisardant(number1, number2) && number1 > number2) {
           questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
-      }
   }
   }
 
   while (questionPool2.length < 5) {
     number1 =generateRandomNumber(1001, 9999)
     number2 =generateRandomNumber(11, 9999)
-    if (number1 > number2) {
-      const numStr1 = number1.toString();
-      const numStr2 = number2.toString();
-
-      const minDigits = Math.min(numStr1.length, numStr2.length);
-
-      let neper = true;
-      // Compare digits from the end of each number
-      for (let i = 1; i <= minDigits; i++) {
-        const digit1 = parseInt(numStr1[numStr1.length - i]);
-        const digit2 = parseInt(numStr2[numStr2.length - i]);
-
-        if (digit1 < digit2) {
-          neper = false
-        }
-      }
-      if (!neper) {
+    if (!neisardant(number1, number2) && number1 > number2) {
         questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
-    }
 }
 }
   
@@ -2248,7 +2211,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
           interNumbers = [generateRandomNumber(101, 9999), generateRandomNumber(2, 9)];
           number1 = Math.max(...interNumbers);
           number2 = Math.min(...interNumbers);
-          if (number1 * number2 < 10000) {
+          if (number1 * number2 <= 10000) {
           questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
           }
       }
@@ -2257,7 +2220,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
         interNumbers = [generateRandomNumber(101, 9999), generateRandomNumber(11, 99)];
         number1 = Math.max(...interNumbers);
         number2 = Math.min(...interNumbers);
-        if (number1 * number2 < 10000) {
+        if (number1 * number2 <= 10000) {
         questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
         }
     }
@@ -2313,9 +2276,165 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     
         controller.combinations = questionPool.concat(questionPool2, questionPool3, questionPool4).sort(() => 0.5 - Math.random()).slice(0, 20);
         }
-  }
+
+        else if (controller.modeChoice2 === "iki1000000") {
+      
+          while (questionPool.length < 1) {
+            number1 = generateRandomNumber(100001, 999999);
+            number2 = generateRandomNumber(100001, 999999);
+              if (!neperzengiant(number1, number2) && number1 + number2 < 1000000) {
+                questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+            }
+          }
+          while (questionPool.length < 2) {
+            number1 = generateRandomNumber(100001, 999999);
+            number2 = generateRandomNumber(10001, 99999);
+              if (!neperzengiant(number1, number2) && number1 + number2 < 1000000) {
+                questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+            }
+          }
+          while (questionPool.length < 3) {
+            number1 = generateRandomNumber(100001, 999999);
+            number2 = generateRandomNumber(1001, 9999);
+              if (!neperzengiant(number1, number2) && number1 + number2 < 1000000) {
+                questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+            }
+          }
+          while (questionPool.length < 4) {
+            number1 = generateRandomNumber(100001, 999999);
+            number2 = generateRandomNumber(11, 99);
+              if (!neperzengiant(number1, number2) && number1 + number2 < 1000000) {
+                questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+            }
+          }
+          while (questionPool.length < 5) {
+            number1 = generateRandomNumber(1001, 999999);
+            number2 = generateRandomNumber(101, 999999);
+              if (!neperzengiant(number1, number2) && number1 + number2 < 1000000) {
+                questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+            }
+          }
+    
+          while (questionPool2.length < 1) {
+            number1 =generateRandomNumber(100000, 1000000)
+            number2 =generateRandomNumber(101, 999)
+            if (!neisardant(number1, number2) && number1 > number2) {
+              questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
+          }
+        }
+          while (questionPool2.length < 2) {
+            number1 =generateRandomNumber(100000, 1000000)
+            number2 =generateRandomNumber(1001, 9999)
+            if (!neisardant(number1, number2) && number1 > number2) {
+              questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
+          }
+        }
+          while (questionPool2.length < 3) {
+            number1 =generateRandomNumber(100000, 1000000)
+            number2 =generateRandomNumber(10001, 99999)
+            if (!neisardant(number1, number2) && number1 > number2) {
+              questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
+          }
+        }
+        while (questionPool2.length < 4) {
+          number1 =generateRandomNumber(100000, 1000000)
+          number2 =generateRandomNumber(100001, 999999)
+          if (!neisardant(number1, number2) && number1 > number2) {
+            questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
+        }
+      }
+      while (questionPool2.length < 5) {
+        number1 =generateRandomNumber(10000, 99999)
+        number2 =generateRandomNumber(10001, 99999)
+        if (!neisardant(number1, number2) && number1 > number2) {
+          questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
+      }
     }
-  
+
+    while (questionPool3.length < 1) {
+
+    interNumbers = [generateRandomNumber(1001, 9999), generateRandomNumber(2, 9)];
+    number1 = Math.max(...interNumbers);
+    number2 = Math.min(...interNumbers);
+
+    questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+  } 
+
+  while (questionPool3.length < 2) {
+
+    interNumbers = [generateRandomNumber(10001, 99999), generateRandomNumber(2, 9)];
+    number1 = Math.max(...interNumbers);
+    number2 = Math.min(...interNumbers);
+
+    questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+  } 
+
+  while (questionPool3.length < 3) {
+
+    interNumbers = [generateRandomNumber(101, 999), generateRandomNumber(11, 99)];
+    number1 = Math.max(...interNumbers);
+    number2 = Math.min(...interNumbers);
+
+    questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+}
+  while (questionPool3.length < 4) {
+
+    interNumbers = [generateRandomNumber(1001, 9999), generateRandomNumber(11, 99)];
+    number1 = Math.max(...interNumbers);
+    number2 = Math.min(...interNumbers);
+
+    questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+  }
+  while (questionPool3.length < 7) {
+
+    interNumbers = [generateRandomNumber(10001, 99999), generateRandomNumber(11, 99)];
+    number1 = Math.max(...interNumbers);
+    number2 = Math.min(...interNumbers);
+
+    if (number1 * number2 <= 1000000) {
+    questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    }
+  }
+
+  while (questionPool4.length < 1) {
+    let number1 = generateRandomNumber(4, 9);
+    let number2 = generateRandomNumber(10001, 99999);
+    if (controller.withRemainder) {
+      remainder = generateRandomNumber(1, number1)
+    }
+    dalinys = (number1 * number2) + remainder;
+    if (dalinys <= 1000000 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
+      if (controller.withRemainder) {
+        if (dalinys % number1 !== 0) {
+      questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        }
+      } else {
+        questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+  }
+  }
+  while (questionPool4.length < 2) {
+    let number1 = generateRandomNumber(4, 9);
+    let number2 = generateRandomNumber(1001, 9999);
+    if (controller.withRemainder) {
+      remainder = generateRandomNumber(1, number1)
+    }
+    dalinys = (number1 * number2) + remainder;
+    if (dalinys <= 1000000 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
+      if (controller.withRemainder) {
+        if (dalinys % number1 !== 0) {
+      questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        }
+      } else {
+        questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+  }
+  }
+      controller.combinations = questionPool.concat(questionPool2, questionPool3, questionPool4).sort(() => 0.5 - Math.random()).slice(0, 20);
+      }
+    }
+      }
+
 function generateRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }

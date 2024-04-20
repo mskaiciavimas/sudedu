@@ -302,7 +302,12 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
       answerSeparator2.style.display = 'block';
     } else if (controller.withRemainder) {
 			linkElement.setAttribute("href", "questions-remainder.css");
-		} else if (controller.modeChoice2 === "tukst" || 
+		} else if (
+      controller.modeChoice2 === "mil" ||
+      controller.modeChoice2 === "iki1000000"
+    )	{
+    linkElement.setAttribute("href", "questions-extra-small.css");
+    } else if (controller.modeChoice2 === "tukst" || 
     controller.modeChoice2 === "dtukst" || 
     controller.modeChoice2 === "iki1000" || 
     controller.modeChoice2 === "iki10000" || 
@@ -410,7 +415,10 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
       var splitNumber2Str;
       var splitNumber1Str;
       var interSplitNumber1Str;
+      var subtractedValueStr;
       var subtractedValue;
+      var subtractedValueLength;
+      var startsWithZero = false;
       var halfpush = false;
       var stopAddingTwoExtraDigits = false;
       var partialSub = '';
@@ -420,7 +428,13 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
       for (var i = 0; i < subAnswerNumber*2; i++) {
         tempOffset = 0;
         if (counter === 1) {
-          if (subtract[1]) {
+          if (startsWithZero) {
+            splitNumber1Str = subtractedValueStr.slice(0, daliklisDigits);
+            splitNumber2Str = subtractedValueStr.slice(daliklisDigits);
+            partialSub = (Number(splitNumber1Str) - subtract[0]).toString();
+            offset = offset + 1;
+            startsWithZero = false;
+          } else if (subtract[1]) {
             splitNumber1Str = number1.toString().slice(0, daliklisDigits+1);
             splitNumber2Str = number1.toString().slice(daliklisDigits+1);
             partialSub = (Number(splitNumber1Str) - subtract[0]).toString();
@@ -429,20 +443,36 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
             splitNumber2Str = number1.toString().slice(daliklisDigits);
             partialSub = (Number(splitNumber1Str) - subtract[0]).toString();
           }
-          
-          subtractedValue = Number(partialSub + splitNumber2Str);
- 
-          if (Number(partialSub) === 0 || partialSub.length === daliklisDigits-1) {
+
+          if (Number(splitNumber2Str[0]) === 0 && Number(partialSub) === 0 && Number(splitNumber2Str) !== 0) {
+            startsWithZero = true;
+            subtractedValueStr = splitNumber2Str
+            subtractedValueLength = subtractedValueStr.length
+            subtractedValue = Number(subtractedValueStr)
+          } else if (Number(partialSub) === 0 && splitNumber2Str.length !== 0) {
+            subtractedValueStr = splitNumber2Str
+            subtractedValueLength = subtractedValueStr.length
+            subtractedValue = Number(subtractedValueStr)
+          } else {
+            subtractedValueStr = partialSub + splitNumber2Str
+            subtractedValueLength = subtractedValueStr.length
+            subtractedValue = Number(subtractedValueStr)
+          }
+
+          if (Number(partialSub) === 0 || partialSub.length === daliklisDigits-1 || Number(subtractedValueStr[0]) === 0) {
             stopAddingTwoExtraDigits = true;
           }
 
-          if (subtractedValue.toString().length === number1.toString().length) {
+          if (subtractedValueLength === number1.toString().length) {
             number1 = subtractedValue;
 
-          } else if (subtractedValue.toString().length < number1.toString().length) {
-            if (!halfpush) {
-            offset = offset + 1 * (Number(number1).toString().length - Number(subtractedValue).toString().length); 
+          if (Number(partialSub) === 0 && Number(subtractedValueStr) === 0 && splitNumber1Str.length !== 1) {
+            offset = offset + 1 * (Number(number1).toString().length - (subtractedValueLength - 1)); 
+          }
 
+          } else if (subtractedValueLength < number1.toString().length) {
+            if (!halfpush) {
+              offset = offset + 1 * (Number(number1).toString().length - (subtractedValueLength)); 
             } else {
               halfpush = false;
             }
@@ -450,7 +480,9 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
           }
           counter--;
         } else {
-          if (Number(number1) > number2) {
+          if (startsWithZero) {
+            subtract = [0, false];
+          } else if (Number(number1) > number2) {
             if (Number(number1.toString().slice(0, daliklisDigits)) < number2 && !stopAddingTwoExtraDigits) { 
               subtract = [Math.floor(Number(number1.toString().slice(0, daliklisDigits+1)) / number2) * number2, true];
               if (subtract[0].toString().length < daliklisDigits+1) {
@@ -681,14 +713,19 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
 
         var counter = 0;
         var offset = 0;
+        var tempOffset = 0;
         var subtract = [];
         var splitNumber1Str;
         var splitNumber2Str;
         var splitNumber1Str;
+        var interSplitNumber1Str;
+        var subtractedValueStr;
         var subtractedValue;
+        var subtractedValueLength;
+        var startsWithZero = false;
         var halfpush = false;
         var stopAddingTwoExtraDigits = false;
-        var partialSub = 0;
+        var partialSub = '';
         let number1 = controller.randomSelection[0];
         const number2 = controller.randomSelection[1];
         const daliklisDigits = controller.randomSelection[1].toString().length;
@@ -706,7 +743,13 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
             }
           } else {
           if (counter === 1) {
-            if (subtract[1]) {
+            if (startsWithZero) {
+              splitNumber1Str = subtractedValueStr.slice(0, daliklisDigits);
+              splitNumber2Str = subtractedValueStr.slice(daliklisDigits);
+              partialSub = (Number(splitNumber1Str) - subtract[0]).toString();
+              offset = offset + 1;
+              startsWithZero = false;
+            } else if (subtract[1]) {
               splitNumber1Str = number1.toString().slice(0, daliklisDigits+1);
               splitNumber2Str = number1.toString().slice(daliklisDigits+1);
               partialSub = (Number(splitNumber1Str) - subtract[0]).toString();
@@ -715,6 +758,22 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
               splitNumber2Str = number1.toString().slice(daliklisDigits);
               partialSub = (Number(splitNumber1Str) - subtract[0]).toString();
             }
+
+            if (Number(splitNumber2Str[0]) === 0 && Number(partialSub) === 0 && Number(splitNumber2Str) !== 0) {
+              startsWithZero = true;
+              subtractedValueStr = splitNumber2Str
+              subtractedValueLength = subtractedValueStr.length
+              subtractedValue = Number(subtractedValueStr)
+            } else if (Number(partialSub) === 0 && splitNumber2Str.length !== 0) {
+              subtractedValueStr = splitNumber2Str
+              subtractedValueLength = subtractedValueStr.length
+              subtractedValue = Number(subtractedValueStr)
+            } else {
+              subtractedValueStr = partialSub + splitNumber2Str
+              subtractedValueLength = subtractedValueStr.length
+              subtractedValue = Number(subtractedValueStr)
+            }
+
             if (Number(partialSub) >= number2) {
               if (divUserSubAnswer !== Number(partialSub)) {
                 isCorrect = false;
@@ -734,19 +793,26 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
               stopAddingTwoExtraDigits = true;
             }
 
-            if (subtractedValue.toString().length === number1.toString().length) {
+            if (subtractedValueLength === number1.toString().length) {
               number1 = subtractedValue;
-            } else if (subtractedValue.toString().length < number1.toString().length) {
+
+            if (Number(partialSub) === 0 && Number(subtractedValueStr) === 0 && splitNumber1Str.length !== 1) {
+              offset = offset + 1 * (Number(number1).toString().length - (subtractedValueLength - 1)); 
+            }
+    
+            } else if (subtractedValueLength < number1.toString().length) {
               if (!halfpush) {
-              offset = offset + 1 * (Number(number1).toString().length - Number(subtractedValue).toString().length);  
+                offset = offset + 1 * (Number(number1).toString().length - (subtractedValueLength)); 
               } else {
                 halfpush = false;
-              }  
+              }
               number1 = subtractedValue;
             }
             counter--;
           } else {
-              if (Number(number1) > number2) {
+              if (startsWithZero) {
+                subtract = [0, false];
+              } else if (Number(number1) > number2) {
               if (Number(number1.toString().slice(0, daliklisDigits)) < number2 && !stopAddingTwoExtraDigits) {
                 subtract = [Math.floor(Number(number1.toString().slice(0, daliklisDigits+1)) / number2) * number2, true];
                 if (subtract[0].toString().length < daliklisDigits+1) {

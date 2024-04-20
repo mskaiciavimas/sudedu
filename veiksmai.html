@@ -209,7 +209,11 @@ document.querySelectorAll('.control').forEach(control => {
 		} else if (controller.withRemainder) {
 						linkElement.setAttribute("href", "questions-remainder.css");
 				} else {
-				if (controller.modeChoice2 === "tukst" || 
+				if (controller.modeChoice2 === "mil" ||
+						controller.modeChoice2 === "iki1000000"
+					)	{
+						linkElement.setAttribute("href", "questions-extra-small.css");
+				} else if (controller.modeChoice2 === "tukst" || 
 						controller.modeChoice2 === "dtukst" || 
 						controller.modeChoice2 === "iki1000" || 
 						controller.modeChoice2 === "iki10000" || 
