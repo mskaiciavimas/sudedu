@@ -1,4 +1,5 @@
 let controller = {
+  language: '',
 	currentMistakes: [],
 	totalMistakes: [],
 	mistakesTracker: 0,
@@ -9,6 +10,7 @@ let controller = {
   modeChoice5: '',
   modeChoice6: '',
   modeChoice7: '',
+  modeChoice8: '',
   timerLimit: 0,
   questionNumber: 0,
 	selectedNumbers: [],
@@ -30,8 +32,10 @@ let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 let stulpeliuDivElement = document.querySelector('#stulpeliu-div');
 let divisionStulp1Element = document.querySelector('#division-stulp-1');
 let divisionStulp2Element = document.querySelector('#division-stulp-2');
+let divisionStulp3Element = document.querySelector('#division-stulp-3');
+let divisionStulp4Element = document.querySelector('#division-stulp-4')
 let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
-
+let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invisible-div');
 
 
 	function formEquation () {
@@ -74,7 +78,11 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
         } else if (controller.randomSelection[2] === 'multiplication') {
           controller.equation = `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = `;
         } else if (controller.randomSelection[2] === 'division') {
-          controller.equation = `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = `;
+          if (controller.language === 'LT') {
+            controller.equation = `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = `;
+          } else if (controller.language === 'EN') {
+            controller.equation = `${controller.randomSelection[0]} \u00F7 ${controller.randomSelection[1]} = `;            
+          }
         } 
       } else if (controller.modeChoice7 === "stulpeliu") {
         if (controller.randomSelection[2] === 'addition') {
@@ -115,7 +123,11 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
         const item2 = String(controller.randomSelection[1]);
     
         // Concatenate the padded items
-        controller.equation = `<div id="dalinys-outer-div" style="display: flex; position: relative;"><div id='dalinys'>${item1}</div><div id='daliklis' style="border-bottom: 2px solid black; border-left: 2px solid black;">${item2}</div></div>`;
+        if (controller.modeChoice8 === "" || controller.modeChoice8 === 'eeu-version') {
+          controller.equation = `<div id="dalinys-outer-div" style="display: flex; position: relative;"><div id='dalinys'>${item1}</div><div id='daliklis' style="border-bottom: 2px solid black; border-left: 2px solid black;">${item2}</div></div>`;
+        } else if (controller.modeChoice8 === 'us-version') {
+          controller.equation = `<div id="first-number-outer-div" style="display: flex; position: relative;"><div id='daliklis'>${item2}</div><div id='dalinys' style="border-top: 2px solid black; border-left: 2px solid black;">${item1}</div></div>`;
+        }
       } 
     }
     } else if (controller.modeChoice5 === "nezinomieji") {
@@ -247,16 +259,36 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
 			contentContainerElement.style.marginLeft = '0';
       
       if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.95) {
-        controller.equation = 'Puikiai skaičiuoji!';
+        if (controller.language === 'LT') {
+          controller.equation = 'Puikiai skaičiuoji!';
+        } else if (controller.language === 'EN') {
+          controller.equation = 'Perfection! Well done!';          
+        }
       } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.7) {
-        controller.equation = 'Tobulėji! Pirmyn!';
+        if (controller.language === 'LT') {
+          controller.equation = 'Tobulėji! Pirmyn!';
+        } else if (controller.language === 'EN') {
+          controller.equation = 'Very good! Well done!';          
+        }
       } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.6) {
-        controller.equation = 'Mokaisi! Nesustok!';
+        if (controller.language === 'LT') {
+          controller.equation = 'Mokaisi! Nesustok!';
+        } else if (controller.language === 'EN') {
+          controller.equation = "You're learning!";          
+        }
       } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker)) {
-        controller.equation = 'Pasikartok su pagalba!';
+        if (controller.language === 'LT') {
+          controller.equation = 'Pasikartok su pagalba!';
+        } else if (controller.language === 'EN') {
+          controller.equation = "Ask for some help!";          
+        }
       } else {
-        controller.equation = 'Bandyk dar kartą!';        
-      };
+        if (controller.language === 'LT') {
+          controller.equation = 'Bandyk dar kartą!';   
+        } else if (controller.language === 'EN') {
+          controller.equation = "Try again!";       
+      }
+    };
       controller.equation2 = '';
       controller.result = ['', '', '', '', ''];
       controller.questionsStopped = true;
@@ -267,7 +299,7 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
 
 
   function triggerFireworks () {
-    fireworksDiv.innerHTML = '<img src="images/fireworks.gif" style="width: 500px; height: auto;" id="fireworks">';
+    fireworksDiv.innerHTML = '<img src="../images/fireworks.gif" style="width: 500px; height: auto;" id="fireworks">';
     setTimeout(disableFireworks, 4500);
   }
 
@@ -278,11 +310,25 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
   function updateScore () {
     controller = JSON.parse(localStorage.getItem('controller'));
     if (controller.modeChoice4 === 'timer') {
-      answerTrackerElement.innerHTML = `Atlikai: ${controller.correctAnswerTracker}`;
+      if (controller.language === 'LT') {
+        answerTrackerElement.innerHTML = `Atlikai: ${controller.correctAnswerTracker}`;
+      } else if (controller.language === 'EN') {
+        answerTrackerElement.innerHTML = `Answered: ${controller.correctAnswerTracker}`;        
+      }
     } else if (controller.modeChoice4 === 'questionNumber') {
-      answerTrackerElement.innerHTML = `Atlikai: ${controller.correctAnswerTracker}/${controller.questionNumber}`;
+      if (controller.language === 'LT') {
+        answerTrackerElement.innerHTML = `Atlikai: ${controller.correctAnswerTracker}/${controller.questionNumber}`;
+      } else if (controller.language === 'EN') {
+        answerTrackerElement.innerHTML = `Completed: ${controller.correctAnswerTracker}/${controller.questionNumber}`;     
+      }
     }
-    mistakeTrackerElement.innerHTML = `Suklydai: ${controller.mistakesTracker}`;
+
+    if (controller.language === 'LT') {
+      mistakeTrackerElement.innerHTML = `Suklydai: ${controller.mistakesTracker}`;
+    } else if (controller.language === 'EN') {
+      mistakeTrackerElement.innerHTML = `Mistakes: ${controller.mistakesTracker}`;    
+    }
+    
     if (controller.modeChoice7 !== 'stulpeliu') {
     answerInputElement.focus();
     }
@@ -294,19 +340,21 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
 		contentContainerElement.style.visibility = 'hidden';
 
     if (!controller.questionsStopped) {
-		if (controller.modeChoice7 === 'stulpeliu' && controller.randomSelection[2] === 'division') {
-      linkElement.setAttribute("href", "questions-stulpeliu-div.css");
-    } else if (controller.modeChoice7 === 'stulpeliu') {
-			linkElement.setAttribute("href", "questions-stulpeliu.css");
+    if (controller.modeChoice7 === 'stulpeliu' && controller.randomSelection[2] === 'division' && (controller.modeChoice8 === '' || controller.modeChoice8 === 'eeu-version')) {
+				linkElement.setAttribute("href", "../questions-stulpeliu-div.css");
+		} else if (controller.modeChoice7 === 'stulpeliu' && controller.randomSelection[2] === 'division' && controller.modeChoice8 === 'us-version') {
+				linkElement.setAttribute("href", "../questions-stulpeliu-div-us.css");
+		}  else if (controller.modeChoice7 === 'stulpeliu') {
+			linkElement.setAttribute("href", "../questions-stulpeliu.css");
       var answerSeparator2 = document.getElementById('answer-separator-2');
       answerSeparator2.style.display = 'block';
     } else if (controller.withRemainder) {
-			linkElement.setAttribute("href", "questions-remainder.css");
+			linkElement.setAttribute("href", "../questions-remainder.css");
 		} else if (
       controller.modeChoice2 === "mil" ||
       controller.modeChoice2 === "iki1000000"
     )	{
-    linkElement.setAttribute("href", "questions-extra-small.css");
+    linkElement.setAttribute("href", "../questions-extra-small.css");
     } else if (controller.modeChoice2 === "tukst" || 
     controller.modeChoice2 === "dtukst" || 
     controller.modeChoice2 === "iki1000" || 
@@ -319,14 +367,15 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
     controller.modeChoice2 === "daugketdvi" ||
     controller.modeChoice2 === "daugdaug"
   ) {
-			linkElement.setAttribute("href", "questions-smaller.css");
+			linkElement.setAttribute("href", "../questions-smaller.css");
 		} else {
-      linkElement.setAttribute("href", "questions-bigger.css");
+      linkElement.setAttribute("href", "../questions-bigger.css");
     }
   }   
 		
 
     if (controller.questionsStopped) {
+      equationElement.style.display = "flex";
       answerFieldDivElement.style.display = "none";
       questionsSubmitButtonRowElement.style.display = "none";
       resetMistakeButtonsElement.style.display = "flex";
@@ -334,9 +383,24 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
     }
 
     if (controller.modeChoice7 === 'stulpeliu') {
+      if (controller.randomSelection[2] === 'division') {
+        if (controller.modeChoice8 === '' || controller.modeChoice8 === 'eeu-version') {
+          equation2Element.style.display = "none";
+          equationElement.innerHTML = controller.equation;
+          equation2Element.innerHTML = '';
+        } else if (controller.modeChoice8 === 'us-version') {
+          equationElement.style.display = "none";
+          equationElement.innerHTML = '';
+          equation2Element.style.display = "block";
+          equation2Element.innerHTML = controller.equation;
+        }
+
+      } else {
       equation2Element.style.display = "none";
       equationElement.innerHTML = controller.equation;
+      equationElement.style.display = "inline-block";
       equation2Element.innerHTML = '';
+      }
     } else if (controller.modeChoice5 === 'skaitiniai' || controller.withRemainder) {
       equation2Element.style.display = "none";
       equationElement.innerHTML = controller.equation;
@@ -355,6 +419,12 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
       stulpeliuDivElement.innerHTML = '';
       divisionStulp1Element .innerHTML = '';
       divisionStulp2Element .innerHTML = '';
+
+      if (controller.language !== 'LT') {
+        answerFieldDivInvisibleDiv.innerHTML = '';
+        divisionStulp3Element .innerHTML = '';
+        divisionStulp4Element .innerHTML = '';
+      }
 
     var answerSeparator1 = document.getElementById('answer-separator-1');
     var answerSeparator2 = document.getElementById('answer-separator-2');
@@ -511,6 +581,8 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
             counter++;
         }
 
+        if (controller.modeChoice8 === '' || controller.modeChoice8 === 'eeu-version') {
+
         if (i === 0) {
           divisionStulp1Element.innerHTML += '<div style="position: relative;"><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-underline" style="margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset) + ')) !important;"><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></div></div>';
           var dalinysOuterDivElement = document.getElementById('dalinys-outer-div');
@@ -529,16 +601,70 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
             '<div class="invisibleDiv" style="visibility: hidden; display: block;"></div>' +
             '</div>';
           } else {
-            divisionStulp2Element.innerHTML += '<div class="d-flex justify-content-center align-items-center">' +
-            '<div style="position: relative;">' +
-            '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset+tempOffset) + ')) !important;">' +
-            '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off">' +
-            '</div>' +
-            '</div>' +
-            '<div id="liek" class="invisibleDiv" style="visibility: hidden; display: block;">(liek.)</div>' +
-            '</div>';
+            if (controller.language === 'LT') {
+              divisionStulp2Element.innerHTML += '<div class="d-flex justify-content-center align-items-center">' +
+              '<div style="position: relative;">' +
+              '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset+tempOffset) + ')) !important;">' +
+              '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off">' +
+              '</div>' +
+              '</div>' +
+              '<div id="liek" class="invisibleDiv" style="visibility: hidden; display: block;">(liek.)</div>' +
+              '</div>';
+            } else {
+              divisionStulp2Element.innerHTML += '<div class="d-flex justify-content-center align-items-center">' +
+              '<div style="position: relative;">' +
+              '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset+tempOffset) + ')) !important;">' +
+              '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off">' +
+              '</div>' +
+              '</div>' +
+              '<div id="liek" class="invisibleDiv" style="visibility: hidden; display: block;">(remainder)</div>' +
+              '</div>';
+            }
           }
     }
+  } else if (controller.modeChoice8 === "us-version") {
+
+    answerFieldDivInvisibleDiv.innerHTML += '<div class="invisibleDiv" style="visibility: hidden; display: block;"></div>';
+
+    if (i === 0) {
+      divisionStulp3Element.innerHTML += '<div class="d-flex justify-content-center align-items-center"><div class="invisibleDiv" style="visibility: hidden; display: block;"></div><div style="position: relative;"><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub stulpeliu-field-underline" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset+tempOffset) + ')) !important;"> <div style="position: absolute; transform: translatex(-150%); top: -14%" class="stulpeliu-symbol-div">-</div><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></div></div></div>';
+    } else {
+      if (counter !== 0) {
+        divisionStulp4Element.innerHTML += `
+        <div class="d-flex justify-content-center align-items-center">
+          <div class="invisibleDiv" style="visibility: hidden; display: block;"></div>
+          <div style="position: relative;">
+            <div id="stulpeliu-field-${i}" class="stulpeliu-field stulpeliu-field-sub stulpeliu-field-underline" style="margin-bottom: 10px; margin-left: calc(${fontSizeFullREM * 0.9}rem * (${offset + tempOffset})) !important;">
+              <div style="position: absolute; transform: translatex(-150%); top: -14%" class="stulpeliu-symbol-div">-</div>
+              <input type="text" id="stulpeliu-${i}" name="stulpeliu-${i}" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off">
+            </div>
+          </div>
+        </div>
+      `
+      } else if (i+1 !== subAnswerNumber*2) {
+        divisionStulp4Element.innerHTML += `
+        <div class="d-flex justify-content-center align-items-center">
+          <div class="invisibleDiv" style="visibility: hidden; display: block;"></div>
+          <div style="position: relative;">
+            <div id="stulpeliu-field-${i}" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(${fontSizeFullREM * 0.9}rem * (${offset + tempOffset})) !important;">
+              <input type="text" id="stulpeliu-${i}" name="stulpeliu-${i}" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off">
+            </div>
+          </div>
+        </div>
+      `;
+      
+      } else {
+        divisionStulp4Element.innerHTML += '<div class="d-flex justify-content-center align-items-center">' +
+        '<div id="liek" class="invisibleDiv" style="visibility: hidden; display: block;"></div>' +
+        '<div style="position: relative;">' +
+        '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset+tempOffset) + ')) !important;">' +
+        '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off">' +
+        '</div>' +
+        '</div>' +
+        '</div>';
+      }
+}
+  }
     
 
 
@@ -707,6 +833,17 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
         isCorrect = false;
       } 
       answerFieldColor(answerInputElement, isCorrect);
+
+      if (controller.modeChoice8 === 'us-version' && controller.withRemainder === true) {
+        var expectedRemainderAnswer = controller.randomSelection[0] % controller.randomSelection[1];
+        let answerRemainderWesternInputElement = document.querySelector('#answer-remainder');
+        userRemainderInput = answerRemainderWesternInputElement.value.trim();
+  
+        if (Number(userRemainderInput) !== expectedRemainderAnswer) {
+          isCorrect = false;
+        } 
+        answerFieldColor(answerRemainderWesternInputElement, isCorrect);
+      }
         
         var subAnswerNumber = 0;
         subAnswerNumber = parseInt((Math.floor(controller.randomSelection[0]/controller.randomSelection[1])).toString().length);
@@ -1056,6 +1193,7 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
       formEquation();
       displayEquation();
       answerInputElement.setAttribute("style", "background-color: #FAEDCD")
+      answerRemainderWesternInputElement.setAttribute("style", "background-color: #FAEDCD")
     } else {
       updateScore();
       setMargins();
@@ -1074,7 +1212,12 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
       controller.combinations = controller.combinations.slice(0, controller.questionNumber);
     }
     answerInputElement.value = '';
-    answerInputElement.setAttribute("style", "background-color: #FAEDCD")
+    answerRemainderInputElement.value = '';
+    answerInputElement.setAttribute("style", "background-color: #FAEDCD");
+    if (controller.modeChoice8 === 'us-version') {
+    answerRemainderWesternInputElement.value = '';
+    answerRemainderWesternInputElement.setAttribute("style", "background-color: #FAEDCD");
+    }
     controller.result = ['', '', '', '', ''];
     controller.equation = '';
     controller.equation2 = '';
@@ -1138,16 +1281,37 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
       setFontSize();
     
       if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.95) {
-        controller.equation = 'Puikiai skaičiuoji!';
+        if (controller.language === 'LT') {
+          controller.equation = 'Puikiai skaičiuoji!';
+        } else if (controller.language === 'EN') {
+          controller.equation = 'Perfection! Well done!';          
+        }
       } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.7) {
-        controller.equation = 'Tobulėji! Pirmyn!';
+        if (controller.language === 'LT') {
+          controller.equation = 'Tobulėji! Pirmyn!';
+        } else if (controller.language === 'EN') {
+          controller.equation = 'Very good! Well done!';          
+        }
       } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.6) {
-        controller.equation = 'Mokaisi! Nesustok!';
+        if (controller.language === 'LT') {
+          controller.equation = 'Mokaisi! Nesustok!';
+        } else if (controller.language === 'EN') {
+          controller.equation = "You're learning!";          
+        }
       } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker)) {
-        controller.equation = 'Pasikartok su pagalba!';
+        if (controller.language === 'LT') {
+          controller.equation = 'Pasikartok su pagalba!';
+        } else if (controller.language === 'EN') {
+          controller.equation = "Ask for some help!";          
+        }
       } else {
-        controller.equation = 'Bandyk dar kartą!';        
+        if (controller.language === 'LT') {
+          controller.equation = 'Bandyk dar kartą!';   
+        } else if (controller.language === 'EN') {
+          controller.equation = "Try again!";       
       }
+    }
+
     controller.equation2 = '';
     controller.result = ['', '', '', '', ''];
     controller.combinations = [];
@@ -1164,11 +1328,11 @@ let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
 }
 
 function redirectToIntermediate() {
-  window.location.href = "./pasirinkimai";
+  window.location.href = "./pasirinkimai.html";
 }
 
   function redirectToQuestions() {
-    window.location.href = "./veiksmai";
+    window.location.href = "./veiksmai.html";
   }
 
   function redirectToIndex() {
@@ -1176,7 +1340,7 @@ function redirectToIntermediate() {
     window.location.href = "./";
   }
   function redirectToSummary () {
-    window.location.href = "./klaidos";
+    window.location.href = "./klaidos.html";
   }
 
  // Function to calculate bar color based on the number of mistakes
@@ -1273,6 +1437,7 @@ function generateSummaryTable(type) {
 
       // Generate the summary table HTML
       const summaryTable = document.createElement("table");
+      if (controller.language === 'LT') {
       summaryTable.innerHTML = `
           <tr>
               <th>Veiksmas</th>
@@ -1298,6 +1463,33 @@ function generateSummaryTable(type) {
               )
               .join("")}
       </div>`;
+      } else if (controller.language === 'EN') {
+        summaryTable.innerHTML = `
+            <tr>
+                <th>Equation</th>
+                <th>Mistake Frequency</th>
+                <th></th>
+            </tr>
+            ${summaryData
+                .map(
+                    (row) => `<div class="col-12 table-container">
+                    <tr>
+                        <td>${row["Veiksmas"]}</td>
+                        <td>${row["Suklydai (kartai)"]}</td>
+                        <td>
+                            <div class="bar" style="width: ${Math.min(
+                                row["Suklydai (kartai)"] * 10,
+                                100
+                            )}px; background-color: ${getBarColor(
+                        row["Suklydai (kartai)"]
+                    )};"></div>
+                        </td>
+                    </tr>
+                `
+                )
+                .join("")}
+        </div>`;
+      }
 
       // Display the summary table
       const summaryTableElement = document.getElementById("summary-table");
@@ -1306,7 +1498,11 @@ function generateSummaryTable(type) {
   } else {
       // Display a message when there are no mistakes
       const summaryTableOuterDivElement = document.querySelector("#summary-table-outer-div");
+      if (controller.language === 'LT') {
       summaryTableOuterDivElement.innerHTML = "<h2>Nėra klaidų!</h2>";
+      } else if ((controller.language === 'EN')) {
+        summaryTableOuterDivElement.innerHTML = "<h2>Nothing here!</h2>";
+      }
   }
 }
 
