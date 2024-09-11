@@ -590,7 +590,7 @@ document.getElementById('language-selection').addEventListener('change', functio
 
         // Redirect to the corresponding language page (if needed)
 
-        window.location.href = `/${selectedLanguage}/index.html`;
+        window.location.href = `/${selectedLanguage}/`;
 
     });
 
@@ -600,10 +600,10 @@ document.getElementById('language-selection').addEventListener('change', functio
 
 		if (controller.language) {
         document.getElementById('language-selection').value = controller.language;
-				window.location.href = `/${controller.language}/index`;
+				window.location.href = `/${controller.language}/`;
     } else {
         controller.language = 'LT';
-				window.location.href = '/LT/index'
+				window.location.href = '/LT/'
 				localStorage.setItem('controller', JSON.stringify(controller));;
     }
 		
