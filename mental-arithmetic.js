@@ -1272,7 +1272,9 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
 
       contentContainerElement.style.width = '100%';
       contentContainerElement.style.marginRight = '0';
-			contentContainerElement.style.marginLeft = '0';
+      contentContainerElement.style.marginLeft = '0';
+      contentContainerElement.style.paddingLeft = 0 + 'px';
+      contentContainerElement.style.paddingRight = 0 + 'px';
 
       answerSeparator1.style.display = 'none';
       answerSeparator2.style.display = 'none';
