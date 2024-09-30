@@ -495,11 +495,23 @@ function generateCombinations() {
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
+  } else if (controller.modeChoice2 === 'daugdvidvi') {
+    while (questionPool.length < 20) {
+      number1 = generateRandomNumber(11, 99);
+      number2 = generateRandomNumber(11, 99);
+      if (number2 % 10 !== 0) {
+      questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      }
+  }
+  controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
+
   } else if (controller.modeChoice2 === 'daugtridvi') {
     while (questionPool.length < 20) {
       number1 = generateRandomNumber(101, 999);
       number2 = generateRandomNumber(11, 99);
+      if (number2 % 10 !== 0) {
       questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      }
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
@@ -507,7 +519,9 @@ function generateCombinations() {
     while (questionPool.length < 20) {
       number1 = generateRandomNumber(1001, 9999);
       number2 = generateRandomNumber(11, 99);
+      if (number2 % 10 !== 0) {
       questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      }
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
@@ -551,7 +565,9 @@ function generateCombinations() {
       number1 = Math.max(...interNumbers);
       number2 = Math.min(...interNumbers);
 
+      if (number2 % 10 !== 0) {
       questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      }
   }
     while (questionPool.length < 14) {
 
@@ -559,7 +575,9 @@ function generateCombinations() {
       number1 = Math.max(...interNumbers);
       number2 = Math.min(...interNumbers);
 
+      if (number2 % 10 !== 0) {
       questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      }
   }
     while (questionPool.length < 20) {
 
@@ -567,7 +585,9 @@ function generateCombinations() {
       number1 = Math.max(...interNumbers);
       number2 = Math.min(...interNumbers);
 
+      if (number2 % 10 !== 0) {
       questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      }
     }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
@@ -599,7 +619,9 @@ function generateCombinations() {
       number1 = Math.max(...interNumbers);
       number2 = Math.min(...interNumbers);
 
+      if (number2 % 10 !== 0) {
       questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      }
   }
 
   while (questionPool2.length < 6) {
@@ -608,7 +630,9 @@ function generateCombinations() {
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
+    if (number2 % 10 !== 0) {
     questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    }
 }
   while (questionPool2.length < 8) {
 
@@ -616,7 +640,9 @@ function generateCombinations() {
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
+    if (number2 % 10 !== 0) {
     questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    }
   }
 
 
@@ -626,7 +652,7 @@ function generateCombinations() {
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    if (number1 * number2 <= 1000000) {
+    if (number1 * number2 <= 1000000 && number2 % 10 !== 0) {
     questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
     }
 }
@@ -636,7 +662,7 @@ function generateCombinations() {
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    if (number1 * number2 <= 1000000) {
+    if (number1 * number2 <= 1000000 && number2 % 10 !== 0) {
     questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
     }
 }
