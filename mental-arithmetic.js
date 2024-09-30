@@ -1413,7 +1413,11 @@ function generateSummaryTable(type) {
         } else if (mistake[2] === "multiplication") {
           action = '\u00D7';
         } else if (mistake[2] === "division") {
-          action = '\uA789';
+            if (controller.language === 'LT') {
+              action = '\uA789';
+          } else if (controller.language === 'EN') {
+              action = '\u00F7';
+          }
         }
 
         function parseOperator(operatorString) {
@@ -1422,6 +1426,7 @@ function generateSummaryTable(type) {
             "-": "-",
             "\u00D7": "*",
             "\uA789": "/",
+	    "\u00F7": "/",
           };
         
           return operatorMap[operatorString] || null;
