@@ -368,7 +368,8 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
     controller.modeChoice2 === "daugdvidvi" ||
     controller.modeChoice2 === "daugtridvi" ||
     controller.modeChoice2 === "daugketdvi" ||
-    controller.modeChoice2 === "daugdaug"
+    controller.modeChoice2 === "daugdaug" ||
+    controller.modeChoice2 === "gretnul" 
   ) {
 			linkElement.setAttribute("href", "../questions-smaller.css");
 		} else {
