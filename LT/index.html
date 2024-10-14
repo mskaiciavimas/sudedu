@@ -238,7 +238,8 @@
 							modeChoice2Selection !== 'daugdaugvien' && 
 							modeChoice2Selection !== 'daugdaugdvi' &&
 							modeChoice2Selection !== 'daugdaug' &&
-							modeChoice2Selection !== 'mil'
+							modeChoice2Selection !== 'mil' &&
+							modeChoice2Selection !== 'gretnul'
 						)
 					) {
 					toggleVisibility(numberLabel, true);
@@ -320,6 +321,7 @@
 				modeChoice2Element.innerHTML += '<option value="tukst">SKAIČIŲ IKI 1 000</option>';
 				modeChoice2Element.innerHTML += '<option value="dtukst">SKAIČIŲ IKI 10 000</option>';
 				modeChoice2Element.innerHTML += '<option value="mil">SKAIČIŲ IKI 1 000 000</option>';
+				modeChoice2Element.innerHTML += '<option value="gretnul">KAI TURINYJE GRETIMI NULIAI</option>';
 				modeChoice6Element.innerHTML += '<option value="turinys">NEŽINOMAS TURINYS</option>';
 				modeChoice6Element.innerHTML += '<option value="ateminys">NEŽINOMAS ATĖMINYS</option>';
 
@@ -475,6 +477,8 @@
 			} else if (modeChoice2Selection === "mil" && modeChoiceSelection === "sudetis ir atimtis") {
 				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT/NEIŠARDANT SKAIČIŲ SKYRIŲ</option>';
 				modeChoice3Element.innerHTML += '<option value="per10">PERŽENGIANT/IŠARDANT SKAIČIŲ SKYRIUS</option>';
+			} else if (modeChoice2Selection === "gretnul") {
+				modeChoice3Element.innerHTML += '<option value="per10">IŠARDANT SKAIČIŲ SKYRIUS</option>';
 			}
 			
 			else {
