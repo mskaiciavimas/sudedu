@@ -41,6 +41,25 @@ function generateCombinations() {
     return neisard;
   }
 
+    function nuliaiIsEiles(number) {
+    let inputNumber = String(number); // Convert the number to a string
+    let digits = inputNumber.length;
+    let numberOfZeroes = generateRandomNumber(2, digits - 1); // Random number of zeroes to replace
+    let startPosition = generateRandomNumber(1, digits); // Random starting position (1-based index)
+
+    while (digits - (startPosition) < numberOfZeroes) {
+      numberOfZeroes = generateRandomNumber(2, digits - 1); // Random number of zeroes to replace
+      startPosition = generateRandomNumber(1, digits); // Random starting position (1-based index)
+    }
+
+    // Replace the portion of the string with zeroes
+    let modifiedNumber = inputNumber.slice(0, startPosition) + 
+                          '0'.repeat(numberOfZeroes) + 
+                          inputNumber.slice(startPosition + numberOfZeroes);
+
+    return modifiedNumber; // Convert the modified string back to an integer
+  }
+
   /*ADDITION*/
   if (controller.modeChoice === 'sudetis') {
     if (controller.modeChoice2 === 'viena10') {
@@ -88,7 +107,16 @@ function generateCombinations() {
                 }
               }
             controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-          } else if (controller.modeChoice2 === 'tukst') {
+          } else if (controller.modeChoice2 === 'gretnul') {
+              while (questionPool.length < 20) {
+                number1 = generateRandomNumber(1000, 99999);
+                number2 = generateRandomNumber(1001, 9999);
+                  if (number1 > number2) {
+                    questionPool.push([parseInt(nuliaiIsEiles(number1)), parseInt(number2), "subtraction"]);
+                }
+            }
+              controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
+            } else if (controller.modeChoice2 === 'tukst') {
                 while (questionPool.length < 20) {
                   number1 = generateRandomNumber(101, 999);
                   number2 = generateRandomNumber(11, 999);
