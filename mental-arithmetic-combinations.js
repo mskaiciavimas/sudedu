@@ -207,7 +207,10 @@ function generateCombinations() {
       number1 = generateRandomNumber(1000, 99999);
       number2 = generateRandomNumber(1001, 9999);
         if (number1 > number2) {
-          questionPool.push([parseInt(nuliaiIsEiles(number1)), parseInt(number2), "subtraction"]);
+          number1WithZeroes = parseInt(nuliaiIsEiles(number1));
+          if (number1WithZeroes > number2) {
+          questionPool.push([number1WithZeroes, parseInt(number2), "subtraction"]);
+          }
       }
   }
     controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
