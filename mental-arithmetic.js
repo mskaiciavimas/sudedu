@@ -338,6 +338,8 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
     controller = JSON.parse(localStorage.getItem('controller'));
     var contentContainerElement = document.getElementById('content-container');
 		contentContainerElement.style.visibility = 'hidden';
+    var mainRemainderField = document.getElementById('remainder-field');
+    mainRemainderField.style.display = 'none';
 
     if (!controller.questionsStopped) {
     if (controller.modeChoice7 === 'stulpeliu' && controller.randomSelection[2] === 'division' && (controller.modeChoice8 === '' || controller.modeChoice8 === 'eeu-version')) {
@@ -363,9 +365,11 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
     controller.modeChoice2 === "pil100" ||
     controller.modeChoice2 === "daugtrivien" ||
     controller.modeChoice2 === "daugketvien" ||
+    controller.modeChoice2 === "daugdvidvi" ||
     controller.modeChoice2 === "daugtridvi" ||
     controller.modeChoice2 === "daugketdvi" ||
-    controller.modeChoice2 === "daugdaug"
+    controller.modeChoice2 === "daugdaug" ||
+    controller.modeChoice2 === "gretnul" 
   ) {
 			linkElement.setAttribute("href", "../questions-smaller.css");
 		} else {
@@ -412,6 +416,11 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
       equation2Element.innerHTML = controller.equation2;
       contentContainerElement.style.visibility = 'visible';
     };
+
+
+    if (controller.withRemainder && controller.randomSelection[2] === "division" && controller.modeChoice7 !== 'stulpeliu') {
+      mainRemainderField.style.display = 'block';
+    }
 
     if (controller.modeChoice7 === 'stulpeliu') {
       // Need to adjust the modofier
@@ -975,12 +984,19 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
         answerFieldColor(document.querySelector('#stulpeliu-' + i), localIsCorrect);
       }
 
+      divisionSymbol = ''
+      if (controller.language === 'EN') {
+        divisionSymbol = '\u00F7';
+      } else if (controller.language === 'LT') {
+        divisionSymbol = '\uA789';
+      }
+
       if (isCorrect) {
-        controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], ":", `${controller.randomSelection[0]} : ${controller.randomSelection[1]} = ${userInput}`];
+        controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], ":", `${controller.randomSelection[0]} ${divisionSymbol} ${controller.randomSelection[1]} = ${userInput}`];
         controller.combinations.splice(indexToRemove, 1);
         controller.correctAnswerTracker++;
       } else {
-        controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], ":", `${controller.randomSelection[0]} : ${controller.randomSelection[1]} = ${userInput}`];
+        controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], ":", `${controller.randomSelection[0]} ${divisionSymbol} ${controller.randomSelection[1]} = ${userInput}`];
         controller.mistakesTracker++;
         recordMistakes(); 
       }
@@ -1056,19 +1072,30 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
             isCorrect = false;
           }
         }
+
+        divisionSymbol = '';
+        remainderText = '';
+        if (controller.language === 'EN') {
+          divisionSymbol = '\u00F7';
+          remainderText = 'r.'
+        } else if (controller.language === 'LT') {
+          divisionSymbol = '\uA789';
+          remainderText = 'liek.'
+        }
+        
         if (isCorrect) {
           controller.combinations.splice(indexToRemove, 1);
           controller.correctAnswerTracker++;
           if (controller.withRemainder) {
-            controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer} (liek. ${userAnswerRemainder})`];
+            controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} ${divisionSymbol} ${controller.randomSelection[1]} = ${userAnswer} (${remainderText} ${userAnswerRemainder})`];
           } else {
-          controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer}`];
+          controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} ${divisionSymbol} ${controller.randomSelection[1]} = ${userAnswer}`];
           }
         } else {
           if (controller.withRemainder) {
-            controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer} (liek. ${userAnswerRemainder})`];
+            controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} ${divisionSymbol} ${controller.randomSelection[1]} = ${userAnswer} (${remainderText} ${userAnswerRemainder})`];
           } else {
-            controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = ${userAnswer}`];
+            controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} ${divisionSymbol} ${controller.randomSelection[1]} = ${userAnswer}`];
           }
           isCorrect = false;
           controller.mistakesTracker++;
@@ -1149,13 +1176,21 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
         }
       }
   } else if (controller.randomSelection[2] === 'division') {
+
+    divisionSymbol = ''
+    if (controller.language === 'EN') {
+      divisionSymbol = '\u00F7';
+    } else if (controller.language === 'LT') {
+      divisionSymbol = '\uA789';
+    }
+
     if (controller.randomSelection[3] === "first") {
       if (userAnswer === controller.randomSelection[0]) {
         controller.correctAnswerTracker++;
-        controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${userAnswer} \uA789 ${controller.randomSelection[1]} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
+        controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${userAnswer} ${divisionSymbol} ${controller.randomSelection[1]} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
         controller.combinations.splice(indexToRemove, 1);
       } else {
-        controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${userAnswer} \uA789 ${controller.randomSelection[1]} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
+        controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${userAnswer} ${divisionSymbol} ${controller.randomSelection[1]} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
         isCorrect = false;
         controller.mistakesTracker++;
         recordMistakes(); 
@@ -1163,10 +1198,10 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
     } else if (controller.randomSelection[3] === "second") {
       if (userAnswer === parseInt(controller.randomSelection[1])) {
         controller.correctAnswerTracker++;
-        controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${controller.randomSelection[0]} \uA789 ${userAnswer} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
+        controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${controller.randomSelection[0]} ${divisionSymbol} ${userAnswer} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
         controller.combinations.splice(indexToRemove, 1);
       } else {
-        controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${controller.randomSelection[0]} \uA789 ${userAnswer} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
+        controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${controller.randomSelection[0]} ${divisionSymbol} ${userAnswer} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
         isCorrect = false; 
         controller.mistakesTracker++;
         recordMistakes(); 
@@ -1273,6 +1308,8 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
       contentContainerElement.style.width = '100%';
       contentContainerElement.style.marginRight = '0';
 			contentContainerElement.style.marginLeft = '0';
+      contentContainerElement.style.paddingLeft = 0 + 'px';
+			contentContainerElement.style.paddingRight = 0 + 'px';
 
       answerSeparator1.style.display = 'none';
       answerSeparator2.style.display = 'none';
@@ -1328,11 +1365,11 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
 }
 
 function redirectToIntermediate() {
-  window.location.href = "./pasirinkimai.html";
+  window.location.href = "./pasirinkimai";
 }
 
   function redirectToQuestions() {
-    window.location.href = "./veiksmai.html";
+    window.location.href = "./veiksmai";
   }
 
   function redirectToIndex() {
@@ -1340,7 +1377,7 @@ function redirectToIntermediate() {
     window.location.href = "./";
   }
   function redirectToSummary () {
-    window.location.href = "./klaidos.html";
+    window.location.href = "./klaidos";
   }
 
  // Function to calculate bar color based on the number of mistakes
@@ -1377,7 +1414,11 @@ function generateSummaryTable(type) {
         } else if (mistake[2] === "multiplication") {
           action = '\u00D7';
         } else if (mistake[2] === "division") {
-          action = '\uA789';
+            if (controller.language === 'LT') {
+              action = '\uA789';
+          } else if (controller.language === 'EN') {
+              action = '\u00F7';
+          }
         }
 
         function parseOperator(operatorString) {
@@ -1386,6 +1427,7 @@ function generateSummaryTable(type) {
             "-": "-",
             "\u00D7": "*",
             "\uA789": "/",
+	    "\u00F7": "/",
           };
         
           return operatorMap[operatorString] || null;

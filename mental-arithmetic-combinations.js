@@ -41,6 +41,25 @@ function generateCombinations() {
     return neisard;
   }
 
+  function nuliaiIsEiles(number) {
+    let inputNumber = String(number); // Convert the number to a string
+    let digits = inputNumber.length;
+    let numberOfZeroes = generateRandomNumber(2, digits - 1); // Random number of zeroes to replace
+    let startPosition = generateRandomNumber(1, digits); // Random starting position (1-based index)
+
+    while (digits - (startPosition) < numberOfZeroes) {
+      numberOfZeroes = generateRandomNumber(2, digits - 1); // Random number of zeroes to replace
+      startPosition = generateRandomNumber(1, digits); // Random starting position (1-based index)
+    }
+
+    // Replace the portion of the string with zeroes
+    let modifiedNumber = inputNumber.slice(0, startPosition) + 
+                          '0'.repeat(numberOfZeroes) + 
+                          inputNumber.slice(startPosition + numberOfZeroes);
+
+    return modifiedNumber; // Convert the modified string back to an integer
+  }
+
   /*ADDITION*/
   if (controller.modeChoice === 'sudetis') {
     if (controller.modeChoice2 === 'viena10') {
@@ -183,6 +202,18 @@ function generateCombinations() {
           }
         }
         controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
+  } else if (controller.modeChoice2 === 'gretnul') {
+    while (questionPool.length < 20) {
+      number1 = generateRandomNumber(1000, 99999);
+      number2 = generateRandomNumber(1001, 9999);
+        if (number1 > number2) {
+          number1WithZeroes = parseInt(nuliaiIsEiles(number1));
+          if (number1WithZeroes > number2) {
+          questionPool.push([number1WithZeroes, parseInt(number2), "subtraction"]);
+          }
+      }
+  }
+    controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
   } else if (controller.modeChoice2 === 'tukst') {
       while (questionPool.length < 20) {
         number1 =generateRandomNumber(101, 999)
@@ -495,11 +526,23 @@ function generateCombinations() {
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
+  } else if (controller.modeChoice2 === 'daugdvidvi') {
+    while (questionPool.length < 20) {
+      number1 = generateRandomNumber(11, 99);
+      number2 = generateRandomNumber(11, 99);
+      if (number2 % 10 !== 0) {
+      questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      }
+  }
+  controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
+
   } else if (controller.modeChoice2 === 'daugtridvi') {
     while (questionPool.length < 20) {
       number1 = generateRandomNumber(101, 999);
       number2 = generateRandomNumber(11, 99);
+      if (number2 % 10 !== 0) {
       questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      }
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
@@ -507,7 +550,9 @@ function generateCombinations() {
     while (questionPool.length < 20) {
       number1 = generateRandomNumber(1001, 9999);
       number2 = generateRandomNumber(11, 99);
+      if (number2 % 10 !== 0) {
       questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      }
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
@@ -551,7 +596,9 @@ function generateCombinations() {
       number1 = Math.max(...interNumbers);
       number2 = Math.min(...interNumbers);
 
+      if (number2 % 10 !== 0) {
       questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      }
   }
     while (questionPool.length < 14) {
 
@@ -559,7 +606,9 @@ function generateCombinations() {
       number1 = Math.max(...interNumbers);
       number2 = Math.min(...interNumbers);
 
+      if (number2 % 10 !== 0) {
       questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      }
   }
     while (questionPool.length < 20) {
 
@@ -567,7 +616,9 @@ function generateCombinations() {
       number1 = Math.max(...interNumbers);
       number2 = Math.min(...interNumbers);
 
+      if (number2 % 10 !== 0) {
       questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      }
     }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
@@ -599,7 +650,9 @@ function generateCombinations() {
       number1 = Math.max(...interNumbers);
       number2 = Math.min(...interNumbers);
 
+      if (number2 % 10 !== 0) {
       questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      }
   }
 
   while (questionPool2.length < 6) {
@@ -608,7 +661,9 @@ function generateCombinations() {
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
+    if (number2 % 10 !== 0) {
     questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    }
 }
   while (questionPool2.length < 8) {
 
@@ -616,7 +671,9 @@ function generateCombinations() {
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
+    if (number2 % 10 !== 0) {
     questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    }
   }
 
 
@@ -626,7 +683,7 @@ function generateCombinations() {
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    if (number1 * number2 <= 1000000) {
+    if (number1 * number2 <= 1000000 && number2 % 10 !== 0) {
     questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
     }
 }
@@ -636,7 +693,7 @@ function generateCombinations() {
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    if (number1 * number2 <= 1000000) {
+    if (number1 * number2 <= 1000000 && number2 % 10 !== 0) {
     questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
     }
 }
@@ -947,7 +1004,7 @@ while (questionPool.length < 17) {
     }
 }
 }
-while (questionPool.length < 17) {
+while (questionPool.length < 20) {
   let number1 = generateRandomNumber(2, 9);
   let number2 = generateRandomNumber(1001, 9999);
   if (controller.withRemainder) {
@@ -966,9 +1023,107 @@ while (questionPool.length < 17) {
 }
 
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
+} 
+
+
+
+
+
+else if (controller.modeChoice2 === 'daugdaugviendalmnul') {
+
+  function containsZero(number) {
+    // Convert the number to a string and check if it contains '0'
+    return String(number).includes('0');
+  }
+
+  while (questionPool.length < 3) {
+    let number1 = generateRandomNumber(2, 9);
+    let number2 = generateRandomNumber(11, 99);
+    if (controller.withRemainder) {
+      remainder = generateRandomNumber(1, number1)
+    }
+    dalinys = (number1 * number2) + remainder;
+    if (dalinys <= 99999 && containsZero(number2)) {
+      if (controller.withRemainder) {
+        if (dalinys % number1 !== 0) {
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        }
+      } else {
+        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+  }
+}
+while (questionPool.length < 11) {
+  let number1 = generateRandomNumber(2, 9);
+  let number2 = generateRandomNumber(101, 999);
+  if (controller.withRemainder) {
+    remainder = generateRandomNumber(1, number1)
+  }
+  dalinys = (number1 * number2) + remainder;
+  if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0 && containsZero(number2)) {
+    if (controller.withRemainder) {
+      if (dalinys % number1 !== 0) {
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      }
+    } else {
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    }
+}
+}
+while (questionPool.length < 16) {
+let number1 = generateRandomNumber(2, 9);
+let number2 = generateRandomNumber(1001, 9999);
+if (controller.withRemainder) {
+  remainder = generateRandomNumber(1, number1)
+}
+dalinys = (number1 * number2) + remainder;
+if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0 && containsZero(number2)) {
+  if (controller.withRemainder) {
+    if (dalinys % number1 !== 0) {
+  questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    }
+  } else {
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  }
+}
+}
+while (questionPool.length < 17) {
+let number1 = generateRandomNumber(2, 9);
+let number2 = generateRandomNumber(1001, 9999);
+if (controller.withRemainder) {
+  remainder = generateRandomNumber(1, number1)
+}
+dalinys = (number1 * number2) + remainder;
+if (dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0 && containsZero(number2)) {
+  if (controller.withRemainder) {
+    if (dalinys % number1 !== 0) {
+  questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    }
+  } else {
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  }
+}
+}
+while (questionPool.length < 20) {
+let number1 = generateRandomNumber(2, 9);
+let number2 = generateRandomNumber(1001, 9999);
+if (controller.withRemainder) {
+  remainder = generateRandomNumber(1, number1)
+}
+dalinys = (number1 * number2) + remainder;
+if (10000 < dalinys && dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0 && containsZero(number2)) {
+  if (controller.withRemainder) {
+    if (dalinys % number1 !== 0) {
+  questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    }
+  } else {
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  }
+}
 }
 
-  else if (controller.modeChoice2 === 'daugdaugdvi') {
+controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
+} else if (controller.modeChoice2 === 'daugdaugdvi') {
   while (questionPool.length < 6) {
     let number1 = generateRandomNumber(11, 99);
     let number2 = generateRandomNumber(11, 99);
@@ -1024,6 +1179,13 @@ if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]
 controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 }
   
+
+
+
+
+
+
+
   else if (controller.modeChoice2 === 'daugdaug') {
     while (questionPool.length < 3) {
       let number1 = generateRandomNumber(2, 9);

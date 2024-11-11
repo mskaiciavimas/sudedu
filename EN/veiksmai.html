@@ -84,7 +84,7 @@
 
 							<div id="remainder-field" class="remainder-field">
 								<input type="text" id="remainder" name="remainder" class="form-control text-center remainder-input"
-									placeholder="liek." autocomplete="off">
+									placeholder="r." autocomplete="off">
 							</div>
 
 
@@ -231,9 +231,11 @@ document.querySelectorAll('.control').forEach(control => {
 						controller.modeChoice2 === "pil100" ||
 						controller.modeChoice2 === "daugtrivien" ||
 						controller.modeChoice2 === "daugketvien" ||
+					        controller.modeChoice2 === "daugdvidvi" ||
 						controller.modeChoice2 === "daugtridvi" ||
 						controller.modeChoice2 === "daugketdvi" ||
-						controller.modeChoice2 === "daugdaug"
+						controller.modeChoice2 === "daugdaug" ||
+						controller.modeChoice2 === "gretnul"
 					) {
 						linkElement.setAttribute("href", "../questions-smaller.css");
 				} else {
@@ -398,6 +400,13 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 
 		
 		function positionContentContainer () {
+			contentContainerElement.style.marginRight = 0 + 'px';
+			contentContainerElement.style.marginLeft = 0 + 'px';
+			contentContainerElement.style.paddingLeft = 0 + 'px';
+			contentContainerElement.style.paddingRight = 0 + 'px';
+
+			if (controller.questionsStopped === true || controller.randomSelection[2] !== 'division' || (controller.randomSelection[2] === 'division' && controller.modeChoice8 === 'eeu-version')) {
+				console.log("triggered")
 					contentContainerElement.style.width = 'auto';
 					var middleLineWidth = document.getElementById('middle-line').offsetWidth;
 					var contentContainerElementWidth = contentContainerElement.offsetWidth;
@@ -406,6 +415,48 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 					const element2marginRight =  parseInt(element2ComputedStyles.getPropertyValue("margin-right"), 10) / 2;
 					contentContainerElement.style.marginRight = contentContainerMargins - element2marginRight + 'px';
 					contentContainerElement.style.marginLeft = contentContainerMargins + element2marginRight + 'px';
+			} else if (controller.randomSelection[2] === 'division' && controller.modeChoice8 === 'us-version') {
+				var middleLineWidth = document.getElementById('middle-line').offsetWidth;
+
+				const middleLineRect = document.getElementById('middle-line').getBoundingClientRect();
+				const middleLineLeftBoundary = middleLineRect.left;
+
+				const answerFieldDiv = document.querySelector('.answer-field-div');
+				const divisionStulp4 = document.getElementById('division-stulp-4');
+				// Get their bounding rectangles
+				const answerFieldDivRect = answerFieldDiv.getBoundingClientRect();
+				const divisionStulp4Rect = divisionStulp4.getBoundingClientRect();
+				// Get the highest right boundary
+				const furthestRightBoundary = Math.max(answerFieldDivRect.right, divisionStulp4Rect.right);
+
+
+				// Get the element with class="equation_2"
+				const equationElement = document.querySelector('.equation_2');
+				// Get its bounding rectangle
+				const equationRect = equationElement.getBoundingClientRect();
+				// Get the left boundary
+				const equationElementLeftBoundary = equationRect.left;
+
+				// Get its bounding rectangle
+				const contentContainerRect = contentContainerElement.getBoundingClientRect();
+				// Get the left boundary
+				const contentContainerLeftBoundary = contentContainerRect.left;
+
+				totalLongDivisionWidth = furthestRightBoundary - equationElementLeftBoundary;
+
+				intermEqualPadding = (middleLineWidth - totalLongDivisionWidth) / 2;
+
+				lopsidedAdjustment = (equationElementLeftBoundary - middleLineLeftBoundary) / 2;
+
+				if (intermEqualPadding > lopsidedAdjustment) {
+					contentContainerElement.style.paddingLeft = intermEqualPadding + 10 + 'px';
+					contentContainerElement.style.paddingRight = intermEqualPadding + lopsidedAdjustment + 'px';
+				} else {
+					contentContainerElement.style.paddingLeft = intermEqualPadding + 15 + 'px';
+					contentContainerElement.style.paddingRight = intermEqualPadding + lopsidedAdjustment * 4 + 'px';
+				}
+
+			}
 			}
 
 		contentContainerElement.style.width = '100%';
