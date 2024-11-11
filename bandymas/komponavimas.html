@@ -67,6 +67,10 @@
           margin-top: 10px;
         }
 
+        #check-answer-btn {
+          margin-bottom: 0;
+        }
+
         #options-field,
         #answer-field {
           margin-top: 20px;
@@ -119,9 +123,6 @@
           box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
         }
 
-        #check-answer-btn {
-        }
-
         .btn-primary:focus,
         .btn-primary:active,
         .btn-primary:hover,
@@ -129,10 +130,6 @@
           background-color: #01937C;
           border-color: #01937C;
           color: black;
-        }
-
-        #next-question-btn {
-          margin-left: 3vw;
         }
 
         #tries,
@@ -171,7 +168,8 @@
         }
 
         @media (max-width: 1150px) {
-        #next-question-btn {
+        #next-question-btn,
+        #check-answer-btn {
           width: 17vw;
         }
         }
@@ -181,12 +179,9 @@
           display: block; /* Change to block on mobile */
           }
 
-          #next-question-btn {
+          #next-question-btn,
+          #check-answer-btn {
           width: 35vw;
-        }
-
-        #check-answer-btn {
-          width: 28vw;
         }
 
         #help-btn {
@@ -241,15 +236,7 @@
 
     <!-- Check answer button -->
     <div class="row button-row">
-      <div class="col-12 col-md-6 d-flex" id="answer-next-buttons">
-        <div class="col-4 col-md-3">
-        <button id="check-answer-btn" class="btn btn-primary">Tikrinti</button>
-        </div>
-        <div class="col-8 col-md-3">
-          <button id="next-question-btn" class="btn btn-primary" style="visibility: hidden;">Kita užduotis</button>
-          </div>
-      </div>
-      <div class="col-12 col-md-6 d-flex justify-content-end">
+      <div class="col-12 col-md-6 d-flex justify-content-start">
         <div class="justify-content-end">
         <button id="help-btn" class="btn btn-primary">Pagalba</button>
         <div id="dots" class="d-flex ml-2">
@@ -260,7 +247,16 @@
 
       </div>
     </div>
+
+    <div class="col-12 col-md-6 d-flex justify-content-end">
+      <div class="justify-content-end">
+        <button id="check-answer-btn" class="btn btn-primary">Tikrinti</button>
+        <div class="d-flex ml-2">
+      <button id="next-question-btn" class="btn btn-primary" style="visibility: hidden;">Kita užduotis</button>
+    </div>
+    </div>
   </div>
+
   <div class="row d-flex justify-content-end align-items-end">
     <button class="btn btn-primary reset-button"><span class="material-symbols-rounded">roofing</span></button>
   </div>
@@ -271,7 +267,7 @@
   <!-- Include Dragula JS -->
   <script src="https://cdn.jsdelivr.net/npm/dragula@3.7.3/dist/dragula.min.js"></script>
   <script src="../mental-arithmetic.js"></script>
-  <script src="./sakiniai-komponavimui.js"></script>
+  <script src="../sakiniai-komponavimui.js"></script>
 
   <script>
     var tries = 0;
