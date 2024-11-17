@@ -286,7 +286,6 @@ fetch('text_database.json')
     var orderedSentences;
     var drake;
     controller = JSON.parse(localStorage.getItem('controller')) 
-    console.log(controller.modeChoiceLtDifficulty)
     const answersField = document.getElementById('answers-field');
     const titleField = document.getElementById('title-field');
     const optionsField = document.getElementById('options-field');
@@ -298,6 +297,7 @@ fetch('text_database.json')
     const helpDiv = document.getElementById('help');
 
     var tempTextLibrary = Array.from(textDatabase);
+    console.log(`controller.modeChoiceLtDifficulty: ${controller.modeChoiceLtDifficulty}`)
     var filteredTextLibrary = tempTextLibrary.filter(entry =>
       entry['suitable-for'] &&
       entry['suitable-for']['sakiniai'] && // Check if 'sakiniai' exists
