@@ -295,7 +295,7 @@
     var triesToHelp = 0;
     var helpTracker = 0;
     var orderedSentences;
-    var tempParagraphLibrary = Array.from(textDatabase);
+    controller = JSON.parse(localStorage.getItem('controller')) 
     var drake; 
     const answersFieldStart = document.getElementById('answers-field-start');
     const answersFieldMiddle = document.getElementById('answers-field-middle');
@@ -308,6 +308,13 @@
     var selectedItem;
     const triesDiv = document.getElementById('tries');
     const helpDiv = document.getElementById('help');
+
+    var tempTextLibrary = Array.from(textDatabase);
+    var filteredTextLibrary = tempTextLibrary.filter(entry =>
+      entry['suitable-for'] &&
+      entry['suitable-for']['struktura'] &&
+      entry['suitable-for']['struktura'].includes(controller.modeChoiceLtDifficulty)
+    );
 
 
     helpBtn.disabled = true;
@@ -322,15 +329,15 @@
     }
 
     function selectRandomItem() {
-    if (tempParagraphLibrary.length === 0) {
-      tempParagraphLibrary = Array.from(textDatabase);
+    if (filteredTextLibrary.length === 0) {
+      filteredTextLibrary = Array.from(textDatabase);
     }
     
     // Generate a random index
-    const randomIndex = Math.floor(Math.random() * tempParagraphLibrary.length);
+    const randomIndex = Math.floor(Math.random() * filteredTextLibrary.length);
     
     // Remove the selected item from the array and return it
-    const selectedItem = tempParagraphLibrary.splice(randomIndex, 1)[0];
+    const selectedItem = filteredTextLibrary.splice(randomIndex, 1)[0];
     
     return selectedItem;
     }

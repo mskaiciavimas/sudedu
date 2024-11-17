@@ -284,8 +284,9 @@ fetch('text_database.json')
     var triesToHelp = 0;
     var helpTracker = 0;
     var orderedSentences;
-    var tempParagraphLibrary = Array.from(textDatabase);
-    var drake; 
+    var drake;
+    controller = JSON.parse(localStorage.getItem('controller')) 
+    console.log(controller.modeChoiceLtDifficulty)
     const answersField = document.getElementById('answers-field');
     const titleField = document.getElementById('title-field');
     const optionsField = document.getElementById('options-field');
@@ -296,6 +297,12 @@ fetch('text_database.json')
     const triesDiv = document.getElementById('tries');
     const helpDiv = document.getElementById('help');
 
+    var tempTextLibrary = Array.from(textDatabase);
+    var filteredTextLibrary = tempTextLibrary.filter(entry =>
+      entry['suitable-for'] &&
+      entry['suitable-for']['sakiniai'] && // Check if 'sakiniai' exists
+      entry['suitable-for']['sakiniai'].includes(controller.modeChoiceLtDifficulty) // Check if it includes the value
+    );
 
     helpBtn.disabled = true;
 
@@ -324,15 +331,15 @@ fetch('text_database.json')
     }
 
     function selectRandomItem() {
-    if (tempParagraphLibrary.length === 0) {
-      tempParagraphLibrary = Array.from(textDatabase);
+    if (filteredTextLibrary.length === 0) {
+      filteredTextLibrary = Array.from(textDatabase);
     }
     
     // Generate a random index
-    const randomIndex = Math.floor(Math.random() * tempParagraphLibrary.length);
+    const randomIndex = Math.floor(Math.random() * filteredTextLibrary.length);
     
     // Remove the selected item from the array and return it
-    const selectedItem = tempParagraphLibrary.splice(randomIndex, 1)[0];
+    const selectedItem = filteredTextLibrary.splice(randomIndex, 1)[0];
     
     return selectedItem;
     }

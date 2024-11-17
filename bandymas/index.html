@@ -40,26 +40,41 @@
 			<div class="col-12 d-flex justify-content-center align-items-center middle-div">
 				<div class="row" id="middle-div-row">
 					<div class="d-flex flex-column align-items-center">
-						<label class="mode-choice-label" for="mode_choice">PRAKTIKUOTIS</label>
+						<label class="mode-choice-label" for="mode_choice_lt">PRAKTIKUOTIS</label>
 						<div class="row">
 							<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
 						</div>
-						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
-							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice"
-								id="mode_choice">
+						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_lt_div">
+							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_lt"
+								id="mode_choice_lt">
 								<option value="tekstas">TEKSTO SUPRATIMĄ</option>
 							</select>
 						</div>
 						<div class="row">
 							<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
 						</div>
-						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_2_div">
-							<div class="col-12 d-flex justify-content-center align-items-center mode_choice_2_div text-center"
-								id="mode_choice_2_div">
-								<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_2"
-									id="mode_choice_2">
+						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_lt_2_div">
+							<div class="col-12 d-flex justify-content-center align-items-center mode_choice_lt_2_div text-center"
+								id="mode_choice_lt_2_div">
+								<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_lt_2"
+									id="mode_choice_lt_2">
 									<option value="komponavimas">TURINIO KOMPONAVIMĄ</option>
 									<option value="isdestymas">STRUKTŪROS IŠDĖSTYMĄ</option>
+								</select>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
+						</div>
+						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_lt_3_div">
+							<div class="col-12 d-flex justify-content-center align-items-center mode_choice_lt_3_div text-center"
+								id="mode_choice_lt_3_div">
+								<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_lt_3"
+									id="mode_choice_lt_3">
+									<option value="slenkstinis">SLENKSTINIS</option>
+									<option value="lengvas">LENGVAS</option>
+									<option value="vidutinis">VIDUTINIS</option>
+									<option value="sunkus">SUNKUS</option>
 								</select>
 							</div>
 						</div>
@@ -103,21 +118,22 @@
 
 	<script>
 
-		let modeChoiceElement = document.querySelector('#mode_choice');
-		let modeChoice2Element = document.querySelector('#mode_choice_2');
+		let modeChoiceLtElement = document.querySelector('#mode_choice_lt');
+		let modeChoiceLt2Element = document.querySelector('#mode_choice_lt_2');
+		let modeChoiceLt3Element = document.querySelector('#mode_choice_lt_3');
 	
 
 			function handleModeChoiceChange() {
-				let modeChoiceSelection = modeChoiceElement.value;
-				let modeChoice2Selection = modeChoice2Element.value;
+				let modeChoiceLtSelection = modeChoiceLtElement.value;
+				let modeChoiceLt2Selection = modeChoiceLt2Element.value;
 			}
 
 		function updateModeChoice2() {
-			let modeChoiceSelection = modeChoiceElement.value;
-			let modeChoice2Selection = modeChoice2Element.value;
+			let modeChoiceLtSelection = modeChoiceLtElement.value;
+			let modeChoiceLt2Selection = modeChoiceLt2Element.value;
 		}
 
-		modeChoiceElement.addEventListener('change', updateModeChoice2);
+		modeChoiceLtElement.addEventListener('change', updateModeChoice2);
 
 
 		function submitSelection() {
@@ -125,12 +141,13 @@
 				controller = JSON.parse(localStorage.getItem('controller'))
 			}
 			controller.language = document.getElementById('language-selection').value;
-			modeChoiceSelection = modeChoiceElement.value;
-			modeChoice2Selection = modeChoice2Element.value;
+			modeChoiceLtSelection = modeChoiceLtElement.value;
+			modeChoiceLt2Selection = modeChoiceLt2Element.value;
 
-			controller.modeChoice = modeChoiceSelection;
-			controller.modeChoice2 = modeChoice2Selection;
+			controller.modeChoice = modeChoiceLtSelection;
+			controller.modeChoice2 = modeChoiceLt2Selection;
 			controller.result = ['', '', '', '', '']
+			controller.modeChoiceLtDifficulty = document.getElementById('mode_choice_lt_3').value;
 
 			localStorage.setItem('controller', JSON.stringify(controller))
 			if (controller.modeChoice === "tekstas") {
