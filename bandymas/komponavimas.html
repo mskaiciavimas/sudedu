@@ -22,9 +22,9 @@
           -ms-user-select: none;
           
           /* Add Flexbox to center content */
+          display: flex;
           justify-content: center;
           align-items: center;
-          height: 100vh; /* Full viewport height */
           margin: 0; /* Remove default body margin */
         }
 
@@ -41,6 +41,7 @@
           background-color: #e0e0e0;
           padding: 10px;
           width: 100%;
+          margin-top: 10px;
         }
 
         .item {
@@ -53,6 +54,7 @@
           border: 1px solid #ccc;
           border-radius: 5px;
           box-shadow: 0px 0.1px 3px rgba(0, 0, 0, 0.2);
+          white-space: pre-line;
         }
 
         /* Ensure the drop targets fill the column */
@@ -60,19 +62,14 @@
         #title-field {
           min-height: 100px;
           margin-top: 20px;
-          margin-bottom: 20px;
         }
 
         .button-row {
           margin-top: 10px;
         }
 
-        #check-answer-btn {
-          margin-bottom: 0;
-        }
-
         #options-field,
-        #answer-field {
+        #answers-field {
           margin-top: 20px;
         }
 
@@ -130,6 +127,10 @@
           background-color: #01937C;
           border-color: #01937C;
           color: black;
+        }
+
+        #check-answer-btn {
+          margin-bottom: 0;
         }
 
         #tries,
@@ -226,14 +227,27 @@
         </div>
 
         <!-- Right column with bottom-right item -->
-        <div id="answers-field-div" class="col-12">
-          <div id="answers-field" class="field">
-            Tekstas
+        <div id="answers-field-start-div" class="col-12">
+          <div id="answers-field-start" class="field">
+            Pradžia
+          </div>
+        </div>
+
+        <div id="answers-field-middle-div" class="col-12">
+          <div id="answers-field-middle" class="field">
+            Įvykio raida
+          </div>
+        </div>
+
+        <div id="answers-field-end-div" class="col-12">
+          <div id="answers-field-end" class="field">
+            Pabaiga
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Check answer button -->
     <!-- Check answer button -->
     <div class="row button-row">
       <div class="col-12 col-md-6 d-flex justify-content-start">
@@ -267,17 +281,25 @@
   <!-- Include Dragula JS -->
   <script src="https://cdn.jsdelivr.net/npm/dragula@3.7.3/dist/dragula.min.js"></script>
   <script src="../mental-arithmetic.js"></script>
-  <script src="./sakiniai-komponavimui.js"></script>
+  <script src="./sakiniai-teksto-strukturos-isdestymui.js"></script>
 
   <script>
+  fetch('text_database.json')
+      .then(response => {
+          if (!response.ok) throw new Error("Network error");
+          return response.json();
+      })
+      .then(textDatabase => {
     var tries = 0;
     var helpUsed = 0;
     var triesToHelp = 0;
     var helpTracker = 0;
     var orderedSentences;
-    var tempParagraphLibrary = Array.from(paragraphLibrary);
+    var tempParagraphLibrary = Array.from(textDatabase);
     var drake; 
-    const answersField = document.getElementById('answers-field');
+    const answersFieldStart = document.getElementById('answers-field-start');
+    const answersFieldMiddle = document.getElementById('answers-field-middle');
+    const answersFieldEnd = document.getElementById('answers-field-end');
     const titleField = document.getElementById('title-field');
     const optionsField = document.getElementById('options-field');
     const checkAnswerBtn = document.getElementById('check-answer-btn')
@@ -290,11 +312,6 @@
 
     helpBtn.disabled = true;
 
-    // Function to split a paragraph into sentences
-    function splitParagraphToSentences(paragraph) {
-      return paragraph.split(/(?<=\.)\s+/); // Split by period followed by space
-    }
-
     // Function to shuffle the array of sentences
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
@@ -306,7 +323,7 @@
 
     function selectRandomItem() {
     if (tempParagraphLibrary.length === 0) {
-      tempParagraphLibrary = Array.from(paragraphLibrary);
+      tempParagraphLibrary = Array.from(textDatabase);
     }
     
     // Generate a random index
@@ -322,21 +339,15 @@
       // Select a random item from the library
       selectedItem = selectRandomItem();
       const originalTitle = selectedItem.title;
-      const originalParagraph = selectedItem.paragraph;
+      const fullText = [...selectedItem.text.start, ...selectedItem.text.middle, ...selectedItem.text.end];
       const paragraphAuthor = selectedItem.author;
       optionsField.style.minHeight = `auto`;
 
       const authorDiv = document.getElementById('author');
       authorDiv.innerHTML = paragraphAuthor;
 
-      // Split the paragraph into sentences
-      orderedSentences = splitParagraphToSentences(originalParagraph);
-
-      // Combine the title and sentences into one array
-      const combinedItems = [originalTitle, ...orderedSentences];
-
       // Shuffle the combined items (title + sentences)
-      const shuffledItems = shuffleArray(combinedItems);
+      const shuffledItems = shuffleArray([...fullText, ...[originalTitle]]);
 
       // Append shuffled items (title + sentences) as draggable items
       optionsField.innerHTML = '';  // Clear previous items before appending
@@ -349,10 +360,15 @@
 
       // After the items are appended, set the height of the fields to fixed
       const optionsHeight = optionsField.scrollHeight;
-      const answersHeight = answersField.scrollHeight;
+      const answerFieldStartHeight = answersFieldStart.scrollHeight;
+      const answerFieldMiddleHeight = answersFieldMiddle.scrollHeight;
+      const answerFieldEndHeight = answersFieldEnd.scrollHeight;
 
-      optionsField.style.minHeight = `${optionsHeight+120}px`;
-      answersField.style.minHeight = `${optionsHeight}px`; // Sync the height with optionsField
+      optionsField.style.minHeight = `${optionsHeight+50}px`;
+      answersFieldStart.style.minHeight = `${optionsHeight/3*0.75}px`
+      answersFieldMiddle.style.minHeight = `${optionsHeight/3*1.5}px`
+      answersFieldEnd.style.minHeight = `${optionsHeight/3*0.75}px`
+      
 
       initializeDragula();
 
@@ -375,7 +391,7 @@
       }
 
       // Create a new Dragula instance
-      drake = dragula([document.getElementById('options-field'), document.getElementById('title-field'), document.getElementById('answers-field')]);
+      drake = dragula([document.getElementById('options-field'), document.getElementById('title-field'), document.getElementById('answers-field-start'), document.getElementById('answers-field-middle'), document.getElementById('answers-field-end')]);
 
       drake.on('drag', function (el) {
         // Disable touch scrolling while dragging
@@ -435,11 +451,17 @@ document.addEventListener('touchmove', function (event) {
       const titleAnswerItems = titleField.querySelectorAll('.item');
       const titleAnswer = Array.from(titleAnswerItems).map(item => item.textContent);
 
-      const paragraphAnswerItems = answersField.querySelectorAll('.item');
-      const paragraphAnswerOrder = Array.from(paragraphAnswerItems).map(item => item.textContent);
-
       const titleItems = titleField.querySelectorAll('.item');
       const titleList = Array.from(titleItems).map(item => item.textContent);
+
+      const paragraphAnswerStartItems = answersFieldStart.querySelectorAll('.item');
+      const paragraphAnswerStartOrder = Array.from(paragraphAnswerStartItems).map(item => item.textContent);
+
+      const paragraphAnswerMiddleItems = answersFieldMiddle.querySelectorAll('.item');
+      const paragraphAnswerMiddleOrder = Array.from(paragraphAnswerMiddleItems).map(item => item.textContent);
+
+      const paragraphAnswerEndItems = answersFieldEnd.querySelectorAll('.item');
+      const paragraphAnswerEndOrder = Array.from(paragraphAnswerEndItems).map(item => item.textContent);
 
       function errorIndicator (field) {
         field.classList.add('error')
@@ -448,25 +470,42 @@ document.addEventListener('touchmove', function (event) {
         }, 500);
         }
 
-      function arraysAreEqual(items, arr1, arr2) {
-        var answerCorrect = true;
-        if (arr1.length !== arr2.length) {
-          answerCorrect = false;
-        } 
-        const minLength = Math.min(arr1.length, arr2.length); // Compare up to the shortest length
-        for (let i = 0; i < minLength; i++) {
-          if (arr1[i].trim() !== arr2[i].trim()) {
-            answerCorrect = false;
-            items[i].style.backgroundColor = '#D57E7C'
-          } else {
-            items[i].style.backgroundColor = 'rgb(182, 200, 103)'   
-          }
-        }
-        if (!answerCorrect) {
-          errorIndicator(answersField);
-        }
-        return answerCorrect;
-      }
+  function arraysAreEqual(items, arr1, arr2, field) {
+  var answerCorrect = true;
+  
+  // Check for length mismatch
+  if (arr1.length !== arr2.length) {
+    answerCorrect = false;
+  }
+
+  const minLength = Math.min(arr1.length, arr2.length);
+  
+  // Compare items up to the shortest length
+  for (let i = 0; i < minLength; i++) {
+    if (arr1[i].trim() !== arr2[i].trim()) {
+      answerCorrect = false;
+      items[i].style.backgroundColor = '#D57E7C';
+    } else {
+      items[i].style.backgroundColor = 'rgb(182, 200, 103)';
+    }
+  }
+
+  // Handle extra items in arr1 if it's longer than arr2
+  if (arr1.length > arr2.length) {
+    answerCorrect = false;
+    for (let i = minLength; i < arr1.length; i++) {
+      items[i].style.backgroundColor = '#D57E7C';
+    }
+  }
+
+  // Trigger error indicator if arrays are not equal
+  if (!answerCorrect) {
+    errorIndicator(field);
+  }
+
+  return answerCorrect;
+}
+
 
       function titlesAreEqual(items, answer, title) {
         var answerCorrect = true;
@@ -489,15 +528,18 @@ document.addEventListener('touchmove', function (event) {
       }
 
 
-      if (titleAnswer.length === 0 && paragraphAnswerOrder.length === 0) {
+      if (titleAnswer.length === 0 && paragraphAnswerStartOrder.length === 0 && paragraphAnswerMiddleOrder.length === 0 && paragraphAnswerEndOrder.length === 0) {
         return
       } else {
 
       // The correct answer should include the title as the first item, followed by the sentences in order
       const titleIsCorrect = titlesAreEqual(titleItems, titleAnswer, [selectedItem.title]);
-      const sentenceOrderIsCorrect = arraysAreEqual(paragraphAnswerItems, paragraphAnswerOrder, orderedSentences);
+      const sentenceOrderStartIsCorrect = arraysAreEqual(paragraphAnswerStartItems, paragraphAnswerStartOrder, selectedItem.text.start, answersFieldStart);
+      const sentenceOrderMiddleIsCorrect = arraysAreEqual(paragraphAnswerMiddleItems, paragraphAnswerMiddleOrder, selectedItem.text.middle, answersFieldMiddle);
+      const sentenceOrderEndIsCorrect = arraysAreEqual(paragraphAnswerEndItems, paragraphAnswerEndOrder, selectedItem.text.end, answersFieldEnd);
+      
 
-      if (titleIsCorrect && sentenceOrderIsCorrect) {
+      if (titleIsCorrect && sentenceOrderStartIsCorrect && sentenceOrderMiddleIsCorrect && sentenceOrderEndIsCorrect) {
         nextQuestionBtn.style.visibility = 'visible';
         tries++;
         triesDiv.innerHTML = `Bandymai: ${tries}`;
@@ -540,61 +582,70 @@ document.addEventListener('touchmove', function (event) {
       helpTracker++;
       helpDiv.innerHTML = `Panaudota pagalba: ${helpTracker}`;
       if (helpTracker === 1) {
-        answersField.innerHTML = 'Tekstas';
+        answersFieldStart.innerHTML = 'Prdžia';
+        answersFieldMiddle.innerHTML = 'Įvykio raida';
+        answersFieldEnd.innerHTML = 'Pabaiga';
         titleField.innerHTML = 'Pavadinimas';
         optionsField.innerHTML = '';
   
-        const splitIndex = Math.floor(orderedSentences.length / 3);
-        const orderedSentencesfirstPart = orderedSentences.slice(0, splitIndex);
-        const orderedSentencessecondPart = orderedSentences.slice(splitIndex);
-
         const correctTitle = document.createElement('div');
         correctTitle.classList.add('item');
         correctTitle.textContent = selectedItem.title;
         titleField.appendChild(correctTitle);
 
-        orderedSentencesfirstPart.forEach(item => {
+        selectedItem.text.start.forEach(item => {
         const itemDiv = document.createElement('div');
         itemDiv.classList.add('item');
         itemDiv.textContent = item;
-        answersField.appendChild(itemDiv);
+        answersFieldStart.appendChild(itemDiv);
         });
 
-        shuffleArray(orderedSentencessecondPart).forEach(item => {
+        shuffleArray([...selectedItem.text.middle, ...selectedItem.text.end]).forEach(item => {
         const itemDiv = document.createElement('div');
         itemDiv.classList.add('item');
         itemDiv.textContent = item;
         optionsField.appendChild(itemDiv);
         });
       } else if (helpTracker === 2) {
-        answersField.innerHTML = 'Tekstas';
+        answersFieldStart.innerHTML = 'Prdžia';
+        answersFieldMiddle.innerHTML = 'Įvykio raida';
+        answersFieldEnd.innerHTML = 'Pabaiga';
         titleField.innerHTML = 'Pavadinimas';
         optionsField.innerHTML = '';
   
-        const splitIndex = Math.floor(orderedSentences.length / 3 * 2);
-        const orderedSentencesfirstPart = orderedSentences.slice(0, splitIndex);
-        const orderedSentencessecondPart = orderedSentences.slice(splitIndex);
+        const splitIndex = Math.ceil(selectedItem.text.middle.length / 2);
+        const middleOptionsFirstPart = selectedItem.text.middle.slice(0, splitIndex);
+        const middleOptionsSecondPart = selectedItem.text.middle.slice(splitIndex);
 
         const correctTitle = document.createElement('div');
         correctTitle.classList.add('item');
-        correctTitle.textContent = selectedItem.title;
+        correctTitle.textContent = selectedItem.text.title;
         titleField.appendChild(correctTitle);
 
-        orderedSentencesfirstPart.forEach(item => {
+        selectedItem.text.start.forEach(item => {
         const itemDiv = document.createElement('div');
         itemDiv.classList.add('item');
         itemDiv.textContent = item;
-        answersField.appendChild(itemDiv);
+        answersFieldStart.appendChild(itemDiv);
         });
 
-        shuffleArray(orderedSentencessecondPart).forEach(item => {
+        middleOptionsFirstPart.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('item');
+        itemDiv.textContent = item;
+        answersFieldMiddle.appendChild(itemDiv);
+        });
+
+        shuffleArray([...middleOptionsSecondPart, ...selectedItem.text.end]).forEach(item => {
         const itemDiv = document.createElement('div');
         itemDiv.classList.add('item');
         itemDiv.textContent = item;
         optionsField.appendChild(itemDiv);
         });
       } else if (helpTracker >= 3) {
-        answersField.innerHTML = 'Tekstas';
+        answersFieldStart.innerHTML = 'Prdžia';
+        answersFieldMiddle.innerHTML = 'Įvykio raida';
+        answersFieldEnd.innerHTML = 'Pabaiga';
         titleField.innerHTML = 'Pavadinimas';
         optionsField.innerHTML = '';
   
@@ -603,13 +654,28 @@ document.addEventListener('touchmove', function (event) {
         correctTitle.textContent = selectedItem.title;
         titleField.appendChild(correctTitle);
 
-        orderedSentences.forEach(item => {
+        selectedItem.text.start.forEach(item => {
         const itemDiv = document.createElement('div');
         itemDiv.classList.add('item');
         itemDiv.textContent = item;
-        answersField.appendChild(itemDiv);
+        answersFieldStart.appendChild(itemDiv);
+        });
+
+        selectedItem.text.middle.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('item');
+        itemDiv.textContent = item;
+        answersFieldMiddle.appendChild(itemDiv);
+        });
+
+        selectedItem.text.end.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('item');
+        itemDiv.textContent = item;
+        answersFieldEnd.appendChild(itemDiv);
         });
       }
+
       helpBtn.disabled = true;
 
       const dots = document.querySelectorAll('#dots .dot');
@@ -620,7 +686,9 @@ document.addEventListener('touchmove', function (event) {
     });
 
     nextQuestionBtn.addEventListener('click', function () {
-      answersField.innerHTML = 'Tekstas';
+      answersFieldStart.innerHTML = 'Prdžia';
+        answersFieldMiddle.innerHTML = 'Įvykio raida';
+        answersFieldEnd.innerHTML = 'Pabaiga';
       titleField.innerHTML = 'Pavadinimas';
       optionsField.innerHTML = '';
       nextQuestionBtn.style.visibility = 'hidden';
@@ -634,6 +702,8 @@ document.addEventListener('touchmove', function (event) {
 
     const resetButtonElement = document.querySelector('.reset-button');
 		resetButtonElement.addEventListener("click", redirectToIndex);
+    })
+    .catch(error => console.error('Error:', error));
     
   </script>
 
