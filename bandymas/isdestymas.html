@@ -315,6 +315,7 @@
       entry['suitable-for']['struktura'] &&
       entry['suitable-for']['struktura'].includes(controller.modeChoiceLtDifficulty)
     );
+    var tempFilteredTextLibrary = [...filteredTextLibrary];
 
 
     helpBtn.disabled = true;
@@ -329,15 +330,13 @@
     }
 
     function selectRandomItem() {
-    if (filteredTextLibrary.length === 0) {
-      filteredTextLibrary = Array.from(textDatabase);
+    if (tempFilteredTextLibrary.length === 0) {
+      tempFilteredTextLibrary = [...filteredTextLibrary];
     }
-    
     // Generate a random index
-    const randomIndex = Math.floor(Math.random() * filteredTextLibrary.length);
-    
+    const randomIndex = Math.floor(Math.random() * tempFilteredTextLibrary.length);
     // Remove the selected item from the array and return it
-    const selectedItem = filteredTextLibrary.splice(randomIndex, 1)[0];
+    const selectedItem = tempFilteredTextLibrary.splice(randomIndex, 1)[0];
     
     return selectedItem;
     }

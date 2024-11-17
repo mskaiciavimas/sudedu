@@ -297,12 +297,12 @@ fetch('text_database.json')
     const helpDiv = document.getElementById('help');
 
     var tempTextLibrary = Array.from(textDatabase);
-    console.log(`controller.modeChoiceLtDifficulty: ${controller.modeChoiceLtDifficulty}`)
     var filteredTextLibrary = tempTextLibrary.filter(entry =>
       entry['suitable-for'] &&
       entry['suitable-for']['sakiniai'] && // Check if 'sakiniai' exists
       entry['suitable-for']['sakiniai'].includes(controller.modeChoiceLtDifficulty) // Check if it includes the value
     );
+    var tempFilteredTextLibrary = [...filteredTextLibrary];
 
     helpBtn.disabled = true;
 
@@ -331,15 +331,13 @@ fetch('text_database.json')
     }
 
     function selectRandomItem() {
-    if (filteredTextLibrary.length === 0) {
-      filteredTextLibrary = Array.from(textDatabase);
+    if (tempFilteredTextLibrary.length === 0) {
+      tempFilteredTextLibrary = [...filteredTextLibrary];
     }
-    
     // Generate a random index
-    const randomIndex = Math.floor(Math.random() * filteredTextLibrary.length);
-    
+    const randomIndex = Math.floor(Math.random() * tempFilteredTextLibrary.length);
     // Remove the selected item from the array and return it
-    const selectedItem = filteredTextLibrary.splice(randomIndex, 1)[0];
+    const selectedItem = tempFilteredTextLibrary.splice(randomIndex, 1)[0];
     
     return selectedItem;
     }
