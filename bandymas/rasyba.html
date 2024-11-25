@@ -922,11 +922,13 @@
 		if (allFilled)  {
     inputs.forEach(input => {
         const inputId = input.id;
-        let inputValue = input.value.trim().toLowerCase();
+        let inputValue = input.value.trim();
 
         // Strip input value of spaces before comparing with the dictionary
         inputValue = inputValue.replace(/\s+/g, '');
 
+				console.log(inputValue)
+				console.log(atsakymai[inputId])
         // Compare the stripped value with the corresponding value from atsakymai
         if (inputValue === atsakymai[inputId].replace(/\s+/g, '')) {
             input.classList.add('correct-answer');

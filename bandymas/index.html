@@ -237,6 +237,19 @@
 
 
 		function submitSelection() {
+			const modeChoiceValue = document.querySelector('#mode_choice').value;
+			const rasybaOptions = document.querySelectorAll('[name="rasyba-option"]');
+			let anyChecked = false;
+			rasybaOptions.forEach(option => {
+            if (option.checked) {
+                anyChecked = true;
+            }
+        });
+
+
+			if ((modeChoiceValue === "rasyba" && anyChecked) || modeChoiceValue !== "rasyba") {
+
+			
 			if (localStorage.getItem('controller') !== null) {
 				controller = JSON.parse(localStorage.getItem('controller'))
 			}
@@ -261,6 +274,7 @@
 				window.location.href = "./rasyba.html";
 			}
 		}
+	}
 
 		function getSelectedRasybaConditions() {
   const conditions = {};
