@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title>sudEdu - Mental Arithmetic</title>
+	<title>sudEdu - Mintinis Skai&#x10D;iavimas</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 	<link rel="icon" href="../../images/favicon.ico" type="image/x-icon">
 	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -68,25 +68,17 @@
     width: 100px;
   }
 
-  @media (max-width: 1300px) {
-    .time-question-buttons,
-  .start-questions-timer-button,
-  .start-questions-number-button  {
-    width: 30vw !important;
-  }
-  }
-
   @media (max-width: 1000px) {
     .time-question-buttons,
   .start-questions-timer-button,
   .start-questions-number-button  {
-    width: 28vw !important;
+    width: 25vw !important;
   }
   }
 
   @media (max-width: 767px) {
     h2 {
-      font-size: 1.75rem !important;
+      font-size: 2.5rem !important;
     }
     h3 {
       font-size: 1.5rem;
@@ -95,7 +87,7 @@
   .start-questions-timer-button,
   .start-questions-number-button  {
     font-size: 1rem;
-    width: 32vw !important;
+    width: 25vw !important;
   }
   }
 
@@ -107,7 +99,7 @@
   .start-questions-timer-button,
   .start-questions-number-button  {
     font-size: 1.25rem;
-    width: 70vw !important;
+    width: 50vw !important;
   }
   .mode-choice-message {
     padding-bottom: 0 !important;
@@ -161,10 +153,10 @@
               <div class="col-12 justify-content-center align-items-center modeChoice4-div" style="padding-bottom: 20px;">
                 <div class="row d-flex align-items-center justify-content-center"> <!-- Missing outer row element -->
                   <div class="col-sm-6 col-12 d-flex justify-content-center">
-                    <button class="btn btn-primary set-timer-button time-question-buttons">Amount of time</button>
+                    <button class="btn btn-primary set-timer-button time-question-buttons">Laiko trukmę</button>
                   </div>
                   <div class="col-sm-6 col-12 d-flex justify-content-center">
-                    <button class="btn btn-primary set-question-number-button time-question-buttons" style="white-space: nowrap;">Number of equations</button>
+                    <button class="btn btn-primary set-question-number-button time-question-buttons" style="white-space: nowrap;">Veiksmų kiekį</button>
                   </div>
                 </div>
               </div>
@@ -172,7 +164,7 @@
 							<div class="row d-flex justify-content-center align-items-center" >
                 <div class="timer-input-div row justify-content-center align-items-center">
                 <div class="col-12 d-flex justify-content-center">
-                  <h3 style="padding-bottom: 15px; font-size: 2rem;">PRACTICE FOR</h3>
+                  <h3 style="padding-bottom: 15px; font-size: 2rem;">PRAKTIKUOTIS</h3>
                 </div> 
                 <div class="col-6 d-flex justify-content-end">
 							<input type="number" id="timer-input" min="1" max="60" step="1" value="5">
@@ -183,18 +175,18 @@
           </div>
           <div class="question-number-input-div row justify-content-center align-items-center">
           <div class="col-12 d-flex justify-content-center">
-            <h3 style="padding-bottom: 15px; font-size: 2rem;">SOLVE</h3>
+            <h3 style="padding-bottom: 15px; font-size: 2rem;">ATLIKTI</h3>
           </div> 
           <div class="col-6 d-flex justify-content-end">
 							<input type="number" id="question-number-input" min="1" max="200" step="1" value="20">
 							</div>
               <div class="col-6 d-flex d-flex justify-content-start">
-                <h3 class="answer-number-label">equations</h3>
+                <h3 class="answer-number-label">veiksmų</h3>
               </div>
               </div>
 							<div class="row d-flex justify-content-center align-items-center start-buttons" style="padding-top: 15px;">
-								<button class="btn btn-primary start-questions-timer-button">START</button>
-								<button class="btn btn-primary start-questions-number-button">START</button>
+								<button class="btn btn-primary start-questions-timer-button">Pradėti</button>
+								<button class="btn btn-primary start-questions-number-button">Pradėti</button>
 							</div>
 					</div>
 				</div>
@@ -251,28 +243,28 @@
     window.onload = function () {
 			if (localStorage.getItem('controller') !== null) {
         controller = JSON.parse(localStorage.getItem('controller')) 
-        if (controller.mode === "math" && controller.language === "EN") {
-        document.querySelector('#template-container').removeAttribute('hidden');
-        modeChoiceMessageElement.innerHTML = "CHOOSE TO SET";
-        modeChoice4DIv.style.display = "flex";
-        timerInputDivElement.style.display = "none";
-        questionNumberDivElement.style.display = "none";
-        questionNumberInputElement.style.display = "none";
-        startQuestionsTimerButtonElement.style.display = "none";
-        startQuestionsNumberButtonElement.style.display = "none";
-        if (localStorage.getItem("startTime")) {
-          localStorage.removeItem("startTime");
-        };
-        if (localStorage.getItem("remainingTime")) {
-          localStorage.removeItem("remainingTime");
-        };
-        document.querySelector('.upper-line').setAttribute("style", "background-color: #FAEDCD");
-      } else {
+        if (controller.mode === "math" && controller.language === "LT") {
+			document.querySelector('#template-container').removeAttribute('hidden');
+      modeChoiceMessageElement.innerHTML = "PASIRINKITE";
+      modeChoice4DIv.style.display = "flex";
+			timerInputDivElement.style.display = "none";
+      questionNumberDivElement.style.display = "none";
+			questionNumberInputElement.style.display = "none";
+			startQuestionsTimerButtonElement.style.display = "none";
+			startQuestionsNumberButtonElement.style.display = "none";
+      if (localStorage.getItem("startTime")) {
+				localStorage.removeItem("startTime");
+			};
+      if (localStorage.getItem("remainingTime")) {
+				localStorage.removeItem("remainingTime");
+			};
+      document.querySelector('.upper-line').setAttribute("style", "background-color: #FAEDCD")
+    } else {
         window.location.href = "./";
       }
-    } else { 				
+  } else { 				
     window.location.href = "./";
-    }
+  }
 			
 		};
 
@@ -361,19 +353,23 @@
 
     timerInputElement.addEventListener("input", function(event) {
       if (parseInt(timerInputElement.value) === 1 || parseInt(timerInputElement.value.slice(-1)[0]) === 1 && parseInt(timerInputElement.value) !== 11) {
-        timerLabelElement.innerHTML = 'minute';
-      } else {
+        timerLabelElement.innerHTML = 'minutę';
+      } else if ((parseInt(timerInputElement.value) > 1 && parseInt(timerInputElement.value) < 10) || (parseInt(timerInputElement.value) > 20 && parseInt(timerInputElement.value.slice(-1)[0]) !== 0)) {
         timerLabelElement.innerHTML = 'minutes';
-      } 
+      } else if (parseInt(timerInputElement.value) >= 10 ) {
+        timerLabelElement.innerHTML = 'minučių';
+      }
     })
 
 
     questionNumberInputElement.addEventListener("input", function(event) {
       if (parseInt(questionNumberInputElement.value) === 1 || parseInt(questionNumberInputElement.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElement.value) !== 11) {
-        answerNumberLabelElement.innerHTML = 'equation';
-      } else {
-        answerNumberLabelElement.innerHTML = 'equations';
-      } 
+        answerNumberLabelElement.innerHTML = 'veiksmą';
+      } else if ((parseInt(questionNumberInputElement.value) > 1 && parseInt(questionNumberInputElement.value) < 10) || (parseInt(questionNumberInputElement.value) > 20 && parseInt(questionNumberInputElement.value.slice(-1)[0]) !== 0))  {
+        answerNumberLabelElement.innerHTML = 'veiksmus';
+      } else if (parseInt(questionNumberInputElement.value) >= 10) {
+        answerNumberLabelElement.innerHTML = 'veiksmų';
+      }
     })
 
 
@@ -398,8 +394,8 @@
       input.value = 1; // Restrict input to min value
     } else if (value > max) {
       input.value = max; // Restrict input to max value
-      timerLabelElement.innerHTML = 'minutes';
-      answerNumberLabelElement.innerHTML = 'equations';
+      timerLabelElement.innerHTML = 'minučių';
+      answerNumberLabelElement.innerHTML = 'veiksmų';
     }
   }
 
@@ -415,9 +411,7 @@
       questionNumberInput.value = ''; // Clear the input when backspace is pressed
     }
   });
-
 </script>
-
 
 	</script>
 </body>

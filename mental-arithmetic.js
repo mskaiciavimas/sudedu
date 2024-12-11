@@ -1,10 +1,11 @@
 let controller = {
   language: '',
-  currentMistakes: [],
-  totalMistakes: [],
-  mistakesTracker: 0,
-  modeChoice: '',
-  modeChoice2: '',
+  mode: '',
+	currentMistakes: [],
+	totalMistakes: [],
+	mistakesTracker: 0,
+	modeChoice: '',
+	modeChoice2: '',
   modeChoice3: [],
   modeChoice4: '',
   modeChoice5: '',
@@ -14,14 +15,14 @@ let controller = {
   modeChoiceLtDifficulty: '',
   timerLimit: 0,
   questionNumber: 0,
-  selectedNumbers: [],
+	selectedNumbers: [],
   withRemainder: false,
-  randomSelection: [],
-  combinations: [],
-  equation: '',
+	randomSelection: [],
+	combinations: [],
+	equation: '',
   equation2: '',
   result: ['', '', '', '', ''],
-  correctAnswerTracker: 0,
+	correctAnswerTracker: 0,
   questionsStopped: false
 }
 
@@ -294,13 +295,15 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
       controller.result = ['', '', '', '', ''];
       controller.questionsStopped = true;
       clearInterval(timerInterval);
+      const stopButtonSpanElement = document.querySelector('#stop-button-span');
+      stopButtonSpanElement.innerHTML = "refresh";
     }
     localStorage.setItem('controller', JSON.stringify(controller))
 }
 
 
   function triggerFireworks () {
-    fireworksDiv.innerHTML = '<img src="../images/fireworks.gif" style="width: 500px; height: auto;" id="fireworks">';
+    fireworksDiv.innerHTML = '<img src="../../images/fireworks.gif" style="width: 500px; height: auto;" id="fireworks">';
     setTimeout(disableFireworks, 4500);
   }
 
@@ -344,20 +347,20 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
 
     if (!controller.questionsStopped) {
     if (controller.modeChoice7 === 'stulpeliu' && controller.randomSelection[2] === 'division' && (controller.modeChoice8 === '' || controller.modeChoice8 === 'eeu-version')) {
-				linkElement.setAttribute("href", "../questions-stulpeliu-div.css");
+				linkElement.setAttribute("href", "../../questions-stulpeliu-div.css");
 		} else if (controller.modeChoice7 === 'stulpeliu' && controller.randomSelection[2] === 'division' && controller.modeChoice8 === 'us-version') {
-				linkElement.setAttribute("href", "../questions-stulpeliu-div-us.css");
+				linkElement.setAttribute("href", "../../questions-stulpeliu-div-us.css");
 		}  else if (controller.modeChoice7 === 'stulpeliu') {
-			linkElement.setAttribute("href", "../questions-stulpeliu.css");
+			linkElement.setAttribute("href", "../../questions-stulpeliu.css");
       var answerSeparator2 = document.getElementById('answer-separator-2');
       answerSeparator2.style.display = 'block';
     } else if (controller.withRemainder) {
-			linkElement.setAttribute("href", "../questions-remainder.css");
+			linkElement.setAttribute("href", "../../questions-remainder.css");
 		} else if (
       controller.modeChoice2 === "mil" ||
       controller.modeChoice2 === "iki1000000"
     )	{
-    linkElement.setAttribute("href", "../questions-extra-small.css");
+    linkElement.setAttribute("href", "../../questions-extra-small.css");
     } else if (controller.modeChoice2 === "tukst" || 
     controller.modeChoice2 === "dtukst" || 
     controller.modeChoice2 === "iki1000" || 
@@ -372,9 +375,9 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
     controller.modeChoice2 === "daugdaug" ||
     controller.modeChoice2 === "gretnul" 
   ) {
-			linkElement.setAttribute("href", "../questions-smaller.css");
+			linkElement.setAttribute("href", "../../questions-smaller.css");
 		} else {
-      linkElement.setAttribute("href", "../questions-bigger.css");
+      linkElement.setAttribute("href", "../../questions-bigger.css");
     }
   }   
 		
@@ -1302,6 +1305,8 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
   }
 
   function stopEquations () {
+    const stopButtonSpanElement = document.querySelector('#stop-button-span');
+    if (stopButtonSpanElement.innerHTML === "close") {
       var answerSeparator1 = document.getElementById('answer-separator-1');
       var answerSeparator2 = document.getElementById('answer-separator-2');
       var contentContainerElement = document.getElementById('content-container');
@@ -1363,22 +1368,33 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
     localStorage.setItem('controller', JSON.stringify(controller))
     clearInterval(timerInterval);
     displayEquation()
+    stopButtonSpanElement.innerHTML = "refresh";
+  } else if (stopButtonSpanElement.innerHTML === "refresh") {
+    stopButtonSpanElement.innerHTML = "close";
+    restartEquations();
+  }
 }
 
 function redirectToIntermediate() {
-  window.location.href = "./pasirinkimai";
+  window.location.href = "./pasirinkimai.html";
 }
 
   function redirectToQuestions() {
-    window.location.href = "./veiksmai";
+    window.location.href = "./veiksmai.html";
   }
 
   function redirectToIndex() {
     localStorage.setItem('controller', JSON.stringify(controller))
     window.location.href = "./";
   }
+
+  function redirectToOuterIndex() {
+    localStorage.setItem('controller', JSON.stringify(controller))
+    window.location.href = "../";
+  }
+
   function redirectToSummary () {
-    window.location.href = "./klaidos";
+    window.location.href = "./klaidos.html";
   }
 
  // Function to calculate bar color based on the number of mistakes

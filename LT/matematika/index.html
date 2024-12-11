@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>sudEdu - Mintinis Skai&#x10D;iavimas</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="sudEdu skirtas priešmokyklinio ugdymo, pradinių bei aukštesnių klasių mokinių aritmetinių veiksmų (sudėties, atimties, daugybos, dalybos) mintinio skaičiavimo įgūdžių tobulinimui. Skaičiavimas mintinai ne tik lavina atmintį, bet ir lengvina bei spartina matematikos mokymąsi.">
+	<meta name="keywords" content="mintinis skaičiavimas, mintinas skaičiavimas, skaičiavimas mintinai, matematika, pradinukai, priešmokyklinis ugdymas, priešmokyklinukai, pradinis ugdymas, atminties lavinimas, skaitinė lygybė, skaitinė lygybė su nežinomuoju, sudėtis, dėmuo, atimtis, turinys, atėminys, daugyba, dauginamasis, daugiklis, dalyba, dalinis, daliklis, daugybos lentelė, lentelinė sudėtis, lentelinė atimtis, sudėtis iki 10, sudėtis iki 20, sudėtis iki 100, sudėtis iki 1000, atimtis iki 10, atimtis iki 20, atimtis iki 100, atimtis iki 1000, vienaženkliai skaičiai, dviženkliai skaičiai, triženkliai skaičiai, keturženkliai skaičiai, peržengiant dešimtį, peržengiant šimtą, peržengiant tūkstančių vienetus, išardant dešimtį, išardant šimtą, išardant tūkstančių vienetus, pergrupuojant dešimtis, pergrupuojant šimtus, peržengiant tūkstančių vienetus">
+
+	  <link rel="canonical" href="https://www.sudedu.lt/LT/">
+	  <link rel="alternate" href="https://www.sudedu.lt/LT/" hreflang="lt">
+	  <link rel="alternate" href="https://www.sudedu.lt/EN/" hreflang="en">
+	<link rel="icon" href="../../images/favicon.ico" type="image/x-icon">
+	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+	<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Josefin+Sans&display=swap"
+		rel="stylesheet">
+	<link rel="stylesheet"
+	href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+	<link rel="stylesheet" type="text/css" href="../../index.css">
+
+</head>
+
+<body>
+	<div class="container" id="template-container"
+		style="display: flex; flex-direction: column; justify-content: space-between;" hidden>
+		<div class="position-absolute image-container kid-5 bottom-0 end-0"
+			style="top: 50%; left: 15%; width: 250px; height: 250px;"> <img src="../../images/kid-5.png"
+				style="width: 100%; height: 100%;" class="img-fluid"> </div>
+		<div class="position-absolute image-container kid-6 bottom-0 end-0"
+			style="top: 35%; left: 67%; width: 250px; height: 250px;"> <img src="../../images/kid-6.png"
+				style="width: 250px; height: auto;" class="img-fluid"> </div>
+		<div id="language-about-row" class="row d-flex align-items-start">
+			<div class="col-6" id="language-switcher" onmousedown="return false;" onselectstart="return false;" style="-webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;">
+				<span class="language-option language-option-EN" onclick="setLanguage('EN')">EN</span>
+				<span class="language-option language-option-LT selected" onclick="setLanguage('LT')">LT</span>
+			</div>
+			<div class="col-6 d-flex justify-content-end align-items-end about-button-div">
+				<a href="../apie.html" class="about-button">APIE sudEdu</a>
+			</div>
+		</div>
+			<div class="col-12 d-flex justify-content-center align-items-center text-center">
+				<h1>Mintinis Skai&#x10D;iavimas</h1>
+			</div>
+		<div class="row d-flex align-items-center justify-content-center text-center">
+			<div class="col-12 d-flex justify-content-center align-items-center middle-div">
+				<div class="row" id="middle-div-row">
+					<div class="d-flex flex-column align-items-center">
+						<label class="mode-choice-label" for="mode_choice">PRAKTIKUOTIS</label>
+						<div class="row">
+							<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
+						</div>
+						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
+							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice"
+								id="mode_choice">
+								<option value="sudetis">SUD&#x116;T&#x12E;</option>
+								<option value="atimtis">ATIMT&#x12E;</option>
+								<option value="sudetis ir atimtis">SUD&#x116;T&#x12E; IR ATIMT&#x12E;</option>
+								<option value="daugyba">DAUGYB&#x104;</option>
+								<option value="dalyba">DALYB&#x104;</option>
+								<option value="daugyba ir dalyba">DAUGYB&#x104; IR DALYB&#x104;</option>
+								<option value="visi">ĮVAIRIUS VEIKSMUS</option>
+							</select>
+						</div>
+						<div class="row">
+							<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
+						</div>
+						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_2_div">
+							<div class="col-12 d-flex justify-content-center align-items-center mode_choice_2_div text-center"
+								id="mode_choice_2_div">
+								<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_2"
+									id="mode_choice_2">
+									<option value="viena10">VIENAŽENKLIŲ SKAIČIŲ IKI 10</option>
+									<option value="viena">VIENAŽENKLIŲ SKAIČIŲ IKI 20 (LENTELINĖ SUDĖTIS)</option>
+									<option value="dvivien20">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 20</option>
+									<option value="dvivien">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 100</option>
+									<option value="dvi">DVIŽENKLIŲ SKAIČIŲ IKI 100</option>
+									<option value="tukst">SKAIČIŲ IKI 1 000</option>
+									<option value="dtukst">SKAIČIŲ IKI 10 000</option>
+									<option value="mil">SKAIČIŲ IKI 1 000 000</option>
+								</select>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-12 empty-placeholder-between-options" id="placeholder-bottom"></div>
+						</div>
+						<div class="row">
+							<div class="col-12 d-flex justify-content-center align-items-center number_choice_div text-center">
+								<label class="number-choice-label-nuo" for="selected_number" id="number_label"
+									style="display: none;">NUO</label>
+								<select class="btn btn-secondary dropdown-toggle dropdown text-center" name="selected_number"
+									id="selected_number" style="display: none;">
+									<option value="1">1</option>
+									<option value="2">2</option>
+									<option value="3">3</option>
+									<option value="4">4</option>
+									<option value="5">5</option>
+									<option value="6">6</option>
+									<option value="7">7</option>
+									<option value="8">8</option>
+									<option value="9">9</option>
+									<option value="10">10</option>
+								</select>
+								<label class="number-choice-label-iki" for="selected_number_2" id="number_label_2"
+									style="display: none;">IKI</label>
+								<select class="btn btn-secondary dropdown-toggle dropdown text-center" name="selected_number_2"
+									id="selected_number_2" style="display: none;">
+									<option value="1">1</option>
+									<option value="2">2</option>
+									<option value="3">3</option>
+									<option value="4">4</option>
+									<option value="5">5</option>
+									<option value="6">6</option>
+									<option value="7">7</option>
+									<option value="8">8</option>
+									<option value="9">9</option>
+									<option value="10">10</option>
+								</select>
+							</div>
+						</div>
+						<div class="col-sm-12 empty-placeholder-after-number-options" id="empty-placeholder-after-numbers" style="display: none;"></div>
+						<div class="row d-flex justify-content-center align-items-center text-center remainder-div">
+						<label id="remainder-option" style="display: none;">
+							<input id="remainder-input" type="checkbox" name="myCheckbox"> DALYBA SU LIEKANA
+						</label>
+						</div>
+
+						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_3_div">
+							<div
+								class="col-12 d-flex justify-content-center align-items-center number_choice_div text-center mode_choice_3_div"
+								id="mode_choice_3_div">
+								<select class="btn btn-secondary dropdown-toggle dropdown text-center" name="mode_choice_3"
+									id="mode_choice_3">
+									<option value="neper">NEPERŽENGIANT DEŠIMTIES</option>
+								</select>
+							</div>
+						</div>
+						<div class="col-sm-12 empty-placeholder-between-options placeholder-before-skaitinis" id="empty-placeholder-before-mode-choice-div-5"></div>
+						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
+							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_5"
+								id="mode_choice_5">
+								<option value="skaitiniai">SKAITINĖ LYGYBĖ</option>
+								<option value="nezinomieji">SKAITINĖ LYGYBĖ SU NEŽINOMUOJU</option>
+							</select>
+						</div>
+						<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
+						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
+							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_6"
+								id="mode_choice_6" style="display: none;">
+								<option value="turinys">NEŽINOMAS DĖMUO</option>
+							</select>
+						</div>
+						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
+							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_7"
+								id="mode_choice_7" style="display: block;">
+								<option value="eilute">EILUTE</option>
+								<option value="stulpeliu">STULPELIU / KAMPU</option>
+							</select>
+						</div>
+						<div class="row">
+							<div class="col-sm-12 empty-placeholder-before-submit"></div>
+						</div>
+						<div class="row">
+							<div class="col-12 d-flex justify-content-center align-items-center submit-button">
+								<button class="btn btn-primary submit-button">Pirmyn!</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row d-flex stop-reset-button-div">
+				<div class="col-6 d-flex justify-content-start align-items-center" style="display: inline-block; visibility: hidden;">
+					<button class="btn btn-primary summary-button-lt"><span class="material-symbols-rounded">analytics</span></button>
+				</div>
+			<div class="col-6 d-flex justify-content-end align-items-center">
+				<div class="reset-button-div">
+					<button class="btn btn-primary reset-button"><span class="material-symbols-rounded">roofing</span></button>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+		crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="../../mental-arithmetic.js"></script>
+	<script src="../../mental-arithmetic-combinations.js"></script>
+
+	<script>
+
+		let modeChoiceElement = document.querySelector('#mode_choice');
+		let numberLabel = document.querySelector('#number_label');
+		let modeChoice2Element = document.querySelector('#mode_choice_2');
+		let selectedNumberElement = document.querySelector('#selected_number');
+		let numberLabel2 = document.querySelector('#number_label_2');
+		let selectedNumber2Element = document.querySelector('#selected_number_2');
+		let remainderOptionElement = document.querySelector('#remainder-option');
+		let modeChoice3Element = document.querySelector('#mode_choice_3');
+		let emptySpaceholder = document.querySelector('#placeholder-bottom');
+		let modeChoice5Element = document.querySelector('#mode_choice_5');
+		let modeChoice6Element = document.querySelector('#mode_choice_6');
+		let modeChoice7Element = document.querySelector('#mode_choice_7');
+		let placeholderBeforeSkaitinisElement = document.querySelector('.placeholder-before-skaitinis');
+		let placeholderAfterNumbersElement = document.querySelector('#empty-placeholder-after-numbers');
+
+			function handleModeChoiceChange() {
+				let modeChoiceSelection = modeChoiceElement.value;
+				let modeChoice2Selection = modeChoice2Element.value;
+				let modeChoice5Selection = modeChoice5Element.value;
+
+				function toggleVisibility(element, isVisible) {
+				if (isVisible) {
+					element.style.display = 'block';
+				} else {
+					element.style.display = 'none';
+				}
+			}
+
+				if (modeChoice5Selection === 'skaitiniai') {
+					toggleVisibility(modeChoice7Element, true);
+				} else {
+					toggleVisibility(modeChoice7Element, false);
+				}
+				if (
+						(modeChoiceSelection === 'daugyba' || modeChoiceSelection === 'dalyba' || modeChoiceSelection === 'daugyba ir dalyba') && 
+						(
+							modeChoice2Selection !== 'pil10' && 
+							modeChoice2Selection !== 'pil100' && 
+							modeChoice2Selection !== 'daugdvivien' && 
+							modeChoice2Selection !== 'daugtrivien' && 
+							modeChoice2Selection !== 'daugketvien' &&
+							modeChoice2Selection !== 'daugdvidvi' && 
+							modeChoice2Selection !== 'daugtridvi' && 
+							modeChoice2Selection !== 'daugketdvi' &&
+							modeChoice2Selection !== 'daugdaugvien' &&
+							modeChoice2Selection !== 'daugdaugviendalmnul' &&
+							modeChoice2Selection !== 'daugdaugdvi' &&
+							modeChoice2Selection !== 'daugdaug' &&
+							modeChoice2Selection !== 'mil' &&
+							modeChoice2Selection !== 'gretnul'
+						)
+					) {
+					toggleVisibility(numberLabel, true);
+					toggleVisibility(selectedNumberElement, true);
+					toggleVisibility(numberLabel2, true);
+					toggleVisibility(selectedNumber2Element, true);
+					toggleVisibility(modeChoice3Element, false);
+					toggleVisibility(emptySpaceholder, true);
+					toggleVisibility(placeholderBeforeSkaitinisElement, true);
+					toggleVisibility(modeChoice5Element, true);
+				} else if (modeChoiceSelection === 'sudetis' || modeChoiceSelection === 'atimtis' || modeChoiceSelection === 'sudetis ir atimtis') {
+					toggleVisibility(numberLabel, false);
+					toggleVisibility(selectedNumberElement, false);
+					toggleVisibility(numberLabel2, false);
+					toggleVisibility(selectedNumber2Element, false);
+					toggleVisibility(modeChoice3Element, true);
+					toggleVisibility(emptySpaceholder, true);
+					toggleVisibility(placeholderBeforeSkaitinisElement, true);
+					toggleVisibility(modeChoice5Element, true);
+				} else {
+					toggleVisibility(numberLabel, false);
+					toggleVisibility(selectedNumberElement, false);
+					toggleVisibility(numberLabel2, false);
+					toggleVisibility(selectedNumber2Element, false);
+					toggleVisibility(modeChoice3Element, false);
+					toggleVisibility(emptySpaceholder, true);
+					toggleVisibility(placeholderBeforeSkaitinisElement, false);
+					toggleVisibility(modeChoice5Element, true);
+				}
+				if ((modeChoiceSelection === 'dalyba' || modeChoiceSelection === 'daugyba ir dalyba') && modeChoice2Selection === 'dauglent') {
+					toggleVisibility(remainderOptionElement, true);
+					toggleVisibility(placeholderBeforeSkaitinisElement, true);
+					toggleVisibility(placeholderAfterNumbersElement, true)
+				}
+				else if (modeChoiceSelection === 'dalyba' || modeChoiceSelection === 'daugyba ir dalyba') {
+					toggleVisibility(remainderOptionElement, true);
+					toggleVisibility(placeholderBeforeSkaitinisElement, true);
+					toggleVisibility(placeholderAfterNumbersElement, false)
+				}
+				else {
+					toggleVisibility(remainderOptionElement, false);
+					toggleVisibility(placeholderAfterNumbersElement, false)
+				}
+				if (modeChoiceSelection === 'visi') {
+					toggleVisibility(modeChoice3Element, false);
+					toggleVisibility(emptySpaceholder, false);
+					toggleVisibility(placeholderBeforeSkaitinisElement, true);
+				}
+				if (modeChoice5Selection === 'skaitiniai') {
+					toggleVisibility(modeChoice6Element, false)
+				} else if (modeChoice5Selection === 'nezinomieji') {
+					toggleVisibility(modeChoice6Element, true)					
+				}
+			}
+
+		function updateModeChoice2() {
+			let modeChoiceSelection = modeChoiceElement.value;
+			let modeChoice2Selection = modeChoice2Element.value;
+
+			modeChoice2Element.innerHTML = "";
+			modeChoice6Element.innerHTML = "";
+
+			if (modeChoiceSelection === "sudetis") {
+				modeChoice2Element.innerHTML += '<option value="viena10">VIENAŽENKLIŲ SKAIČIŲ IKI 10</option>';
+				modeChoice2Element.innerHTML += '<option value="viena">VIENAŽENKLIŲ SKAIČIŲ IKI 20 (LENTELINĖ SUDĖTIS)</option>';
+				modeChoice2Element.innerHTML += '<option value="dvivien20">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 20</option>';
+				modeChoice2Element.innerHTML += '<option value="dvivien">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 100</option>';
+				modeChoice2Element.innerHTML += '<option value="dvi">DVIŽENKLIŲ SKAIČIŲ IKI 100</option>';
+				modeChoice2Element.innerHTML += '<option value="tukst">SKAIČIŲ IKI 1 000</option>';
+				modeChoice2Element.innerHTML += '<option value="dtukst">SKAIČIŲ IKI 10 000</option>';
+				modeChoice2Element.innerHTML += '<option value="mil">SKAIČIŲ IKI 1 000 000</option>';
+				modeChoice6Element.innerHTML += '<option value="turinys">NEŽINOMAS DĖMUO</option>';
+
+			} else if (modeChoiceSelection === "atimtis") {
+				modeChoice2Element.innerHTML += '<option value="viena10">VIENAŽENKLIŲ SKAIČIŲ IKI 10</option>';
+				modeChoice2Element.innerHTML += '<option value="dvivien20">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 20</option>';
+				modeChoice2Element.innerHTML += '<option value="dvivien">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 100</option>';
+				modeChoice2Element.innerHTML += '<option value="dvi">DVIŽENKLIŲ SKAIČIŲ IKI 100</option>';
+				modeChoice2Element.innerHTML += '<option value="tukst">SKAIČIŲ IKI 1 000</option>';
+				modeChoice2Element.innerHTML += '<option value="dtukst">SKAIČIŲ IKI 10 000</option>';
+				modeChoice2Element.innerHTML += '<option value="mil">SKAIČIŲ IKI 1 000 000</option>';
+				modeChoice2Element.innerHTML += '<option value="gretnul">KAI TURINYJE GRETIMI NULIAI</option>';
+				modeChoice6Element.innerHTML += '<option value="turinys">NEŽINOMAS TURINYS</option>';
+				modeChoice6Element.innerHTML += '<option value="ateminys">NEŽINOMAS ATĖMINYS</option>';
+
+			} else if (modeChoiceSelection === "sudetis ir atimtis") {
+				modeChoice2Element.innerHTML += '<option value="viena10">VIENAŽENKLIŲ SKAIČIŲ IKI 10</option>';
+				modeChoice2Element.innerHTML += '<option value="lent">LENTELINĖ SUDĖTIS IR ATIMTIS IKI 20</option>';
+				modeChoice2Element.innerHTML += '<option value="dvivien20">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 20</option>';
+				modeChoice2Element.innerHTML += '<option value="dvivien">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 100</option>';
+				modeChoice2Element.innerHTML += '<option value="dvi">DVIŽENKLIŲ SKAIČIŲ IKI 100</option>';
+				modeChoice2Element.innerHTML += '<option value="tukst">SKAIČIŲ IKI 1 000</option>';
+				modeChoice2Element.innerHTML += '<option value="dtukst">SKAIČIŲ IKI 10 000</option>';
+				modeChoice2Element.innerHTML += '<option value="mil">SKAIČIŲ IKI 1 000 000</option>';
+				modeChoice6Element.innerHTML += '<option value="turinys">NEŽINOMAS DĖMUO/TURINYS/ATĖMINYS</option>';
+
+			} else if (modeChoiceSelection === "daugyba") {
+				modeChoice2Element.innerHTML += '<option value="dauglent">DAUGYBOS LENTELĖ</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdvivien">DVIŽENKLIO IŠ VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugtrivien">TRIŽENKLIO IŠ VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugketvien">KETURŽENKLIO IŠ VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdaugvien">DAUGIAŽENKLIO IŠ VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdvidvi">DVIŽENKLIO IŠ DVIŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugtridvi">TRIŽENKLIO IŠ DVIŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugketdvi">KETURŽENKLIO IŠ DVIŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdaugdvi">DAUGIAŽENKLIO IŠ DVIŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdaug">*DAUGIAŽENKLIŲ SKAIČIŲ</option>';
+				modeChoice2Element.innerHTML += '<option value="pil10">IŠ PILNŲ DEŠIMČIŲ</option>';
+				modeChoice2Element.innerHTML += '<option value="pil100">IŠ PILNŲ ŠIMTŲ</option>';
+				modeChoice6Element.innerHTML += '<option value="dalinys">NEŽINOMAS DAUGINAMASIS</option>';
+
+			} else if (modeChoiceSelection === "dalyba") {
+				modeChoice2Element.innerHTML += '<option value="dauglent">IŠ DAUGYBOS LENTELĖS</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdvivien">DVIŽENKLIO IŠ VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugtrivien">TRIŽENKLIO IŠ VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugketvien">KETURŽENKLIO IŠ VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdaugvien">DAUGIAŽENKLIO IŠ VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdaugviendalmnul">DAUGIAŽENKLIO IŠ VIENAŽENKLIO (DALMENYJE 0)</option>';
+				modeChoice2Element.innerHTML += '<option value="daugtridvi">*TRIŽENKLIO IŠ DVIŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugketdvi">*KETURŽENKLIO IŠ DVIŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdaugdvi">*DAUGIAŽENKLIO IŠ DVIŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdaug">*DAUGIAŽENKLIŲ SKAIČIŲ</option>';
+				modeChoice2Element.innerHTML += '<option value="pil10">IŠ PILNŲ DEŠIMČIŲ</option>';
+				modeChoice2Element.innerHTML += '<option value="pil100">IŠ PILNŲ ŠIMTŲ</option>';
+				modeChoice6Element.innerHTML += '<option value="dalinys">NEŽINOMAS DALINYS</option>';
+				modeChoice6Element.innerHTML += '<option value="daliklis">NEŽINOMAS DALIKLIS</option>';
+
+			} else if (modeChoiceSelection === "daugyba ir dalyba") {
+				modeChoice2Element.innerHTML += '<option value="dauglent">IŠ DAUGYBOS LENTELĖS</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdvivien">DVIŽENKLIO IŠ VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugtrivien">TRIŽENKLIO IŠ VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugketvien">KETURŽENKLIO IŠ VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdaugvien">DAUGIAŽENKLIO IŠ VIENAŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugtridvi">*TRIŽENKLIO IŠ DVIŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugketdvi">*KETURŽENKLIO IŠ DVIŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdaugdvi">*DAUGIAŽENKLIO IŠ DVIŽENKLIO</option>';
+				modeChoice2Element.innerHTML += '<option value="daugdaug">*DAUGIAŽENKLIŲ SKAIČIŲ</option>';
+				modeChoice2Element.innerHTML += '<option value="pil10">IŠ PILNŲ DEŠIMČIŲ</option>';
+				modeChoice2Element.innerHTML += '<option value="pil100">IŠ PILNŲ ŠIMTŲ</option>';
+				modeChoice6Element.innerHTML += '<option value="dalinys">NEŽINOMAS DAUGINAMASIS/DALINYS/DALIKLIS</option>';
+
+			} else if (modeChoiceSelection === "visi") {
+				modeChoice2Element.innerHTML += '<option value="iki10">IKI 10</option>';
+				modeChoice2Element.innerHTML += '<option value="iki20">IKI 20</option>';
+				modeChoice2Element.innerHTML += '<option value="iki100">IKI 100</option>';
+				modeChoice2Element.innerHTML += '<option value="iki1000">IKI 1,000</option>';
+				modeChoice2Element.innerHTML += '<option value="iki10000">IKI 10,000</option>';
+				modeChoice2Element.innerHTML += '<option value="iki1000000">IKI 1,000,000</option>';
+				modeChoice6Element.innerHTML += '<option value="dalinys">NEŽINOMAS DĖMUO/TURINYS/ATĖMINYS/DAUGINAMASIS/DALINYS/DALIKLIS</option>';
+			}
+		}
+
+		modeChoiceElement.addEventListener('change', updateModeChoice2);
+
+
+		function updateModeChoice3() {
+			let modeChoiceSelection = modeChoiceElement.value;
+			let modeChoice2Selection = modeChoice2Element.value;
+
+			modeChoice3Element.innerHTML = "";
+			modeChoice5Element.innerHTML = "";
+			modeChoice5Element.innerHTML += '<option value="skaitiniai">SKAITINĖ LYGYBĖ</option>';
+			modeChoice5Element.innerHTML += '<option value="nezinomieji">SKAITINĖ LYGYBĖ SU NEŽINOMUOJU</option>';
+
+			if (modeChoice2Selection === "viena" && modeChoiceSelection === "sudetis") {
+				modeChoice3Element.innerHTML += '<option value="neper">PERŽENGIANT DEŠIMTĮ</option>';
+			} else if (modeChoice2Selection === "viena" && modeChoiceSelection === "atimtis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEIŠARDANT DEŠIMTIES</option>';
+			} else if (modeChoice2Selection === "viena" && modeChoiceSelection === "sudetis ir atimtis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT/NEIŠARDANT DEŠIMTIES</option>';
+				modeChoice3Element.innerHTML += '<option value="per10">PERŽENGIANT/IŠARDANT DEŠIMTĮ</option>';
+
+			} else if (modeChoice2Selection === "lent" && modeChoiceSelection === "sudetis ir atimtis") {
+				modeChoice3Element.innerHTML += '<option value="per10">PERŽENGIANT/IŠARDANT DEŠIMTĮ</option>';
+			} else if (modeChoice2Selection === "viena10" && modeChoiceSelection === "sudetis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT DEŠIMTIES</option>';
+			} else if (modeChoice2Selection === "viena10" && modeChoiceSelection === "atimtis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEIŠARDANT DEŠIMTIES</option>';
+			} else if (modeChoice2Selection === "viena10" && modeChoiceSelection === "sudetis ir atimtis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT/NEIŠARDANT DEŠIMTIES</option>';
+
+			} else if (modeChoice2Selection === "dvivien20" && modeChoiceSelection === "sudetis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT DEŠIMTIES</option>';
+			} else if (modeChoice2Selection === "dvivien20" && modeChoiceSelection === "atimtis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEIŠARDANT DEŠIMTIES</option>';
+				modeChoice3Element.innerHTML += '<option value="per10">IŠARDANT DEŠIMTĮ (LENTELINĖ ATIMTIS)</option>';
+			} else if (modeChoice2Selection === "dvivien20" && modeChoiceSelection === "sudetis ir atimtis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT/NEIŠARDANT DEŠIMTIES</option>';
+
+			} else if (modeChoice2Selection === "dvivien" && modeChoiceSelection === "sudetis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT DEŠIMTIES</option>';
+				modeChoice3Element.innerHTML += '<option value="per10">PERŽENGIANT DEŠIMTĮ</option>';
+			} else if (modeChoice2Selection === "dvivien" && modeChoiceSelection === "atimtis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEIŠARDANT DEŠIMTIES</option>';
+				modeChoice3Element.innerHTML += '<option value="per10">IŠARDANT DEŠIMTĮ</option>';
+			} else if (modeChoice2Selection === "dvivien" && modeChoiceSelection === "sudetis ir atimtis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT/NEIŠARDANT DEŠIMTIES</option>';
+				modeChoice3Element.innerHTML += '<option value="per10">PERŽENGIANT/IŠARDANT DEŠIMTĮ</option>';
+
+			} else if (modeChoice2Selection === "dvi" && modeChoiceSelection === "sudetis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT DEŠIMTIES</option>';
+				modeChoice3Element.innerHTML += '<option value="per10">PERŽENGIANT DEŠIMTĮ</option>';
+			} else if (modeChoice2Selection === "dvi" && modeChoiceSelection === "atimtis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEIŠARDANT DEŠIMTIES</option>';
+				modeChoice3Element.innerHTML += '<option value="per10">IŠARDANT DEŠIMTĮ</option>';
+			} else if (modeChoice2Selection === "dvi" && modeChoiceSelection === "sudetis ir atimtis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT/NEIŠARDANT DEŠIMTIES</option>';
+				modeChoice3Element.innerHTML += '<option value="per10">PERŽENGIANT/IŠARDANT DEŠIMTĮ</option>';
+
+			} else if (modeChoice2Selection === "tukst" && modeChoiceSelection === "sudetis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT SKAIČIŲ SKYRIŲ</option>';
+				modeChoice3Element.innerHTML += '<option value="per10">PERŽENGIANT SKAIČIŲ SKYRIUS</option>';
+			} else if (modeChoice2Selection === "tukst" && modeChoiceSelection === "atimtis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEIŠARDANT SKAIČIŲ SKYRIŲ</option>';
+				modeChoice3Element.innerHTML += '<option value="per10">IŠARDANT SKAIČIŲ SKYRIUS</option>';
+			} else if (modeChoice2Selection === "tukst" && modeChoiceSelection === "sudetis ir atimtis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT/NEIŠARDANT SKAIČIŲ SKYRIŲ</option>';
+				modeChoice3Element.innerHTML += '<option value="per10">PERŽENGIANT/IŠARDANT SKAIČIŲ SKYRIUS</option>';
+
+			} else if (modeChoice2Selection === "dtukst" && modeChoiceSelection === "sudetis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT SKAIČIŲ SKYRIŲ</option>';
+				modeChoice3Element.innerHTML += '<option value="per10">PERŽENGIANT SKAIČIŲ SKYRIUS</option>';
+			} else if (modeChoice2Selection === "dtukst" && modeChoiceSelection === "atimtis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEIŠARDANT SKAIČIŲ SKYRIŲ</option>';
+				modeChoice3Element.innerHTML += '<option value="per10">IŠARDANT SKAIČIŲ SKYRIUS</option>';
+			} else if (modeChoice2Selection === "dtukst" && modeChoiceSelection === "sudetis ir atimtis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT/NEIŠARDANT SKAIČIŲ SKYRIŲ</option>';
+				modeChoice3Element.innerHTML += '<option value="per10">PERŽENGIANT/IŠARDANT SKAIČIŲ SKYRIUS</option>';
+			
+			} else if (modeChoice2Selection === "mil" && modeChoiceSelection === "sudetis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT SKAIČIŲ SKYRIŲ</option>';
+				modeChoice3Element.innerHTML += '<option value="per10">PERŽENGIANT SKAIČIŲ SKYRIUS</option>';
+			} else if (modeChoice2Selection === "mil" && modeChoiceSelection === "atimtis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEIŠARDANT SKAIČIŲ SKYRIŲ</option>';
+				modeChoice3Element.innerHTML += '<option value="per10">IŠARDANT SKAIČIŲ SKYRIUS</option>';
+			} else if (modeChoice2Selection === "mil" && modeChoiceSelection === "sudetis ir atimtis") {
+				modeChoice3Element.innerHTML += '<option value="neper">NEPERŽENGIANT/NEIŠARDANT SKAIČIŲ SKYRIŲ</option>';
+				modeChoice3Element.innerHTML += '<option value="per10">PERŽENGIANT/IŠARDANT SKAIČIŲ SKYRIUS</option>';
+			} else if (modeChoice2Selection === "gretnul") {
+				modeChoice3Element.innerHTML += '<option value="per10">IŠARDANT SKAIČIŲ SKYRIUS</option>';
+			}
+			
+			else {
+			}
+		}
+
+		modeChoiceElement.addEventListener('change', updateModeChoice3);
+		modeChoice2Element.addEventListener('change', updateModeChoice3);
+
+		function updateModeChoice7() {
+			let modeChoice5Selection = modeChoice5Element.value;
+			let modeChoice2Selection = modeChoice2Element.value;
+
+			if (modeChoice5Selection === 'nezinomieji') {
+				modeChoice7Element.innerHTML = '<option value="eilute">EILUTE</option>';
+			} else if (modeChoice5Selection === 'skaitiniai') {
+				modeChoice7Element.innerHTML = '';
+				modeChoice7Element.innerHTML += '<option value="eilute">EILUTE</option>';
+				modeChoice7Element.innerHTML += '<option value="stulpeliu">STULPELIU / KAMPU</option>';
+		}
+		}
+
+		modeChoiceElement.addEventListener('change', updateModeChoice7);
+		modeChoice5Element.addEventListener('change', updateModeChoice7);
+		modeChoice2Element.addEventListener('change', updateModeChoice7);
+
+		modeChoiceElement.addEventListener('change', handleModeChoiceChange);
+		modeChoice2Element.addEventListener('change', handleModeChoiceChange);
+		modeChoice5Element.addEventListener('change', handleModeChoiceChange);
+
+
+		var checkbox = document.getElementById("remainder-input");
+		function updateModeChoice5() {
+			if (checkbox.checked) {
+				modeChoice5Element.innerHTML = '<option value="skaitiniai">SKAITINĖ LYGYBĖ</option>';
+			} else {
+				modeChoice5Element.innerHTML = '';
+				modeChoice5Element.innerHTML += '<option value="skaitiniai">SKAITINĖ LYGYBĖ</option>';
+				modeChoice5Element.innerHTML += '<option value="nezinomieji">SKAITINĖ LYGYBĖ SU NEŽINOMUOJU</option>';
+			}
+		}
+
+		checkbox.addEventListener('change', updateModeChoice5);
+		checkbox.addEventListener('change', handleModeChoiceChange);
+		checkbox.addEventListener('change', updateModeChoice7);
+
+		function submitSelection() {
+			if (localStorage.getItem('controller') !== null) {
+				controller = JSON.parse(localStorage.getItem('controller'))
+			}
+			modeChoiceSelection = modeChoiceElement.value;
+			modeChoice2Selection = modeChoice2Element.value;
+			selectedNumbers = [selectedNumberElement.value, selectedNumber2Element.value].sort();
+			modeChoice3Selection = modeChoice3Element.value;
+			modeChoice5Selection = modeChoice5Element.value;
+			modeChoice6Selection = modeChoice6Element.value;
+			modeChoice7Selection = modeChoice7Element.value;
+
+			var checkbox = document.getElementById("remainder-input");
+
+			controller.language = "LT";
+			controller.mode = 'math';
+			controller.modeChoice = modeChoiceSelection;
+			controller.modeChoice2 = modeChoice2Selection;
+			controller.selectedNumbers = selectedNumbers;
+			controller.withRemainder = checkbox.checked;
+			if (modeChoice3Selection === 'neper') {
+				controller.modeChoice3 = true;
+			} else if (modeChoice3Selection === 'per10') {
+				controller.modeChoice3 = false;
+			}
+			controller.modeChoice5 = modeChoice5Selection;
+			controller.modeChoice6 = modeChoice6Selection;
+			controller.modeChoice7 = modeChoice7Selection;
+			controller.modeChoice8 = 'eeu-version';
+			controller.result = ['', '', '', '', '']
+
+			localStorage.setItem('controller', JSON.stringify(controller))
+			redirectToIntermediate()
+		}
+
+		let submitButtonElement = document.querySelector('.submit-button');
+		submitButtonElement.addEventListener("click", submitSelection);
+		let summaryButtonElement = document.querySelector('.summary-button-lt');
+		summaryButtonElement.addEventListener("click", redirectToSummary);
+
+		window.onload = function () {
+			document.querySelector('#template-container').removeAttribute('hidden');
+		};
+
+		window.onload = function () {
+			if (localStorage.getItem('controller') !== null) {
+				summaryButtonElement.style.visibility = "visible";
+			};
+			document.querySelector('#template-container').removeAttribute('hidden');
+		};
+
+		window.addEventListener("pageshow", function() {
+    var selects = document.querySelectorAll('select');
+    selects.forEach(function(select) {
+        var selectedOption = select.querySelector('[selected]');
+        var selectedIndex = selectedOption ? Array.from(select.children).indexOf(selectedOption) : 0;
+        select.selectedIndex = selectedIndex;
+    });
+
+    var checkbox = document.getElementById('remainder-input');
+    if (checkbox) {
+        checkbox.checked = false; // Deselect the checkbox
+    }
+});
+
+function setLanguage(lang) {
+	if (lang !== controller.language) {
+  // Update the language controller and store it in localStorage
+  controller.language = lang;
+  localStorage.setItem('controller', JSON.stringify(controller));
+
+  // Select all language options
+  const options = document.querySelectorAll('.language-option');
+
+  // Update the selected class for the clicked option
+  options.forEach(option => {
+    if (option.classList.contains(`language-option-${lang}`)) {
+      option.classList.add('selected');
+    } else {
+      option.classList.remove('selected');
+    }
+  });
+	window.location.href = `/${lang}`;
+}
+}
+
+	if (localStorage.getItem('controller') !== null) {
+	controller = JSON.parse(localStorage.getItem('controller'));
+	controller.language = "LT";
+}
+
+const resetButtonElement = document.querySelector('.reset-button');
+resetButtonElement.addEventListener("click", redirectToOuterIndex);
+
+	</script>
+</body>
+
+</html>

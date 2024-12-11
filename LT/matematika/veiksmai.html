@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title>sudEdu - Mental Arithmetic</title>
+	<title>sudEdu - Mintinis Skai&#x10D;iavimas</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 	<link rel="icon" href="../../images/favicon.ico" type="image/x-icon">
 	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -69,36 +69,28 @@
 						<div class="answer-field-div">
 							<div id="stulp-div-ans-and-first" class="d-flex justify-content-center align-items-center">
 							<div id="division-stulp-1"></div>
-							<div id="answer-field-div-invisible-div"></div>
-							<div id="answer-field" class="answer-field d-flex justify-content-center align-items-center">
+							<div id="answer-field" class="answer-field">
 								<input type="text" id="answer" name="answer" class="form-control text-center answer-input"
 									placeholder="" autofocus autocomplete="off" style="display: none;">
 							</div>
-							<div id="answer-remainder-field" class="justify-content-center align-items-center" style="display: none;">
-								<div><h1 style="padding-right: 5px;">r.</h1></div>
-								<input type="text" id="answer-remainder" name="answer-remainder" class="form-control text-center answer-input"
-											 placeholder="" autofocus autocomplete="off">
-						</div>
 						</div>
 							<div id="division-stulp-2"></div>
 
 							<div id="remainder-field" class="remainder-field">
 								<input type="text" id="remainder" name="remainder" class="form-control text-center remainder-input"
-									placeholder="r." autocomplete="off">
+									placeholder="liek." autocomplete="off">
 							</div>
 
 
 					</div>
 							<label class="equation_2 text-nowrap" for="answer-field" style="display: none;"></label>
-							<div id="division-stulp-3"></div>
-							<div id="division-stulp-4"></div>
 					</div>
 				</div>
 
 				<div id="submit-button-row" class="row" style="display: none;">
 					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
 						<div class="d-flex justify-content-start align-items-center">
-							<button class="btn btn-primary question-submit-button">CHECK</button>
+							<button class="btn btn-primary question-submit-button">Tikrinti</button>
 						</div>
 					</div>
 				</div>
@@ -109,8 +101,9 @@
 								<div id="fireworks-div" class="position-absolute image-container bottom-0 end-0 fireworks-div"></div>
 							<div class="col-12 d-flex position-relative justify-content-center align-items-center">
 								<div class="d-flex justify-content-end align-items-center summary-div">
-									<button class="btn btn-primary summary-button">Mistakes</button>
+									<button class="btn btn-primary summary-button">Klaidos</button>
 								</div>
+
 							</div>
 						</div>
 					</div>
@@ -142,6 +135,7 @@
 	<script src="../../mental-arithmetic-combinations.js"></script>
 
 	<script>
+
 let helpTimeout;
 
 function updateHelpTextForControl(controlId) {
@@ -199,11 +193,9 @@ document.querySelectorAll('.control').forEach(control => {
 		if (controller.modeChoice7 === 'stulpeliu' && controller.randomSelection[2] !== 'division') {
 				linkElement.setAttribute("href", "../../questions-stulpeliu.css");
 
-		} else if (controller.modeChoice7 === 'stulpeliu' && controller.randomSelection[2] === 'division' && (controller.modeChoice8 === '' || controller.modeChoice8 === 'eeu-version')) {
+		} else if (controller.modeChoice7 === 'stulpeliu' && controller.randomSelection[2] === 'division') {
 				linkElement.setAttribute("href", "../../questions-stulpeliu-div.css");
 
-		} else if (controller.modeChoice7 === 'stulpeliu' && controller.randomSelection[2] === 'division' && controller.modeChoice8 === 'us-version') {
-				linkElement.setAttribute("href", "../../questions-stulpeliu-div-us.css");
 		} else if (controller.modeChoice7 === 'stulpeliu') {
 			linkElement.setAttribute("href", "../../questions-stulpeliu.css");
 		} else if (controller.withRemainder) {
@@ -237,12 +229,12 @@ document.querySelectorAll('.control').forEach(control => {
 		}
 	}
 
-	window.onload = function () {
+		window.onload = function () {
 			if (localStorage.getItem('controller') === null) {
         window.location.href = "./";
     } else {
 			controller = JSON.parse(localStorage.getItem('controller')) 
-			if (controller.mode !== "math" || controller.language !== "EN") {
+			if (controller.mode !== "math" || controller.language !== "LT") {
 			window.location.href = "./";
 			}
 		}
@@ -271,14 +263,6 @@ document.querySelectorAll('.control').forEach(control => {
     }
     stylePage();
 };
-
-let answerRemainderWesternInputElement = document.querySelector('#answer-remainder');
-answerRemainderWesternInputElement.setAttribute("inputmode", "numeric");
-
-answerRemainderWesternInputElement.addEventListener("input", function (event) {
-			const sanitizedValue = event.target.value.replace(/[^0-9]/g, '');
-			event.target.value = sanitizedValue;
-		});
 
 let answerInputElement = document.querySelector('#answer');
 		answerInputElement.setAttribute("inputmode", "numeric");
@@ -309,10 +293,6 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 				checkAnswer();
 				clearAnswerField();
 			}
-			if (answerRemainderWesternInputElement.value.trim() !== "") {
-				checkAnswer();
-				clearAnswerField();
-			}
 		});
 
 		// Handle "Enter" key press with condition
@@ -332,24 +312,14 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 				}
 			}
 		});
-		answerRemainderWesternInputElement.addEventListener("keydown", function (event) {
-			if (event.key === "Enter") {
-				if (answerRemainderWesternInputElement.value.trim() !== "") {
-					checkAnswer();
-					clearAnswerField();
-				}
-			}
-		});
 
 		function clearAnswerField() {
 			if (!isStulpeliu()) {
 				answerInputElement.value = '';
 				answerRemainderInputElement.value = '';
-				answerRemainderWesternInputElement.value = '';
 			} else if (isStulpeliu() && controller.result[0] === 'Correct') {
 				answerInputElement.value = '';
 				answerRemainderInputElement.value = '';
-				answerRemainderWesternInputElement.value = '';
 			}
 		}
 
@@ -395,13 +365,6 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 
 		
 		function positionContentContainer () {
-			contentContainerElement.style.marginRight = 0 + 'px';
-			contentContainerElement.style.marginLeft = 0 + 'px';
-			contentContainerElement.style.paddingLeft = 0 + 'px';
-			contentContainerElement.style.paddingRight = 0 + 'px';
-
-			if (controller.questionsStopped === true || controller.randomSelection[2] !== 'division' || (controller.randomSelection[2] === 'division' && controller.modeChoice8 === 'eeu-version')) {
-				console.log("triggered")
 					contentContainerElement.style.width = 'auto';
 					var middleLineWidth = document.getElementById('middle-line').offsetWidth;
 					var contentContainerElementWidth = contentContainerElement.offsetWidth;
@@ -410,48 +373,6 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 					const element2marginRight =  parseInt(element2ComputedStyles.getPropertyValue("margin-right"), 10) / 2;
 					contentContainerElement.style.marginRight = contentContainerMargins - element2marginRight + 'px';
 					contentContainerElement.style.marginLeft = contentContainerMargins + element2marginRight + 'px';
-			} else if (controller.randomSelection[2] === 'division' && controller.modeChoice8 === 'us-version') {
-				var middleLineWidth = document.getElementById('middle-line').offsetWidth;
-
-				const middleLineRect = document.getElementById('middle-line').getBoundingClientRect();
-				const middleLineLeftBoundary = middleLineRect.left;
-
-				const answerFieldDiv = document.querySelector('.answer-field-div');
-				const divisionStulp4 = document.getElementById('division-stulp-4');
-				// Get their bounding rectangles
-				const answerFieldDivRect = answerFieldDiv.getBoundingClientRect();
-				const divisionStulp4Rect = divisionStulp4.getBoundingClientRect();
-				// Get the highest right boundary
-				const furthestRightBoundary = Math.max(answerFieldDivRect.right, divisionStulp4Rect.right);
-
-
-				// Get the element with class="equation_2"
-				const equationElement = document.querySelector('.equation_2');
-				// Get its bounding rectangle
-				const equationRect = equationElement.getBoundingClientRect();
-				// Get the left boundary
-				const equationElementLeftBoundary = equationRect.left;
-
-				// Get its bounding rectangle
-				const contentContainerRect = contentContainerElement.getBoundingClientRect();
-				// Get the left boundary
-				const contentContainerLeftBoundary = contentContainerRect.left;
-
-				totalLongDivisionWidth = furthestRightBoundary - equationElementLeftBoundary;
-
-				intermEqualPadding = (middleLineWidth - totalLongDivisionWidth) / 2;
-
-				lopsidedAdjustment = (equationElementLeftBoundary - middleLineLeftBoundary) / 2;
-
-				if (intermEqualPadding > lopsidedAdjustment) {
-					contentContainerElement.style.paddingLeft = intermEqualPadding + 10 + 'px';
-					contentContainerElement.style.paddingRight = intermEqualPadding + lopsidedAdjustment + 'px';
-				} else {
-					contentContainerElement.style.paddingLeft = intermEqualPadding + 15 + 'px';
-					contentContainerElement.style.paddingRight = intermEqualPadding + lopsidedAdjustment * 4 + 'px';
-				}
-
-			}
 			}
 
 		contentContainerElement.style.width = '100%';
@@ -490,7 +411,6 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 
 			element2.style.width = firstElementRight + 28*adjuster - lastElementLeft + 'px';
 			var answerFieldWidth = element2.offsetWidth;
-			element2.style.marginLeft = '0px';
 			element2.style.marginRight = firstElmenetMarginRight + (answerFieldWidth - newWidth) + 'px';
 			answerSeparator2.style.width = firstElementRight + 28*adjuster - lastElementLeft + 'px';
 			answerSeparator2.style.marginRight = firstElmenetMarginRight + (answerFieldWidth - newWidth) + 'px';
@@ -510,7 +430,6 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 
 			daugiklisDigits = didDaugiklis.toString().length;
 			element2.style.width = didDaugiklisWidth + oneRem*1.75 + oneRem*1.75*(answerDigits - daugiklisDigits) + 'px';
-			element2.style.marginLeft = '0px';
 			element2.style.marginRight = oneRem*1.75*(answerDigits - daugiklisDigits) + 3 + 'px';
 			answerSeparator2.style.width = didDaugiklisWidth + oneRem*1.75 + oneRem*1.75*(answerDigits - daugiklisDigits) + 'px';
 			answerSeparator2.style.marginRight = oneRem*1.75*(answerDigits - daugiklisDigits) + 3 + 'px';
@@ -521,9 +440,6 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 		}
 
 	} else if (controller.randomSelection[2] === 'division') {
-
-
-		if (controller.modeChoice8 === '' || controller.modeChoice8 === 'eeu-version' || (controller.modeChoice8 === "us-version" && controller.randomSelection[2] !== 'division')) {
 		var dalinysElement = document.getElementById('dalinys');
 		var daliklisElemet = document.getElementById('daliklis');
 		var divisionResultDigits = (Math.floor(controller.randomSelection[0] / controller.randomSelection[1])).toString().length
@@ -551,9 +467,9 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 
 
 		if (stulpeliu0MarginLeft !== "0px") {
-			const marginValue = (fontSIzeFull * oneRem * 1.15) / 2 + 'px';
-			dalinysElement.style.marginLeft = marginValue;
-			daliklisElement.style.marginLeft = marginValue;
+    const marginValue = (fontSIzeFull * oneRem * 1.15) / 2 + 'px';
+    dalinysElement.style.marginLeft = marginValue;
+    daliklisElement.style.marginLeft = marginValue;
 		} else {
 				dalinysElement.style.marginLeft = "px";
 				daliklisElement.style.marginLeft = "px";
@@ -577,73 +493,9 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 
 		var computedStyle = window.getComputedStyle(lastStulpeliuField);
 		var lastStulpeliuFieldMarginLeft = parseFloat(computedStyle.getPropertyValue('margin-left')); 
-	} else if (controller.modeChoice8 === "us-version" && controller.randomSelection[2] === 'division') {
-
-
-
-
-
-
-
-		var dalinysElement = document.getElementById('dalinys');
-		var daliklisElemet = document.getElementById('daliklis');
-		var divisionResultDigits = (Math.floor(controller.randomSelection[0] / controller.randomSelection[1])).toString().length
-		var daliklisDigits = controller.randomSelection[1].toString().length
-		var dalinysElementWidth = dalinysElement.offsetWidth;
-		var daliklisElementWidth = daliklisElemet.offsetWidth;
-		var stulpeliu0 = document.getElementById('stulpeliu-0');
-		var stulpeliu0Element = document.getElementById('stulpeliu-field-0');
-
-		var stulpeliu0ComputedStyle = window.getComputedStyle(stulpeliu0Element);
-		var stulpeliu0MarginLeft = stulpeliu0ComputedStyle.getPropertyValue('margin-left');
-		stulpeliu0.style.width = dalinysElementWidth + 14 + "px";
-		stulpeliu0.style.marginRight = 0 + 'px';
-
-		var daliklisElement = document.getElementById('daliklis');
-		var stulpeliu0 = document.getElementById('stulpeliu-0');
-		modifier = 0;
-		if ((Math.floor(controller.randomSelection[0] / controller.randomSelection[1])).toString().length < 2) {
-			modifier = 1;
-		}
-		element2.style.width = dalinysElementWidth + 14 + "px";
-
-		const dalinysDigits = controller.randomSelection[0].toString().length;
-		const answerDigits = (Math.floor(controller.randomSelection[0]/controller.randomSelection[1])).toString().length;
-		digitDifference = Number(dalinysDigits) - Number(answerDigits);
-
-		let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invisible-div');
-		answerFieldDivInvisibleDiv.style.width = (daliklisElementWidth + 14) + "px"
-		element2.style.marginRight = '0px';
-		test=1;
-		element2.style.marginLeft = 'calc(' + (digitDifference * (oneRem * 0.21)) + 'rem';
-
-		var counter = 0;
-		var invisibleDivs = document.getElementsByClassName('invisibleDiv');
-		for (var i = 0; i < invisibleDivs.length; i++) {
-				var invisibleDivElement = invisibleDivs[i];
-				invisibleDivElement.style.width = (daliklisElementWidth + 14) + "px";
-		}
-
-		var stulpeliuField = document.getElementsByClassName('stulpeliu-field-sub');
-		for (var i = 0; i < stulpeliuField.length; i++) {
-			var stulpeliuFieldElement = stulpeliuField[i];
-
-			stulpeliuFieldElement.style.width = dalinysElementWidth + 16 + "px";
-		}
-		var stulpeliuField = document.getElementsByClassName('stulpeliu-field-sub');
-		var lastStulpeliuField = stulpeliuField[stulpeliuField.length - 1];
-
-		var computedStyle = window.getComputedStyle(lastStulpeliuField);
-		var lastStulpeliuFieldMarginLeft = parseFloat(computedStyle.getPropertyValue('margin-left')); 
-
-
-
-
-
-		
-	}
 
 		} else {
+
 			var demAtTur = document.getElementsByClassName('demuo-turinys-ateminys');
 			var didDemAtTurWidth = 0;
 			var didDemAtTur;
@@ -654,17 +506,16 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 
 			var answerSize = 0;
 			var marginSize = 0;
-
 			if (controller.randomSelection[2] === 'addition') {
 				answerSize = didDemAtTurWidth + oneRem*1.75 * 2;
 				marginSize = oneRem*1.75 + 3;
+				positionContentContainer();
 			} else if (controller.randomSelection[2] === 'subtraction') {
 				answerSize = didDemAtTurWidth + oneRem*1.75;
 				marginSize = 3;
 			}
 
 			element2.style.width = answerSize + 'px'
-			element2.style.marginLeft = '0px';
 			element2.style.marginRight = marginSize + 'px';
 			answerSeparator2.style.width = answerSize + 'px'
 			answerSeparator2.style.marginRight = marginSize + 'px';
@@ -672,28 +523,10 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 		}
 
 		if (controller.withRemainder && controller.randomSelection[2] === 'division') {
-			if (controller.modeChoice8 === "eeu-version") {
-				var liekElement = document.getElementById("liek");
-				liekElement.style.visibility = "visible";
-			} else if (controller.modeChoice8 === "us-version") {
-				let answerRemainderField = document.querySelector('#answer-remainder-field');
-				answerRemainderField.style.display = 'flex';
-				let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invisible-div');
-				answerFieldDivInvisibleDiv.style.width = (daliklisElementWidth + 14 + 125) + "px"
-				var liekElement = document.getElementById("liek");
-				liekElement.style.visibility = "visible";
-			}
-  } else {
-		let answerRemainderField = document.querySelector('#answer-remainder-field');
-		answerRemainderField.style.display = 'none';
-	}
+    var liekElement = document.getElementById("liek");
+    liekElement.style.visibility = "visible";
+  }
 
-	if (controller.randomSelection[2] !== 'division') {
-		let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invisible-div');
-		answerFieldDivInvisibleDiv.style.width = "0px"
-	}
-
-		positionContentContainer();
 		contentContainerElement.style.visibility = 'visible';
 	}
 
