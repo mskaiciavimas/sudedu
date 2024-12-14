@@ -1377,11 +1377,11 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
 }
 
 function redirectToIntermediate() {
-  window.location.href = "./pasirinkimai.html";
+  window.location.href = "./pasirinkimai";
 }
 
   function redirectToQuestions() {
-    window.location.href = "./veiksmai.html";
+    window.location.href = "./veiksmai";
   }
 
   function redirectToIndex() {
@@ -1395,7 +1395,7 @@ function redirectToIntermediate() {
   }
 
   function redirectToSummary () {
-    window.location.href = "./klaidos.html";
+    window.location.href = "./klaidos";
   }
 
  // Function to calculate bar color based on the number of mistakes
