@@ -39,7 +39,7 @@
 				<span class="language-option language-option-LT selected" onclick="setLanguage('LT')">LT</span>
 			</div>
 			<div class="col-6 d-flex justify-content-end align-items-end about-button-div">
-				<a href="../apie" class="about-button">APIE sudEdu</a>
+				<a href="../apie.html" class="about-button">APIE sudEdu</a>
 			</div>
 		</div>
 			<div class="col-12 d-flex justify-content-center align-items-center text-center">
@@ -229,7 +229,7 @@
 						(modeChoiceSelection === 'daugyba' || modeChoiceSelection === 'dalyba' || modeChoiceSelection === 'daugyba ir dalyba') && 
 						(
 							modeChoice2Selection !== 'pil10' && 
-							modeChoice2Selection !== 'pil100' && 
+							modeChoice2Selection !== 'pil' && 
 							modeChoice2Selection !== 'daugdvivien' && 
 							modeChoice2Selection !== 'daugtrivien' && 
 							modeChoice2Selection !== 'daugketvien' &&
@@ -349,8 +349,8 @@
 				modeChoice2Element.innerHTML += '<option value="daugketdvi">KETURŽENKLIO IŠ DVIŽENKLIO</option>';
 				modeChoice2Element.innerHTML += '<option value="daugdaugdvi">DAUGIAŽENKLIO IŠ DVIŽENKLIO</option>';
 				modeChoice2Element.innerHTML += '<option value="daugdaug">*DAUGIAŽENKLIŲ SKAIČIŲ</option>';
-				modeChoice2Element.innerHTML += '<option value="pil10">IŠ PILNŲ DEŠIMČIŲ</option>';
-				modeChoice2Element.innerHTML += '<option value="pil100">IŠ PILNŲ ŠIMTŲ</option>';
+				modeChoice2Element.innerHTML += '<option value="pil10">IŠ PILNŲ DEŠIMČIŲ/ŠIMTŲ (LENGVESNI)</option>';
+				modeChoice2Element.innerHTML += '<option value="pil">IŠ PILNŲ DEŠIMČIŲ/ŠIMTŲ/TŪKSTANČIŲ</option>';
 				modeChoice6Element.innerHTML += '<option value="dalinys">NEŽINOMAS DAUGINAMASIS</option>';
 
 			} else if (modeChoiceSelection === "dalyba") {
@@ -364,8 +364,8 @@
 				modeChoice2Element.innerHTML += '<option value="daugketdvi">*KETURŽENKLIO IŠ DVIŽENKLIO</option>';
 				modeChoice2Element.innerHTML += '<option value="daugdaugdvi">*DAUGIAŽENKLIO IŠ DVIŽENKLIO</option>';
 				modeChoice2Element.innerHTML += '<option value="daugdaug">*DAUGIAŽENKLIŲ SKAIČIŲ</option>';
-				modeChoice2Element.innerHTML += '<option value="pil10">IŠ PILNŲ DEŠIMČIŲ</option>';
-				modeChoice2Element.innerHTML += '<option value="pil100">IŠ PILNŲ ŠIMTŲ</option>';
+				modeChoice2Element.innerHTML += '<option value="pil10">IŠ PILNŲ DEŠIMČIŲ/ŠIMTŲ (LENGVESNI)</option>';
+				modeChoice2Element.innerHTML += '<option value="pil">IŠ PILNŲ DEŠIMČIŲ/ŠIMTŲ/TŪKSTANČIŲ</option>';
 				modeChoice6Element.innerHTML += '<option value="dalinys">NEŽINOMAS DALINYS</option>';
 				modeChoice6Element.innerHTML += '<option value="daliklis">NEŽINOMAS DALIKLIS</option>';
 
@@ -379,8 +379,8 @@
 				modeChoice2Element.innerHTML += '<option value="daugketdvi">*KETURŽENKLIO IŠ DVIŽENKLIO</option>';
 				modeChoice2Element.innerHTML += '<option value="daugdaugdvi">*DAUGIAŽENKLIO IŠ DVIŽENKLIO</option>';
 				modeChoice2Element.innerHTML += '<option value="daugdaug">*DAUGIAŽENKLIŲ SKAIČIŲ</option>';
-				modeChoice2Element.innerHTML += '<option value="pil10">IŠ PILNŲ DEŠIMČIŲ</option>';
-				modeChoice2Element.innerHTML += '<option value="pil100">IŠ PILNŲ ŠIMTŲ</option>';
+				modeChoice2Element.innerHTML += '<option value="pil10">IŠ PILNŲ DEŠIMČIŲ/ŠIMTŲ (LENGVESNI)</option>';
+				modeChoice2Element.innerHTML += '<option value="pil">IŠ PILNŲ DEŠIMČIŲ/ŠIMTŲ/TŪKSTANČIŲ</option>';
 				modeChoice6Element.innerHTML += '<option value="dalinys">NEŽINOMAS DAUGINAMASIS/DALINYS/DALIKLIS</option>';
 
 			} else if (modeChoiceSelection === "visi") {
@@ -497,10 +497,13 @@
 
 			if (modeChoice5Selection === 'nezinomieji') {
 				modeChoice7Element.innerHTML = '<option value="eilute">EILUTE</option>';
-			} else if (modeChoice5Selection === 'skaitiniai') {
+			} else if (modeChoice5Selection === 'skaitiniai' && modeChoice2Selection !== "dauglent" && modeChoice2Selection !== "pil10" && modeChoice2Selection !== "pil") {
 				modeChoice7Element.innerHTML = '';
 				modeChoice7Element.innerHTML += '<option value="eilute">EILUTE</option>';
 				modeChoice7Element.innerHTML += '<option value="stulpeliu">STULPELIU / KAMPU</option>';
+		} else {
+			modeChoice7Element.innerHTML = '';
+			modeChoice7Element.innerHTML += '<option value="eilute">EILUTE</option>';
 		}
 		}
 

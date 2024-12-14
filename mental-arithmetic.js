@@ -367,6 +367,7 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
     controller.modeChoice2 === "iki10000" || 
     controller.modeChoice2 === "pil10" || 
     controller.modeChoice2 === "pil100" ||
+    controller.modeChoice2 === "pil" ||
     controller.modeChoice2 === "daugtrivien" ||
     controller.modeChoice2 === "daugketvien" ||
     controller.modeChoice2 === "daugdvidvi" ||
@@ -1376,11 +1377,11 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
 }
 
 function redirectToIntermediate() {
-  window.location.href = "./pasirinkimai";
+  window.location.href = "./pasirinkimai.html";
 }
 
   function redirectToQuestions() {
-    window.location.href = "./veiksmai";
+    window.location.href = "./veiksmai.html";
   }
 
   function redirectToIndex() {
@@ -1394,7 +1395,7 @@ function redirectToIntermediate() {
   }
 
   function redirectToSummary () {
-    window.location.href = "./klaidos";
+    window.location.href = "./klaidos.html";
   }
 
  // Function to calculate bar color based on the number of mistakes

@@ -104,11 +104,6 @@
 		width: 100%;
 	}
 
-	.check-next-question-row {
-		padding-top: 20px;
-		padding-bottom: 50px;
-	}
-	
 	.btn-primary {
           font-size: 1rem;
           align-items: center;
@@ -142,8 +137,7 @@
 
 	#warning {
 		font-size: 18px;
-		margin-right: 10px;
-
+		padding-top: 20px;
 	}
 
 	.stop-reset-button-div {
@@ -223,11 +217,9 @@
 }
 
 @media (max-width: 767px) {
-	#help-button {
-		width: 20vw;
-	}
-
-	#next-question {
+	#help-button,
+	#next-question,
+	#show-answers {
 		width: 20vw;
 	}
 
@@ -247,12 +239,9 @@
 }
 
 @media (max-width: 575px) {
-	#help-button {
-		width: 30vw;
-	}
-	#check-answers{
-		width: 30vw;
-	}
+	#help-button,
+	#check-answers,
+	#show-answers,
 	#next-question {
 		width: 30vw;
 	}
@@ -282,15 +271,24 @@
 			</div>
 		</div>
 		<div class="row justify-content-center align-items-center">
+      <div class="row justify-content-center align-items-center">
+        <div class="col-12 d-flex justify-content-end align-items-center">
+        <div id="warning" style="visibility: hidden;">įrašyk visas raides</div>
+      </div>
+      </div>
 		<div class="row justify-content-center align-items-center check-next-question-row">
 			<div class="col-6 d-flex justify-content-start align-items-left">
 				<button id="help-button" class="btn btn-primary">Pagalba</button>
 			</div>
 			<div class="col-6 d-flex justify-content-end align-items-center">
-				<div id="warning"></div>
 				<button id="check-answers" class="btn btn-primary">Tikrinti</button>
 				<button id="next-question" class="btn btn-primary">Toliau</button>
 			</div>
+		</div>
+		<div class="row justify-content-center align-items-center">
+			<div class="col-12 d-flex justify-content-end align-items-center">
+        <button id="show-answers" class="btn btn-primary" style="visibility: hidden;">Atsakymai</button>
+		</div>
 		</div>
 
 		<div class="row justify-content-center align-items-center">
@@ -348,7 +346,14 @@ window.onload = function () {
 		let firstTimeChecking = true;
 		let totalAttemptedQuestions = 0;
 		let totalCorrectAnswers = 0;
+    let currentAnswerAttempts = 0;
 		const maximumQuestionFrequencyPerWord = 1;
+		let allowAdjacentEndlessWords;
+		if (controller.modeChoice4 === "lengvesnes") {
+			allowAdjacentEndlessWords = false;
+		} else if (controller.modeChoice4 === "sunkesnes") {
+			allowAdjacentEndlessWords = true;
+		}
 		let allAnswersCorrect = false;
 
 		if(sentenceLibrary) {
@@ -722,11 +727,14 @@ window.onload = function () {
 									if (Object.keys(wordsOneMustBeUsed).length > 0) {
 										let randomWord = Object.keys(wordsOneMustBeUsed)[Math.floor(Math.random() * Object.keys(wordsOneMustBeUsed).length)];
 										wordsToBeUsed[randomWord] = wordsOneMustBeUsed[randomWord];
+										delete wordsOneMustBeUsed[randomWord];
 									}
-									while (Object.keys(wordsToBeUsed).length < questionQuota && Object.keys(wordsThatCanBeUsedForQuestions).length > 0) {
-										let randomWord = Object.keys(wordsThatCanBeUsedForQuestions)[Math.floor(Math.random() * Object.keys(wordsThatCanBeUsedForQuestions).length)];
-										wordsToBeUsed[randomWord] = wordsThatCanBeUsedForQuestions[randomWord];
-										delete wordsThatCanBeUsedForQuestions[randomWord];
+									let combinedWordsThatCanBeUsed = Object.assign({}, wordsOneMustBeUsed, wordsThatCanBeUsedForQuestions);
+									while (Object.keys(wordsToBeUsed).length < questionQuota && (Object.keys(combinedWordsThatCanBeUsed).length > 0)) {
+										
+										let randomWord = Object.keys(combinedWordsThatCanBeUsed)[Math.floor(Math.random() * Object.keys(combinedWordsThatCanBeUsed).length)];
+										wordsToBeUsed[randomWord] = combinedWordsThatCanBeUsed[randomWord];
+										delete combinedWordsThatCanBeUsed[randomWord];
 									}
 									
 									if (Object.keys(wordsToBeUsed).length === 0) {
@@ -734,7 +742,7 @@ window.onload = function () {
 									} else {
 									// Now loop through the sentence again and build the final formatted sentence
 									
-									const formattedSentence = sentence["sentence"].map(([beforePunctuation, word, afterPunctuation, wordInfo]) => {
+									const formattedSentence = sentence["sentence"].reduce((acc, [beforePunctuation, word, afterPunctuation, wordInfo]) => {
 										if (word in wordsToBeUsed) {
 											if (categoriesThatNeedEndings.includes(wordsToBeUsed[word])) {
 												if (wordInfo["gal-s"]) {
@@ -786,12 +794,12 @@ window.onload = function () {
 															}
 													}
 
-													// Join the results into a single string separated by commas
-													const valuesToShowString = valuesToShow.join(', ');
-												formattedWord = `${beforePunctuation}<span class="question-word-span end" style="display: inline; white-space: nowrap;">${wordInfo["gal-c"][0][0][0]}<input type="text" autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input end"> <span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`;
+												// Join the results into a single string separated by commas
+												const valuesToShowString = valuesToShow.join(', ');
+												formattedWord = [`${beforePunctuation}<span class="question-word-span end" style="display: inline; white-space: nowrap;">${wordInfo["gal-c"][0][0][0]}<input type="text" autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input end"> <span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
 												atsakymai[`id-${questionId}`] = wordInfo["gal-c"][0][1][0];
 												questionId++;
-												return formattedWord
+												
 												}
 											
 											} else {
@@ -799,17 +807,51 @@ window.onload = function () {
 												if (combinations && combinations.length > 0) {
 														let randomIndex = Math.floor(Math.random() * combinations.length);
 														let randomElement = combinations[randomIndex];
-														formattedWord = `${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<input type="text" autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input middle"><span class="pagalba-div"></span>${randomElement[2][0]}${afterPunctuation}</span>`;
+														formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<input type="text" autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input middle"><span class="pagalba-div"></span>${randomElement[2][0]}${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
 														atsakymai[`id-${questionId}`] = randomElement[1][0];
 														questionId++;
-														return formattedWord
+														
 												}
 										}
 									 } else {
-											return `${beforePunctuation}${word}${afterPunctuation}`;
+										formattedWord = [`${beforePunctuation}${word}${afterPunctuation}`, "none"];
 										}
-									}).join(' '); // Join the words after all processing
-									const output = `<div class="sakiniai">${formattedSentence}</div>`;
+										if (allowAdjacentEndlessWords) {
+											acc.push(formattedWord)
+										} else {
+											if (acc.length > 0) {
+											if ((formattedWord[1] === "bdv" || formattedWord[1] ==="dkt") && (acc[acc.length - 1][1] === "bdv" || acc[acc.length - 1][1] === "dkt") && acc[acc.length - 1][3] === false) {
+												if (Math.random() <= 0.5) {
+													var temp = acc[acc.length - 1][0]
+													acc[acc.length - 1][0] = acc[acc.length - 1][2]
+													acc[acc.length - 1][2] = temp
+													if (acc.length >= 3) {
+													if (acc[acc.length - 2][3] === true) {
+														var temp2 = acc[acc.length - 2][0]
+														acc[acc.length - 2][0] = acc[acc.length - 2][2]
+														acc[acc.length - 2][2] = temp2	
+													}
+													acc.push(formattedWord)
+												}
+											 } else {
+													// This code will run the other 50% of the time
+													var temp = formattedWord[0]
+													formattedWord[0] = formattedWord[2]
+													formattedWord[2] = temp
+													formattedWord[3] = true
+													acc.push(formattedWord)
+												}
+											} else {
+												acc.push(formattedWord)
+											}
+										} else {
+											acc.push(formattedWord)
+										}
+
+										}
+										return acc;
+									}, [])
+									const output = `<div class="sakiniai">${formattedSentence.map(item => item[0]).join(' ')}</div>`;
 									sakiniai.push(output);
 									break; // Stop processing further sentences once one has been added
 								}
@@ -823,6 +865,9 @@ window.onload = function () {
 
 		function displaySentences() {
 				allAnswersCorrect = false;
+        currentAnswerAttempts = 0;
+        document.getElementById('check-answers').disabled = false;
+				document.getElementById('show-answers').style.visibility = "hidden";
 				// Ensure questionsToDisplay doesn't exceed the number of sentences
 				if (questionsToDisplay > sakiniai.length) {
 					assembleAndFormatSentences();
@@ -874,6 +919,8 @@ window.onload = function () {
             input.classList.remove('wrong-answer');
         });
 			});
+
+      setupDynamicListeners();
 			}
 
 
@@ -922,64 +969,111 @@ window.onload = function () {
     }
   }
 
-	function checkAnswers() {
+// Function to set up listeners for all inputs
+function setupDynamicListeners() {
     const inputs = document.querySelectorAll('.question-input');
-		const NumberOfQuestionsInRound = inputs.length;
-    const warning = document.getElementById('warning'); // Use `querySelector` to get the single element
+    const checkAnswersButton = document.getElementById('check-answers');
+
+    inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            // Recheck inputs with 'wrong-answer' class
+            const wrongInputs = document.querySelectorAll('.wrong-answer');
+            const modified = [...wrongInputs].some(wrongInput => wrongInput.value.trim() !== "");
+            
+            // Re-enable the button if any wrong answer has been modified
+            checkAnswersButton.disabled = modified;
+						if (!modified) {
+						warning.style.visibility = "hidden";
+						}
+        });
+    });
+}
+
+function checkAnswers() {
+    const inputs = document.querySelectorAll('.question-input');
+    const NumberOfQuestionsInRound = inputs.length;
+    const warning = document.getElementById('warning');
     const nextQuestionButton = document.getElementById('next-question');
-    warning.innerHTML = ""; // Clear previous warnings
+    const checkAnswersButton = document.getElementById('check-answers');
+    warning.style.visibility = "hidden";
     let answersCorrect = true;
     let allFilled = true; // Check if all fields are filled
 
-		inputs.forEach(input => {
-			let inputValue = input.value.trim().toLowerCase();
-			if (inputValue === "") {
-            allFilled = false; // Mark as not all filled
-						warning.innerHTML = "įrašyk visas raides";
-            return;
-			}
-		})
-		if (allFilled)  {
+    checkAnswersButton.disabled = true; // Disable the button initially
+
     inputs.forEach(input => {
-        const inputId = input.id;
-        let inputValue = input.value.trim();
-
-        // Strip input value of spaces before comparing with the dictionary
-        inputValue = inputValue.replace(/\s+/g, '');
-
-				console.log(inputValue)
-				console.log(atsakymai[inputId])
-        // Compare the stripped value with the corresponding value from atsakymai
-        if (inputValue === atsakymai[inputId].replace(/\s+/g, '')) {
-            input.classList.add('correct-answer');
-            input.classList.remove('wrong-answer');
-						input.disabled = true;
-						if (firstTimeChecking) {
-							totalCorrectAnswers++
-						}
-        } else {
-            input.classList.add('wrong-answer');
-            input.classList.remove('correct-answer');
-            answersCorrect = false; // Mark as incorrect due to wrong answer
+        let inputValue = input.value.trim().toLowerCase();
+        if (inputValue === "") {
+            allFilled = false; // Mark as not all filled
+            warning.innerHTML = "įrašyk visas raides"
+            warning.style.visibility = "visible";
+            return;
         }
-				
-    // Show "Next Question" button only if all answers are correct
-    nextQuestionButton.style.display = answersCorrect ? "flex" : "none";
-		document.getElementById('check-answers').style.display = answersCorrect ? "none" : "flex";
-
-		
     });
-		if (firstTimeChecking) {
-					totalAttemptedQuestions = totalAttemptedQuestions + NumberOfQuestionsInRound
-					document.getElementById('mistake-tracker').innerHTML = `Teisingai: ${totalCorrectAnswers}/${totalAttemptedQuestions}`;
-				}
-				if (answersCorrect) {
-			allAnswersCorrect = true
-		}
-				firstTimeChecking = false;
 
-	}
-		
+    if (allFilled) {
+        inputs.forEach(input => {
+            const inputId = input.id;
+            let inputValue = input.value.trim();
+
+            // Strip input value of spaces before comparing with the dictionary
+            inputValue = inputValue.replace(/\s+/g, '');
+
+            // Compare the stripped value with the corresponding value from atsakymai
+            if (inputValue === atsakymai[inputId].replace(/\s+/g, '')) {
+                input.classList.add('correct-answer');
+                input.classList.remove('wrong-answer');
+                input.disabled = true;
+                if (firstTimeChecking) {
+                    totalCorrectAnswers++;
+                }
+            } else {
+                input.classList.add('wrong-answer');
+                input.classList.remove('correct-answer');
+                answersCorrect = false; // Mark as incorrect due to wrong answer
+            }
+
+            // Show "Next Question" button only if all answers are correct
+            nextQuestionButton.style.display = answersCorrect ? "flex" : "none";
+            checkAnswersButton.style.display = answersCorrect ? "none" : "flex";
+        });
+
+        if (firstTimeChecking) {
+            totalAttemptedQuestions += NumberOfQuestionsInRound;
+            document.getElementById('mistake-tracker').innerHTML = `Teisingai: ${totalCorrectAnswers}/${totalAttemptedQuestions}`;
+        }
+
+        if (answersCorrect) {
+            allAnswersCorrect = true;
+        } else {
+            currentAnswerAttempts += 1;
+            warning.innerHTML = "pataisyk visas klaidas";
+            warning.style.visibility = "visible";
+        }
+
+        firstTimeChecking = false;
+
+        if (currentAnswerAttempts >= 3) {
+            document.getElementById('show-answers').style.visibility = "visible";
+        }
+    }
+}
+
+function showAnswers() {
+  const inputs = document.querySelectorAll('.question-input');
+  
+  // Iterate over each input field
+  inputs.forEach(input => {
+    const inputId = input.id;
+    
+    // Ensure that the answer exists in the atsakymai object
+    if (atsakymai[inputId]) {
+      // Set the value of the input field to the correct answer, stripping spaces
+      input.value = atsakymai[inputId].replace(/\s+/g, '');
+      resizeInput(input);
+    }
+  });
+  checkAnswers();
 }
 
 function helpToggle() {
@@ -1009,12 +1103,16 @@ function helpToggle() {
 
 			function stopQuestions() {
 				const stopButtonSpanElement = document.querySelector('#stop-button-span');
-				document.getElementById('warning').innerHTML = "";
+				document.getElementById('warning').style.visibility = "hidden";
 				if (stopButtonSpanElement.innerHTML === "close") {
 					clearInterval(timerInterval);
 					stopButtonSpanElement.innerHTML = "refresh";
+					document.getElementById('check-answers').disabled = true;
+					document.getElementById('help-button').disabled = true;
 				} else if (stopButtonSpanElement.innerHTML === "refresh") {
 					stopButtonSpanElement.innerHTML = "close";
+					document.getElementById('check-answers').disabled = false;
+					document.getElementById('help-button').disabled = false;
 					document.getElementById('mistake-tracker').innerHTML = `Teisingai: 0/0`;
 					firstTimeChecking = true;
 					totalAttemptedQuestions = 0;
@@ -1048,8 +1146,6 @@ function handleEnterKey(event) {
             // Move to the next input field
             inputs[currentIndex + 1].focus();
 				
-						console.log(`currentIndex: ${currentIndex}`)
-						console.log(`inputs.length - 1: ${currentIndex === -1}`)
         } else if (currentIndex === inputs.length - 1) {
             // Autofocus the "check-answers" button when the last input field is reached
             const checkAnswersButton = document.getElementById('check-answers');
@@ -1074,6 +1170,7 @@ nextQuestionButton = document.getElementById('next-question')
 
 document.getElementById('check-answers').addEventListener('click', checkAnswers);
 document.getElementById('next-question').addEventListener('click', nextQuestion);
+document.getElementById('show-answers').addEventListener('click', showAnswers);
 document.getElementById('help-button').addEventListener('click', helpToggle);
 
 const stopButtonElement = document.querySelector('.stop-button');

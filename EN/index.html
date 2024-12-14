@@ -20,6 +20,30 @@
 		rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="../../index.css">
 
+<style>
+	#remainder-option {
+		font-size: 1.5rem;
+	}
+
+	@media (max-width: 1100px) {
+		#remainder-option {
+		font-size: 1.2rem !important;
+		}
+	}
+
+	@media (max-width: 1000px) {
+		#remainder-option {
+		font-size: 1.1rem !important;
+	}
+	}
+
+	@media (max-width: 767px) {
+		#remainder-option {
+		font-size: 1.25rem !important;
+	}
+	}
+
+</style>
 </head>
 
 <body>
@@ -37,7 +61,7 @@
 				<span class="language-option language-option-LT" onclick="setLanguage('LT')">LT</span>
 			</div>
 			<div class="col-6 d-flex justify-content-end align-items-end about-button-div">
-				<a href="./apie" class="about-button">ABOUT sudEdu</a>
+				<a href="./apie.html" class="about-button">ABOUT sudEdu</a>
 			</div>
 		</div>
 			<div class="col-12 d-flex justify-content-center align-items-center text-center">
@@ -234,8 +258,8 @@
 				if (
 						(modeChoiceSelection === 'daugyba' || modeChoiceSelection === 'dalyba' || modeChoiceSelection === 'daugyba ir dalyba') && 
 						(
-							modeChoice2Selection !== 'pil10' && 
-							modeChoice2Selection !== 'pil100' && 
+							modeChoice2Selection !== 'pil10' &&
+							modeChoice2Selection !== 'pil' && 
 							modeChoice2Selection !== 'daugdvivien' && 
 							modeChoice2Selection !== 'daugtrivien' && 
 							modeChoice2Selection !== 'daugketvien' &&
@@ -355,8 +379,8 @@
 				modeChoice2Element.innerHTML += '<option value="daugketdvi">4-DIGIT BY 2-DIGIT NUMBERS</option>';
 				modeChoice2Element.innerHTML += '<option value="daugdaugdvi">MULTI-DIGIT BY 2-DIGIT NUMBERS</option>';
 				modeChoice2Element.innerHTML += '<option value="daugdaug">MULTI-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="pil10">MULTIPLES OF TEN</option>';
-				modeChoice2Element.innerHTML += '<option value="pil100">MULTIPLES OF HUNDRED</option>';
+				modeChoice2Element.innerHTML += '<option value="pil10">MULTIPLES OF TEN/HUNDRED (EASIER)</option>';
+				modeChoice2Element.innerHTML += '<option value="pil">MULTIPLES OF TEN/HUNDRED/THOUSAND (HARDER)</option>';
 				modeChoice6Element.innerHTML += '<option value="dalinys">UNKNOWN MULTIPLICAND/MULTIPLIER</option>';
 
 			} else if (modeChoiceSelection === "dalyba") {
@@ -370,8 +394,8 @@
 				modeChoice2Element.innerHTML += '<option value="daugketdvi">4-DIGIT BY 2-DIGIT NUMBERS</option>';
 				modeChoice2Element.innerHTML += '<option value="daugdaugdvi">MULTI-DIGIT BY 2-DIGIT NUMBERS</option>';
 				modeChoice2Element.innerHTML += '<option value="daugdaug">MULTI-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="pil10">MULTIPLES OF TEN</option>';
-				modeChoice2Element.innerHTML += '<option value="pil100">MULTIPLES OF HUNDRED</option>';
+				modeChoice2Element.innerHTML += '<option value="pil10">MULTIPLES OF TEN/HUNDRED (EASIER)</option>';
+				modeChoice2Element.innerHTML += '<option value="pil">MULTIPLES OF TEN/HUNDRED/THOUSAND (HARDER)</option>';
 				modeChoice6Element.innerHTML += '<option value="dalinys">UNKNOWN DIVIDEND</option>';
 				modeChoice6Element.innerHTML += '<option value="daliklis">UNKNOWN DIVISOR</option>';
 
@@ -385,8 +409,8 @@
 				modeChoice2Element.innerHTML += '<option value="daugketdvi">4-DIGIT BY 2-DIGIT NUMBERS</option>';
 				modeChoice2Element.innerHTML += '<option value="daugdaugdvi">MULTI-DIGIT BY 2-DIGIT NUMBERS</option>';
 				modeChoice2Element.innerHTML += '<option value="daugdaug">MULTI-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="pil10">MULTIPLES OF TEN</option>';
-				modeChoice2Element.innerHTML += '<option value="pil100">MULTIPLES OF HUNDRED</option>';
+				modeChoice2Element.innerHTML += '<option value="pil10">MULTIPLES OF TEN/HUNDRED (EASIER)</option>';
+				modeChoice2Element.innerHTML += '<option value="pil">MULTIPLES OF TEN/HUNDRED/THOUSAND (HARDER)</option>';
 				modeChoice6Element.innerHTML += '<option value="dalinys">UNKNOWN MULTIPLICAND/MULTIPLIER/DIVIDEND/DIVISOR</option>';
 
 			} else if (modeChoiceSelection === "visi") {
@@ -504,7 +528,7 @@
 
 			if (modeChoice5Selection === 'nezinomieji') {
 				modeChoice7Element.innerHTML = '<option value="eilute">SIMPLE ADDITION/SUBTRACTION/DIVISION/MULTIPLICATION</option>';
-			} else if (modeChoice5Selection === 'skaitiniai') {
+			} else if (modeChoice5Selection === 'skaitiniai' && modeChoice2Selection !== "dauglent" && modeChoice2Selection !== "pil10" && modeChoice2Selection !== "pil") {
 				modeChoice7Element.innerHTML = '';
 
 				if (modeChoiceSelection === 'sudetis') {
@@ -528,6 +552,23 @@
 				} else if (modeChoiceSelection === 'visi') {
 					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE ADDITION/SUBTRACTION/DIVISION/MULTIPLICATION</option>';
 					modeChoice7Element.innerHTML += '<option value="stulpeliu">LONG ADDITION/SUBTRACTION/DIVISION/MULTIPLICATION</option>';
+				}
+		} else {
+			modeChoice7Element.innerHTML = '';
+			if (modeChoiceSelection === 'sudetis') {
+					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE ADDITION</option>';
+				} else if (modeChoiceSelection === 'atimtis') {
+					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE SUBTRACTION</option>';
+				} else if (modeChoiceSelection === 'sudetis ir atimtis') {
+					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE ADDITION/SUBTRACTION</option>';
+				} else if (modeChoiceSelection === 'daugyba') {
+					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE MULTIPLICATION</option>';
+				} else if (modeChoiceSelection === 'dalyba') {
+					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE DIVISION</option>';
+				} else if (modeChoiceSelection === 'daugyba ir dalyba') {
+					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE MULTIPLICATION/DIVISION</option>';
+				} else if (modeChoiceSelection === 'visi') {
+					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE ADDITION/SUBTRACTION/DIVISION/MULTIPLICATION</option>';
 				}
 		}
 		}

@@ -41,6 +41,42 @@ function generateCombinations() {
     return neisard;
   }
 
+  function hasNoCarrying(a, b) {
+    // Convert the numbers to strings
+    const aStr = a.toString();
+    const bStr = b.toString();
+
+    // Iterate over each digit of `b`
+    for (let i = 0; i < bStr.length; i++) {
+        const bDigit = parseInt(bStr[bStr.length - 1 - i], 10);
+        let carry = 0;
+
+        // Iterate over each digit of `a`
+        for (let j = 0; j < aStr.length; j++) {
+            const aDigit = parseInt(aStr[aStr.length - 1 - j], 10);
+
+            // Calculate the product and add the carry
+            const product = aDigit * bDigit + carry;
+
+            // If any product exceeds 9, carrying happens
+            if (product >= 10) {
+                return false;
+            }
+
+            // Update carry for the next iteration
+            carry = Math.floor(product / 10);
+        }
+
+        // If there's leftover carry, check it
+        if (carry > 0) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
   function nuliaiIsEiles(number) {
     let inputNumber = String(number); // Convert the number to a string
     let digits = inputNumber.length;
@@ -704,17 +740,76 @@ function generateCombinations() {
   else if (controller.modeChoice2 === 'pil10') {
     for (let number1 = 1; number1 <= 10; number1++) {
       for (let number2 = 10; number2 <= 90; number2+=10) {
-        questionPool.push([parseInt(number2), parseInt(number1), "multiplication"]);
+        if (Math.random() <= 0.5) {
+          questionPool.push([parseInt(number2), parseInt(number1), "multiplication"]);
+        } else {
+          questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+        }
+      }
+      for (let number1 = 1; number1 <= 10; number1++) {
+        for (let number2 = 100; number2 <= 900; number2+=100) {
+          if (Math.random() <= 0.5) {
+            questionPool2.push([parseInt(number2), parseInt(number1), "multiplication"]);
+          } else {
+            questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+          }
+        }
       }
     }
-    controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-  } else if (controller.modeChoice2 === 'pil100') {
-    for (let number1 = 1; number1 <= 10; number1++) {
-      for (let number2 = 100; number2 <= 900; number2+=100) {
-        questionPool.push([parseInt(number2), parseInt(number1), "multiplication"]);
+    controller.combinations = [...questionPool.sort(() => 0.5 - Math.random()).slice(0, 10), ...questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10)];
+  } else if (controller.modeChoice2 === 'pil') {
+    let sublist10 = [];
+    let sublist100 = [];
+    let sublist1000 = [];
+    for (let number1 = 2; number1 <= 90;) {
+      if (number1 < 10) {
+        number1++;
+      } else {
+        number1+=10;
+      }
+      for (let number2 = 10; number2 <= 90; number2+=10) {
+        if (hasNoCarrying(number1, number2) && (number1 !== 10 && number1 !== 100 && number2 !== 10)) {
+        if (Math.random() <= 0.5) {
+          sublist10.push([parseInt(number2), parseInt(number1), "multiplication"]);
+        } else {
+          sublist10.push([parseInt(number1), parseInt(number2), "multiplication"]);
+        }
+        }
       }
     }
-    controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
+    for (let number1 = 2; number1 <= 90;) {
+      if (number1 < 10) {
+        number1++;
+      } else {
+        number1+=10;
+      }
+      for (let number2 = 100; number2 <= 900; number2+=10) {
+        if (hasNoCarrying(number1, number2) && (number1 !== 10 && number1 !== 100 && number2 !== 10 && number2 !== 100)) {
+          if (Math.random() <= 0.5) {
+            sublist10.push([parseInt(number2), parseInt(number1), "multiplication"]);
+          } else {
+            sublist10.push([parseInt(number1), parseInt(number2), "multiplication"]);
+          }
+        }
+      }
+    }
+    for (let number1 = 2; number1 <= 90;) {
+      if (number1 < 10) {
+        number1++;
+      } else {
+        number1+=10;
+      }
+      for (let number2 = 1000; number2 <= 9000; number2+=100) {
+        if (hasNoCarrying(number1, number2) && (number1 !== 10 && number1 !== 100 && number2 !== 10 && number2 !== 100 && number2 !== 1000)) {
+          if (Math.random() <= 0.5) {
+            sublist10.push([parseInt(number2), parseInt(number1), "multiplication"]);
+          } else {
+            sublist10.push([parseInt(number1), parseInt(number2), "multiplication"]);
+          }
+        }
+      }
+    }
+    controller.combinations = [...sublist10.sort(() => 0.5 - Math.random()).slice(0, 8), ...sublist100.sort(() => 0.5 - Math.random()).slice(0, 8), ...sublist1000.sort(() => 0.5 - Math.random()).slice(0, 4)];
   }
   
 /*DIVISION*/
@@ -1315,33 +1410,102 @@ questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "
     }
 
       }
+
+      for (let number1 = 1; number1 <= 10; number1++) {
+        for (let number2 = 1; number2 <= 9; number2++) {
+          if (controller.withRemainder) {
+            remainder = generateRandomNumber(1, number1*100)
+          }
+          dalinys = (number1 * number2 * 100) + remainder;
+  
+  
+          if (controller.withRemainder) {
+            if (dalinys % number1*100 !== 0) {
+              questionPool2.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+            }
+          } else {
+            questionPool2.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+          }
+      
+    }
+  
+      }
     
-    controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-  } else if (controller.modeChoice2 === 'pil100') {
-    for (let number1 = 1; number1 <= 10; number1++) {
-      for (let number2 = 1; number2 <= 9; number2++) {
+    controller.combinations = [...questionPool.sort(() => 0.5 - Math.random()).slice(0, 10), ...questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10)];
+  } else if (controller.modeChoice2 === 'pil') {
+    let sublist10 = [];
+    let sublist100 = [];
+    let sublist1000 = [];
+    for (let number1 = 2; number1 <= 9; number1++) {
+      for (let number2 = 1; number2 <= 90; number2++) {
+        if (hasNoCarrying(number1, number2)) {
+        if (Number(String(number1 * number2)[0]) !== Number(String(number1)[0])) {
+        if (controller.withRemainder) {
+          remainder = generateRandomNumber(1, number1*10)
+        }
+        dalinys = (number1 * number2 * 10) + remainder;
+
+        if (controller.withRemainder) {
+          if (dalinys % number1*10 !== 0) {
+            sublist10.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
+          }
+        } else {
+          sublist10.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
+        }
+      }
+    }
+  }
+
+    }
+
+    for (let number1 = 2; number1 <= 9; number1++) {
+      for (let number2 = 1; number2 <= 90; number2++) {
+        if (hasNoCarrying(number1, number2)) {
+        if (Number(String(number1 * number2)[0]) !== Number(String(number1)[0])) {
         if (controller.withRemainder) {
           remainder = generateRandomNumber(1, number1*100)
         }
         dalinys = (number1 * number2 * 100) + remainder;
 
-
         if (controller.withRemainder) {
           if (dalinys % number1*100 !== 0) {
-            questionPool.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+            sublist100.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
           }
         } else {
-          questionPool.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+          sublist100.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
         }
-    
+      }
+    }
+  }
+
+    }
+
+    for (let number1 = 2; number1 <= 9; number1++) {
+      for (let number2 = 1; number2 <= 90; number2++) {
+        if (hasNoCarrying(number1, number2)) {
+        if (Number(String(number1 * number2)[0]) !== Number(String(number1)[0])) {
+        if (controller.withRemainder) {
+          remainder = generateRandomNumber(1, number1*1000)
+        }
+        dalinys = (number1 * number2 * 1000) + remainder;
+
+        if (controller.withRemainder) {
+          if (dalinys % number1*1000 !== 0) {
+            sublist1000.push([parseInt(number1 * number2 * 1000) + remainder, parseInt(number1 * 1000), "division"]);
+          }
+        } else {
+          sublist1000.push([parseInt(number1 * number2 * 1000) + remainder, parseInt(number1 * 1000), "division"]);
+        }
+      }
+    }
   }
 
     }
   
-    controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
+    controller.combinations = [...sublist10.sort(() => 0.5 - Math.random()).slice(0, 8), ...sublist100.sort(() => 0.5 - Math.random()).slice(0, 8), ...sublist1000.sort(() => 0.5 - Math.random()).slice(0, 4)];
   }
 
-  
+
 /*MULTIPLICATION AND DIVISION*/
 } else if (controller.modeChoice === 'daugyba ir dalyba') {
   if (controller.modeChoice2 === 'dauglent') {
@@ -1999,31 +2163,63 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
   else if (controller.modeChoice2 === 'pil10') {
     for (let number1 = 1; number1 <= 10; number1++) {
       for (let number2 = 10; number2 <= 90; number2+=10) {
-        questionPool2.push([parseInt(number2), parseInt(number1), "multiplication"]);
+        if (Math.random() <= 0.5) {
+          questionPool.push([parseInt(number2), parseInt(number1), "multiplication"]);
+        } else {
+          questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+        }
+      }
+      for (let number1 = 1; number1 <= 10; number1++) {
+        for (let number2 = 100; number2 <= 900; number2+=100) {
+          if (Math.random() <= 0.5) {
+            questionPool2.push([parseInt(number2), parseInt(number1), "multiplication"]);
+          } else {
+            questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+          }
+        }
       }
     }
-    for (let number1 = 1; number1 <= 10; number1++) {
+    for (let number1 = 1; number1 <= 9; number1++) {
       for (let number2 = 1; number2 <= 9; number2++) {
         if (controller.withRemainder) {
           remainder = generateRandomNumber(1, number1*10)
         }
+
         dalinys = (number1 * number2 * 10) + remainder;
 
 
           if (controller.withRemainder) {
             if (dalinys % number1*10 !== 0) {
-              questionPool2.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
+              questionPool3.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
             }
           } else {
-            questionPool2.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
+            questionPool3.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
           }
       
     }
 
       }
-    questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
-    questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
-    controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
+
+      for (let number1 = 1; number1 <= 10; number1++) {
+        for (let number2 = 1; number2 <= 9; number2++) {
+          if (controller.withRemainder) {
+            remainder = generateRandomNumber(1, number1*100)
+          }
+          dalinys = (number1 * number2 * 100) + remainder;
+  
+  
+          if (controller.withRemainder) {
+            if (dalinys % number1*100 !== 0) {
+              questionPool4.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+            }
+          } else {
+            questionPool4.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+          }
+      
+    }
+  
+      }
+    controller.combinations = [...questionPool.sort(() => 0.5 - Math.random()).slice(0, 5), ...questionPool2.sort(() => 0.5 - Math.random()).slice(0, 5), ...questionPool3.sort(() => 0.5 - Math.random()).slice(0, 5), ...questionPool4.sort(() => 0.5 - Math.random()).slice(0, 5)]
   } else if (controller.modeChoice2 === 'pil100') {
     for (let number1 = 1; number1 <= 10; number1++) {
       for (let number2 = 100; number2 <= 900; number2+=100) {
@@ -2052,7 +2248,130 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
     questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
     controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
+  } else if (controller.modeChoice2 === 'pil') {
+    let sublist10 = [];
+    let sublist100 = [];
+    let sublist1000 = [];
+    let sublist10Div = [];
+    let sublist100Div = [];
+    let sublist1000Div = [];
+    for (let number1 = 2; number1 <= 90;) {
+      if (number1 < 10) {
+        number1++;
+      } else {
+        number1+=10;
+      }
+      for (let number2 = 10; number2 <= 90; number2+=10) {
+        if (hasNoCarrying(number1, number2) && (number1 !== 10 && number1 !== 100 && number2 !== 10)) {
+          if (Math.random() <= 0.5) {
+            sublist10.push([parseInt(number2), parseInt(number1), "multiplication"]);
+          } else {
+            sublist10.push([parseInt(number1), parseInt(number2), "multiplication"]);
+          }
+        }
+      }
+    }
+    for (let number1 = 2; number1 <= 90;) {
+      if (number1 < 10) {
+        number1++;
+      } else {
+        number1+=10;
+      }
+      for (let number2 = 100; number2 <= 900; number2+=10) {
+        if (hasNoCarrying(number1, number2) && (number1 !== 10 && number1 !== 100 && number2 !== 10 && number2 !== 100)) {
+          if (Math.random() <= 0.5) {
+            sublist10.push([parseInt(number2), parseInt(number1), "multiplication"]);
+          } else {
+            sublist10.push([parseInt(number1), parseInt(number2), "multiplication"]);
+          }
+        }
+      }
+    }
+    for (let number1 = 2; number1 <= 90;) {
+      if (number1 < 10) {
+        number1++;
+      } else {
+        number1+=10;
+      }
+      for (let number2 = 1000; number2 <= 9000; number2+=100) {
+        if (hasNoCarrying(number1, number2) && (number1 !== 10 && number1 !== 100 && number2 !== 10 && number2 !== 100 && number2 !== 1000)) {
+          if (Math.random() <= 0.5) {
+            sublist10.push([parseInt(number2), parseInt(number1), "multiplication"]);
+          } else {
+            sublist10.push([parseInt(number1), parseInt(number2), "multiplication"]);
+          }
+        }
+      }
+    }
+
+    for (let number1 = 2; number1 <= 9; number1++) {
+      for (let number2 = 1; number2 <= 90; number2++) {
+        if (hasNoCarrying(number1, number2)) {
+        if (Number(String(number1 * number2)[0]) !== Number(String(number1)[0])) {
+        if (controller.withRemainder) {
+          remainder = generateRandomNumber(1, number1*10)
+        }
+        dalinys = (number1 * number2 * 10) + remainder;
+
+        if (controller.withRemainder) {
+          if (dalinys % number1*10 !== 0) {
+            sublist10Div.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
+          }
+        } else {
+          sublist10Div.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
+        }
+      }
+    }
   }
+
+    }
+
+    for (let number1 = 2; number1 <= 9; number1++) {
+      for (let number2 = 1; number2 <= 90; number2++) {
+        if (hasNoCarrying(number1, number2)) {
+        if (Number(String(number1 * number2)[0]) !== Number(String(number1)[0])) {
+        if (controller.withRemainder) {
+          remainder = generateRandomNumber(1, number1*100)
+        }
+        dalinys = (number1 * number2 * 100) + remainder;
+
+        if (controller.withRemainder) {
+          if (dalinys % number1*100 !== 0) {
+            sublist100Div.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+          }
+        } else {
+          sublist100Div.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+        }
+      }
+    }
+  }
+
+    }
+
+    for (let number1 = 2; number1 <= 9; number1++) {
+      for (let number2 = 1; number2 <= 90; number2++) {
+        if (hasNoCarrying(number1, number2)) {
+        if (Number(String(number1 * number2)[0]) !== Number(String(number1)[0])) {
+        if (controller.withRemainder) {
+          remainder = generateRandomNumber(1, number1*1000)
+        }
+        dalinys = (number1 * number2 * 1000) + remainder;
+
+        if (controller.withRemainder) {
+          if (dalinys % number1*1000 !== 0) {
+            sublist1000Div.push([parseInt(number1 * number2 * 1000) + remainder, parseInt(number1 * 1000), "division"]);
+          }
+        } else {
+          sublist1000Div.push([parseInt(number1 * number2 * 1000) + remainder, parseInt(number1 * 1000), "division"]);
+        }
+      }
+    }
+  }
+
+    }
+      controller.combinations = [...sublist10.sort(() => 0.5 - Math.random()).slice(0, 4), ...sublist100.sort(() => 0.5 - Math.random()).slice(0, 3), ...sublist1000.sort(() => 0.5 - Math.random()).slice(0, 3), ...sublist10Div.sort(() => 0.5 - Math.random()).slice(0, 4), ...sublist100Div.sort(() => 0.5 - Math.random()).slice(0, 3), ...sublist1000Div.sort(() => 0.5 - Math.random()).slice(0, 3)];
+    }
+  
 /*ALL*/
 } else if (controller.modeChoice === "visi") {
   if (controller.modeChoice2 === "iki10") {

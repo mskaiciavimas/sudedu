@@ -42,6 +42,13 @@
 	.center-row-language {
 		margin-bottom: 0;
 	}
+
+	#mode_choice_4 {
+		margin-top: 5px;
+		margin-bottom: 5px;
+		width: 90%;
+		font-size: 1rem;
+	}
 </style>
 </head>
 
@@ -60,7 +67,7 @@
 					<span class="language-option language-option-LT selected" onclick="setLanguage('LT')">LT</span>
 			</div>
 			<div class="col-6 d-flex justify-content-end align-items-end about-button-div">
-				<a href="../apie" class="about-button">APIE sudEdu</a>
+				<a href="../apie.html" class="about-button">APIE sudEdu</a>
 			</div>
 		</div>
 			<div class="col-12 d-flex justify-content-center align-items-center text-center">
@@ -127,6 +134,14 @@
 									<label class="rasyba-options-label">
 										<input type="checkbox" class="rasyba-options" name="rasyba-option" value='{"vks": []}' checked><span class="rasyba-options-label-text"></span>VEIKSMAŽODIS</span>
 									</label><br>
+									<div class="col-12 d-flex justify-content-start align-items-center mode_choice_3_div text-center"
+									id="mode_choice_3_div">
+									<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_4"
+										id="mode_choice_4">
+										<option value="lengvesnes">LENGVESNĖS GALŪNIŲ KOMBINACIJOS</option>
+										<option value="sunkesnes">SUNKESNĖS GALŪNIŲ KOMBINACIJOS</option>
+									</select>
+								</div>
 								</div>
 									<label class="rasyba-options-label">
 										<input id="įsi-r" type="checkbox" class="rasyba-options" name="rasyba-option" value='{"įsi-r": []}' checked><span class="rasyba-options-label-text"></span>ĮSIDĖMĖTINA RAŠYBA:</span>
@@ -203,6 +218,7 @@
 		let modeChoiceLtElement = document.querySelector('#mode_choice');
 		let modeChoiceLt2Element = document.querySelector('#mode_choice_2');
 		let modeChoiceLt3Element = document.querySelector('#mode_choice_3');
+		let modeChoiceLt4Element = document.querySelector('#mode_choice_4');
 		let modeChoiceLt8DivElement = document.querySelector('#mode_choice_8_div');
 	
 
@@ -221,11 +237,11 @@
 
 			if (modeChoiceLtSelection === "rasyba") {
 				toggleVisibility(modeChoiceLt3Element, false);
-				modeChoiceLt2Element.innerHTML += '<option value="5">5 SAKINIAI EKRANE</option>';
-				modeChoiceLt2Element.innerHTML += '<option value="4">4 SAKINIAI EKRANE</option>';
-				modeChoiceLt2Element.innerHTML += '<option value="3">3 SAKINIAI EKRANE</option>';
-				modeChoiceLt2Element.innerHTML += '<option value="2">2 SAKINIAI EKRANE</option>';
 				modeChoiceLt2Element.innerHTML += '<option value="1">1 SAKINYS EKRANE</option>';
+				modeChoiceLt2Element.innerHTML += '<option value="2">2 SAKINIAI EKRANE</option>';
+				modeChoiceLt2Element.innerHTML += '<option value="3">3 SAKINIAI EKRANE</option>';
+				modeChoiceLt2Element.innerHTML += '<option value="4">4 SAKINIAI EKRANE</option>';
+				modeChoiceLt2Element.innerHTML += '<option value="5">5 SAKINIAI EKRANE</option>';
 				toggleVisibility(modeChoiceLt8DivElement, true);
 			} else if (modeChoiceLtSelection === "tekstas") {
 				toggleVisibility(modeChoiceLt3Element, true);
@@ -272,10 +288,12 @@
 			}
 			modeChoiceLtSelection = modeChoiceLtElement.value;
 			modeChoiceLt2Selection = modeChoiceLt2Element.value;
+			modeChoiceLt4Selection = modeChoiceLt4Element.value;
 
 			controller.modeChoice = modeChoiceLtSelection;
 			controller.modeChoice2 = modeChoiceLt2Selection;
 			controller.modeChoice3 = getSelectedRasybaConditions();
+			controller.modeChoice4 = modeChoiceLt4Selection;
 			controller.result = ['', '', '', '', '']
 			controller.modeChoiceLtDifficulty = document.getElementById('mode_choice_3').value;
 
@@ -284,14 +302,14 @@
 				console.log(controller.mode)
 				localStorage.setItem('controller', JSON.stringify(controller))
         if (controller.modeChoice2 === 'komponavimas') {
-          window.location.href = "./komponavimas";
+          window.location.href = "./komponavimas.html";
         } else if (controller.modeChoice2 === 'isdestymas') {
-          window.location.href = "./isdestymas";
+          window.location.href = "./isdestymas.html";
         }
       } else if (controller.modeChoice === "rasyba") {
 				controller.mode = "grammar"
 				localStorage.setItem('controller', JSON.stringify(controller))
-				window.location.href = "./rasyba";
+				window.location.href = "./rasyba.html";
 			}
 		}
 	}
