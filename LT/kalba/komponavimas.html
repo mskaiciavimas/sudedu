@@ -285,7 +285,17 @@ window.onload = function () {
     }
   }
 
-fetch('../../databases/text_database.json')
+  controller = JSON.parse(localStorage.getItem('controller')) 
+  let jsonFiles = [];
+
+	// Define an array of URLs for the JSON files you want to fetch
+	if (controller.classChoice === "pirma-antra") {
+		jsonFile = '../../databases/1_2_klase_teksto_suvokimas.json';
+	} else if (controller.classChoice === "trecia-ketvirta") {
+		jsonFile = '../../databases/3_4_klase_teksto_suvokimas.json';
+	}
+
+fetch(jsonFile)
     .then(response => {
         if (!response.ok) throw new Error("Network error");
         return response.json();
@@ -308,14 +318,15 @@ fetch('../../databases/text_database.json')
     var selectedItem;
     const triesDiv = document.getElementById('tries');
     const helpDiv = document.getElementById('help');
+    let filteredTextLibrary = [];
 
+    function generateFilteredTextLibrary() {
     var tempTextLibrary = Array.from(textDatabase);
-    var filteredTextLibrary = tempTextLibrary.filter(entry =>
-      entry['suitable-for'] &&
-      entry['suitable-for']['sakiniai'] && // Check if 'sakiniai' exists
-      entry['suitable-for']['sakiniai'].includes(controller.modeChoiceLtDifficulty) // Check if it includes the value
+    console.log(tempTextLibrary.length);
+    filteredTextLibrary = tempTextLibrary.filter(entry =>
+      entry['suitable-for']?.['komponavimas']?.includes(controller.modeChoiceLtDifficulty)
     );
-
+    }
     helpBtn.disabled = true;
 
     // Function to split a paragraph into sentences
@@ -342,11 +353,7 @@ fetch('../../databases/text_database.json')
       return array;
     }
 
-    function selectRandomItem() {
-    if (filteredTextLibrary.length === 0) {
-      filteredTextLibrary = Array.from(textDatabase);
-    }
-    
+    function selectRandomItem() {    
     // Generate a random index
     const randomIndex = Math.floor(Math.random() * filteredTextLibrary.length);
     
@@ -357,7 +364,9 @@ fetch('../../databases/text_database.json')
     }
 
     function displayQuestion() {
-      // Select a random item from the library
+      if (filteredTextLibrary.length === 0) {
+        generateFilteredTextLibrary();
+      }
       selectedItem = selectRandomItem();
       const originalTitle = selectedItem.title;
       const originalParagraph = [...selectedItem.text.start, ...selectedItem.text.middle, ...selectedItem.text.end];

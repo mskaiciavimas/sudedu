@@ -49,6 +49,17 @@
 		width: 90%;
 		font-size: 1rem;
 	}
+
+	.rasyba-options-row {
+		width: 100%;
+	}
+
+	.mode_choice_5_div,
+	#mode_choice_5 {
+		width: 100%;
+		padding-left: 0;
+		padding-right: 0;
+	}
 </style>
 </head>
 
@@ -67,7 +78,7 @@
 					<span class="language-option language-option-LT selected" onclick="setLanguage('LT')">LT</span>
 			</div>
 			<div class="col-6 d-flex justify-content-end align-items-end about-button-div">
-				<a href="../apie" class="about-button">APIE sudEdu</a>
+				<a href="../apie.html" class="about-button">APIE sudEdu</a>
 			</div>
 		</div>
 			<div class="col-12 d-flex justify-content-center align-items-center text-center">
@@ -78,6 +89,16 @@
 				<div class="row" id="middle-div-row">
 					<div class="d-flex flex-column align-items-center">
 						<label class="mode-choice-label" for="mode_choice">PRAKTIKUOTIS</label>
+						<div class="row">
+							<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
+						</div>
+						<div class="row d-flex justify-content-center align-items-center text-center class_choice_div">
+							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="class_choice"
+								id="class_choice">
+								<option value="pirma-antra">1-2 KLASĖ</option>
+								<option value="trecia-ketvirta">3-4 KLASĖ</option>
+							</select>
+						</div>
 						<div class="row">
 							<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
 						</div>
@@ -109,7 +130,6 @@
 								id="mode_choice_3_div">
 								<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_3"
 									id="mode_choice_3">
-									<option value="slenkstinis">SLENKSTINIS</option>
 									<option value="lengvas">LENGVAS</option>
 									<option value="vidutinis">VIDUTINIS</option>
 									<option value="sunkus">SUNKUS</option>
@@ -117,67 +137,87 @@
 							</div>
 						</div>
 
-						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_8_div">
+						<div class="row d-flex justify-content-center align-items-center text-center rasyba-options-row">
 							<div class="col-12 justify-content-start align-items-center mode_choice_8_div text-center"
 								id="mode_choice_8_div" style="display: none;">
 								<label class="rasyba-options-label">
-									<input type="checkbox" class="r" name="r" value='GALŪNĖS' checked><span class="rasyba-options-label-text">GALŪNĖ:</span>
+									<input type="checkbox" class="r" name="r" value='GALŪNĖS' checked><span class="rasyba-options-label-text" id="rasyba-options-label-text-galune">ŽODŽIO PABAIGA:</span>
 								</label>
 								<br>
 									<div id="galuniu-div">
-									<label class="rasyba-options-label">
-										<input type="checkbox" class="rasyba-options" name="rasyba-option" value='{"dkt": []}' checked><span class="rasyba-options-label-text">DAIKTAVARDIS</span>
-									</label><br>
-									<label class="rasyba-options-label">
-										<input type="checkbox" class="rasyba-options" name="rasyba-option" value='{"bdv": [], "prv": []}' checked><span class="rasyba-options-label-text"></span>BŪDVARDIS + PRIEVEIKSMIS</span>
-									</label><br>
-									<label class="rasyba-options-label">
-										<input type="checkbox" class="rasyba-options" name="rasyba-option" value='{"vks": []}' checked><span class="rasyba-options-label-text"></span>VEIKSMAŽODIS</span>
-									</label><br>
+									<label class="rasyba-options-label" style="display: none;">
+										<input type="checkbox" class="rasyba-options options-for-first-second-classes-input" id="first-second-class-endings" name="rasyba-option" value='{"fsc-gal": []}' checked><span class="rasyba-options-label-text">DAIKTAVARDIS</span>
+										<br>
+									</label>
+									<label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+										<input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"dkt": []}'><span class="rasyba-options-label-text">DAIKTAVARDŽIAI</span>
+										<br>
+									</label>
+									<label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+										<input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"bdv": [], "prv": []}'><span class="rasyba-options-label-text"></span>BŪDVARDŽIAI IR PRIEVEIKSMIAI</span>
+										<br>
+									</label>
+									<label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+										<input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"vks": []}'><span class="rasyba-options-label-text"></span>VEIKSMAŽODŽIAI</span>
+										<br>
+									</label>
 									<div class="col-12 d-flex justify-content-start align-items-center mode_choice_3_div text-center"
 									id="mode_choice_3_div">
 									<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_4"
 										id="mode_choice_4">
-										<option value="lengvesnes">LENGVESNĖS GALŪNIŲ KOMBINACIJOS</option>
-										<option value="sunkesnes">SUNKESNĖS GALŪNIŲ KOMBINACIJOS</option>
+										<option value="lengvesnes">LENGVESNĖS KOMBINACIJOS</option>
+										<option value="sunkesnes">SUNKESNĖS KOMBINACIJOS</option>
 									</select>
 								</div>
 								</div>
 									<label class="rasyba-options-label">
-										<input id="įsi-r" type="checkbox" class="rasyba-options" name="rasyba-option" value='{"įsi-r": []}' checked><span class="rasyba-options-label-text"></span>ĮSIDĖMĖTINA RAŠYBA:</span>
-									</label><br>
-
-									<div id="is-ras-subsection" style="display: block;">
-											
-											<label class="rasyba-options-label">
-												<input type="radio" class="rasyba-options" name="klase" value='{"įsi-r": ["2kl"]}'>
-												<span class="rasyba-options-label-text">1-2 KLASĖ</span>
-											</label><br>
-											
-											<label class="rasyba-options-label">
-												<input type="radio" class="rasyba-options" name="klase" value='{"įsi-r": ["4kl"]}' checked>
-												<span class="rasyba-options-label-text">3-4 KLASĖ</span>
-											</label><br>
-
-									</div>
-
-
-
-									<label class="rasyba-options-label">
-										<input type="checkbox" class="rasyba-options" name="rasyba-option" value='{"asim": []}' checked><span class="rasyba-options-label-text"></span>PRIEBALSIŲ SUPANAŠĖJIMAS</span>
-									</label><br>
-									<label class="rasyba-options-label">
-										<input type="checkbox" class="rasyba-options" name="rasyba-option" value='{"md": []}' checked><span class="rasyba-options-label-text"></span>MIŠRUSIS DVIGARSIS</span>
-									</label><br>
-									<label class="rasyba-options-label">
-										<input type="checkbox" class="rasyba-options" name="rasyba-option" value='{"prš": []}' checked><span class="rasyba-options-label-text"></span>PRIEŠDĖLIS</span>
-									</label><br>
-									<label class="rasyba-options-label">
-										<input type="checkbox" class="rasyba-options" name="rasyba-option" value='{"prs": []}' checked><span class="rasyba-options-label-text"></span>PRIESAGOS + ŠAKNIES BALSĖ</span>
-									</label><br>
-
+										<input id="įsi-r" type="checkbox" class="rasyba-options" name="rasyba-option" value='{"įsi-r": []}' checked><span class="rasyba-options-label-text"></span>ĮSIDĖMĖTINA RAŠYBA</span>
+										<br>
+									</label>
+									<label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+										<input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"asim": []}'><span class="rasyba-options-label-text"></span>PRIEBALSIŲ SUPANAŠĖJIMAS</span>
+										<br>
+									</label>
+									<label class="rasyba-options-label options-for-first-second-classes" style="display: block;">
+										<input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"fsc-con": []}' checked><span class="rasyba-options-label-text"></span>PANAŠIAI SKAMBANČIOS PRIEBALSĖS</span>
+										<br>
+									</label>
+									<label class="rasyba-options-label" style="display: block;">
+										<input type="checkbox" class="rasyba-options" name="rasyba-option" value='{"fsc-vow": []}' checked><span class="rasyba-options-label-text"></span>BALSĖS IR DVIBALSĖS</span>
+										<br>
+									</label>
+									<label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+										<input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"md": []}'><span class="rasyba-options-label-text"></span>MIŠRIEJI DVIGARSIAI</span>
+										<br>
+									</label>
+									<label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+										<input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"prš": []}'><span class="rasyba-options-label-text"></span>PRIEŠDĖLIAI</span>
+										<br>
+									</label>
+									<label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+										<input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"prs": []}'><span class="rasyba-options-label-text"></span>PRIESAGOS</span>
+										<br>
+									</label>
+							
 							</div>
+
+							<div class="row d-flex justify-content-center align-items-center text-center mode_choice_5_div">
+								<div class="row">
+									<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-before-mode-choice-5" style="display: none;"></div>
+								</div>
+								<div class="col-12 d-flex justify-content-center align-items-center mode_choice_5_div text-center"
+									id="mode_choice_5_div">
+									<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_5"
+										id="mode_choice_5" style="display: none;">
+										<option value="3">RETESNI ATVEJAI</option>
+										<option value="1">DAŽNESNI ATVEJAI</option>
+									</select>
+								</div>
+							</div>
+
 						</div>
+
+						
 					
 						<div class="row">
 							<div class="col-sm-12 empty-placeholder-before-submit"></div>
@@ -215,14 +255,19 @@
 
 	<script>
 
+		let classChoiceElement = document.querySelector('#class_choice');
 		let modeChoiceLtElement = document.querySelector('#mode_choice');
 		let modeChoiceLt2Element = document.querySelector('#mode_choice_2');
 		let modeChoiceLt3Element = document.querySelector('#mode_choice_3');
 		let modeChoiceLt4Element = document.querySelector('#mode_choice_4');
+		let modeChoiceLt5Element = document.querySelector('#mode_choice_5');
+		let rasybaOptionsLabelTextGaluneElement = document.querySelector('#rasyba-options-label-text-galune');
+		let placeholderBeforeModeChoice5Element = document.querySelector('#empty-placeholder-before-mode-choice-5');
 		let modeChoiceLt8DivElement = document.querySelector('#mode_choice_8_div');
 	
 
 			function handleModeChoiceChange() {
+				let classChoiceSelection = classChoiceElement.value;
 				let modeChoiceLtSelection = modeChoiceLtElement.value;
 				let modeChoiceLt2Selection = modeChoiceLt2Element.value;
 				modeChoiceLt2Element.innerHTML = "";
@@ -243,9 +288,22 @@
 				modeChoiceLt2Element.innerHTML += '<option value="4">4 SAKINIAI EKRANE</option>';
 				modeChoiceLt2Element.innerHTML += '<option value="5">5 SAKINIAI EKRANE</option>';
 				toggleVisibility(modeChoiceLt8DivElement, true);
+				if (classChoiceSelection === "pirma-antra") {
+					toggleVisibility(modeChoiceLt5Element, true);
+					toggleVisibility(placeholderBeforeModeChoice5Element, true);
+					toggleVisibility(modeChoiceLt4Element, false);
+					rasybaOptionsLabelTextGaluneElement.innerHTML = "ŽODŽIO PABAIGA";
+				} else {
+					toggleVisibility(modeChoiceLt5Element, false);
+					toggleVisibility(placeholderBeforeModeChoice5Element, false);
+					toggleVisibility(modeChoiceLt4Element, true);
+					rasybaOptionsLabelTextGaluneElement.innerHTML = "ŽODŽIO PABAIGA:";
+				}
 			} else if (modeChoiceLtSelection === "tekstas") {
 				toggleVisibility(modeChoiceLt3Element, true);
 				toggleVisibility(modeChoiceLt8DivElement, false);
+				toggleVisibility(modeChoiceLt5Element, false);
+				toggleVisibility(placeholderBeforeModeChoice5Element, false);
 				modeChoiceLt2Element.innerHTML += '<option value="komponavimas">TURINIO KOMPONAVIMĄ</option>';
 				modeChoiceLt2Element.innerHTML += '<option value="isdestymas">STRUKTŪROS IŠDĖSTYMĄ</option>';
 
@@ -258,16 +316,61 @@
 		}
 
 		modeChoiceLtElement.addEventListener('change', handleModeChoiceChange);
+		classChoiceElement.addEventListener('change', handleModeChoiceChange);
 
-		document.getElementById('įsi-r').addEventListener('change', function() {
-    var subsection = document.getElementById('is-ras-subsection');
-    if (this.checked) {
-      subsection.style.display = 'block'; // Show subsection if checkbox is checked
-    } else {
-      subsection.style.display = 'none'; // Hide subsection if checkbox is unchecked
-    }
-  });
 
+		function handleClassChoiceChange() {
+			if (classChoiceElement.value === "pirma-antra") {
+				const elements = document.querySelectorAll('.options-for-third-fourth-classes');
+    
+				// Loop through each element and set its display style to "none"
+				elements.forEach(function(element) {
+					element.style.display = 'none';
+				});
+
+				const elements2 = document.querySelectorAll('.options-for-first-second-classes');
+    
+				// Loop through each element and set its display style to "none"
+				elements2.forEach(function(element) {
+					element.style.display = 'block';
+				});
+
+				const inputs = document.querySelectorAll('.options-for-third-fourth-classes-input');
+				inputs.forEach(function(input) {
+					input.checked = false;  // Uncheck the checkbox or radio button
+				});
+
+				const inputs2 = document.querySelectorAll('.options-for-first-second-classes-input');
+				inputs2.forEach(function(input) {
+					input.checked = true;  // Uncheck the checkbox or radio button
+				});
+			} else if (classChoiceElement.value === "trecia-ketvirta") {
+				const elements = document.querySelectorAll('.options-for-third-fourth-classes');
+				// Loop through each element and set its display style to "block"
+				elements.forEach(function(element) {
+					element.style.display = 'block';
+				});
+
+				const elements2 = document.querySelectorAll('.options-for-first-second-classes');
+				// Loop through each element and set its display style to "block"
+				elements2.forEach(function(element) {
+					element.style.display = 'none';
+				});
+
+				const inputs = document.querySelectorAll('.options-for-third-fourth-classes-input');
+				inputs.forEach(function(input) {
+					input.checked = true;  // Uncheck the checkbox or radio button
+				});
+
+				const inputs2 = document.querySelectorAll('.options-for-first-second-classes-input');
+				inputs2.forEach(function(input) {
+					input.checked = false;  // Uncheck the checkbox or radio button
+				});
+		
+			}	
+		}
+
+		classChoiceElement.addEventListener('change', handleClassChoiceChange);
 
 		function submitSelection() {
 			const modeChoiceValue = document.querySelector('#mode_choice').value;
@@ -289,27 +392,36 @@
 			modeChoiceLtSelection = modeChoiceLtElement.value;
 			modeChoiceLt2Selection = modeChoiceLt2Element.value;
 			modeChoiceLt4Selection = modeChoiceLt4Element.value;
+			modeChoiceLt5Selection = modeChoiceLt5Element.value;
+			classChoiceSelection = classChoiceElement.value;
 
+			controller.classChoice = classChoiceSelection;
 			controller.modeChoice = modeChoiceLtSelection;
 			controller.modeChoice2 = modeChoiceLt2Selection;
 			controller.modeChoice3 = getSelectedRasybaConditions();
+			console.log(controller.modeChoice3)
 			controller.modeChoice4 = modeChoiceLt4Selection;
 			controller.result = ['', '', '', '', '']
 			controller.modeChoiceLtDifficulty = document.getElementById('mode_choice_3').value;
+			if (controller.classChoice === "pirma-antra") {
+				controller.questionFrequency = Number(modeChoiceLt5Selection);
+			} else {
+				controller.questionFrequency = 1;
+			}
 
 			if (controller.modeChoice === "tekstas") {
 				controller.mode = "text-comprehension"
 				console.log(controller.mode)
 				localStorage.setItem('controller', JSON.stringify(controller))
         if (controller.modeChoice2 === 'komponavimas') {
-          window.location.href = "./komponavimas";
+          window.location.href = "./komponavimas.html";
         } else if (controller.modeChoice2 === 'isdestymas') {
-          window.location.href = "./isdestymas";
+          window.location.href = "./isdestymas.html";
         }
       } else if (controller.modeChoice === "rasyba") {
 				controller.mode = "grammar"
 				localStorage.setItem('controller', JSON.stringify(controller))
-				window.location.href = "./rasyba";
+				window.location.href = "./rasyba.html";
 			}
 		}
 	}
@@ -339,17 +451,11 @@
 
   // If it's checked, get the selected radio button for klase
   if (isIsidmetinaChecked) {
-    const selectedKlase = document.querySelector('input[name="klase"]:checked');
-    if (selectedKlase) {
-      const klaseValue = JSON.parse(selectedKlase.value);
-
-      // Ensure that there are no duplicates in the "įsi-r" key by using a Set
-      if (!conditions['įsi-r']) {
-        conditions['įsi-r'] = [];
-      }
-      // Add only unique values to the "įsi-r" key
-      conditions['įsi-r'] = [...new Set(conditions['įsi-r'].concat(klaseValue['įsi-r']))];
-    }
+	if (classChoiceElement.value === "pirma-antra") {
+		conditions['įsi-r'] = ["2kl"];
+	} else if (classChoiceElement.value === "trecia-ketvirta") {
+		conditions['įsi-r'] = ["4kl"];
+	}
   } else {
     // If the "ĮSIDĖMĖTINA RAŠYBA" checkbox is not checked, remove the "įsi-r" key
     delete conditions['įsi-r'];
@@ -374,12 +480,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   };
 
-  // Function to show/hide the "galuniu-div" based on the "GALŪNĖS" checkbox
+  // Function to show/hide the "galuniu-div" based on the "GALŪNĖS" checkbox4
+  const firstSecondClassEndingCheckbox = document.getElementById('first-second-class-endings');
   const toggleGaluniuDiv = (isChecked) => {
     if (isChecked) {
       galuniuDiv.style.display = 'block'; // Show the div
+	  firstSecondClassEndingCheckbox.checked = true;
     } else {
       galuniuDiv.style.display = 'none';  // Hide the div
+	  firstSecondClassEndingCheckbox.checked = false;
     }
   };
 

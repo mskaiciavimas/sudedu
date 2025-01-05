@@ -52,7 +52,7 @@
 				<p class="previous-equation">
 			</div>
 			<div id='middle-line' class="row middle-line d-flex align-items-center justify-content-center justify-content: space-between;">
-				<div class="row" id="invisibleRow" style="visibility: hidden; height: 0;"></div>
+				<div class="row" id="invisibleRow" style="display: none; height: 0;"></div>
 				<div class="row" id="body-row" class="col12 d-flex justify-content-center align-items-center">
 					<div id='content-container' class="col12 d-flex justify-content-center align-items-center equation-and-answer">
 						<div id="equation-and-symbol">
@@ -233,9 +233,6 @@ document.querySelectorAll('.control').forEach(control => {
 					linkElement.setAttribute("href", "../../questions-bigger.css");
 				}
 		}
-		if (controller.questionsStopped) {
-			stopEquations();
-		}
 	}
 
 	window.onload = function () {
@@ -268,6 +265,8 @@ document.querySelectorAll('.control').forEach(control => {
     } else {
 			resetMistakeButtonsElement.style.display = "flex";
         document.querySelector('.answer-field-div').style.display = "none";
+		const stopButtonSpanElement = document.querySelector('#stop-button-span');
+		stopButtonSpanElement.innerHTML = "refresh";
         timerDisplay.textContent = localStorage.getItem("elapsedTime");
     }
     stylePage();

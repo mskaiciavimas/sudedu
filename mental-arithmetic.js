@@ -4,6 +4,7 @@ let controller = {
 	currentMistakes: [],
 	totalMistakes: [],
 	mistakesTracker: 0,
+  classChoice: '',
 	modeChoice: '',
 	modeChoice2: '',
   modeChoice3: [],
@@ -13,6 +14,7 @@ let controller = {
   modeChoice7: '',
   modeChoice8: '',
   modeChoiceLtDifficulty: '',
+  questionFrequency: 0,
   timerLimit: 0,
   questionNumber: 0,
 	selectedNumbers: [],
@@ -389,6 +391,13 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
       questionsSubmitButtonRowElement.style.display = "none";
       resetMistakeButtonsElement.style.display = "flex";
       contentContainerElement.style.visibility = 'visible';
+
+      //added newly
+      contentContainerElement.style.width = '100%';
+      contentContainerElement.style.marginRight = '0';
+			contentContainerElement.style.marginLeft = '0';
+      contentContainerElement.style.paddingLeft = 0 + 'px';
+			contentContainerElement.style.paddingRight = 0 + 'px';
     }
 
     if (controller.modeChoice7 === 'stulpeliu') {
@@ -1377,11 +1386,11 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
 }
 
 function redirectToIntermediate() {
-  window.location.href = "./pasirinkimai";
+  window.location.href = "./pasirinkimai.html";
 }
 
   function redirectToQuestions() {
-    window.location.href = "./veiksmai";
+    window.location.href = "./veiksmai.html";
   }
 
   function redirectToIndex() {
@@ -1395,7 +1404,7 @@ function redirectToIntermediate() {
   }
 
   function redirectToSummary () {
-    window.location.href = "./klaidos";
+    window.location.href = "./klaidos.html";
   }
 
  // Function to calculate bar color based on the number of mistakes

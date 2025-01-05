@@ -130,7 +130,8 @@
 		display: none;
 	}
 
-	.pagalba-span{
+	.pagalba-span,
+	.pagalba-span-perm {
 		color: gray;
 		font-size: calc(var(--font-size)*0.8);
 	}
@@ -326,9 +327,15 @@ window.onload = function () {
     }
   }
 
+  controller = JSON.parse(localStorage.getItem('controller')) 
+  let jsonFiles = [];
 
 	// Define an array of URLs for the JSON files you want to fetch
-	const jsonFiles = ['../../databases/sentence_library.json'];
+	if (controller.classChoice === "pirma-antra") {
+		jsonFiles = ['../../databases/1_2_klase_rasyba.json'];
+	} else if (controller.classChoice === "trecia-ketvirta") {
+		jsonFiles = ['../../databases/3_4_klase_rasyba.json'];
+	}
 	Promise.all(jsonFiles.map(file => fetch(file).then(response => {
 		if(!response.ok) {
 			throw new Error(`Network error while fetching ${file}`);
@@ -339,15 +346,15 @@ window.onload = function () {
 		return null; // Return null or empty object in case of error
 	}))).then(([sentenceLibrary]) => {
 
-		controller = JSON.parse(localStorage.getItem('controller')) 
+
 		let sakiniai = [];
 		let atsakymai = {};
 		let questionsToDisplay = Number(controller.modeChoice2);
 		let firstTimeChecking = true;
 		let totalAttemptedQuestions = 0;
 		let totalCorrectAnswers = 0;
-    let currentAnswerAttempts = 0;
-		const maximumQuestionFrequencyPerWord = 1;
+    	let currentAnswerAttempts = 0;
+		const maximumQuestionFrequencyPerWord = controller.questionFrequency;
 		let allowAdjacentEndlessWords;
 		if (controller.modeChoice4 === "lengvesnes") {
 			allowAdjacentEndlessWords = false;
@@ -360,7 +367,7 @@ window.onload = function () {
 			const conditions = controller.modeChoice3
 
 			const categoriesToCheck = ["prv", "bdv", "vks", "dkt", "įsi-r", "įvr", "skt"]
-			const categoriesThatNeedEndings = ["prv", "bdv", "vks", "dkt"]
+			const categoriesThatNeedEndings = ["prv", "bdv", "vks", "dkt", "fsc-gal"]
 			const categoryMatchingRules = {
 				// Default case: category matches only itself
 				"default": [],
@@ -368,6 +375,9 @@ window.onload = function () {
 				"bdv": ["prv"],
 				"vks": [],
 				"dkt": [],
+				"fsc-gal": ["dkt"],
+				"fsc-con": ["prv", "bdv", "vks", "dkt", "įvr", "skt", "įsi-r"],
+				"fsc-vow": ["prv", "bdv", "vks", "dkt", "įvr", "skt", "įsi-r"],
 				"prv": ["bdv"],
 				"įvr": [],
 				"skt": [],
@@ -424,6 +434,7 @@ window.onload = function () {
 			}
 
 			// Function to get allowed matching categories
+
 			function getAllowedMatchingCategories(category, rules) {
 					// Check if category is an array or a single string
 					if (Array.isArray(category)) {
@@ -528,9 +539,7 @@ window.onload = function () {
 											let matchesCondition = false;
 											let matchesSubCondition = false;
 											// Check if the condition key exists in the wordInfo
-
 											if(!!wordInfo[condition]) {
-												
 												// If subcondition is empty, match all, otherwise check for matching values
 												if(subcondition.length === 0 || subcondition.some(value => {
 														if(!(subcondition[0] === undefined)) {
@@ -545,7 +554,8 @@ window.onload = function () {
 														if (!(subcondition[0] === undefined)) {
 														if(checkCategories(wordInfo, subCategoriesToCheck[condition], getAllowedMatchingCategories(subcondition, subCategoryMatchingRules[condition]))) {
 															if (
-																			(categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
+																			(controller.classChoice === "pirma-antra" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "trecia-ketvirta" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
 																			!categoriesThatNeedEndings.includes(condition)
 																	) {
 																			const isNounOrAdjective = (condition === "dkt") ||  (condition === "bdv");
@@ -567,7 +577,8 @@ window.onload = function () {
 														}
 													} else {
 														if (
-																			(categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
+																			(controller.classChoice === "pirma-antra" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "trecia-ketvirta" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
 																			!categoriesThatNeedEndings.includes(condition)
 																	) {
 																			const isNounOrAdjective = (condition === "dkt") ||  (condition === "bdv");
@@ -604,7 +615,8 @@ window.onload = function () {
 																	if (!(otherSubconditions[0] === undefined)) {
 																	if(checkCategories(wordInfo, subCategoriesToCheck[otherCondition], getAllowedMatchingCategories(otherSubconditions, subCategoryMatchingRules[otherCondition]))) {
 																		if (
-																			(categoriesThatNeedEndings.includes(otherCondition) && wordInfo["gal-s"]) ||
+																			(controller.classChoice === "pirma-antra" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "trecia-ketvirta" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
 																			!categoriesThatNeedEndings.includes(otherCondition)
 																	) {
 																			const isNounOrAdjective = (otherCondition === "dkt") ||  (otherCondition === "bdv");
@@ -627,7 +639,8 @@ window.onload = function () {
 																	}
 																} else {
 																	if (
-																			(categoriesThatNeedEndings.includes(otherCondition) && wordInfo["gal-s"]) ||
+																			(controller.classChoice === "pirma-antra" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "trecia-ketvirta" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
 																			!categoriesThatNeedEndings.includes(otherCondition)
 																	) {
 																			const isNounOrAdjective = (otherCondition === "dkt") ||  (otherCondition === "bdv");
@@ -670,7 +683,8 @@ window.onload = function () {
 																	if (!(otherSubconditions[0] === undefined)) {
 																	if(checkCategories(wordInfo, subCategoriesToCheck[otherCondition], getAllowedMatchingCategories(otherSubconditions, subCategoryMatchingRules[otherCondition]))) {
 																		if (
-																			(categoriesThatNeedEndings.includes(otherCondition) && wordInfo["gal-s"]) ||
+																			(controller.classChoice === "pirma-antra" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "trecia-ketvirta" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
 																			!categoriesThatNeedEndings.includes(otherCondition)
 																	) {
 																			const isNounOrAdjective = (otherCondition === "dkt") ||  (otherCondition === "bdv");
@@ -693,7 +707,8 @@ window.onload = function () {
 																	}
 																} else {
 																	if (
-																			(categoriesThatNeedEndings.includes(otherCondition) && wordInfo["gal-s"]) ||
+																			(controller.classChoice === "pirma-antra" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "trecia-ketvirta" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
 																			!categoriesThatNeedEndings.includes(otherCondition)
 																	) {
 																			const isNounOrAdjective = (otherCondition === "dkt") ||  (otherCondition === "bdv");
@@ -744,10 +759,11 @@ window.onload = function () {
 									
 									const formattedSentence = sentence["sentence"].reduce((acc, [beforePunctuation, word, afterPunctuation, wordInfo]) => {
 										if (word in wordsToBeUsed) {
+											let pagalbaText = "";
+											let valuesToShow = [];
 											if (categoriesThatNeedEndings.includes(wordsToBeUsed[word])) {
-												if (wordInfo["gal-s"]) {
-													let pagalbaText = "";
-													let valuesToShow = [];
+												if ((controller.classChoice === "trecia-ketvirta" && wordInfo["gal-s"]) || (controller.classChoice === "pirma-antra" && wordInfo["fsc-gal"])) {
+													if (controller.classChoice === "trecia-ketvirta") {
 													const pagalbaIndex = {
 															"vns": "vns.",
 															"dgs": "dgs.",
@@ -757,7 +773,9 @@ window.onload = function () {
 															"es-l": "es.l.",
 															"b-k-l": "būt.k.l.",
 															"b-d-l": "būt.d.l.",
-															"būs-l": "būs.l."
+															"būs-l": "būs.l.",
+															"vyr-g": "vyr.g.",
+															"mot-g": "mot.g.",
 													};
 
 													// Assuming wordInfo is provided, e.g., wordInfo = { "vks": true, "dkt": false, "bdv": false }
@@ -792,23 +810,73 @@ window.onload = function () {
 															});
 																valuesToShow.push("prv.?")
 															}
+															if (wordInfo['vyr-g']) {
+																valuesToShow.push(pagalbaIndex["vyr-g"]);
+															}
+															if (wordInfo['mot-g']) {
+																valuesToShow.push(pagalbaIndex["mot-g"]);
+															}
+													}
+													} else if (controller.classChoice === "pirma-antra") {
+														if (wordInfo['g'] === true) {
+															valuesToShow.push("ką vieną?")
+														} else if (wordInfo['k'] === true) {
+															valuesToShow.push("ko daug?")
+														} else if (wordInfo['vt'] === true) {
+															valuesToShow.push("kur?")
+														}
 													}
 
 												// Join the results into a single string separated by commas
 												const valuesToShowString = valuesToShow.join(', ');
 												formattedWord = [`${beforePunctuation}<span class="question-word-span end" style="display: inline; white-space: nowrap;">${wordInfo["gal-c"][0][0][0]}<input type="text" autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input end"> <span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
-												atsakymai[`id-${questionId}`] = wordInfo["gal-c"][0][1][0];
+												atsakymai[`id-${questionId}`] = [wordInfo["gal-c"][0][1]];
 												questionId++;
 												
 												}
 											
+											} else if (controller.classChoice === 'pirma-antra' && (wordsToBeUsed[word] === "fsc-con" || wordsToBeUsed[word] === "fsc-vow")) {
+												removedLetterOptionIndex = {
+													"k": ["k", "g"],
+													"g": ["k", "g"],
+													"p": ["p", "b"],
+													"b": ["p", "b"],
+													"t": ["t", "d"],
+													"d": ["t", "d"],
+													"ž": ["ž", "š"],
+													"z": ["z", "s"],
+													"s": ["z", "s"],
+													"š": ["ž", "š"],
+													"e": ["e", "ė"],
+													"ė": ["e", "ė"],
+													"i": ["i", "y"],
+													"y": ["i", "y"],
+													"u": ["u", "ū"],
+													"ū": ["u", "ū"],
+												}
+												var combinations = wordInfo[`${wordsToBeUsed[word]}-c`];
+												if (combinations && combinations.length > 0) {
+														let randomIndex = Math.floor(Math.random() * combinations.length);
+														let randomElement = combinations[randomIndex];
+														if (randomElement[1][0].toLowerCase() in removedLetterOptionIndex) {
+															valuesToShow = removedLetterOptionIndex[randomElement[1][0].toLowerCase()];
+														}
+														const valuesToShowString = valuesToShow.join('/');
+														if (wordsToBeUsed[word] === "fsc-vow") {
+															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<input type="text" autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input middle">${randomElement[2][0]} <span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
+														} else if (wordsToBeUsed[word] === "fsc-con" ) {
+															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<input type="text" autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input middle">${randomElement[2][0]} <span class="pagalba-span-perm">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];															
+														}
+														atsakymai[`id-${questionId}`] = [randomElement[1]];
+														questionId++;
+													}
 											} else {
 												var combinations = wordInfo[`${wordsToBeUsed[word]}-c`];
 												if (combinations && combinations.length > 0) {
 														let randomIndex = Math.floor(Math.random() * combinations.length);
 														let randomElement = combinations[randomIndex];
 														formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<input type="text" autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input middle"><span class="pagalba-div"></span>${randomElement[2][0]}${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
-														atsakymai[`id-${questionId}`] = randomElement[1][0];
+														atsakymai[`id-${questionId}`] = [randomElement[1]];
 														questionId++;
 														
 												}
@@ -923,11 +991,21 @@ window.onload = function () {
       setupDynamicListeners();
 			}
 
+			function toggleHelpButton() {
+				const helpButton = document.getElementById("help-button");
+				const pagalbaSpans = document.querySelectorAll(".pagalba-span");
+
+				let isAnySpanNonEmpty = Array.from(pagalbaSpans).some(span => span.innerHTML.trim() !== "");
+
+				helpButton.style.visibility = isAnySpanNonEmpty ? "visible" : "hidden";
+			}
+
 
 		function initiateTheProgram() {
 		filterSentenceLibrary();
 		assembleAndFormatSentences();
 		displaySentences();
+		toggleHelpButton();
 		if (localStorage.getItem("startTime")) {
       localStorage.removeItem("startTime");
     };
@@ -1020,18 +1098,22 @@ function checkAnswers() {
             inputValue = inputValue.replace(/\s+/g, '');
 
             // Compare the stripped value with the corresponding value from atsakymai
-            if (inputValue === atsakymai[inputId].replace(/\s+/g, '')) {
-                input.classList.add('correct-answer');
-                input.classList.remove('wrong-answer');
-                input.disabled = true;
-                if (firstTimeChecking) {
-                    totalCorrectAnswers++;
-                }
-            } else {
-                input.classList.add('wrong-answer');
-                input.classList.remove('correct-answer');
-                answersCorrect = false; // Mark as incorrect due to wrong answer
-            }
+			console.log(atsakymai)
+			if (atsakymai[inputId].some(answerArray => {
+				// Flatten the nested arrays and check if any answer matches the input value
+				return answerArray.some(answer => inputValue.replace(/\s+/g, '') === answer.replace(/\s+/g, ''));
+			})) {
+				input.classList.add('correct-answer');
+				input.classList.remove('wrong-answer');
+				input.disabled = true;
+				if (firstTimeChecking) {
+					totalCorrectAnswers++;
+				}
+			} else {
+				input.classList.add('wrong-answer');
+				input.classList.remove('correct-answer');
+				answersCorrect = false; // Mark as incorrect due to wrong answer
+			}
 
             // Show "Next Question" button only if all answers are correct
             nextQuestionButton.style.display = answersCorrect ? "flex" : "none";
@@ -1092,12 +1174,12 @@ function helpToggle() {
 
 			function nextQuestion() {
 				displaySentences()
+				toggleHelpButton();
 				document.getElementById('check-answers').style.display = "flex"
 				nextQuestionButton.style.display = "none";
 				document.querySelectorAll('.pagalba-span').forEach(element => {
-            element.style.display = 'none';
-        
-    });
+            	element.style.display = 'none';
+				});
 				firstTimeChecking = true;
 			}
 
