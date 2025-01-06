@@ -835,7 +835,11 @@ window.onload = function () {
 												
 												}
 											
-											} else if (controller.classChoice === 'pirma-antra' && (wordsToBeUsed[word] === "fsc-con" || wordsToBeUsed[word] === "fsc-vow")) {
+											} 
+
+											if ((controller.classChoice === 'pirma-antra' && (wordsToBeUsed[word] === "fsc-con" || wordsToBeUsed[word] === "fsc-vow")) ||
+												(controller.classChoice === "trecia-ketvirta" && wordsToBeUsed[word] === "fsc-vow")
+											) {
 												removedLetterOptionIndex = {
 													"k": ["k", "g"],
 													"g": ["k", "g"],
