@@ -1098,7 +1098,6 @@ function checkAnswers() {
             inputValue = inputValue.replace(/\s+/g, '');
 
             // Compare the stripped value with the corresponding value from atsakymai
-			console.log(atsakymai)
 			if (atsakymai[inputId].some(answerArray => {
 				// Flatten the nested arrays and check if any answer matches the input value
 				return answerArray.some(answer => inputValue.replace(/\s+/g, '') === answer.replace(/\s+/g, ''));
@@ -1151,7 +1150,7 @@ function showAnswers() {
     // Ensure that the answer exists in the atsakymai object
     if (atsakymai[inputId]) {
       // Set the value of the input field to the correct answer, stripping spaces
-      input.value = atsakymai[inputId].replace(/\s+/g, '');
+      input.value = atsakymai[inputId][0][0].replace(/\s+/g, '');
       resizeInput(input);
     }
   });
