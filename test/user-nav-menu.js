@@ -22,5 +22,6 @@ if (userDataString) {
 }
 
 function clearUserData() {
-    localStorage.removeItem('userData');
+    localStorage.removeItem('userData');	
+     window.location.href = 'https://www.sudedu.lt/test/LT/matematika/index.html';
 }
