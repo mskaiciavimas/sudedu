@@ -1066,6 +1066,12 @@
                 <input id="admin-remove-user-input" placeholder="user email">
                 <button id="admin-remove-user-button" onclick="deleteUser()" class="btn btn-primary" style="margin-top: 15px;">Remove user</button>
                 </div>
+                <div class="row d-flex flex-column justify-content-center align-items-center" style="width: 50%; min-width: 50%; margin-top: 100px;">
+                <h2>DELETE INACTIVE USERS</h2>
+                <input type="number" id="inactivePeriod" placeholder="period of inactivity (days)" min="1" />
+                <p id="statusMessage"></p>
+                <button onclick="deleteInactiveUsers()" class="btn btn-primary" style="margin-top: 15px;">Delete Inactive Users</button>
+            </div>
             </div>
 
             <div class="col-12 d-flex justify-content-end align-items-center">
@@ -2896,6 +2902,62 @@
         alert(`Error: ${error.message}`);
     }
 }
+
+async function deleteInactiveUsers() {
+    const inactivePeriod = document.getElementById('inactivePeriod').value;
+    const statusElement = document.getElementById('statusMessage');
+    statusElement.innerHTML = ''; // Clear previous messages
+    
+    try {
+        // Validate admin access
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        if (userData?.accType !== 'admin') {
+            statusElement.innerHTML = '<span class="error">Only admin accounts can delete users</span>';
+            return;
+        }
+
+        // Validate input
+        if (!inactivePeriod || isNaN(inactivePeriod)) {
+            statusElement.innerHTML = '<span class="error">Please enter a valid number of days</span>';
+            return;
+        }
+
+        // Make API request
+        const response = await fetch(`${apiBase}admin/inactive?inactivePeriod=${encodeURIComponent(inactivePeriod)}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': userData.token,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const responseData = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(responseData.message || 'Failed to delete inactive users');
+        }
+
+        // Display success message with count and threshold
+        statusElement.innerHTML = `
+            <span class="success">${responseData.message}</span><br>
+            <span class="info">Deleted ${responseData.deletedCount || 0} users inactive for more than ${responseData.inactiveThresholdDays} days</span>
+        `;
+        
+    } catch (error) {
+        // Handle different error cases
+        let errorMessage = error.message;
+        
+        if (error.message.includes('No inactive users found')) {
+            errorMessage = `No users found inactive for ${inactivePeriod} days`;
+        } else if (error.message.includes('Failed to fetch')) {
+            errorMessage = 'Network error - please check your connection';
+        }
+
+        statusElement.innerHTML = `<span class="error">${errorMessage}</span>`;
+        console.error('Delete inactive users error:', error);
+    }
+}
+
 
 	</script>
 </body>
