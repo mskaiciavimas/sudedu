@@ -32,7 +32,7 @@ if (userDataString) {
 
 function clearUserData() {
     localStorage.removeItem('userData');
-    window.location.reload();
+    window.location.href = `/test`;
 }
 
 function resizeFont() {
