@@ -1,10 +1,4 @@
-html {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-body {
+html, body {
   height: 100vh;
   width: 100vw;
   margin: 0;
@@ -40,47 +34,8 @@ h1 {
   max-width: 31vw !important;
 }
 
-.class_choice_div {
-  width: 100%;
-  padding: 0;
-}
-
-.center-row-language {
-  margin-bottom: 15vh;
-}
-
-.stop-reset-button-div {
-  padding-top: 4vh;
-}
-
-#language-about-row {
-  margin-bottom: 15px;
-}
-
-.center-row-language {
-  margin-bottom: 0;
-}
-
-#mode_choice_12 {
-  margin-top: 5px;
-  margin-bottom: 5px;
-  width: 90%;
-  font-size: 1rem;
-}
-
-.rasyba-options-row {
-  width: 100%;
-}
-
-.mode_choice_13_div,
-#mode_choice_13 {
-  width: 100%;
-  padding-left: 0;
-  padding-right: 0;
-}
-
 .mode-choice-label {
-  margin-bottom: 5px;
+  font-weight: bold;
 }
 
 .mode_choice_div {
@@ -110,10 +65,6 @@ h1 {
   width: 100%;
 }
 
-.log-in {
-  font-size: 1.4rem;
-}
-
 /*nauja */
 
 input[type="checkbox"] {
@@ -126,42 +77,6 @@ input[type="radio"] {
 
 .mode_choice_8_div {
   width: 100%;
-  padding: 0;
-}
-
-#mode_choice_8 {
-  width: 100%;
-}
-
-.mode_choice_9_div {
-  width: 100%;
-  padding: 0;
-}
-
-#mode_choice_9 {
-  width: 100%;
-}
-
-.mode_choice_10_div {
-  width: 100%;
-  padding: 0;
-}
-
-#mode_choice_10 {
-  width: 100%;
-}
-
-.mode_choice_13_div {
-  width: 100%;
-  padding: 0;
-}
-
-#mode_choice_13 {
-  width: 100%;
-}
-
-.mode_choice_11_div {
-  width: 100%;
   background-color: #FAEDCD;
   color: black;
   font-size: 1.3rem;
@@ -170,9 +85,8 @@ input[type="radio"] {
   text-align: start !important;
 }
 
-#mode_choice_11_div {
+#mode_choice_8_div {
   padding: 10px;
-  margin: 15px 0;
 }
 
 #galuniu-label {
@@ -196,7 +110,7 @@ input[type="radio"] {
   padding-left: 5px;
 }
 
-#mode_choice_11 {
+#mode_choice_8 {
   width: 100%;
 }
 
@@ -232,8 +146,6 @@ input[type="radio"] {
 #remainder-option {
  font-size: 1.75rem;
  font-weight: bold;
- margin-top: 5px;
- margin-bottom: 5px;
 }
 
 #remainder-option input {
@@ -281,7 +193,6 @@ input[type="radio"] {
   color: black;
   font-size: 1.3rem;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-  margin: 10px 0;
 }
 
 .dropdown.open {
@@ -332,11 +243,15 @@ input[type="radio"] {
   font-weight: bold;
 }
 
+.summary-button {
+  font-size: 1.2rem;
+}
+
 .about-button {
   color: #212529 !important;
+  text-decoration: none;
   font-size: 1.75rem;
   transition: transform 0.2s;
-  font-weight: bold;
 }
 
 .about-button:active {
@@ -369,11 +284,10 @@ a:active {
 .submit-button {
   width: 14vw;
   font-size: 1.5rem;
-  margin-top: 5px;
 }
 
 .summary-button-div {
-  padding: 20px 12px 0 0;
+  padding: 20px 12px 10px 0;
 }
 
 label {
@@ -381,8 +295,7 @@ label {
 }
 
 .reset-button,
-.summary-button-lt,
-.summary-button {
+.summary-button-lt {
   width: 5rem;
   height: 5rem;
   border-radius: 0.25rem;
@@ -415,10 +328,6 @@ label {
 
 .stop-reset-button-div {
   padding-top: 20px;
-}
-
-.about-button-div {
-  padding: 10px 10px 15px 10px;
 }
 
 @media (max-width: 1200px) {
@@ -530,7 +439,7 @@ label {
   .language-option {
     cursor: pointer;
     transition: transform 0.2s;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     display: flex;
     align-items: center;
   }
@@ -546,6 +455,10 @@ label {
 
   #sudedu-main-page-logo {
     height: 15vh;
+  }
+
+  #language-about-row {
+    padding-bottom: 20px;
   }
 }
 
@@ -567,12 +480,20 @@ label {
    }
 
   .dropdown {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
   }
 
   .submit-button {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     width: 50vw;
+    padding: 0.35rem 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .summary-button {
+    font-size: 1rem;
     padding: 0.35rem 0.85rem;
     white-space: nowrap;
     overflow: hidden;
@@ -593,16 +514,8 @@ label {
     height: 17vh;
   }
   .reset-button,
-  .summary-button-lt,
-  .summary-button {
-    height: 4.55rem;
+  .summary-button-lt {
+    height: 4.5rem;
     width: 4.5rem;
-  }
-  
-  .material-symbols-rounded {
-    font-size: 3rem;
-  }
-  .log-in {
-    font-size: 1.2rem;
   }
 }

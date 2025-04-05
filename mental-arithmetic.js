@@ -4,7 +4,6 @@ let controller = {
 	currentMistakes: [],
 	totalMistakes: [],
 	mistakesTracker: 0,
-  classChoice: '',
 	modeChoice: '',
 	modeChoice2: '',
   modeChoice3: [],
@@ -13,11 +12,7 @@ let controller = {
   modeChoice6: '',
   modeChoice7: '',
   modeChoice8: '',
-  taskId: 0,
-  setTaskDuration: '',
-  taskCompleted: false,
   modeChoiceLtDifficulty: '',
-  questionFrequency: 0,
   timerLimit: 0,
   questionNumber: 0,
 	selectedNumbers: [],
@@ -27,7 +22,7 @@ let controller = {
 	equation: '',
   equation2: '',
   result: ['', '', '', '', ''],
-	answeredQuestionTracker: 0,
+	correctAnswerTracker: 0,
   questionsStopped: false
 }
 
@@ -47,7 +42,7 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
 
 	function formEquation () {
     let remainingTime = parseInt(localStorage.getItem('remainingTime'));
-    if (controller.modeChoice4 === "C39") {
+    if (controller.modeChoice4 === 'timer') {
       if (controller.combinations.length === 0 && remainingTime > 0 && !controller.questionsStopped) {
         generateCombinations()
       }
@@ -55,21 +50,19 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
         formatEquation()
       }
       if (remainingTime <= 0) {
-        controller.taskCompleted = true;
         formatFinalMessage()
       }
-    } else if (controller.modeChoice4 === "C40") {
-      if (controller.combinations.length === 0 && controller.answeredQuestionTracker < controller.questionNumber && !controller.questionsStopped) {
+    } else if (controller.modeChoice4 === 'questionNumber') {
+      if (controller.combinations.length === 0 && controller.correctAnswerTracker < controller.questionNumber && !controller.questionsStopped) {
         generateCombinations()
-        if (controller.combinations.length > controller.questionNumber - controller.answeredQuestionTracker) {
-          controller.combinations = controller.combinations.slice(0, controller.questionNumber - controller.answeredQuestionTracker);
+        if (controller.combinations.length > controller.questionNumber - controller.correctAnswerTracker) {
+          controller.combinations = controller.combinations.slice(0, controller.questionNumber - controller.correctAnswerTracker);
         }
       }
-      if (controller.combinations.length > 0 && controller.answeredQuestionTracker < controller.questionNumber && !controller.questionsStopped) {
+      if (controller.combinations.length > 0 && controller.correctAnswerTracker < controller.questionNumber && !controller.questionsStopped) {
         formatEquation()
       }
-      if (controller.answeredQuestionTracker === controller.questionNumber) {
-        controller.taskCompleted = true;
+      if (controller.correctAnswerTracker === controller.questionNumber) {
         formatFinalMessage()
       }
     }
@@ -78,23 +71,23 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
     if (controller.result[0] === "Correct" && controller.result[1] === controller.randomSelection[0] && controller.result[2] === controller.randomSelection[1] || controller.randomSelection.length === 0) {
 		controller.randomSelection = controller.combinations[Math.floor(Math.random() * controller.combinations.length)];
     };
-    if (controller.modeChoice5 === "C41") {
-      if (controller.modeChoice7 === "C47") {
-        if (controller.randomSelection[2] === 'A') {
+    if (controller.modeChoice5 === "skaitiniai") {
+      if (controller.modeChoice7 === "eilute") {
+        if (controller.randomSelection[2] === 'addition') {
           controller.equation = `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = `;
-        } else if (controller.randomSelection[2] === 'S') {
+        } else if (controller.randomSelection[2] === 'subtraction') {
           controller.equation = `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = `;
-        } else if (controller.randomSelection[2] === 'M') {
+        } else if (controller.randomSelection[2] === 'multiplication') {
           controller.equation = `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = `;
-        } else if (controller.randomSelection[2] === 'D') {
+        } else if (controller.randomSelection[2] === 'division') {
           if (controller.language === 'LT') {
             controller.equation = `${controller.randomSelection[0]} \uA789 ${controller.randomSelection[1]} = `;
           } else if (controller.language === 'EN') {
             controller.equation = `${controller.randomSelection[0]} \u00F7 ${controller.randomSelection[1]} = `;            
           }
         } 
-      } else if (controller.modeChoice7 === "C48") {
-        if (controller.randomSelection[2] === 'A') {
+      } else if (controller.modeChoice7 === "stulpeliu") {
+        if (controller.randomSelection[2] === 'addition') {
         const maxLength = 20; // Adjust as needed
         const item1 = String(controller.randomSelection[0]);
         const item2 = String(controller.randomSelection[1]);
@@ -105,7 +98,7 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
     
         // Concatenate the padded items
         controller.equation = `<div class="demuo-turinys-ateminys" style="text-align: right;">${paddedItem1}</div><div class="demuo-turinys-ateminys" style="text-align: right;">${paddedItem2}</div>`;
-        } else if (controller.randomSelection[2] === 'S') {
+        } else if (controller.randomSelection[2] === 'subtraction') {
         const maxLength = 20; // Adjust as needed
         const item1 = String(controller.randomSelection[0]);
         const item2 = String(controller.randomSelection[1]);
@@ -116,7 +109,7 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
     
         // Concatenate the padded items
         controller.equation = `<div class="demuo-turinys-ateminys" style="text-align: right;">${paddedItem1}</div><div class="demuo-turinys-ateminys" style="text-align: right;">${paddedItem2}</div>`;
-      } else if (controller.randomSelection[2] === 'M') {
+      } else if (controller.randomSelection[2] === 'multiplication') {
         const maxLength = 0; // Adjust as needed
         const item1 = String(controller.randomSelection[0]);
         const item2 = String(controller.randomSelection[1]);
@@ -127,20 +120,20 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
     
         // Concatenate the padded items
         controller.equation = `<div class="daugiklis" style="text-align: right;">${paddedItem1}</div><div id="antras-daugiklis" class="daugiklis" style="text-align: right;">${paddedItem2}</div>`;
-      } else if (controller.randomSelection[2] === 'D') {
+      } else if (controller.randomSelection[2] === 'division') {
         const item1 = String(controller.randomSelection[0]);
         const item2 = String(controller.randomSelection[1]);
     
         // Concatenate the padded items
-        if (controller.modeChoice8 === "" || controller.modeChoice8 === 'C79') {
-          controller.equation = `<div id="dalinys-outer-div" style="display: flex; position: relative;"><div id="dalinys">${item1}</div><div id="daliklis" style="border-bottom: 2px solid black; border-left: 2px solid black;">${item2}</div></div>`;
-        } else if (controller.modeChoice8 === 'C78') {
-          controller.equation = `<div id="first-number-outer-div" style="display: flex; position: relative;"><div id="daliklis">${item2}</div><div id="dalinys" style="border-top: 2px solid black; border-left: 2px solid black;">${item1}</div></div>`;
+        if (controller.modeChoice8 === "" || controller.modeChoice8 === 'eeu-version') {
+          controller.equation = `<div id="dalinys-outer-div" style="display: flex; position: relative;"><div id='dalinys'>${item1}</div><div id='daliklis' style="border-bottom: 2px solid black; border-left: 2px solid black;">${item2}</div></div>`;
+        } else if (controller.modeChoice8 === 'us-version') {
+          controller.equation = `<div id="first-number-outer-div" style="display: flex; position: relative;"><div id='daliklis'>${item2}</div><div id='dalinys' style="border-top: 2px solid black; border-left: 2px solid black;">${item1}</div></div>`;
         }
       } 
     }
-    } else if (controller.modeChoice5 === "C42") {
-      if (controller.randomSelection[2] === 'A') {
+    } else if (controller.modeChoice5 === "nezinomieji") {
+      if (controller.randomSelection[2] === 'addition') {
         if (controller.randomSelection[3]) {
           if (controller.randomSelection[3] === 'first') {
             controller.equation = ``;
@@ -161,7 +154,7 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
           controller.equation2 = `= ${controller.randomSelection[0] + controller.randomSelection[1]}`;
         }
         }
-      } else if (controller.randomSelection[2] === 'S') {
+      } else if (controller.randomSelection[2] === 'subtraction') {
         
         if (controller.randomSelection[3]) {
           if (controller.randomSelection[3] === 'first') {
@@ -172,7 +165,7 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
             controller.equation2 = `= ${controller.randomSelection[0] - controller.randomSelection[1]}`
           }
         } else {
-          if (controller.modeChoice1 === "C7" || controller.modeChoice1 === "C3") {
+          if (controller.modeChoice === 'visi' || controller.modeChoice === 'sudetis ir atimtis') {
             const randomNum = Math.random();
             if (randomNum < 0.5) {
             controller.randomSelection.push("first");
@@ -184,18 +177,18 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
             controller.equation2 = `= ${controller.randomSelection[0] - controller.randomSelection[1]}`
           }
           }
-          else if (controller.modeChoice6 === "C43") {
+          else if (controller.modeChoice6 === "turinys") {
             controller.randomSelection.push("first");
             controller.equation = ``;
             controller.equation2 = ` - ${controller.randomSelection[1]} = ${controller.randomSelection[0] - controller.randomSelection[1]}`;
-          } else if (controller.modeChoice6 === "C44") {
+          } else if (controller.modeChoice6 === 'ateminys') {
             controller.randomSelection.push("second");
             controller.equation = `${controller.randomSelection[0]} - `;
             controller.equation2 = `= ${controller.randomSelection[0] - controller.randomSelection[1]}`
           }
         }
 
-      } else if (controller.randomSelection[2] === 'M') {
+      } else if (controller.randomSelection[2] === 'multiplication') {
         
         if (controller.randomSelection[3]) {
           if (controller.randomSelection[3] === 'first') {
@@ -218,7 +211,7 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
         }
         }
 
-      } else if (controller.randomSelection[2] === 'D') {
+      } else if (controller.randomSelection[2] === 'division') {
           if (controller.randomSelection[3]) {
             if (controller.randomSelection[3] === 'first') {
               controller.equation = ``;
@@ -228,7 +221,7 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
               controller.equation2 = `= ${controller.randomSelection[0] / controller.randomSelection[1]}`
             }
           } else {
-            if (controller.modeChoice1 === "C7" || controller.modeChoice1 === "C6") {
+            if (controller.modeChoice === 'visi' || controller.modeChoice === 'daugyba ir dalyba') {
               const randomNum = Math.random();
               if (randomNum < 0.5) {
               controller.randomSelection.push("first");
@@ -240,11 +233,11 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
               controller.equation2 = `= ${controller.randomSelection[0] / controller.randomSelection[1]}`
             }
             }
-            if (!controller.randomSelection[3] && controller.modeChoice6 === "C45") {
+            if (!controller.randomSelection[3] && controller.modeChoice6 === "dalinys") {
               controller.randomSelection.push("first");
               controller.equation = ``;
               controller.equation2 = ` \uA789 ${controller.randomSelection[1]} = ${controller.randomSelection[0] / controller.randomSelection[1]}`
-            } else if (!controller.randomSelection[3] && controller.modeChoice6 === "C46") {
+            } else if (!controller.randomSelection[3] && controller.modeChoice6 === 'daliklis') {
               controller.randomSelection.push("second");
               controller.equation = `${controller.randomSelection[0]} \uA789 `;
               controller.equation2 = `= ${controller.randomSelection[0] / controller.randomSelection[1]}`
@@ -253,26 +246,12 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
     }
   }
 
-    } 
+    }
 
     function formatFinalMessage () {
       document.querySelector('#invisibleRow').style.display = "none";
-      if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.answeredQuestionTracker >= 10) {
+      if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.correctAnswerTracker >= 10) {
         triggerFireworks();
-      }
-
-      if (controller.taskId !== 0) {
-        if (controller.taskCompleted === true) {
-          sendSetTaskResultsToDatabase();
-        controller.taskId = 0;
-        controller.taskCompleted = false;
-        } else {
-          if (controller.language === 'LT') {
-            alert('Užduotis nepabaigta iki galo. Rezultatai neišsaugoti.');
-          } else if (controller.language === 'EN') {
-            alert('Task was not completed. Results were not saved.');
-          }
-        }
       }
 
       setFontSize();
@@ -281,8 +260,37 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
       contentContainerElement.style.marginRight = '0';
 			contentContainerElement.style.marginLeft = '0';
       
-      controller.equation = finalMessageText();
-
+      if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.95) {
+        if (controller.language === 'LT') {
+          controller.equation = 'Puikiai skaičiuoji!';
+        } else if (controller.language === 'EN') {
+          controller.equation = 'Perfection! Well done!';          
+        }
+      } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.7) {
+        if (controller.language === 'LT') {
+          controller.equation = 'Tobulėji! Pirmyn!';
+        } else if (controller.language === 'EN') {
+          controller.equation = 'Very good! Well done!';          
+        }
+      } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.6) {
+        if (controller.language === 'LT') {
+          controller.equation = 'Mokaisi! Nesustok!';
+        } else if (controller.language === 'EN') {
+          controller.equation = "You're learning!";          
+        }
+      } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker)) {
+        if (controller.language === 'LT') {
+          controller.equation = 'Pasikartok su pagalba!';
+        } else if (controller.language === 'EN') {
+          controller.equation = "Ask for some help!";          
+        }
+      } else {
+        if (controller.language === 'LT') {
+          controller.equation = 'Bandyk dar kartą!';   
+        } else if (controller.language === 'EN') {
+          controller.equation = "Try again!";       
+      }
+    };
       controller.equation2 = '';
       controller.result = ['', '', '', '', ''];
       controller.questionsStopped = true;
@@ -293,107 +301,9 @@ let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invis
     localStorage.setItem('controller', JSON.stringify(controller))
 }
 
-function formatFinalMessageForGrammar() {
-  if (controller.taskId !== 0) {
-    if (controller.taskCompleted === true) {
-      sendSetTaskResultsToDatabase();
-      controller.taskId = 0;
-      controller.taskCompleted = false;
-    } else {
-      alert('Užduotis nepabaigta iki galo. Rezultatai neišsaugoti.');
-    }
-  }
-  document.querySelector('#restart-reset-button-row').style.display = "flex";
-  document.getElementById('next-question').style.display = "none";
-  document.getElementById('check-answers').style.visibility = "hidden";
-  document.getElementById('help-button').style.visibility = "hidden";
-  document.getElementById('warning').style.visibility = "hidden";
-  clearInterval(timerInterval);
-  document.querySelector('#stop-button-span').innerHTML = "refresh";
-  document.getElementById("field-for-sentences").innerHTML = "";
-  document.getElementById("field-for-final-message").innerHTML = `<div style="min-height: 200px; display: flex; justify-content: center; align-items: center;">${finalMessageText()}</div>`;
-  localStorage.setItem('controller', JSON.stringify(controller))
-}
-
-function formatFinalMessageForTextcomprehension() {
-    if (controller.taskId !== 0) {
-      if (controller.taskCompleted === true) {
-        sendSetTaskResultsToDatabase();
-        controller.taskId = 0;
-        controller.taskCompleted = false;
-      } else {
-        alert('Užduotis nepabaigta iki galo. Rezultatai neišsaugoti.');
-      }
-    }
-    document.getElementById('check-answer-btn').disabled = true;
-    document.getElementById('help-btn').disabled = true;
-    document.getElementById('next-question-btn').disabled = true;
-    clearInterval(timerInterval);
-    document.querySelector('#stop-button-span').innerHTML = "refresh";
-    document.getElementById("fields-row").style.display = "none";
-    document.getElementById("final-message-div").innerHTML = finalMessageText();
-    document.getElementById("final-message-row").style.display = "flex";
-    localStorage.setItem('controller', JSON.stringify(controller))
-}
-
-async function sendSetTaskResultsToDatabase() {
-  const userDataString = localStorage.getItem('userData');
-  let userData;
-
-  if (userDataString) {
-      userData = JSON.parse(userDataString);
-  } else {
-      window.location.href = '/LT/index.html'; // Redirect to login if no userData
-      return; // Stop execution after redirect
-  }
-
-  resultsData = [ [controller.answeredQuestionTracker, controller.mistakesTracker],
-                  controller.currentMistakes
-                ]
-  resultsDataString = JSON.stringify(resultsData);
-
-  const taskResults = {
-      taskId: controller.taskId,
-      results: resultsDataString
-  };
-
-  //const apiBase = 'https://sudedu-server.onrender.com/';
-  const apiBase = 'http://localhost:5000/'
-
-  try {
-      const response = await fetch(apiBase + 'results', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `${userData.token}`
-          },
-          body: JSON.stringify(taskResults)
-      });
-
-      if (!response.ok) {
-          // If the response is not okay (non-2xx status), throw an error
-          throw new Error(`Failed to send data: ${response.statusText}`);
-      } else {
-        if (controller.language === 'LT') {
-          alert('Užduotis atlikta ir rezultatai išsaugoti.');
-        } else if (controller.language === 'EN') {
-          alert('The task was completed and the results saved');
-        }
-      }
-
-  } catch (error) {
-      // Log any error that occurs during the fetch or response handling
-      console.error('Error sending task results:', error);
-      if (controller.language === 'LT') {
-        alert('Įvyko klaida. Rezultatai neišsaugoti. Bandykite vėl vėliau.');
-      } else if (controller.language === 'EN') {
-        alert('An error has occurred. Results were not saved. Please try again later.');
-      }
-  }
-}
 
   function triggerFireworks () {
-    fireworksDiv.innerHTML = '<img src="../images/fireworks.gif" style="width: 500px; height: auto;" id="fireworks">';
+    fireworksDiv.innerHTML = '<img src="../../images/fireworks.gif" style="width: 500px; height: auto;" id="fireworks">';
     setTimeout(disableFireworks, 4500);
   }
 
@@ -403,17 +313,17 @@ async function sendSetTaskResultsToDatabase() {
 
   function updateScore () {
     controller = JSON.parse(localStorage.getItem('controller'));
-    if (controller.modeChoice4 === "C39") {
+    if (controller.modeChoice4 === 'timer') {
       if (controller.language === 'LT') {
-        answerTrackerElement.innerHTML = `Atlikai: ${controller.answeredQuestionTracker}`;
+        answerTrackerElement.innerHTML = `Atlikai: ${controller.correctAnswerTracker}`;
       } else if (controller.language === 'EN') {
-        answerTrackerElement.innerHTML = `Answered: ${controller.answeredQuestionTracker}`;        
+        answerTrackerElement.innerHTML = `Answered: ${controller.correctAnswerTracker}`;        
       }
-    } else if (controller.modeChoice4 === "C40") {
+    } else if (controller.modeChoice4 === 'questionNumber') {
       if (controller.language === 'LT') {
-        answerTrackerElement.innerHTML = `Atlikai: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
+        answerTrackerElement.innerHTML = `Atlikai: ${controller.correctAnswerTracker}/${controller.questionNumber}`;
       } else if (controller.language === 'EN') {
-        answerTrackerElement.innerHTML = `Completed: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;     
+        answerTrackerElement.innerHTML = `Completed: ${controller.correctAnswerTracker}/${controller.questionNumber}`;     
       }
     }
 
@@ -423,7 +333,7 @@ async function sendSetTaskResultsToDatabase() {
       mistakeTrackerElement.innerHTML = `Mistakes: ${controller.mistakesTracker}`;    
     }
     
-    if (controller.modeChoice7 !== "C48") {
+    if (controller.modeChoice7 !== 'stulpeliu') {
     answerInputElement.focus();
     }
   }
@@ -436,40 +346,39 @@ async function sendSetTaskResultsToDatabase() {
     mainRemainderField.style.display = 'none';
 
     if (!controller.questionsStopped) {
-    if (controller.modeChoice7 === "C48" && controller.randomSelection[2] === 'D' && (controller.modeChoice8 === '' || controller.modeChoice8 === 'C79')) {
-				linkElement.setAttribute("href", "../questions-stulpeliu-div.css");
-		} else if (controller.modeChoice7 === "C48" && controller.randomSelection[2] === 'D' && controller.modeChoice8 === 'C78') {
-				linkElement.setAttribute("href", "../questions-stulpeliu-div-us.css");
-		}  else if (controller.modeChoice7 === "C48") {
-			linkElement.setAttribute("href", "../questions-stulpeliu.css");
+    if (controller.modeChoice7 === 'stulpeliu' && controller.randomSelection[2] === 'division' && (controller.modeChoice8 === '' || controller.modeChoice8 === 'eeu-version')) {
+				linkElement.setAttribute("href", "../../questions-stulpeliu-div.css");
+		} else if (controller.modeChoice7 === 'stulpeliu' && controller.randomSelection[2] === 'division' && controller.modeChoice8 === 'us-version') {
+				linkElement.setAttribute("href", "../../questions-stulpeliu-div-us.css");
+		}  else if (controller.modeChoice7 === 'stulpeliu') {
+			linkElement.setAttribute("href", "../../questions-stulpeliu.css");
       var answerSeparator2 = document.getElementById('answer-separator-2');
       answerSeparator2.style.display = 'block';
     } else if (controller.withRemainder) {
-			linkElement.setAttribute("href", "../questions-remainder.css");
+			linkElement.setAttribute("href", "../../questions-remainder.css");
 		} else if (
-      controller.modeChoice2 === "C15" ||
-      controller.modeChoice2 === "C36"
+      controller.modeChoice2 === "mil" ||
+      controller.modeChoice2 === "iki1000000"
     )	{
-    linkElement.setAttribute("href", "../questions-extra-small.css");
-    } else if (controller.modeChoice2 === "C13" || 
-    controller.modeChoice2 === "C14" || 
-    controller.modeChoice2 === "C34" || 
-    controller.modeChoice2 === "C35" || 
-    controller.modeChoice2 === "C28" || 
-    controller.modeChoice2 === "C77" ||
-    controller.modeChoice2 === "C29" ||
-    controller.modeChoice2 === "C20" ||
-    controller.modeChoice2 === "C21" ||
-    controller.modeChoice2 === "C23" ||
-    controller.modeChoice2 === "C24" ||
-    controller.modeChoice2 === "C25" ||
-    controller.modeChoice2 === "C26" ||
-    controller.modeChoice2 === "C27" ||
-    controller.modeChoice2 === "C16" 
+    linkElement.setAttribute("href", "../../questions-extra-small.css");
+    } else if (controller.modeChoice2 === "tukst" || 
+    controller.modeChoice2 === "dtukst" || 
+    controller.modeChoice2 === "iki1000" || 
+    controller.modeChoice2 === "iki10000" || 
+    controller.modeChoice2 === "pil10" || 
+    controller.modeChoice2 === "pil100" ||
+    controller.modeChoice2 === "pil" ||
+    controller.modeChoice2 === "daugtrivien" ||
+    controller.modeChoice2 === "daugketvien" ||
+    controller.modeChoice2 === "daugdvidvi" ||
+    controller.modeChoice2 === "daugtridvi" ||
+    controller.modeChoice2 === "daugketdvi" ||
+    controller.modeChoice2 === "daugdaug" ||
+    controller.modeChoice2 === "gretnul" 
   ) {
-			linkElement.setAttribute("href", "../questions-smaller.css");
+			linkElement.setAttribute("href", "../../questions-smaller.css");
 		} else {
-      linkElement.setAttribute("href", "../questions-bigger.css");
+      linkElement.setAttribute("href", "../../questions-bigger.css");
     }
   }   
 		
@@ -480,22 +389,15 @@ async function sendSetTaskResultsToDatabase() {
       questionsSubmitButtonRowElement.style.display = "none";
       resetMistakeButtonsElement.style.display = "flex";
       contentContainerElement.style.visibility = 'visible';
-
-      //added newly
-      contentContainerElement.style.width = '100%';
-      contentContainerElement.style.marginRight = '0';
-			contentContainerElement.style.marginLeft = '0';
-      contentContainerElement.style.paddingLeft = 0 + 'px';
-			contentContainerElement.style.paddingRight = 0 + 'px';
     }
 
-    if (controller.modeChoice7 === "C48") {
-      if (controller.randomSelection[2] === 'D') {
-        if (controller.modeChoice8 === '' || controller.modeChoice8 === 'C79') {
+    if (controller.modeChoice7 === 'stulpeliu') {
+      if (controller.randomSelection[2] === 'division') {
+        if (controller.modeChoice8 === '' || controller.modeChoice8 === 'eeu-version') {
           equation2Element.style.display = "none";
           equationElement.innerHTML = controller.equation;
           equation2Element.innerHTML = '';
-        } else if (controller.modeChoice8 === 'C78') {
+        } else if (controller.modeChoice8 === 'us-version') {
           equationElement.style.display = "none";
           equationElement.innerHTML = '';
           equation2Element.style.display = "block";
@@ -508,12 +410,12 @@ async function sendSetTaskResultsToDatabase() {
       equationElement.style.display = "inline-block";
       equation2Element.innerHTML = '';
       }
-    } else if (controller.modeChoice5 === "C41" || controller.withRemainder) {
+    } else if (controller.modeChoice5 === 'skaitiniai' || controller.withRemainder) {
       equation2Element.style.display = "none";
       equationElement.innerHTML = controller.equation;
       equation2Element.innerHTML = '';
       contentContainerElement.style.visibility = 'visible';
-    } else if (controller.modeChoice5 === "C42") {
+    } else if (controller.modeChoice5 === 'nezinomieji') {
       equationElement.innerHTML = controller.equation;
       equation2Element.style.display = "block";
       equation2Element.innerHTML = controller.equation2;
@@ -521,11 +423,11 @@ async function sendSetTaskResultsToDatabase() {
     };
 
 
-    if (controller.withRemainder && controller.randomSelection[2] === "D" && controller.modeChoice7 !== "C48") {
+    if (controller.withRemainder && controller.randomSelection[2] === "division" && controller.modeChoice7 !== 'stulpeliu') {
       mainRemainderField.style.display = 'block';
     }
 
-    if (controller.modeChoice7 === "C48") {
+    if (controller.modeChoice7 === 'stulpeliu') {
       // Need to adjust the modofier
       fontSizeFullREM = 3*1.3;
       stulpeliuDivElement.innerHTML = '';
@@ -544,17 +446,17 @@ async function sendSetTaskResultsToDatabase() {
     arithmeticSymbol.style.display = 'block';
     if (controller.questionsStopped) {
       arithmeticSymbol.innerHTML = '';
-    } else if (controller.randomSelection[2] === 'A') {
+    } else if (controller.randomSelection[2] === 'addition') {
       arithmeticSymbol.innerHTML = '+';
-    } else if (controller.randomSelection[2] === 'S') {
+    } else if (controller.randomSelection[2] === 'subtraction') {
       arithmeticSymbol.innerHTML = '-';
-    } else if (controller.randomSelection[2] === 'M') {
+    } else if (controller.randomSelection[2] === 'multiplication') {
       arithmeticSymbol.innerHTML = `\u00D7`;
-    } else if (controller.randomSelection[2] === 'D') {
+    } else if (controller.randomSelection[2] === 'division') {
       arithmeticSymbol.innerHTML = ``;
     } 
       
-   if (controller.randomSelection[2] === 'M') {
+   if (controller.randomSelection[2] === 'multiplication') {
     
     if (!controller.questionsStopped) {
       var digitNumber = (controller.randomSelection[1]).toString();
@@ -581,7 +483,7 @@ async function sendSetTaskResultsToDatabase() {
   }
   }
 
-  if (controller.randomSelection[2] === 'D') {
+  if (controller.randomSelection[2] === 'division') {
     
     if (!controller.questionsStopped) {
       var digitNumber = controller.randomSelection[1].toString();
@@ -693,7 +595,7 @@ async function sendSetTaskResultsToDatabase() {
             counter++;
         }
 
-        if (controller.modeChoice8 === '' || controller.modeChoice8 === 'C79') {
+        if (controller.modeChoice8 === '' || controller.modeChoice8 === 'eeu-version') {
 
         if (i === 0) {
           divisionStulp1Element.innerHTML += '<div style="position: relative;"><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-underline" style="margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset) + ')) !important;"><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></div></div>';
@@ -734,7 +636,7 @@ async function sendSetTaskResultsToDatabase() {
             }
           }
     }
-  } else if (controller.modeChoice8 === "C78") {
+  } else if (controller.modeChoice8 === "us-version") {
 
     answerFieldDivInvisibleDiv.innerHTML += '<div class="invisibleDiv" style="visibility: hidden; display: block;"></div>';
 
@@ -783,7 +685,7 @@ async function sendSetTaskResultsToDatabase() {
     }
 }
 }
-    if (controller.randomSelection[2] !== 'D') {
+    if (controller.randomSelection[2] !== 'division') {
     answerSeparator2.style.display = 'block'
     var element3 = document.querySelector('#stulpeliu-' + (subAnswerNumber - 1));
     if (element3) {
@@ -802,7 +704,7 @@ async function sendSetTaskResultsToDatabase() {
     }
 
     
-    if (controller.modeChoice7 === "C48") {
+    if (controller.modeChoice7 === 'stulpeliu') {
       setTimeout(function() {
         if (!controller.questionsStopped) {
           setMargins();
@@ -890,8 +792,8 @@ async function sendSetTaskResultsToDatabase() {
         return Number(output);
     }
 
-    if (controller.modeChoice7 === "C48") {
-      if (controller.randomSelection[2] === 'M') {
+    if (controller.modeChoice7 === "stulpeliu") {
+      if (controller.randomSelection[2] === 'multiplication') {
 
       var expectedAnswer = controller.randomSelection[0] * controller.randomSelection[1];
     
@@ -929,7 +831,7 @@ async function sendSetTaskResultsToDatabase() {
       if (isCorrect) {
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${flipNumber(userInput)}`];
         controller.combinations.splice(indexToRemove, 1);
-        controller.answeredQuestionTracker++;
+        controller.correctAnswerTracker++;
       } else {
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${flipNumber(userInput)}`];
         controller.mistakesTracker++;
@@ -937,7 +839,7 @@ async function sendSetTaskResultsToDatabase() {
       }
     
     
-    } else if (controller.randomSelection[2] === 'D') {
+    } else if (controller.randomSelection[2] === 'division') {
       var expectedAnswer = Math.floor(controller.randomSelection[0] / controller.randomSelection[1]);
       var isCorrect = true;
     
@@ -946,7 +848,7 @@ async function sendSetTaskResultsToDatabase() {
       } 
       answerFieldColor(answerInputElement, isCorrect);
 
-      if (controller.modeChoice8 === 'C78' && controller.withRemainder === true) {
+      if (controller.modeChoice8 === 'us-version' && controller.withRemainder === true) {
         var expectedRemainderAnswer = controller.randomSelection[0] % controller.randomSelection[1];
         let answerRemainderWesternInputElement = document.querySelector('#answer-remainder');
         userRemainderInput = answerRemainderWesternInputElement.value.trim();
@@ -1097,17 +999,17 @@ async function sendSetTaskResultsToDatabase() {
       if (isCorrect) {
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], ":", `${controller.randomSelection[0]} ${divisionSymbol} ${controller.randomSelection[1]} = ${userInput}`];
         controller.combinations.splice(indexToRemove, 1);
-        controller.answeredQuestionTracker++;
+        controller.correctAnswerTracker++;
       } else {
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], ":", `${controller.randomSelection[0]} ${divisionSymbol} ${controller.randomSelection[1]} = ${userInput}`];
         controller.mistakesTracker++;
         recordMistakes(); 
       }
 
-    } else if (controller.randomSelection[2] === 'A') {
+    } else if (controller.randomSelection[2] === 'addition') {
       if (flipNumber(userInput) === controller.randomSelection[0] + controller.randomSelection[1]) {
         controller.combinations.splice(indexToRemove, 1);
-        controller.answeredQuestionTracker++;
+        controller.correctAnswerTracker++;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
       } else {
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
@@ -1116,10 +1018,10 @@ async function sendSetTaskResultsToDatabase() {
         recordMistakes(); 
       }
       answerFieldColor(answerInputElement, isCorrect);
-     } else if (controller.randomSelection[2] === 'S') {
+     } else if (controller.randomSelection[2] === 'subtraction') {
       if (flipNumber(userInput) === controller.randomSelection[0] - controller.randomSelection[1]) {
         controller.combinations.splice(indexToRemove, 1);
-        controller.answeredQuestionTracker++;
+        controller.correctAnswerTracker++;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
       } else {
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
@@ -1132,11 +1034,11 @@ async function sendSetTaskResultsToDatabase() {
       if (isCorrect) {
         middleLineCorrectAnswerColor();
       }
-     } else if (controller.modeChoice5 === "C41") {
-    if (controller.randomSelection[2] === 'A') {
+     } else if (controller.modeChoice5 === "skaitiniai") {
+    if (controller.randomSelection[2] === 'addition') {
       if (userAnswer === controller.randomSelection[0] + controller.randomSelection[1]) {
         controller.combinations.splice(indexToRemove, 1);
-        controller.answeredQuestionTracker++;
+        controller.correctAnswerTracker++;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
       } else {
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
@@ -1144,10 +1046,10 @@ async function sendSetTaskResultsToDatabase() {
         controller.mistakesTracker++;
         recordMistakes(); 
       }
-     } else if (controller.randomSelection[2] === 'S') {
+     } else if (controller.randomSelection[2] === 'subtraction') {
       if (userAnswer === controller.randomSelection[0] - controller.randomSelection[1]) {
         controller.combinations.splice(indexToRemove, 1);
-        controller.answeredQuestionTracker++;
+        controller.correctAnswerTracker++;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
       } else {
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
@@ -1155,10 +1057,10 @@ async function sendSetTaskResultsToDatabase() {
         controller.mistakesTracker++;
         recordMistakes(); 
       }
-      } else if (controller.randomSelection[2] === 'M') {
+      } else if (controller.randomSelection[2] === 'multiplication') {
         if (userAnswer === controller.randomSelection[0] * controller.randomSelection[1]) {
           controller.combinations.splice(indexToRemove, 1);
-          controller.answeredQuestionTracker++;
+          controller.correctAnswerTracker++;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${userAnswer}`];
         } else {
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${userAnswer}`];
@@ -1166,7 +1068,7 @@ async function sendSetTaskResultsToDatabase() {
           controller.mistakesTracker++;
           recordMistakes(); 
         }
-      } else if (controller.randomSelection[2] === 'D') {
+      } else if (controller.randomSelection[2] === 'division') {
         if (userAnswer !== Math.floor(controller.randomSelection[0] / controller.randomSelection[1])) {
           isCorrect = false;
         }
@@ -1188,7 +1090,7 @@ async function sendSetTaskResultsToDatabase() {
         
         if (isCorrect) {
           controller.combinations.splice(indexToRemove, 1);
-          controller.answeredQuestionTracker++;
+          controller.correctAnswerTracker++;
           if (controller.withRemainder) {
             controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} ${divisionSymbol} ${controller.randomSelection[1]} = ${userAnswer} (${remainderText} ${userAnswerRemainder})`];
           } else {
@@ -1205,11 +1107,11 @@ async function sendSetTaskResultsToDatabase() {
           recordMistakes(); 
         }
       } 
-    } else if (controller.modeChoice5 === "C42") {
-      if (controller.randomSelection[2] === 'A') {
+    } else if (controller.modeChoice5 === "nezinomieji") {
+      if (controller.randomSelection[2] === 'addition') {
         if (controller.randomSelection[3] === "first") {
           if (userAnswer === controller.randomSelection[0]) {
-            controller.answeredQuestionTracker++;
+            controller.correctAnswerTracker++;
             controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+ first", `${userAnswer} + ${controller.randomSelection[1]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
             controller.combinations.splice(indexToRemove, 1);
           } else {
@@ -1220,7 +1122,7 @@ async function sendSetTaskResultsToDatabase() {
           }
         } else if (controller.randomSelection[3] === "second") {
           if (userAnswer === controller.randomSelection[1]) {
-            controller.answeredQuestionTracker++;
+            controller.correctAnswerTracker++;
             controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+ second", `${controller.randomSelection[0]} + ${userAnswer} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
             controller.combinations.splice(indexToRemove, 1);
           } else {
@@ -1230,10 +1132,10 @@ async function sendSetTaskResultsToDatabase() {
             recordMistakes(); 
           }
         }
-    } else if (controller.randomSelection[2] === 'S') {
+    } else if (controller.randomSelection[2] === 'subtraction') {
       if (controller.randomSelection[3] === "first") {
         if (userAnswer === controller.randomSelection[0]) {
-          controller.answeredQuestionTracker++;
+          controller.correctAnswerTracker++;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "- first", `${userAnswer} - ${controller.randomSelection[1]} = ${controller.randomSelection[0] - controller.randomSelection[1]}`]; 
           controller.combinations.splice(indexToRemove, 1);
         } else {
@@ -1244,7 +1146,7 @@ async function sendSetTaskResultsToDatabase() {
         }
       } else if (controller.randomSelection[3] === "second") {
         if (userAnswer === controller.randomSelection[1]) {
-          controller.answeredQuestionTracker++;
+          controller.correctAnswerTracker++;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "- second", `${controller.randomSelection[0]} - ${userAnswer} = ${controller.randomSelection[0] - controller.randomSelection[1]}`]; 
           controller.combinations.splice(indexToRemove, 1);
         } else {
@@ -1254,10 +1156,10 @@ async function sendSetTaskResultsToDatabase() {
           recordMistakes(); 
         }
       }
-    } else if (controller.randomSelection[2] === 'M') {
+    } else if (controller.randomSelection[2] === 'multiplication') {
       if (controller.randomSelection[3] === "first") {
         if (userAnswer === controller.randomSelection[0]) {
-          controller.answeredQuestionTracker++;
+          controller.correctAnswerTracker++;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7 first", `${userAnswer} \u00D7 ${controller.randomSelection[1]} = ${controller.randomSelection[0] * controller.randomSelection[1]}`]; 
           controller.combinations.splice(indexToRemove, 1);
         } else {
@@ -1268,7 +1170,7 @@ async function sendSetTaskResultsToDatabase() {
         }
       } else if (controller.randomSelection[3] === "second") {
         if (userAnswer === controller.randomSelection[1]) {
-          controller.answeredQuestionTracker++;
+          controller.correctAnswerTracker++;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7 first", `${controller.randomSelection[0]} \u00D7 ${userAnswer} = ${controller.randomSelection[0] * controller.randomSelection[1]}`]; 
           controller.combinations.splice(indexToRemove, 1);
         } else {
@@ -1278,7 +1180,7 @@ async function sendSetTaskResultsToDatabase() {
           recordMistakes(); 
         }
       }
-  } else if (controller.randomSelection[2] === 'D') {
+  } else if (controller.randomSelection[2] === 'division') {
 
     divisionSymbol = ''
     if (controller.language === 'EN') {
@@ -1289,7 +1191,7 @@ async function sendSetTaskResultsToDatabase() {
 
     if (controller.randomSelection[3] === "first") {
       if (userAnswer === controller.randomSelection[0]) {
-        controller.answeredQuestionTracker++;
+        controller.correctAnswerTracker++;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${userAnswer} ${divisionSymbol} ${controller.randomSelection[1]} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
         controller.combinations.splice(indexToRemove, 1);
       } else {
@@ -1300,7 +1202,7 @@ async function sendSetTaskResultsToDatabase() {
       }
     } else if (controller.randomSelection[3] === "second") {
       if (userAnswer === parseInt(controller.randomSelection[1])) {
-        controller.answeredQuestionTracker++;
+        controller.correctAnswerTracker++;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${controller.randomSelection[0]} ${divisionSymbol} ${userAnswer} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
         controller.combinations.splice(indexToRemove, 1);
       } else {
@@ -1318,27 +1220,16 @@ async function sendSetTaskResultsToDatabase() {
     while (controller.currentMistakes.length > 29) {
       controller.currentMistakes.splice(0, 1)
     }
+    controller.currentMistakes.push(controller.randomSelection)
     while (controller.totalMistakes.length > 29) {
       controller.totalMistakes.splice(0, 1)
     }
-
-    if (controller.randomSelection[3]) {
-      if (controller.randomSelection[3] === "first") {
-        controller.currentMistakes.push([[controller.randomSelection[0], controller.randomSelection[1], "F"], controller.randomSelection[2]])
-        controller.totalMistakes.push([[controller.randomSelection[0], controller.randomSelection[1], "F"], controller.randomSelection[2]])
-      } else if (controller.randomSelection[3] === "second") {
-        controller.currentMistakes.push([[controller.randomSelection[0], controller.randomSelection[1], "S"], controller.randomSelection[2]])
-        controller.totalMistakes.push([[controller.randomSelection[0], controller.randomSelection[1], "S"], controller.randomSelection[2]])
-      }
-    } else {
-      controller.currentMistakes.push([[controller.randomSelection[0], controller.randomSelection[1]], controller.randomSelection[2]])
-      controller.totalMistakes.push([[controller.randomSelection[0], controller.randomSelection[1]], controller.randomSelection[2]])
-    }
+    controller.totalMistakes.push(controller.randomSelection)
   }
     localStorage.setItem('controller', JSON.stringify(controller));
 
 
-    if (isCorrect || controller.modeChoice7 !== "C48") {
+    if (isCorrect || controller.modeChoice7 !== "stulpeliu") {
       formEquation();
       displayEquation();
       answerInputElement.setAttribute("style", "background-color: #FAEDCD")
@@ -1363,7 +1254,7 @@ async function sendSetTaskResultsToDatabase() {
     answerInputElement.value = '';
     answerRemainderInputElement.value = '';
     answerInputElement.setAttribute("style", "background-color: #FAEDCD");
-    if (controller.modeChoice8 === 'C78') {
+    if (controller.modeChoice8 === 'us-version') {
     answerRemainderWesternInputElement.value = '';
     answerRemainderWesternInputElement.setAttribute("style", "background-color: #FAEDCD");
     }
@@ -1371,7 +1262,7 @@ async function sendSetTaskResultsToDatabase() {
     controller.equation = '';
     controller.equation2 = '';
     controller.mistakesTracker = 0;
-    controller.answeredQuestionTracker = 0;
+    controller.correctAnswerTracker = 0;
     controller.randomSelection = [];
     controller.questionsStopped = false;
     answerFieldDivElement.style.display = "flex";
@@ -1384,9 +1275,9 @@ async function sendSetTaskResultsToDatabase() {
     if (localStorage.getItem("remainingTime")) {
       localStorage.removeItem("remainingTime");
     };
-    if (controller.modeChoice4 === "C39") {
+    if (controller.modeChoice4 === 'timer') {
       countDown();
-    } else if (controller.modeChoice4 === "C40") {
+    } else if (controller.modeChoice4 === 'questionNumber') {
       startTimer()
     }
     formEquation();
@@ -1414,42 +1305,6 @@ async function sendSetTaskResultsToDatabase() {
       }
   }
 
-  function finalMessageText () {
-    let message = '';
-    if ((controller.answeredQuestionTracker - controller.mistakesTracker) / controller.answeredQuestionTracker >= 0.95) {
-      if (controller.language === 'LT') {
-        message = 'Puikiai mokaisi!';
-      } else if (controller.language === 'EN') {
-        message = 'Perfection! Well done!';          
-      }
-    } else if ((controller.answeredQuestionTracker - controller.mistakesTracker) / controller.answeredQuestionTracker >= 0.7) {
-      if (controller.language === 'LT') {
-        message = 'Tobulėji! Pirmyn!';
-      } else if (controller.language === 'EN') {
-        message = 'Very good! Well done!';          
-      }
-    } else if ((controller.answeredQuestionTracker - controller.mistakesTracker) / controller.answeredQuestionTracker >= 0.6) {
-      if (controller.language === 'LT') {
-        message = 'Mokaisi! Nesustok!';
-      } else if (controller.language === 'EN') {
-        message = "You're learning!";          
-      }
-    } else if ((controller.answeredQuestionTracker - controller.mistakesTracker) / controller.answeredQuestionTracker > 0) {
-      if (controller.language === 'LT') {
-        message = 'Pasikartok su pagalba!';
-      } else if (controller.language === 'EN') {
-        message = "Ask for some help!";          
-      }
-    } else {
-      if (controller.language === 'LT') {
-        message = 'Bandyk dar kartą!';   
-      } else if (controller.language === 'EN') {
-        message = "Try again!";       
-    }
-  }
-    return message
-  }
-
   function stopEquations () {
     const stopButtonSpanElement = document.querySelector('#stop-button-span');
     if (stopButtonSpanElement.innerHTML === "close") {
@@ -1468,31 +1323,53 @@ async function sendSetTaskResultsToDatabase() {
       arithmeticSymbol.innerHTML = '';
       
       setFontSize();
-
-      if (controller.taskId !== 0) {
+    
+      if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.95) {
         if (controller.language === 'LT') {
-          alert('Užduotis nepabaigta iki galo. Rezultatai neišsaugoti.');
+          controller.equation = 'Puikiai skaičiuoji!';
         } else if (controller.language === 'EN') {
-          alert('Task was not completed. Results were not saved.');
+          controller.equation = 'Perfection! Well done!';          
         }
+      } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.7) {
+        if (controller.language === 'LT') {
+          controller.equation = 'Tobulėji! Pirmyn!';
+        } else if (controller.language === 'EN') {
+          controller.equation = 'Very good! Well done!';          
+        }
+      } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker) >= 0.6) {
+        if (controller.language === 'LT') {
+          controller.equation = 'Mokaisi! Nesustok!';
+        } else if (controller.language === 'EN') {
+          controller.equation = "You're learning!";          
+        }
+      } else if (controller.correctAnswerTracker / (controller.correctAnswerTracker + controller.mistakesTracker)) {
+        if (controller.language === 'LT') {
+          controller.equation = 'Pasikartok su pagalba!';
+        } else if (controller.language === 'EN') {
+          controller.equation = "Ask for some help!";          
+        }
+      } else {
+        if (controller.language === 'LT') {
+          controller.equation = 'Bandyk dar kartą!';   
+        } else if (controller.language === 'EN') {
+          controller.equation = "Try again!";       
       }
+    }
 
-      controller.equation = finalMessageText();
+    controller.equation2 = '';
+    controller.result = ['', '', '', '', ''];
+    controller.combinations = [];
+    controller.randomSelection = []; 
+    controller.questionsStopped = true;
 
-      controller.equation2 = '';
-      controller.result = ['', '', '', '', ''];
-      controller.combinations = [];
-      controller.randomSelection = []; 
-      controller.questionsStopped = true;
-
-      document.querySelector('#invisibleRow').style.display = "none";
-      document.querySelector('.answer-field-div').style.display = "none";
-      questionsSubmitButtonRowElement.style.display = "none";
-      resetMistakeButtonsElement.style.display = "flex";
-      localStorage.setItem('controller', JSON.stringify(controller))
-      clearInterval(timerInterval);
-      displayEquation()
-      stopButtonSpanElement.innerHTML = "refresh";
+    document.querySelector('#invisibleRow').style.display = "none";
+    document.querySelector('.answer-field-div').style.display = "none";
+    questionsSubmitButtonRowElement.style.display = "none";
+    resetMistakeButtonsElement.style.display = "flex";
+    localStorage.setItem('controller', JSON.stringify(controller))
+    clearInterval(timerInterval);
+    displayEquation()
+    stopButtonSpanElement.innerHTML = "refresh";
   } else if (stopButtonSpanElement.innerHTML === "refresh") {
     stopButtonSpanElement.innerHTML = "close";
     restartEquations();
@@ -1500,19 +1377,11 @@ async function sendSetTaskResultsToDatabase() {
 }
 
 function redirectToIntermediate() {
-  window.location.href = "./pasirinkimai.html";
+  window.location.href = "./pasirinkimai";
 }
 
   function redirectToQuestions() {
-    if (controller.mode === "lang") {
-    if (controller.modeChoice1 === "C50") {
-      window.location.href = "./rasyba.html";
-    } else if (controller.modeChoice1 === "C49") {
-      window.location.href = "./teksto-suvokimas.html";
-    } 
-  } else if (controller.mode === "math") {
-      window.location.href = "./veiksmai.html";
-  }
+    window.location.href = "./veiksmai";
   }
 
   function redirectToIndex() {
@@ -1526,7 +1395,7 @@ function redirectToIntermediate() {
   }
 
   function redirectToSummary () {
-    window.location.href = "./klaidos.html";
+    window.location.href = "./klaidos";
   }
 
  // Function to calculate bar color based on the number of mistakes
@@ -1541,48 +1410,28 @@ function getBarColor(value) {
 }
 
 // Function to generate the summary table
-function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=null, customDivForGrammarSummaryTable=null) {
+function generateSummaryTable(type) {
   controller = JSON.parse(localStorage.getItem('controller'));
-
   mistakes = [];
   if (type === 'total') {
     mistakes = controller.totalMistakes;
   } else if (type === 'current') {
     mistakes = controller.currentMistakes;
-  } else if (type === 'custom') {
-    mistakes = mistakeList;
   };
 
-  mathMistakes = [];
-  grammarMistakes = [];
-
-  mistakes.forEach(mistake => {
-    if (mistake[1] == "A" ||
-        mistake[1] == "S" ||
-        mistake[1] == "M" ||
-        mistake[1] == "D"
-    ) {
-      mathMistakes.push(mistake)
-    } else {
-      grammarMistakes.push(mistake)
-    }
-  }
-  );
-
-  if (mathMistakes.length > 0) {
+  if (mistakes.length > 0) {
       // Group the data and calculate the number of mistakes for each action and pair of numbers
-      const performanceData = mathMistakes.reduce((acc, mistake) => {
-        const first_number = mistake[0][0];
-        const second_number = mistake[0][1];
-        let unknwownNumber = false;
+      const performanceData = mistakes.reduce((acc, mistake) => {
+        const first_number = mistake[0];
+        const second_number = mistake[1];
         let action = '';
-        if (mistake[1] === "A") {
+        if (mistake[2] === "addition") {
           action = '+';
-        } else if (mistake[1] === "S") {
+        } else if (mistake[2] === "subtraction") {
           action = '-';
-        } else if (mistake[1] === "M") {
+        } else if (mistake[2] === "multiplication") {
           action = '\u00D7';
-        } else if (mistake[1] === "D") {
+        } else if (mistake[2] === "division") {
             if (controller.language === 'LT') {
               action = '\uA789';
           } else if (controller.language === 'EN') {
@@ -1596,7 +1445,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
             "-": "-",
             "\u00D7": "*",
             "\uA789": "/",
-	          "\u00F7": "/",
+	    "\u00F7": "/",
           };
         
           return operatorMap[operatorString] || null;
@@ -1606,25 +1455,21 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
         let firstAsIs = '';
         let swappedOrder = '';
         // If action is "/" or "*", create both order variations for first_number and second_number
-
-        if (mistake[0][2]) {
-        if (mistake[0][2] === "F") {
-            result = eval(`${first_number} ${parseOperator(action)} ${second_number}`);
-            firstAsIs = `&#x25fb ${action}  ${second_number} = ${result}`;
-            swappedOrder = `${first_number} ${action} &#x25fb = ${result}`
-            unknwownNumber = true;
-        } else if (mistake[0][2] === "S") {
+        if (mistake[3]) {
+          if (mistake[3] === "first") {
+              result = eval(`${first_number} ${parseOperator(action)} ${second_number}`);
+              firstAsIs = `&#x25fb ${action}  ${second_number} = ${result}`;
+          } else if (mistake[3] === "second") {
             result = eval(`${first_number} ${parseOperator(action)} ${second_number}`);
             firstAsIs = `${first_number} ${action} &#x25fb = ${result}`;
-            swappedOrder = `&#x25fb ${action}  ${second_number} = ${result}`;
-            unknwownNumber = true;
-        }  
+          }
         } else {
-          firstAsIs = `${first_number} ${action} ${second_number} = &#x25fb`;
-          swappedOrder = `${second_number} ${action} ${first_number} = &#x25fb`;
+        firstAsIs = `${first_number} ${action} ${second_number} = &#x25fb`;
+        swappedOrder = `${second_number} ${action} ${first_number} = &#x25fb`;
         }
-
-        if ((action === "\u00D7" || action === "+")) {
+      
+        // Check if the action is "/" or "*" and update the accumulator accordingly
+        if ((action === "\uA789" || action === "\u00D7") && (!mistake[3])) {
           if (acc[firstAsIs]) {
             acc[firstAsIs] += 1;
           } else if (acc[swappedOrder]) {
@@ -1643,34 +1488,34 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
 
       // Convert the data to an array of objects
       const summaryData = Object.entries(performanceData).map(([veiksmas, mistakes]) => ({
-          Veiksmai: veiksmas,
-          "Suklysta (kartai)": mistakes
+          Veiksmas: veiksmas,
+          "Suklydai (kartai)": mistakes
       }));
 
-      // Sort the data by Suklysta (kartai) in descending order
-      summaryData.sort((a, b) => b["Suklysta (kartai)"] - a["Suklysta (kartai)"]);
+      // Sort the data by Suklydai (kartai) in descending order
+      summaryData.sort((a, b) => b["Suklydai (kartai)"] - a["Suklydai (kartai)"]);
 
       // Generate the summary table HTML
       const summaryTable = document.createElement("table");
       if (controller.language === 'LT') {
       summaryTable.innerHTML = `
           <tr>
-              <th>Veiksmai</th>
-              <th>Suklysta (kartai)</th>
+              <th>Veiksmas</th>
+              <th>Suklydai (kartai)</th>
               <th></th>
           </tr>
           ${summaryData
               .map(
                   (row) => `<div class="col-12 table-container">
                   <tr>
-                      <td>${row["Veiksmai"]}</td>
-                      <td>${row["Suklysta (kartai)"]}</td>
+                      <td>${row["Veiksmas"]}</td>
+                      <td>${row["Suklydai (kartai)"]}</td>
                       <td>
                           <div class="bar" style="width: ${Math.min(
-                              row["Suklysta (kartai)"] * 10,
+                              row["Suklydai (kartai)"] * 10,
                               100
                           )}px; background-color: ${getBarColor(
-                      row["Suklysta (kartai)"]
+                      row["Suklydai (kartai)"]
                   )};"></div>
                       </td>
                   </tr>
@@ -1689,14 +1534,14 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
                 .map(
                     (row) => `<div class="col-12 table-container">
                     <tr>
-                        <td>${row["Veiksmai"]}</td>
-                        <td>${row["Suklysta (kartai)"]}</td>
+                        <td>${row["Veiksmas"]}</td>
+                        <td>${row["Suklydai (kartai)"]}</td>
                         <td>
                             <div class="bar" style="width: ${Math.min(
-                                row["Suklysta (kartai)"] * 10,
+                                row["Suklydai (kartai)"] * 10,
                                 100
                             )}px; background-color: ${getBarColor(
-                        row["Suklysta (kartai)"]
+                        row["Suklydai (kartai)"]
                     )};"></div>
                         </td>
                     </tr>
@@ -1707,150 +1552,17 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
       }
 
       // Display the summary table
-      let summaryTableElement;
-      if (customDivForSummaryTable) {
-        summaryTableElement = document.getElementById(customDivForSummaryTable);
-      } else {
-        summaryTableElement = document.getElementById("summary-table");
-      }
+      const summaryTableElement = document.getElementById("summary-table");
       summaryTableElement.innerHTML = "";
       summaryTableElement.appendChild(summaryTable);
   } else {
-    // No mistakes case
-    document.getElementById("summary-table").innerHTML = controller.language === 'LT' 
-      ? 'Nėra klaidų!' 
-      : 'No mistakes!';
-  }
-
-
-
-  if (grammarMistakes.length > 0) {
-    // Process mistakes into word forms and categories
-    const mistakeData = grammarMistakes.reduce((result, [wordParts, wordCategory]) => {
-      const [prefix, answer, suffix] = wordParts;
-
-      const wordCategoryCoding = 
-      {
-				"C61": "žodžio pabaiga",
-        "C62": "daiktavardžio pabaiga",
-        "C63": "būdvardžio pabaiga",
-        "C64": "prieveiksmio pabaiga", 
-        "C65": "veiksmažodžio pabaiga",
-        "C66": "įsimintina rašyba",
-				"C67": "panašiai skambančios priebalsės",
-				"C68": "balsės ir dvibalsės",
-				"C69": "priešdėliai",
-				"C70": "priesagos",
-				"C71": "priebalsių supanašėjimas",
-				"C72": "mišrieji dvigarsiai",
+      // Display a message when there are no mistakes
+      const summaryTableOuterDivElement = document.querySelector("#summary-table-outer-div");
+      if (controller.language === 'LT') {
+      summaryTableOuterDivElement.innerHTML = "<h2>Nėra klaidų!</h2>";
+      } else if ((controller.language === 'EN')) {
+        summaryTableOuterDivElement.innerHTML = "<h2>Nothing here!</h2>";
       }
-
-      const decodedWordCategory = wordCategoryCoding[wordCategory]
-      
-      // Create highlighted word form
-      const highlightedWord = `${prefix}<span class="incorrect-part" data-category="${decodedWordCategory}">${answer}</span>${suffix}`;
-      
-      // Count word occurrences
-      if (!result.words[highlightedWord]) {
-        result.words[highlightedWord] = 0;
-      }
-      result.words[highlightedWord]++;
-      
-      // Count category occurrences
-      result.categories[decodedWordCategory] = (result.categories[decodedWordCategory] || 0) + 1;
-      
-      return result;
-    }, { words: {}, categories: {} });
-  
-    // Generate table data for current view
-    const getTableData = (viewType) => {
-      const data = viewType === 'words' ? mistakeData.words : mistakeData.categories;
-      return Object.entries(data)
-        .map(([display, count]) => ({ display, count }))
-        .sort((a, b) => b.count - a.count);
-    };
-  
-    // Create the table with integrated view selector
-    const createTable = (viewType) => {
-      const tableData = getTableData(viewType);
-      const isLT = controller.language === 'LT';
-      
-      const table = document.createElement('table');
-      table.className = 'grammar-mistakes-table';
-      
-      // Create header with integrated selector
-      const headerRow = document.createElement('tr');
-      
-      // Word Form header with dropdown
-      const wordHeader = document.createElement('th');
-      wordHeader.className = 'header-with-selector';
-      wordHeader.innerHTML = `
-        <div class="header-selector-container">
-          <select class="grammar-view-selector">
-            <option value="words" ${viewType === 'words' ? 'selected' : ''}>${isLT ? 'Žodžiai' : 'Words'}</option>
-            <option value="categories" ${viewType === 'categories' ? 'selected' : ''}>${isLT ? 'Kategorijos' : 'Categories'}</option>
-          </select>
-        </div>
-      `;
-      
-      // Mistakes header
-      const countHeader = document.createElement('th');
-      countHeader.textContent = isLT ? 'Suklysta (kartai)' : 'Mistakes';
-      
-      // Bar header (empty)
-      const barHeader = document.createElement('th');
-      
-      headerRow.appendChild(wordHeader);
-      headerRow.appendChild(countHeader);
-      headerRow.appendChild(barHeader);
-      
-      // Create table structure
-      const thead = document.createElement('thead');
-      thead.appendChild(headerRow);
-      
-      const tbody = document.createElement('tbody');
-      tbody.innerHTML = tableData.map(item => `
-        <tr>
-          <td>${item.display}</td>
-          <td>${item.count}</td>
-          <td>
-            <div class="bar" style="width: ${Math.min(item.count * 10, 100)}px;
-                 background-color: ${getBarColor(item.count)};">
-            </div>
-          </td>
-        </tr>
-      `).join('');
-      
-      table.appendChild(thead);
-      table.appendChild(tbody);
-      
-      return table;
-    };
-    if (customDivForGrammarSummaryTable !== "none") {
-    // Initialize display
-    let currentView = 'words';
-    const container = document.getElementById(customDivForGrammarSummaryTable) || 
-                     document.getElementById('summary-table-grammar');
-    
-    container.innerHTML = '';
-    const table = createTable(currentView);
-    container.appendChild(table);
-  
-    // Handle view changes from the integrated selector
-    container.addEventListener('change', (e) => {
-      if (e.target.classList.contains('grammar-view-selector')) {
-        currentView = e.target.value;
-        container.replaceChild(createTable(currentView), container.querySelector('table'));
-      }
-    });
-    }
-  } else {
-    if (customDivForGrammarSummaryTable !== "none") {
-    // No mistakes case
-    document.getElementById('summary-table-grammar').innerHTML = controller.language === 'LT' 
-      ? 'Nėra klaidų!' 
-      : 'No mistakes!';
-    }
   }
 }
 
@@ -1913,19 +1625,8 @@ function countDown() {
       localStorage.setItem("remainingTime", remainingTime);
       clearInterval(timerInterval);
       timerDisplay.textContent = "00:00:00";
-      controller.questionsStopped = true;
-      controller.taskCompleted = true;
-      localStorage.setItem('controller', JSON.stringify(controller))
-      if (controller.mode === "math") {
-        formEquation();
-        displayEquation();
-      } else if (controller.mode === "lang") {
-        if (controller.modeChoice1 === "C50") {
-        formatFinalMessageForGrammar();
-      } else if (controller.modeChoice1 === "C49") {
-        formatFinalMessageForTextcomprehension();
-      }
-    }
+      formEquation();
+      displayEquation();
       localStorage.removeItem("remainingTime");
     } else {
       // Calculate hours, minutes, and seconds from the remaining time
@@ -1951,26 +1652,4 @@ function countDown() {
 
   // Set up the timer interval to call updateTimer every second
   timerInterval = setInterval(updateTimer, 1000);
-}
-
-function setLanguage(lang) {
-	if (lang !== controller.language) {
-  // Update the language controller and store it in localStorage
-  controller.language = lang;
-  localStorage.setItem('controller', JSON.stringify(controller));
-
-  // Select all language options
-  const options = document.querySelectorAll('.language-option');
-
-  // Update the selected class for the clicked option
-  options.forEach(option => {
-    if (option.classList.contains(`language-option-${lang}`)) {
-      option.classList.add('selected');
-    } else {
-      option.classList.remove('selected');
-    }
-  });
-
-		window.location.href = `/${lang}`;
-}
 }
