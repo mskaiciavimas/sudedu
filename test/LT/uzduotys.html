@@ -19,7 +19,7 @@
 	<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Josefin+Sans&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 	<link rel="stylesheet" type="text/css" href="/index.css">
-    <link rel="stylesheet" type="text/css" href="../../user-nav-menu.css">
+    <link rel="stylesheet" type="text/css" href="../user-nav-menu.css">
 
     <style>
         html,
@@ -28,13 +28,21 @@
         }
 
         body {
-            padding: 50px 0 ;
+            padding: 25px 0 ;
         }
 
         .row {
             width: 100%;
             min-width: 100%;
             --bs-gutter-x: 0; 
+        }
+
+        #inner-container {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         #teacher-gui {
@@ -47,12 +55,18 @@
             min-height: 50vh;
         }
 
-        .teacher-button-line {
+        .initial-button-div {
+            min-width: 250px;
             margin-bottom: 15px;
         }
 
         .teacher-button {
-            min-width: 250px;
+            width: 100%;
+        }
+
+        #timer-input-div,
+        #question-number-input-div {
+            margin-top: 5px;
         }
 
         .teacher-button:disabled {
@@ -62,10 +76,20 @@
             filter: grayscale(25%);
         }
 
+        .confirmation-button-div {
+            min-width: 150px;
+            margin: 0 0 15px 15px;
+        }
+
         #confirm-delete-task-button,
         #confirm-delete-student-button {
-            min-width: 150px;
-            margin-left: 15px;
+            width: 100%;
+        }
+
+        #teacher-message-line-2 {
+            text-align: center;
+            margin: 15px 0;
+            min-height: 48px;
         }
         
         #teacher-message-line,
@@ -77,6 +101,7 @@
         #task-group-sorting {
             width: 100%;
             padding: 0;
+            margin-top: 0;
             margin-bottom: 15px;
             padding: 5px;
         }
@@ -181,7 +206,7 @@
 
         .group_name_div {
             width: 100%;
-            margin-bottom: 15px;
+            margin-bottom: 5px;
         }
 
         #group_name {
@@ -224,7 +249,7 @@
             padding: 15px;
         }
 
-        #mistakes-summary {
+        .summary-inner-container {
             margin-top: 10px;
             max-height: 200px;
             overflow-y: scroll;
@@ -237,6 +262,7 @@
             border-color: rgba(255, 255, 255, 0.2);
             overflow: hidden;
             margin: 0 !important;
+            table-layout: fixed;
         }
 
         th,
@@ -301,13 +327,17 @@
             font-weight: bold;
             text-transform: uppercase;
             font-size: 1.5rem;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         
-        #student-task-group-and-status-idnicator {
+        #student-task-group-and-status-indicator {
             display: flex;
             align-items: center;
             justify-content: space-between;
+        }
+
+        #student-score-asnwer-number {
+            margin-top: 5px;
         }
 
         #student-task-group,
@@ -342,7 +372,7 @@
         }
 
         .reset-button-div {
-            margin-top: 20px;
+            margin-top: 40px;
         }
 
         #task-description-list {
@@ -351,6 +381,7 @@
 
         .task-description-list-item {
             text-transform: lowercase;
+            margin-left: 2rem;
         }
 
         #change-teacher-input {
@@ -409,6 +440,60 @@
             width: 100%;
         }
 
+        .grammar-params-list {
+            margin-left: 15px;
+        }
+
+        .incorrect-part {
+        font-weight: bold;
+        padding: 2px 1px;
+        border-radius: 3px;
+        color: #D57E7E;
+        }
+
+        .grammar-view-selector {
+            position: relative;
+            border: none;
+            border-radius: 4px;
+            background-color: transparent;
+            text-align: center;
+            font-weight: bold;
+            z-index: 10;
+            pointer-events: auto; 
+        }
+
+        .task-info-subtitle {
+            font-style: italic;
+        }
+
+        .student-statistics-title {
+            font-size: 1.35rem;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .student-statistics-subtitle {
+            font-size: 1.15rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        #submit-new-taks-button {
+            min-width: 150px;
+            margin-top: 15px;
+        }
+
+        .invalid-submition {
+        animation: shake 0.2s ease-in-out 0s 2 !important;
+        }
+
+        @keyframes shake {
+        0% { margin-left: 0rem; }
+        25% { margin-left: 0.5rem; }
+        75% { margin-left: -0.5rem; }
+        100% { margin-left: 0rem; }
+        }
+
         @media (max-width: 1999px) {
             #teacher-message-line,
             #student-message {
@@ -424,6 +509,60 @@
             #teacher-message-line {
                 margin-right: 0;
             }
+
+            #new-task-options-container {
+                padding: 0;
+                margin-top: 15px;
+            }
+
+            .dropdown {
+                margin: 7px 0;
+            }
+
+            #dynamic-student-content {
+                padding-left: 0;
+                margin-top: 20px;
+            }
+
+            #inner-container {
+                margin-top: 40px;
+            }  
+        }
+
+        @media (max-width: 575px) {
+            html,
+            body {
+                width: 100vw;
+            }
+
+            body {
+                padding: 20px 0;
+            }
+
+            .initial-button-div {
+                width: 100%;
+            }
+
+            .confirmation-button-div {
+                width: 100%;
+                margin: 0;
+            }
+
+            #confirm-delete-task-button {
+                margin-bottom: 15px;
+            }
+
+            #confirm-delete-student-button {
+                margin-bottom: 15px;
+            }
+
+            .teacher-button-line {
+                flex-direction: column;
+            }
+
+            #teacher-message-line {
+                margin-bottom: 15px;
+            }
         }
 
     </style>
@@ -431,7 +570,12 @@
 
 <body>
 	<div class="container" id="template-container">
-        <div class="col-12 d-flex justify-content-end align-items-end" id="user-login-div">
+		<div id="language-about-row" class="row d-flex align-items-start">
+        <div class="col-6" id="language-switcher" onmousedown="return false;" onselectstart="return false;" style="-webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;">
+            <span class="language-option language-option-EN" onclick="setLanguage('EN')">EN</span>
+            <span class="language-option language-option-LT selected" onclick="setLanguage('LT')">LT</span>
+        </div>
+        <div class="col-6 d-flex justify-content-end align-items-end" id="user-login-div">
                     <a id="user-login-anchor" href="../prisijungimas.html" class="log-in">Prisijungti</a>
 
                     <div id="loggedin-user-menu">
@@ -440,20 +584,21 @@
                 <h3 id="loggedin-user-nickname"></h3>
                 <p id="loggedin-user-id"></p>
             </div>
-            <div class="img-box">
-                <div class="img-box"></div>
-            </div>
+                <div class="img-box">
+                    <span id="user-initial"></span>
+                </div>
         </div>
         <div class="menu">
             <ul>
-                <li><a href="uzduotys.html"><i class="ph-bold ph-user"></i>&nbsp;Užduotys</a></li>
-                <li><a href="#" onclick="clearUserData()"><i class="ph-bold ph-envelope-simple"></i>&nbsp;Atsijungti</a></li>
+                <li><a href="index.html"><i class="ph-bold ph-user"></i>Pradžia</a></li>
+                <li><a href="/LT" onclick="clearUserData()"><i class="ph-bold ph-envelope-simple"></i>Atsijungti</a></li>
             </ul>
         </div>
                     </div>
                 </div>
+            </div>
 
-        <div class="row d-flex align-items-center justify-content-center">
+        <div class="row d-flex align-items-center justify-content-center" id="inner-container">
             <div id="teacher-gui" style="display: none;">
 
             <div class="col-12" id="button-message-section">
@@ -461,17 +606,27 @@
                     <div class="col-lg-6 col-md-8 col-12">
 
                 <div class="col-12 d-flex align-items-center justify-content-start teacher-button-line">
+                    <div class="initial-button-div">
                 <button id="new-task-button" class="btn btn-primary teacher-button" onclick="toggleAddNewTask()">Nauja užduotis</button>
+            </div>
                 </div>
 
                 <div class="col-12 d-flex align-items-center justify-content-start teacher-button-line">
-                <button id="delete-task-button" class="btn btn-primary teacher-button"" onclick="toggleDeleteTask()">Ištrinti užduotis</button>
+                    <div class="initial-button-div">
+                <button id="delete-task-button" class="btn btn-primary teacher-button" onclick="toggleDeleteTask()">Ištrinti užduotis</button>
+            </div>
+            <div class="confirmation-button-div">
                 <button style="display: none;" id="confirm-delete-task-button" class="btn btn-primary" onclick="deleteSelectedTasks()">Trinti užduotis</button>
+            </div>
                 </div>
 
                 <div class="d-flex align-items-center justify-content-start teacher-button-line">
-                <button id="delete-student-button" class="btn btn-primary teacher-button"" onclick="toggleDeleteStudent()">Pašalinti mokinius</button>
+                    <div class="initial-button-div">
+                <button id="delete-student-button" class="btn btn-primary teacher-button" onclick="toggleDeleteStudent()">Pašalinti mokinius</button>
+            </div>
+                <div class="confirmation-button-div">
                 <button style="display: none;" id="confirm-delete-student-button" class="btn btn-primary" onclick="deleteStudents()">Šalinti mokinius</button>
+            </div>
                 </div>
             </div>
 
@@ -508,39 +663,43 @@
                         <input type="text" id="group_name" placeholder="Užduočių grupės pavadinimas" class="form-control">
                     </div>
 
+                    
                     <div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
                         <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice"
                             id="mode_choice">
-                            <option value="sudetis">SUD&#x116;T&#x12E;</option>
-                            <option value="atimtis">ATIMT&#x12E;</option>
-                            <option value="sudetis ir atimtis">SUD&#x116;T&#x12E; IR ATIMT&#x12E;</option>
-                            <option value="daugyba">DAUGYB&#x104;</option>
-                            <option value="dalyba">DALYB&#x104;</option>
-                            <option value="daugyba ir dalyba">DAUGYB&#x104; IR DALYB&#x104;</option>
-                            <option value="visi">ĮVAIRIUS VEIKSMUS</option>
+                            <option value="matematika">MATEMATIKĄ</option>
+                            <option value="kalba">LIETUVIŲ KALBĄ</option>
                         </select>
                     </div>
-                    <div class="row">
-                        <div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
+                    
+                    <div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
+                        <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_1"
+                            id="mode_choice_1">
+                            <option value="C1">SUD&#x116;T&#x12E;</option>
+                            <option value="C2">ATIMT&#x12E;</option>
+                            <option value="C3">SUD&#x116;T&#x12E; IR ATIMT&#x12E;</option>
+                            <option value="C4">DAUGYB&#x104;</option>
+                            <option value="C5">DALYB&#x104;</option>
+                            <option value="C6">DAUGYB&#x104; IR DALYB&#x104;</option>
+                            <option value="C7">ĮVAIRIUS VEIKSMUS</option>
+                        </select>
                     </div>
+                    
                     <div class="row d-flex justify-content-center align-items-center text-center mode_choice_2_div">
                         <div class="col-12 d-flex justify-content-center align-items-center mode_choice_2_div text-center"
                             id="mode_choice_2_div">
                             <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_2"
                                 id="mode_choice_2">
-                                <option value="viena10">VIENAŽENKLIŲ SKAIČIŲ IKI 10</option>
-                                <option value="viena">VIENAŽENKLIŲ SKAIČIŲ IKI 20 (LENTELINĖ SUDĖTIS)</option>
-                                <option value="dvivien20">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 20</option>
-                                <option value="dvivien">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 100</option>
-                                <option value="dvi">DVIŽENKLIŲ SKAIČIŲ IKI 100</option>
-                                <option value="tukst">SKAIČIŲ IKI 1 000</option>
-                                <option value="dtukst">SKAIČIŲ IKI 10 000</option>
-                                <option value="mil">SKAIČIŲ IKI 1 000 000</option>
+                                <option value="C8">VIENAŽENKLIŲ SKAIČIŲ IKI 10</option>
+                                <option value="C9">VIENAŽENKLIŲ SKAIČIŲ IKI 20 (LENTELINĖ SUDĖTIS)</option>
+                                <option value="C10">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 20</option>
+                                <option value="C11">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 100</option>
+                                <option value="C12">DVIŽENKLIŲ SKAIČIŲ IKI 100</option>
+                                <option value="C13">SKAIČIŲ IKI 1 000</option>
+                                <option value="C14">SKAIČIŲ IKI 10 000</option>
+                                <option value="C15">SKAIČIŲ IKI 1 000 000</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12 empty-placeholder-between-options" id="placeholder-bottom"></div>
                     </div>
                     <div class="row">
                         <div class="col-12 d-flex justify-content-center align-items-center number_choice_div text-center">
@@ -576,55 +735,169 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-sm-12 empty-placeholder-after-number-options" id="empty-placeholder-after-numbers" style="display: none;"></div>
                     <div class="row d-flex justify-content-center align-items-center text-center remainder-div">
                     <label id="remainder-option" style="display: none;">
                         <input id="remainder-input" type="checkbox" name="myCheckbox"> DALYBA SU LIEKANA
                     </label>
                     </div>
-                    
+
                     <div class="row d-flex justify-content-center align-items-center text-center mode_choice_3_div">
                         <div
-                            class="col-12 d-flex justify-content-center align-items-center number_choice_div text-center mode_choice_3_div"
+                            class="col-12 d-flex justify-content-center align-items-center text-center mode_choice_3_div"
                             id="mode_choice_3_div">
                             <select class="btn btn-secondary dropdown-toggle dropdown text-center" name="mode_choice_3"
                                 id="mode_choice_3">
-                                <option value="neper">NEPERŽENGIANT DEŠIMTIES</option>
+                                <option value="C37">NEPERŽENGIANT DEŠIMTIES</option>
                             </select>
                         </div>
                     </div>
-                    <div class="col-sm-12 empty-placeholder-between-options placeholder-before-skaitinis" id="empty-placeholder-before-mode-choice-div-5"></div>
                     <div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
                         <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_5"
                             id="mode_choice_5">
-                            <option value="skaitiniai">SKAITINĖ LYGYBĖ</option>
-                            <option value="nezinomieji">SKAITINĖ LYGYBĖ SU NEŽINOMUOJU</option>
+                            <option value="C41">SKAITINĖ LYGYBĖ</option>
+                            <option value="C42">SKAITINĖ LYGYBĖ SU NEŽINOMUOJU</option>
                         </select>
                     </div>
-                    <div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
                     <div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
                         <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_6"
                             id="mode_choice_6" style="display: none;">
-                            <option value="turinys">NEŽINOMAS DĖMUO</option>
+                            <option value="C43">NEŽINOMAS DĖMUO</option>
                         </select>
                     </div>
                     <div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
                         <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_7"
                             id="mode_choice_7" style="display: block;">
-                            <option value="eilute">EILUTE</option>
-                            <option value="stulpeliu">STULPELIU / KAMPU</option>
+                            <option value="C47">EILUTE</option>
+                            <option value="C48">STULPELIU / KAMPU</option>
                         </select>
                     </div>
-                    <div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
+                    
+                    <div class="row d-flex justify-content-center align-items-center text-center class_choice_div">
+                        <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="class_choice"
+                            id="class_choice" style="display: none;">
+                            <option value="C75">1-2 KLASĖ</option>
+                            <option value="C76">3-4 KLASĖ</option>
+                        </select>
+                    </div>
+                    
+                    <div class="row d-flex justify-content-center align-items-center text-center mode_choice_8_div">
+                        <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_8"
+                            id="mode_choice_8" style="display: none;">
+                            <option value="tekstas">TEKSTO SUPRATIMĄ</option>
+                            <option value="rasyba">RAŠYBĄ</option>
+                        </select>
+                    </div>
+                    
+                    <div class="row d-flex justify-content-center align-items-center text-center mode_choice_9_div">
+                        <div class="col-12 d-flex justify-content-center align-items-center mode_choice_9_div text-center"
+                            id="mode_choice_9_div">
+                            <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_9"
+                                id="mode_choice_9" style="display: none;">
+                                <option value="C51">TURINIO KOMPONAVIMĄ</option>
+                                <option value="C52">STRUKTŪROS IŠDĖSTYMĄ</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row d-flex justify-content-center align-items-center text-center mode_choice_10_div">
+                        <div class="col-12 d-flex justify-content-center align-items-center mode_choice_10_div text-center"
+                            id="mode_choice_10_div">
+                            <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_10"
+                                id="mode_choice_10" style="display: none;">
+                                <option value="C58">LENGVAS</option>
+                                <option value="C59">VIDUTINIS</option>
+                                <option value="C60">SUNKUS</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row d-flex justify-content-center align-items-center text-center rasyba-options-row">
+                        <div class="col-12 justify-content-start align-items-center mode_choice_11_div text-center"
+                            id="mode_choice_11_div" style="display: none;">
+                            <label class="rasyba-options-label">
+                                <input type="checkbox" class="r" name="r" value='GALŪNĖS' checked><span class="rasyba-options-label-text" id="rasyba-options-label-text-galune">ŽODŽIO PABAIGA:</span>
+                            </label>
+                            <br>
+                                <div id="galuniu-div">
+                                <label class="rasyba-options-label" style="display: none;">
+                                    <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" id="first-second-class-endings" name="rasyba-option" value='{"C61": []}' checked><span class="rasyba-options-label-text">DAIKTAVARDIS</span>
+                                    <br>
+                                </label>
+                                <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                    <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C62": []}'><span class="rasyba-options-label-text">DAIKTAVARDŽIAI</span>
+                                    <br>
+                                </label>
+                                <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                    <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C63": [], "C64": []}'><span class="rasyba-options-label-text"></span>BŪDVARDŽIAI IR PRIEVEIKSMIAI</span>
+                                    <br>
+                                </label>
+                                <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                    <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C65": []}'><span class="rasyba-options-label-text"></span>VEIKSMAŽODŽIAI</span>
+                                    <br>
+                                </label>
+                                <div class="col-12 d-flex justify-content-start align-items-center mode_choice_12_div text-center"
+                                id="mode_choice_12_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_12"
+                                    id="mode_choice_12">
+                                    <option value="C73">LENGVESNĖS KOMBINACIJOS</option>
+                                    <option value="C74">SUNKESNĖS KOMBINACIJOS</option>
+                                </select>
+                            </div>
+                            </div>
+                                <label class="rasyba-options-label">
+                                    <input id="C66" type="checkbox" class="rasyba-options" name="rasyba-option" value='{"C66": []}' checked><span class="rasyba-options-label-text"></span>ĮSIDĖMĖTINA RAŠYBA</span>
+                                    <br>
+                                </label>
+                                <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                    <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C71": []}'><span class="rasyba-options-label-text"></span>PRIEBALSIŲ SUPANAŠĖJIMAS</span>
+                                    <br>
+                                </label>
+                                <label class="rasyba-options-label options-for-first-second-classes" style="display: block;">
+                                    <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C67": []}' checked><span class="rasyba-options-label-text"></span>PANAŠIAI SKAMBANČIOS PRIEBALSĖS</span>
+                                    <br>
+                                </label>
+                                <label class="rasyba-options-label" style="display: block;">
+                                    <input type="checkbox" class="rasyba-options" name="rasyba-option" value='{"C68": []}' checked><span class="rasyba-options-label-text"></span>BALSĖS IR DVIBALSĖS</span>
+                                    <br>
+                                </label>
+                                <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                    <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C72": []}'><span class="rasyba-options-label-text"></span>MIŠRIEJI DVIGARSIAI</span>
+                                    <br>
+                                </label>
+                                <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                    <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C69": []}'><span class="rasyba-options-label-text"></span>PRIEŠDĖLIAI</span>
+                                    <br>
+                                </label>
+                                <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                    <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C70": []}'><span class="rasyba-options-label-text"></span>PRIESAGOS</span>
+                                    <br>
+                                </label>
+                        
+                        </div>
+
+                        <div class="row d-flex justify-content-center align-items-center text-center mode_choice_13_div">
+                            <div class="row">
+                            </div>
+                            <div class="col-12 d-flex justify-content-center align-items-center mode_choice_13_div text-center"
+                                id="mode_choice_13_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_13"
+                                    id="mode_choice_13" style="display: none;">
+                                    <option value="3">RETESNI ATVEJAI</option>
+                                    <option value="1">DAŽNESNI ATVEJAI</option>
+                                </select>
+                            </div>
+                        </div>
+                        </div>
+
+
                     <div class="row d-flex justify-content-center align-items-center text-center modeChoice4_div">
                         <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="modeChoice4"
                             id="mode_choice_4" style="display: block;">
-                            <option value="timer">NUSTATYTI LAIKO TRUKMĘ</option>
-                            <option value="questionNumber">NUSTATYTI KLAUSIMŲ KIEKĮ</option>
+                            <option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>
+                            <option value="C40">NUSTATYTI VEIKSMŲ KIEKĮ</option>
                         </select>
                     </div>
 
-                    <div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
                     <div class="row d-flex justify-content-center align-items-center" >
                         <div class="timer-input-div row justify-content-center align-items-center" id="timer-input-div">
                         <div class="col-6 d-flex justify-content-end">
@@ -639,18 +912,18 @@
                                     <input type="number" id="question-number-input" min="1" max="200" step="1" value="20">
                                     </div>
                       <div class="col-6 d-flex d-flex justify-content-start">
-                        <h3 class="answer-number-label-teacher">veiksmų</h3>
+                        <h3 class="answer-number-label-teacher" id="answer-number-label-teacher">veiksmus</h3>
                       </div>
                       </div>
                             </div>
 
-
-                        <div class="col-sm-12 empty-placeholder-before-submit"></div>
-
-                        <div class="d-flex align-items-center justify-content-center">
+                        <div class="d-flex align-items-center justify-content-center flex-column">
                         <div class="col-12 d-flex justify-content-center align-items-center submit-button">
                             <button onclick="setTask()" class="btn btn-primary" id="submit-new-taks-button">Užduoti</button>
                         </div>
+                    </div>
+                    <div class="col-12 d-flex align-items-center justify-content-center">
+                        <div id="teacher-message-line-2"></div>
                     </div>
 
 
@@ -660,21 +933,55 @@
                 <div id="student-task-info-container-inner">
                     <div>
                     <div class="col-12 d-flex align-items-center justify-content-start" id="student-task-student-name"></div>
-                    <div id="student-task-group-and-status-idnicator">
+                    <div id="student-task-group-and-status-indicator">
                         <div id="student-task-group"></div>
                         <div id="student-task-status-indicator"></div>
                     </div>
+
+                    <div class="col-12" id="student-statistics-completed-tasks" style="display: none;"></div>
+
+                    <div id="student-statistics-math" style="display: none;">
+                        <div class="student-statistics-title">Matematika</div>
+                        <div class="col-12" id="student-statistics-math-error-frequency"></div>
+                    </div>
+
                     <div class="col-12" id="student-score-asnwer-number"></div>
                     <div class="col-12" id="student-score-mistake-number"></div>
 
-                    <div id="mistakes-table-title"></div>
-                    <div id="mistakes-summary">
+                    <div id="mistakes-summary-math" style="display: none;">
+                            <div id="mistakes-table-title-math" class="task-info-subtitle">Dažniausios skaičiavimo klaidos:</div>
+                            <div class="summary-inner-container">
                             <div class="col-12 table-container">
                                 <div id="summary-table"></div>
                             </div>
+                        </div>
                     </div>
+
+                    <div id="student-statistics-lang-grammar" style="display: none;">
+                        <div class="student-statistics-title">Lietuvių kalba</div>
+                        <div class="student-statistics-subtitle">Rašyba</div>
+                        <div class="col-12" id="student-statistics-grammar-error-frequency"></div>
+                    </div>
+
+                    <div id="mistakes-summary-grammar" style="display: none;">
+                        <div id="mistakes-table-title-grammar" class="task-info-subtitle">Dažniausios rašybos klaidos:</div>
+                        <div class="summary-inner-container">
+                        <div class="col-12 table-container">
+                            <div id="summary-table-grammar"></div>
+                        </div>
+                    </div>
+                    </div>
+
+                    <div id="student-statistics-lang-text-comprahension" style="display: none;">
+                        <div class="student-statistics-subtitle" id="student-statistics-lang-text-comprahension-komponavimas" style="display: none;">Turinio komponavimas</div>
+                        <div class="col-12" id="student-statistics-komponavimas-error-frequency"></div>
+                        <div class="student-statistics-subtitle" id="student-statistics-lang-text-comprahension-isdestymas" style="display: none;">Struktūros išdėstymas</div>
+                        <div class="col-12" id="student-statistics-isdestymas-error-frequency"></div>
+                    </div>
+
+
                     <div id="task-description-outer-container">
-                        <div id="task-description-title" style="display: none;">Užduoties aprašymas:</div>
+                        <div id="task-description-title" class="task-info-subtitle" style="display: none;">Užduoties aprašymas:</div>
                         <div id="task-description"></div>
                     </div>
                 </div>
@@ -715,26 +1022,41 @@
                     <div id="task-info-container-for-students">
                             <div id="student-task-info-container-inner">
                                 <div>
-                                <div id="student-task-group-and-status-idnicator">
+                                <div id="student-task-group-and-status-indicator">
                                     <div id="student-task-group-for-student"></div>
                                     <div id="student-task-status-indicator-for-student"></div>
                                 </div>
                                 <div class="col-12" id="student-score-asnwer-number-for-student"></div>
                                 <div class="col-12" id="student-score-mistake-number-for-student"></div>
-            
-                                <div id="mistakes-table-title-for-student"></div>
-                                <div id="mistakes-summary">
-                                        <div class="col-12 table-container">
-                                            <div id="summary-table-for-student"></div>
-                                        </div>
+
+                                <div id="mistakes-summary-math-for-student" style="display: none;">
+                                    <div id="mistakes-table-title-math-for-students" class="task-info-subtitle">Dažniausios skaičiavimo klaidos:</div>
+                                    <div class="summary-inner-container">
+                                    <div class="col-12 table-container">
+                                        <div id="summary-table-for-student"></div>
+                                    </div>
+                                </div>
+                                </div>
+                                <div id="mistakes-summary-grammar-for-student" style="display: none;">
+                                    <div id="mistakes-table-title-grammar-for-student" class="task-info-subtitle">Dažniausios rašybos klaidos:</div>
+                                    <div class="summary-inner-container">
+                                    <div class="col-12 table-container">
+                                        <div id="summary-table-grammar-for-student"></div>
+                                    </div>
+                                </div>
+                                </div>
+                                <div id="task-description-outer-container-for-student">
+                                    <div id="task-description-title-for-student" class="task-info-subtitle" style="display: none;">Užduoties aprašymas:</div>
+                                    <div id="task-description-for-student"></div>
                                 </div>
                                 <div id="task-description-outer-container-for-student">
                                     <div id="task-description-for-student"></div>
                                 </div>
                             </div>
-                                <div class="col-12 d-flex align-items-center justify-content-end">
+                            <div class="col-12 d-flex align-items-center justify-content-end">
                                 <button id="complete-task-button" class="btn btn-primary" onclick="completeTask()" style="display: none;">Atlikti užduotį</button>
                                 </div>
+                            </div>
                             </div>
                     </div>
                 </div>
@@ -763,11 +1085,12 @@
 		integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
 		crossorigin="anonymous"></script>
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="../../mental-arithmetic.js"></script>
-	<script src="../../mental-arithmetic-combinations.js"></script>
+	<script src="../mental-arithmetic.js"></script>
+	<script src="../mental-arithmetic-combinations.js"></script>
     <script src="matematika_options.js"></script>
     <script src="pasirinkimai.js"></script>
-    <script src="../../user-nav-menu.js"></script>
+    <script src="../parameter_dictionary.js"></script>
+    <script src="../user-nav-menu.js"></script>
 
 	<script>
         const redCircleColorCode = '#D57E7E';
@@ -777,7 +1100,7 @@
         if (userDataString) {
             userData = JSON.parse(userDataString);
         } else {
-            window.location.href = '/LT/matematika/index.html';
+            window.location.href = '/LT';
         }
 
         let studentList;
@@ -801,6 +1124,7 @@
         const deleteTaskButton = document.getElementById('delete-task-button');
         const confirmDeleteTaskButton = document.getElementById('confirm-delete-task-button');
         const teacherMessageLine = document.getElementById('teacher-message-line');
+        const teacherMessageLine2 = document.getElementById('teacher-message-line-2');
         const newTaskOptions = document.getElementById('new-task-options-container');
         const studentTaskInfoContainer = document.getElementById('student-task-info-container');
         const studentTaskStudentName = document.getElementById('student-task-student-name');
@@ -809,7 +1133,7 @@
         const studentTaskStatus = document.getElementById('student-task-status');
         const studentScoreAnswerNumber = document.getElementById('student-score-asnwer-number');
         const studentScoreMistakeNumber = document.getElementById('student-score-mistake-number');
-        const studentMistakesTableTitle = document.getElementById('mistakes-table-title');
+
 
         let dynamicStudentContent = document.getElementById('dynamic-student-content');
 
@@ -845,12 +1169,68 @@
         const studentTaskGroupForStudent = document.getElementById('student-task-group-for-student');
         const studentScoreAnswerNumberForStudent = document.getElementById('student-score-asnwer-number-for-student');
         const studentScoreMistakeNumberForStudent = document.getElementById('student-score-mistake-number-for-student');
-        const studentMistakesTableTitleForStudent = document.getElementById('mistakes-table-title-for-student');
         const taskDescriptionForStudent = document.querySelector('#task-description-for-student');
         const teacherDispalyStudentTaskIndicatorForStudent = document.getElementById('student-task-status-indicator-for-student');
         const taskListTitleForStudents = document.getElementById('task-list-title-for-students');
 
         const completeTaskButton = document.getElementById('complete-task-button');
+
+    function changeQuestionNumberLabel () {
+        if (document.getElementById('mode_choice').value === "kalba") {
+        if (document.getElementById('mode_choice_8').value === "tekstas") {
+            if (document.getElementById('mode_choice_4').value === "C40") {
+                    document.getElementById("question-number-input").value = 5;
+                    document.getElementById('answer-number-label-teacher').innerHTML = 'tekstus';
+                }
+        } else if (document.getElementById('mode_choice_8').value === "rasyba") {
+            if (document.getElementById('mode_choice_4').value === "C40") {
+                    document.getElementById("question-number-input").value = 20;
+                    document.getElementById('answer-number-label-teacher').innerHTML = 'sakinių';
+                }
+        } 
+        } else {
+            document.getElementById("question-number-input").value = 20;
+            document.getElementById('answer-number-label-teacher').innerHTML = 'veiksmų';
+        }
+        }
+
+    function updateModeChoice4() {
+        let modeChoice4ElementSelection = modeChoice4Element.value;
+        if (modeChoice4ElementSelection === "C39") {
+            timerInputDiv.style.display = 'flex';
+            questionNumberInputDiv.style.display = 'none';
+        } else if (modeChoice4ElementSelection === "C40") {
+            timerInputDiv.style.display = 'none';
+            questionNumberInputDiv.style.display = 'flex';
+        }
+        changeQuestionNumberLabel();
+    }
+
+    document.querySelector("#mode_choice_4").addEventListener('change', updateModeChoice4);
+
+    
+    function updateModeChoice4Options () {
+        document.getElementById('mode_choice_4').innerHTML = '';
+        if (document.getElementById('mode_choice').value === "kalba") {
+            if (document.getElementById('mode_choice_8').value === "tekstas") {
+                document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
+                document.getElementById('mode_choice_4').innerHTML += '<option value="C40">NUSTATYTI TEKSTŲ KIEKĮ</option>';
+
+            } else if (document.getElementById('mode_choice_8').value === "rasyba") {
+                document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
+                document.getElementById('mode_choice_4').innerHTML += '<option value="C40">NUSTATYTI SAKINIŲ KIEKĮ</option>';
+            }
+        } else {
+            document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
+            document.getElementById('mode_choice_4').innerHTML += '<option value="C40">NUSTATYTI VEIKSMŲ KIEKĮ</option>'; 
+        }
+        updateModeChoice4();
+    }
+
+
+    document.getElementById('mode_choice').addEventListener('change', updateModeChoice4Options);
+    document.getElementById('mode_choice_8').addEventListener('change', updateModeChoice4Options);
+    
 
     timerInputElementTeacher.addEventListener("input", function(event) {
       if (parseInt(timerInputElementTeacher.value) === 1 || parseInt(timerInputElementTeacher.value.slice(-1)[0]) === 1 && parseInt(timerInputElementTeacher.value) !== 11) {
@@ -866,131 +1246,125 @@
     let answerNumberLabelTeacher = document.querySelector('.answer-number-label-teacher');
 
     questionNumberInputElementTeacher.addEventListener("input", function(event) {
-      if (parseInt(questionNumberInputElementTeacher.value) === 1 || parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElementTeacher.value) !== 11) {
-        answerNumberLabelTeacher.innerHTML = 'veiksmą';
-      } else if ((parseInt(questionNumberInputElementTeacher.value) > 1 && parseInt(questionNumberInputElementTeacher.value) < 10) || (parseInt(questionNumberInputElementTeacher.value) > 20 && parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) !== 0))  {
-        answerNumberLabelTeacher.innerHTML = 'veiksmus';
-      } else if (parseInt(questionNumberInputElementTeacher.value) >= 10) {
-        answerNumberLabelTeacher.innerHTML = 'veiksmų';
-      }
+        if (document.getElementById('mode_choice').value === "kalba") {
+        if (document.getElementById('mode_choice_8').value === "tekstas") {
+            if (parseInt(questionNumberInputElementTeacher.value) === 1 || parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElementTeacher.value) !== 11) {
+                answerNumberLabelTeacher.innerHTML = 'tekstą';
+            } else if ((parseInt(questionNumberInputElementTeacher.value) > 1 && parseInt(questionNumberInputElementTeacher.value) < 10) || (parseInt(questionNumberInputElementTeacher.value) > 20 && parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) !== 0))  {
+                answerNumberLabelTeacher.innerHTML = 'tekstus';
+            } else if (parseInt(questionNumberInputElementTeacher.value) >= 10) {
+                answerNumberLabelTeacher.innerHTML = 'tekstų';
+            }
+
+        } else if (document.getElementById('mode_choice_8').value === "rasyba") {
+            if (parseInt(questionNumberInputElementTeacher.value) === 1 || parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElementTeacher.value) !== 11) {
+                answerNumberLabelTeacher.innerHTML = 'sakinį';
+            } else if ((parseInt(questionNumberInputElementTeacher.value) > 1 && parseInt(questionNumberInputElementTeacher.value) < 10) || (parseInt(questionNumberInputElementTeacher.value) > 20 && parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) !== 0))  {
+                answerNumberLabelTeacher.innerHTML = 'sakinius';
+            } else if (parseInt(questionNumberInputElementTeacher.value) >= 10) {
+                answerNumberLabelTeacher.innerHTML = 'sakinių';
+            }
+        }
+        } else if (parseInt(questionNumberInputElementTeacher.value) === 1 || parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElementTeacher.value) !== 11) {
+            answerNumberLabelTeacher.innerHTML = 'veiksmą';
+        } else if ((parseInt(questionNumberInputElementTeacher.value) > 1 && parseInt(questionNumberInputElementTeacher.value) < 10) || (parseInt(questionNumberInputElementTeacher.value) > 20 && parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) !== 0))  {
+            answerNumberLabelTeacher.innerHTML = 'veiksmus';
+        } else if (parseInt(questionNumberInputElementTeacher.value) >= 10) {
+            answerNumberLabelTeacher.innerHTML = 'veiksmų';
+        }
     })
 
 
         function getOptionTextFromValues(values) {
-            const optionsLibrary = {
-                // mode_choice options
-                "sudetis": "SUDĖTIS",
-                "atimtis": "ATIMTIS",
-                "sudetis ir atimtis": "SUDĖTIS IR ATIMTIS",
-                "daugyba": "DAUGYBA",
-                "dalyba": "DALYBA",
-                "daugyba ir dalyba": "DAUGYBA IR DALYBA",
-                "visi": "ĮVAIRŪS VEIKSMAI",
-                
-                // mode_choice_2 options
-                "viena10": "VIENAŽENKLIŲ SKAIČIŲ IKI 10",
-                "viena": "VIENAŽENKLIŲ SKAIČIŲ IKI 20 (LENTELINĖ SUDĖTIS)",
-                "dvivien20": "DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 20",
-                "dvivien": "DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 100",
-                "dvi": "DVIŽENKLIŲ SKAIČIŲ IKI 100",
-                "tukst": "SKAIČIŲ IKI 1 000",
-                "dtukst": "SKAIČIŲ IKI 10 000",
-                "mil": "SKAIČIŲ IKI 1 000 000",
-                "gretnul": "KAI TURINYJE GRETIMI NULIAI",
-                "lent": "LENTELINĖ SUDĖTIS IR ATIMTIS IKI 20",
-                "dauglent": "DAUGYBOS LENTELĖ",
-                "daugdvivien": "DVIŽENKLIO IŠ VIENAŽENKLIO",
-                "daugtrivien": "TRIŽENKLIO IŠ VIENAŽENKLIO",
-                "daugketvien": "KETURŽENKLIO IŠ VIENAŽENKLIO",
-                "daugdaugvien": "DAUGIAŽENKLIO IŠ VIENAŽENKLIO",
-                "daugdvidvi": "DVIŽENKLIO IŠ DVIŽENKLIO",
-                "daugtridvi": "TRIŽENKLIO IŠ DVIŽENKLIO",
-                "daugketdvi": "KETURŽENKLIO IŠ DVIŽENKLIO",
-                "daugdaugdvi": "DAUGIAŽENKLIO IŠ DVIŽENKLIO",
-                "daugdaug": "*DAUGIAŽENKLIŲ SKAIČIŲ",
-                "pil10": "IŠ PILNŲ DEŠIMČIŲ/ŠIMTŲ (LENGVESNI)",
-                "pil": "IŠ PILNŲ DEŠIMČIŲ/ŠIMTŲ/TŪKSTANČIŲ",
-                "daugdaugviendalmnul": "DAUGIAŽENKLIO IŠ VIENAŽENKLIO (DALMENYJE 0)",
-                "iki10": "IKI 10",
-                "iki20": "IKI 20",
-                "iki100": "IKI 100",
-                "iki1000": "IKI 1,000",
-                "iki10000": "IKI 10,000",
-                "iki1000000": "IKI 1,000,000",
-                
-                // mode_choice_3 options
-                "neper": "NEPERŽENGIANT DEŠIMTIES",
-                "per10": "PERŽENGIANT DEŠIMTĮ",
-                "neper": "NEIŠARDANT DEŠIMTIES",
-                "neper": "NEPERŽENGIANT/NEIŠARDANT DEŠIMTIES",
-                "per10": "PERŽENGIANT/IŠARDANT DEŠIMTĮ",
-                "neper": "NEIŠARDANT SKAIČIŲ SKYRIŲ",
-                "per10": "IŠARDANT SKAIČIŲ SKYRIUS",
-                "neper": "NEPERŽENGIANT/NEIŠARDANT SKAIČIŲ SKYRIŲ",
-                "per10": "PERŽENGIANT/IŠARDANT SKAIČIŲ SKYRIUS",
-                "neper": "NEPERŽENGIANT SKAIČIŲ SKYRIŲ",
-                
-                // mode_choice_5 options
-                "skaitiniai": "SKAITINĖ LYGYBĖ",
-                "nezinomieji": "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU",
-                
-                // mode_choice_6 options
-                "turinys": "NEŽINOMAS DĖMUO",
-                "ateminys": "NEŽINOMAS ATĖMINYS",
-                "turinys": "NEŽINOMAS TURINYS",
-                "dalinys": "NEŽINOMAS DAUGINAMASIS",
-                "daliklis": "NEŽINOMAS DALIKLIS",
-                "turinys": "NEŽINOMAS DĖMUO/TURINYS/ATĖMINYS",
-                "dalinys": "NEŽINOMAS DAUGINAMASIS/DALINYS/DALIKLIS",
-                "dalinys": "NEŽINOMAS DĖMUO/TURINYS/ATĖMINYS/DAUGINAMASIS/DALINYS/DALIKLIS",
-                
-                // mode_choice_7 options
-                "eilute": "EILUTE",
-                "stulpeliu": "STULPELIU / KAMPU",
-                
-                // mode_choice_4 options
-                "timer": "NUSTATYTI LAIKO TRUKMĘ",
-                "questionNumber": "NUSTATYTI KLAUSIMŲ KIEKĮ"
-            };
-
-            result = []
-
-            function determineQuestionNumberTimeLabelEnding() {
-                if (result[3] === "NUSTATYTI KLAUSIMŲ KIEKĮ") {
-                    numberLabel = ''
-                    if (parseInt(result[9]) === 1 || parseInt(result[9].slice(-1)[0]) === 1 && parseInt(result[9]) !== 11) {
-                        numberLabel = 'KLAUSIMĄ';
-                    } else if ((parseInt(result[9]) > 1 && parseInt(result[9]) < 10) || (parseInt(result[9]) > 20 && parseInt(result[9].slice(-1)[0]) !== 0)) {
-                        numberLabel = 'KLAUSIMUS';
-                    } else if (parseInt(result[9]) >= 10 ) {
-                        numberLabel = 'KLAUSIMŲ';
+            function determineQuestionNumberTimeLabelEnding(type, string) {
+                if (type === "NUSTATYTI LAIKO TRUKMĘ") {
+                    durationTypeTag = ''
+                    if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                        durationTypeTag = 'MINUTĘ';
+                    } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                        durationTypeTag = 'MINUTES';
+                    } else if (parseInt(string) >= 10 ) {
+                        durationTypeTag = 'MINUČIŲ';
                     }
-                    return ("ATSAKYTI " + result[9] + " " + numberLabel)  
+                    return ("PRAKTIKUOTIS " + string + " " + durationTypeTag)  
                 } else {
-                    numberLabel = ''
-                    if (parseInt(result[9]) === 1 || parseInt(result[9].slice(-1)[0]) === 1 && parseInt(result[9]) !== 11) {
-                        numberLabel = 'MINUTĘ';
-                    } else if ((parseInt(result[9]) > 1 && parseInt(result[9]) < 10) || (parseInt(result[9]) > 20 && parseInt(result[9].slice(-1)[0]) !== 0)) {
-                        numberLabel = 'MINUTES';
-                    } else if (parseInt(result[9]) >= 10 ) {
-                        numberLabel = 'MINUČIŲ';
+                    if (values[0] === "math") {
+                    durationTypeTag = ''
+                    if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                        durationTypeTag = 'VEIKSMĄ';
+                    } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                        durationTypeTag = 'VEIKSMUS';
+                    } else if (parseInt(string) >= 10 ) {
+                        durationTypeTag = 'VEIKSMŲ';
                     }
-                    return ("PRAKTIKUOTIS " + result[9] + " " + numberLabel)  
+                    return ("ATLIKTI " + string + " " + durationTypeTag)  
+                } else if (values[0] === "lang") {
+                    if (values[2] === "C49") {
+                        if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                            durationTypeTag = 'TEKSTĄ';
+                        } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                            durationTypeTag = 'TEKSTUS';
+                        } else if (parseInt(string) >= 10 ) {
+                            durationTypeTag = 'TEKSTŲ';
+                        }
+                        return ("SUDĖLIOTI " + string + " " + durationTypeTag)  
+                    } else if (values[2] === "C50") {
+                        if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                            durationTypeTag = 'SAKINYS';
+                        } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                            durationTypeTag = 'SAKINIAI';
+                        } else if (parseInt(string) >= 10 ) {
+                            durationTypeTag = 'SAKINIŲ';
+                        }
+                        return (string + " " + durationTypeTag)  
+                    }
+
                 }
             }
-            
-            result.push(optionsLibrary[values[0]])
-            result.push(optionsLibrary[values[1]])
-            result.push(values[2] ? "PERŽENGIANT DEŠIMTĮ" : "NEPERŽENGIANT DEŠIMTIES")
-            result.push(optionsLibrary[values[3]])
-            result.push(optionsLibrary[values[4]])
-            result.push(optionsLibrary[values[5]])
-            result.push(optionsLibrary[values[6]])
-            result.push(values[7])
-            result.push(values[8] ? "Dalyba su liekana" : "Dalyba be liekanos")
-            result.push(values[9])
-
+            }
+ 
+            result = []
             final_results = []
+            if (values[0] === "math") {
+
+            result.push(parameterDictionary[values[1]]["decodedParameterText"])
+            result.push(parameterDictionary[values[2]]["decodedParameterText"])
+            result.push(values[3] ? "PERŽENGIANT DEŠIMTĮ" : "NEPERŽENGIANT DEŠIMTIES")
+            result.push(parameterDictionary[values[4]]["decodedParameterText"])
+            result.push(parameterDictionary[values[5]]["decodedParameterText"])
+            if (values[5] === "C42") {
+                if (values[1] === "C1") {
+                    result.push("NEŽINOMAS DĖMUO")
+                } else if (values[1] === "C2") {
+                    if (values[6] === "C43") {
+                        result.push("NEŽINOMAS TURINYS")
+                    } else if (values[6] === "C44") {
+                        result.push("NEŽINOMAS ATĖMINYS")
+                    } 
+                } else if (values[1] === "C3") {
+                    result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS")
+                } else if (values[1] === "C4") {
+                    result.push("NEŽINOMAS DAUGINAMASIS")
+                } else if (values[1] === "C5") {
+                    if (values[6] === "C45") {
+                        result.push("NEŽINOMAS DALINYS")
+                    } else if (values[6] === "C46") {
+                        result.push("NEŽINOMAS DALIKLIS")
+                    }
+                } else if (values[1] === "C6") {
+                    result.push("NEŽINOMAS DAUGINAMASIS / DALINYS / DALIKLIS")
+                } else if (values[1] === "C7") {
+                    result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS / DAUGINAMASIS / DALINYS / DALIKLIS")
+                }
+            } else {
+                result.push(parameterDictionary[values[6]]["decodedParameterText"])
+            }
+
+            result.push(parameterDictionary[values[7]]["decodedParameterText"])
+            result.push(values[8])
+            result.push(values[9] ? "DALYBA SU LIEKANA" : "DALYBA BE LIEKANOS")
+            result.push(values[10])
+
             final_results.push(result[0])
 
             if (result[0] === "SUDĖTIS" || result[0] === "ATIMTIS" || result[0] === "SUDĖTIS IR ATIMTIS") {
@@ -1002,26 +1376,30 @@
                 } else if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
                     final_results.push(result[5])  
                 }
-                final_results.push(determineQuestionNumberTimeLabelEnding())
+                final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))
             } else if (result[0] === "DAUGYBA") {
                 final_results.push(result[1])
-                final_results.push(`NUO ${result[7][0]} IKI ${result[7][1]}`)
+                if (result[1] === "DAUGYBOS LENTELĖ") {
+                final_results.push(`FROM ${result[7][0]} TO ${result[7][1]}`)
+                }
                 final_results.push(result[4])
                 if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
                     final_results.push(result[5])    
                 }
-                final_results.push(result[6])    
-                final_results.push(determineQuestionNumberTimeLabelEnding())    
-            } else if (result[0] === "DALYBA" || result[0] === "DALYBA IR DALYBA") {
+                final_results.push(result[6])
+                final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))    
+            } else if (result[0] === "DALYBA" || result[0] === "DAUGYBA IR DALYBA") {
                 final_results.push(result[1])
-                final_results.push(`NUO ${result[7][0]} IKI ${result[7][1]}`)
+                if (result[1] === "DAUGYBOS LENTELĖ") {
+                final_results.push(`FROM ${result[7][0]} TO ${result[7][1]}`)
+                }
                 final_results.push(result[8])
                 final_results.push(result[4])
                 if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
                     final_results.push(result[5])    
                 }
-                final_results.push(result[6])    
-                final_results.push(determineQuestionNumberTimeLabelEnding())    
+                final_results.push(result[6])
+                final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))    
             } else if (result[0] === "ĮVAIRŪS VEIKSMAI") {
                 final_results.push(result[1])
                 final_results.push(result[4])
@@ -1029,13 +1407,62 @@
                     final_results.push(result[5])    
                 }
                 final_results.push(result[6]) 
-                final_results.push(determineQuestionNumberTimeLabelEnding())       
+                final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))       
             }
+
+        } else if (values[0] === "lang") {
+            result.push(parameterDictionary[values[1]]["decodedParameterText"])
+            result.push(parameterDictionary[values[2]]["decodedParameterText"])
+            result.push(values[3])
+
+            let outerLiItem = document.createElement('li');
+            outerLiItem.textContent = "RAŠYBOS NUSTATYMAI:"; // Add a label for the outer <li>
+
+            let grammarParamsList = document.createElement('ul');
+            grammarParamsList.classList.add('grammar-params-list');
+
+            Object.keys(values[4]).forEach(key => {
+                let listItem = document.createElement('li');
+                listItem.innerHTML = parameterDictionary[key]["decodedParameterText"]; // Use innerHTML instead of textContent
+                grammarParamsList.appendChild(listItem);
+            });
+
+            outerLiItem.appendChild(grammarParamsList);
+
+
+            // Store as an HTML string
+            result.push(outerLiItem.outerHTML);
+
+            result.push(parameterDictionary[values[5]]["decodedParameterText"])
+            result.push(parameterDictionary[values[6]]["decodedParameterText"])
+            result.push(values[9])
+            if (values[8] === 1) {
+                result.push("DAŽNESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
+            } else {
+                result.push("RETESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
+            }
+
+            final_results.push(result[0])
+            final_results.push(result[1])
+            if (result[1] === "TEKSTO SUPRATIMAS") {
+                final_results.push(parameterDictionary[result[2]]["decodedParameterText"])
+                final_results.push(determineQuestionNumberTimeLabelEnding(result[4], result[6])) 
+            } else if (result[1] === "RAŠYBA") {
+                final_results.push(result[2])
+                final_results.push(result[3])
+                if (result[0] === "3-4 KLASĖ") {
+                    if ("C62" in values[4] || "C63" in values[4] || "C64" in values[4] || "C65" in values[4]) {
+                            final_results.push(result[5])
+                        } 
+                    } else {
+                        final_results.push(result[7])
+                    }
+                final_results.push(determineQuestionNumberTimeLabelEnding(result[4], result[6])) 
+            }
+        }
 
             return final_results;
         }
-
-
 
         function toggleStudentListLabel() {
             showingSelectAllCheckbox = !showingSelectAllCheckbox
@@ -1168,8 +1595,6 @@
         }
 
 
-
-
         async function addTeacher() {
             const teacherId = addTeacherInput.value;
             if (!teacherId) return;
@@ -1287,16 +1712,27 @@
             studentScoreMistakeNumber.innerHTML = '';
             mistakesSummaryTable.innerHTML = '';
             taskDescription.innerHTML = '';
-            studentMistakesTableTitle.innerHTML = '';
             taskDescriptionTitle.style.display = "none"
             teacherDispalyStudentTaskIndicator.style.display = "none"
+            studentStatisticsCompletedTasks.innerHTML = '';
+            studentStatisticsCompletedTasks.style.display = "none";
+            studentStatisticsMathDiv.style.display = "none";
+            studentStatisticsMathErrorFrequency.innerHTML = '';
+            studentStatisticsLangDiv.style.display = "none";
+            studentStatisticsGrammarErrorFrequency.innerHTML = '';
+            studentStatisticsTextComprahensionDiv.style.display = "none";
+            studentStatisticsKomponavimasErrorFrequency.innerHTML = '';
+            studentStatisticsIsdestymasErrorFrequency.innerHTML = '';
+            document.querySelector("#mistakes-summary-math").style.display = "none";
+            document.querySelector("#mistakes-summary-grammar").style.display = "none";
+            studentStatisticsTextComprahensionIsdestymasTitle.style.display = "none";
+            studentStatisticsTextComprahensionKomponavimasTitle.style.display = "none";
         }
 
         function clearTaskInfoContainerForStudents() {
             studentTaskGroupForStudent.innerHTML = '';
             studentScoreAnswerNumberForStudent.innerHTML = '';
             studentScoreMistakeNumberForStudent.innerHTML = '';
-            studentMistakesTableTitleForStudent.innerHTML = '';
             document.querySelector("#summary-table-for-student").innerHTML = '';
             taskDescriptionForStudent.innerHTML = '';
             teacherDispalyStudentTaskIndicatorForStudent.style.display = "none"
@@ -1304,74 +1740,186 @@
 
         function clearTeacherMessage() {
             teacherMessageLine.innerHTML = '';
+            teacherMessageLine2.innerHTML = '';
         }
 
         function clearStudentMessage() {
             studentMessage.innerHTML = '';
         }
 
+        let studentStatisticsCompletedTasks = document.querySelector("#student-statistics-completed-tasks");
+        const studentStatisticsMathDiv = document.querySelector("#student-statistics-math");
+        const studentStatisticsMathErrorFrequency = document.querySelector("#student-statistics-math-error-frequency");
+        const studentStatisticsLangDiv = document.querySelector("#student-statistics-lang-grammar") 
+        const studentStatisticsGrammarErrorFrequency = document.querySelector("#student-statistics-grammar-error-frequency");
+        const studentStatisticsTextComprahensionDiv = document.querySelector("#student-statistics-lang-text-comprahension")
+        const studentStatisticsKomponavimasErrorFrequency = document.querySelector("#student-statistics-komponavimas-error-frequency"); 
+        const studentStatisticsIsdestymasErrorFrequency = document.querySelector("#student-statistics-isdestymas-error-frequency"); 
+
+        const studentStatisticsTextComprahensionIsdestymasTitle = document.querySelector("#student-statistics-lang-text-comprahension-isdestymas")
+        const studentStatisticsTextComprahensionKomponavimasTitle = document.querySelector("#student-statistics-lang-text-comprahension-komponavimas")
+        
+
         function displayStudentStatistics(student, studentTasks) {
-            function combineStudentTaskResults(studentTasks) {
-        let combinedResult = {
-            result: [[0, 0], []], // Initialize with sums and an empty array for the combined lists
-            totalTasks: 0,
-            completedTasks: 0
-        };
+            function processStudentTasks(studentTasks) {
+                // Initialize the result objects
+                const mathTasks = [[0, 0], []];
+                const grammarTasks = [[0, 0], []];
+                const komponavimasTasks = [[0, 0], []];
+                const isdestymasTasks = [[0, 0], []];
 
-        if (studentTasks && studentTasks.length > 0) { // Ensure there are tasks to process
-            studentTasks.forEach(task => {
-                // Increment total task count
-                combinedResult.totalTasks += 1;
+                // Filter tasks with status true
+                const filteredTasks = studentTasks.filter(task => task.status);
 
-                // If the task status is true, increment the completedTasks count
-                if (task.status === true) {
-                    combinedResult.completedTasks += 1;
-                }
+                for (const task of filteredTasks) {
+                    try {
+                        const taskDesc = JSON.parse(task.taskDescription);
+                        const result = JSON.parse(task.result);
 
-                // Safely parse result if it exists
-                let result = [];
-                try {
-                    result = JSON.parse(task.result);
-                } catch (e) {
-                    console.error("Error parsing result for task", task);
-                    return; // Skip this task if it can't be parsed
-                }
-
-                if (Array.isArray(result) && result.length > 0) {
-                    // Add the result[0][0] numbers together, checking for valid data
-                    if (Array.isArray(result[0]) && result[0].length >= 2) {
-                        combinedResult.result[0][0] += result[0][0] || 0; // Default to 0 if the value is undefined or not valid
-                        combinedResult.result[0][1] += result[0][1] || 0; // Same for result[0][1]
+                        if (taskDesc[0] === "math") {
+                            // Process math tasks
+                            mathTasks[0][0] += result[0][0];
+                            mathTasks[0][1] += result[0][1];
+                            mathTasks[1].push(...result[1]);
+                        } else if (taskDesc[0] === "lang") {
+                            if (taskDesc[2] === "C50") {
+                                // Process grammar tasks
+                                grammarTasks[0][0] += result[0][0];
+                                grammarTasks[0][1] += result[0][1];
+                                grammarTasks[1].push(...result[1]);
+                            } else if (taskDesc[2] === "C49") {
+                                if (taskDesc[3] === "C51") {
+                                    // Process komponavimas tasks
+                                    komponavimasTasks[0][0] += result[0][0];
+                                    komponavimasTasks[0][1] += result[0][1];
+                                    komponavimasTasks[1].push(...result[1]);
+                                } else if (taskDesc[3] === "C52") {
+                                    // Process isdestymas tasks
+                                    isdestymasTasks[0][0] += result[0][0];
+                                    isdestymasTasks[0][1] += result[0][1];
+                                    isdestymasTasks[1].push(...result[1]);
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        // Skip tasks with invalid taskDescription or result format
+                        console.error("Error processing task:", error);
+                        continue;
                     }
+                }
 
-                    // Combine the result[1] lists together, ensuring it's an array
-                    if (Array.isArray(result[1])) {
-                        combinedResult.result[1] = combinedResult.result[1].concat(result[1]);
+                    return {
+                        math: mathTasks,
+                        grammar: grammarTasks,
+                        komponavimas: komponavimasTasks,
+                        isdestymas: isdestymasTasks
+                    };
+            }
+
+            function countTaskStatuses(studentTasks, category = null) {
+                let trueCount = 0;
+                let falseCount = 0;
+                let filteredTasks = studentTasks;
+
+                if (category) {
+                    filteredTasks = studentTasks.filter(task => {
+                        try {
+                            const taskDesc = JSON.parse(task.taskDescription);
+                            // Check for different possible category locations
+                            return taskDesc[0] === category || 
+                                taskDesc[2] === category || 
+                                taskDesc[3] === category;
+                        } catch (e) {
+                            console.error("Error parsing taskDescription:", e);
+                            return false;
+                        }
+                    });
+                }
+
+                const total = filteredTasks.length;
+
+                for (const task of filteredTasks) {
+                    if (task.status === true) {
+                        trueCount++;
+                    } else if (task.status === false) {
+                        falseCount++;
                     }
                 }
-            });
-        }
 
-        // Return the updated combined data with task counts
-        return combinedResult;
-    }
+                return {
+                    total: total,
+                    completed: trueCount,
+                    pending: falseCount,
+                };
+            }
+
         clearTaskInfoContainer();
         clearTeacherMessage();
         studentTaskInfoContainer.style.display = 'block';
         studentTaskStudentName.innerHTML = `${student[1]} (ID: ${student[0]})`;
 
-        combinedStudentData = combineStudentTaskResults(studentTasks)
 
-        studentScoreAnswerNumber.innerHTML = `Baigtos užduotys: ${combinedStudentData.completedTasks}/${combinedStudentData.totalTasks}`
-        mistakeFrequency = Math.round(combinedStudentData.result[0][1]/combinedStudentData.result[0][0]*100)
+        studentStatisticsCompletedTasks.style.display = "block";
 
-        if (!isNaN(mistakeFrequency)) {
-            studentScoreMistakeNumber.innerHTML = `Klaidų dažnis: ${mistakeFrequency}%`;
+        const taskStatusSummary = countTaskStatuses(studentTasks)
+        studentStatisticsCompletedTasks.innerHTML = `<span class="task-info-subtitle">Baigtos užduotys:</span> ${taskStatusSummary.completed}/${taskStatusSummary.total}`
+
+        const categorizedStudentTasks = processStudentTasks(studentTasks)
+
+
+        if (countTaskStatuses(studentTasks, "math").completed > 0)
+            studentStatisticsMathDiv.style.display = "block";
+            mistakeFrequency = Math.round(categorizedStudentTasks.math[0][1]/categorizedStudentTasks.math[0][0]*100)
+            if (!isNaN(mistakeFrequency)) {
+            studentStatisticsMathErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.math[0][1]}/${categorizedStudentTasks.math[0][0]} (${mistakeFrequency}%)`;
+            }
+
+        if (countTaskStatuses(studentTasks, "C50").completed > 0) {
+            studentStatisticsLangDiv.style.display = "block";
+            mistakeFrequency = Math.round(categorizedStudentTasks.grammar[0][1]/categorizedStudentTasks.grammar[0][0]*100)
+            if (!isNaN(mistakeFrequency)) {
+                studentStatisticsGrammarErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.grammar[0][1]}/${categorizedStudentTasks.grammar[0][0]} (${mistakeFrequency}%)`;
+            }
         }
-        if (combinedStudentData.result[1].length > 0) {
-            studentMistakesTableTitle.innerHTML = "Dažniausios klaidos:"
-            generateSummaryTable("custom", combinedStudentData.result[1]) 
+
+        if (countTaskStatuses(studentTasks, "C51").completed > 0 || countTaskStatuses(studentTasks, "C52").completed > 0) {
+            studentStatisticsTextComprahensionDiv.style.display = "block";
         }
+
+        if (countTaskStatuses(studentTasks, "C51").completed > 0) {
+            mistakeFrequency = Math.round(categorizedStudentTasks.komponavimas[0][1]/categorizedStudentTasks.komponavimas[0][0]*100)
+            if (!isNaN(mistakeFrequency)) {
+                studentStatisticsKomponavimasErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.komponavimas[0][1]}/${categorizedStudentTasks.komponavimas[0][0]} (${mistakeFrequency}%)`;
+                studentStatisticsTextComprahensionKomponavimasTitle.style.display = "block";
+            }
+        }
+
+        if (countTaskStatuses(studentTasks, "C52").completed > 0) {
+            mistakeFrequency = Math.round(categorizedStudentTasks.isdestymas[0][1]/categorizedStudentTasks.isdestymas[0][0]*100)
+            if (!isNaN(mistakeFrequency)) {
+                studentStatisticsIsdestymasErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.isdestymas[0][1]}/${categorizedStudentTasks.isdestymas[0][0]} (${mistakeFrequency}%)`;
+                studentStatisticsTextComprahensionIsdestymasTitle.style.display = "block";
+            }
+        }
+
+
+        const combinedMathAndGrammarMistakes = [...categorizedStudentTasks.math[1], ...categorizedStudentTasks.grammar[1]]
+
+        if (combinedMathAndGrammarMistakes.length > 0) {
+            generateSummaryTable("custom", combinedMathAndGrammarMistakes, "summary-table", "summary-table-grammar") 
+        }
+
+
+        document.querySelector("#mistakes-summary-math").style.display = "block";
+        document.querySelector("#mistakes-summary-grammar").style.display = "block";
+        if (document.querySelector("#summary-table").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table").innerHTML === '') {
+            document.querySelector("#mistakes-summary-math").style.display = "none";
+        }
+        if (document.querySelector("#summary-table-grammar").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table-grammar").innerHTML === '') {
+            document.querySelector("#mistakes-summary-grammar").style.display = "none";
+        }
+
+
     }
                 
 
@@ -1383,39 +1931,80 @@
             taskDescriptionTitle.style.display = "block"
             teacherDispalyStudentTaskIndicator.style.display = "block"
 
+            const parsedTaskDescription = JSON.parse(task.taskDescription);
+            const formattedTaskDescription = getOptionTextFromValues(parsedTaskDescription);
             studentTaskStudentName.innerHTML = `${student[1]} (ID: ${student[0]})`;
             studentTaskGroup.innerHTML = `Užduotis: ${task.group}`;
             teacherDispalyStudentTaskIndicator.style.backgroundColor = task.status ? greenCircleColorCode : redCircleColorCode;
             if (task.result !== '') {
                 score = JSON.parse(task.result)[0]
-                studentScoreAnswerNumber.innerHTML = `Atsakyti klausimai: ${score[0]}`;
-                studentScoreMistakeNumber.innerHTML = `Padarytos klaidos: ${score[1]}`;
+                if (parsedTaskDescription[0] === "math") {
+                    studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Atsakyti klausimai:</span> ${score[0]}`;
+                    studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Padarytos klaidos:</span> ${score[1]}`;
+                } else if (parsedTaskDescription[0] === "lang") {
+                    if (parsedTaskDescription[2] === "C50") {
+                        studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Įrašytos raidės:</span> ${score[0]}`;
+                        studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Padarytos klaidos:</span> ${score[1]}`;
+                    } else if (parsedTaskDescription[2] === "C49") {
+                        studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Sudėlioti tekstai:</span> ${score[0]}`;
+                        studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
+                    }
+                }
                 let mistakesList = [];
                 mistakesList = JSON.parse(task.result)[1]
                 if (mistakesList.length > 0) {
-                    studentMistakesTableTitle.innerHTML = "Dažniausios klaidos:"
                     generateSummaryTable("custom", mistakesList) 
+                }
+
+                if (parsedTaskDescription[0] === "math") {
+                    document.querySelector("#mistakes-summary-math").style.display = "block";
+                    document.querySelector("#mistakes-summary-grammar").style.display = "none";
+                } else if (parsedTaskDescription[0] === "lang" && parsedTaskDescription[2] === "C50") {
+                    document.querySelector("#mistakes-summary-math").style.display = "none";
+                    document.querySelector("#mistakes-summary-grammar").style.display = "block";
+                } else {
+                    document.querySelector("#mistakes-summary-math").style.display = "none";
+                    document.querySelector("#mistakes-summary-grammar").style.display = "none";
+                }
+
+                if (document.querySelector("#summary-table").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table").innerHTML === '') {
+                    document.querySelector("#mistakes-summary-math").style.display = "none";
+                } else if (document.querySelector("#summary-table-grammar").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table-grammar").innerHTML === '') {
+                    document.querySelector("#mistakes-summary-grammar").style.display = "none";
                 }
             }
 
-            const formattedTaskDescription = getOptionTextFromValues(JSON.parse(task.taskDescription))
             taskDescriptionList = document.createElement('ul');
-            taskDescriptionList.classList.add("task-description-list")
+            taskDescriptionList.classList.add("task-description-list");
+
             formattedTaskDescription.forEach(item => {
                 if (item) {  // Ensure empty values are not added
                     let listItem = document.createElement('li');
-                    listItem.textContent = item;
-                    listItem.classList.add("task-description-list-item")
+                    
+                    // Check if item contains an HTML tag, then use innerHTML
+                    if (item.includes("<")) {
+                        listItem.innerHTML = item; // Render HTML properly
+                    } else {
+                        listItem.textContent = item; // Use textContent for plain text
+                    }
+                    
+                    listItem.classList.add("task-description-list-item");
                     taskDescriptionList.appendChild(listItem);
                 }
             });
+
             taskDescription.appendChild(taskDescriptionList);
+
         }
 
         function displayStudentTaskInfo(task) {
             clearTaskInfoContainerForStudents()
             currentTaskInstructions = task.taskInstructions;
             currentTaskId = task.assignmentId
+            const parsedTaskDescription = JSON.parse(task.taskInstructions);
+            const formattedTaskDescription = getOptionTextFromValues(parsedTaskDescription);
+
+
             studentTaskGroupForStudent.innerHTML = `Užduotis: ${task.group}`;
 
             teacherDispalyStudentTaskIndicatorForStudent.style.display = "block";
@@ -1428,31 +2017,75 @@
             }
 
             if (task.result !== '') {
-            score = JSON.parse(task.result)[0]
-            studentScoreAnswerNumberForStudent.innerHTML = `Atsakyti klausimai: ${score[0]}`;
-            studentScoreMistakeNumberForStudent.innerHTML = `Padarytos klaidos: ${score[1]}`;
 
-            let mistakesList = [];
+
+                score = JSON.parse(task.result)[0]
+                if (parsedTaskDescription[0] === "math") {
+                    studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Atsakyti klausimai:</span> ${score[0]}`;
+                    studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Padarytos klaidos</span>: ${score[1]}`;
+                } else if (parsedTaskDescription[0] === "lang") {
+                    if (parsedTaskDescription[2] === "C50") {
+                        studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Irašytos raidės:</span> ${score[0]}`;
+                        studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Padarytos klaidos:</span> ${score[1]}`;
+                    } else if (parsedTaskDescription[2] === "C49") {
+                        studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Sudėlioti tekstai:</span> ${score[0]}`;
+                        studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
+                    }
+                }
+                let mistakesList = [];
+                mistakesList = JSON.parse(task.result)[1]
+                if (mistakesList.length > 0) {
+                    generateSummaryTable("custom", mistakesList, "summary-table-for-student", "summary-table-grammar-for-student") 
+                }
+
+                if (parsedTaskDescription[0] === "math") {
+                    document.querySelector("#mistakes-summary-math-for-student").style.display = "block";
+                    document.querySelector("#mistakes-summary-grammar-for-student").style.display = "none";
+                } else if (parsedTaskDescription[0] === "lang" && parsedTaskDescription[2] === "C50") {
+                    document.querySelector("#mistakes-summary-math-for-student").style.display = "none";
+                    document.querySelector("#mistakes-summary-grammar-for-student").style.display = "block";
+                } else {
+                    document.querySelector("#mistakes-summary-math-for-student").style.display = "none";
+                    document.querySelector("#mistakes-summary-grammar-for-student").style.display = "none";
+                }
+
+                if (document.querySelector("#summary-table-for-student").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table-for-student").innerHTML === "") {
+                    document.querySelector("#mistakes-summary-math-for-student").style.display = "none";
+                } else if (document.querySelector("#summary-table-grammar-for-student").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table-grammar-for-student").innerHTML === "") {
+                    document.querySelector("#mistakes-summary-grammar-for-student").style.display = "none";
+                }
+
+
+
+
+
+
+
             mistakesList = JSON.parse(task.result)[1]
             if (mistakesList.length > 0) {
-                studentMistakesTableTitleForStudent.innerHTML = "Dažniausios klaidos:"
                 generateSummaryTable("custom", mistakesList, "summary-table-for-student") 
             }
             }
 
-            const formattedTaskDescription = getOptionTextFromValues(JSON.parse(task.taskInstructions))
             taskDescriptionList = document.createElement('ul');
             taskDescriptionList.classList.add("task-description-list")
             formattedTaskDescription.forEach(item => {
                 if (item) {  // Ensure empty values are not added
                     let listItem = document.createElement('li');
-                    listItem.textContent = item;
-                    listItem.classList.add("task-description-list-item")
+                    
+                    // Check if item contains an HTML tag, then use innerHTML
+                    if (item.includes("<")) {
+                        listItem.innerHTML = item; // Render HTML properly
+                    } else {
+                        listItem.textContent = item; // Use textContent for plain text
+                    }
+                    
+                    listItem.classList.add("task-description-list-item");
                     taskDescriptionList.appendChild(listItem);
                 }
             });
             let description = document.createElement('div');
-            description.innerHTML = "Užduoties aprašymas:"
+            description.innerHTML = '<span class="task-info-subtitle">Užduoties aprašymas:</span>'
 
             taskDescriptionForStudent.appendChild(description);
             taskDescriptionForStudent.appendChild(taskDescriptionList);
@@ -1729,6 +2362,7 @@
 
 
         const apiBase = 'https://sudedu-server.onrender.com/'
+        //const apiBase = 'http://localhost:5000/'
 
         async function fetchDataForTeachers() {
             try {
@@ -1803,6 +2437,7 @@
             document.querySelectorAll('.selection-option').forEach(element => {
                 element.classList.add('temp-disabled');
             });
+            
         } else {
             toggleTaskVisibility();
             studentTaskInfoContainer.style.display = 'block'; 
@@ -1831,7 +2466,7 @@
             checkbox.style.visibility = "visible";
             checkbox.disabled = false;
         });
-            deleteTaskButton.innerText = 'Atšaukti užduoties trinimą';
+            deleteTaskButton.innerText = 'Atšaukti užduočių trinimą';
             newTaskButton.disabled = true;
             deleteStudentButton.disabled = true;
         } else {
@@ -1925,25 +2560,35 @@
             toggleDeleteTask()
         }
     }
-
+    
     async function setTask() {
+        function removeError(element) { 
+            element.classList.remove('invalid-submition'); 
+        };
+
         const selectedStudents = Array.from(document.querySelectorAll('.student-checkbox'))
             .filter(checkbox => checkbox.checked)
             .map(checkbox => parseInt(checkbox.value))
 
         if (selectedStudents.length === 0) {
-            teacherMessageLine.innerHTML = "Pasirinkite bent vieną mokinį!"
+            teacherMessageLine2.innerHTML = "Pasirinkite bent vieną mokinį!"
+            clearTimeout(timeoutReference);
+            submitNewTaskButton.classList.add('invalid-submition')
+            var timeoutReference = setTimeout(function() {
+                removeError(submitNewTaskButton);
+            }, 500);
             return
         }
 
         const groupName = document.getElementById('group_name').value.trim();
-        const modeChoice = document.getElementById('mode_choice').value
-        const modeChoice2 = document.getElementById('mode_choice_2').value
-        const modeChoice3 = document.getElementById('mode_choice_3').value
+        let modeChoice1 = document.getElementById('mode_choice_1').value
+        let modeChoice2 = document.getElementById('mode_choice_2').value
+        let modeChoice3 = document.getElementById('mode_choice_3').value
         const modeChoice4 = document.getElementById('mode_choice_4').value
-        const modeChoice5 = document.getElementById('mode_choice_5').value
+        let modeChoice5 = document.getElementById('mode_choice_5').value
         const modeChoice6 = document.getElementById('mode_choice_6').value
         const modeChoice7 = document.getElementById('mode_choice_7').value
+        const classChoiceSelection = document.querySelector('#class_choice').value;
         const timerInput = document.getElementById('timer-input-teacher').value
         const questionNumberInput = document.getElementById('question-number-input').value
         const remainderInput = document.getElementById('remainder-input').checked
@@ -1952,33 +2597,101 @@
         const selectedNumber2Element = document.querySelector('#selected_number_2');
         let selectedNumbers = [selectedNumberElement.value, selectedNumber2Element.value].sort();
 
+        let modeChoiceSelection = document.querySelector('#mode_choice').value;
+        let mode;
+        if (modeChoiceSelection === "matematika") {
+            mode = 'math';
+        } else if (modeChoiceSelection === "kalba") {
+            mode = 'lang';
+        }
+
         if (groupName.length === 0) {
-            teacherMessageLine.innerHTML = "Įveskite grupės pavadinimą!"
+            teacherMessageLine2.innerHTML = "Įveskite grupės pavadinimą!"
+            clearTimeout(timeoutReference);
+            submitNewTaskButton.classList.add('invalid-submition')
+            var timeoutReference = setTimeout(function() {
+                removeError(submitNewTaskButton);
+            }, 500);
             return
-        } else if (groupName.length > 15) {
-            teacherMessageLine.innerHTML = "Maksimalus grupės pavadinimo ilgis yra 15 simbolių."
+        } else if (groupName.length > 20) {
+            teacherMessageLine2.innerHTML = "Maksimalus grupės pavadinimo ilgis yra 20 simbolių."
+            clearTimeout(timeoutReference);
+            submitNewTaskButton.classList.add('invalid-submition')
+            var timeoutReference = setTimeout(function() {
+                removeError(submitNewTaskButton);
+            }, 500);
             return
         }
 
         let modeChoice3Processed;
-        if (modeChoice3 === 'neper') {
+        if (modeChoice3 === "C37") {
             modeChoice3Processed = true;
-			} else if (modeChoice3 === 'per10') {
+			} else if (modeChoice3 === "C38") {
 				modeChoice3Processed = false;
 			}
 
         let durationType;
-        if (modeChoice4 === 'timer') {
+        if (modeChoice4 === "C39") {
             durationType = timerInput;
-        } else if (modeChoice4 === 'questionNumber') {
+        } else if (modeChoice4 === "C40") {
             durationType = questionNumberInput;
         }
 
-        const task = [
-            modeChoice, modeChoice2, modeChoice3Processed, modeChoice4, 
-            modeChoice5, modeChoice6, modeChoice7, selectedNumbers, 
-            remainderInput, durationType
-        ];
+        const modeChoiceElementSelection = document.querySelector('#mode_choice').value;
+        let task = []
+        if (modeChoiceElementSelection === "matematika") {
+            task = [
+                mode, modeChoice1, modeChoice2, modeChoice3Processed, modeChoice4, 
+                modeChoice5, modeChoice6, modeChoice7, selectedNumbers, 
+                remainderInput, durationType, "C79"
+            ];
+        } else if (modeChoiceElementSelection === "kalba") {
+            const classChoiceSelection = document.querySelector('#class_choice').value;
+            classChoice = classChoiceSelection;
+
+            let modeChoice8Selection = document.querySelector('#mode_choice_8').value;
+            if (modeChoice8Selection === "tekstas") {
+                modeChoice1 = "C49";
+            } else if (modeChoice8Selection === "rasyba") {
+                modeChoice1 = "C50";
+            }
+
+            const modeChoice9Selection = document.querySelector('#mode_choice_9').value;
+
+            if (modeChoice9Selection === "C53") {
+                modeChoice2 = "1";
+            } else if (modeChoice9Selection === "C54") {
+                modeChoice2 = "2";
+            } else if (modeChoice9Selection === "C55") {
+                modeChoice2 = "3";
+            } else if (modeChoice9Selection === "C56") {
+                modeChoice2 = "4";
+            } else if (modeChoice9Selection === "C57") {
+                modeChoice2 = "5";
+            } else {
+                modeChoice2 = modeChoice9Selection;
+            }
+
+            modeChoice3 = getSelectedRasybaConditions();
+
+            const modeChoice12Selection = document.querySelector('#mode_choice_12').value;
+            modeChoice5 = modeChoice12Selection;
+
+            const modeChoiceLtDifficulty = document.getElementById('mode_choice_10').value;
+
+            let questionFrequency;
+            if (classChoice === "C75") {
+                    let modeChoice13Selection = document.querySelector('#mode_choice_13').value;
+					questionFrequency = Number(modeChoice13Selection);
+				} else {
+					questionFrequency = 1;
+				}
+
+            task = [
+                mode, classChoiceSelection, modeChoice1, modeChoice2, modeChoice3, modeChoice4,
+                modeChoice5, modeChoiceLtDifficulty, questionFrequency, durationType
+            ];
+        }
 
         const normalizedTask = JSON.stringify(task);
 
@@ -2007,12 +2720,27 @@
             toggleAddNewTask();
             fetchDataForTeachers()
         } else if (responseData.message === 'Some students already have the maximum allowed tasks per student.') {
-            teacherMessageLine.innerHTML = 'Galima sukurti tik vieną užduotį per mokinį. Išstrinkite seną užduotį, kad galėtumėte sukurti naują.'
+            clearTimeout(timeoutReference);
+            submitNewTaskButton.classList.add('invalid-submition')
+            var timeoutReference = setTimeout(function() {
+                removeError(submitNewTaskButton);
+            }, 500);
+            teacherMessageLine2.innerHTML = 'Galima sukurti tik 6 užduotis per mokinį. Išstrinkite seną užduotį, kad galėtumėte sukurti naują.'
         } else {
-            teacherMessageLine.innerHTML = 'Nepavyko pridėti užduoties. Bandykite vėl vėliau.'
+            clearTimeout(timeoutReference);
+            submitNewTaskButton.classList.add('invalid-submition')
+            var timeoutReference = setTimeout(function() {
+                removeError(submitNewTaskButton);
+            }, 500);
+            teacherMessageLine2.innerHTML = 'Nepavyko pridėti užduoties. Bandykite vėl vėliau.'
         }
         } catch (error) {
-        teacherMessageLine.innerHTML = 'Nepavyko pridėti užduoties. Bandykite vėl vėliau.';
+            clearTimeout(timeoutReference);
+            submitNewTaskButton.classList.add('invalid-submition')
+            var timeoutReference = setTimeout(function() {
+                removeError(submitNewTaskButton);
+            }, 500);
+            teacherMessageLine2.innerHTML = 'Nepavyko pridėti užduoties. Bandykite vėl vėliau.';
         } finally {
             submitNewTaskButton.innerHTML = "Užduoti";
         }
@@ -2028,21 +2756,37 @@
 
 			var checkbox = document.getElementById("remainder-input");
 
-			controller.language = "LT";
-			controller.mode = 'math';
-			controller.modeChoice = parsedCurrentTaskInstructions[0];
-			controller.modeChoice2 = parsedCurrentTaskInstructions[1];
-			controller.selectedNumbers = parsedCurrentTaskInstructions[7];
-			controller.withRemainder = parsedCurrentTaskInstructions[8];
-			controller.modeChoice3 = parsedCurrentTaskInstructions[2];
-            controller.modeChoice4 = parsedCurrentTaskInstructions[3];
-			controller.modeChoice5 = parsedCurrentTaskInstructions[4];
-			controller.modeChoice6 = parsedCurrentTaskInstructions[5];
-			controller.modeChoice7 = parsedCurrentTaskInstructions[6];
-			controller.modeChoice8 = 'eeu-version';
-            controller.taskId = currentTaskId;
-            controller.setTaskDuration = parsedCurrentTaskInstructions[9];
-			controller.result = ['', '', '', '', '']
+            controller.language = "LT";
+            if (parsedCurrentTaskInstructions[0] === "math") {
+                controller.mode = 'math';
+                controller.modeChoice1 = parsedCurrentTaskInstructions[1];
+                controller.modeChoice2 = parsedCurrentTaskInstructions[2];
+                controller.selectedNumbers = parsedCurrentTaskInstructions[8];
+                controller.withRemainder = parsedCurrentTaskInstructions[9];
+                controller.modeChoice3 = parsedCurrentTaskInstructions[3];
+                controller.modeChoice4 = parsedCurrentTaskInstructions[4];
+                controller.modeChoice5 = parsedCurrentTaskInstructions[5];
+                controller.modeChoice6 = parsedCurrentTaskInstructions[6];
+                controller.modeChoice7 = parsedCurrentTaskInstructions[7];
+                controller.modeChoice8 = "C79";
+                controller.taskId = currentTaskId;
+                controller.taskCompleted = false;
+                controller.setTaskDuration = parsedCurrentTaskInstructions[10];
+
+            } else if (parsedCurrentTaskInstructions[0] === "lang") {
+                controller.mode = 'lang';
+                controller.classChoice = parsedCurrentTaskInstructions[1];
+				controller.modeChoice1 = parsedCurrentTaskInstructions[2];
+				controller.modeChoice2 = parsedCurrentTaskInstructions[3];
+				controller.modeChoice3 = parsedCurrentTaskInstructions[4];
+                controller.modeChoice4 = parsedCurrentTaskInstructions[5];
+				controller.modeChoice5 = parsedCurrentTaskInstructions[6];
+				controller.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[7];
+	            controller.questionFrequency = parsedCurrentTaskInstructions[8];
+                controller.taskId = currentTaskId;
+                controller.taskCompleted = false;
+                controller.setTaskDuration = parsedCurrentTaskInstructions[9];
+            }
 
 			localStorage.setItem('controller', JSON.stringify(controller))
 
@@ -2125,13 +2869,11 @@
 
         alert('User deleted successfully');
         usernameInput.value = '';
-        
     } catch (error) {
         console.error('Deletion error:', error);
         alert(`Error: ${error.message}`);
     }
 }
-
 
 	</script>
 </body>

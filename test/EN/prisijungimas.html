@@ -48,7 +48,7 @@
 		<div>
 		<div class="row">
 		<div class="col-12">
-			<h2 id="log-in-text">Prisijungimas</h2>
+			<h2 id="log-in-text">Log In</h2>
 		</div>
 		</div>
 
@@ -56,29 +56,29 @@
 			<p id="error"></p>
 		</div>
 		<div class="col-12 gap-after-row">
-		<input id="emailInput" placeholder="elektroninis paštas" />
+		<input id="emailInput" placeholder="email address" />
 		</div>
 		<div class="col-12 gap-after-row">
-		<input id="passwordInput" placeholder="slaptažodis" type="password" />
+		<input id="passwordInput" placeholder="password" type="password" />
 		</div>
 		<div class="col-12 gap-after-row">
-			<input id="nickname" placeholder="vardas" />
+			<input id="nickname" placeholder="name" />
 		</div>
 		<div class="col-12 gap-after-row"id="is-teacher-div">
 				<input type="checkbox" id="is-teacher"/>
-				Aš esu mokytoja(as)
+				I am a teacher
 		</div>
 		<div class="col-12 gap-after-row">
 		<button class="btn btn-primary" id="authBtn" onclick="authenticate()">
-			Prisijungti
+			Log In
 		</button>
 		</div>
 		<hr />
 			<div class="col-12">
-			<p id="sign-ip-text">Neturi paskyros?</p>
+			<p id="sign-ip-text">Need an account?</p>
 			</div>
 			<div class="col-12">
-			<button class="btn btn-primary" onclick="toggleIsRegister()" id="registerBtn">Sukurti paskyrą</button>
+			<button class="btn btn-primary" onclick="toggleIsRegister()" id="registerBtn">Sign Up</button>
 		</div>
 	</div>
 	
@@ -130,10 +130,10 @@
 
 	async function toggleIsRegister() {
         isRegistration = !isRegistration
-        registerBtn.innerText = isRegistration ? 'Prisijungti' : 'Sukurti paskyrą';
-        logInTitle.innerHTML = isRegistration ? 'Registracija' : 'Prisijungimas';
-        signUpText.innerText = isRegistration ? 'Jau turi paskyrą?' : 'Neturi paskyros?';
-        authBtn.innerHTML = isRegistration ? 'Prisiregistruoti' : 'Prisijungti';
+        registerBtn.innerText = isRegistration ? 'Log In' : 'Sign Up';
+        logInTitle.innerHTML = isRegistration ? 'Sign Up' : 'Log In';
+        signUpText.innerText = isRegistration ? 'Already have an account?' : 'Need an account?';
+        authBtn.innerHTML = isRegistration ? 'Sign Up' : 'Log In';
 		nickname.style.display = isRegistration ? 'block' : 'none';
 		isTeacherDiv.style.display = isRegistration ? 'block' : 'none';
     }
@@ -149,22 +149,22 @@
 
 		// guard clauses... if authenticating, return
 		if (!emailVal) {
-			errorField.innerHTML = 'Įveskite elektroninį paštą';
+			errorField.innerHTML = 'Please type in your email address';
 			return
 		} else if (!passVal) {
-			errorField.innerHTML = 'Įveskite slaptažodį';
+			errorField.innerHTML = 'Please type in your password';
 			return
 		} else if ((passVal.length < 6 || passVal.length > 15) && isRegistration) {
-			errorField.innerHTML = 'Slaptažodis turi būti nuo 6 iki 15 simbolių';
+			errorField.innerHTML = 'Password must be between 6 and 15 characters long';
 			return
 		} else if (!emailVal.includes('@')) {
-			errorField.innerHTML = 'Neteisingas elektroninio pašto formatas';
+			errorField.innerHTML = 'Invalid email address';
 			return
 		} else if (!nicknameVal && isRegistration) {
-			errorField.innerHTML = 'Įveskite vardą';
+			errorField.innerHTML = 'Please type in your name';
 			return
 		} else if (nicknameVal.length > 15) {
-			errorField.innerHTML = 'Vardas gali būti tik iki 15 simbolių';
+			errorField.innerHTML = 'Name can only ne 15 characters long';
 			return
 		}
 	
@@ -176,7 +176,7 @@
 		// reset error and set isAuthenticating to true
 		errorField.innerHTML = ''
 		isAuthenticating = true
-		authBtn.innerText = 'Tikrinama...'
+		authBtn.innerText = 'Checking...'
 
 		try {
 			let data
@@ -200,7 +200,7 @@
 			}
 
 			if (isRegistration && data.message == 'registration successful') {
-				errorField.innerHTML = 'Paskyra sėkmingai sukurta';
+				errorField.innerHTML = 'Account created successfully!';
 				email.value = '';
     	 		password.value = '';
 				nickname.value = '';
@@ -216,29 +216,29 @@
 				};
 
 				localStorage.setItem('userData', JSON.stringify(userData));
-				window.location.href = `/LT`;
+				window.location.href = `/EN`;
 			} else {
 				if (data.message == 'User not found') {
-					errorField.innerHTML = 'Vartotojas nerastas';
+					errorField.innerHTML = 'User not found';
 				} else if (data.message == 'Invalid password') {
-					errorField.innerHTML = 'Neteisingas slaptažodis';
+					errorField.innerHTML = 'Invalid password';
 				} else if (data.message = 'Username is already taken') {
-					errorField.innerHTML = 'Elektroninis paštas jau užimtas';
+					errorField.innerHTML = 'sername is already taken';
 				} else if (data.message = 'Database is not available') {
-					errorField.innerHTML = 'Duomenų bazė nepasiekamia. Bandykite vėliau';	
+					errorField.innerHTML = 'Database is not available. Try again later.';	
 				} else if (data.message = 'Unexpected error') {
-					errorField.innerHTML = 'Kažkas nepavyko, bandykite vėliau';
-				} else throw Error('Kažkas nepavyko')
+					errorField.innerHTML = 'Unexpected error. Try again later.';
+				} else throw Error('Unexpected error')
 			}
 		} catch (err) {
-			errorField.innerHTML = 'Nepavyko pasiekti duomenų. Bandykite vėl vėliau.';
+			errorField.innerHTML = 'Database is not available. Try again later.';
 			console.log('Error fetching tasks:', err);
 		} finally {
 			isAuthenticating = false
 			if (isAuthenticating) {
-				authBtn.innerText = 'Prisiregistruoti'
+				authBtn.innerText = 'Sign Up'
 			} else {
-				authBtn.innerText = 'Prisijungti'
+				authBtn.innerText = 'Log In'
 			}
 		}
 }

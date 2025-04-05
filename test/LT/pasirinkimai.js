@@ -11,6 +11,9 @@ const resetButtonElement = document.querySelector('.reset-button');
 		const questionNumberInputElement = document.querySelector('#question-number-input');
 		const startQuestionsButtonElement = document.querySelector('.start-questions-button');
 
+    const questionNumberSectionTitle = document.querySelector('#question-number-selection-title');
+    let answerNumberLabelElement = document.querySelector('.answer-number-label');
+
     let answerInputElement = document.querySelector('#answer');
 		const trackersElement = document.querySelector('.trackers');
 
@@ -18,13 +21,12 @@ const resetButtonElement = document.querySelector('.reset-button');
     let equationAnswerDivElement = document.querySelector('.equation-answer-div');
 
     let timerLabelElement = document.querySelector('.timer-label');
-    let answerNumberLabelElement = document.querySelector('.answer-number-label');
 
 		const linkElement = document.querySelector("#questionsStyleSheet");
 
 		setTimerElement.addEventListener('click', function(event) {
 			controller = JSON.parse(localStorage.getItem('controller'));
-			controller.modeChoice4 = 'timer';
+			controller.modeChoice4 = "C39";
 			localStorage.setItem('controller', JSON.stringify(controller));
       modeChoice4DIv.style.display = "none";
 			timerInputDivElement.style.display = "flex";
@@ -34,26 +36,42 @@ const resetButtonElement = document.querySelector('.reset-button');
 
 		setQuestionNumberElement.addEventListener('click', function(event) {
 			controller = JSON.parse(localStorage.getItem('controller'));
-			controller.modeChoice4 = 'questionNumber';
+			controller.modeChoice4 = "C40";
 			localStorage.setItem('controller', JSON.stringify(controller));
       modeChoice4DIv.style.display = "none";
 			questionNumberInputElement.style.display = "flex";
       questionNumberDivElement.style.display = "flex";
       equationAnswerDivElement.style.display = "none";
       startQuestionsButtonElement.style.display = "flex";
+
+      if (controller.mode === "lang") {
+        if (controller.modeChoice1 === "C49") {
+          questionNumberSectionTitle.innerHTML = "SUDĖLIOTI";
+          questionNumberInputElement.value = 5
+          answerNumberLabelElement.innerHTML = 'tekstus';
+        } else if (controller.modeChoice1 === "C50") {
+          questionNumberInputElement.value = 20;
+          answerNumberLabelElement.innerHTML = 'sakinių';
+        }
+            
+        } else {
+          questionNumberSectionTitle.innerHTML = "ATLIKTI";
+          questionNumberInputElement.value = 20;
+          answerNumberLabelElement.innerHTML = 'veiksmų';
+        } 
 		});
 
 		startQuestionsButtonElement.addEventListener('click', startQuestions)
     
     
     function startQuestions () {
-        if (controller.modeChoice4 === 'timer') {
+      controller = JSON.parse(localStorage.getItem('controller'));
+      if (controller.modeChoice4 === "C39") {
           startQuestionsTimer()
-        } else if (controller.modeChoice4 = 'questionNumber') {
+        } else if (controller.modeChoice4 = "C40") {
           startQuestionsNumber()
         }
     };
-
 
     
       function startQuestionsTimer () {
@@ -61,7 +79,7 @@ const resetButtonElement = document.querySelector('.reset-button');
       if (controller.taskId !== 0) {
         controller.timerLimit = parseInt(controller.setTaskDuration);
       } else {
-		controller.timerLimit = parseInt(timerInputElement.value);
+		    controller.timerLimit = parseInt(timerInputElement.value);
       }
       if (!controller.timerLimit) {
         controller.timerLimit = 5;
@@ -76,24 +94,25 @@ const resetButtonElement = document.querySelector('.reset-button');
       }
 
       if (localStorage.getItem("startTime")) {
-      localStorage.removeItem("startTime");
-    }
-      controller.result = ['', '', '', '', '']
+        localStorage.removeItem("startTime");
+      }
+        controller.result = ['', '', '', '', '']
         controller.currentMistakes = [];
         controller.mistakesTracker = 0;
-        controller.correctAnswerTracker = 0;
+        controller.answeredQuestionTracker = 0;
         controller.equation = '';
-      controller.equation2 = '';
-      controller.randomSelection = [];
-      controller.correctAnswerTracker = 0;
-      controller.questionsStopped = false;
-			generateCombinations();
-			localStorage.setItem('controller', JSON.stringify(controller));
-      redirectToQuestions();
-
+        controller.equation2 = '';
+        controller.randomSelection = [];
+        controller.questionsStopped = false;
+        if (controller.mode === "math") {
+          generateCombinations();
+        }
+        localStorage.setItem('controller', JSON.stringify(controller));
+        redirectToQuestions();
 		};
     
       function startQuestionsNumber () {
+
 			controller = JSON.parse(localStorage.getItem('controller'));
       if (controller.taskId !== 0) { 
         controller.questionNumber = parseInt(controller.setTaskDuration);
@@ -109,15 +128,17 @@ const resetButtonElement = document.querySelector('.reset-button');
       controller.result = ['', '', '', '', '']
 			controller.currentMistakes = [];
 			controller.mistakesTracker = 0;
-			controller.correctAnswerTracker = 0;
+			controller.answeredQuestionTracker = 0;
 			controller.equation = '';
       controller.randomSelection = [];
-      controller.correctAnswerTracker = 0;
       controller.questionsStopped = false;
-			generateCombinations();
+      if (controller.mode === "math") {
+			  generateCombinations();
+      }
       if (controller.combinations.length > controller.questionNumber) {
         controller.combinations = controller.combinations.sort(() => 0.5 - Math.random()).slice(0, controller.questionNumber);
       }
+
 			localStorage.setItem('controller', JSON.stringify(controller));
       redirectToQuestions();
 
@@ -135,13 +156,32 @@ const resetButtonElement = document.querySelector('.reset-button');
 
 
     questionNumberInputElement.addEventListener("input", function(event) {
-      if (parseInt(questionNumberInputElement.value) === 1 || parseInt(questionNumberInputElement.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElement.value) !== 11) {
-        answerNumberLabelElement.innerHTML = 'veiksmą';
-      } else if ((parseInt(questionNumberInputElement.value) > 1 && parseInt(questionNumberInputElement.value) < 10) || (parseInt(questionNumberInputElement.value) > 20 && parseInt(questionNumberInputElement.value.slice(-1)[0]) !== 0))  {
-        answerNumberLabelElement.innerHTML = 'veiksmus';
-      } else if (parseInt(questionNumberInputElement.value) >= 10) {
-        answerNumberLabelElement.innerHTML = 'veiksmų';
-      }
+      if (controller.mode === "lang") {
+        if (controller.modeChoice1 === "C49") {
+            if (parseInt(questionNumberInputElement.value) === 1 || parseInt(questionNumberInputElement.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElement.value) !== 11) {
+              answerNumberLabelElement.innerHTML = 'tekstą';
+            } else if ((parseInt(questionNumberInputElement.value) > 1 && parseInt(questionNumberInputElement.value) < 10) || (parseInt(questionNumberInputElement.value) > 20 && parseInt(questionNumberInputElement.value.slice(-1)[0]) !== 0))  {
+              answerNumberLabelElement.innerHTML = 'tekstus';
+            } else if (parseInt(questionNumberInputElement.value) >= 10) {
+              answerNumberLabelElement.innerHTML = 'tekstų';
+            }
+
+        } else if (controller.modeChoice1 === "C50") {
+            if (parseInt(questionNumberInputElement.value) === 1 || parseInt(questionNumberInputElement.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElement.value) !== 11) {
+              answerNumberLabelElement.innerHTML = 'sakinys';
+            } else if ((parseInt(questionNumberInputElement.value) > 1 && parseInt(questionNumberInputElement.value) < 10) || (parseInt(questionNumberInputElement.value) > 20 && parseInt(questionNumberInputElement.value.slice(-1)[0]) !== 0))  {
+              answerNumberLabelElement.innerHTML = 'sakiniai';
+            } else if (parseInt(questionNumberInputElement.value) >= 10) {
+              answerNumberLabelElement.innerHTML = 'sakinių';
+            }
+        }
+        } else if (parseInt(questionNumberInputElement.value) === 1 || parseInt(questionNumberInputElement.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElement.value) !== 11) {
+          answerNumberLabelElement.innerHTML = 'veiksmą';
+        } else if ((parseInt(questionNumberInputElement.value) > 1 && parseInt(questionNumberInputElement.value) < 10) || (parseInt(questionNumberInputElement.value) > 20 && parseInt(questionNumberInputElement.value.slice(-1)[0]) !== 0))  {
+          answerNumberLabelElement.innerHTML = 'veiksmus';
+        } else if (parseInt(questionNumberInputElement.value) >= 10) {
+          answerNumberLabelElement.innerHTML = 'veiksmų';
+        }
     })
 
 

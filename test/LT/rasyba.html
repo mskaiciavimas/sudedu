@@ -217,6 +217,16 @@
 	padding-bottom: 10px;
 }
 
+#field-for-final-message {
+    color: black;
+    font-size: 4rem;
+    text-align: center;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 @media (max-width: 767px) {
 	#help-button,
 	#next-question,
@@ -237,6 +247,11 @@
 	:root {
         --font-size: 22px; /* Smaller font size for tablets */
     }
+
+	#field-for-final-message {
+		font-size: 3rem;
+	}
+
 }
 
 @media (max-width: 575px) {
@@ -249,6 +264,10 @@
 	:root {
         --font-size: 22px; /* Smaller font size for tablets */
     }
+
+	#field-for-final-message {
+		font-size: 2rem;
+	}
 }
 	</style>
 </head>
@@ -257,7 +276,14 @@
 	<div class="container" style="display: flex; flex-direction: column; justify-content: space-between;">
 		<div class="row justify-content-center align-items-center trackers-row">
 			<div class="col-6 d-flex justify-content-start align-items-left">
-				<h3 id="mistake-tracker">Teisingai: 0/0</h3>
+				<div class="trackers">
+					<div>
+						<h3 id="answer-tracker"></h3>
+					</div>
+					<div>
+						<h3 id="mistake-tracker">Teisingai: 0/0</h3>
+					</div>
+				</div>
 		</div>
 		<div class="col-6 d-flex justify-content-end align-items-left">
 			<h3>
@@ -267,8 +293,23 @@
 		</div>
 		<div class="row justify-content-center align-items-center">
 			<div class="col-12 justify-content-center align-items-center">
-				<div id="text" class="field">
+				<div id="field-for-text" class="field">
+				<div id="field-for-sentences"></div>
+				<div id="field-for-final-message"></div>
+				<div id="restart-reset-button-row" class="row justify-content-center align-items-center" style="display: none;">
+					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
+						<div id="reset-mistake-buttons" class="col-12 d-flex justify-content-center align-items-center">
+								<div id="fireworks-div" class="position-absolute image-container bottom-0 end-0 fireworks-div"></div>
+							<div class="col-12 d-flex position-relative justify-content-center align-items-center">
+								<div class="d-flex justify-content-end align-items-center summary-div">
+									<button class="btn btn-primary summary-button">Klaidos</button>
+								</div>
+	
+							</div>
+						</div>
+					</div>
 				</div>
+			</div>
 			</div>
 		</div>
 		<div class="row justify-content-center align-items-center">
@@ -312,7 +353,8 @@
 	</div>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/dragula@3.7.3/dist/dragula.min.js"></script>
-	<script src="../../mental-arithmetic.js"></script>
+	<script src="../parameter_dictionary.js"></script>
+	<script src="../mental-arithmetic.js"></script>
 
 	<script>
 
@@ -321,20 +363,21 @@ window.onload = function () {
         window.location.href = "./";
     } else {
       controller = JSON.parse(localStorage.getItem('controller')) 
-      if (controller.mode !== "grammar") {
+      if (controller.modeChoice1 !== "C50") {
 			window.location.href = "./";
 		}
     }
   }
 
-  controller = JSON.parse(localStorage.getItem('controller')) 
+  controller = JSON.parse(localStorage.getItem('controller'))
+
   let jsonFiles = [];
 
 	// Define an array of URLs for the JSON files you want to fetch
-	if (controller.classChoice === "pirma-antra") {
-		jsonFiles = ['../../databases/1_2_klase_rasyba.json'];
-	} else if (controller.classChoice === "trecia-ketvirta") {
-		jsonFiles = ['../../databases/3_4_klase_rasyba.json'];
+	if (controller.classChoice === "C75") {
+		jsonFiles = ['../databases/1_2_klase_rasyba.json'];
+	} else if (controller.classChoice === "C76") {
+		jsonFiles = ['../databases/3_4_klase_rasyba.json'];
 	}
 	Promise.all(jsonFiles.map(file => fetch(file).then(response => {
 		if(!response.ok) {
@@ -350,21 +393,27 @@ window.onload = function () {
 		let sakiniai = [];
 		let atsakymai = {};
 		let questionsToDisplay = Number(controller.modeChoice2);
+		let totalSentencesCompleted = 0;
 		let firstTimeChecking = true;
-		let totalAttemptedQuestions = 0;
 		let totalCorrectAnswers = 0;
     	let currentAnswerAttempts = 0;
 		const maximumQuestionFrequencyPerWord = controller.questionFrequency;
 		let allowAdjacentEndlessWords;
-		if (controller.modeChoice4 === "lengvesnes") {
+		if (controller.modeChoice5 === "C73") {
 			allowAdjacentEndlessWords = false;
-		} else if (controller.modeChoice4 === "sunkesnes") {
+		} else if (controller.modeChoice5 === "C74") {
 			allowAdjacentEndlessWords = true;
 		}
 		let allAnswersCorrect = false;
 
 		if(sentenceLibrary) {
-			const conditions = controller.modeChoice3
+			const codedConditions = controller.modeChoice3
+			let conditions = {}
+
+			Object.entries(codedConditions).forEach(([key, value]) => {
+				let decodedKey = parameterDictionary[key]["parameter"];
+				conditions[decodedKey] = value;
+			});
 
 			const categoriesToCheck = ["prv", "bdv", "vks", "dkt", "įsi-r", "įvr", "skt"]
 			const categoriesThatNeedEndings = ["prv", "bdv", "vks", "dkt", "fsc-gal"]
@@ -554,8 +603,8 @@ window.onload = function () {
 														if (!(subcondition[0] === undefined)) {
 														if(checkCategories(wordInfo, subCategoriesToCheck[condition], getAllowedMatchingCategories(subcondition, subCategoryMatchingRules[condition]))) {
 															if (
-																			(controller.classChoice === "pirma-antra" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
-																			(controller.classChoice === "trecia-ketvirta" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
+																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
 																			!categoriesThatNeedEndings.includes(condition)
 																	) {
 																			const isNounOrAdjective = (condition === "dkt") ||  (condition === "bdv");
@@ -577,8 +626,8 @@ window.onload = function () {
 														}
 													} else {
 														if (
-																			(controller.classChoice === "pirma-antra" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
-																			(controller.classChoice === "trecia-ketvirta" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
+																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
 																			!categoriesThatNeedEndings.includes(condition)
 																	) {
 																			const isNounOrAdjective = (condition === "dkt") ||  (condition === "bdv");
@@ -615,8 +664,8 @@ window.onload = function () {
 																	if (!(otherSubconditions[0] === undefined)) {
 																	if(checkCategories(wordInfo, subCategoriesToCheck[otherCondition], getAllowedMatchingCategories(otherSubconditions, subCategoryMatchingRules[otherCondition]))) {
 																		if (
-																			(controller.classChoice === "pirma-antra" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
-																			(controller.classChoice === "trecia-ketvirta" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
+																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
 																			!categoriesThatNeedEndings.includes(otherCondition)
 																	) {
 																			const isNounOrAdjective = (otherCondition === "dkt") ||  (otherCondition === "bdv");
@@ -639,8 +688,8 @@ window.onload = function () {
 																	}
 																} else {
 																	if (
-																			(controller.classChoice === "pirma-antra" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
-																			(controller.classChoice === "trecia-ketvirta" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
+																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
 																			!categoriesThatNeedEndings.includes(otherCondition)
 																	) {
 																			const isNounOrAdjective = (otherCondition === "dkt") ||  (otherCondition === "bdv");
@@ -683,8 +732,8 @@ window.onload = function () {
 																	if (!(otherSubconditions[0] === undefined)) {
 																	if(checkCategories(wordInfo, subCategoriesToCheck[otherCondition], getAllowedMatchingCategories(otherSubconditions, subCategoryMatchingRules[otherCondition]))) {
 																		if (
-																			(controller.classChoice === "pirma-antra" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
-																			(controller.classChoice === "trecia-ketvirta" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
+																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
 																			!categoriesThatNeedEndings.includes(otherCondition)
 																	) {
 																			const isNounOrAdjective = (otherCondition === "dkt") ||  (otherCondition === "bdv");
@@ -707,8 +756,8 @@ window.onload = function () {
 																	}
 																} else {
 																	if (
-																			(controller.classChoice === "pirma-antra" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
-																			(controller.classChoice === "trecia-ketvirta" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
+																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
 																			!categoriesThatNeedEndings.includes(otherCondition)
 																	) {
 																			const isNounOrAdjective = (otherCondition === "dkt") ||  (otherCondition === "bdv");
@@ -762,8 +811,8 @@ window.onload = function () {
 											let pagalbaText = "";
 											let valuesToShow = [];
 											if (categoriesThatNeedEndings.includes(wordsToBeUsed[word])) {
-												if ((controller.classChoice === "trecia-ketvirta" && wordInfo["gal-s"]) || (controller.classChoice === "pirma-antra" && wordInfo["fsc-gal"])) {
-													if (controller.classChoice === "trecia-ketvirta") {
+												if ((controller.classChoice === "C76" && wordInfo["gal-s"]) || (controller.classChoice === "C75" && wordInfo["fsc-gal"])) {
+													if (controller.classChoice === "C76") {
 													const pagalbaIndex = {
 															"vns": "vns.",
 															"dgs": "dgs.",
@@ -817,7 +866,7 @@ window.onload = function () {
 																valuesToShow.push(pagalbaIndex["mot-g"]);
 															}
 													}
-													} else if (controller.classChoice === "pirma-antra") {
+													} else if (controller.classChoice === "C75") {
 														if (wordInfo['g'] === true) {
 															valuesToShow.push("ką vieną?")
 														} else if (wordInfo['k'] === true) {
@@ -830,15 +879,18 @@ window.onload = function () {
 												// Join the results into a single string separated by commas
 												const valuesToShowString = valuesToShow.join(', ');
 												formattedWord = [`${beforePunctuation}<span class="question-word-span end" style="display: inline; white-space: nowrap;">${wordInfo["gal-c"][0][0][0]}<input type="text" autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input end"> <span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
-												atsakymai[`id-${questionId}`] = [wordInfo["gal-c"][0][1]];
+												atsakymai[`id-${questionId}`] = {};
+												atsakymai[`id-${questionId}`]["klausimas"] = [wordInfo["gal-c"][0][0][0], '']
+												atsakymai[`id-${questionId}`]["atsakymas"] = [wordInfo["gal-c"][0][1]];
+												atsakymai[`id-${questionId}`]["kl-grupe"] = wordsToBeUsed[word];
 												questionId++;
 												
 												}
 											
 											} 
 											
-											if ((controller.classChoice === 'pirma-antra' && (wordsToBeUsed[word] === "fsc-con" || wordsToBeUsed[word] === "fsc-vow")) ||
-												(controller.classChoice === "trecia-ketvirta" && wordsToBeUsed[word] === "fsc-vow")
+											if ((controller.classChoice === "C75" && (wordsToBeUsed[word] === "fsc-con" || wordsToBeUsed[word] === "fsc-vow")) ||
+												(controller.classChoice === "C76" && wordsToBeUsed[word] === "fsc-vow")
 											) {
 												removedLetterOptionIndex = {
 													"k": ["k", "g"],
@@ -871,7 +923,11 @@ window.onload = function () {
 														} else if (wordsToBeUsed[word] === "fsc-con" ) {
 															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<input type="text" autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input middle">${randomElement[2][0]} <span class="pagalba-span-perm">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];															
 														}
-														atsakymai[`id-${questionId}`] = [randomElement[1]];
+														atsakymai[`id-${questionId}`] = {};
+														atsakymai[`id-${questionId}`]["klausimas"] = [randomElement[0][0], randomElement[2][0]]
+														atsakymai[`id-${questionId}`]["atsakymas"] = [randomElement[1]];
+														atsakymai[`id-${questionId}`]["kl-grupe"] = wordsToBeUsed[word];
+
 														questionId++;
 													}
 											} else {
@@ -880,7 +936,10 @@ window.onload = function () {
 														let randomIndex = Math.floor(Math.random() * combinations.length);
 														let randomElement = combinations[randomIndex];
 														formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<input type="text" autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input middle"><span class="pagalba-div"></span>${randomElement[2][0]}${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
-														atsakymai[`id-${questionId}`] = [randomElement[1]];
+														atsakymai[`id-${questionId}`] = {};
+														atsakymai[`id-${questionId}`]["klausimas"] = [randomElement[0][0], randomElement[2][0]]
+														atsakymai[`id-${questionId}`]["atsakymas"] = [randomElement[1]];
+														atsakymai[`id-${questionId}`]["kl-grupe"] = wordsToBeUsed[word];
 														questionId++;
 														
 												}
@@ -935,25 +994,45 @@ window.onload = function () {
 			}
 		}
 
+		let answerTrackerElement = document.querySelector('#answer-tracker');
+		let stopButtonSpanElement = document.querySelector('#stop-button-span');
+		const resetMistakeButtonsElement = document.querySelector('#restart-reset-button-row');
+
+		if (controller.modeChoice4 === "C40") {
+			answerTrackerElement.innerHTML = `Atlikta: ${totalSentencesCompleted}/${controller.questionNumber}`;
+		}
+
+
 		function displaySentences() {
-				allAnswersCorrect = false;
-        currentAnswerAttempts = 0;
-        document.getElementById('check-answers').disabled = false;
-				document.getElementById('show-answers').style.visibility = "hidden";
-				// Ensure questionsToDisplay doesn't exceed the number of sentences
+			allAnswersCorrect = false;
+			currentAnswerAttempts = 0;
+			document.getElementById('check-answers').disabled = false;
+			document.getElementById('show-answers').style.visibility = "hidden";
+			document.getElementById('field-for-final-message').innerHTML = '';
+
+			if (controller.modeChoice4 === "C39") {
 				if (questionsToDisplay > sakiniai.length) {
 					assembleAndFormatSentences();
 				}
+			} else if (controller.modeChoice4 === "C40") {
+				if ((controller.questionNumber - totalSentencesCompleted) < questionsToDisplay) {
+					questionsToDisplay = controller.questionNumber - totalSentencesCompleted
+				}
+				totalSentencesCompleted = totalSentencesCompleted + questionsToDisplay
+				if (questionsToDisplay > sakiniai.length) {
+					assembleAndFormatSentences();
+				}
+			}
 
+			let subSakiniai = [];
+
+			if (controller.randomSelection.length === 0) {
 				// Select random unique indices
 				const selectedIndices = new Set();
 				while (selectedIndices.size < questionsToDisplay) {
 					const randomIndex = Math.floor(Math.random() * sakiniai.length);
 					selectedIndices.add(randomIndex);
 				}
-
-				// Create sublist for selected sentences
-				const subSakiniai = [];
 
 				// Sort indices in descending order to avoid modifying the list while iterating
 				const sortedIndices = Array.from(selectedIndices).sort((a, b) => b - a);
@@ -967,54 +1046,70 @@ window.onload = function () {
 				const remainingSakiniai = sakiniai.filter((_, index) => !selectedIndices.has(index));
 				sakiniai = remainingSakiniai;
 
-				// Set the inner HTML of the text container
-				document.getElementById("text").innerHTML = subSakiniai.join('');
+				controller.randomSelection = [subSakiniai, atsakymai]
+				localStorage.setItem("controller", JSON.stringify(controller));
+			} else {
+				subSakiniai = controller.randomSelection[0];
+				atsakymai = controller.randomSelection[1]
+			}
 
-				// Restrict input to Lithuanian letters and spaces for the question inputs
-				document.querySelectorAll('.question-input').forEach(input => {
-					input.addEventListener('input', function () {
-						// Replace any character that isn't a Lithuanian letter or space
-						this.value = this.value.replace(/[^a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ\s]/g, '');
-					});
+			// Set the inner HTML of the text container
+			document.getElementById("field-for-sentences").innerHTML = subSakiniai.join('');
+
+			// Restrict input to Lithuanian letters and spaces for the question inputs
+			document.querySelectorAll('.question-input').forEach(input => {
+				input.addEventListener('input', function () {
+					// Replace any character that isn't a Lithuanian letter or space
+					this.value = this.value.replace(/[^a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ\s]/g, '');
 				});
-				document.querySelectorAll('input, textarea').forEach(input => {
-					input.setAttribute('spellcheck', 'false');
-    input.addEventListener('input', () => resizeInput(input));
-    resizeInput(input);
-  });
-
-	focusFirstInput();
-
-	document.querySelectorAll('.question-input').forEach(input => {
-        // Add event listener to remove 'wrong-answer' class on focus
-        input.addEventListener('focus', () => {
-            input.classList.remove('wrong-answer');
-        });
+			});
+			document.querySelectorAll('input, textarea').forEach(input => {
+				input.setAttribute('spellcheck', 'false');
+				input.addEventListener('input', () => resizeInput(input));
+				resizeInput(input);
 			});
 
-      setupDynamicListeners();
-			}
+			focusFirstInput();
 
-			function toggleHelpButton() {
-				const helpButton = document.getElementById("help-button");
-				const pagalbaSpans = document.querySelectorAll(".pagalba-span");
+			document.querySelectorAll('.question-input').forEach(input => {
+				// Add event listener to remove 'wrong-answer' class on focus
+				input.addEventListener('focus', () => {
+					input.classList.remove('wrong-answer');
+				});
+					});
 
-				let isAnySpanNonEmpty = Array.from(pagalbaSpans).some(span => span.innerHTML.trim() !== "");
+			setupDynamicListeners();
 
-				helpButton.style.visibility = isAnySpanNonEmpty ? "visible" : "hidden";
-			}
+		}
+
+		function toggleHelpButton() {
+			const helpButton = document.getElementById("help-button");
+			const pagalbaSpans = document.querySelectorAll(".pagalba-span");
+
+			let isAnySpanNonEmpty = Array.from(pagalbaSpans).some(span => span.innerHTML.trim() !== "");
+
+			helpButton.style.visibility = isAnySpanNonEmpty ? "visible" : "hidden";
+		}
 
 
 		function initiateTheProgram() {
-		filterSentenceLibrary();
-		assembleAndFormatSentences();
-		displaySentences();
-		toggleHelpButton();
-		if (localStorage.getItem("startTime")) {
-      localStorage.removeItem("startTime");
-    };
-		helpToggle();
-		startTimer();
+			if (!controller.questionsStopped) {
+				filterSentenceLibrary();
+				assembleAndFormatSentences();
+				displaySentences();
+				toggleHelpButton();
+				helpToggle();
+
+				if (!controller.questionsStopped) {
+				if (controller.modeChoice4 === "C39") {
+					countDown();
+				} else if (controller.modeChoice4 === "C40") {
+					startTimer();
+				}
+				}
+			} else {
+				formatFinalMessageForGrammar();
+			}
 	}
 
 
@@ -1071,6 +1166,32 @@ function setupDynamicListeners() {
     });
 }
 
+function recordGrammarMistakes (asnwer) {
+    while (controller.currentMistakes.length > 29) {
+      controller.currentMistakes.splice(0, 1)
+    }
+
+	const mistakeEncoudingIndex = {
+		"fsc-gal": "C61",
+		"dkt": "C62",
+		"bdv": "C63",
+		"prv": "C64",
+		"vks": "C65",
+		"įsi-r": "C66",
+		"fsc-con": "C67",
+		"fsc-vow": "C68",
+		"prš": "C69",
+		"prs": "C70",
+		"asim": "C71",
+		"md": "C72"
+	}
+    controller.currentMistakes.push([[asnwer["klausimas"][0], asnwer["atsakymas"][0][0], asnwer["klausimas"][1]], mistakeEncoudingIndex[asnwer["kl-grupe"]]])
+    while (controller.totalMistakes.length > 29) {
+      controller.totalMistakes.splice(0, 1)
+    }
+    controller.totalMistakes.push([[asnwer["klausimas"][0], asnwer["atsakymas"][0][0], asnwer["klausimas"][1]], mistakeEncoudingIndex[asnwer["kl-grupe"]]])
+  }
+
 function checkAnswers() {
     const inputs = document.querySelectorAll('.question-input');
     const NumberOfQuestionsInRound = inputs.length;
@@ -1102,8 +1223,7 @@ function checkAnswers() {
             inputValue = inputValue.replace(/\s+/g, '');
 
             // Compare the stripped value with the corresponding value from atsakymai
-			if (atsakymai[inputId].some(answerArray => {
-				// Flatten the nested arrays and check if any answer matches the input value
+			if (atsakymai[inputId] && atsakymai[inputId]["atsakymas"] && atsakymai[inputId]["atsakymas"].some(answerArray => {
 				return answerArray.some(answer => inputValue.replace(/\s+/g, '') === answer.replace(/\s+/g, ''));
 			})) {
 				input.classList.add('correct-answer');
@@ -1115,8 +1235,12 @@ function checkAnswers() {
 			} else {
 				input.classList.add('wrong-answer');
 				input.classList.remove('correct-answer');
-				answersCorrect = false; // Mark as incorrect due to wrong answer
+				answersCorrect = false;
+				if (firstTimeChecking) {
+					recordGrammarMistakes(atsakymai[input.id])
+				}
 			}
+
 
             // Show "Next Question" button only if all answers are correct
             nextQuestionButton.style.display = answersCorrect ? "flex" : "none";
@@ -1124,12 +1248,33 @@ function checkAnswers() {
         });
 
         if (firstTimeChecking) {
-            totalAttemptedQuestions += NumberOfQuestionsInRound;
-            document.getElementById('mistake-tracker').innerHTML = `Teisingai: ${totalCorrectAnswers}/${totalAttemptedQuestions}`;
+            controller.answeredQuestionTracker += NumberOfQuestionsInRound;
+			localStorage.setItem('controller', JSON.stringify(controller));
+            document.getElementById('mistake-tracker').innerHTML = `Teisingai: ${totalCorrectAnswers}/${controller.answeredQuestionTracker}`;
+			controller.mistakesTracker = controller.answeredQuestionTracker - totalCorrectAnswers;
+			localStorage.setItem('controller', JSON.stringify(controller));
         }
 
         if (answersCorrect) {
             allAnswersCorrect = true;
+			if (controller.modeChoice4 === "C40") {
+				answerTrackerElement.innerHTML = `Atlikta: ${totalSentencesCompleted}/${controller.questionNumber}`;
+			}
+
+			controller.correctAnswerTracker = totalCorrectAnswers
+			if (controller.modeChoice4 === "C40") {
+				if (totalSentencesCompleted === controller.questionNumber) {
+					localStorage.setItem("elapsedTime", timerDisplay.textContent);
+					controller.taskCompleted = true;
+					formatFinalMessageForGrammar();
+					controller.questionsStopped = true;
+					localStorage.setItem('controller', JSON.stringify(controller));
+				}
+			}
+
+			controller.randomSelection = [];
+			localStorage.setItem("controller", JSON.stringify(controller));
+
         } else {
             currentAnswerAttempts += 1;
             warning.innerHTML = "pataisyk visas klaidas";
@@ -1154,7 +1299,7 @@ function showAnswers() {
     // Ensure that the answer exists in the atsakymai object
     if (atsakymai[inputId]) {
       // Set the value of the input field to the correct answer, stripping spaces
-      input.value = atsakymai[inputId][0][0].replace(/\s+/g, '');
+      input.value = atsakymai[inputId]["atsakymas"][0][0].replace(/\s+/g, '');
       resizeInput(input);
     }
   });
@@ -1187,33 +1332,70 @@ function helpToggle() {
 			}
 
 			function stopQuestions() {
-				const stopButtonSpanElement = document.querySelector('#stop-button-span');
 				document.getElementById('warning').style.visibility = "hidden";
 				if (stopButtonSpanElement.innerHTML === "close") {
+
+					controller.questionsStopped = true;
 					clearInterval(timerInterval);
 					stopButtonSpanElement.innerHTML = "refresh";
 					document.getElementById('check-answers').disabled = true;
+					document.getElementById('check-answers').style.display = "inline-block";
 					document.getElementById('help-button').disabled = true;
+					document.getElementById('next-question').style.display = "none";
+					document.getElementById('show-answers').style.visibility = "hidden";
+
+					document.querySelectorAll('.question-input').forEach(input => {
+						input.disabled = true;
+					});
+
+					resetMistakeButtonsElement.style.display = "flex";
+					localStorage.setItem("elapsedTime", timerDisplay.textContent);
+					localStorage.setItem('controller', JSON.stringify(controller))
+					formatFinalMessageForGrammar();
 				} else if (stopButtonSpanElement.innerHTML === "refresh") {
 					stopButtonSpanElement.innerHTML = "close";
+					controller.questionsStopped = false;
+					if (localStorage.getItem("startTime")) {
+					localStorage.removeItem("startTime");
+					};
+					if (localStorage.getItem("remainingTime")) {
+					localStorage.removeItem("remainingTime");
+					};
 					document.getElementById('check-answers').disabled = false;
 					document.getElementById('help-button').disabled = false;
+
+					document.getElementById('check-answers').style.display = "inline-block";
+					document.getElementById('check-answers').style.visibility = "visible";
+					document.getElementById('help-button').style.visibility = "visible";
+
+					document.querySelectorAll('.question-input').forEach(input => {
+						input.disabled = false;
+					});
+
 					document.getElementById('mistake-tracker').innerHTML = `Teisingai: 0/0`;
+					totalSentencesCompleted = 0;
+					questionsToDisplay = Number(controller.modeChoice2);
+					if (controller.modeChoice4 === "C40") {
+						answerTrackerElement.innerHTML = `Atlikta: ${totalSentencesCompleted}/${controller.questionNumber}`;
+					}
 					firstTimeChecking = true;
-					totalAttemptedQuestions = 0;
+					controller.randomSelection = [];
+					controller.currentMistakes = [];
+					controller.mistakesTracker = 0;
+					controller.answeredQuestionTracker = 0;
 					totalCorrectAnswers = 0;
+					resetMistakeButtonsElement.style.display = "none";
+					localStorage.setItem('controller', JSON.stringify(controller));
 					initiateTheProgram();
 				}
-
-				
 			}
 
 			function focusFirstInput() {
-    const inputs = document.querySelectorAll('input[type="text"].question-input');
-    if (inputs.length > 0) {
-        inputs[0].focus();
-    }
-}
+				const inputs = document.querySelectorAll('input[type="text"].question-input');
+				if (inputs.length > 0) {
+					inputs[0].focus();
+				}
+			}
 
 function enableEnterNavigation() {
     // Ensure the event listener is added only once
@@ -1264,6 +1446,31 @@ stopButtonElement.addEventListener("click", stopQuestions)
 const resetButtonElement = document.querySelector('.reset-button');
 resetButtonElement.addEventListener("click", redirectToIndex);
 
+if (controller.questionsStopped) {
+	if (localStorage.getItem("elapsedTime") !== null) {
+		timerDisplay.textContent = localStorage.getItem("elapsedTime");
+	} else {
+		timerDisplay.textContent = "00:00:00";
+	}
+}
+
+window.addEventListener("beforeunload", () => {
+    controller.taskId = 0;
+    localStorage.setItem("controller", JSON.stringify(controller));
+	localStorage.setItem("elapsedTime", timerDisplay.textContent);
+	localStorage.setItem("elapsedTime", timerDisplay.textContent);
+});
+
+const mistakesButtonElement = document.querySelector('.summary-button');
+	mistakesButtonElement.addEventListener("click", () => {
+		localStorage.setItem("elapsedTime", timerDisplay.textContent);
+	})
+	mistakesButtonElement.addEventListener("click", redirectToSummary);
+
+	mistakesButtonElement.addEventListener("click", () => {
+		localStorage.setItem("elapsedTime", timerDisplay.textContent);
+	})
+	mistakesButtonElement.addEventListener("click", redirectToSummary);
 
 	}).catch(error => {
 		console.error('Error in fetching multiple JSON files:', error);

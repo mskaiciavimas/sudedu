@@ -97,213 +97,213 @@ function generateCombinations() {
   }
 
   /*ADDITION*/
-  if (controller.modeChoice === 'sudetis') {
-    if (controller.modeChoice2 === 'viena10') {
+  if (controller.modeChoice1 === "C1") {
+    if (controller.modeChoice2 === "C8") {
         for (let number1 = 1; number1 <= 9; number1++) {
           for (let number2 = 1; number2 <= 9; number2++) {
              if (number1 + number2 <= 10) {
-              questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+              questionPool.push([parseInt(number1), parseInt(number2), "A"]);
             }
           }
         }
         controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-    } else if (controller.modeChoice2 === 'viena') {
+    } else if (controller.modeChoice2 === "C9") {
         for (let number1 = 1; number1 <= 9; number1++) {
           for (let number2 = 1; number2 <= 9; number2++) {
             if (11 <= number1 + number2 && number1 + number2 <= 19) {
-              questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+              questionPool.push([parseInt(number1), parseInt(number2), "A"]);
             }
           }
         }
           controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-    } else if (controller.modeChoice2 === 'dvivien20') {
+    } else if (controller.modeChoice2 === "C10") {
           for (let number1 = 10; number1 <= 19; number1++) {
             for (let number2 = 1; number2 <= 9; number2++) {
               if (number1 + number2 < 20) {
-                questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                questionPool.push([parseInt(number1), parseInt(number2), "A"]);
               }
             }
           }
           controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-      } else if (controller.modeChoice2 === 'dvivien') {
+      } else if (controller.modeChoice2 === "C11") {
             for (let number1 = 10; number1 <= 99; number1++) {
               for (let number2 = 1; number2 <= 9; number2++) {
                 if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 <= 100) {
-                  questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                  questionPool.push([parseInt(number1), parseInt(number2), "A"]);
                 }
               }
             }
           controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-        } else if (controller.modeChoice2 === 'dvi') {
+        } else if (controller.modeChoice2 === "C12") {
               for (let number1 = 10; number1 <= 99; number1++) {
                 for (let number2 = 10; number2 <= 99; number2++) {
                   if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 <= 100) {
-                    questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                    questionPool.push([parseInt(number1), parseInt(number2), "A"]);
                   }
                 }
               }
             controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-          } else if (controller.modeChoice2 === 'tukst') {
+          } else if (controller.modeChoice2 === "C13") {
                 while (questionPool.length < 20) {
                   number1 = generateRandomNumber(101, 999);
                   number2 = generateRandomNumber(11, 999);
                     if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000) {
-                      questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                      questionPool.push([parseInt(number1), parseInt(number2), "A"]);
                   }
                 }
               controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-            } else if (controller.modeChoice2 === 'dtukst') {
+            } else if (controller.modeChoice2 === "C14") {
                   while (questionPool.length < 20) {
                     number1 = generateRandomNumber(1001, 9999);
                     number2 = generateRandomNumber(101, 9999);
                       if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 10000) {
-                        questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                        questionPool.push([parseInt(number1), parseInt(number2), "A"]);
                     }
                   }
                 controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-            } else if (controller.modeChoice2 === 'mil') {
+            } else if (controller.modeChoice2 === "C15") {
               while (questionPool.length < 2) {
                 number1 = generateRandomNumber(100001, 999999);
                 number2 = generateRandomNumber(100001, 999999);
                   if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
-                    questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                    questionPool.push([parseInt(number1), parseInt(number2), "A"]);
                 }
               }
               while (questionPool.length < 8) {
                 number1 = generateRandomNumber(100001, 999999);
                 number2 = generateRandomNumber(10001, 99999);
                   if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
-                    questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                    questionPool.push([parseInt(number1), parseInt(number2), "A"]);
                 }
               }
               while (questionPool.length < 12) {
                 number1 = generateRandomNumber(100001, 999999);
                 number2 = generateRandomNumber(1001, 9999);
                   if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
-                    questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                    questionPool.push([parseInt(number1), parseInt(number2), "A"]);
                 }
               }
               while (questionPool.length < 13) {
                 number1 = generateRandomNumber(100001, 999999);
                 number2 = generateRandomNumber(11, 99);
                   if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
-                    questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                    questionPool.push([parseInt(number1), parseInt(number2), "A"]);
                 }
               }
               while (questionPool.length < 20) {
                 number1 = generateRandomNumber(1001, 999999);
                 number2 = generateRandomNumber(101, 999999);
                   if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
-                    questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                    questionPool.push([parseInt(number1), parseInt(number2), "A"]);
                 }
               }
             controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
           } 
       /*SUBTRACTION*/
-      } else if (controller.modeChoice === 'atimtis') {
-        if (controller.modeChoice2 === 'viena10') {
+      } else if (controller.modeChoice1 === "C2") {
+        if (controller.modeChoice2 === "C8") {
             for (let number1 = 1; number1 <= 9; number1++) {
               for (let number2 = 1; number2 <= 9; number2++) {
                  if (number1 > number2) {
-                  questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
+                  questionPool.push([parseInt(number1), parseInt(number2), "S"]);
                 }
               }
             }
             controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
-        } else if (controller.modeChoice2 === 'dvivien20') {
+        } else if (controller.modeChoice2 === "C10") {
             for (let number1 = 10; number1 <= 19; number1++) {
               for (let number2 = 1; number2 <= 9; number2++) {
                 if (neisardant(number1, number2) === controller.modeChoice3) {
-                  questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
+                  questionPool.push([parseInt(number1), parseInt(number2), "S"]);
                 }
               }
             }
             controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-      } else if (controller.modeChoice2 === 'dvivien') {
+      } else if (controller.modeChoice2 === "C11") {
           for (let number1 = 10; number1 <= 99; number1++) {
             for (let number2 = 1; number2 <= 9; number2++) {
               if (neisardant(number1, number2) === controller.modeChoice3) {
-                questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
+                questionPool.push([parseInt(number1), parseInt(number2), "S"]);
               }
             }
           }
           controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-    } else if (controller.modeChoice2 === 'dvi') {
+    } else if (controller.modeChoice2 === "C12") {
         for (let number1 = 10; number1 <= 99; number1++) {
           for (let number2 = 10; number2 <= 99; number2++) {
             if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
-              questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
+              questionPool.push([parseInt(number1), parseInt(number2), "S"]);
             }
           }
         }
         controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-  } else if (controller.modeChoice2 === 'gretnul') {
+  } else if (controller.modeChoice2 === "C16") {
     while (questionPool.length < 20) {
       number1 = generateRandomNumber(1000, 99999);
       number2 = generateRandomNumber(1001, 9999);
         if (number1 > number2) {
           number1WithZeroes = parseInt(nuliaiIsEiles(number1));
           if (number1WithZeroes > number2) {
-          questionPool.push([number1WithZeroes, parseInt(number2), "subtraction"]);
+          questionPool.push([number1WithZeroes, parseInt(number2), "S"]);
           }
       }
   }
     controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-  } else if (controller.modeChoice2 === 'tukst') {
+  } else if (controller.modeChoice2 === "C13") {
       while (questionPool.length < 20) {
         number1 =generateRandomNumber(101, 999)
         number2 =generateRandomNumber(11, 999)
         if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
-          questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
+          questionPool.push([parseInt(number1), parseInt(number2), "S"]);
       }
     }
       controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-    } else if (controller.modeChoice2 === 'dtukst') {
+    } else if (controller.modeChoice2 === "C14") {
         while (questionPool.length < 20) {
           number1 =generateRandomNumber(1001, 9999)
           number2 =generateRandomNumber(101, 9999)
           if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
-            questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
+            questionPool.push([parseInt(number1), parseInt(number2), "S"]);
         }
       }
         controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
       }
 
-      else if (controller.modeChoice2 === 'mil') {
+      else if (controller.modeChoice2 === "C15") {
         while (questionPool.length < 3) {
           number1 =generateRandomNumber(100000, 1000000)
           number2 =generateRandomNumber(101, 999)
           if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
-            questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
+            questionPool.push([parseInt(number1), parseInt(number2), "S"]);
         }
       }
         while (questionPool.length < 8) {
           number1 =generateRandomNumber(100000, 1000000)
           number2 =generateRandomNumber(1001, 9999)
           if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
-            questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
+            questionPool.push([parseInt(number1), parseInt(number2), "S"]);
         }
       }
         while (questionPool.length < 15) {
           number1 =generateRandomNumber(100000, 1000000)
           number2 =generateRandomNumber(10001, 99999)
           if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
-            questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
+            questionPool.push([parseInt(number1), parseInt(number2), "S"]);
         }
       }
       while (questionPool.length < 19) {
         number1 =generateRandomNumber(100000, 1000000)
         number2 =generateRandomNumber(100001, 999999)
         if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
-          questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
+          questionPool.push([parseInt(number1), parseInt(number2), "S"]);
       }
     }
     while (questionPool.length < 20) {
       number1 =generateRandomNumber(10000, 99999)
       number2 =generateRandomNumber(10001, 99999)
       if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
-        questionPool.push([parseInt(number1), parseInt(number2), "subtraction"]);
+        questionPool.push([parseInt(number1), parseInt(number2), "S"]);
     }
   }
 
@@ -311,12 +311,12 @@ function generateCombinations() {
       }
       
   /*ADDITION AND SUBTRACTION*/
-  } else if (controller.modeChoice === 'sudetis ir atimtis') {
-    if (controller.modeChoice2 === 'viena10') {
+  } else if (controller.modeChoice1 === "C3") {
+    if (controller.modeChoice2 === "C8") {
         for (let number1 = 1; number1 <= 9; number1++) {
           for (let number2 = 1; number2 <= 9; number2++) {
              if (number1 + number2 <= 10) {
-              questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+              questionPool2.push([parseInt(number1), parseInt(number2), "A"]);
             }
           }
         }
@@ -324,33 +324,33 @@ function generateCombinations() {
         for (let number1 = 1; number1 <= 9; number1++) {
           for (let number2 = 1; number2 <= 9; number2++) {
              if (number1 > number2) {
-              questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+              questionPool3.push([parseInt(number1), parseInt(number2), "S"]);
             }
           }
         }
         questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
         controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-    } else if (controller.modeChoice2 === 'lent') {
+    } else if (controller.modeChoice2 === "C17") {
         for (let number1 = 2; number1 <= 9; number1++) {
           for (let number2 = 2; number2 <= 9; number2++) {
             if (number1 + number2 > 10) {
-              questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+              questionPool2.push([parseInt(number1), parseInt(number2), "A"]);
             }
           }
         }
         for (let number1 = 11; number1 <= 19; number1++) {
           for (let number2 = 2; number2 <= 9; number2++) {
              if (parseInt(number1.toString()[1]) < number2) {
-              questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+              questionPool3.push([parseInt(number1), parseInt(number2), "S"]);
             }
           }
         }
         controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random());
-    } else if (controller.modeChoice2 === 'dvivien20') {
+    } else if (controller.modeChoice2 === "C10") {
           for (let number1 = 10; number1 <= 19; number1++) {
             for (let number2 = 1; number2 <= 9; number2++) {
               if (number1 + number2 < 20) {
-                questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+                questionPool2.push([parseInt(number1), parseInt(number2), "A"]);
               }
             }
           }
@@ -359,17 +359,17 @@ function generateCombinations() {
           for (let number1 = 10; number1 <= 19; number1++) {
             for (let number2 = 1; number2 <= 9; number2++) {
               if (parseInt(number1.toString()[1]) > number2) {
-                questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+                questionPool3.push([parseInt(number1), parseInt(number2), "S"]);
               }
             }
           }
           questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
           controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-      } else if (controller.modeChoice2 === 'dvivien') {
+      } else if (controller.modeChoice2 === "C11") {
             for (let number1 = 10; number1 <= 99; number1++) {
               for (let number2 = 1; number2 <= 9; number2++) {
                 if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 100) {
-                  questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+                  questionPool2.push([parseInt(number1), parseInt(number2), "A"]);
                 }
               }
             }
@@ -378,18 +378,18 @@ function generateCombinations() {
             for (let number1 = 10; number1 <= 99; number1++) {
               for (let number2 = 1; number2 <= 9; number2++) {
                 if (neisardant(number1, number2) === controller.modeChoice3) {
-                  questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+                  questionPool3.push([parseInt(number1), parseInt(number2), "S"]);
                 }
               }
             }
             questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
             controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
       }
-        else if (controller.modeChoice2 === 'dvi') {
+        else if (controller.modeChoice2 === "C12") {
             for (let number1 = 10; number1 <= 99; number1++) {
               for (let number2 = 10; number2 <= 99; number2++) {
                 if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 100) {
-                  questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+                  questionPool2.push([parseInt(number1), parseInt(number2), "A"]);
                 }
               }
             }
@@ -398,18 +398,18 @@ function generateCombinations() {
             for (let number1 = 10; number1 <= 99; number1++) {
               for (let number2 = 10; number2 <= 99; number2++) {
                 if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
-                  questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+                  questionPool3.push([parseInt(number1), parseInt(number2), "S"]);
                 }
               }
             }
             questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
             controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-           } else if (controller.modeChoice2 === 'tukst') {
+           } else if (controller.modeChoice2 === "C13") {
                 while (questionPool2.length < 10) {
                   number1 = generateRandomNumber(101, 999);
                   number2 = generateRandomNumber(11, 999);
                     if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000) {
-                      questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+                      questionPool2.push([parseInt(number1), parseInt(number2), "A"]);
                   }
                 }
                 questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
@@ -417,19 +417,19 @@ function generateCombinations() {
                   number1 =generateRandomNumber(101, 999)
                   number2 =generateRandomNumber(11, 999)
                   if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
-                    questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+                    questionPool3.push([parseInt(number1), parseInt(number2), "S"]);
                 }
               }
               questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
               controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
         } 
         
-        else if (controller.modeChoice2 === 'dtukst') {
+        else if (controller.modeChoice2 === "C14") {
                   while (questionPool2.length < 10) {
                     number1 = generateRandomNumber(1001, 9999);
                     number2 = generateRandomNumber(101, 9999);
                       if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 10000) {
-                        questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+                        questionPool2.push([parseInt(number1), parseInt(number2), "A"]);
                     }
                   }
                   questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
@@ -437,48 +437,48 @@ function generateCombinations() {
                     number1 =generateRandomNumber(1001, 9999)
                     number2 =generateRandomNumber(101, 9999)
                     if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
-                      questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+                      questionPool3.push([parseInt(number1), parseInt(number2), "S"]);
                   }
                 }
                 questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
                 controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
           } 
 
-          else if (controller.modeChoice2 === 'mil') {
+          else if (controller.modeChoice2 === "C15") {
 
             while (questionPool2.length < 1) {
               number1 = generateRandomNumber(100001, 999999);
               number2 = generateRandomNumber(100001, 999999);
                 if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
-                  questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+                  questionPool2.push([parseInt(number1), parseInt(number2), "A"]);
               }
             }
             while (questionPool2.length < 4) {
               number1 = generateRandomNumber(100001, 999999);
               number2 = generateRandomNumber(10001, 99999);
                 if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
-                  questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+                  questionPool2.push([parseInt(number1), parseInt(number2), "A"]);
               }
             }
             while (questionPool2.length < 6) {
               number1 = generateRandomNumber(100001, 999999);
               number2 = generateRandomNumber(1001, 9999);
                 if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
-                  questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+                  questionPool2.push([parseInt(number1), parseInt(number2), "A"]);
               }
             }
             while (questionPool2.length < 7) {
               number1 = generateRandomNumber(100001, 999999);
               number2 = generateRandomNumber(11, 99);
                 if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
-                  questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+                  questionPool2.push([parseInt(number1), parseInt(number2), "A"]);
               }
             }
             while (questionPool2.length < 10) {
               number1 = generateRandomNumber(1001, 999999);
               number2 = generateRandomNumber(101, 999999);
                 if (neperzengiant(number1, number2) === controller.modeChoice3 && number1 + number2 < 1000000) {
-                  questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+                  questionPool2.push([parseInt(number1), parseInt(number2), "A"]);
               }
             }
 
@@ -490,35 +490,35 @@ function generateCombinations() {
               number1 =generateRandomNumber(100000, 1000000)
               number2 =generateRandomNumber(101, 999)
               if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
-                questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+                questionPool3.push([parseInt(number1), parseInt(number2), "S"]);
             }
           }
             while (questionPool3.length < 3) {
               number1 =generateRandomNumber(100000, 1000000)
               number2 =generateRandomNumber(1001, 9999)
               if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
-                questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+                questionPool3.push([parseInt(number1), parseInt(number2), "S"]);
             }
           }
             while (questionPool3.length < 6) {
               number1 =generateRandomNumber(100000, 1000000)
               number2 =generateRandomNumber(10001, 99999)
               if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
-                questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+                questionPool3.push([parseInt(number1), parseInt(number2), "S"]);
             }
           }
           while (questionPool3.length < 9) {
             number1 =generateRandomNumber(100000, 1000000)
             number2 =generateRandomNumber(100001, 999999)
             if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
-              questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+              questionPool3.push([parseInt(number1), parseInt(number2), "S"]);
           }
         }
         while (questionPool3.length < 10) {
           number1 =generateRandomNumber(10000, 99999)
           number2 =generateRandomNumber(10001, 99999)
           if (neisardant(number1, number2) === controller.modeChoice3 && number1 > number2) {
-            questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+            questionPool3.push([parseInt(number1), parseInt(number2), "S"]);
         }
       }
 
@@ -527,81 +527,81 @@ function generateCombinations() {
     } 
 
 /*MULTIPLICATION*/          
-} else if (controller.modeChoice === 'daugyba') {
-  if (controller.modeChoice2 === 'dauglent') {
+} else if (controller.modeChoice1 === "C4") {
+  if (controller.modeChoice2 === "C18") {
     const firstNumber = controller.selectedNumbers[0];
     const secondNumber = controller.selectedNumbers[1];
     for (let number1 = firstNumber; number1 <= secondNumber; number1++) {
       for (let number2 = 1; number2 <= 10; number2++) {
-        questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+        questionPool.push([parseInt(number1), parseInt(number2), "M"]);
       }
     }
     controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
-  } else if (controller.modeChoice2 === 'daugdvivien') {
+  } else if (controller.modeChoice2 === "C19") {
     while (questionPool.length < 20) {
       number1 = generateRandomNumber(11, 99);
       number2 = generateRandomNumber(2, 9);
-      questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      questionPool.push([parseInt(number1), parseInt(number2), "M"]);
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
-  } else if (controller.modeChoice2 === 'daugtrivien') {
+  } else if (controller.modeChoice2 === "C20") {
     while (questionPool.length < 20) {
       number1 = generateRandomNumber(101, 999);
       number2 = generateRandomNumber(2, 9);
-      questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      questionPool.push([parseInt(number1), parseInt(number2), "M"]);
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
-  } else if (controller.modeChoice2 === 'daugketvien') {
+  } else if (controller.modeChoice2 === "C21") {
     while (questionPool.length < 20) {
       number1 = generateRandomNumber(1001, 9999);
       number2 = generateRandomNumber(2, 9);
-      questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      questionPool.push([parseInt(number1), parseInt(number2), "M"]);
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
-  } else if (controller.modeChoice2 === 'daugdvidvi') {
+  } else if (controller.modeChoice2 === "C23") {
     while (questionPool.length < 20) {
       number1 = generateRandomNumber(11, 99);
       number2 = generateRandomNumber(11, 99);
       if (number2 % 10 !== 0) {
-      questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      questionPool.push([parseInt(number1), parseInt(number2), "M"]);
       }
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
-  } else if (controller.modeChoice2 === 'daugtridvi') {
+  } else if (controller.modeChoice2 === "C24") {
     while (questionPool.length < 20) {
       number1 = generateRandomNumber(101, 999);
       number2 = generateRandomNumber(11, 99);
       if (number2 % 10 !== 0) {
-      questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      questionPool.push([parseInt(number1), parseInt(number2), "M"]);
       }
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
-  } else if (controller.modeChoice2 === 'daugketdvi') {
+  } else if (controller.modeChoice2 === "C25") {
     while (questionPool.length < 20) {
       number1 = generateRandomNumber(1001, 9999);
       number2 = generateRandomNumber(11, 99);
       if (number2 % 10 !== 0) {
-      questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      questionPool.push([parseInt(number1), parseInt(number2), "M"]);
       }
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
   }
   
-  else if (controller.modeChoice2 === 'daugdaugvien') {
+  else if (controller.modeChoice2 === "C22") {
     while (questionPool.length < 6) {
 
       interNumbers = [generateRandomNumber(11, 99), generateRandomNumber(2, 9)];
       number1 = Math.max(...interNumbers);
       number2 = Math.min(...interNumbers);
 
-      questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      questionPool.push([parseInt(number1), parseInt(number2), "M"]);
   }
   while (questionPool.length < 14) {
 
@@ -609,7 +609,7 @@ function generateCombinations() {
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool.push([parseInt(number1), parseInt(number2), "M"]);
 }
 
   while (questionPool.length < 20) {
@@ -618,14 +618,14 @@ function generateCombinations() {
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool.push([parseInt(number1), parseInt(number2), "M"]);
   }
 
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
   }
 
-  else if (controller.modeChoice2 === 'daugdaugdvi') {
+  else if (controller.modeChoice2 === "C26") {
     while (questionPool.length < 6) {
 
       interNumbers = [generateRandomNumber(11, 99), generateRandomNumber(11, 99)];
@@ -633,7 +633,7 @@ function generateCombinations() {
       number2 = Math.min(...interNumbers);
 
       if (number2 % 10 !== 0) {
-      questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      questionPool.push([parseInt(number1), parseInt(number2), "M"]);
       }
   }
     while (questionPool.length < 14) {
@@ -643,7 +643,7 @@ function generateCombinations() {
       number2 = Math.min(...interNumbers);
 
       if (number2 % 10 !== 0) {
-      questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      questionPool.push([parseInt(number1), parseInt(number2), "M"]);
       }
   }
     while (questionPool.length < 20) {
@@ -653,33 +653,33 @@ function generateCombinations() {
       number2 = Math.min(...interNumbers);
 
       if (number2 % 10 !== 0) {
-      questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      questionPool.push([parseInt(number1), parseInt(number2), "M"]);
       }
     }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
-  } else if (controller.modeChoice2 === 'daugdaug') {
+  } else if (controller.modeChoice2 === "C27") {
     while (questionPool.length < 2) {
 
       interNumbers = [generateRandomNumber(11, 99), generateRandomNumber(2, 9)];
       number1 = Math.max(...interNumbers);
       number2 = Math.min(...interNumbers);
 
-      questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      questionPool.push([parseInt(number1), parseInt(number2), "M"]);
   } while (questionPool.length < 4) {
 
     interNumbers = [generateRandomNumber(101, 999), generateRandomNumber(2, 9)];
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool.push([parseInt(number1), parseInt(number2), "M"]);
   } while (questionPool.length < 6) {
 
     interNumbers = [generateRandomNumber(1001, 9999), generateRandomNumber(2, 9)];
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool.push([parseInt(number1), parseInt(number2), "M"]);
   } while (questionPool2.length < 2) {
 
       interNumbers = [generateRandomNumber(11, 99), generateRandomNumber(11, 99)];
@@ -687,7 +687,7 @@ function generateCombinations() {
       number2 = Math.min(...interNumbers);
 
       if (number2 % 10 !== 0) {
-      questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
       }
   }
 
@@ -698,7 +698,7 @@ function generateCombinations() {
     number2 = Math.min(...interNumbers);
 
     if (number2 % 10 !== 0) {
-    questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
     }
 }
   while (questionPool2.length < 8) {
@@ -708,7 +708,7 @@ function generateCombinations() {
     number2 = Math.min(...interNumbers);
 
     if (number2 % 10 !== 0) {
-    questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
     }
   }
 
@@ -720,7 +720,7 @@ function generateCombinations() {
     number2 = Math.min(...interNumbers);
 
     if (number1 * number2 <= 1000000 && number2 % 10 !== 0) {
-    questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool3.push([parseInt(number1), parseInt(number2), "M"]);
     }
 }
   while (questionPool3.length < 6) {
@@ -730,34 +730,34 @@ function generateCombinations() {
     number2 = Math.min(...interNumbers);
 
     if (number1 * number2 <= 1000000 && number2 % 10 !== 0) {
-    questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool3.push([parseInt(number1), parseInt(number2), "M"]);
     }
 }
 
   controller.combinations = questionPool.concat(questionPool2, questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
   }
   
-  else if (controller.modeChoice2 === 'pil10') {
+  else if (controller.modeChoice2 === "C28") {
     for (let number1 = 1; number1 <= 10; number1++) {
       for (let number2 = 10; number2 <= 90; number2+=10) {
         if (Math.random() <= 0.5) {
-          questionPool.push([parseInt(number2), parseInt(number1), "multiplication"]);
+          questionPool.push([parseInt(number2), parseInt(number1), "M"]);
         } else {
-          questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+          questionPool.push([parseInt(number1), parseInt(number2), "M"]);
         }
       }
       for (let number1 = 1; number1 <= 10; number1++) {
         for (let number2 = 100; number2 <= 900; number2+=100) {
           if (Math.random() <= 0.5) {
-            questionPool2.push([parseInt(number2), parseInt(number1), "multiplication"]);
+            questionPool2.push([parseInt(number2), parseInt(number1), "M"]);
           } else {
-            questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+            questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
           }
         }
       }
     }
     controller.combinations = [...questionPool.sort(() => 0.5 - Math.random()).slice(0, 10), ...questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10)];
-  } else if (controller.modeChoice2 === 'pil') {
+  } else if (controller.modeChoice2 === "C29") {
     let sublist10 = [];
     let sublist100 = [];
     let sublist1000 = [];
@@ -770,9 +770,9 @@ function generateCombinations() {
       for (let number2 = 10; number2 <= 90; number2+=10) {
         if (hasNoCarrying(number1, number2) && (number1 !== 10 && number1 !== 100 && number2 !== 10)) {
         if (Math.random() <= 0.5) {
-          sublist10.push([parseInt(number2), parseInt(number1), "multiplication"]);
+          sublist10.push([parseInt(number2), parseInt(number1), "M"]);
         } else {
-          sublist10.push([parseInt(number1), parseInt(number2), "multiplication"]);
+          sublist10.push([parseInt(number1), parseInt(number2), "M"]);
         }
         }
       }
@@ -786,9 +786,9 @@ function generateCombinations() {
       for (let number2 = 100; number2 <= 900; number2+=10) {
         if (hasNoCarrying(number1, number2) && (number1 !== 10 && number1 !== 100 && number2 !== 10 && number2 !== 100)) {
           if (Math.random() <= 0.5) {
-            sublist10.push([parseInt(number2), parseInt(number1), "multiplication"]);
+            sublist10.push([parseInt(number2), parseInt(number1), "M"]);
           } else {
-            sublist10.push([parseInt(number1), parseInt(number2), "multiplication"]);
+            sublist10.push([parseInt(number1), parseInt(number2), "M"]);
           }
         }
       }
@@ -802,9 +802,9 @@ function generateCombinations() {
       for (let number2 = 1000; number2 <= 9000; number2+=100) {
         if (hasNoCarrying(number1, number2) && (number1 !== 10 && number1 !== 100 && number2 !== 10 && number2 !== 100 && number2 !== 1000)) {
           if (Math.random() <= 0.5) {
-            sublist10.push([parseInt(number2), parseInt(number1), "multiplication"]);
+            sublist10.push([parseInt(number2), parseInt(number1), "M"]);
           } else {
-            sublist10.push([parseInt(number1), parseInt(number2), "multiplication"]);
+            sublist10.push([parseInt(number1), parseInt(number2), "M"]);
           }
         }
       }
@@ -813,8 +813,8 @@ function generateCombinations() {
   }
   
 /*DIVISION*/
-} else if (controller.modeChoice === 'dalyba') {
-  if (controller.modeChoice2 === 'dauglent') {
+} else if (controller.modeChoice1 === "C5") {
+  if (controller.modeChoice2 === "C18") {
     var firstNumber = parseInt(controller.selectedNumbers[0]);
     var secondNumber = parseInt(controller.selectedNumbers[1]);
     if (controller.withRemainder) {
@@ -833,15 +833,15 @@ function generateCombinations() {
         }
         if (controller.withRemainder) {
         if ((((number1 * number2) + remainder) % number1) !== 0) {
-        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
       } else {
-        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     }
     }
     controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-  } else if (controller.modeChoice2 === 'daugdvivien') {
+  } else if (controller.modeChoice2 === "C19") {
     while (questionPool.length < 20) {
       let number1 = generateRandomNumber(2, 9);
       let number2 = generateRandomNumber(11, 99);
@@ -853,16 +853,16 @@ function generateCombinations() {
       if (dalinys <= 99 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
         if (controller.withRemainder) {
           if (dalinys % number1 !== 0) {
-        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
           }
         } else {
-          questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+          questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
     }
   }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
-  } else if (controller.modeChoice2 === 'daugtrivien') {
+  } else if (controller.modeChoice2 === "C20") {
     while (questionPool.length < 10) {
       let number1 = generateRandomNumber(2, 9);
       let number2 = generateRandomNumber(11, 99);
@@ -875,10 +875,10 @@ function generateCombinations() {
       if (100 < dalinys && dalinys <= 999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
         if (controller.withRemainder) {
           if (dalinys % number1 !== 0) {
-        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
           }
         } else {
-          questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+          questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
     }
   }
@@ -895,10 +895,10 @@ function generateCombinations() {
     if (100 < dalinys && dalinys <= 999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
       if (controller.withRemainder) {
         if (dalinys % number1 !== 0) {
-      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
       } else {
-        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
   }
 }
@@ -907,7 +907,7 @@ function generateCombinations() {
 
   } 
   
-  else if (controller.modeChoice2 === 'daugketvien') {
+  else if (controller.modeChoice2 === "C21") {
     while (questionPool.length < 10) {
       let number1 = generateRandomNumber(2, 9);
       let number2 = generateRandomNumber(101, 9999);
@@ -919,10 +919,10 @@ function generateCombinations() {
       if (1000 < dalinys && dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
         if (controller.withRemainder) {
           if (dalinys % number1 !== 0) {
-        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
           }
         } else {
-          questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+          questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
     }
   }
@@ -939,17 +939,17 @@ function generateCombinations() {
     if (dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
       if (controller.withRemainder) {
         if (dalinys % number1 !== 0) {
-      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
       } else {
-        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
   }
 }
 
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
-  } else if (controller.modeChoice2 === 'daugtridvi') {
+  } else if (controller.modeChoice2 === "C24") {
     while (questionPool.length < 10) {
       let number1 = generateRandomNumber(11, 99);
       let number2 = generateRandomNumber(2, 9);
@@ -961,10 +961,10 @@ function generateCombinations() {
       if (100 < dalinys && dalinys <= 999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
         if (controller.withRemainder) {
           if (dalinys % number1 !== 0) {
-        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
           }
         } else {
-          questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+          questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
     }
   }
@@ -980,16 +980,16 @@ function generateCombinations() {
     if (dalinys <= 999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
       if (controller.withRemainder) {
         if (dalinys % number1 !== 0) {
-      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
       } else {
-        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
   }
 }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
-  } else if (controller.modeChoice2 === 'daugketdvi') {
+  } else if (controller.modeChoice2 === "C25") {
     while (questionPool.length < 10) {
       let number1 = generateRandomNumber(11, 99);
       let number2 = generateRandomNumber(11, 99);
@@ -1001,10 +1001,10 @@ function generateCombinations() {
       if (1000 < dalinys && dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
         if (controller.withRemainder) {
           if (dalinys % number1 !== 0) {
-        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
           }
         } else {
-          questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+          questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
     }
   }
@@ -1019,10 +1019,10 @@ function generateCombinations() {
     if (dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
       if (controller.withRemainder) {
         if (dalinys % number1 !== 0) {
-      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
       } else {
-        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
   }
 }
@@ -1030,7 +1030,7 @@ function generateCombinations() {
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 } 
   
-  else if (controller.modeChoice2 === 'daugdaugvien') {
+  else if (controller.modeChoice2 === "C22") {
     while (questionPool.length < 3) {
       let number1 = generateRandomNumber(2, 9);
       let number2 = generateRandomNumber(11, 99);
@@ -1041,10 +1041,10 @@ function generateCombinations() {
       if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
         if (controller.withRemainder) {
           if (dalinys % number1 !== 0) {
-        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
           }
         } else {
-          questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+          questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
     }
   }
@@ -1058,10 +1058,10 @@ function generateCombinations() {
     if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
       if (controller.withRemainder) {
         if (dalinys % number1 !== 0) {
-      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
       } else {
-        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
   }
 }
@@ -1075,10 +1075,10 @@ while (questionPool.length < 16) {
   if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
     if (controller.withRemainder) {
       if (dalinys % number1 !== 0) {
-    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     } else {
-      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
 }
 }
@@ -1092,10 +1092,10 @@ while (questionPool.length < 17) {
   if (dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
     if (controller.withRemainder) {
       if (dalinys % number1 !== 0) {
-    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     } else {
-      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
 }
 }
@@ -1109,10 +1109,10 @@ while (questionPool.length < 20) {
   if (10000 < dalinys && dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
     if (controller.withRemainder) {
       if (dalinys % number1 !== 0) {
-    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     } else {
-      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
 }
 }
@@ -1124,7 +1124,7 @@ while (questionPool.length < 20) {
 
 
 
-else if (controller.modeChoice2 === 'daugdaugviendalmnul') {
+else if (controller.modeChoice2 === "C30") {
 
   function containsZero(number) {
     // Convert the number to a string and check if it contains '0'
@@ -1141,10 +1141,10 @@ else if (controller.modeChoice2 === 'daugdaugviendalmnul') {
     if (dalinys <= 99999 && containsZero(number2)) {
       if (controller.withRemainder) {
         if (dalinys % number1 !== 0) {
-      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
       } else {
-        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
   }
 }
@@ -1158,10 +1158,10 @@ while (questionPool.length < 11) {
   if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0 && containsZero(number2)) {
     if (controller.withRemainder) {
       if (dalinys % number1 !== 0) {
-    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     } else {
-      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
 }
 }
@@ -1175,10 +1175,10 @@ dalinys = (number1 * number2) + remainder;
 if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0 && containsZero(number2)) {
   if (controller.withRemainder) {
     if (dalinys % number1 !== 0) {
-  questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
   } else {
-    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
   }
 }
 }
@@ -1192,10 +1192,10 @@ dalinys = (number1 * number2) + remainder;
 if (dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0 && containsZero(number2)) {
   if (controller.withRemainder) {
     if (dalinys % number1 !== 0) {
-  questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
   } else {
-    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
   }
 }
 }
@@ -1209,16 +1209,16 @@ dalinys = (number1 * number2) + remainder;
 if (10000 < dalinys && dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0 && containsZero(number2)) {
   if (controller.withRemainder) {
     if (dalinys % number1 !== 0) {
-  questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
   } else {
-    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
   }
 }
 }
 
 controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-} else if (controller.modeChoice2 === 'daugdaugdvi') {
+} else if (controller.modeChoice2 === "C26") {
   while (questionPool.length < 6) {
     let number1 = generateRandomNumber(11, 99);
     let number2 = generateRandomNumber(11, 99);
@@ -1229,10 +1229,10 @@ controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 
     if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
       if (controller.withRemainder) {
         if (dalinys % number1 !== 0) {
-      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
       } else {
-        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
   }
 }
@@ -1246,10 +1246,10 @@ while (questionPool.length < 14) {
   if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
     if (controller.withRemainder) {
       if (dalinys % number1 !== 0) {
-    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     } else {
-      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
 }
 }
@@ -1263,10 +1263,10 @@ dalinys = (number1 * number2) + remainder;
 if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
   if (controller.withRemainder) {
     if (dalinys % number1 !== 0) {
-  questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
   } else {
-    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
   }
 }
 }
@@ -1281,7 +1281,7 @@ controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 
 
 
 
-  else if (controller.modeChoice2 === 'daugdaug') {
+  else if (controller.modeChoice2 === "C27") {
     while (questionPool.length < 3) {
       let number1 = generateRandomNumber(2, 9);
       let number2 = generateRandomNumber(11, 99);
@@ -1292,10 +1292,10 @@ controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 
       if (100 < dalinys && dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
         if (controller.withRemainder) {
           if (dalinys % number1 !== 0) {
-        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
           }
         } else {
-          questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+          questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
     }
   }
@@ -1309,10 +1309,10 @@ while (questionPool.length < 7) {
   if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
     if (controller.withRemainder) {
       if (dalinys % number1 !== 0) {
-    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     } else {
-      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
 }
 }
@@ -1326,10 +1326,10 @@ while (questionPool.length < 10) {
   if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
     if (controller.withRemainder) {
       if (dalinys % number1 !== 0) {
-    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     } else {
-      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
 }
 }
@@ -1344,10 +1344,10 @@ while (questionPool.length < 13) {
   if (100 < dalinys && dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
     if (controller.withRemainder) {
       if (dalinys % number1 !== 0) {
-    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     } else {
-      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
 }
 }
@@ -1361,10 +1361,10 @@ dalinys = (number1 * number2) + remainder;
 if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
   if (controller.withRemainder) {
     if (dalinys % number1 !== 0) {
-  questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
   } else {
-    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
   }
 }
 }
@@ -1379,17 +1379,17 @@ dalinys = (number1 * number2) + remainder;
 if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
 if (controller.withRemainder) {
   if (dalinys % number1 !== 0) {
-questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
   }
 } else {
-  questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
 }
 }
 }
   controller.combinations = questionPool.sort(() => 0.5 - Math.random()).slice(0, 20);
 
   }
-  else if (controller.modeChoice2 === 'pil10') {
+  else if (controller.modeChoice2 === "C28") {
     for (let number1 = 1; number1 <= 9; number1++) {
       for (let number2 = 1; number2 <= 9; number2++) {
         if (controller.withRemainder) {
@@ -1401,10 +1401,10 @@ questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "
 
           if (controller.withRemainder) {
             if (dalinys % number1*10 !== 0) {
-              questionPool.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
+              questionPool.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "D"]);
             }
           } else {
-            questionPool.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
+            questionPool.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "D"]);
           }
       
     }
@@ -1421,10 +1421,10 @@ questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "
   
           if (controller.withRemainder) {
             if (dalinys % number1*100 !== 0) {
-              questionPool2.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+              questionPool2.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "D"]);
             }
           } else {
-            questionPool2.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+            questionPool2.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "D"]);
           }
       
     }
@@ -1432,7 +1432,7 @@ questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "
       }
     
     controller.combinations = [...questionPool.sort(() => 0.5 - Math.random()).slice(0, 10), ...questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10)];
-  } else if (controller.modeChoice2 === 'pil') {
+  } else if (controller.modeChoice2 === "C29") {
     let sublist10 = [];
     let sublist100 = [];
     let sublist1000 = [];
@@ -1447,10 +1447,10 @@ questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "
 
         if (controller.withRemainder) {
           if (dalinys % number1*10 !== 0) {
-            sublist10.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
+            sublist10.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "D"]);
           }
         } else {
-          sublist10.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
+          sublist10.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "D"]);
         }
       }
     }
@@ -1469,10 +1469,10 @@ questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "
 
         if (controller.withRemainder) {
           if (dalinys % number1*100 !== 0) {
-            sublist100.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+            sublist100.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "D"]);
           }
         } else {
-          sublist100.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+          sublist100.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "D"]);
         }
       }
     }
@@ -1491,10 +1491,10 @@ questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "
 
         if (controller.withRemainder) {
           if (dalinys % number1*1000 !== 0) {
-            sublist1000.push([parseInt(number1 * number2 * 1000) + remainder, parseInt(number1 * 1000), "division"]);
+            sublist1000.push([parseInt(number1 * number2 * 1000) + remainder, parseInt(number1 * 1000), "D"]);
           }
         } else {
-          sublist1000.push([parseInt(number1 * number2 * 1000) + remainder, parseInt(number1 * 1000), "division"]);
+          sublist1000.push([parseInt(number1 * number2 * 1000) + remainder, parseInt(number1 * 1000), "D"]);
         }
       }
     }
@@ -1507,13 +1507,13 @@ questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "
 
 
 /*MULTIPLICATION AND DIVISION*/
-} else if (controller.modeChoice === 'daugyba ir dalyba') {
-  if (controller.modeChoice2 === 'dauglent') {
+} else if (controller.modeChoice1 === "C6") {
+  if (controller.modeChoice2 === "C18") {
     var firstNumber = parseInt(controller.selectedNumbers[0]);
     var secondNumber = parseInt(controller.selectedNumbers[1]);
     for (let number1 = firstNumber; number1 <= secondNumber; number1++) {
       for (let number2 = 1; number2 <= 10; number2++) {
-        questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+        questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
       }
     }
     
@@ -1533,20 +1533,20 @@ questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "
         }
         if (controller.withRemainder) {
         if ((((number1 * number2) + remainder) % number1) !== 0) {
-        questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
       } else {
-        questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     }
     }
 
     controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-  } else if (controller.modeChoice2 === 'daugdvivien') {
+  } else if (controller.modeChoice2 === "C19") {
     while (questionPool2.length < 10) {
         let number1 = generateRandomNumber(11, 99);
         let number2 = generateRandomNumber(2, 9);
-        questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+        questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
     }
     while (questionPool3.length < 10) {
         let number1 = generateRandomNumber(2, 9);
@@ -1558,19 +1558,19 @@ questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "
         if (dalinys <= 99 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
           if (controller.withRemainder) {
             if (dalinys % number1 !== 0) {
-          questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+          questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
             }
           } else {
-            questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+            questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
           }
       }
     }
     controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-} else if (controller.modeChoice2 === 'daugtrivien') {
+} else if (controller.modeChoice2 === "C20") {
   while (questionPool2.length < 10) {
       let number1 = generateRandomNumber(101, 999);
       let number2 = generateRandomNumber(2, 9);
-      questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
   }
 
 
@@ -1586,10 +1586,10 @@ questionPool.push([parseInt(number1 * number2) + remainder, parseInt(number1), "
     if (100 < dalinys && dalinys <= 999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
       if (controller.withRemainder) {
         if (dalinys % number1 !== 0) {
-      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
       } else {
-        questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
   }
 }
@@ -1606,20 +1606,20 @@ while (questionPool3.length < 20) {
   if (100 < dalinys && dalinys <= 999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
     if (controller.withRemainder) {
       if (dalinys % number1 !== 0) {
-    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     } else {
-      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
 }
 }
 
   controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-} else if (controller.modeChoice2 === 'daugketvien') {
+} else if (controller.modeChoice2 === "C21") {
   while (questionPool2.length < 10) {
       let number1 = generateRandomNumber(1001, 9999);
       let number2 = generateRandomNumber(2, 9);
-      questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
   }
   while (questionPool3.length < 10) {
     let number1 = generateRandomNumber(2, 9);
@@ -1632,10 +1632,10 @@ while (questionPool3.length < 20) {
     if (1000 < dalinys && dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
       if (controller.withRemainder) {
         if (dalinys % number1 !== 0) {
-      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
       } else {
-        questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
   }
 }
@@ -1651,19 +1651,19 @@ while (questionPool3.length < 20) {
   if (dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
     if (controller.withRemainder) {
       if (dalinys % number1 !== 0) {
-    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     } else {
-      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
 }
 }
   controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-} else if (controller.modeChoice2 === 'daugtridvi') {
+} else if (controller.modeChoice2 === "C24") {
 while (questionPool2.length < 10) {
     let number1 = generateRandomNumber(101, 999);
     let number2 = generateRandomNumber(11, 99);
-    questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
 }
 
 while (questionPool3.length < 10) {
@@ -1677,10 +1677,10 @@ while (questionPool3.length < 10) {
   if (100 < dalinys && dalinys <= 999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
     if (controller.withRemainder) {
       if (dalinys % number1 !== 0) {
-    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     } else {
-      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
 }
 }
@@ -1696,20 +1696,20 @@ dalinys = (number1 * number2) + remainder;
 if (dalinys <= 999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
   if (controller.withRemainder) {
     if (dalinys % number1 !== 0) {
-  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
   } else {
-    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
   }
 }
 }
 
 controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-} else if (controller.modeChoice2 === 'daugketdvi') {
+} else if (controller.modeChoice2 === "C25") {
 while (questionPool2.length < 10) {
     let number1 = generateRandomNumber(1001, 9999);
     let number2 = generateRandomNumber(11, 99);
-    questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
 }
 while (questionPool3.length < 10) {
   let number1 = generateRandomNumber(11, 99);
@@ -1722,10 +1722,10 @@ while (questionPool3.length < 10) {
   if (1000 < dalinys && dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
     if (controller.withRemainder) {
       if (dalinys % number1 !== 0) {
-    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     } else {
-      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
 }
 }
@@ -1740,10 +1740,10 @@ dalinys = (number1 * number2) + remainder;
 if (dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
   if (controller.withRemainder) {
     if (dalinys % number1 !== 0) {
-  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
   } else {
-    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
   }
 }
 }
@@ -1754,7 +1754,7 @@ controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - M
 
 
 
-else if (controller.modeChoice2 === 'daugdaugvien') {
+else if (controller.modeChoice2 === "C22") {
 
   while (questionPool2.length < 6) {
 
@@ -1762,7 +1762,7 @@ else if (controller.modeChoice2 === 'daugdaugvien') {
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
 }
 while (questionPool2.length < 14) {
 
@@ -1770,7 +1770,7 @@ while (questionPool2.length < 14) {
   number1 = Math.max(...interNumbers);
   number2 = Math.min(...interNumbers);
 
-  questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+  questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
 }
 
 while (questionPool2.length < 20) {
@@ -1779,7 +1779,7 @@ while (questionPool2.length < 20) {
   number1 = Math.max(...interNumbers);
   number2 = Math.min(...interNumbers);
 
-  questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+  questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
 }
 
 
@@ -1794,10 +1794,10 @@ while (questionPool3.length < 3) {
   if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
     if (controller.withRemainder) {
       if (dalinys % number1 !== 0) {
-    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     } else {
-      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
 }
 }
@@ -1811,10 +1811,10 @@ dalinys = (number1 * number2) + remainder;
 if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
   if (controller.withRemainder) {
     if (dalinys % number1 !== 0) {
-  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
   } else {
-    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
   }
 }
 }
@@ -1828,10 +1828,10 @@ dalinys = (number1 * number2) + remainder;
 if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
 if (controller.withRemainder) {
   if (dalinys % number1 !== 0) {
-questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
   }
 } else {
-  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
 }
 }
 }
@@ -1845,10 +1845,10 @@ dalinys = (number1 * number2) + remainder;
 if (dalinys <= 9999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
 if (controller.withRemainder) {
   if (dalinys % number1 !== 0) {
-questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
   }
 } else {
-  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
 }
 }
 }
@@ -1862,10 +1862,10 @@ dalinys = (number1 * number2) + remainder;
 if (10000 < dalinys && dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
 if (controller.withRemainder) {
   if (dalinys % number1 !== 0) {
-questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
   }
 } else {
-  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
 }
 }
 }
@@ -1873,28 +1873,28 @@ controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - M
 
 }
 
-else if (controller.modeChoice2 === 'daugdaugdvi') {
+else if (controller.modeChoice2 === "C26") {
 
   while (questionPool2.length < 6) {
     interNumbers = [generateRandomNumber(11, 99), generateRandomNumber(11, 99)];
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
 }
   while (questionPool2.length < 14) {
     interNumbers = [generateRandomNumber(101, 999), generateRandomNumber(11, 99)];
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
 }
   while (questionPool2.length < 20) {
     interNumbers = [generateRandomNumber(1001, 9999), generateRandomNumber(11, 99)];
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
   }
 
   while (questionPool3.length < 6) {
@@ -1907,10 +1907,10 @@ else if (controller.modeChoice2 === 'daugdaugdvi') {
     if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
       if (controller.withRemainder) {
         if (dalinys % number1 !== 0) {
-      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
       } else {
-        questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
   }
 }
@@ -1924,10 +1924,10 @@ while (questionPool3.length < 14) {
   if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
     if (controller.withRemainder) {
       if (dalinys % number1 !== 0) {
-    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     } else {
-      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
 }
 }
@@ -1941,10 +1941,10 @@ dalinys = (number1 * number2) + remainder;
 if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
   if (controller.withRemainder) {
     if (dalinys % number1 !== 0) {
-  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
   } else {
-    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
   }
 }
 }
@@ -1953,35 +1953,35 @@ controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - M
 }
 
 
-else if (controller.modeChoice2 === 'daugdaug') {
+else if (controller.modeChoice2 === "C27") {
   while (questionPool2.length < 2) {
 
     interNumbers = [generateRandomNumber(11, 99), generateRandomNumber(2, 9)];
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
 } while (questionPool2.length < 6) {
 
   interNumbers = [generateRandomNumber(101, 999), generateRandomNumber(2, 9)];
   number1 = Math.max(...interNumbers);
   number2 = Math.min(...interNumbers);
 
-  questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+  questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
 } while (questionPool2.length < 8) {
 
   interNumbers = [generateRandomNumber(1001, 9999), generateRandomNumber(2, 9)];
   number1 = Math.max(...interNumbers);
   number2 = Math.min(...interNumbers);
 
-  questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+  questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
 } while (questionPool2.length < 10) {
 
     interNumbers = [generateRandomNumber(11, 99), generateRandomNumber(11, 99)];
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
 }
 
 while (questionPool2.length < 13) {
@@ -1990,7 +1990,7 @@ while (questionPool2.length < 13) {
   number1 = Math.max(...interNumbers);
   number2 = Math.min(...interNumbers);
 
-  questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+  questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
 }
 while (questionPool2.length < 15) {
 
@@ -1998,7 +1998,7 @@ while (questionPool2.length < 15) {
   number1 = Math.max(...interNumbers);
   number2 = Math.min(...interNumbers);
 
-  questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+  questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
 }
 
 
@@ -2008,7 +2008,7 @@ while (questionPool2.length < 18) {
   number1 = Math.max(...interNumbers);
   number2 = Math.min(...interNumbers);
 
-  questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+  questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
 }
 while (questionPool2.length < 20) {
 
@@ -2016,7 +2016,7 @@ while (questionPool2.length < 20) {
   number1 = Math.max(...interNumbers);
   number2 = Math.min(...interNumbers);
 
-  questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+  questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
 }
 
 while (questionPool3.length < 3) {
@@ -2029,10 +2029,10 @@ while (questionPool3.length < 3) {
   if (100 < dalinys && dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
     if (controller.withRemainder) {
       if (dalinys % number1 !== 0) {
-    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+    questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     } else {
-      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
 }
 }
@@ -2046,10 +2046,10 @@ dalinys = (number1 * number2) + remainder;
 if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
 if (controller.withRemainder) {
   if (dalinys % number1 !== 0) {
-questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
   }
 } else {
-  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
 }
 }
 }
@@ -2063,10 +2063,10 @@ dalinys = (number1 * number2) + remainder;
 if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
 if (controller.withRemainder) {
   if (dalinys % number1 !== 0) {
-questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
   }
 } else {
-  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
 }
 }
 }
@@ -2080,10 +2080,10 @@ dalinys = (number1 * number2) + remainder;
 if (100 < dalinys && dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
 if (controller.withRemainder) {
   if (dalinys % number1 !== 0) {
-questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
   }
 } else {
-  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+  questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
 }
 }
 }
@@ -2097,10 +2097,10 @@ dalinys = (number1 * number2) + remainder;
 if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
 if (controller.withRemainder) {
 if (dalinys % number1 !== 0) {
-questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
 }
 } else {
-questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
 }
 }
 }
@@ -2115,10 +2115,10 @@ dalinys = (number1 * number2) + remainder;
 if (dalinys <= 99999 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
 if (controller.withRemainder) {
 if (dalinys % number1 !== 0) {
-questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
 }
 } else {
-questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
 }
 }
 }
@@ -2160,21 +2160,21 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
   
   
   
-  else if (controller.modeChoice2 === 'pil10') {
+  else if (controller.modeChoice2 === "C28") {
     for (let number1 = 1; number1 <= 10; number1++) {
       for (let number2 = 10; number2 <= 90; number2+=10) {
         if (Math.random() <= 0.5) {
-          questionPool.push([parseInt(number2), parseInt(number1), "multiplication"]);
+          questionPool.push([parseInt(number2), parseInt(number1), "M"]);
         } else {
-          questionPool.push([parseInt(number1), parseInt(number2), "multiplication"]);
+          questionPool.push([parseInt(number1), parseInt(number2), "M"]);
         }
       }
       for (let number1 = 1; number1 <= 10; number1++) {
         for (let number2 = 100; number2 <= 900; number2+=100) {
           if (Math.random() <= 0.5) {
-            questionPool2.push([parseInt(number2), parseInt(number1), "multiplication"]);
+            questionPool2.push([parseInt(number2), parseInt(number1), "M"]);
           } else {
-            questionPool2.push([parseInt(number1), parseInt(number2), "multiplication"]);
+            questionPool2.push([parseInt(number1), parseInt(number2), "M"]);
           }
         }
       }
@@ -2190,10 +2190,10 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
 
           if (controller.withRemainder) {
             if (dalinys % number1*10 !== 0) {
-              questionPool3.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
+              questionPool3.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "D"]);
             }
           } else {
-            questionPool3.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
+            questionPool3.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "D"]);
           }
       
     }
@@ -2210,20 +2210,20 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
   
           if (controller.withRemainder) {
             if (dalinys % number1*100 !== 0) {
-              questionPool4.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+              questionPool4.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "D"]);
             }
           } else {
-            questionPool4.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+            questionPool4.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "D"]);
           }
       
     }
   
       }
     controller.combinations = [...questionPool.sort(() => 0.5 - Math.random()).slice(0, 5), ...questionPool2.sort(() => 0.5 - Math.random()).slice(0, 5), ...questionPool3.sort(() => 0.5 - Math.random()).slice(0, 5), ...questionPool4.sort(() => 0.5 - Math.random()).slice(0, 5)]
-  } else if (controller.modeChoice2 === 'pil100') {
+  } else if (controller.modeChoice2 === "C77") {
     for (let number1 = 1; number1 <= 10; number1++) {
       for (let number2 = 100; number2 <= 900; number2+=100) {
-        questionPool2.push([parseInt(number2), parseInt(number1), "multiplication"]);
+        questionPool2.push([parseInt(number2), parseInt(number1), "M"]);
       }
     }
     for (let number1 = 1; number1 <= 10; number1++) {
@@ -2236,10 +2236,10 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
 
           if (controller.withRemainder) {
             if (dalinys % number1*100 !== 0) {
-              questionPool3.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+              questionPool3.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "D"]);
             }
           } else {
-            questionPool3.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+            questionPool3.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "D"]);
           }
       
     }
@@ -2248,7 +2248,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
     questionPool3 = questionPool3.sort(() => 0.5 - Math.random()).slice(0, 10);
     controller.combinations = questionPool2.concat(questionPool3).sort(() => 0.5 - Math.random()).slice(0, 20);
-  } else if (controller.modeChoice2 === 'pil') {
+  } else if (controller.modeChoice2 === "C29") {
     let sublist10 = [];
     let sublist100 = [];
     let sublist1000 = [];
@@ -2264,9 +2264,9 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       for (let number2 = 10; number2 <= 90; number2+=10) {
         if (hasNoCarrying(number1, number2) && (number1 !== 10 && number1 !== 100 && number2 !== 10)) {
           if (Math.random() <= 0.5) {
-            sublist10.push([parseInt(number2), parseInt(number1), "multiplication"]);
+            sublist10.push([parseInt(number2), parseInt(number1), "M"]);
           } else {
-            sublist10.push([parseInt(number1), parseInt(number2), "multiplication"]);
+            sublist10.push([parseInt(number1), parseInt(number2), "M"]);
           }
         }
       }
@@ -2280,9 +2280,9 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       for (let number2 = 100; number2 <= 900; number2+=10) {
         if (hasNoCarrying(number1, number2) && (number1 !== 10 && number1 !== 100 && number2 !== 10 && number2 !== 100)) {
           if (Math.random() <= 0.5) {
-            sublist10.push([parseInt(number2), parseInt(number1), "multiplication"]);
+            sublist10.push([parseInt(number2), parseInt(number1), "M"]);
           } else {
-            sublist10.push([parseInt(number1), parseInt(number2), "multiplication"]);
+            sublist10.push([parseInt(number1), parseInt(number2), "M"]);
           }
         }
       }
@@ -2296,9 +2296,9 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       for (let number2 = 1000; number2 <= 9000; number2+=100) {
         if (hasNoCarrying(number1, number2) && (number1 !== 10 && number1 !== 100 && number2 !== 10 && number2 !== 100 && number2 !== 1000)) {
           if (Math.random() <= 0.5) {
-            sublist10.push([parseInt(number2), parseInt(number1), "multiplication"]);
+            sublist10.push([parseInt(number2), parseInt(number1), "M"]);
           } else {
-            sublist10.push([parseInt(number1), parseInt(number2), "multiplication"]);
+            sublist10.push([parseInt(number1), parseInt(number2), "M"]);
           }
         }
       }
@@ -2315,10 +2315,10 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
 
         if (controller.withRemainder) {
           if (dalinys % number1*10 !== 0) {
-            sublist10Div.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
+            sublist10Div.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "D"]);
           }
         } else {
-          sublist10Div.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "division"]);
+          sublist10Div.push([parseInt(number1 * number2 * 10) + remainder, parseInt(number1 * 10), "D"]);
         }
       }
     }
@@ -2337,10 +2337,10 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
 
         if (controller.withRemainder) {
           if (dalinys % number1*100 !== 0) {
-            sublist100Div.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+            sublist100Div.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "D"]);
           }
         } else {
-          sublist100Div.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "division"]);
+          sublist100Div.push([parseInt(number1 * number2 * 100) + remainder, parseInt(number1 * 100), "D"]);
         }
       }
     }
@@ -2359,10 +2359,10 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
 
         if (controller.withRemainder) {
           if (dalinys % number1*1000 !== 0) {
-            sublist1000Div.push([parseInt(number1 * number2 * 1000) + remainder, parseInt(number1 * 1000), "division"]);
+            sublist1000Div.push([parseInt(number1 * number2 * 1000) + remainder, parseInt(number1 * 1000), "D"]);
           }
         } else {
-          sublist1000Div.push([parseInt(number1 * number2 * 1000) + remainder, parseInt(number1 * 1000), "division"]);
+          sublist1000Div.push([parseInt(number1 * number2 * 1000) + remainder, parseInt(number1 * 1000), "D"]);
         }
       }
     }
@@ -2373,19 +2373,19 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     }
   
 /*ALL*/
-} else if (controller.modeChoice === "visi") {
-  if (controller.modeChoice2 === "iki10") {
+} else if (controller.modeChoice1 === "C7") {
+  if (controller.modeChoice2 === "C31") {
     for (let number1 = 1; number1 <= 9; number1++) {
       for (let number2 = 1; number2 <= 9; number2++) {
          if (number1 + number2 <= 10) {
-          questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+          questionPool.push([parseInt(number1), parseInt(number2), "A"]);
         }
       }
     }
     for (let number1 = 1; number1 <= 9; number1++) {
       for (let number2 = 1; number2 <= 9; number2++) {
          if (number1 > number2) {
-          questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
+          questionPool2.push([parseInt(number1), parseInt(number2), "S"]);
         }
       }
     }
@@ -2393,14 +2393,14 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     questionPool2 = questionPool2.sort(() => 0.5 - Math.random()).slice(0, 10);
     controller.combinations = questionPool.concat(questionPool2).sort(() => 0.5 - Math.random()).slice(0, 20);
 
-  } else if (controller.modeChoice2 === "iki20") {
+  } else if (controller.modeChoice2 === "C32") {
     for (let number1 = 11; number1 <= 19; number1++) {
       for (let number2 = 1; number2 <= 9; number2++) {
         if (11 <= number1 + number2 && number1 + number2 <= 19) {
           if (Math.random() < 0.5) {
-            questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+            questionPool.push([parseInt(number1), parseInt(number2), "A"]);
         } else {
-            questionPool.push([parseInt(number2), parseInt(number1), "addition"]);
+            questionPool.push([parseInt(number2), parseInt(number1), "A"]);
         }
     }
         }
@@ -2409,7 +2409,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     for (let number1 = 1; number1 <= 9; number1++) {
       for (let number2 = 1; number2 <= 9; number2++) {
         if (11 <= number1 + number2 && number1 + number2 <= 19) {
-          questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+          questionPool2.push([parseInt(number1), parseInt(number2), "A"]);
         }
       }
     }
@@ -2417,7 +2417,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       for (let number1 = 11; number1 <= 19; number1++) {
         for (let number2 = 1; number2 <= 9; number2++) {
           if (parseInt(number1.toString()[1]) < number2) {
-            questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+            questionPool3.push([parseInt(number1), parseInt(number2), "S"]);
           }
         }
       }
@@ -2425,7 +2425,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       for (let number1 = 11; number1 <= 19; number1++) {
         for (let number2 = 1; number2 <= 9; number2++) {
           if (parseInt(number1.toString()[1]) > number2) {
-            questionPool4.push([parseInt(number1), parseInt(number2), "subtraction"]);
+            questionPool4.push([parseInt(number1), parseInt(number2), "S"]);
           }
         }
       }
@@ -2441,15 +2441,15 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
 
       controller.combinations = combinedPool.concat(combinedPool2).sort(() => 0.5 - Math.random()).slice(0, 20);
     
-  } else if (controller.modeChoice2 === "iki100") {
+  } else if (controller.modeChoice2 === "C33") {
 
     for (let number1 = 11; number1 <= 99; number1++) {
       for (let number2 = 11; number2 <= 99; number2++) {
         if (neperzengiant(number1, number2) && number1 + number2 <= 100) {
             if (Math.random() < 0.5) {
-              questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+              questionPool.push([parseInt(number1), parseInt(number2), "A"]);
           } else {
-              questionPool.push([parseInt(number2), parseInt(number1), "addition"]);
+              questionPool.push([parseInt(number2), parseInt(number1), "A"]);
           }
         }
     }
@@ -2460,7 +2460,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       for (let number2 = 11; number2 <= 99; number2++) {
         if (!neperzengiant(number1, number2) && number1 + number2 <= 100) {
           if (number1 + number2 <= 100) {
-              questionPool2.push([parseInt(number1), parseInt(number2), "addition"]);
+              questionPool2.push([parseInt(number1), parseInt(number2), "A"]);
           }
         }
       }
@@ -2470,7 +2470,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       for (let number1 = 11; number1 <= 99; number1++) {
         for (let number2 = 2; number2 <= 99; number2++) {
           if (neisardant(number1, number2) && number1 > number2) {
-            questionPool3.push([parseInt(number1), parseInt(number2), "subtraction"]);
+            questionPool3.push([parseInt(number1), parseInt(number2), "S"]);
         }
       }
     }
@@ -2479,7 +2479,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       for (let number1 = 11; number1 <= 99; number1++) {
         for (let number2 = 2; number2 <= 99; number2++) {
           if (!neisardant(number1, number2) && number1 > number2) {
-              questionPool4.push([parseInt(number1), parseInt(number2), "subtraction"]);
+              questionPool4.push([parseInt(number1), parseInt(number2), "S"]);
         }
         }
       }
@@ -2496,7 +2496,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     for (let number1 = 2; number1 <= 9; number1++) {
       for (let number2 = 2; number2 <= 9; number2++) {
         if (number1 * number2 < 100) {
-          combinedPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+          combinedPool3.push([parseInt(number1), parseInt(number2), "M"]);
       }
     }
   }
@@ -2510,10 +2510,10 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       }
       if (controller.withRemainder) {
       if ((((number1 * number2) + remainder) % number1) !== 0) {
-        combinedPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        combinedPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     } else {
-      combinedPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      combinedPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
     }
   }
   }
@@ -2522,16 +2522,16 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     combinedPool4 = combinedPool4.sort(() => 0.5 - Math.random()).slice(0, 5);    
 
     controller.combinations = combinedPool.concat(combinedPool2, combinedPool3, combinedPool4).sort(() => 0.5 - Math.random()).slice(0, 20);
-    } else if (controller.modeChoice2 === "iki1000") {
+    } else if (controller.modeChoice2 === "C34") {
 
       while (questionPool.length < 1) {
         number1 = generateRandomNumber(101, 999);
         number2 = generateRandomNumber(11, 999);
           if (neperzengiant(number1, number2) && number1 + number2 <= 1000) {
               if (Math.random() < 0.5) {
-                questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                questionPool.push([parseInt(number1), parseInt(number2), "A"]);
             } else {
-                questionPool.push([parseInt(number2), parseInt(number1), "addition"]);
+                questionPool.push([parseInt(number2), parseInt(number1), "A"]);
             }
       }
     }
@@ -2540,7 +2540,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       number1 = generateRandomNumber(101, 999);
       number2 = generateRandomNumber(11, 999);
         if (!neperzengiant(number1, number2) && number1 + number2 <= 1000) {
-            questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+            questionPool.push([parseInt(number1), parseInt(number2), "A"]);
     }
   }
 
@@ -2549,7 +2549,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
         number2 = generateRandomNumber(11, 999);
         if (neisardant(number1, number2) && number1 > number2) {
 
-            questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
+            questionPool2.push([parseInt(number1), parseInt(number2), "S"]);
 
         
     }
@@ -2559,7 +2559,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     number1 = generateRandomNumber(101, 999);
     number2 = generateRandomNumber(11, 999);
     if (!neisardant(number1, number2) && number1 > number2) {
-        questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
+        questionPool2.push([parseInt(number1), parseInt(number2), "S"]);
 }
 }
 
@@ -2568,7 +2568,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
         number1 = Math.max(...interNumbers);
         number2 = Math.min(...interNumbers);
         if (number1 * number2 <= 1000) {
-        questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+        questionPool3.push([parseInt(number1), parseInt(number2), "M"]);
         }
     }
 
@@ -2577,7 +2577,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       number1 = Math.max(...interNumbers);
       number2 = Math.min(...interNumbers);
       if (number1 * number2 <= 1000) {
-      questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+      questionPool3.push([parseInt(number1), parseInt(number2), "M"]);
       }
   }
         while (questionPool4.length < 2) {
@@ -2589,7 +2589,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
           let dalinys = number1 * number2;
 
           if (dalinys < 1000 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
-              questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+              questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
       }
 
@@ -2603,7 +2603,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
         let dalinys = number1 * number2;
 
         if (dalinys < 1000 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
-            questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+            questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
     }
 
@@ -2613,14 +2613,14 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       for (let number1 = 2; number1 <= 10; number1++) {
         for (let number2 = 2; number2 <= 9; number2++) {
           if (number1 * number2 * 10 < 1000) {
-            tens.push([parseInt(number1 * number2 * 10), parseInt(number1* 10), "division"]);
+            tens.push([parseInt(number1 * number2 * 10), parseInt(number1* 10), "D"]);
         }
       }
     }
         for (let number1 = 2; number1 <= 10; number1++) {
           for (let number2 = 2; number2 <= 9; number2++) {
             if (number1 * number2 * 100 < 1000) {
-              hundreds.push([parseInt(number1 * number2 * 100), parseInt(number1 * 100), "division"]);
+              hundreds.push([parseInt(number1 * number2 * 100), parseInt(number1 * 100), "D"]);
           }  
       }
     }
@@ -2632,7 +2632,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
   
       controller.combinations = questionPool.concat(questionPool2, questionPool3, questionPool4).sort(() => 0.5 - Math.random()).slice(0, 20);
 
-      } else if (controller.modeChoice2 === "iki10000") {
+      } else if (controller.modeChoice2 === "C35") {
       
         while (questionPool.length < 1) {
           number1 = generateRandomNumber(1001, 9999);
@@ -2640,9 +2640,9 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
             if (neperzengiant(number1, number2) && number1 + number2 < 10000) {
 
                 if (Math.random() < 0.5) {
-                  questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                  questionPool.push([parseInt(number1), parseInt(number2), "A"]);
               } else {
-                  questionPool.push([parseInt(number2), parseInt(number1), "addition"]);
+                  questionPool.push([parseInt(number2), parseInt(number1), "A"]);
               }
 
         }
@@ -2652,7 +2652,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
         number1 = generateRandomNumber(1001, 9999);
         number2 = generateRandomNumber(11, 999);
           if (!neperzengiant(number1, number2) && number1 + number2 <= 10000) {
-              questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+              questionPool.push([parseInt(number1), parseInt(number2), "A"]);
       }
     }
 
@@ -2660,7 +2660,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       number1 = generateRandomNumber(101, 9999);
       number2 = generateRandomNumber(11, 9999);
         if (!neperzengiant(number1, number2) && number1 + number2 <= 10000) {
-            questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+            questionPool.push([parseInt(number1), parseInt(number2), "A"]);
     }
   }
   
@@ -2668,7 +2668,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
           number1 =generateRandomNumber(1001, 9999)
           number2 =generateRandomNumber(11, 9999)
           if (neisardant(number1, number2) && number1 > number2) {
-              questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
+              questionPool2.push([parseInt(number1), parseInt(number2), "S"]);
       }
     }
   
@@ -2676,7 +2676,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
       number1 =generateRandomNumber(1001, 9999)
       number2 =generateRandomNumber(11, 999)
       if (!neisardant(number1, number2) && number1 > number2) {
-          questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
+          questionPool2.push([parseInt(number1), parseInt(number2), "S"]);
   }
   }
 
@@ -2684,7 +2684,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     number1 =generateRandomNumber(1001, 9999)
     number2 =generateRandomNumber(11, 9999)
     if (!neisardant(number1, number2) && number1 > number2) {
-        questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
+        questionPool2.push([parseInt(number1), parseInt(number2), "S"]);
 }
 }
   
@@ -2693,7 +2693,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
           number1 = Math.max(...interNumbers);
           number2 = Math.min(...interNumbers);
           if (number1 * number2 <= 10000) {
-          questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+          questionPool3.push([parseInt(number1), parseInt(number2), "M"]);
           }
       }
   
@@ -2702,7 +2702,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
         number1 = Math.max(...interNumbers);
         number2 = Math.min(...interNumbers);
         if (number1 * number2 <= 10000) {
-        questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+        questionPool3.push([parseInt(number1), parseInt(number2), "M"]);
         }
     }
 
@@ -2715,7 +2715,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
             let dalinys = number1 * number2;
   
             if (dalinys < 10000 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
-                questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+                questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
           }
         }
   
@@ -2729,7 +2729,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
           let dalinys = number1 * number2;
   
           if (dalinys < 10000 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
-              questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+              questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
       }
   
@@ -2738,14 +2738,14 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
         for (let number1 = 2; number1 <= 10; number1++) {
           for (let number2 = 2; number2 <= 9; number2++) {
             if (number1 * number2 * 10 < 10000) {
-              tens.push([parseInt(number1 * number2 * 10), parseInt(number1* 10), "division"]);
+              tens.push([parseInt(number1 * number2 * 10), parseInt(number1* 10), "D"]);
           }
         }
       }
           for (let number1 = 2; number1 <= 10; number1++) {
             for (let number2 = 2; number2 <= 9; number2++) {
               if (number1 * number2 * 100 < 10000) {
-                hundreds.push([parseInt(number1 * number2 * 100), parseInt(number1 * 100), "division"]);
+                hundreds.push([parseInt(number1 * number2 * 100), parseInt(number1 * 100), "D"]);
             }  
         }
       }
@@ -2758,41 +2758,41 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
         controller.combinations = questionPool.concat(questionPool2, questionPool3, questionPool4).sort(() => 0.5 - Math.random()).slice(0, 20);
         }
 
-        else if (controller.modeChoice2 === "iki1000000") {
+        else if (controller.modeChoice2 === "C36") {
       
           while (questionPool.length < 1) {
             number1 = generateRandomNumber(100001, 999999);
             number2 = generateRandomNumber(100001, 999999);
               if (!neperzengiant(number1, number2) && number1 + number2 < 1000000) {
-                questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                questionPool.push([parseInt(number1), parseInt(number2), "A"]);
             }
           }
           while (questionPool.length < 2) {
             number1 = generateRandomNumber(100001, 999999);
             number2 = generateRandomNumber(10001, 99999);
               if (!neperzengiant(number1, number2) && number1 + number2 < 1000000) {
-                questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                questionPool.push([parseInt(number1), parseInt(number2), "A"]);
             }
           }
           while (questionPool.length < 3) {
             number1 = generateRandomNumber(100001, 999999);
             number2 = generateRandomNumber(1001, 9999);
               if (!neperzengiant(number1, number2) && number1 + number2 < 1000000) {
-                questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                questionPool.push([parseInt(number1), parseInt(number2), "A"]);
             }
           }
           while (questionPool.length < 4) {
             number1 = generateRandomNumber(100001, 999999);
             number2 = generateRandomNumber(11, 99);
               if (!neperzengiant(number1, number2) && number1 + number2 < 1000000) {
-                questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                questionPool.push([parseInt(number1), parseInt(number2), "A"]);
             }
           }
           while (questionPool.length < 5) {
             number1 = generateRandomNumber(1001, 999999);
             number2 = generateRandomNumber(101, 999999);
               if (!neperzengiant(number1, number2) && number1 + number2 < 1000000) {
-                questionPool.push([parseInt(number1), parseInt(number2), "addition"]);
+                questionPool.push([parseInt(number1), parseInt(number2), "A"]);
             }
           }
     
@@ -2800,35 +2800,35 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
             number1 =generateRandomNumber(100000, 1000000)
             number2 =generateRandomNumber(101, 999)
             if (!neisardant(number1, number2) && number1 > number2) {
-              questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
+              questionPool2.push([parseInt(number1), parseInt(number2), "S"]);
           }
         }
           while (questionPool2.length < 2) {
             number1 =generateRandomNumber(100000, 1000000)
             number2 =generateRandomNumber(1001, 9999)
             if (!neisardant(number1, number2) && number1 > number2) {
-              questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
+              questionPool2.push([parseInt(number1), parseInt(number2), "S"]);
           }
         }
           while (questionPool2.length < 3) {
             number1 =generateRandomNumber(100000, 1000000)
             number2 =generateRandomNumber(10001, 99999)
             if (!neisardant(number1, number2) && number1 > number2) {
-              questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
+              questionPool2.push([parseInt(number1), parseInt(number2), "S"]);
           }
         }
         while (questionPool2.length < 4) {
           number1 =generateRandomNumber(100000, 1000000)
           number2 =generateRandomNumber(100001, 999999)
           if (!neisardant(number1, number2) && number1 > number2) {
-            questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
+            questionPool2.push([parseInt(number1), parseInt(number2), "S"]);
         }
       }
       while (questionPool2.length < 5) {
         number1 =generateRandomNumber(10000, 99999)
         number2 =generateRandomNumber(10001, 99999)
         if (!neisardant(number1, number2) && number1 > number2) {
-          questionPool2.push([parseInt(number1), parseInt(number2), "subtraction"]);
+          questionPool2.push([parseInt(number1), parseInt(number2), "S"]);
       }
     }
 
@@ -2838,7 +2838,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool3.push([parseInt(number1), parseInt(number2), "M"]);
   } 
 
   while (questionPool3.length < 2) {
@@ -2847,7 +2847,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool3.push([parseInt(number1), parseInt(number2), "M"]);
   } 
 
   while (questionPool3.length < 3) {
@@ -2856,7 +2856,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool3.push([parseInt(number1), parseInt(number2), "M"]);
 }
   while (questionPool3.length < 4) {
 
@@ -2864,7 +2864,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     number1 = Math.max(...interNumbers);
     number2 = Math.min(...interNumbers);
 
-    questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool3.push([parseInt(number1), parseInt(number2), "M"]);
   }
   while (questionPool3.length < 7) {
 
@@ -2873,7 +2873,7 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     number2 = Math.min(...interNumbers);
 
     if (number1 * number2 <= 1000000) {
-    questionPool3.push([parseInt(number1), parseInt(number2), "multiplication"]);
+    questionPool3.push([parseInt(number1), parseInt(number2), "M"]);
     }
   }
 
@@ -2887,10 +2887,10 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     if (dalinys <= 1000000 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
       if (controller.withRemainder) {
         if (dalinys % number1 !== 0) {
-      questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
       } else {
-        questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
   }
   }
@@ -2904,10 +2904,10 @@ questionPool3.push([parseInt(number1 * number2) + remainder, parseInt(number1), 
     if (dalinys <= 1000000 && Number(dalinys.toString()[dalinys.toString().length - 1]) !== 0) {
       if (controller.withRemainder) {
         if (dalinys % number1 !== 0) {
-      questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+      questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
         }
       } else {
-        questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "division"]);
+        questionPool4.push([parseInt(number1 * number2) + remainder, parseInt(number1), "D"]);
       }
   }
   }

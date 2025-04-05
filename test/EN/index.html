@@ -10,7 +10,7 @@
 	  <link rel="canonical" href="https://www.sudedu.lt/EN/">
 	  <link rel="alternate" href="https://www.sudedu.lt/LT/" hreflang="lt">
 	  <link rel="alternate" href="https://www.sudedu.lt/EN/" hreflang="en">
-	<link rel="icon" href="../../images/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
 	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -18,7 +18,10 @@
 	<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Josefin+Sans&display=swap"
 		rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="../../index.css">
+		<link rel="stylesheet"
+	href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+	<link rel="stylesheet" type="text/css" href="../index.css">
+	<link rel="stylesheet" type="text/css" href="../user-nav-menu.css">
 
 <style>
 	#remainder-option {
@@ -50,18 +53,36 @@
 	<div class="container" id="template-container"
 		style="display: flex; flex-direction: column; justify-content: space-between;" hidden>
 		<div class="position-absolute image-container kid-5 bottom-0 end-0"
-			style="top: 50%; left: 15%; width: 250px; height: 250px;"> <img src="../../images/kid-5.png"
+			style="top: 50%; left: 15%; width: 250px; height: 250px;"> <img src="../images/kid-5.png"
 				style="width: 100%; height: 100%;" class="img-fluid"> </div>
 		<div class="position-absolute image-container kid-6 bottom-0 end-0"
-			style="top: 35%; left: 67%; width: 250px; height: 250px;"> <img src="../../images/kid-6.png"
+			style="top: 35%; left: 67%; width: 250px; height: 250px;"> <img src="../images/kid-6.png"
 				style="width: 250px; height: auto;" class="img-fluid"> </div>
 		<div id="language-about-row" class="row d-flex align-items-start">
 			<div class="col-6" id="language-switcher" onmousedown="return false;" onselectstart="return false;" style="-webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;">
 				<span class="language-option language-option-EN selected" onclick="setLanguage('EN')">EN</span>
 				<span class="language-option language-option-LT" onclick="setLanguage('LT')">LT</span>
 			</div>
-			<div class="col-6 d-flex justify-content-end align-items-end about-button-div">
-				<a href="./apie.html" class="about-button">ABOUT sudEdu</a>
+			<div class="col-6 d-flex justify-content-end align-items-end" id="user-login-div">
+				<a id="user-login-anchor" href="./prisijungimas.html" class="log-in">Log In</a>
+
+				<div id="loggedin-user-menu">
+	<div class="profile">
+		<div class="user">
+			<h3 id="loggedin-user-nickname"></h3>
+			<p id="loggedin-user-id"></p>
+		</div>
+
+			<div class="img-box"><span id="user-initial"></span></div>
+
+	</div>
+	<div class="menu">
+		<ul>
+			<li><a href="uzduotys.html"><i class="ph-bold ph-user"></i>Tasks</a></li>
+			<li><a href="/EN" onclick="clearUserData()"><i class="ph-bold ph-envelope-simple"></i>Log Out</a></li>
+		</ul>
+	</div>
+				</div>
 			</div>
 		</div>
 			<div class="col-12 d-flex justify-content-center align-items-center text-center">
@@ -72,42 +93,33 @@
 				<div class="row" id="middle-div-row">
 					<div class="d-flex flex-column align-items-center">
 						<label class="mode-choice-label" for="mode_choice">PRACTICE</label>
-						<div class="row">
-							<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
-						</div>
 						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
-							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice"
-								id="mode_choice">
-								<option value="sudetis">ADDITION</option>
-								<option value="atimtis">SUBTRACTION</option>
-								<option value="sudetis ir atimtis">ADDITION AND SUBTRACTION</option>
-								<option value="daugyba">MULTIPLICATION</option>
-								<option value="dalyba">DIVISION</option>
-								<option value="daugyba ir dalyba">MULTIPLICATION AND DIVISION</option>
-								<option value="visi">MIXED</option>
+							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_1"
+								id="mode_choice_1">
+								<option value="C1">ADDITION</option>
+								<option value="C2">SUBTRACTION</option>
+								<option value="C3">ADDITION AND SUBTRACTION</option>
+								<option value="C4">MULTIPLICATION</option>
+								<option value="C5">DIVISION</option>
+								<option value="C6">MULTIPLICATION AND DIVISION</option>
+								<option value="C7">MIXED</option>
 							</select>
-						</div>
-						<div class="row">
-							<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
 						</div>
 						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_2_div">
 							<div class="col-12 d-flex justify-content-center align-items-center mode_choice_2_div text-center"
 								id="mode_choice_2_div">
 								<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_2"
 									id="mode_choice_2">
-									<option value="viena10">1-DIGIT NUMBERS UP TO 10</option>
-									<option value="viena">1-DIGIT NUMBERS UP TO 20</option>
-									<option value="dvivien20">2-DIGIT AND 1-DIGIT NUMBERS UP TO 20</option>
-									<option value="dvivien">2-DIGIT AND 1-DIGIT NUMBERS UP TO 100</option>
-									<option value="dvi">2-DIGIT NUMBERS UP TO 100</option>
-									<option value="tukst">NUMBERS UP TO 1,000</option>
-									<option value="dtukst">NUMBERS UP TO 10,000</option>
-									<option value="mil">NUMBERS UP TO 1,000,000</option>
+									<option value="C8">1-DIGIT NUMBERS UP TO 10</option>
+									<option value="C9">1-DIGIT NUMBERS UP TO 20</option>
+									<option value="C10">2-DIGIT AND 1-DIGIT NUMBERS UP TO 20</option>
+									<option value="C11">2-DIGIT AND 1-DIGIT NUMBERS UP TO 100</option>
+									<option value="C12">2-DIGIT NUMBERS UP TO 100</option>
+									<option value="C13">NUMBERS UP TO 1,000</option>
+									<option value="C14">NUMBERS UP TO 10,000</option>
+									<option value="C15">NUMBERS UP TO 1,000,000</option>
 								</select>
 							</div>
-						</div>
-						<div class="row">
-							<div class="col-sm-12 empty-placeholder-between-options" id="placeholder-bottom"></div>
 						</div>
 						<div class="row">
 							<div class="col-12 d-flex justify-content-center align-items-center number_choice_div text-center">
@@ -143,7 +155,6 @@
 								</select>
 							</div>
 						</div>
-						<div class="col-sm-12 empty-placeholder-after-number-options" id="empty-placeholder-after-numbers" style="display: none;"></div>
 						<div class="row d-flex justify-content-center align-items-center text-center remainder-div">
 						<label id="remainder-option" style="display: none;">
 							<input id="remainder-input" type="checkbox" name="myCheckbox"> DIVISION WITH A REMAINDER
@@ -156,42 +167,36 @@
 								id="mode_choice_3_div">
 								<select class="btn btn-secondary dropdown-toggle dropdown text-center" name="mode_choice_3"
 									id="mode_choice_3">
-									<option value="neper">WITHOUT CARRYING OVER PLACE VALUES</option>
+									<option value="C37">WITHOUT CARRYING OVER PLACE VALUES</option>
 								</select>
 							</div>
 						</div>
-						<div class="col-sm-12 empty-placeholder-between-options placeholder-before-skaitinis" id="empty-placeholder-before-mode-choice-div-5"></div>
 						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
 							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_5"
 								id="mode_choice_5">
-								<option value="skaitiniai">SIMPLE EQUATION</option>
-								<option value="nezinomieji">EQUATION WITH UNKNOWN NUMBER</option>
+								<option value="C41">SIMPLE EQUATION</option>
+								<option value="C42">EQUATION WITH UNKNOWN NUMBER</option>
 							</select>
 						</div>
-						<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-top"></div>
 						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
 							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_6"
 								id="mode_choice_6" style="display: none;">
-								<option value="turinys">UNKNOWN ADDEND</option>
+								<option value="C43">UNKNOWN ADDEND</option>
 							</select>
 						</div>
 						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
 							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_7"
 								id="mode_choice_7" style="display: block;">
-								<option value="eilute">SIMPLE ADDITION</option>
-								<option value="stulpeliu">LONG ADDITION</option>
+								<option value="C47">SIMPLE ADDITION</option>
+								<option value="C48">LONG ADDITION</option>
 							</select>
 						</div>
-						<div class="col-sm-12 empty-placeholder-between-options" id="empty-placeholder-before-version" style="display: none;"></div>
 						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
-							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_8"
-								id="mode_choice_8" style="display: none;">
-								<option value="us-version">US/UK/INDONESIA VERSION</option>
-								<option value="eeu-version">EASTERN EUROPE VERSION</option>
+							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_14"
+								id="mode_choice_14" style="display: none;">
+								<option value="C78">US/UK/INDONESIA VERSION</option>
+								<option value="C79">EASTERN EUROPE VERSION</option>
 							</select>
-						</div>
-						<div class="row">
-							<div class="col-sm-12 empty-placeholder-before-submit"></div>
 						</div>
 						<div class="row">
 							<div class="col-12 d-flex justify-content-center align-items-center submit-button">
@@ -202,457 +207,26 @@
 				</div>
 			</div>
 		</div>
-		<div class="row d-flex align-items-center language-and-mistakes-div">
-
-			<div class="col-12 d-flex justify-content-end align-items-center summary-button-div" style="display: inline-block; visibility: hidden;">
-				<button class="btn btn-primary summary-button">Tricky Mistakes</button>
+		<div class="row d-flex stop-reset-button-div">
+			<div class="col-6 d-flex justify-content-start align-items-center" style="display: inline-block; visibility: hidden;">
+				<button class="btn btn-primary summary-button"><span class="material-symbols-rounded">analytics</span></button>
 			</div>
-		</div>
+
+	<div class="col-12 d-flex justify-content-center align-items-center about-button-div">
+		<a href="apie.html" class="about-button">APIE sudEdu</a>
 	</div>
+</div>
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
 		crossorigin="anonymous"></script>
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="../../mental-arithmetic.js"></script>
-	<script src="../../mental-arithmetic-combinations.js"></script>
+	<script src="../mental-arithmetic.js"></script>
+	<script src="../user-nav-menu.js"></script>
+	<script src="../mental-arithmetic-combinations.js"></script>
+	<script src="math-options.js"></script>
 
 	<script>
-
-		let modeChoiceElement = document.querySelector('#mode_choice');
-		let numberLabel = document.querySelector('#number_label');
-		let modeChoice2Element = document.querySelector('#mode_choice_2');
-		let selectedNumberElement = document.querySelector('#selected_number');
-		let numberLabel2 = document.querySelector('#number_label_2');
-		let selectedNumber2Element = document.querySelector('#selected_number_2');
-		let remainderOptionElement = document.querySelector('#remainder-option');
-		let modeChoice3Element = document.querySelector('#mode_choice_3');
-		let emptySpaceholder = document.querySelector('#placeholder-bottom');
-		let modeChoice5Element = document.querySelector('#mode_choice_5');
-		let modeChoice6Element = document.querySelector('#mode_choice_6');
-		let modeChoice7Element = document.querySelector('#mode_choice_7');
-		let modeChoice8Element = document.querySelector('#mode_choice_8');
-		let placeholderBeforeSkaitinisElement = document.querySelector('.placeholder-before-skaitinis');
-		let placeholderAfterNumbersElement = document.querySelector('#empty-placeholder-after-numbers');
-
-		function toggleVisibility(element, isVisible) {
-				if (isVisible) {
-					element.style.display = 'block';
-				} else {
-					element.style.display = 'none';
-				}
-			}
-
-			function handleModeChoiceChange() {
-				let modeChoiceSelection = modeChoiceElement.value;
-				let modeChoice2Selection = modeChoice2Element.value;
-				let modeChoice5Selection = modeChoice5Element.value;
-
-				if (modeChoice5Selection === 'skaitiniai') {
-					toggleVisibility(modeChoice7Element, true);
-					toggleVisibility(modeChoice8Element, true);
-				} else {
-					toggleVisibility(modeChoice7Element, false);
-				}
-
-				if (
-						(modeChoiceSelection === 'daugyba' || modeChoiceSelection === 'dalyba' || modeChoiceSelection === 'daugyba ir dalyba') && 
-						(
-							modeChoice2Selection !== 'pil10' &&
-							modeChoice2Selection !== 'pil' && 
-							modeChoice2Selection !== 'daugdvivien' && 
-							modeChoice2Selection !== 'daugtrivien' && 
-							modeChoice2Selection !== 'daugketvien' &&
-							modeChoice2Selection !== 'daugdvidvi' &&
-							modeChoice2Selection !== 'daugtridvi' && 
-							modeChoice2Selection !== 'daugketdvi' &&
-							modeChoice2Selection !== 'daugdaugvien' &&
-							modeChoice2Selection !== 'daugdaugviendalmnul' &&
-							modeChoice2Selection !== 'daugdaugdvi' &&
-							modeChoice2Selection !== 'daugdaug' &&
-							modeChoice2Selection !== 'mil' &&
-							modeChoice2Selection !== 'gretnul'
-						)
-					) {
-					toggleVisibility(numberLabel, true);
-					toggleVisibility(selectedNumberElement, true);
-					toggleVisibility(numberLabel2, true);
-					toggleVisibility(selectedNumber2Element, true);
-					toggleVisibility(modeChoice3Element, false);
-					toggleVisibility(emptySpaceholder, true);
-					toggleVisibility(placeholderBeforeSkaitinisElement, true);
-					toggleVisibility(modeChoice5Element, true);
-				} else if (modeChoiceSelection === 'sudetis' || modeChoiceSelection === 'atimtis' || modeChoiceSelection === 'sudetis ir atimtis') {
-					toggleVisibility(numberLabel, false);
-					toggleVisibility(selectedNumberElement, false);
-					toggleVisibility(numberLabel2, false);
-					toggleVisibility(selectedNumber2Element, false);
-					toggleVisibility(modeChoice3Element, true);
-					toggleVisibility(emptySpaceholder, true);
-					toggleVisibility(placeholderBeforeSkaitinisElement, true);
-					toggleVisibility(modeChoice5Element, true);
-				} else {
-					toggleVisibility(numberLabel, false);
-					toggleVisibility(selectedNumberElement, false);
-					toggleVisibility(numberLabel2, false);
-					toggleVisibility(selectedNumber2Element, false);
-					toggleVisibility(modeChoice3Element, false);
-					toggleVisibility(emptySpaceholder, true);
-					toggleVisibility(placeholderBeforeSkaitinisElement, false);
-					toggleVisibility(modeChoice5Element, true);
-				}
-				if ((modeChoiceSelection === 'dalyba' || modeChoiceSelection === 'daugyba ir dalyba') && modeChoice2Selection === 'dauglent') {
-					toggleVisibility(remainderOptionElement, true);
-					toggleVisibility(placeholderBeforeSkaitinisElement, true);
-					toggleVisibility(placeholderAfterNumbersElement, true)
-				}
-				else if (modeChoiceSelection === 'dalyba' || modeChoiceSelection === 'daugyba ir dalyba') {
-					toggleVisibility(remainderOptionElement, true);
-					toggleVisibility(placeholderBeforeSkaitinisElement, true);
-					toggleVisibility(placeholderAfterNumbersElement, false)
-				}
-				else {
-					toggleVisibility(remainderOptionElement, false);
-					toggleVisibility(placeholderAfterNumbersElement, false)
-				}
-				if (modeChoiceSelection === 'visi') {
-					toggleVisibility(modeChoice3Element, false);
-					toggleVisibility(emptySpaceholder, false);
-					toggleVisibility(placeholderBeforeSkaitinisElement, true);
-				}
-				if (modeChoice5Selection === 'skaitiniai') {
-					toggleVisibility(modeChoice6Element, false)
-				} else if (modeChoice5Selection === 'nezinomieji') {
-					toggleVisibility(modeChoice6Element, true)					
-				}
-			}
-
-		function updateModeChoice2() {
-			let modeChoiceSelection = modeChoiceElement.value;
-			let modeChoice2Selection = modeChoice2Element.value;
-
-			modeChoice2Element.innerHTML = "";
-			modeChoice6Element.innerHTML = "";
-
-			if (modeChoiceSelection === "sudetis") {
-				modeChoice2Element.innerHTML += '<option value="viena10">1-DIGIT NUMBERS UP TO 10</option>';
-				modeChoice2Element.innerHTML += '<option value="viena">1-DIGIT NUMBERS UP TO 20</option>';
-				modeChoice2Element.innerHTML += '<option value="dvivien20">2-DIGIT AND 1-DIGIT NUMBERS UP TO 20</option>';
-				modeChoice2Element.innerHTML += '<option value="dvivien">2-DIGIT AND 1-DIGIT NUMBERS UP TO 100</option>';
-				modeChoice2Element.innerHTML += '<option value="dvi">2-DIGIT NUMBERS UP TO 100</option>';
-				modeChoice2Element.innerHTML += '<option value="tukst">SKAIČIŲ IKI 1 000</option>';
-				modeChoice2Element.innerHTML += '<option value="dtukst">NUMBERS UP TO 10,000</option>';
-				modeChoice2Element.innerHTML += '<option value="mil">NUMBERS UP TO 1,000,000</option>';
-				modeChoice6Element.innerHTML += '<option value="turinys">UNKNOWN ADDEND</option>';
-
-			} else if (modeChoiceSelection === "atimtis") {
-				modeChoice2Element.innerHTML += '<option value="viena10">1-DIGIT NUMBERS UP TO 10</option>';
-				modeChoice2Element.innerHTML += '<option value="dvivien20">1-DIGIT FROM 2-DIGIT NUMBERS UP TO 20</option>';
-				modeChoice2Element.innerHTML += '<option value="dvivien">1-DIGIT FROM 2-DIGIT NUMBERS UP TO 100</option>';
-				modeChoice2Element.innerHTML += '<option value="dvi">2-DIGIT NUMBERS UP TO 100</option>';
-				modeChoice2Element.innerHTML += '<option value="tukst">NUMBERS UP TO 1,000</option>';
-				modeChoice2Element.innerHTML += '<option value="dtukst">NUMBERS UP TO 10,000</option>';
-				modeChoice2Element.innerHTML += '<option value="mil">NUMBERS UP TO 1,000,000</option>';
-				modeChoice2Element.innerHTML += '<option value="gretnul">WHEN MINUEND CONTAINS ADJACENT ZEROS</option>';
-				modeChoice6Element.innerHTML += '<option value="turinys">UNKNOWN MINUEND</option>';
-				modeChoice6Element.innerHTML += '<option value="ateminys">UNKNOWN SUBTRAHEND </option>';
-
-			} else if (modeChoiceSelection === "sudetis ir atimtis") {
-				modeChoice2Element.innerHTML += '<option value="viena10">1-DIGIT NUMBERS UP TO 10</option>';
-				modeChoice2Element.innerHTML += '<option value="lent">1-DIGIT NUMBERS UP TO 20</option>';
-				modeChoice2Element.innerHTML += '<option value="dvivien20">2-DIGIT AND 1-DIGIT NUMBERS UP TO 20</option>';
-				modeChoice2Element.innerHTML += '<option value="dvivien">2-DIGIT AND 1-DIGIT NUMBERS UP TO 100</option>';
-				modeChoice2Element.innerHTML += '<option value="dvi">2-DIGIT NUMBERS UP TO 100</option>';
-				modeChoice2Element.innerHTML += '<option value="tukst">NUMBERS UP TO 1,000</option>';
-				modeChoice2Element.innerHTML += '<option value="dtukst">NUMBERS UP TO 10,000</option>';
-				modeChoice2Element.innerHTML += '<option value="mil">NUMBERS UP TO 1,000,000</option>';
-				modeChoice6Element.innerHTML += '<option value="turinys">UNKNOWN ADDEND/MINUEND/SUBTRAHEND </option>';
-
-			} else if (modeChoiceSelection === "daugyba") {
-				modeChoice2Element.innerHTML += '<option value="dauglent">MULTIPLICATION TABLE</option>';
-				modeChoice2Element.innerHTML += '<option value="daugdvivien">2-DIGIT BY 1-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugtrivien">3-DIGIT BY 1-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugketvien">4-DIGIT BY 1-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugdaugvien">MULTI-DIGIT BY 1-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugdvidvi">2-DIGIT BY 2-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugtridvi">3-DIGIT BY 2-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugketdvi">4-DIGIT BY 2-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugdaugdvi">MULTI-DIGIT BY 2-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugdaug">MULTI-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="pil10">MULTIPLES OF TEN/HUNDRED (EASIER)</option>';
-				modeChoice2Element.innerHTML += '<option value="pil">MULTIPLES OF TEN/HUNDRED/THOUSAND (HARDER)</option>';
-				modeChoice6Element.innerHTML += '<option value="dalinys">UNKNOWN MULTIPLICAND/MULTIPLIER</option>';
-
-			} else if (modeChoiceSelection === "dalyba") {
-				modeChoice2Element.innerHTML += '<option value="dauglent">MULTIPLICATION TABLE</option>';
-				modeChoice2Element.innerHTML += '<option value="daugdvivien">2-DIGIT BY 1-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugtrivien">3-DIGIT BY 1-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugketvien">4-DIGIT BY 1-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugdaugvien">MULTI-DIGIT BY 1-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugdaugviendalmnul">MULTI-DIGIT BY 1-DIGIT NUMBERS (QUOTIENT CONTAINS 0)</option>';
-				modeChoice2Element.innerHTML += '<option value="daugtridvi">3-DIGIT BY 2-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugketdvi">4-DIGIT BY 2-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugdaugdvi">MULTI-DIGIT BY 2-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugdaug">MULTI-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="pil10">MULTIPLES OF TEN/HUNDRED (EASIER)</option>';
-				modeChoice2Element.innerHTML += '<option value="pil">MULTIPLES OF TEN/HUNDRED/THOUSAND (HARDER)</option>';
-				modeChoice6Element.innerHTML += '<option value="dalinys">UNKNOWN DIVIDEND</option>';
-				modeChoice6Element.innerHTML += '<option value="daliklis">UNKNOWN DIVISOR</option>';
-
-			} else if (modeChoiceSelection === "daugyba ir dalyba") {
-				modeChoice2Element.innerHTML += '<option value="dauglent">MULTIPLICATION TABLE</option>';
-				modeChoice2Element.innerHTML += '<option value="daugdvivien">2-DIGIT BY 1-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugtrivien">3-DIGIT BY 1-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugketvien">4-DIGIT BY 1-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugdaugvien">MULTI-DIGIT BY 1-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugtridvi">3-DIGIT BY 2-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugketdvi">4-DIGIT BY 2-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugdaugdvi">MULTI-DIGIT BY 2-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="daugdaug">MULTI-DIGIT NUMBERS</option>';
-				modeChoice2Element.innerHTML += '<option value="pil10">MULTIPLES OF TEN/HUNDRED (EASIER)</option>';
-				modeChoice2Element.innerHTML += '<option value="pil">MULTIPLES OF TEN/HUNDRED/THOUSAND (HARDER)</option>';
-				modeChoice6Element.innerHTML += '<option value="dalinys">UNKNOWN MULTIPLICAND/MULTIPLIER/DIVIDEND/DIVISOR</option>';
-
-			} else if (modeChoiceSelection === "visi") {
-				modeChoice2Element.innerHTML += '<option value="iki10">UP TO 10</option>';
-				modeChoice2Element.innerHTML += '<option value="iki20">UP TO 20</option>';
-				modeChoice2Element.innerHTML += '<option value="iki100">UP TO 100</option>';
-				modeChoice2Element.innerHTML += '<option value="iki1000">UP TO 1,000</option>';
-				modeChoice2Element.innerHTML += '<option value="iki10000">UP TO 10,000</option>';
-				modeChoice2Element.innerHTML += '<option value="iki1000000">UP TO 1,000,000</option>';
-				modeChoice6Element.innerHTML += '<option value="dalinys">UNKNOWN ADDEND/MINUEND/SUBTRAHEND/MULTIPLICAND/MULTIPLIER/DIVIDEND/DIVISOR</option>';
-			}
-		}
-
-		modeChoiceElement.addEventListener('change', updateModeChoice2);
-
-
-		function updateModeChoice3() {
-			let modeChoiceSelection = modeChoiceElement.value;
-			let modeChoice2Selection = modeChoice2Element.value;
-
-			modeChoice3Element.innerHTML = "";
-			modeChoice5Element.innerHTML = "";
-			modeChoice5Element.innerHTML += '<option value="skaitiniai">SIMPLE EQUATION</option>';
-			modeChoice5Element.innerHTML += '<option value="nezinomieji">EQUATION WITH UNKNOWN NUMBER</option>';
-
-			if (modeChoice2Selection === "viena" && modeChoiceSelection === "sudetis") {
-				modeChoice3Element.innerHTML += '<option value="neper">CARRYING OVER PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "viena" && modeChoiceSelection === "atimtis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT REGROUPING PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "viena" && modeChoiceSelection === "sudetis ir atimtis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT CARRYING OVER/REGROUPING PLACE VALUES</option>';
-				modeChoice3Element.innerHTML += '<option value="per10">CARRYING OVER/REGROUPING PLACE VALUES</option>';
-
-			} else if (modeChoice2Selection === "lent" && modeChoiceSelection === "sudetis ir atimtis") {
-				modeChoice3Element.innerHTML += '<option value="per10">CARRYING OVER/REGROUPING PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "viena10" && modeChoiceSelection === "sudetis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT CARRYING OVER PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "viena10" && modeChoiceSelection === "atimtis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT REGROUPING PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "viena10" && modeChoiceSelection === "sudetis ir atimtis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT CARRYING OVER/REGROUPING PLACE VALUES</option>';
-
-			} else if (modeChoice2Selection === "dvivien20" && modeChoiceSelection === "sudetis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT CARRYING OVER PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "dvivien20" && modeChoiceSelection === "atimtis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT REGROUPING PLACE VALUES</option>';
-				modeChoice3Element.innerHTML += '<option value="per10">REGROUPING PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "dvivien20" && modeChoiceSelection === "sudetis ir atimtis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT CARRYING OVER/REGROUPING PLACE VALUES</option>';
-
-			} else if (modeChoice2Selection === "dvivien" && modeChoiceSelection === "sudetis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT CARRYING OVER PLACE VALUES</option>';
-				modeChoice3Element.innerHTML += '<option value="per10">CARRYING OVER PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "dvivien" && modeChoiceSelection === "atimtis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT REGROUPING PLACE VALUES</option>';
-				modeChoice3Element.innerHTML += '<option value="per10">REGROUPING PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "dvivien" && modeChoiceSelection === "sudetis ir atimtis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT CARRYING OVER/REGROUPING PLACE VALUES</option>';
-				modeChoice3Element.innerHTML += '<option value="per10">CARRYING OVER/REGROUPING PLACE VALUES</option>';
-
-			} else if (modeChoice2Selection === "dvi" && modeChoiceSelection === "sudetis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT CARRYING OVER PLACE VALUES</option>';
-				modeChoice3Element.innerHTML += '<option value="per10">CARRYING OVER PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "dvi" && modeChoiceSelection === "atimtis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT REGROUPING PLACE VALUES</option>';
-				modeChoice3Element.innerHTML += '<option value="per10">REGROUPING PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "dvi" && modeChoiceSelection === "sudetis ir atimtis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT CARRYING OVER/REGROUPING PLACE VALUES</option>';
-				modeChoice3Element.innerHTML += '<option value="per10">CARRYING OVER/REGROUPING PLACE VALUES</option>';
-
-			} else if (modeChoice2Selection === "tukst" && modeChoiceSelection === "sudetis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT CARRYING OVER PLACE VALUES</option>';
-				modeChoice3Element.innerHTML += '<option value="per10">CARRYING OVER PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "tukst" && modeChoiceSelection === "atimtis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT REGROUPING PLACE VALUES</option>';
-				modeChoice3Element.innerHTML += '<option value="per10">REGROUPING PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "tukst" && modeChoiceSelection === "sudetis ir atimtis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT REGROUPING PLACE VALUES</option>';
-				modeChoice3Element.innerHTML += '<option value="per10">REGROUPING PLACE VALUES</option>';
-
-			} else if (modeChoice2Selection === "dtukst" && modeChoiceSelection === "sudetis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT CARRYING OVER PLACE VALUES</option>';
-				modeChoice3Element.innerHTML += '<option value="per10">CARRYING OVER PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "dtukst" && modeChoiceSelection === "atimtis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT REGROUPING PLACE VALUES</option>';
-				modeChoice3Element.innerHTML += '<option value="per10">REGROUPING PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "dtukst" && modeChoiceSelection === "sudetis ir atimtis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT REGROUPING PLACE VALUES</option>';
-				modeChoice3Element.innerHTML += '<option value="per10">REGROUPING PLACE VALUES</option>';
-			
-			} else if (modeChoice2Selection === "mil" && modeChoiceSelection === "sudetis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT CARRYING OVER PLACE VALUES</option>';
-				modeChoice3Element.innerHTML += '<option value="per10">CARRYING OVER PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "mil" && modeChoiceSelection === "atimtis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT REGROUPING PLACE VALUES</option>';
-				modeChoice3Element.innerHTML += '<option value="per10">REGROUPING PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "mil" && modeChoiceSelection === "sudetis ir atimtis") {
-				modeChoice3Element.innerHTML += '<option value="neper">WITHOUT REGROUPING PLACE VALUES</option>';
-				modeChoice3Element.innerHTML += '<option value="per10">REGROUPING PLACE VALUES</option>';
-			} else if (modeChoice2Selection === "gretnul") {
-				modeChoice3Element.innerHTML += '<option value="per10">REGROUPING PLACE VALUES</option>';
-			}
-			
-			else {
-			}
-		}
-
-		modeChoiceElement.addEventListener('change', updateModeChoice3);
-		modeChoice2Element.addEventListener('change', updateModeChoice3);
-
-		function updateModeChoice7() {
-			let modeChoiceSelection = modeChoiceElement.value;
-			let modeChoice5Selection = modeChoice5Element.value;
-			let modeChoice2Selection = modeChoice2Element.value;
-
-			if (modeChoice5Selection === 'nezinomieji') {
-				modeChoice7Element.innerHTML = '<option value="eilute">SIMPLE ADDITION/SUBTRACTION/DIVISION/MULTIPLICATION</option>';
-			} else if (modeChoice5Selection === 'skaitiniai' && modeChoice2Selection !== "dauglent" && modeChoice2Selection !== "pil10" && modeChoice2Selection !== "pil") {
-				modeChoice7Element.innerHTML = '';
-
-				if (modeChoiceSelection === 'sudetis') {
-					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE ADDITION</option>';
-					modeChoice7Element.innerHTML += '<option value="stulpeliu">LONG ADDITION</option>';
-				} else if (modeChoiceSelection === 'atimtis') {
-					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE SUBTRACTION</option>';
-					modeChoice7Element.innerHTML += '<option value="stulpeliu">LONG SUBTRACTION</option>';
-				} else if (modeChoiceSelection === 'sudetis ir atimtis') {
-					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE ADDITION/SUBTRACTION</option>';
-					modeChoice7Element.innerHTML += '<option value="stulpeliu">LONG ADDITION/SUBTRACTION</option>';
-				} else if (modeChoiceSelection === 'daugyba') {
-					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE MULTIPLICATION</option>';
-					modeChoice7Element.innerHTML += '<option value="stulpeliu">LONG MULTIPLICATION</option>';
-				} else if (modeChoiceSelection === 'dalyba') {
-					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE DIVISION</option>';
-					modeChoice7Element.innerHTML += '<option value="stulpeliu">LONG DIVISION</option>';
-				} else if (modeChoiceSelection === 'daugyba ir dalyba') {
-					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE MULTIPLICATION/DIVISION</option>';
-					modeChoice7Element.innerHTML += '<option value="stulpeliu">LONG MULTIPLICATION/DIVISION</option>';
-				} else if (modeChoiceSelection === 'visi') {
-					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE ADDITION/SUBTRACTION/DIVISION/MULTIPLICATION</option>';
-					modeChoice7Element.innerHTML += '<option value="stulpeliu">LONG ADDITION/SUBTRACTION/DIVISION/MULTIPLICATION</option>';
-				}
-		} else {
-			modeChoice7Element.innerHTML = '';
-			if (modeChoiceSelection === 'sudetis') {
-					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE ADDITION</option>';
-				} else if (modeChoiceSelection === 'atimtis') {
-					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE SUBTRACTION</option>';
-				} else if (modeChoiceSelection === 'sudetis ir atimtis') {
-					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE ADDITION/SUBTRACTION</option>';
-				} else if (modeChoiceSelection === 'daugyba') {
-					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE MULTIPLICATION</option>';
-				} else if (modeChoiceSelection === 'dalyba') {
-					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE DIVISION</option>';
-				} else if (modeChoiceSelection === 'daugyba ir dalyba') {
-					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE MULTIPLICATION/DIVISION</option>';
-				} else if (modeChoiceSelection === 'visi') {
-					modeChoice7Element.innerHTML += '<option value="eilute">SIMPLE ADDITION/SUBTRACTION/DIVISION/MULTIPLICATION</option>';
-				}
-		}
-		}
-
-		function updateModeChoice8() {
-			let modeChoice7Selection = modeChoice7Element.value;
-			let emptySpaceholderBeforeVersion = document.querySelector('#empty-placeholder-before-version');
-
-			if (modeChoice7Selection === 'stulpeliu') {
-					toggleVisibility(modeChoice8Element, true);
-					toggleVisibility(emptySpaceholderBeforeVersion, true)
-				} else {
-					toggleVisibility(modeChoice8Element, false);
-					toggleVisibility(emptySpaceholderBeforeVersion, false)
-				}
-			}
-
-		modeChoiceElement.addEventListener('change', updateModeChoice7);
-		modeChoice5Element.addEventListener('change', updateModeChoice7);
-		modeChoice2Element.addEventListener('change', updateModeChoice7);
-
-		modeChoiceElement.addEventListener('change', handleModeChoiceChange);
-		modeChoice2Element.addEventListener('change', handleModeChoiceChange);
-		modeChoice5Element.addEventListener('change', handleModeChoiceChange);
-
-		modeChoiceElement.addEventListener('change', updateModeChoice8);
-		modeChoice2Element.addEventListener('change', updateModeChoice8);
-		modeChoice3Element.addEventListener('change', updateModeChoice8);
-		modeChoice5Element.addEventListener('change', updateModeChoice8);
-		modeChoice6Element.addEventListener('change', updateModeChoice8);
-		modeChoice7Element.addEventListener('change', updateModeChoice8);
-
-
-		var checkbox = document.getElementById("remainder-input");
-		function updateModeChoice5() {
-			if (checkbox.checked) {
-				modeChoice5Element.innerHTML = '<option value="skaitiniai">SIMPLE EQUATION</option>';
-			} else {
-				modeChoice5Element.innerHTML = '';
-				modeChoice5Element.innerHTML += '<option value="skaitiniai">SIMPLE EQUATION</option>';
-				modeChoice5Element.innerHTML += '<option value="nezinomieji">EQUATION WITH UNKNOWN NUMBER</option>';
-			}
-		}
-
-		checkbox.addEventListener('change', updateModeChoice5);
-		checkbox.addEventListener('change', handleModeChoiceChange);
-		checkbox.addEventListener('change', updateModeChoice7);
-		checkbox.addEventListener('change', updateModeChoice8);
-
-		function submitSelection() {
-			if (localStorage.getItem('controller') !== null) {
-				controller = JSON.parse(localStorage.getItem('controller'))
-			}
-			modeChoiceSelection = modeChoiceElement.value;
-			modeChoice2Selection = modeChoice2Element.value;
-			selectedNumbers = [selectedNumberElement.value, selectedNumber2Element.value].sort();
-			modeChoice3Selection = modeChoice3Element.value;
-			modeChoice5Selection = modeChoice5Element.value;
-			modeChoice6Selection = modeChoice6Element.value;
-			modeChoice7Selection = modeChoice7Element.value;
-			modeChoice8Selection = modeChoice8Element.value;
-
-			var checkbox = document.getElementById("remainder-input");
-
-			controller.language = "EN";
-			controller.mode = 'math';
-			controller.modeChoice = modeChoiceSelection;
-			controller.modeChoice2 = modeChoice2Selection;
-			controller.selectedNumbers = selectedNumbers;
-			controller.withRemainder = checkbox.checked;
-			if (modeChoice3Selection === 'neper') {
-				controller.modeChoice3 = true;
-			} else if (modeChoice3Selection === 'per10') {
-				controller.modeChoice3 = false;
-			}
-			controller.modeChoice5 = modeChoice5Selection;
-			controller.modeChoice6 = modeChoice6Selection;
-			controller.modeChoice7 = modeChoice7Selection;
-			controller.modeChoice8 = modeChoice8Selection;
-			controller.result = ['', '', '', '', '']
-
-			localStorage.setItem('controller', JSON.stringify(controller))
-			redirectToIntermediate()
-		}
 
 		let submitButtonElement = document.querySelector('.submit-button');
 		submitButtonElement.addEventListener("click", submitSelection);
@@ -683,29 +257,6 @@
         checkbox.checked = false; // Deselect the checkbox
     }
 });
-
-function setLanguage(lang) {
-	if (lang !== controller.language) {
-  // Update the language controller and store it in localStorage
-  controller.language = lang;
-  localStorage.setItem('controller', JSON.stringify(controller));
-
-  // Select all language options
-  const options = document.querySelectorAll('.language-option');
-
-  // Update the selected class for the clicked option
-  options.forEach(option => {
-    if (option.classList.contains(`language-option-${lang}`)) {
-      option.classList.add('selected');
-    } else {
-      option.classList.remove('selected');
-    }
-  });
-
-		window.location.href = `/${lang}`;
-}
-}
-
 
 	if (localStorage.getItem('controller') !== null) {
 	controller = JSON.parse(localStorage.getItem('controller'));
