@@ -132,6 +132,7 @@
             height: 50vh;
             overflow: auto;
             padding-top: 5px;
+            padding-bottom: 15px;
         }
 
         .student-checkbox,
@@ -415,15 +416,10 @@
 
         #student-tasks-list {
             background-color: #FAEDCD;
+            list-style: none;
             height: 50vh;
             overflow: auto;
-            padding-top: 5px;
-        }
-
-        #student-tasks-list {
-            list-style: none;
-            margin: 0;
-            padding: 0;
+            padding: 0 0 10px 0;
         }
 
         .task-li-item-for-students {
@@ -812,7 +808,7 @@
                         <div id="student-task-group"></div>
                         <div id="student-task-status-indicator"></div>
                     </div>
-
+                    <div class="col-12" id="student-task-completion-date"></div>
                     <div class="col-12" id="student-statistics-completed-tasks" style="display: none;"></div>
 
                     <div id="student-statistics-math" style="display: none;">
@@ -884,6 +880,7 @@
                                     <div id="student-task-group-for-student"></div>
                                     <div id="student-task-status-indicator-for-student"></div>
                                 </div>
+                                <div class="col-12" id="student-task-completion-date-for-students"></div>
                                 <div class="col-12" id="student-score-asnwer-number-for-student"></div>
                                 <div class="col-12" id="student-score-mistake-number-for-student"></div>
 
@@ -1509,6 +1506,9 @@
 
         const studentStatisticsLangTitle = document.querySelector("#student-statistics-lang-title")
         const studentStatisticsLangMessage = document.querySelector("#student-statistics-lang-message")
+
+        const studentTaskCompletionDate = document.querySelector("#student-task-completion-date")
+        const studentTaskCompletionDateForStudents = document.querySelector("#student-task-completion-date-for-students")
         
         function displayStudentStatistics(student, studentTasks) {
             function processStudentTasks(studentTasks) {
@@ -1651,6 +1651,9 @@
             studentTaskStudentName.innerHTML = `${student[1]} (ID: ${student[0]})`;
             studentTaskGroup.innerHTML = `Task: ${task.group}`;
             teacherDispalyStudentTaskIndicator.style.backgroundColor = task.status ? greenCircleColorCode : redCircleColorCode;
+            if (task.status) {
+                studentTaskCompletionDate.innerHTML = `<span class="task-info-subtitle">Atlikimo data</span>: ${task.completionDate.split('T')[0]}`
+            }
             if (task.result !== '') {
                 score = JSON.parse(task.result)[0]
                 if (parsedTaskDescription[0] === "math") {
@@ -1709,6 +1712,9 @@
 
             teacherDispalyStudentTaskIndicatorForStudent.style.display = "block";
             teacherDispalyStudentTaskIndicatorForStudent.style.backgroundColor = task.status ? greenCircleColorCode : redCircleColorCode;
+            if (task.status) {
+                studentTaskCompletionDateForStudents.innerHTML = `<span class="task-info-subtitle">Atlikimo data</span>: ${task.completionDate.split('T')[0]}`
+            }
 
             if (task.status) {
                 completeTaskButton.style.display = "none"
@@ -2061,8 +2067,8 @@
             }
         }
 
-        const apiBase = 'https://sudedu-server.onrender.com/'
-        //const apiBase = 'http://localhost:5000/'
+        //const apiBase = 'https://sudedu-server.onrender.com/'
+        const apiBase = 'http://localhost:5000/'
 
         async function fetchDataForTeachers() {
             try {
@@ -2370,7 +2376,7 @@
             var timeoutReference = setTimeout(function() {
                 removeError(submitNewTaskButton);
             }, 500);
-            teacherMessageLine2.innerHTML = 'Some students already have the maximum allowed tasks (6) per student. Delete old tasks to add new ones.'
+            teacherMessageLine2.innerHTML = 'Some students already have the maximum allowed tasks (2) per student. Delete old tasks to add new ones.'
         } else {
             clearTimeout(timeoutReference);
             submitNewTaskButton.classList.add('invalid-submition')

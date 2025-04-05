@@ -108,8 +108,8 @@
 		window.location.href = `/LT`;
 	}
 
-	const apiBase = 'https://sudedu-server.onrender.com/'
-	//const apiBase = 'http://localhost:5000/'
+	//const apiBase = 'https://sudedu-server.onrender.com/'
+	const apiBase = 'http://localhost:5000/'
 
     const registerBtn = document.getElementById('registerBtn')
 	const logInTitle = document.getElementById('log-in-text')
@@ -216,7 +216,7 @@
 				};
 
 				localStorage.setItem('userData', JSON.stringify(userData));
-				window.location.href = `/test/LT`;
+				window.location.href = `/LT`;
 			} else {
 				if (data.message == 'User not found') {
 					errorField.innerHTML = 'Vartotojas nerastas';
