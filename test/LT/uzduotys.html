@@ -608,7 +608,7 @@
         <div class="menu">
             <ul>
                 <li><a href="index.html"><i class="ph-bold ph-user"></i>Pradžia</a></li>
-                <li><a href="/test/LT" onclick="clearUserData()"><i class="ph-bold ph-envelope-simple"></i>Atsijungti</a></li>
+                <li><a href="/LT" onclick="clearUserData()"><i class="ph-bold ph-envelope-simple"></i>Atsijungti</a></li>
             </ul>
         </div>
                     </div>
@@ -1124,7 +1124,7 @@
         if (userDataString) {
             userData = JSON.parse(userDataString);
         } else {
-            window.location.href = '/test/LT';
+            window.location.href = '/LT';
         }
 
         let studentList;
@@ -2443,7 +2443,8 @@
 
 
 
-        const apiBase = 'https://sudedu-server.onrender.com/'
+        //const apiBase = 'https://sudedu-server.onrender.com/'
+        const apiBase = 'http://localhost:5000/'
 
         async function fetchDataForTeachers() {
             let success = false;

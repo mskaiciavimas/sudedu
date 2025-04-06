@@ -104,6 +104,20 @@
 		width: 100%;
 	}
 
+	#task-saving-message:empty {
+		min-height: 0;
+	}
+
+	#task-saving-message {
+		font-size: 1.35rem;
+		text-align: center;
+		min-height: 200px;
+		color: black;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
 	.btn-primary {
           font-size: 1rem;
           align-items: center;
@@ -227,6 +241,10 @@
     justify-content: center;
 }
 
+.summary-button {
+	min-width: 120px;
+}
+
 @media (max-width: 767px) {
 	#help-button,
 	#next-question,
@@ -296,6 +314,7 @@
 				<div id="field-for-text" class="field">
 				<div id="field-for-sentences"></div>
 				<div id="field-for-final-message"></div>
+				<div id="task-saving-message"></div>
 				<div id="restart-reset-button-row" class="row justify-content-center align-items-center" style="display: none;">
 					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
 						<div id="reset-mistake-buttons" class="col-12 d-flex justify-content-center align-items-center">
@@ -1009,6 +1028,7 @@ window.onload = function () {
 			document.getElementById('check-answers').disabled = false;
 			document.getElementById('show-answers').style.visibility = "hidden";
 			document.getElementById('field-for-final-message').innerHTML = '';
+			taskSavingMessageDiv.innerHTML = ''
 
 			if (controller.modeChoice4 === "C39") {
 				if (questionsToDisplay > sakiniai.length) {
