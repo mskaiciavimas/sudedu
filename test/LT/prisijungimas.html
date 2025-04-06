@@ -131,13 +131,12 @@
 
 	let userData = localStorage.getItem('userData');
 	if (userData) {
-		window.location.href = `/LT`;
+		window.location.href = `/test/LT`;
 	}
 
 	document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
 
-	//const apiBase = 'https://sudedu-server.onrender.com/'
-	const apiBase = 'http://localhost:5000/'
+	const apiBase = 'https://sudedu-server.onrender.com/'
 
     const registerBtn = document.getElementById('registerBtn')
 	const logInTitle = document.getElementById('log-in-text')
@@ -242,7 +241,7 @@
 				};
 
 				localStorage.setItem('userData', JSON.stringify(userData));
-				window.location.href = `/LT`;
+				window.location.href = `/test/LT`;
 			} else {
 				if (data.message == 'User not found') {
 					errorField.innerHTML = 'Vartotojas nerastas';
