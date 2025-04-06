@@ -38,6 +38,23 @@
 		min-width: 0;
 	}
 
+	.btn:disabled {
+            background-color: #B6C867;
+            border-color: #B6C867;
+            color: black;
+            filter: grayscale(25%);
+    }
+
+	#error {
+		max-width: 300px;
+		min-height: 48px;
+
+	}
+
+	hr {
+		margin: 32px 0 32px 0;
+	}
+
 </style>
 
 </head>
@@ -59,7 +76,16 @@
 		<input id="emailInput" placeholder="email address" />
 		</div>
 		<div class="col-12 gap-after-row">
-		<input id="passwordInput" placeholder="password" type="password" />
+			<div style="position: relative;">
+				<input id="passwordInput" placeholder="password" type="password" />
+				<button type="button" onclick="togglePasswordVisibility()" 
+				style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); border: none; background-color: transparent;">
+				  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+					<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
+					<path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+				  </svg>
+				</button>
+				</div>
 		</div>
 		<div class="col-12 gap-after-row">
 			<input id="nickname" placeholder="name" />
@@ -69,7 +95,7 @@
 				I am a teacher
 		</div>
 		<div class="col-12 gap-after-row">
-		<button class="btn btn-primary" id="authBtn" onclick="authenticate()">
+		<button class="btn btn-primary item-to-be-disabled-while-talking-to-server" id="authBtn" onclick="authenticate()">
 			Log In
 		</button>
 		</div>
@@ -78,7 +104,7 @@
 			<p id="sign-ip-text">Need an account?</p>
 			</div>
 			<div class="col-12">
-			<button class="btn btn-primary" onclick="toggleIsRegister()" id="registerBtn">Sign Up</button>
+			<button class="btn btn-primary item-to-be-disabled-while-talking-to-server" onclick="toggleIsRegister()" id="registerBtn">Sign Up</button>
 		</div>
 	</div>
 	
@@ -105,10 +131,13 @@
 
 	let userData = localStorage.getItem('userData');
 	if (userData) {
-		window.location.href = `/test/LT`;
+		window.location.href = `/LT`;
 	}
 
-	const apiBase = 'https://sudedu-server.onrender.com/'
+	document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
+
+	//const apiBase = 'https://sudedu-server.onrender.com/'
+	const apiBase = 'http://localhost:5000/'
 
     const registerBtn = document.getElementById('registerBtn')
 	const logInTitle = document.getElementById('log-in-text')
@@ -144,8 +173,6 @@
 		const nicknameVal = nickname.value
 		const isTeacherVal = isTeacher.checked
 
-		console.log(nicknameVal.length)
-
 		// guard clauses... if authenticating, return
 		if (!emailVal) {
 			errorField.innerHTML = 'Please type in your email address';
@@ -176,6 +203,7 @@
 		errorField.innerHTML = ''
 		isAuthenticating = true
 		authBtn.innerText = 'Checking...'
+		document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = true);
 
 		try {
 			let data
@@ -195,7 +223,6 @@
 					body: JSON.stringify({ username: emailVal, password: passVal })
 				})
 				data = await response.json()
-				console.log(data)
 			}
 
 			if (isRegistration && data.message == 'registration successful') {
@@ -215,7 +242,7 @@
 				};
 
 				localStorage.setItem('userData', JSON.stringify(userData));
-				window.location.href = `/test/EN`;
+				window.location.href = `/EN`;
 			} else {
 				if (data.message == 'User not found') {
 					errorField.innerHTML = 'User not found';
@@ -239,7 +266,13 @@
 			} else {
 				authBtn.innerText = 'Log In'
 			}
+			document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
 		}
+}
+
+function togglePasswordVisibility() {
+  const input = document.getElementById('passwordInput');
+  input.type = input.type === 'password' ? 'text' : 'password';
 }
 
 	</script>

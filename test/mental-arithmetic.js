@@ -357,7 +357,8 @@ async function sendSetTaskResultsToDatabase() {
       results: resultsDataString
   };
 
-  const apiBase = 'https://sudedu-server.onrender.com/';
+  //const apiBase = 'https://sudedu-server.onrender.com/';
+  const apiBase = 'http://localhost:5000/'
 
   try {
       const response = await fetch(apiBase + 'results', {
