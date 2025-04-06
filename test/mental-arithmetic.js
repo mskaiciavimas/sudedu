@@ -343,7 +343,7 @@ async function sendSetTaskResultsToDatabase() {
   if (userDataString) {
       userData = JSON.parse(userDataString);
   } else {
-      window.location.href = '/LT/index.html'; // Redirect to login if no userData
+      window.location.href = '/test/LT/index.html'; // Redirect to login if no userData
       return; // Stop execution after redirect
   }
 
@@ -357,8 +357,7 @@ async function sendSetTaskResultsToDatabase() {
       results: resultsDataString
   };
 
-  //const apiBase = 'https://sudedu-server.onrender.com/';
-  const apiBase = 'http://localhost:5000/'
+  const apiBase = 'https://sudedu-server.onrender.com/';
 
   try {
       const response = await fetch(apiBase + 'results', {
@@ -1966,6 +1965,6 @@ function setLanguage(lang) {
     }
   });
 
-		window.location.href = `/${lang}`;
+		window.location.href = `/test/${lang}`;
 }
 }
