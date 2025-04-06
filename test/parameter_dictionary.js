@@ -133,15 +133,15 @@ const parameterDictionary = {
     },
     "C34": {
         "parameter": "iki1000",
-        "decodedParameterText": "IKI 1,000"
+        "decodedParameterText": "IKI 1 000"
     },
     "C35": {
         "parameter": "iki10000",
-        "decodedParameterText": "IKI 10,000"
+        "decodedParameterText": "IKI 10 000"
     },
     "C36": {
         "parameter": "iki1000000",
-        "decodedParameterText": "IKI 1,000,000"
+        "decodedParameterText": "IKI 1 000 000"
     },
     "C37": {
         "parameter": "neper",
