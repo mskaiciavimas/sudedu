@@ -494,6 +494,13 @@
             box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
         }
 
+        #expand-student-info-button {
+            background-color: transparent;
+            border: none;
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+
         @keyframes shake {
         0% { margin-left: 0rem; }
         25% { margin-left: 0.5rem; }
@@ -649,7 +656,7 @@
                 <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" id="task-group-sorting">
                 </select>
                 <div id="outer-student-list-container">
-                <div class="align-items-center justify-content-start" id="student-list-header">
+                <div class="align-items-center justify-content-between" id="student-list-header">
                 <div class="align-items-center justify-content-start" id="student-list-header-checkbox-container" style="display: none;">
                     <input type="checkbox" id="select-all-checkbox">
                     <div>select all</div>
@@ -657,6 +664,7 @@
                 <div class="align-items-center justify-content-start" id="student-list-title-container">
                     <div>Student list:</div>
                 </div>
+                <button type="button" id="expand-student-info-button" style="margin-left: auto;" onclick="toggleTaskVisibility()">&#x2212;</button>
                 </div>
                 <div id="student-list"></div>
             </div>
@@ -1041,6 +1049,7 @@
         const taskDescriptionForStudent = document.querySelector('#task-description-for-student');
         const teacherDispalyStudentTaskIndicatorForStudent = document.getElementById('student-task-status-indicator-for-student');
         const taskListTitleForStudents = document.getElementById('task-list-title-for-students');
+        const expandStudentInfoButton = document.getElementById('expand-student-info-button')
 
         const completeTaskButton = document.getElementById('complete-task-button');
 
@@ -1302,6 +1311,7 @@
                 // Manually trigger the change event
                 dropdown.dispatchEvent(new Event("change"));
                 dropdown.disabled = true;
+                taskContainerVisible = true;
                 toggleTaskVisibility()
 
                 confirmDeleteStudentButton.style.display = "block";       
@@ -1314,6 +1324,7 @@
                 deleteTaskButton.disabled = true;
 
             } else {
+                taskContainerVisible = false;
                 toggleTaskVisibility()
                 confirmDeleteStudentButton.style.display = "none";   
                 document.querySelectorAll('.student-checkbox').forEach(checkbox => {
@@ -2014,10 +2025,12 @@
         function toggleTaskVisibility() {
             taskContainerVisible = !taskContainerVisible;
             if (taskContainerVisible) {
+                expandStudentInfoButton.innerHTML = '&#x2212;';
                 document.querySelectorAll('.task-container').forEach(container => {
                     container.style.display = 'block';
                 });
             } else {
+                expandStudentInfoButton.innerHTML = '+';
                 document.querySelectorAll('.task-container').forEach(container => {
                     container.style.display = 'none';
                 });
@@ -2198,6 +2211,7 @@
             dropdown.dispatchEvent(new Event("change"));
             dropdown.disabled = true;
 
+            taskContainerVisible = true;
             toggleTaskVisibility();
             studentTaskInfoContainer.style.display = 'none'; 
             document.querySelectorAll('.student-checkbox').forEach(checkbox => {
@@ -2219,6 +2233,7 @@
             });
             
         } else {
+            taskContainerVisible = false;
             toggleTaskVisibility();
             studentTaskInfoContainer.style.display = 'block'; 
             document.querySelectorAll('.student-checkbox').forEach(checkbox => {
@@ -2240,6 +2255,8 @@
         deletingTask = !deletingTask
         toggleStudentListLabel();
         if (deletingTask) {
+            taskContainerVisible = false;
+            toggleTaskVisibility();
             clearTeacherMessage();
             confirmDeleteTaskButton.style.display = "block";       
             document.querySelectorAll('.task-checkbox').forEach(checkbox => {
@@ -2250,6 +2267,8 @@
             newTaskButton.disabled = true;
             deleteStudentButton.disabled = true;
         } else {
+            taskContainerVisible = false;
+            toggleTaskVisibility();
             confirmDeleteTaskButton.style.display = "none";   
             document.querySelectorAll('.task-checkbox').forEach(checkbox => {
             checkbox.style.visibility = "hidden";
