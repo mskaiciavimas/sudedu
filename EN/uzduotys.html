@@ -1,0 +1,2700 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Mintinis Skai&#x10D;iavimas</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="sudEdu skirtas priešmokyklinio ugdymo, pradinių bei aukštesnių klasių mokinių aritmetinių veiksmų (sudėties, atimties, daugybos, dalybos) mintinio skaičiavimo, teksto suvokimo ir rašybos įgūdžių tobulinimui.">
+	<meta name="keywords" content="mintinis skaičiavimas, mintinas skaičiavimas, skaičiavimas mintinai, matematika, pradinukai, priešmokyklinis ugdymas, priešmokyklinukai, pradinis ugdymas, atminties lavinimas, skaitinė lygybė, skaitinė lygybė su nežinomuoju, sudėtis, dėmuo, atimtis, turinys, atėminys, daugyba, dauginamasis, daugiklis, dalyba, dalinis, daliklis, daugybos lentelė, lentelinė sudėtis, lentelinė atimtis, sudėtis iki 10, sudėtis iki 20, sudėtis iki 100, sudėtis iki 1000, atimtis iki 10, atimtis iki 20, atimtis iki 100, atimtis iki 1000, vienaženkliai skaičiai, dviženkliai skaičiai, triženkliai skaičiai, keturženkliai skaičiai, peržengiant dešimtį, peržengiant šimtą, peržengiant tūkstančių vienetus, išardant dešimtį, išardant šimtą, išardant tūkstančių vienetus, pergrupuojant dešimtis, pergrupuojant šimtus, peržengiant tūkstančių vienetus, rašyba, gramatika, rašinelis, teksto suvokimas, teksto komponavimas, tekso strūktura, teksto struktūros išdestymas, atnaujinta pradinio ugdymo programa">
+
+	  <link rel="canonical" href="https://www.sudedu.lt/LT/">
+	  <link rel="alternate" href="https://www.sudedu.lt/LT/" hreflang="lt">
+	  <link rel="alternate" href="https://www.sudedu.lt/EN/" hreflang="en">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+	<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Josefin+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+	<link rel="stylesheet" type="text/css" href="../index.css">
+    <link rel="stylesheet" type="text/css" href="../user-nav-menu.css">
+
+    <style>
+        html,
+        body {
+            height: auto;
+        }
+
+        body {
+            padding: 25px 0 ;
+        }
+
+        .row {
+            width: 100%;
+            min-width: 100%;
+            --bs-gutter-x: 0; 
+        }
+
+        #inner-container {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #teacher-gui {
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        #dynamic-teacher-content {
+            min-height: 50vh;
+        }
+
+        .initial-button-div {
+            min-width: 250px;
+            margin-bottom: 15px;
+        }
+
+        .teacher-button {
+            width: 100%;
+        }
+
+        #timer-input-div,
+        #question-number-input-div {
+            margin-top: 5px;
+        }
+
+        .teacher-button:disabled {
+            background-color: #B6C867;
+            border-color: #B6C867;
+            color: black;
+            filter: grayscale(25%);
+        }
+
+        .confirmation-button-div {
+            min-width: 150px;
+            margin: 0 0 15px 15px;
+        }
+
+        #confirm-delete-task-button,
+        #confirm-delete-student-button {
+            width: 100%;
+        }
+
+        #teacher-message-line-2 {
+            text-align: center;
+            margin: 15px 0;
+            min-height: 48px;
+        }
+        
+        #teacher-message-line,
+        #student-message {
+            text-align: center;
+            margin-right: 4vw;
+        }
+
+        #task-group-sorting {
+            width: 100%;
+            padding: 0;
+            margin-top: 0;
+            margin-bottom: 15px;
+            padding: 5px;
+        }
+
+        #outer-student-list-container {
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #student-list-header {
+            background-color: #FAEDCD;
+            border-bottom: #6c757d 1px solid;
+        }
+
+        #student-list-header-checkbox-container,
+        #student-list-title-container {
+            padding: 10px 0 10px 0;
+            margin-left: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        #select-all-checkbox {
+            margin-right: 10px;
+        }
+
+        #student-list {
+            background-color: #FAEDCD;
+            height: 50vh;
+            overflow: auto;
+            padding-top: 5px;
+            padding-bottom: 15px;
+        }
+
+        .student-checkbox,
+        .task-checkbox {
+            margin-right: 10px;
+        }
+
+        #student-list ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .outer-student-list-entry-item {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            justify-content: center;
+        }
+
+        .student-li-item {
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: start;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .task-li-item {
+            margin-left: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: start;
+        }
+
+        .student-li-item,
+        .task-container {
+            width: calc(100% - 10px);
+        }
+
+        .task-li-item {
+            width: calc(100% - 20px);
+        }
+
+        .student-li-item .selection-option {
+            width: 80%;
+            transition: box-shadow 0.3s ease; /* Smooth transition for highlighting */
+        }
+
+        .task-li-item .selection-option {
+            width: calc(80% - 5px);
+            transition: box-shadow 0.3s ease; /* Smooth transition for highlighting */
+        }
+
+        .selected-option {
+            background-color: #fdf7e8;
+            box-shadow: 0 0 0 5px #fdf7e8; /* Adds a glow effect around the selected element */
+        }
+
+        .selection-option.temp-disabled {
+            pointer-events: none;
+        }
+
+        #student-list li { 
+            padding: 10px 0 0 10px; 
+        }
+
+        #new-task-options-container {
+            padding-left: 25px;
+        }
+
+        .group_name_div {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        #group_name {
+            width: 100%;
+        }
+
+        .modeChoice4_div {
+            width: 100%;
+            padding: 0;
+        }
+        
+        .empty-placeholder-between-options {
+            padding: 0;
+            width: 100%;
+        }
+
+        #timer-input-teacher,
+        #question-number-input {
+            width: 55px;
+        }
+
+        .timer-label-teacher,
+        .answer-number-label-teacher {
+            margin-left: 10px;
+        }
+
+        #student-task-info-container {
+            width: 100%;
+            padding-left: 25px;
+        }
+
+        #student-task-info-container-inner {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            background-color: #FAEDCD;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+        }
+
+        .summary-inner-container {
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: scroll;
+        }
+
+        table {
+            width: 100%;
+            height: 100%;
+            border-collapse: collapse;
+            border-color: rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            margin: 0 !important;
+            table-layout: fixed;
+        }
+
+        th,
+        td {
+            padding: 5px 5px 5px 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            font-size: 1rem;
+        }
+
+        th:first-child, th:nth-child(2) {
+            text-align: center;
+        }
+
+        td:first-child, td:nth-child(2) {
+            text-align: center;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        tbody td:hover:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: -9999px;
+            bottom: -9999px;
+            background-color: rgba(255, 255, 255, 0.2);
+            z-index: 2;
+        }
+
+        tbody td {
+            position: relative;
+        }
+
+        .bar {
+            height: 20px;
+            border-radius: 5px;
+        }
+
+        .table-container {
+            width: 100%;
+            max-height: 50% !important;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .table-container::-webkit-scrollbar {
+        display: none;
+        }
+
+        .table-container:hover {
+        overflow-y: scroll;
+        }
+
+        #student-task-student-name {
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        #student-task-group-and-status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #student-score-asnwer-number {
+            margin-top: 5px;
+        }
+
+        #student-task-group,
+        #student-task-group-for-student {
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 1.25rem;
+        }
+
+        .student-list-task-indicatior {
+            display: inline-block;
+            margin-left: 5px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        #student-task-status-indicator,
+        #student-task-status-indicator-for-student {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        #task-description-title,
+        #task-description-title-for-student {
+            margin-top: 15px;
+        }
+
+        #task-description-for-student {
+            margin-top: 15px;
+        }
+
+        .reset-button-div {
+            margin-top: 40px;
+        }
+
+        #task-description-list {
+            margin-bottom: 0;
+        }
+
+        .task-description-list-item {
+            text-transform: lowercase;
+            margin-left: 2rem;
+        }
+
+        #change-teacher-input {
+            margin-bottom: 5px;
+        }
+
+        #teacher-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        #change-teacher-toggle-button {
+            text-decoration: underline;
+            cursor: pointer;
+            text-align: start;
+            color: #01937C;
+            background-color: transparent;
+            border: none;
+            padding: 0;
+        }
+
+        #change-teacher-toggle-button:disabled {
+            color: gray;
+        }
+
+        #add-change-teacher-buttons {
+            height: 38px;
+            margin: 10px 0;
+        }
+
+        #student-task-for-students-title-container {
+            background-color: #FAEDCD;
+            padding: 10px 0 10px 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: #6c757d 1px solid;
+        }
+
+        #student-tasks-list {
+            background-color: #FAEDCD;
+            list-style: none;
+            height: 50vh;
+            overflow: auto;
+            padding: 0 0 10px 0;
+        }
+
+        .task-li-item-for-students {
+            padding-top: 10px;
+            margin-left: 15px;
+        }
+
+        #dynamic-student-content {
+            padding-left: 25px;
+        }
+
+        #task-info-container-for-students {
+            height: 100%;
+            width: 100%;
+        }
+
+        .incorrect-part {
+        font-weight: bold;
+        padding: 2px 1px;
+        border-radius: 3px;
+        color: #D57E7E;
+        }
+
+        .task-info-subtitle {
+            font-style: italic;
+        }
+
+        .student-statistics-title {
+            font-size: 1.35rem;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .student-statistics-subtitle {
+            font-size: 1.15rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        #submit-new-taks-button {
+            min-width: 150px;
+            margin-top: 15px;
+        }
+
+        .invalid-submition {
+        animation: shake 0.2s ease-in-out 0s 2 !important;
+        }
+
+        #lang-message-for-students {
+            background-color: #FAEDCD;
+            padding: 15px 20px 0 15px;
+            text-align: justify;
+            font-style: italic;
+        }
+
+        .btn:disabled {
+            background-color: #B6C867;
+            border-color: #B6C867;
+            color: black;
+            filter: grayscale(25%);
+        }
+
+        #student-tasks-list-outer-container {
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes shake {
+        0% { margin-left: 0rem; }
+        25% { margin-left: 0.5rem; }
+        75% { margin-left: -0.5rem; }
+        100% { margin-left: 0rem; }
+        }
+
+        @media (max-width: 1999px) {
+            #teacher-message-line,
+            #student-message {
+                margin-right: 8vw;
+            }
+        }
+
+        @media (max-width: 767px) {
+            #student-task-info-container {
+                padding-left: 0;
+                margin-top: 20px;
+            }
+            #teacher-message-line {
+                margin-right: 0;
+            }
+
+            #new-task-options-container {
+                padding: 0;
+                margin-top: 15px;
+            }
+
+            .dropdown {
+                margin: 7px 0;
+            }
+
+            #dynamic-student-content {
+                padding-left: 0;
+                margin-top: 20px;
+            }
+
+            #inner-container {
+                margin-top: 40px;
+            }   
+        }
+
+        @media (max-width: 575px) {
+            html,
+            body {
+                width: 100vw;
+            }
+
+            body {
+                padding: 20px 0;
+            }
+
+            .initial-button-div {
+                width: 100%;
+            }
+
+            .confirmation-button-div {
+                width: 100%;
+                margin: 0;
+            }
+
+            #confirm-delete-task-button {
+                margin-bottom: 15px;
+            }
+
+            #confirm-delete-student-button {
+                margin-bottom: 15px;
+            }
+
+            .teacher-button-line {
+                flex-direction: column;
+            }
+
+            #teacher-message-line {
+                margin-bottom: 15px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+	<div class="container" id="template-container">
+		<div id="language-about-row" class="row d-flex align-items-start">
+			<div class="col-6" id="language-switcher" onmousedown="return false;" onselectstart="return false;" style="-webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;">
+				<span class="language-option language-option-EN selected" onclick="setLanguage('EN')">EN</span>
+				<span class="language-option language-option-LT" onclick="setLanguage('LT')">LT</span>
+			</div>
+			<div class="col-6 d-flex justify-content-end align-items-end" id="user-login-div">
+				<a id="user-login-anchor" href="./prisijungimas.html" class="log-in">Log In</a>
+
+				<div id="loggedin-user-menu">
+	<div class="profile">
+		<div class="user">
+			<h3 id="loggedin-user-nickname"></h3>
+			<p id="loggedin-user-id"></p>
+		</div>
+
+			<div class="img-box"><span id="user-initial"></span></div>
+
+	</div>
+	<div class="menu">
+		<ul>
+            <li><a href="/EN"><i class="ph-bold ph-envelope-simple"></i>Home</a></li>
+			<li><a href="/EN" onclick="clearUserData()"><i class="ph-bold ph-envelope-simple"></i>Log Out</a></li>
+		</ul>
+	</div>
+				</div>
+			</div>
+		</div>
+
+        <div class="row d-flex align-items-center justify-content-center" id="inner-container">
+            <div id="teacher-gui" style="display: none;">
+
+            <div class="col-12" id="button-message-section">
+                <div class="row d-flex" id="button-message-subsection">
+                    <div class="col-lg-6 col-md-8 col-12">
+
+                <div class="col-12 d-flex align-items-center justify-content-start teacher-button-line">
+                    <div class="initial-button-div">
+                <button id="new-task-button" class="btn btn-primary teacher-button" onclick="toggleAddNewTask()">New Task</button>
+            </div>
+                </div>
+
+                <div class="col-12 d-flex align-items-center justify-content-start teacher-button-line">
+                    <div class="initial-button-div">
+                <button id="delete-task-button" class="btn btn-primary teacher-button" onclick="toggleDeleteTask()">Delete Tasks</button>
+            </div>
+            <div class="confirmation-button-div">
+                <button style="display: none;" id="confirm-delete-task-button" class="btn btn-primary" onclick="deleteSelectedTasks()">Confirm Deletion</button>
+            </div>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-start teacher-button-line">
+                    <div class="initial-button-div">
+                <button id="delete-student-button" class="btn btn-primary teacher-button" onclick="toggleDeleteStudent()">Remove Students</button>
+            </div>
+                <div class="confirmation-button-div">
+                <button style="display: none;" id="confirm-delete-student-button" class="btn btn-primary" onclick="deleteStudents()">Confirm Removal</button>
+            </div>
+                </div>
+            </div>
+
+                <div class="col-lg-6 col-md-4 col-12 d-flex align-items-center justify-content-center teacher-button-line">
+                    <div id="teacher-message-line"></div>
+                </div>
+            </div>
+            </div>
+
+            <div class="d-flex row" id="section-under-buttons">
+            <div class="col-12 col-md-6 col-lg-5">
+            <div id="student-details-for-teachers">
+                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" id="task-group-sorting">
+                </select>
+                <div id="outer-student-list-container">
+                <div class="align-items-center justify-content-start" id="student-list-header">
+                <div class="align-items-center justify-content-start" id="student-list-header-checkbox-container" style="display: none;">
+                    <input type="checkbox" id="select-all-checkbox">
+                    <div>select all</div>
+                </div>
+                <div class="align-items-center justify-content-start" id="student-list-title-container">
+                    <div>Student list:</div>
+                </div>
+                </div>
+                <div id="student-list"></div>
+            </div>
+            </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-7" id="dynamic-teacher-content">
+                <div id="new-task-options-container" style="display: none;">
+
+                    <div class="row d-flex justify-content-center align-items-center text-center group_name_div">
+                        <input type="text" id="group_name" placeholder="Task Group Name" class="form-control">
+                    </div>
+
+                    <div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
+                        <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_1"
+                            id="mode_choice_1">
+                            <option value="C1">ADDITION</option>
+                            <option value="C2">SUBTRACTION</option>
+                            <option value="C3">ADDITION AND SUBTRACTION</option>
+                            <option value="C4">MULTIPLICATION</option>
+                            <option value="C5">DIVISION</option>
+                            <option value="C6">MULTIPLICATION AND DIVISION</option>
+                            <option value="C7">MIXED</option>
+                        </select>
+                    </div>
+                    <div class="row d-flex justify-content-center align-items-center text-center mode_choice_2_div">
+                        <div class="col-12 d-flex justify-content-center align-items-center mode_choice_2_div text-center"
+                            id="mode_choice_2_div">
+                            <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_2"
+                                id="mode_choice_2">
+                                <option value="C8">1-DIGIT NUMBERS UP TO 10</option>
+                                <option value="C9">1-DIGIT NUMBERS UP TO 20</option>
+                                <option value="C10">2-DIGIT AND 1-DIGIT NUMBERS UP TO 20</option>
+                                <option value="C11">2-DIGIT AND 1-DIGIT NUMBERS UP TO 100</option>
+                                <option value="C12">2-DIGIT NUMBERS UP TO 100</option>
+                                <option value="C13">NUMBERS UP TO 1,000</option>
+                                <option value="C14">NUMBERS UP TO 10,000</option>
+                                <option value="C15">NUMBERS UP TO 1,000,000</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center align-items-center number_choice_div text-center">
+                            <label class="number-choice-label-nuo" for="selected_number" id="number_label"
+                                style="display: none;">FROM</label>
+                            <select class="btn btn-secondary dropdown-toggle dropdown text-center" name="selected_number"
+                                id="selected_number" style="display: none;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                            </select>
+                            <label class="number-choice-label-iki" for="selected_number_2" id="number_label_2"
+                                style="display: none;">TO</label>
+                            <select class="btn btn-secondary dropdown-toggle dropdown text-center" name="selected_number_2"
+                                id="selected_number_2" style="display: none;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row d-flex justify-content-center align-items-center text-center remainder-div">
+                    <label id="remainder-option" style="display: none;">
+                        <input id="remainder-input" type="checkbox" name="myCheckbox"> DIVISION WITH A REMAINDER
+                    </label>
+                    </div>
+
+                    <div class="row d-flex justify-content-center align-items-center text-center mode_choice_3_div">
+                        <div
+                            class="col-12 d-flex justify-content-center align-items-center number_choice_div text-center mode_choice_3_div"
+                            id="mode_choice_3_div">
+                            <select class="btn btn-secondary dropdown-toggle dropdown text-center" name="mode_choice_3"
+                                id="mode_choice_3">
+                                <option value="C37">WITHOUT CARRYING OVER PLACE VALUES</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
+                        <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_5"
+                            id="mode_choice_5">
+                            <option value="C41">SIMPLE EQUATION</option>
+                            <option value="C42">EQUATION WITH UNKNOWN NUMBER</option>
+                        </select>
+                    </div>
+                    <div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
+                        <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_6"
+                            id="mode_choice_6" style="display: none;">
+                            <option value="C43">UNKNOWN ADDEND</option>
+                        </select>
+                    </div>
+                    <div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
+                        <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_7"
+                            id="mode_choice_7" style="display: block;">
+                            <option value="C47">SIMPLE ADDITION</option>
+                            <option value="C48">LONG ADDITION</option>
+                        </select>
+                    </div>
+                    <div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
+                        <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_14"
+                            id="mode_choice_14" style="display: none;">
+                            <option value="C78">US/UK/INDONESIA VERSION</option>
+                            <option value="C79">EASTERN EUROPE VERSION</option>
+                        </select>
+                    </div>
+
+                    <div class="row d-flex justify-content-center align-items-center text-center modeChoice4_div">
+                        <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="modeChoice4"
+                            id="mode_choice_4" style="display: block;">
+                            <option value="C39">SET TIME DURATION</option>
+                            <option value="C40">SET NUMBER OF EQUATIONS</option>
+                        </select>
+                    </div>
+
+                    <div class="row d-flex justify-content-center align-items-center" >
+                        <div class="timer-input-div row justify-content-center align-items-center" id="timer-input-div">
+                        <div class="col-6 d-flex justify-content-end">
+                                    <input type="number" id="timer-input-teacher" min="1" max="60" step="1" value="5">
+                    </div>
+                    <div class="col-6 d-flex d-flex justify-content-start">
+                      <h3 class="timer-label-teacher">minutes</h3>
+                    </div>
+                  </div>
+                  <div class="question-number-input-div row justify-content-center align-items-center" id="question-number-input-div" style="display: none;">
+                  <div class="col-6 d-flex justify-content-end">
+                                    <input type="number" id="question-number-input" min="1" max="200" step="1" value="20">
+                                    </div>
+                      <div class="col-6 d-flex d-flex justify-content-start">
+                        <h3 class="answer-number-label-teacher" id="answer-number-label-teacher">equations</h3>
+                      </div>
+                      </div>
+                            </div>
+
+                        <div class="d-flex align-items-center justify-content-center flex-column">
+                        <div class="col-12 d-flex justify-content-center align-items-center submit-button">
+                            <button onclick="setTask()" class="btn btn-primary" id="submit-new-taks-button">Assign</button>
+                        </div>
+                    </div>
+                    <div class="col-12 d-flex align-items-center justify-content-center">
+                        <div id="teacher-message-line-2"></div>
+                    </div>
+
+
+                </div>
+
+                <div id="student-task-info-container">
+                <div id="student-task-info-container-inner">
+                    <div>
+                    <div class="col-12 d-flex align-items-center justify-content-start" id="student-task-student-name"></div>
+                    <div id="student-task-group-and-status-indicator">
+                        <div id="student-task-group"></div>
+                        <div id="student-task-status-indicator"></div>
+                    </div>
+                    <div class="col-12" id="student-task-completion-date"></div>
+                    <div class="col-12" id="student-statistics-completed-tasks" style="display: none;"></div>
+
+                    <div id="student-statistics-math" style="display: none;">
+                        <div class="student-statistics-title">Math</div>
+                        <div class="col-12" id="student-statistics-math-error-frequency"></div>
+                    </div>
+
+                    <div class="col-12" id="student-score-asnwer-number"></div>
+                    <div class="col-12" id="student-score-mistake-number"></div>
+
+                    <div id="mistakes-summary-math" style="display: none;">
+                            <div id="mistakes-table-title-math" class="task-info-subtitle">Most frequent mistakes:</div>
+                            <div class="summary-inner-container">
+                            <div class="col-12 table-container">
+                                <div id="summary-table"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="student-statistics-lang">
+                        <div class="student-statistics-subtitle" id="student-statistics-lang-title"></div>
+                        <div class="col-12" id="student-statistics-lang-message"></div>
+                    </div>
+
+                    <div id="task-description-outer-container">
+                        <div id="task-description-title" class="task-info-subtitle" style="display: none;">Task description:</div>
+                        <div id="task-description"></div>
+                    </div>
+                </div>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+            <div id="student-gui" class="row" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6 col-12">
+                        <div id="teacher-name"></div>
+
+                        <input id="add-teacher-input" type="text" placeholder="Teacher's ID" style="display: none;" class="item-to-be-disabled-while-talking-to-server">
+                        <input id="change-teacher-input" type="text" placeholder="Teacher's ID" style="display: none;" class="item-to-be-disabled-while-talking-to-server">
+                        <button onclick="changeTeacherToggle()" id="change-teacher-toggle-button" class="item-to-be-disabled-while-talking-to-server">Change Teacher</button>
+                        <div id="add-change-teacher-buttons">
+                        <button id="add-teacher" class="btn btn-primary item-to-be-disabled-while-talking-to-server" onclick="addTeacher()" style="display: none;">Add Teacher</button>
+                        <button id="change-teacher" class="btn btn-primary item-to-be-disabled-while-talking-to-server" onclick="changeTeacher()" style="display: none;">Change Teacher</button>
+                    </div>
+                    </div>
+                    <div class="col-md-6 col-12 d-flex justify-content-center align-items-center">
+                        <div id="student-message"></div>
+                    </div>
+                </div>
+                <div class="row">
+                <div class="col-12 col-md-6 col-lg-5" id="student-tasks-list-outer-container">
+                <div class="align-items-center justify-content-start" id="student-task-for-students-title-container">
+                    <div id="task-list-title-for-students"></div>
+                </div>
+                <div id="lang-message-for-students"></div>
+                <div id="student-tasks-list">
+
+                </div>
+                </div>
+    
+                <div class="col-12 col-md-6 col-lg-7" id="dynamic-student-content">
+                    <div id="task-info-container-for-students">
+                            <div id="student-task-info-container-inner">
+                                <div>
+                                <div id="student-task-group-and-status-indicator">
+                                    <div id="student-task-group-for-student"></div>
+                                    <div id="student-task-status-indicator-for-student"></div>
+                                </div>
+                                <div class="col-12" id="student-task-completion-date-for-students"></div>
+                                <div class="col-12" id="student-score-asnwer-number-for-student"></div>
+                                <div class="col-12" id="student-score-mistake-number-for-student"></div>
+
+                                <div id="mistakes-summary-math-for-student" style="display: none;">
+                                    <div id="mistakes-table-title-math-for-students" class="task-info-subtitle">Most frequent mistakes:</div>
+                                    <div class="summary-inner-container">
+                                    <div class="col-12 table-container">
+                                        <div id="summary-table-for-student"></div>
+                                    </div>
+                                </div>
+                                </div>
+                                <div id="task-description-outer-container-for-student">
+                                    <div id="task-description-title-for-student" class="task-info-subtitle" style="display: none;">Task description:</div>
+                                    <div id="task-description-for-student"></div>
+                                </div>
+                                <div id="task-description-outer-container-for-student">
+                                    <div id="task-description-for-student"></div>
+                                </div>
+                            </div>
+                            <div class="col-12 d-flex align-items-center justify-content-end">
+                                <button id="complete-task-button" class="btn btn-primary" onclick="completeTask()" style="display: none;">Complete Task</button>
+                                </div>
+                            </div>
+                            </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <div id="admin-gui" class="flex-column justify-content-center align-items-center" style="display: none;">
+                <div class="row d-flex flex-column justify-content-center align-items-center" style="width: 50%; min-width: 50%;">
+                <h2>REMOVE USER</h2>
+                <input id="admin-remove-user-input" placeholder="user email">
+                <button id="admin-remove-user-button" onclick="deleteUser()" class="btn btn-primary" style="margin-top: 15px;">Remove user</button>
+                </div>
+                <div class="row d-flex flex-column justify-content-center align-items-center" style="width: 50%; min-width: 50%; margin-top: 100px;">
+                <h2>DELETE INACTIVE USERS</h2>
+                <input type="number" id="inactivePeriod" placeholder="period of inactivity (days)" min="1" />
+                <p id="statusMessage"></p>
+                <button onclick="deleteInactiveUsers()" class="btn btn-primary" style="margin-top: 15px;">Delete Inactive Users</button>
+            </div>
+            </div>
+
+            <div class="col-12 d-flex justify-content-end align-items-center">
+			<div class="reset-button-div">
+					<button class="btn btn-primary reset-button"><span class="material-symbols-rounded">roofing</span></button>
+			</div>
+		</div>
+
+        </div>
+
+    </div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+		crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="../mental-arithmetic.js"></script>
+	<script src="../mental-arithmetic-combinations.js"></script>
+	<script src="math-options.js"></script>
+    <script src="pasirinkimai.js"></script>
+    <script src="../parameter_dictionary.js"></script>
+    <script src="../user-nav-menu.js"></script>
+
+	<script>
+        const redCircleColorCode = '#D57E7E';
+        const greenCircleColorCode = '#B6C867';
+        let userData;
+
+        if (userDataString) {
+            userData = JSON.parse(userDataString);
+        } else {
+            window.location.href = '/LT';
+        }
+
+        let studentList;
+        let tasksList;
+        let currentTaskId;
+        let currentTaskInstructions;
+        let studentListDiv = document.getElementById('student-list')
+        let addingNewTask = false;
+        let deletingTask = false;
+        let deletingStudent = false;
+        let showingSelectAllCheckbox = false;
+        let taskContainerVisible = true;
+        let changingTeacher = false;
+        const teacherGUI = document.getElementById('teacher-gui');
+        const studentGUI = document.getElementById('student-gui');
+        const adminGUI = document.getElementById('admin-gui');
+        let studentTasksList = document.getElementById('student-tasks-list')
+        let langMessageForStudents = document.getElementById('lang-message-for-students')
+        let taskInfoContainerForStudents = document.getElementById('task-info-container-for-students')
+        const newTaskButton = document.getElementById('new-task-button');
+        const submitNewTaskButton = document.getElementById('submit-new-taks-button');
+        const deleteTaskButton = document.getElementById('delete-task-button');
+        const confirmDeleteTaskButton = document.getElementById('confirm-delete-task-button');
+        const teacherMessageLine = document.getElementById('teacher-message-line');
+        const teacherMessageLine2 = document.getElementById('teacher-message-line-2');
+        const newTaskOptions = document.getElementById('new-task-options-container');
+        const studentTaskInfoContainer = document.getElementById('student-task-info-container');
+        const studentTaskStudentName = document.getElementById('student-task-student-name');
+        const studentTaskGroup = document.getElementById('student-task-group');
+
+        const studentTaskStatus = document.getElementById('student-task-status');
+        const studentScoreAnswerNumber = document.getElementById('student-score-asnwer-number');
+        const studentScoreMistakeNumber = document.getElementById('student-score-mistake-number');
+
+
+        let dynamicStudentContent = document.getElementById('dynamic-student-content');
+
+        let taskGroupForStudents = document.getElementById('task-group-for-students');
+        let taskStatusForStudents = document.getElementById('task-status-for-students');
+
+        let teacherName = document.getElementById('teacher-name');
+        const addTeacherInput = document.getElementById('add-teacher-input');
+        const addTeacherButton = document.getElementById('add-teacher');
+
+        const changeTeacherToggleButton = document.getElementById('change-teacher-toggle-button');
+        const changeTeacherInput = document.getElementById('change-teacher-input');
+        const changeTeacherButton = document.getElementById('change-teacher');
+
+        const deleteStudentButton = document.getElementById('delete-student-button');
+        const confirmDeleteStudentButton = document.getElementById('confirm-delete-student-button');
+
+        const studentListTitle = document.getElementById('student-list-title-container');
+        const studentListSelectAllCheckbox = document.getElementById('student-list-header-checkbox-container');
+        const selectAllCheckbox = document.getElementById('select-all-checkbox');
+
+        const studentMessage = document.getElementById('student-message');
+
+        const teacherDispalyStudentTaskIndicator = document.getElementById('student-task-status-indicator');
+        const mistakesSummaryTable = document.querySelector('#summary-table');
+
+        const taskDescriptionTitle = document.querySelector('#task-description-title');
+        const taskDescription = document.querySelector('#task-description');
+
+        const timerInputElementTeacher = document.querySelector('#timer-input-teacher');
+        let timerLabelElementTeacher = document.querySelector('.timer-label-teacher');
+
+        const studentTaskGroupForStudent = document.getElementById('student-task-group-for-student');
+        const studentScoreAnswerNumberForStudent = document.getElementById('student-score-asnwer-number-for-student');
+        const studentScoreMistakeNumberForStudent = document.getElementById('student-score-mistake-number-for-student');
+        const taskDescriptionForStudent = document.querySelector('#task-description-for-student');
+        const teacherDispalyStudentTaskIndicatorForStudent = document.getElementById('student-task-status-indicator-for-student');
+        const taskListTitleForStudents = document.getElementById('task-list-title-for-students');
+
+        const completeTaskButton = document.getElementById('complete-task-button');
+
+        enableTeacherControlPannel();
+        enableNewTaskContainer();
+        document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
+        confirmDeleteTaskButton.disabled = false;
+        submitNewTaskButton.disabled = false;
+        deleteStudentButton.disabled = false;
+        confirmDeleteStudentButton.disabled = false;
+        newTaskButton.disabled = false;
+        deleteTaskButton.disabled = false;
+        deleteStudentButton.disabled = false;
+
+        if (userData.teacher !== '' && userData.accType === "student") {
+            teacherName.innerHTML = `Mok. ${userData.teacher}`
+            addTeacherInput.style.display = "none";
+            addTeacherButton.style.display = "none";
+            changeTeacherToggleButton.style.display = "block"
+        } else {
+            addTeacherInput.style.display = "block";
+            addTeacherButton.style.display = "block";
+            changeTeacherToggleButton.style.display = "none"
+        }
+    
+    timerInputElementTeacher.addEventListener("input", function(event) {
+      if (parseInt(timerInputElementTeacher.value) === 1 || parseInt(timerInputElementTeacher.value.slice(-1)[0]) === 1 && parseInt(timerInputElementTeacher.value) !== 11) {
+        timerLabelElementTeacher.innerHTML = 'minute';
+      } else if ((parseInt(timerInputElementTeacher.value) > 1 && parseInt(timerInputElementTeacher.value) < 10) || (parseInt(timerInputElementTeacher.value) > 20 && parseInt(timerInputElementTeacher.value.slice(-1)[0]) !== 0)) {
+        timerLabelElementTeacher.innerHTML = 'minutes';
+      } else if (parseInt(timerInputElementTeacher.value) >= 10 ) {
+        timerLabelElementTeacher.innerHTML = 'minutes';
+      }
+    })
+
+    const questionNumberInputElementTeacher = document.querySelector('#question-number-input');
+    let answerNumberLabelTeacher = document.querySelector('.answer-number-label-teacher');
+
+    const parameterTranslations = {
+        "SUDĖTIS": "ADDITION",
+        "ATIMTIS": "SUBTRACTION",
+        "SUDĖTIS IR ATIMTIS": "ADDITION AND SUBTRACTION",
+        "DAUGYBA": "MULTIPLICATION",
+        "DALYBA": "DIVISION",
+        "DAUGYBA IR DALYBA": "MULTIPLICATION AND DIVISION",
+        "ĮVAIRŪS VEIKSMAI": "MIXED",
+        "VIENAŽENKLIŲ SKAIČIŲ IKI 10": "1-DIGIT NUMBERS UP TO 10",
+        "VIENAŽENKLIŲ SKAIČIŲ IKI 20 (LENTELINĖ SUDĖTIS)": "1-DIGIT NUMBERS UP TO 20",
+        "DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 20": "2-DIGIT AND 1-DIGIT NUMBERS UP TO 20",
+        "DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 100": "2-DIGIT AND 1-DIGIT NUMBERS UP TO 100",
+        "DVIŽENKLIŲ SKAIČIŲ IKI 100": "2-DIGIT NUMBERS UP TO 100",
+        "SKAIČIŲ IKI 1 000": "NUMBERS UP TO 1,000",
+        "SKAIČIŲ IKI 10 000": "NUMBERS UP TO 10,000",
+        "SKAIČIŲ IKI 1 000 000": "NUMBERS UP TO 1,000,000",
+        "KAI TURINYJE GRETIMI NULIAI": "WHEN MINUEND CONTAINS ADJACENT ZEROS",
+        "LENTELINĖ SUDĖTIS IR ATIMTIS IKI 20": "1-DIGIT NUMBERS UP TO 20",
+        "DAUGYBOS LENTELĖ": "MULTIPLICATION TABLE",
+        "DVIŽENKLIO IŠ VIENAŽENKLIO": "2-DIGIT BY 1-DIGIT NUMBERS",
+        "TRIŽENKLIO IŠ VIENAŽENKLIO": "3-DIGIT BY 1-DIGIT NUMBERS",
+        "KETURŽENKLIO IŠ VIENAŽENKLIO": "4-DIGIT BY 1-DIGIT NUMBERS",
+        "DAUGIAŽENKLIO IŠ VIENAŽENKLIO": "MULTI-DIGIT BY 1-DIGIT NUMBERS",
+        "DVIŽENKLIO IŠ DVIŽENKLIO": "2-DIGIT BY 2-DIGIT NUMBERS",
+        "TRIŽENKLIO IŠ DVIŽENKLIO": "3-DIGIT BY 2-DIGIT NUMBERS",
+        "KETURŽENKLIO IŠ DVIŽENKLIO": "4-DIGIT BY 2-DIGIT NUMBERS",
+        "DAUGIAŽENKLIO IŠ DVIŽENKLIO": "MULTI-DIGIT BY 2-DIGIT NUMBERS",
+        "*DAUGIAŽENKLIŲ SKAIČIŲ": "MULTI-DIGIT NUMBERS",
+        "IŠ PILNŲ DEŠIMČIŲ/ŠIMTŲ (LENGVESNI)": "MULTIPLES OF TEN/HUNDRED (EASIER)",
+        "IŠ PILNŲ DEŠIMČIŲ/ŠIMTŲ/TŪKSTANČIŲ": "MULTIPLES OF TEN/HUNDRED/THOUSAND (HARDER)",
+        "DAUGIAŽENKLIO IŠ VIENAŽENKLIO (DALMENYJE 0)": "MULTI-DIGIT BY 1-DIGIT NUMBERS (QUOTIENT CONTAINS 0)",
+        "IKI 10": "UP TO 10",
+        "IKI 20": "UP TO 20",
+        "IKI 100": "UP TO 100",
+        "IKI 1 000": "UP TO 1,000",
+        "IKI 10 000": "UP TO 10,000",
+        "IKI 1 000 000": "UP TO 1,000,000",
+        "NEPERŽENGIANT DEŠIMTIES": "WITHOUT CARRYING OVER/REGROUPING PLACE VALUES",
+        "PERŽENGIANT DEŠIMTĮ": "CARRYING OVER/REGROUPING PLACE VALUES",
+        "NUSTATYTI LAIKO TRUKMĘ": "SET TIME DURATION",
+        "NUSTATYTI KLAUSIMŲ KIEKĮ": "SET EQUATION NUMBER",
+        "SKAITINĖ LYGYBĖ": "SIMPLE EQUATION",
+        "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU": "EQUATION WITH UNKNOWN NUMBER",
+        "NEŽINOMAS DĖMUO": "UNKNOWN ADDEND",
+        "NEŽINOMAS TURINYS": "UNKNOWN MINUEND",
+        "NEŽINOMAS ATĖMINYS": "UNKNOWN SUBTRAHEND",
+        "NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS": "UNKNOWN ADDEND / MINUEND / SUBTRAHEND",
+        "NEŽINOMAS DAUGINAMASIS": "UNKNOWN MULTIPLICAND / MULTIPLIER",
+        "NEŽINOMAS DALINYS": "UNKNOWN DIVIDEND",
+        "NEŽINOMAS DALIKLIS": "UNKNOWN DIVISOR",
+        "NEŽINOMAS DAUGINAMASIS / DALINYS / DALIKLIS": "UNKNOWN MULTIPLICAND / MULTIPLIER / DIVIDEND / DIVISOR",
+        "NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS / DAUGINAMASIS / DALINYS / DALIKLIS": "UNKNOWN ADDEND / MINUEND / SUBTRAHEND / MULTIPLICAND / MULTIPLIER / DIVIDEND / DIVISOR",
+        "EILUTE": "SIMPLE ADDITION/SUBTRACTION/DIVISION/MULTIPLICATION",
+        "STULPELIU / KAMPU": "LONG ADDITION/SUBTRACTION/DIVISION/MULTIPLICATION"
+    }
+
+
+        function getOptionTextFromValues(values) {
+            function determineQuestionNumberTimeLabelEnding(type, string) {
+                if (type === "NUSTATYTI LAIKO TRUKMĘ") {
+                    durationTypeTag = ''
+                    if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                        durationTypeTag = 'MINUTE';
+                    } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                        durationTypeTag = 'MINUTES';
+                    } else if (parseInt(string) >= 10 ) {
+                        durationTypeTag = 'MINUTES';
+                    }
+                    return ("PRACTISE FOR " + string + " " + durationTypeTag)  
+                } else {
+                    if (values[0] === "math") {
+                    durationTypeTag = ''
+                    if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                        durationTypeTag = 'EQUATION';
+                    } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                        durationTypeTag = 'EQUATIONS';
+                    } else if (parseInt(string) >= 10 ) {
+                        durationTypeTag = 'EQUATIONS';
+                    }
+                    return ("SOLVE " + string + " " + durationTypeTag)  
+                } 
+            }
+            }
+
+            result = []
+            final_results = []
+            if (values[0] === "math") {
+
+            result.push(parameterDictionary[values[1]]["decodedParameterText"])
+            result.push(parameterDictionary[values[2]]["decodedParameterText"])
+            result.push(values[3] ? "PERŽENGIANT DEŠIMTĮ" : "NEPERŽENGIANT DEŠIMTIES")
+            result.push(parameterDictionary[values[4]]["decodedParameterText"])
+            result.push(parameterDictionary[values[5]]["decodedParameterText"])
+            if (values[5] === "C42") {
+                if (values[1] === "C1") {
+                    result.push("NEŽINOMAS DĖMUO")
+                } else if (values[1] === "C2") {
+                    if (values[6] === "C43") {
+                        result.push("NEŽINOMAS TURINYS")
+                    } else if (values[6] === "C44") {
+                        result.push("NEŽINOMAS ATĖMINYS")
+                    } 
+                } else if (values[1] === "C3") {
+                    result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS")
+                } else if (values[1] === "C4") {
+                    result.push("NEŽINOMAS DAUGINAMASIS")
+                } else if (values[1] === "C5") {
+                    if (values[6] === "C45") {
+                        result.push("NEŽINOMAS DALINYS")
+                    } else if (values[6] === "C46") {
+                        result.push("NEŽINOMAS DALIKLIS")
+                    }
+                } else if (values[1] === "C6") {
+                    result.push("NEŽINOMAS DAUGINAMASIS / DALINYS / DALIKLIS")
+                } else if (values[1] === "C7") {
+                    result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS / DAUGINAMASIS / DALINYS / DALIKLIS")
+                }
+            } else {
+                result.push(parameterDictionary[values[6]]["decodedParameterText"])
+            }
+
+            result.push(parameterDictionary[values[7]]["decodedParameterText"])
+            result.push(values[8])
+            result.push(values[9] ? "DIVISION WITH A REMAINDER" : "DIVISION WITHOUT A REMAINDER")
+            result.push(values[10])
+
+            final_results.push(result[0])
+
+            if (result[0] === "SUDĖTIS" || result[0] === "ATIMTIS" || result[0] === "SUDĖTIS IR ATIMTIS") {
+                final_results.push(result[1])
+                final_results.push(result[2])
+                final_results.push(result[4])
+                if (result[4] === "SKAITINĖ LYGYBĖ") {
+                    final_results.push(result[6])  
+                    if (values[7] === "C48") {
+                        final_results.push(parameterDictionary[values[11]]["decodedParameterText"])
+                    }
+                } else if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+                    final_results.push(result[5])  
+                }
+                final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))
+            } else if (result[0] === "DAUGYBA") {
+                final_results.push(result[1])
+                if (result[1] === "DAUGYBOS LENTELĖ") {
+                final_results.push(`FROM ${result[7][0]} TO ${result[7][1]}`)
+                }
+                final_results.push(result[4])
+                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+                    final_results.push(result[5])    
+                }
+                final_results.push(result[6])
+                if (values[7] === "C48") {
+                    final_results.push(parameterDictionary[values[11]]["decodedParameterText"])
+                }    
+                final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))    
+            } else if (result[0] === "DALYBA" || result[0] === "DAUGYBA IR DALYBA") {
+                final_results.push(result[1])
+                if (result[1] === "DAUGYBOS LENTELĖ") {
+                final_results.push(`FROM ${result[7][0]} TO ${result[7][1]}`)
+                }
+                final_results.push(result[8])
+                final_results.push(result[4])
+                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+                    final_results.push(result[5])    
+                }
+                final_results.push(result[6])
+                if (values[7] === "C48") {
+                    final_results.push(parameterDictionary[values[11]]["decodedParameterText"])
+                }    
+                final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))    
+            } else if (result[0] === "ĮVAIRŪS VEIKSMAI") {
+                final_results.push(result[1])
+                final_results.push(result[4])
+                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+                    final_results.push(result[5])    
+                }
+                final_results.push(result[6]) 
+                if (values[7] === "C48") {
+                    final_results.push(parameterDictionary[values[11]]["decodedParameterText"])
+                }
+                final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))       
+            }
+        }
+
+            return final_results;
+        }
+
+        function toggleStudentListLabel() {
+            showingSelectAllCheckbox = !showingSelectAllCheckbox
+            const dropdown = document.getElementById("task-group-sorting");
+            if (showingSelectAllCheckbox) {
+                studentListTitle.style.display = "none"
+                studentListSelectAllCheckbox.style.display = "flex"
+                selectAllCheckbox.checked = false
+            } else {
+                studentListTitle.style.display = "flex"
+                studentListSelectAllCheckbox.style.display = "none"
+                selectAllCheckbox.checked = false
+            }
+        }
+
+        document.getElementById('select-all-checkbox').addEventListener('change', function () {
+            const checkboxes = document.querySelectorAll('#student-list input[type="checkbox"]');
+
+            checkboxes.forEach(checkbox => {
+                if (getComputedStyle(checkbox).visibility !== 'hidden') {
+                    checkbox.checked = this.checked;
+                }
+            });
+        });
+
+        function toggleDeleteStudent() {
+            deletingStudent = !deletingStudent
+            const dropdown = document.getElementById("task-group-sorting");
+            toggleStudentListLabel();
+            clearTaskInfoContainer();
+            if (deletingStudent) {
+                clearTeacherMessage();
+                // Set the selected option to "All task groups"
+                dropdown.value = "All task groups";
+                // Manually trigger the change event
+                dropdown.dispatchEvent(new Event("change"));
+                dropdown.disabled = true;
+                toggleTaskVisibility()
+
+                confirmDeleteStudentButton.style.display = "block";       
+                document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+                checkbox.style.visibility = "visible";
+                checkbox.disabled = false;
+            });
+                deleteStudentButton.innerText = 'Cancel Student Removal';
+                newTaskButton.disabled = true;
+                deleteTaskButton.disabled = true;
+
+            } else {
+                toggleTaskVisibility()
+                confirmDeleteStudentButton.style.display = "none";   
+                document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+                checkbox.style.visibility = "hidden";
+                checkbox.checked = false;
+            });
+                deleteStudentButton.innerText = 'Remove Students';
+                newTaskButton.disabled = false;
+                deleteTaskButton.disabled = false;
+                dropdown.disabled = false;
+            }
+        }
+
+        async function deleteStudents() {
+            let studentsToRemove = [];
+            document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+                if (checkbox.checked) {
+                    studentsToRemove.push(parseInt(checkbox.value));
+                }
+            });
+            
+            if (studentsToRemove.length === 0) {
+                teacherMessageLine.innerHTML = "Select at least one student to remove.";
+                return
+            }
+
+            const studentIdsBeingRemoved = studentsToRemove.map(id => parseInt(id));
+    
+            // Find matching students and collect assignmentIds
+            const assignmentIds = [];
+            
+            studentList.forEach(student => {
+                if (studentIdsBeingRemoved.includes(student.id)) {
+                    student.tasks.forEach(task => {
+                        assignmentIds.push(task.assignmentId);
+                    });
+                }
+            });
+
+            deleteStudentButton.disabled = true
+            confirmDeleteStudentButton.innerHTML = "Removing..."
+            confirmDeleteStudentButton.disabled = true;
+            disableTeacherControlPannel();
+            
+            deletingTask = true
+            await deleteTasks(assignmentIds)
+
+            try {
+                // Prepare the list of tasks to delete (assuming tasksToTemove is already populated)
+                const studentsToDelete = studentsToRemove;  // Ensure this array holds task IDs to be deleted
+
+                const response = await fetch(apiBase + 'students', {
+                    method: 'DELETE',  // Change to DELETE method
+                    headers: {
+                        'Authorization': userData.token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ studentIds: studentsToDelete })  // Send the list as JSON in the body
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                // Optionally, handle the response if needed (e.g., confirm deletion or update the UI)
+                const result = await response.json();
+                if (result.message === "Student removal successful.") {
+                    fetchDataForTeachers()
+                    teacherMessageLine.innerHTML = "Student removal successful.";
+                } 
+
+            } catch (error) {
+                console.log('Error deleting tasks:', error);
+                teacherMessageLine.innerHTML = 'Student removal failed. Please try again later.';
+
+            } finally {
+                deleteStudentButton.disabled = false
+                confirmDeleteStudentButton.disabled = false;
+                enableTeacherControlPannel();
+                confirmDeleteStudentButton.innerHTML = "Remove Students"
+                showingSelectAllCheckbox = true;
+                toggleDeleteStudent() 
+                clearTaskInfoContainer();
+            }
+            addTeacherButton.innerHTML = "Add Teacher";
+        }
+
+
+        async function addTeacher() {
+            const teacherId = addTeacherInput.value;
+            if (!teacherId) return;
+
+            addTeacherButton.innerHTML = "Adding...";
+            document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = true);
+            try {
+                const response = await fetch(apiBase + 'students', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': userData.token
+                    },
+                    body: JSON.stringify({ teacherId })
+                });
+
+                // Safely parse response (fallback if JSON fails)
+                const responseData = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    if (responseData.error === 'Invalid teacher ID') {
+                        alert("Invalid teacher ID");
+                    } else if (responseData.error === 'Relationship already exists') {
+                        alert("This teacher is already added");
+                    } else if (responseData.error === 'Student already has a teacher. Use PUT to update instead.') {
+                        alert("You already have a teacher added");
+                    } else {
+                        throw new Error(`Server error: ${response.status}`);
+                    }
+                    return;
+                }
+
+                userData.teacher = responseData.teacherInfo
+                localStorage.setItem('userData', JSON.stringify(userData))
+
+                if (userData.teacher === '') {
+                    addTeacherInput.style.display = "block";
+                    addTeacherButton.style.display = "block";
+                    changeTeacherToggleButton.style.display = "none"
+                } else {
+                    teacherName.innerHTML = `Teacher ${userData.teacher}`
+                    addTeacherInput.style.display = "none";
+                    addTeacherButton.style.display = "none";
+                    changeTeacherToggleButton.style.display = "block"
+                }
+
+                studentMessage.innerHTML = "Teacher added successfully."
+            } catch (error) {
+                console.log('Full error:', error);
+                studentMessage.innerHTML = "An error has occurred. Please try again later."
+            }
+            addTeacherButton.innerHTML = "Add Teacher";
+            document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
+        }
+
+        async function changeTeacher() {
+            const teacherId = changeTeacherInput.value;
+            if (!teacherId) return;
+
+            changeTeacherButton.innerHTML = "Changing..." 
+            document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = true);  
+            try {
+                const response = await fetch(apiBase + 'students', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': userData.token
+                    },
+                    body: JSON.stringify({ teacherId })
+                });
+
+                // Safely parse response (fallback if JSON fails)
+                const responseData = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    if (response.status === 400 && responseData.error === 'Invalid teacher ID') {
+                        studentMessage.innerHTML = "Invalid teacher ID'."
+                    } else if (response.status === 404 && responseData.error === 'No existing teacher relationship found') {
+                        studentMessage.innerHTML = "No teacher added."
+                    } else if (response.status === 400 && responseData.error === 'Student already has this teacher') {
+                        studentMessage.innerHTML = "You already have this teacher"
+                    } else if (response.status === 400 && responseData.error === 'No existing teacher relationship found. Use POST to create one.') {
+                        studentMessage.innerHTML = "You have no teacher added."
+                    } else {
+                        throw new Error(`Server error: ${response.status}`);
+                    }
+                    return;
+                }
+                
+                userData.teacher = responseData.teacherInfo
+                localStorage.setItem('userData', JSON.stringify(userData))
+
+                if (userData.teacher === '') {
+                    addTeacherInput.style.display = "block";
+                    addTeacherButton.style.display = "block";
+                    changeTeacherToggleButton.style.display = "none"
+                } else {
+                    teacherName.innerHTML = `Teacher ${userData.teacher}`
+                    teacherName.style.display = "block"
+                    addTeacherInput.style.display = "none";
+                    addTeacherButton.style.display = "none";
+                    changeTeacherInput.style.display = "none";
+                    changeTeacherButton.style.display = "none";
+                    changeTeacherToggleButton.style.display = "block"
+                    changeTeacherToggle();
+                }
+
+                deleteAllTasks();
+                studentMessage.innerHTML = "Teacher added successfully."
+
+            } catch (error) {
+                console.log('Full error:', error);
+                studentMessage.innerHTML = "Error adding a teacher. Please try again later."
+            }
+            changeTeacherButton.innerHTML = "Change Teacher" 
+            document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
+        }
+
+        function clearTaskInfoContainer() {
+            studentTaskStudentName.innerHTML = '';
+            studentTaskGroup.innerHTML = '';
+            studentScoreAnswerNumber.innerHTML = '';
+            studentScoreMistakeNumber.innerHTML = '';
+            mistakesSummaryTable.innerHTML = '';
+            taskDescription.innerHTML = '';
+            taskDescriptionTitle.style.display = "none"
+            teacherDispalyStudentTaskIndicator.style.display = "none"
+            studentStatisticsCompletedTasks.innerHTML = '';
+            studentStatisticsCompletedTasks.style.display = "none";
+            studentStatisticsMathDiv.style.display = "none";
+            studentStatisticsMathErrorFrequency.innerHTML = '';
+            document.querySelector("#mistakes-summary-math").style.display = "none";
+            studentStatisticsLangTitle.innerHTML = '';
+            studentStatisticsLangMessage.innerHTML = '';
+        }
+
+        function clearTaskInfoContainerForStudents() {
+            studentTaskGroupForStudent.innerHTML = '';
+            studentScoreAnswerNumberForStudent.innerHTML = '';
+            studentScoreMistakeNumberForStudent.innerHTML = '';
+            document.querySelector("#summary-table-for-student").innerHTML = '';
+            taskDescriptionForStudent.innerHTML = '';
+            teacherDispalyStudentTaskIndicatorForStudent.style.display = "none"
+        }
+
+        function clearTeacherMessage() {
+            teacherMessageLine.innerHTML = '';
+            teacherMessageLine2.innerHTML = '';
+        }
+
+        function clearStudentMessage() {
+            studentMessage.innerHTML = '';
+        }
+
+        let studentStatisticsCompletedTasks = document.querySelector("#student-statistics-completed-tasks");
+        const studentStatisticsMathDiv = document.querySelector("#student-statistics-math");
+        const studentStatisticsMathErrorFrequency = document.querySelector("#student-statistics-math-error-frequency");
+
+        const studentStatisticsLangTitle = document.querySelector("#student-statistics-lang-title")
+        const studentStatisticsLangMessage = document.querySelector("#student-statistics-lang-message")
+
+        const studentTaskCompletionDate = document.querySelector("#student-task-completion-date")
+        const studentTaskCompletionDateForStudents = document.querySelector("#student-task-completion-date-for-students")
+        
+        function displayStudentStatistics(student, studentTasks) {
+            function processStudentTasks(studentTasks) {
+                // Initialize the result objects
+                const mathTasks = [[0, 0], []];
+                const grammarTasks = [[0, 0], []];
+                const komponavimasTasks = [[0, 0], []];
+                const isdestymasTasks = [[0, 0], []];
+
+                // Filter tasks with status true
+                const filteredTasks = studentTasks.filter(task => task.status);
+
+                for (const task of filteredTasks) {
+                    try {
+                        const taskDesc = JSON.parse(task.taskDescription);
+                        const result = JSON.parse(task.result);
+
+                        if (taskDesc[0] === "math") {
+                            // Process math tasks
+                            mathTasks[0][0] += result[0][0];
+                            mathTasks[0][1] += result[0][1];
+                            mathTasks[1].push(...result[1]);
+                        }
+                    } catch (error) {
+                        // Skip tasks with invalid taskDescription or result format
+                        console.error("Error processing task:", error);
+                        continue;
+                    }
+                }
+
+                    return {
+                        math: mathTasks,
+                        grammar: grammarTasks,
+                        komponavimas: komponavimasTasks,
+                        isdestymas: isdestymasTasks
+                    };
+            }
+
+            function countTaskStatuses(studentTasks, category = null) {
+                let trueCount = 0;
+                let falseCount = 0;
+                let categoryCounts = {}; // e.g., { math: 5, lang: 3 }
+
+                let filteredTasks = studentTasks;
+
+                for (const task of studentTasks) {
+                    let taskDesc;
+
+                    try {
+                        taskDesc = JSON.parse(task.taskDescription);
+                    } catch (e) {
+                        console.error("Error parsing taskDescription:", e);
+                        continue;
+                    }
+
+                    const taskCategory = taskDesc[0];
+
+                    // Count by category
+                    if (taskCategory) {
+                        if (!categoryCounts[taskCategory]) {
+                            categoryCounts[taskCategory] = 0;
+                        }
+                        categoryCounts[taskCategory]++;
+                    }
+
+                    // Apply category filter if specified
+                    if (category && taskCategory !== category) {
+                        continue;
+                    }
+
+                    // Count completed and pending
+                    if (task.status === true) {
+                        trueCount++;
+                    } else if (task.status === false) {
+                        falseCount++;
+                    }
+                }
+
+                const total = trueCount + falseCount;
+
+                return {
+                    total: total,
+                    completed: trueCount,
+                    pending: falseCount,
+                    categoryCounts: categoryCounts,
+                };
+            }
+
+
+        clearTaskInfoContainer();
+        clearTeacherMessage();
+        studentTaskInfoContainer.style.display = 'block';
+        studentTaskStudentName.innerHTML = `${student[1]} (ID: ${student[0]})`;
+
+
+        studentStatisticsCompletedTasks.style.display = "block";
+
+        const taskStatusSummary = countTaskStatuses(studentTasks)
+
+        studentStatisticsCompletedTasks.innerHTML = `<span class="task-info-subtitle">Completed tasks:</span> ${taskStatusSummary.completed}/${taskStatusSummary.total}`
+
+        const categorizedStudentTasks = processStudentTasks(studentTasks)
+
+        if (taskStatusSummary.categoryCounts.lang > 0) {
+            studentStatisticsLangTitle.innerHTML = "Lithuanian Language Tasks"
+            studentStatisticsLangMessage.innerHTML = "Student has assigned tasks to practice Lithuanian language. Please switch to the Lithuanian version of the website to view the tasks."
+        }
+
+        if (countTaskStatuses(studentTasks, "math").completed > 0)
+            studentStatisticsMathDiv.style.display = "block";
+            mistakeFrequency = Math.round(categorizedStudentTasks.math[0][1]/categorizedStudentTasks.math[0][0]*100)
+            if (!isNaN(mistakeFrequency)) {
+            studentStatisticsMathErrorFrequency.innerHTML = `<span class="task-info-subtitle">Mistake frequency:</span> ${categorizedStudentTasks.math[0][1]}/${categorizedStudentTasks.math[0][0]} (${mistakeFrequency}%)`;
+            }
+
+
+        const combinedMathAndGrammarMistakes = [...categorizedStudentTasks.math[1], ...categorizedStudentTasks.grammar[1]]
+
+        if (combinedMathAndGrammarMistakes.length > 0) {
+            generateSummaryTable("custom", combinedMathAndGrammarMistakes, "summary-table", "none") 
+        }
+
+        document.querySelector("#mistakes-summary-math").style.display = "block";
+        if (document.querySelector("#summary-table").innerHTML === "No mistakes found!" || document.querySelector("#summary-table").innerHTML === '') {
+            document.querySelector("#mistakes-summary-math").style.display = "none";
+        }
+    }
+                
+
+        function displayTaskInfo(student, task) {
+            clearTaskInfoContainer();
+            clearTeacherMessage();
+
+            studentTaskInfoContainer.style.display = 'block';
+            taskDescriptionTitle.style.display = "block"
+            teacherDispalyStudentTaskIndicator.style.display = "block"
+
+            const parsedTaskDescription = JSON.parse(task.taskDescription);
+            const formattedTaskDescription = getOptionTextFromValues(parsedTaskDescription);
+            studentTaskStudentName.innerHTML = `${student[1]} (ID: ${student[0]})`;
+            studentTaskGroup.innerHTML = `Task: ${task.group}`;
+            teacherDispalyStudentTaskIndicator.style.backgroundColor = task.status ? greenCircleColorCode : redCircleColorCode;
+            if (task.status) {
+                studentTaskCompletionDate.innerHTML = `<span class="task-info-subtitle">Atlikimo data</span>: ${task.completionDate.split('T')[0]}`
+            }
+            if (task.result !== '') {
+                score = JSON.parse(task.result)[0]
+                if (parsedTaskDescription[0] === "math") {
+                    studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Total equations:</span> ${score[0]}`;
+                    studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Mistakes:</span> ${score[1]}`;
+                }
+                let mistakesList = [];
+                mistakesList = JSON.parse(task.result)[1]
+                if (mistakesList.length > 0) {
+                    generateSummaryTable("custom", mistakesList, "summary-table", "none") 
+                }
+
+                if (parsedTaskDescription[0] === "math") {
+                    document.querySelector("#mistakes-summary-math").style.display = "block";
+                } else {
+                    document.querySelector("#mistakes-summary-math").style.display = "none";
+                }
+
+                if (document.querySelector("#summary-table").innerHTML === "No mistakes found!" || document.querySelector("#summary-table").innerHTML === '') {
+                    document.querySelector("#mistakes-summary-math").style.display = "none";
+            }
+        }
+
+            taskDescriptionList = document.createElement('ul');
+            taskDescriptionList.classList.add("task-description-list");
+            formattedTaskDescription.forEach(item => {
+                if (item) {  // Ensure empty values are not added
+                    let listItem = document.createElement('li');
+                    if (parameterTranslations[item]) {
+                        item = parameterTranslations[item];
+                    }
+                    // Check if item contains an HTML tag, then use innerHTML
+                    if (item.includes("<")) {
+                        listItem.innerHTML = item; // Render HTML properly
+                    } else {
+                        listItem.textContent = item; // Use textContent for plain text
+                    }
+                    
+                    listItem.classList.add("task-description-list-item");
+                    taskDescriptionList.appendChild(listItem);
+                }
+            });
+
+            taskDescription.appendChild(taskDescriptionList);
+    }
+
+        function displayStudentTaskInfo(task) {
+            clearTaskInfoContainerForStudents()
+            currentTaskInstructions = task.taskInstructions;
+            currentTaskId = task.assignmentId
+            const parsedTaskDescription = JSON.parse(task.taskInstructions);
+            const formattedTaskDescription = getOptionTextFromValues(parsedTaskDescription);
+
+
+            studentTaskGroupForStudent.innerHTML = `Task: ${task.group}`;
+
+            teacherDispalyStudentTaskIndicatorForStudent.style.display = "block";
+            teacherDispalyStudentTaskIndicatorForStudent.style.backgroundColor = task.status ? greenCircleColorCode : redCircleColorCode;
+            if (task.status) {
+                studentTaskCompletionDateForStudents.innerHTML = `<span class="task-info-subtitle">Atlikimo data</span>: ${task.completionDate.split('T')[0]}`
+            }
+
+            if (task.status) {
+                completeTaskButton.style.display = "none"
+            } else {
+                completeTaskButton.style.display = "block"
+            }
+
+            if (task.result !== '') {
+
+
+                score = JSON.parse(task.result)[0]
+                if (parsedTaskDescription[0] === "math") {
+                    studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Total equations:</span> ${score[0]}`;
+                    studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Mistakes</span>: ${score[1]}`;
+                }
+                let mistakesList = [];
+                mistakesList = JSON.parse(task.result)[1]
+                if (mistakesList.length > 0) {
+                    generateSummaryTable("custom", mistakesList, "summary-table-for-student", "none") 
+                }
+
+                if (parsedTaskDescription[0] === "math") {
+                    document.querySelector("#mistakes-summary-math-for-student").style.display = "block";
+                }
+
+                if (document.querySelector("#summary-table-for-student").innerHTML === "No mistakes found!" || document.querySelector("#summary-table-for-student").innerHTML === "") {
+                    document.querySelector("#mistakes-summary-math-for-student").style.display = "none";
+                }
+
+
+            mistakesList = JSON.parse(task.result)[1]
+            if (mistakesList.length > 0) {
+                generateSummaryTable("custom", mistakesList, "summary-table-for-student", "none") 
+            }
+            }
+
+            taskDescriptionList = document.createElement('ul');
+            taskDescriptionList.classList.add("task-description-list")
+            formattedTaskDescription.forEach(item => {
+                if (item) {  // Ensure empty values are not added
+                    let listItem = document.createElement('li');
+                    
+                    if (parameterTranslations[item]) {
+                        item = parameterTranslations[item];
+                    }
+
+                    // Check if item contains an HTML tag, then use innerHTML
+                    if (item.includes("<")) {
+                        listItem.innerHTML = item; // Render HTML properly
+                    } else {
+                        listItem.textContent = item; // Use textContent for plain text
+                    }
+                    
+                    listItem.classList.add("task-description-list-item");
+                    taskDescriptionList.appendChild(listItem);
+                }
+            });
+            let description = document.createElement('div');
+            description.innerHTML = '<span class="task-info-subtitle">Task description:</span>'
+
+            taskDescriptionForStudent.appendChild(description);
+            taskDescriptionForStudent.appendChild(taskDescriptionList);
+            clearStudentMessage();
+        }
+
+        function populateTaskGroupDropdown() {
+            const dropdown = document.getElementById("task-group-sorting");
+            dropdown.innerHTML = ''; // Clear existing options
+
+            // Create a Set to store unique task groups
+            const taskGroups = new Set();
+
+            // Iterate through students and collect unique task group names
+            studentList.forEach(student => {
+                student.tasks.forEach(task => {
+                    if (JSON.parse(task.taskDescription)[0] === "math") {
+                        taskGroups.add(task.group);
+                    }
+                });
+            });
+
+            // Convert Set to sorted array
+            const sortedGroups = ["All task groups", ...Array.from(taskGroups).sort()];
+
+            // Populate dropdown with options
+            sortedGroups.forEach(group => {
+                const option = document.createElement("option");
+                option.value = group;
+                option.textContent = group;
+                dropdown.appendChild(option);
+            });
+        }
+
+        function handleTaskGroupChange() {
+            const dropdown = document.getElementById("task-group-sorting");
+            
+            dropdown.addEventListener("change", () => {
+                const selectedGroup = dropdown.value;
+
+                // Filter students based on the selected task group
+                const filteredStudents = selectedGroup === "All task groups"
+                    ? studentList
+                    : studentList
+                        .map(student => ({
+                            ...student,
+                            tasks: student.tasks.filter(task => task.group === selectedGroup)
+                        }))
+                        .filter(student => student.tasks.length > 0); // Remove students with no tasks after filtering
+
+                // Re-render with the filtered student list
+                renderDataForTeachers(filteredStudents);
+                clearTeacherMessage();
+            });
+        }
+
+        // Ensure the function runs after populating the dropdown
+        handleTaskGroupChange();
+        
+        function renderDataForTeachers(filteredList = studentList) {
+        studentListDiv.innerHTML = '';
+
+        // Sort students alphabetically by nickname
+        const sortedStudents = [...filteredList].sort((a, b) => a.nickname.localeCompare(b.nickname));
+
+        const listContainer = document.createElement('ul');
+
+        sortedStudents.forEach((student, studentIndex) => {
+        const studentElement = document.createElement('li');
+        studentElement.classList.add('student-li-item');
+
+        // Student checkbox
+        const studentCheckbox = document.createElement('input');
+        studentCheckbox.type = 'checkbox';
+        studentCheckbox.id = `student-${student.id}`;
+        studentCheckbox.value = student.id;
+        studentCheckbox.classList.add('student-checkbox');
+        studentCheckbox.style.visibility = 'hidden';
+
+        // Student label with numbering
+        const studentName = document.createElement('div');
+        studentName.classList.add('student-name');
+        studentName.classList.add('selection-option');
+        studentName.style.cursor = 'pointer';
+        studentName.innerHTML = `${studentIndex + 1}. ${student.nickname} (ID: ${student.id})`;
+
+        studentName.addEventListener('click', () => {
+            // Remove 'selected-option' class from all task names
+            document.querySelectorAll('.selection-option').forEach(name => {
+                name.classList.remove('selected-option');
+            });
+
+            // Add 'selected-option' class to the clicked task
+            studentName.classList.add('selected-option');
+
+            // Display task info
+            displayStudentStatistics([student.id, student.nickname], student.tasks);
+        });
+
+        // Student-level task status circles
+        const studentCircleContainer = document.createElement('div');
+        studentCircleContainer.classList.add('student-li-entry-tasks-indicatior');
+
+        // Tasks container
+        const tasksContainer = document.createElement('ul');
+        tasksContainer.id = `tasks-${student.id}`;
+        tasksContainer.classList.add('task-container');
+
+        student.tasks.forEach((task, taskIndex) => {
+            if (JSON.parse(task.taskDescription)[0] === "math") {
+            const taskWrapper = document.createElement('li');
+            taskWrapper.classList.add('task-li-item');
+
+            // Task checkbox
+            const taskCheckbox = document.createElement('input');
+            taskCheckbox.type = 'checkbox';
+            taskCheckbox.id = `task-${task.assignmentId}`;
+            taskCheckbox.value = task.assignmentId;
+            taskCheckbox.classList.add('task-checkbox');
+            taskCheckbox.style.visibility = "hidden";
+            taskCheckbox.disabled = true;
+
+            // Task label with numbering
+            const taskName = document.createElement('div');
+            taskName.innerHTML = `${taskIndex + 1}. ${task.group}`;
+            taskName.style.cursor = 'pointer';
+            taskName.classList.add('task-name');
+            taskName.classList.add('selection-option');
+            taskName.addEventListener('click', () => {
+                // Remove 'selected-option' class from all task names
+                document.querySelectorAll('.selection-option').forEach(task => {
+                    task.classList.remove('selected-option');
+                });
+
+                // Add 'selected-option' class to the clicked task
+                taskName.classList.add('selected-option');
+
+                // Display task info
+                displayTaskInfo([student.id, student.nickname], task);
+            });
+
+            // Task status circle
+            const taskCircle = document.createElement('div');
+            taskCircle.classList.add('student-list-task-indicatior');
+            taskCircle.style.backgroundColor = task.status ? greenCircleColorCode : redCircleColorCode;
+
+            // Append elements to task wrapper
+            taskWrapper.appendChild(taskCheckbox);
+            taskName.appendChild(taskCircle);
+            taskWrapper.appendChild(taskName);
+
+            // Append task to tasks container
+            tasksContainer.appendChild(taskWrapper);
+        }
+        });
+
+        // Append elements to student element
+        studentElement.appendChild(studentCheckbox);
+        studentElement.appendChild(studentName);
+
+        const outerStudentListItem = document.createElement('div');
+        outerStudentListItem.classList.add('outer-student-list-entry-item');
+        outerStudentListItem.appendChild(studentElement);
+        outerStudentListItem.appendChild(tasksContainer);
+
+        // Append student element to main list
+        listContainer.appendChild(outerStudentListItem);
+    });
+
+    studentListDiv.appendChild(listContainer);
+
+    if (deletingTask) {  
+        document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+        checkbox.style.visibility = "visible";
+        checkbox.disabled = false;
+        });
+    }
+}
+
+
+
+        function toggleTaskVisibility() {
+            taskContainerVisible = !taskContainerVisible;
+            if (taskContainerVisible) {
+                document.querySelectorAll('.task-container').forEach(container => {
+                    container.style.display = 'block';
+                });
+            } else {
+                document.querySelectorAll('.task-container').forEach(container => {
+                    container.style.display = 'none';
+                });
+            }
+        }
+
+        function changeTeacherToggle () {
+            changingTeacher = !changingTeacher;
+            if (changingTeacher) {
+                changeTeacherInput.style.display = "block";
+                changeTeacherButton.style.display = "block";
+                teacherName.style.display = "none";
+                changeTeacherToggleButton.innerHTML = "Cancel"
+            } else {
+                changeTeacherInput.style.display = "none";
+                changeTeacherButton.style.display = "none";
+                teacherName.style.display = "block";
+                changeTeacherToggleButton.innerHTML = "Change Teacher"   
+            }
+        }
+
+
+        function renderDataForStudents() {
+        langMessageForStudents.innerHTML = '';
+        if (userData.teacher === '') {
+            addTeacherInput.style.display = "block";
+            addTeacherButton.style.display = "block";
+            changeTeacherToggleButton.style.display = "none"
+        } else {
+            teacherName.innerHTML = `Teacher ${userData.teacher}`
+        }
+
+            tasksList.forEach((task, taskIndex) => {
+                if (JSON.parse(task.taskInstructions)[0] === "math") {
+                const taskWrapper = document.createElement('li');
+                taskWrapper.classList.add('task-li-item');
+                taskWrapper.classList.add('task-li-item-for-students');
+
+                // Task checkbox
+                const taskCheckbox = document.createElement('input');
+                taskCheckbox.type = 'checkbox';
+                taskCheckbox.id = `task-${task.assignmentId}`;
+                taskCheckbox.value = task.assignmentId;
+                taskCheckbox.classList.add('task-checkbox');
+                taskCheckbox.style.visibility = "hidden";
+                taskCheckbox.disabled = true;
+
+                // Task label with numbering
+                const taskName = document.createElement('div');
+                taskName.innerHTML = `${taskIndex + 1}. ${task.group}`;
+                taskName.style.cursor = 'pointer';
+                taskName.classList.add('task-name');
+                taskName.classList.add('selection-option');
+                taskName.addEventListener('click', () => {
+                    // Remove 'selected-option' class from all task names
+                    document.querySelectorAll('.selection-option').forEach(task => {
+                        task.classList.remove('selected-option');
+                    });
+
+                    // Add 'selected-option' class to the clicked task
+                    taskName.classList.add('selected-option');
+
+                    // Display task info
+                    displayStudentTaskInfo(task);
+                });
+
+                // Task status circle
+                const taskCircle = document.createElement('div');
+                taskCircle.classList.add('student-list-task-indicatior');
+                taskCircle.style.backgroundColor = task.status ? greenCircleColorCode : redCircleColorCode;
+
+                // Append elements to task wrapper
+                //taskWrapper.appendChild(taskCheckbox);
+                taskName.appendChild(taskCircle);
+                taskWrapper.appendChild(taskName);
+
+                // Append task to tasks container
+                studentTasksList.appendChild(taskWrapper);
+            }
+            });
+
+            const totalTasks = tasksList.length;
+            const completedTasks = tasksList.filter(task => task.status === true).length;
+            
+            function hasLangTask(studentTasks) {
+                return studentTasks.some(task => {
+                    try {
+                        const taskDesc = JSON.parse(task.taskInstructions);
+                        return taskDesc[0] === "lang";
+                    } catch (e) {
+                        return false;
+                    }
+                });
+            }
+
+            if (hasLangTask(tasksList)) {
+                langMessageForStudents.innerHTML = "You have tasks to practice Lithuanian language. Please switch to the Lithuanian version of the website to view the tasks."
+            }
+            if (totalTasks.length === 0) {
+                taskListTitleForStudents.innerHTML = "Tasks:"
+            } else {
+                taskListTitleForStudents.innerHTML = `Tasks (completed ${completedTasks}/${totalTasks}):`
+            }
+        }
+
+        //const apiBase = 'https://sudedu-server.onrender.com/'
+        const apiBase = 'http://localhost:5000/'
+
+        async function fetchDataForTeachers() {
+            let success = false;
+            teacherMessageLine.innerHTML = "The student and task data are being retrieved from the database. This might take a few minutes."
+            newTaskButton.disabled = true
+            deleteTaskButton.disabled = true
+            deleteStudentButton.disabled = true
+            try {
+                const response = await fetch(apiBase + 'students', {
+                    method: 'GET',
+                    headers: { 'Authorization': userData.token }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                studentList = await response.json();
+                success = true;
+                populateTaskGroupDropdown();
+                renderDataForTeachers();
+            } catch (error) {
+                console.log('Error fetching data:', error);
+                teacherMessageLine.innerHTML = "Database not accessible. Please try again later."
+            }
+            if (success) {
+                teacherMessageLine.innerHTML = ""
+            }
+            newTaskButton.disabled = false
+            deleteTaskButton.disabled = false
+            deleteStudentButton.disabled = false
+        }
+
+
+        async function fetchDataForStudents() {
+            let success = false;
+            studentMessage.innerHTML = 'Tasks are being retrieved from the database. This might take a few minutes.'
+            try {
+                const response = await fetch(apiBase + 'tasks', {
+                    method: 'GET',
+                    headers: { 'Authorization': userData.token }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                tasksList = await response.json();
+                success = true;
+                renderDataForStudents();
+
+            } catch (error) {
+                console.log('Error fetching tasks:', error);
+                studentMessage.innerHTML = 'Database not accessible. Please try again later.';
+            }
+            if (success) {
+                studentMessage.innerHTML = ""
+            }
+        }
+    
+
+    function toggleAddNewTask() {
+        addingNewTask = !addingNewTask
+        toggleStudentListLabel();
+        const dropdown = document.getElementById("task-group-sorting");
+        if (addingNewTask) {
+            clearTeacherMessage();
+            // Set the selected option to "All task groups"
+            dropdown.value = "All task groups";
+            // Manually trigger the change event
+            dropdown.dispatchEvent(new Event("change"));
+            dropdown.disabled = true;
+
+            toggleTaskVisibility();
+            studentTaskInfoContainer.style.display = 'none'; 
+            document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+            checkbox.style.visibility = 'visible';
+
+            const taskGroup = document.querySelector('#task-group-sorting');
+            const groupName = document.querySelector('#group_name');
+
+            if (taskGroup && groupName) {
+                groupName.style.height = `${taskGroup.offsetHeight}px`;
+            }
+        });
+            newTaskButton.innerText = 'Cancel New Task';
+            newTaskOptions.style.display = 'block';
+            deleteTaskButton.disabled = true;
+            deleteStudentButton.disabled = true;
+            document.querySelectorAll('.selection-option').forEach(element => {
+                element.classList.add('temp-disabled');
+            });
+            
+        } else {
+            toggleTaskVisibility();
+            studentTaskInfoContainer.style.display = 'block'; 
+            document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+            checkbox.style.visibility = 'hidden';
+            checkbox.checked = false;
+        });
+            newTaskButton.innerText = 'New Task';
+            newTaskOptions.style.display = 'none';
+            deleteTaskButton.disabled = false;
+            deleteStudentButton.disabled = false;
+            dropdown.disabled = false;
+            document.querySelectorAll('.selection-option').forEach(element => {
+                element.classList.remove('temp-disabled');
+            });
+        }
+    }
+
+    function toggleDeleteTask() {
+        deletingTask = !deletingTask
+        toggleStudentListLabel();
+        if (deletingTask) {
+            clearTeacherMessage();
+            confirmDeleteTaskButton.style.display = "block";       
+            document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+            checkbox.style.visibility = "visible";
+            checkbox.disabled = false;
+        });
+            deleteTaskButton.innerText = 'Cancel Task Deletion';
+            newTaskButton.disabled = true;
+            deleteStudentButton.disabled = true;
+        } else {
+            confirmDeleteTaskButton.style.display = "none";   
+            document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+            checkbox.style.visibility = "hidden";
+            checkbox.checked = false;
+            checkbox.disabled = true;
+        });
+            deleteTaskButton.innerText = 'Delete Tasks';
+            newTaskButton.disabled = false;
+            deleteStudentButton.disabled = false;
+        }
+    }
+
+    function deleteSelectedTasks() {
+        let tasksToRemove = [];
+        document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+            if (checkbox.checked) {
+                tasksToRemove.push(parseInt(checkbox.value));
+            }
+        });
+
+        if (tasksToRemove.length === 0) {
+            teacherMessageLine.innerHTML = "Please select at least one task for removal!"
+            return
+        }
+
+        deleteTasks(tasksToRemove)
+    }
+
+    async function deleteAllTasks() {
+        try {
+                const response = await fetch(apiBase + 'tasks', {
+                    method: 'GET',
+                    headers: { 'Authorization': userData.token }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const allStudentsTasks = await response.json();
+                const assignmentIds = allStudentsTasks.map(task => task.assignmentId);
+                deleteTasks(assignmentIds)
+                
+            } catch (error) {
+                console.log('Error fetching tasks:', error);
+                alert('Database not accessible. Please try again later.');
+            }
+    }
+
+
+    async function deleteTasks(tasksToRemove) {
+
+        try {
+            // Prepare the list of tasks to delete (assuming tasksToTemove is already populated)
+            const tasksToDelete = tasksToRemove;  // Ensure this array holds task IDs to be deleted
+
+            deleteTaskButton.disabled = true
+            confirmDeleteTaskButton.innerHTML = "Deleting..."
+            confirmDeleteTaskButton.disabled = true
+            disableTeacherControlPannel()
+            const response = await fetch(apiBase + 'tasks', {
+                method: 'DELETE',  // Change to DELETE method
+                headers: {
+                    'Authorization': userData.token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ tasks: tasksToDelete })  // Send the list as JSON in the body
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            // Optionally, handle the response if needed (e.g., confirm deletion or update the UI)
+            const result = await response.json();
+            if (result.message === "Tasks and their associated assignments deleted successfully.") {
+                teacherMessageLine.innerHTML = "Užduotys pašalintos sėkmingai!"
+                fetchDataForTeachers()
+            } else if (result.message === "An error occurred while deleting tasks.") {
+                teacherMessageLine.innerHTML = "Nepavyko pašalinti užduočių. Bandykite vėl vėliau."
+            }
+
+        } catch (error) {
+            console.log('Error deleting tasks:', error);
+            teacherMessageLine.innerHTML = "Nepavyko pašalinti užduočių. Bandykite vėl vėliau."
+        } finally {
+            deleteTaskButton.disabled = false
+            confirmDeleteTaskButton.disabled = false
+            enableTeacherControlPannel();
+            confirmDeleteTaskButton.innerHTML = "Delete Tasks"
+            clearTaskInfoContainer();
+            toggleDeleteTask()
+        }
+    }
+    
+    async function setTask() {
+        function removeError(element) { 
+            element.classList.remove('invalid-submition'); 
+        };
+
+        const selectedStudents = Array.from(document.querySelectorAll('.student-checkbox'))
+            .filter(checkbox => checkbox.checked)
+            .map(checkbox => parseInt(checkbox.value))
+
+        if (selectedStudents.length === 0) {
+            teacherMessageLine2.innerHTML = "Please select at least one student!"
+            clearTimeout(timeoutReference);
+            submitNewTaskButton.classList.add('invalid-submition')
+            var timeoutReference = setTimeout(function() {
+                removeError(submitNewTaskButton);
+            }, 500);
+            return
+        }
+
+        const groupName = document.getElementById('group_name').value.trim();
+        let modeChoice1 = document.getElementById('mode_choice_1').value
+        let modeChoice2 = document.getElementById('mode_choice_2').value
+        let modeChoice3 = document.getElementById('mode_choice_3').value
+        const modeChoice4 = document.getElementById('mode_choice_4').value
+        let modeChoice5 = document.getElementById('mode_choice_5').value
+        const modeChoice6 = document.getElementById('mode_choice_6').value
+        const modeChoice7 = document.getElementById('mode_choice_7').value
+        const timerInput = document.getElementById('timer-input-teacher').value
+        const questionNumberInput = document.getElementById('question-number-input').value
+        const remainderInput = document.getElementById('remainder-input').checked
+        const modeChoice14 = document.getElementById('mode_choice_14').value
+
+        const selectedNumberElement = document.querySelector('#selected_number');
+        const selectedNumber2Element = document.querySelector('#selected_number_2');
+        let selectedNumbers = [selectedNumberElement.value, selectedNumber2Element.value].sort();
+
+        const mode = 'math';
+
+        if (groupName.length === 0) {
+            teacherMessageLine2.innerHTML = "Type in the group name!"
+            clearTimeout(timeoutReference);
+            submitNewTaskButton.classList.add('invalid-submition')
+            var timeoutReference = setTimeout(function() {
+                removeError(submitNewTaskButton);
+            }, 500);
+            return
+        } else if (groupName.length >= 60) {
+            teacherMessageLine2.innerHTML = "The maximum group name character number is 60."
+            clearTimeout(timeoutReference);
+            submitNewTaskButton.classList.add('invalid-submition')
+            var timeoutReference = setTimeout(function() {
+                removeError(submitNewTaskButton);
+            }, 500);
+            return
+        }
+
+        let modeChoice3Processed;
+        if (modeChoice3 === "C37") {
+            modeChoice3Processed = true;
+			} else if (modeChoice3 === "C38") {
+				modeChoice3Processed = false;
+			}
+
+        let durationType;
+        if (modeChoice4 === "C39") {
+            durationType = timerInput;
+        } else if (modeChoice4 === "C40") {
+            durationType = questionNumberInput;
+        }
+
+        task = [
+            mode, modeChoice1, modeChoice2, modeChoice3Processed, modeChoice4, 
+            modeChoice5, modeChoice6, modeChoice7, selectedNumbers, 
+            remainderInput, durationType, modeChoice14
+        ];
+    
+
+        const normalizedTask = JSON.stringify(task);
+
+        const taskData = {
+            students: selectedStudents,
+            group_name: groupName,
+            task: normalizedTask
+        }
+
+        submitNewTaskButton.innerHTML = "Assigning..."
+        submitNewTaskButton.disabled = true
+        disableNewTaskContainer();
+        disableTeacherControlPannel();
+        try {
+        const response = await fetch(apiBase + 'tasks', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': userData.token
+            },
+            body: JSON.stringify(taskData)
+        });
+
+        // First parse the response as JSON
+        const responseData = await response.json();
+
+        if (responseData.message === 'Task set successfully') {
+            teacherMessageLine.innerHTML = 'Task successfully added!'
+            toggleAddNewTask();
+            fetchDataForTeachers()
+        } else if (responseData.message === 'Some students already have the maximum allowed tasks per student.') {
+            clearTimeout(timeoutReference);
+            submitNewTaskButton.classList.add('invalid-submition')
+            var timeoutReference = setTimeout(function() {
+                removeError(submitNewTaskButton);
+            }, 500);
+            teacherMessageLine2.innerHTML = 'Some students already have the maximum allowed tasks (2) per student. Delete old tasks to add new ones.'
+        } else {
+            clearTimeout(timeoutReference);
+            submitNewTaskButton.classList.add('invalid-submition')
+            var timeoutReference = setTimeout(function() {
+                removeError(submitNewTaskButton);
+            }, 500);
+            teacherMessageLine2.innerHTML = 'Task assignment failed. Try again later.'
+        }
+        } catch (error) {
+            clearTimeout(timeoutReference);
+            submitNewTaskButton.classList.add('invalid-submition')
+            var timeoutReference = setTimeout(function() {
+                removeError(submitNewTaskButton);
+            }, 500);
+            teacherMessageLine2.innerHTML = 'Task assignment failed. Try again later.';
+        } finally {
+            newTaskButton.disabled = false
+            enableTeacherControlPannel();
+            enableNewTaskContainer();
+            submitNewTaskButton.innerHTML = "Assign";
+        }
+    }
+
+
+    function completeTask() {
+        const parsedCurrentTaskInstructions = JSON.parse(currentTaskInstructions);
+
+        if (localStorage.getItem('controller') !== null) {
+				controller = JSON.parse(localStorage.getItem('controller'))
+			}
+
+			var checkbox = document.getElementById("remainder-input");
+
+            controller.language = "EN";
+            if (parsedCurrentTaskInstructions[0] === "math") {
+                controller.mode = 'math';
+                controller.modeChoice1 = parsedCurrentTaskInstructions[1];
+                controller.modeChoice2 = parsedCurrentTaskInstructions[2];
+                controller.selectedNumbers = parsedCurrentTaskInstructions[8];
+                controller.withRemainder = parsedCurrentTaskInstructions[9];
+                controller.modeChoice3 = parsedCurrentTaskInstructions[3];
+                controller.modeChoice4 = parsedCurrentTaskInstructions[4];
+                controller.modeChoice5 = parsedCurrentTaskInstructions[5];
+                controller.modeChoice6 = parsedCurrentTaskInstructions[6];
+                controller.modeChoice7 = parsedCurrentTaskInstructions[7];
+                controller.taskId = currentTaskId;
+                controller.taskCompleted = false;
+                controller.setTaskDuration = parsedCurrentTaskInstructions[10];
+                controller.modeChoice8 = parsedCurrentTaskInstructions[11];
+            }
+
+			localStorage.setItem('controller', JSON.stringify(controller))
+
+            startQuestions();
+    }
+
+    if (userData) {
+        if (userData.accType === 'teacher') {
+            teacherGUI.style.display = 'flex';
+            fetchDataForTeachers();
+        } else if (userData.accType === 'student') {
+            studentGUI.style.display = 'flex';
+            fetchDataForStudents();
+        } else if (userData.accType === 'admin') {
+            adminGUI.style.display = 'flex';
+        }
+    }
+
+    const studentDetailsForTeachersDiv = document.querySelector('#student-details-for-teachers');
+    const studentTaskInfoInnerContainer = document.querySelector('#student-task-info-container-inner');
+
+    if (studentDetailsForTeachersDiv && studentTaskInfoInnerContainer) {
+        studentTaskInfoInnerContainer.style.minHeight = `${studentDetailsForTeachersDiv.offsetHeight}px`;
+    }
+
+    const studentTaskListOuterContainer = document.querySelector('#student-tasks-list-outer-container');
+
+    if (studentTaskListOuterContainer && dynamicStudentContent) {
+        dynamicStudentContent.style.minHeight = `${studentTaskListOuterContainer.offsetHeight}px`;
+    }
+
+    async function deleteUser() {
+    const usernameInput = document.getElementById('admin-remove-user-input');
+    const username = usernameInput.value.trim();
+    
+    if (!username) {
+        alert('Please enter a username');
+        return;
+    }
+    
+    try {
+        // 1. Verify current user is admin
+        if (userData.accType !== 'admin') {
+            alert('Only admin accounts can delete users');
+            return;
+        }
+
+        // 2. Get target user info
+        const userResponse = await fetch(`${apiBase}auth/?username=${encodeURIComponent(username)}`, {
+            headers: {
+                'Authorization': userData.token
+            }
+        });
+        
+        const userInfo = await userResponse.json();
+        
+        if (!userInfo.id) {
+            alert('User not found');
+            return;
+        }
+
+        // 3. Delete user's task assignments
+        if (userInfo.assignmentIds?.length > 0) {
+            await deleteTasks(userInfo.assignmentIds);
+        }
+
+        // 4. Delete user and all associations
+        const deleteResponse = await fetch(`${apiBase}auth/${userInfo.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': userData.token
+            }
+        });
+
+        if (!deleteResponse.ok) {
+            throw new Error(deleteResponse.status === 403 
+                ? 'Admin privileges required' 
+                : 'Failed to delete user');
+        }
+
+        alert('User deleted successfully');
+        usernameInput.value = '';
+    } catch (error) {
+        console.error('Deletion error:', error);
+        alert(`Error: ${error.message}`);
+    }
+}
+
+function toggleTimeAmountInputs () {
+    if (document.getElementById('mode_choice_4').value === "C39") {
+        document.getElementById('timer-input-div').style.display = 'flex';
+        document.getElementById('question-number-input-div').style.display = 'none';
+    } else if (document.getElementById('mode_choice_4').value === "C40") {
+        document.getElementById('timer-input-div').style.display = 'none';
+        document.getElementById('question-number-input-div').style.display = 'flex';
+    }
+}
+document.querySelector('#mode_choice_4').addEventListener('change', toggleTimeAmountInputs);
+
+
+questionNumberInputElementTeacher.addEventListener("input", function(event) {
+    if (parseInt(questionNumberInputElementTeacher.value) === 1) {
+        answerNumberLabelTeacher.innerHTML = 'equation';
+    } else if (parseInt(questionNumberInputElementTeacher.value) > 1) {
+        answerNumberLabelTeacher.innerHTML = 'equations';
+    }
+})
+
+async function deleteInactiveUsers() {
+    const inactivePeriod = document.getElementById('inactivePeriod').value;
+    const statusElement = document.getElementById('statusMessage');
+    statusElement.innerHTML = ''; // Clear previous messages
+    
+    try {
+        // Validate admin access
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        if (userData?.accType !== 'admin') {
+            statusElement.innerHTML = '<span class="error">Only admin accounts can delete users</span>';
+            return;
+        }
+
+        // Validate input
+        if (!inactivePeriod || isNaN(inactivePeriod)) {
+            statusElement.innerHTML = '<span class="error">Please enter a valid number of days</span>';
+            return;
+        }
+
+        // Make API request
+        const response = await fetch(`${apiBase}admin/inactive?inactivePeriod=${encodeURIComponent(inactivePeriod)}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': userData.token,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const responseData = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(responseData.message || 'Failed to delete inactive users');
+        }
+
+        // Display success message with count and threshold
+        statusElement.innerHTML = `
+            <span class="success">${responseData.message}</span><br>
+            <span class="info">Deleted ${responseData.deletedCount || 0} users inactive for more than ${responseData.inactiveThresholdDays} days</span>
+        `;
+        
+    } catch (error) {
+        // Handle different error cases
+        let errorMessage = error.message;
+        
+        if (error.message.includes('No inactive users found')) {
+            errorMessage = `No users found inactive for ${inactivePeriod} days`;
+        } else if (error.message.includes('Failed to fetch')) {
+            errorMessage = 'Network error - please check your connection';
+        }
+
+        statusElement.innerHTML = `<span class="error">${errorMessage}</span>`;
+        console.error('Delete inactive users error:', error);
+    }
+}
+
+function disableTeacherControlPannel() {
+    const parentDiv = document.getElementById('student-details-for-teachers');
+    const children = parentDiv.querySelectorAll('button, input, select, textarea');  // Add more form elements if needed
+    children.forEach(child => child.disabled = true);
+}
+
+function enableTeacherControlPannel() {
+    const parentDiv = document.getElementById('student-details-for-teachers');
+    const children = parentDiv.querySelectorAll('button, input, select, textarea');
+    children.forEach(child => child.disabled = false);
+}
+
+function disableNewTaskContainer() {
+    const parentDiv = document.getElementById('new-task-options-container');
+    const children = parentDiv.querySelectorAll('button, input, select, textarea');  // Add more form elements if needed
+    children.forEach(child => child.disabled = true);
+}
+
+function enableNewTaskContainer() {
+    const parentDiv = document.getElementById('new-task-options-container');
+    const children = parentDiv.querySelectorAll('button, input, select, textarea');
+    children.forEach(child => child.disabled = false);
+}
+	</script>
+</body>
+
+</html>
