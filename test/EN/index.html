@@ -262,6 +262,43 @@
 	controller = JSON.parse(localStorage.getItem('controller'));
 	controller.language = "EN";
 }
+
+function submitSelection() {
+    if (localStorage.getItem('controller') !== null) {
+        controller = JSON.parse(localStorage.getItem('controller'))
+    }
+    modeChoice1Selection = modeChoiceElement1.value;
+    modeChoice2Selection = modeChoice2Element.value;
+    selectedNumbers = [selectedNumberElement.value, selectedNumber2Element.value].sort();
+    modeChoice3Selection = modeChoice3Element.value;
+    modeChoice5Selection = modeChoice5Element.value;
+    modeChoice6Selection = modeChoice6Element.value;
+    modeChoice7Selection = modeChoice7Element.value;
+    modeChoice8Selection = modeChoice14Element.value;
+
+    var checkbox = document.getElementById("remainder-input");
+
+    controller.language = "EN";
+    controller.mode = 'math';
+    controller.modeChoice1 = modeChoice1Selection;
+    controller.modeChoice2 = modeChoice2Selection;
+    controller.selectedNumbers = selectedNumbers;
+    controller.withRemainder = checkbox.checked;
+    if (modeChoice3Selection === "C37") {
+        controller.modeChoice3 = true;
+    } else if (modeChoice3Selection === "C38") {
+        controller.modeChoice3 = false;
+    }
+    controller.modeChoice5 = modeChoice5Selection;
+    controller.modeChoice6 = modeChoice6Selection;
+    controller.modeChoice7 = modeChoice7Selection;
+    controller.modeChoice8 = modeChoice8Selection;
+    controller.result = ['', '', '', '', '']
+	controller.taskId = 0;
+
+    localStorage.setItem('controller', JSON.stringify(controller))
+    redirectToIntermediate()
+}
 	</script>
 </body>
 

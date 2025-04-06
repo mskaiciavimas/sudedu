@@ -236,9 +236,9 @@ function updateModeChoice2() {
         modeChoice2Element.innerHTML += '<option value="C31">IKI 10</option>';
         modeChoice2Element.innerHTML += '<option value="C32">IKI 20</option>';
         modeChoice2Element.innerHTML += '<option value="C33">IKI 100</option>';
-        modeChoice2Element.innerHTML += '<option value="C34">IKI 1,000</option>';
-        modeChoice2Element.innerHTML += '<option value="C35">IKI 10,000</option>';
-        modeChoice2Element.innerHTML += '<option value="C36">IKI 1,000,000</option>';
+        modeChoice2Element.innerHTML += '<option value="C34">IKI 1 000</option>';
+        modeChoice2Element.innerHTML += '<option value="C35">IKI 10 000</option>';
+        modeChoice2Element.innerHTML += '<option value="C36">IKI 1 000 000</option>';
         modeChoice6Element.innerHTML += '<option value="C45">NEŽINOMAS DĖMUO/TURINYS/ATĖMINYS/DAUGINAMASIS/DALINYS/DALIKLIS</option>';
     }
 }

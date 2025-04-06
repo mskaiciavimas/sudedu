@@ -23,46 +23,6 @@ const resetButtonElement = document.querySelector('.reset-button');
     let timerLabelElement = document.querySelector('.timer-label');
 
 		const linkElement = document.querySelector("#questionsStyleSheet");
-
-		setTimerElement.addEventListener('click', function(event) {
-			controller = JSON.parse(localStorage.getItem('controller'));
-			controller.modeChoice4 = "C39";
-			localStorage.setItem('controller', JSON.stringify(controller));
-      modeChoice4DIv.style.display = "none";
-			timerInputDivElement.style.display = "flex";
-			startQuestionsButtonElement.style.display = "flex";
-      equationAnswerDivElement.style.display = "none";
-		});
-
-		setQuestionNumberElement.addEventListener('click', function(event) {
-			controller = JSON.parse(localStorage.getItem('controller'));
-			controller.modeChoice4 = "C40";
-			localStorage.setItem('controller', JSON.stringify(controller));
-      modeChoice4DIv.style.display = "none";
-			questionNumberInputElement.style.display = "flex";
-      questionNumberDivElement.style.display = "flex";
-      equationAnswerDivElement.style.display = "none";
-      startQuestionsButtonElement.style.display = "flex";
-
-      if (controller.mode === "lang") {
-        if (controller.modeChoice1 === "C49") {
-          questionNumberSectionTitle.innerHTML = "SUDĖLIOTI";
-          questionNumberInputElement.value = 5
-          answerNumberLabelElement.innerHTML = 'tekstus';
-        } else if (controller.modeChoice1 === "C50") {
-          questionNumberInputElement.value = 20;
-          answerNumberLabelElement.innerHTML = 'sakinių';
-        }
-            
-        } else {
-          questionNumberSectionTitle.innerHTML = "ATLIKTI";
-          questionNumberInputElement.value = 20;
-          answerNumberLabelElement.innerHTML = 'veiksmų';
-        } 
-		});
-
-		startQuestionsButtonElement.addEventListener('click', startQuestions)
-    
     
     function startQuestions () {
       controller = JSON.parse(localStorage.getItem('controller'));
@@ -73,7 +33,6 @@ const resetButtonElement = document.querySelector('.reset-button');
         }
     };
 
-    
       function startQuestionsTimer () {
 			controller = JSON.parse(localStorage.getItem('controller'));
       if (controller.taskId !== 0) {
@@ -144,54 +103,9 @@ const resetButtonElement = document.querySelector('.reset-button');
 
 		}
 
-    timerInputElement.addEventListener("input", function(event) {
-      if (parseInt(timerInputElement.value) === 1 || parseInt(timerInputElement.value.slice(-1)[0]) === 1 && parseInt(timerInputElement.value) !== 11) {
-        timerLabelElement.innerHTML = 'minutę';
-      } else if ((parseInt(timerInputElement.value) > 1 && parseInt(timerInputElement.value) < 10) || (parseInt(timerInputElement.value) > 20 && parseInt(timerInputElement.value.slice(-1)[0]) !== 0)) {
-        timerLabelElement.innerHTML = 'minutes';
-      } else if (parseInt(timerInputElement.value) >= 10 ) {
-        timerLabelElement.innerHTML = 'minučių';
-      }
-    })
-
-
-    questionNumberInputElement.addEventListener("input", function(event) {
-      if (controller.mode === "lang") {
-        if (controller.modeChoice1 === "C49") {
-            if (parseInt(questionNumberInputElement.value) === 1 || parseInt(questionNumberInputElement.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElement.value) !== 11) {
-              answerNumberLabelElement.innerHTML = 'tekstą';
-            } else if ((parseInt(questionNumberInputElement.value) > 1 && parseInt(questionNumberInputElement.value) < 10) || (parseInt(questionNumberInputElement.value) > 20 && parseInt(questionNumberInputElement.value.slice(-1)[0]) !== 0))  {
-              answerNumberLabelElement.innerHTML = 'tekstus';
-            } else if (parseInt(questionNumberInputElement.value) >= 10) {
-              answerNumberLabelElement.innerHTML = 'tekstų';
-            }
-
-        } else if (controller.modeChoice1 === "C50") {
-            if (parseInt(questionNumberInputElement.value) === 1 || parseInt(questionNumberInputElement.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElement.value) !== 11) {
-              answerNumberLabelElement.innerHTML = 'sakinys';
-            } else if ((parseInt(questionNumberInputElement.value) > 1 && parseInt(questionNumberInputElement.value) < 10) || (parseInt(questionNumberInputElement.value) > 20 && parseInt(questionNumberInputElement.value.slice(-1)[0]) !== 0))  {
-              answerNumberLabelElement.innerHTML = 'sakiniai';
-            } else if (parseInt(questionNumberInputElement.value) >= 10) {
-              answerNumberLabelElement.innerHTML = 'sakinių';
-            }
-        }
-        } else if (parseInt(questionNumberInputElement.value) === 1 || parseInt(questionNumberInputElement.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElement.value) !== 11) {
-          answerNumberLabelElement.innerHTML = 'veiksmą';
-        } else if ((parseInt(questionNumberInputElement.value) > 1 && parseInt(questionNumberInputElement.value) < 10) || (parseInt(questionNumberInputElement.value) > 20 && parseInt(questionNumberInputElement.value.slice(-1)[0]) !== 0))  {
-          answerNumberLabelElement.innerHTML = 'veiksmus';
-        } else if (parseInt(questionNumberInputElement.value) >= 10) {
-          answerNumberLabelElement.innerHTML = 'veiksmų';
-        }
-    })
-
-
   // Get the input elements
   const timerInput = document.getElementById('timer-input');
   const questionNumberInput = document.getElementById('question-number-input');
-
-  // Add event listeners for input validation
-  timerInput.addEventListener('input', restrictInputToMinMax);
-  questionNumberInput.addEventListener('input', restrictInputToMinMax);
 
   // Function to restrict input to the defined min and max values
   function restrictInputToMinMax(event) {
@@ -210,16 +124,3 @@ const resetButtonElement = document.querySelector('.reset-button');
       answerNumberLabelElement.innerHTML = 'veiksmų';
     }
   }
-
-  // Handle keydown event to allow deleting fully with backspace
-  timerInput.addEventListener('keydown', function (event) {
-    if (event.key === 'Backspace') {
-      timerInput.value = ''; // Clear the input when backspace is pressed
-    }
-  });
-
-  questionNumberInput.addEventListener('keydown', function (event) {
-    if (event.key === 'Backspace') {
-      questionNumberInput.value = ''; // Clear the input when backspace is pressed
-    }
-  });

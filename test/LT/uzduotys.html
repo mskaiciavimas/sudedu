@@ -399,6 +399,14 @@
             text-decoration: underline;
             cursor: pointer;
             text-align: start;
+            color: #01937C;
+            background-color: transparent;
+            border: none;
+            padding: 0;
+        }
+
+        #change-teacher-toggle-button:disabled {
+            color: gray;
         }
 
         #add-change-teacher-buttons {
@@ -477,6 +485,19 @@
         #submit-new-taks-button {
             min-width: 150px;
             margin-top: 15px;
+        }
+
+        .btn:disabled {
+            background-color: #B6C867;
+            border-color: #B6C867;
+            color: black;
+            filter: grayscale(25%);
+        }
+
+        .dropdown:disabled {
+            filter: grayscale(25%);
+            background-color: #FAEDCD;
+            border-color: #6c757d;
         }
 
         .invalid-submition {
@@ -992,12 +1013,12 @@
                     <div class="col-md-6 col-12">
                         <div id="teacher-name"></div>
 
-                        <input id="add-teacher-input" type="text" placeholder="mokytojo ID" style="display: none;">
-                        <input id="change-teacher-input" type="text" placeholder="mokytojo ID" style="display: none;">
-                        <a onclick="changeTeacherToggle()" id="change-teacher-toggle-button">Keisti mokytoją</a>
+                        <input id="add-teacher-input" type="text" placeholder="mokytojo ID" style="display: none;" class="item-to-be-disabled-while-talking-to-server">
+                        <input id="change-teacher-input" type="text" placeholder="mokytojo ID" style="display: none;" class="item-to-be-disabled-while-talking-to-server">
+                        <button onclick="changeTeacherToggle()" id="change-teacher-toggle-button" class="item-to-be-disabled-while-talking-to-server">Keisti mokytoją</button>
                         <div id="add-change-teacher-buttons">
-                        <button id="add-teacher" class="btn btn-primary" onclick="addTeacher()" style="display: none;">Pridėti mokytoją</button>
-                        <button id="change-teacher" class="btn btn-primary" onclick="changeTeacher()" style="display: none;">Keisti mokytoją</button>
+                        <button id="add-teacher" class="btn btn-primary item-to-be-disabled-while-talking-to-server" onclick="addTeacher()" style="display: none;">Pridėti mokytoją</button>
+                        <button id="change-teacher" class="btn btn-primary item-to-be-disabled-while-talking-to-server" onclick="changeTeacher()" style="display: none;">Keisti mokytoją</button>
                     </div>
                     </div>
                     <div class="col-md-6 col-12 d-flex justify-content-center align-items-center">
@@ -1066,6 +1087,12 @@
                 <input id="admin-remove-user-input" placeholder="user email">
                 <button id="admin-remove-user-button" onclick="deleteUser()" class="btn btn-primary" style="margin-top: 15px;">Remove user</button>
                 </div>
+                <div class="row d-flex flex-column justify-content-center align-items-center" style="width: 50%; min-width: 50%; margin-top: 100px;">
+                <h2>DELETE INACTIVE USERS</h2>
+                <input type="number" id="inactivePeriod" placeholder="period of inactivity (days)" min="1" />
+                <p id="statusMessage"></p>
+                <button onclick="deleteInactiveUsers()" class="btn btn-primary" style="margin-top: 15px;">Delete Inactive Users</button>
+            </div>
             </div>
 
             <div class="col-12 d-flex justify-content-end align-items-center">
@@ -1171,6 +1198,30 @@
         const taskListTitleForStudents = document.getElementById('task-list-title-for-students');
 
         const completeTaskButton = document.getElementById('complete-task-button');
+
+        enableTeacherControlPannel();
+        enableNewTaskContainer();
+        document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
+        confirmDeleteTaskButton.disabled = false;
+        submitNewTaskButton.disabled = false;
+        deleteStudentButton.disabled = false;
+        confirmDeleteStudentButton.disabled = false;
+        newTaskButton.disabled = false;
+        deleteTaskButton.disabled = false;
+        deleteStudentButton.disabled = false;
+
+
+        if (userData.teacher !== '' && userData.accType === "student") {
+            teacherName.innerHTML = `Mok. ${userData.teacher}`
+            addTeacherInput.style.display = "none";
+            addTeacherButton.style.display = "none";
+            changeTeacherToggleButton.style.display = "block"
+        } else {
+            addTeacherInput.style.display = "block";
+            addTeacherButton.style.display = "block";
+            changeTeacherToggleButton.style.display = "none"
+        }
+
 
     function changeQuestionNumberLabel () {
         if (document.getElementById('mode_choice').value === "kalba") {
@@ -1565,6 +1616,9 @@
 
             deleteStudentButton.disabled = true
             confirmDeleteStudentButton.innerHTML = "Trinama..."
+            confirmDeleteStudentButton.disabled = true;
+            disableTeacherControlPannel();
+
             
             deletingTask = true
             await deleteTasks(assignmentIds)
@@ -1599,6 +1653,8 @@
 
             } finally {
                 deleteStudentButton.disabled = false
+                confirmDeleteStudentButton.disabled = false;
+                enableTeacherControlPannel();
                 confirmDeleteStudentButton.innerHTML = "Šalinti mokinius"
                 showingSelectAllCheckbox = true;
                 toggleDeleteStudent() 
@@ -1611,6 +1667,9 @@
             const teacherId = addTeacherInput.value;
             if (!teacherId) return;
 
+            addTeacherButton.innerHTML = "Pridedama...";
+            document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = true);
+            disableTeacherControlPannel();
             try {
                 const response = await fetch(apiBase + 'students', {
                     method: 'POST',
@@ -1656,12 +1715,16 @@
                 console.log('Full error:', error);
                 studentMessage.innerHTML = "Įvyko klaida. Bandykite vėl vėliau."
             }
+            addTeacherButton.innerHTML = "Pridėti mokytoją";
+            document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
         }
 
         async function changeTeacher() {
             const teacherId = changeTeacherInput.value;
             if (!teacherId) return;
 
+            changeTeacherButton.innerHTML = "Keičiama..."
+            document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = true);   
             try {
                 const response = await fetch(apiBase + 'students', {
                     method: 'PUT',
@@ -1715,6 +1778,8 @@
                 console.log('Full error:', error);
                 studentMessage.innerHTML = "Įvyko klaida keičiant mokytoją. Bandykite vėl vėliau."
             }
+            changeTeacherButton.innerHTML = "Keisti mokytoją"
+            document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
         }
 
         function clearTaskInfoContainer() {
@@ -2078,12 +2143,6 @@
                     document.querySelector("#mistakes-summary-grammar-for-student").style.display = "none";
                 }
 
-
-
-
-
-
-
             mistakesList = JSON.parse(task.result)[1]
             if (mistakesList.length > 0) {
                 generateSummaryTable("custom", mistakesList, "summary-table-for-student") 
@@ -2388,6 +2447,11 @@
         const apiBase = 'http://localhost:5000/'
 
         async function fetchDataForTeachers() {
+            let success = false;
+            teacherMessageLine.innerHTML = "Mokinių ir užduočių informacija ieškoma duomenų bazėje. Procesas gali užtrukti kelias minutes."
+            newTaskButton.disabled = true
+            deleteTaskButton.disabled = true
+            deleteStudentButton.disabled = true
             try {
                 const response = await fetch(apiBase + 'students', {
                     method: 'GET',
@@ -2399,16 +2463,25 @@
                 }
 
                 studentList = await response.json();
+                success = true;
                 populateTaskGroupDropdown();
                 renderDataForTeachers();
             } catch (error) {
                 console.log('Error fetching data:', error);
                 teacherMessageLine.innerHTML = "Nepavyko pasiekti duomenų. Bandykite vėl vėliau."
             }
+            if (success) {
+                teacherMessageLine.innerHTML = ""
+            }
+            newTaskButton.disabled = false
+            deleteTaskButton.disabled = false
+            deleteStudentButton.disabled = false
         }
 
 
         async function fetchDataForStudents() {
+            let success = false;
+            studentMessage.innerHTML = 'Užduočių informacija ieškoma duomenų bazėje. Procesas gali užtrukti kelias minutes.'
             try {
                 const response = await fetch(apiBase + 'tasks', {
                     method: 'GET',
@@ -2420,11 +2493,15 @@
                 }
 
                 tasksList = await response.json();
+                success = true;
                 renderDataForStudents();
 
             } catch (error) {
                 console.log('Error fetching tasks:', error);
-                alert('Nepavyko pasiekti duomenų. Bandykite vėl vėliau.');
+                studentMessage.innerHTML = 'Nepavyko pasiekti duomenų. Bandykite vėl vėliau.'
+            }
+            if (success) {
+                studentMessage.innerHTML = ""
             }
         }
     
@@ -2551,6 +2628,8 @@
 
             deleteTaskButton.disabled = true
             confirmDeleteTaskButton.innerHTML = "Trinama..."
+            confirmDeleteTaskButton.disabled = true
+            disableTeacherControlPannel()
             const response = await fetch(apiBase + 'tasks', {
                 method: 'DELETE',  // Change to DELETE method
                 headers: {
@@ -2578,6 +2657,8 @@
             teacherMessageLine.innerHTML = "Nepavyko pašalinti užduočių. Bandykite vėl vėliau."
         } finally {
             deleteTaskButton.disabled = false
+            confirmDeleteTaskButton.disabled = false
+            enableTeacherControlPannel();
             confirmDeleteTaskButton.innerHTML = "Trinti užduotis"
             clearTaskInfoContainer();
             toggleDeleteTask()
@@ -2636,8 +2717,8 @@
                 removeError(submitNewTaskButton);
             }, 500);
             return
-        } else if (groupName.length > 20) {
-            teacherMessageLine2.innerHTML = "Maksimalus grupės pavadinimo ilgis yra 20 simbolių."
+        } else if (groupName.length >= 60) {
+            teacherMessageLine2.innerHTML = "Maksimalus grupės pavadinimo ilgis yra 60 simbolių."
             clearTimeout(timeoutReference);
             submitNewTaskButton.classList.add('invalid-submition')
             var timeoutReference = setTimeout(function() {
@@ -2725,6 +2806,9 @@
         }
 
         submitNewTaskButton.innerHTML = "Užduodama..."
+        newTaskButton.disabled = true
+        disableNewTaskContainer();
+        disableTeacherControlPannel();
         try {
         const response = await fetch(apiBase + 'tasks', {
             method: 'POST',
@@ -2765,6 +2849,9 @@
             }, 500);
             teacherMessageLine2.innerHTML = 'Nepavyko pridėti užduoties. Bandykite vėl vėliau.';
         } finally {
+            newTaskButton.disabled = false
+            enableTeacherControlPannel();
+            enableNewTaskContainer();
             submitNewTaskButton.innerHTML = "Užduoti";
         }
     }
@@ -2897,6 +2984,86 @@
         alert(`Error: ${error.message}`);
     }
 }
+
+async function deleteInactiveUsers() {
+    const inactivePeriod = document.getElementById('inactivePeriod').value;
+    const statusElement = document.getElementById('statusMessage');
+    statusElement.innerHTML = ''; // Clear previous messages
+    
+    try {
+        // Validate admin access
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        if (userData?.accType !== 'admin') {
+            statusElement.innerHTML = '<span class="error">Only admin accounts can delete users</span>';
+            return;
+        }
+
+        // Validate input
+        if (!inactivePeriod || isNaN(inactivePeriod)) {
+            statusElement.innerHTML = '<span class="error">Please enter a valid number of days</span>';
+            return;
+        }
+
+        // Make API request
+        const response = await fetch(`${apiBase}admin/inactive?inactivePeriod=${encodeURIComponent(inactivePeriod)}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': userData.token,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const responseData = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(responseData.message || 'Failed to delete inactive users');
+        }
+
+        // Display success message with count and threshold
+        statusElement.innerHTML = `
+            <span class="success">${responseData.message}</span><br>
+            <span class="info">Deleted ${responseData.deletedCount || 0} users inactive for more than ${responseData.inactiveThresholdDays} days</span>
+        `;
+        
+    } catch (error) {
+        // Handle different error cases
+        let errorMessage = error.message;
+        
+        if (error.message.includes('No inactive users found')) {
+            errorMessage = `No users found inactive for ${inactivePeriod} days`;
+        } else if (error.message.includes('Failed to fetch')) {
+            errorMessage = 'Network error - please check your connection';
+        }
+
+        statusElement.innerHTML = `<span class="error">${errorMessage}</span>`;
+        console.error('Delete inactive users error:', error);
+    }
+}
+
+function disableTeacherControlPannel() {
+    const parentDiv = document.getElementById('student-details-for-teachers');
+    const children = parentDiv.querySelectorAll('button, input, select, textarea');  // Add more form elements if needed
+    children.forEach(child => child.disabled = true);
+}
+
+function enableTeacherControlPannel() {
+    const parentDiv = document.getElementById('student-details-for-teachers');
+    const children = parentDiv.querySelectorAll('button, input, select, textarea');
+    children.forEach(child => child.disabled = false);
+}
+
+function disableNewTaskContainer() {
+    const parentDiv = document.getElementById('new-task-options-container');
+    const children = parentDiv.querySelectorAll('button, input, select, textarea');  // Add more form elements if needed
+    children.forEach(child => child.disabled = true);
+}
+
+function enableNewTaskContainer() {
+    const parentDiv = document.getElementById('new-task-options-container');
+    const children = parentDiv.querySelectorAll('button, input, select, textarea');
+    children.forEach(child => child.disabled = false);
+}
+
 
 	</script>
 </body>

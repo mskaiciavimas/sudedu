@@ -1520,11 +1520,6 @@ function redirectToIntermediate() {
     window.location.href = "./";
   }
 
-  function redirectToOuterIndex() {
-    localStorage.setItem('controller', JSON.stringify(controller))
-    window.location.href = "../";
-  }
-
   function redirectToSummary () {
     window.location.href = "./klaidos.html";
   }

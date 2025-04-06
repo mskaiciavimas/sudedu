@@ -86,7 +86,7 @@ localStorage.removeItem("startTime");
     }
     localStorage.setItem('controller', JSON.stringify(controller));
     console.log(controller)
-redirectToQuestions();
+    redirectToQuestions();
 
 }
 

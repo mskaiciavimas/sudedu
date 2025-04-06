@@ -222,9 +222,10 @@ document.querySelectorAll('.control').forEach(control => {
 						controller.modeChoice2 === "C29" ||
 						controller.modeChoice2 === "C20" ||
 						controller.modeChoice2 === "C21" ||
-					        controller.modeChoice2 === "C23" ||
+					    controller.modeChoice2 === "C23" ||
 						controller.modeChoice2 === "C24" ||
 						controller.modeChoice2 === "C25" ||
+						controller.modeChoice2 === "C26" ||
 						controller.modeChoice2 === "C27" ||
 						controller.modeChoice2 === "C16"
 					) {
@@ -248,7 +249,6 @@ document.querySelectorAll('.control').forEach(control => {
     document.querySelector('#template-container').removeAttribute('hidden');
     controller = JSON.parse(localStorage.getItem('controller'));
     
-	console.log(controller)
 	if (!controller.questionsStopped) {
     if (controller.modeChoice4 === "C39") {
         countDown();
@@ -402,7 +402,6 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 			contentContainerElement.style.paddingRight = 0 + 'px';
 
 			if (controller.questionsStopped === true || controller.randomSelection[2] !== "D" || (controller.randomSelection[2] === "D" && controller.modeChoice8 === 'C79')) {
-				console.log("triggered")
 					contentContainerElement.style.width = 'auto';
 					var middleLineWidth = document.getElementById('middle-line').offsetWidth;
 					var contentContainerElementWidth = contentContainerElement.offsetWidth;
