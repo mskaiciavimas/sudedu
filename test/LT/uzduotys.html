@@ -600,7 +600,7 @@
             <span class="language-option language-option-LT selected" onclick="setLanguage('LT')">LT</span>
         </div>
         <div class="col-6 d-flex justify-content-end align-items-end" id="user-login-div">
-                    <a id="user-login-anchor" href="./prisijungimas.html" class="log-in">Prisijungti</a>
+                    <a id="user-login-anchor" href="/test/prisijungimas.html" class="log-in">Prisijungti</a>
 
                     <div id="loggedin-user-menu">
         <div class="profile">
@@ -614,8 +614,8 @@
         </div>
         <div class="menu">
             <ul>
-                <li><a href="index.html"><i class="ph-bold ph-user"></i>Pradžia</a></li>
-                <li><a href="/LT" onclick="clearUserData()"><i class="ph-bold ph-envelope-simple"></i>Atsijungti</a></li>
+                <li><a href="/test/index.html"><i class="ph-bold ph-user"></i>Pradžia</a></li>
+                <li><a href="/test/LT" onclick="clearUserData()"><i class="ph-bold ph-envelope-simple"></i>Atsijungti</a></li>
             </ul>
         </div>
                     </div>
@@ -1132,7 +1132,7 @@
         if (userDataString) {
             userData = JSON.parse(userDataString);
         } else {
-            window.location.href = '/LT';
+            window.location.href = '/test/LT';
         }
 
         let studentList;
@@ -2456,8 +2456,7 @@
 
 
 
-        //const apiBase = 'https://sudedu-server.onrender.com/'
-        const apiBase = 'http://localhost:5000/'
+        const apiBase = 'https://sudedu-server.onrender.com/'
 
         async function fetchDataForTeachers() {
             let success = false;
