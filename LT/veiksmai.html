@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title>sudEdu - Mintinis Skai&#x10D;iavimas</title>
+	<title>Mintinis Skai&#x10D;iavimas</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
 	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -52,13 +52,12 @@
 				<p class="previous-equation">
 			</div>
 			<div id='middle-line' class="row middle-line d-flex align-items-center justify-content-center justify-content: space-between;">
-				<div class="row" id="invisibleRow" style="display: none; height: 0;"></div>
+				<div class="row" id="invisibleRow" style="visibility: hidden; height: 0;"></div>
 				<div class="row" id="body-row" class="col12 d-flex justify-content-center align-items-center">
 					<div id='content-container' class="col12 d-flex justify-content-center align-items-center equation-and-answer">
 						<div id="equation-and-symbol">
 						<div id="arithmetic-symbol"></div>
 						<label id="equation" class="equation text-nowrap" for="answer-field"></label>
-						<div id="task-saving-message"></div>
 					</div>
 						<div id="answer-separator-1" style="display: none;"></div>
 							<div id="stulpeliu-div" class="d-flex justify-content-center align-items-center">
@@ -99,8 +98,14 @@
 				<div id="restart-reset-button-row" class="row justify-content-center align-items-center" style="display: none;">
 					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
 						<div id="reset-mistake-buttons" class="col-12 d-flex justify-content-center align-items-center">
+							<div class="col-6 d-flex justify-content-start align-items-center">
+								<div class="d-flex justify-content-start align-items-center restart-div">
+									<button class="btn btn-primary restart-button">Iš naujo</button>
+								</div>
 								<div id="fireworks-div" class="position-absolute image-container bottom-0 end-0 fireworks-div"></div>
-							<div class="col-12 d-flex position-relative justify-content-center align-items-center">
+							</div>
+
+							<div class="col-6 d-flex position-relative justify-content-end align-items-center">
 								<div class="d-flex justify-content-end align-items-center summary-div">
 									<button class="btn btn-primary summary-button">Klaidos</button>
 								</div>
@@ -115,8 +120,8 @@
 		<div class="row d-flex d-flex align-items-end justify-content-center stop-reset-button-div">
 			<div class="col-2">
 				<div class="stop-button-div">
-					<button id="stopButton" class="btn btn-primary stop-button"><span id="stop-button-span"
-						class="material-symbols-rounded">close</span></button>
+					<button id="stopButton" class="btn btn-primary stop-button"><span
+							class="material-symbols-rounded">close</span></button>
 				</div>
 			</div>
 			<div class="col-8"></div>
@@ -164,6 +169,9 @@ document.querySelectorAll('.control').forEach(control => {
 
 		const answerFieldDivElement = document.querySelector('.answer-field-div')
 
+		const restratButtonElement = document.querySelector('.restart-button');
+		restratButtonElement.addEventListener("click", restartEquations);
+
 		const resetButtonElement = document.querySelector('.reset-button');
 		resetButtonElement.addEventListener("click", redirectToIndex);
 
@@ -191,61 +199,57 @@ document.querySelectorAll('.control').forEach(control => {
 		let equation2Element = document.querySelector(".equation_2");
 
 		function stylePage () {
-		if (controller.modeChoice7 === "C48" && controller.randomSelection[2] !== 'D') {
+		if (controller.modeChoice7 === 'stulpeliu' && controller.randomSelection[2] !== 'division') {
 				linkElement.setAttribute("href", "../questions-stulpeliu.css");
 
-		} else if (controller.modeChoice7 === "C48" && controller.randomSelection[2] === 'D') {
+		} else if (controller.modeChoice7 === 'stulpeliu' && controller.randomSelection[2] === 'division') {
 				linkElement.setAttribute("href", "../questions-stulpeliu-div.css");
 
-		} else if (controller.modeChoice7 === "C48") {
+		} else if (controller.modeChoice7 === 'stulpeliu') {
 			linkElement.setAttribute("href", "../questions-stulpeliu.css");
 		} else if (controller.withRemainder) {
 						linkElement.setAttribute("href", "../questions-remainder.css");
 				} else {
-				if (controller.modeChoice2 === "C15" ||
-						controller.modeChoice2 === "C36"
+				if (controller.modeChoice2 === "mil" ||
+						controller.modeChoice2 === "iki1000000"
 					)	{
 						linkElement.setAttribute("href", "../questions-extra-small.css");
-				} else if (controller.modeChoice2 === "C13" || 
-						controller.modeChoice2 === "C14" || 
-						controller.modeChoice2 === "C34" || 
-						controller.modeChoice2 === "C35" || 
-						controller.modeChoice2 === "C28" || 
-						controller.modeChoice2 === "C77" ||
-						controller.modeChoice2 === "C29" ||
-						controller.modeChoice2 === "C20" ||
-						controller.modeChoice2 === "C21" ||
-					  	controller.modeChoice2 === "C23" ||
-						controller.modeChoice2 === "C24" ||
-						controller.modeChoice2 === "C25" ||
-						controller.modeChoice2 === "C26" ||
-						controller.modeChoice2 === "C27" ||
-						controller.modeChoice2 === "C16"
+				} else if (controller.modeChoice2 === "tukst" || 
+						controller.modeChoice2 === "dtukst" || 
+						controller.modeChoice2 === "iki1000" || 
+						controller.modeChoice2 === "iki10000" || 
+						controller.modeChoice2 === "pil10" || 
+						controller.modeChoice2 === "pil100" ||
+						controller.modeChoice2 === "daugtrivien" ||
+						controller.modeChoice2 === "daugketvien" ||
+					        controller.modeChoice2 === "daugdvidvi" ||
+						controller.modeChoice2 === "daugtridvi" ||
+						controller.modeChoice2 === "daugketdvi" ||
+						controller.modeChoice2 === "daugdaug" ||
+						controller.modeChoice2 === "gretnul"
 					) {
 						linkElement.setAttribute("href", "../questions-smaller.css");
 				} else {
 					linkElement.setAttribute("href", "../questions-bigger.css");
 				}
 		}
+		if (controller.questionsStopped) {
+			stopEquations();
+		}
 	}
 
 		window.onload = function () {
-			if (localStorage.getItem('controller') === null) {
+    if (localStorage.getItem('controller') === null) {
         window.location.href = "./";
-    } else {
-			controller = JSON.parse(localStorage.getItem('controller')) 
-			if (controller.mode !== "math" || controller.language !== "LT") {
-			window.location.href = "./";
-			}
-		}
+    }
     
     document.querySelector('#template-container').removeAttribute('hidden');
     controller = JSON.parse(localStorage.getItem('controller'));
     
 		if (!controller.questionsStopped) {
-    if (controller.modeChoice4 === "C39") {
+    if (controller.modeChoice4 === 'timer') {
         countDown();
-    } else if (controller.modeChoice4 === "C40") {
+    } else if (controller.modeChoice4 === 'questionNumber') {
         startTimer();
     }
 		}
@@ -259,11 +263,8 @@ document.querySelectorAll('.control').forEach(control => {
     } else {
 			resetMistakeButtonsElement.style.display = "flex";
         document.querySelector('.answer-field-div').style.display = "none";
-		const stopButtonSpanElement = document.querySelector('#stop-button-span');
-		stopButtonSpanElement.innerHTML = "refresh";
         timerDisplay.textContent = localStorage.getItem("elapsedTime");
     }
-	console.log(controller)
     stylePage();
 };
 
@@ -327,7 +328,7 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 		}
 
 		function isStulpeliu() {
-			if (controller.modeChoice7 === "C48") {
+			if (controller.modeChoice7 === 'stulpeliu') {
 				return true;
 			} else {
 				return false;
@@ -382,7 +383,7 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 		contentContainerElement.style.marginRight = 0 + 'px';
 		contentContainerElement.style.marginLeft = 0 + 'px';
 
-	if (controller.randomSelection[2] === 'M') {
+	if (controller.randomSelection[2] === 'multiplication') {
 		for (var i = 0; i < stulpeliuInput.length; i++) {
 			var stulpeliuInputElement = stulpeliuInput[i];
 			newWidth = equationElementWidth + oneRem*1.75 + 2;
@@ -442,9 +443,9 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 			positionContentContainer();
 		}
 
-	} else if (controller.randomSelection[2] === 'D') {
-		var dalinysElement = document.getElementById("dalinys");
-		var daliklisElement = document.getElementById("daliklis");
+	} else if (controller.randomSelection[2] === 'division') {
+		var dalinysElement = document.getElementById('dalinys');
+		var daliklisElemet = document.getElementById('daliklis');
 		var divisionResultDigits = (Math.floor(controller.randomSelection[0] / controller.randomSelection[1])).toString().length
 		var daliklisDigits = controller.randomSelection[1].toString().length
 		var dalinysElementWidth = dalinysElement.offsetWidth;
@@ -456,13 +457,14 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 		stulpeliu0.style.width = dalinysElementWidth + 10 + "px";
 		stulpeliu0.style.marginRight = 0 + 'px';
 
+		var daliklisElement = document.getElementById('daliklis');
 		var stulpeliu0 = document.getElementById('stulpeliu-0');
 		modifier = 0;
 		if ((Math.floor(controller.randomSelection[0] / controller.randomSelection[1])).toString().length < 2) {
 			modifier = 1;
 		}
 		element2.style.width = oneRem*1.75*(divisionResultDigits) + oneRem*1.75 + 4 + "px";
-		daliklisElement.style.width = oneRem*1.75*(divisionResultDigits) + oneRem*1.75 + "px";
+		daliklisElemet.style.width = oneRem*1.75*(divisionResultDigits) + oneRem*1.75 + "px";
 		element2.style.marginRight = oneRem*1.75*modifier + 4 + 'px';
 		answerSeparator2.style.marginRight = oneRem*1.75*modifier + 4 + 'px';
 		var daliklisElementWidth = daliklisElement.offsetWidth;
@@ -508,11 +510,11 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 
 			var answerSize = 0;
 			var marginSize = 0;
-			if (controller.randomSelection[2] === 'A') {
+			if (controller.randomSelection[2] === 'addition') {
 				answerSize = didDemAtTurWidth + oneRem*1.75 * 2;
 				marginSize = oneRem*1.75 + 3;
 				positionContentContainer();
-			} else if (controller.randomSelection[2] === 'S') {
+			} else if (controller.randomSelection[2] === 'subtraction') {
 				answerSize = didDemAtTurWidth + oneRem*1.75;
 				marginSize = 3;
 			}
@@ -524,7 +526,7 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 
 		}
 
-		if (controller.withRemainder && controller.randomSelection[2] === 'D') {
+		if (controller.withRemainder && controller.randomSelection[2] === 'division') {
     var liekElement = document.getElementById("liek");
     liekElement.style.visibility = "visible";
   }
@@ -534,10 +536,8 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 
 // Run the function when the page is loaded
 window.addEventListener('load', function() {
-	if (controller.questionsStopped) {
-		setFontSize();
-	}
-	if (controller.modeChoice7 === "C48") {
+
+	if (controller.modeChoice7 === 'stulpeliu') {
 		if (!controller.questionsStopped) {
     setTimeout(function() {
         setMargins();
@@ -552,19 +552,12 @@ window.addEventListener('resize', function() {
 	if (controller.questionsStopped) {
 	setFontSize();
 	}
-	if (controller.modeChoice7 === "C48") {
+	if (controller.modeChoice7 === 'stulpeliu') {
 		if (!controller.questionsStopped) {
         setMargins();
 	}
 }
 });
-
-window.addEventListener("beforeunload", () => {
-    controller.taskId = 0;
-    localStorage.setItem("controller", JSON.stringify(controller));
-});
-
-
 	</script>
 </body>
 
