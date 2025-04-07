@@ -381,8 +381,7 @@ async function sendSetTaskResultsToDatabase() {
       results: resultsDataString
   };
 
-  //const apiBase = 'https://sudedu-server.onrender.com/';
-  const apiBase = 'http://localhost:5000/'
+  const apiBase = 'https://sudedu-server.onrender.com/';
 
   if (document.querySelector("#stopButton")) {
     document.querySelector("#stopButton").disabled = true;
