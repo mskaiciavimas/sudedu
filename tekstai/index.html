@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sudEdu duomenų bazė</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="../../index.css">
+
+  <style>
+    h1 {
+      margin-top:10vh;
+    }
+
+    body, html {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      height: auto;
+      width: 100%
+    }
+
+    .container {
+      flex-grow: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .individual-option input {
+      width: auto;
+    }
+
+    .type-text {
+      width: 150px;
+    }
+
+    .list {
+      font-size: 1.05rem;
+    }
+    
+    #entry-list {
+      overflow-y: auto;
+      height: 95vh;
+      width: 35vw;
+      border-right: 1px solid #ccc;
+      padding: 20px;
+      position: sticky;
+      top: 0;
+    }
+
+    #content-wrapper {
+      display: flex;
+      flex-direction: row;
+      width: 90%;
+    }
+
+    .form-section {
+      width: 100%;
+      flex-grow: 1;
+      margin: 20px;
+      padding-left: 50px;
+      box-sizing: border-box;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-size: 1.05rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      font-size:1.05rem;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    .class-label {
+      margin:0;
+      padding-left: 5px;
+    }
+
+    .individual-option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .individual-option label {
+      padding-left: 5px;
+    }
+
+    button {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      font-size: 1.02rem;
+    }
+    
+    .type-text {
+      margin: 0;
+    }
+
+    #search-bar {
+      width:100%;
+      margin-top:15px
+    }
+
+    .radio {
+      margin-bottom: 0;
+    }
+
+    .list span {
+      display: inline-block;
+      margin: 5px;
+      background-color: #ddd;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .list span:hover {
+      background-color: #D57E7E;
+      color: white;
+    }
+
+    .selected {
+      background-color: #f0f0f0;
+      border-left: 4px solid #01937C;
+      padding-left: 5px
+    }
+
+    #new-entry-btn {
+      margin-top: 3vh;
+      font-size: 1.5rem;
+      width: 100%;
+      height: 50px;
+    }
+
+    .container h1 {
+      margin-top: 0;
+    }
+
+    .list {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+    }
+
+    #database-entries {
+      padding-left: 5px;
+      font-size:1.05rem;
+    }
+
+    #database-entries li {
+      margin-bottom: 10px;
+      padding-top: 3px;
+      padding-bottom: 3px;
+      cursor: pointer;
+    }
+    
+    .label-bold {
+      font-size:1.25rem;
+      font-weight: bold;
+      padding-bottom: 10px
+    }
+
+    #tekstas-title {
+      font-size:1.25rem;
+    }
+
+    #tekstai-title {
+      margin-bottom: 8px;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    .align-right {
+      float: right;
+      padding-top:6px;
+      padding-bottom:6px;
+      margin-top: 3vh;
+    }
+
+    #message-container {
+      height: 50px;
+      position: relative;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    #message-field {
+      position: absolute;
+      width: 100%;
+      padding: 10px;
+      border-radius: 4px;
+      display: none;
+      box-sizing: border-box;
+    }
+
+    #message-field.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    #message-field.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    #message-field.info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .edit-mode {
+      background-color: #f1b46a;
+    }
+
+    #edit-toggle-btn {
+      margin-bottom: 20px;
+    }
+
+    #edit-toggle-btn.cancel {
+      background-color: #01937C;
+      border: #01937C;
+    }
+
+    #edit-toggle-btn:disabled {
+      color: black;
+      cursor: not-allowed;
+    }
+
+    #delete-btn {
+      background-color: #D57E7E;
+      border-color: #D57E7E;
+      margin-bottom: 20px;
+      margin-left: 10px;
+    }
+
+    #delete-btn:disabled {
+      color: black;
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    /* Login modal styles */
+    #login-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.9);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #login-modal > div {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      width: 400px;
+      max-width: 90%;
+    }
+
+    #login-message {
+      margin-bottom: 15px;
+      color: red;
+      text-align: center;
+      display: none;
+    }
+
+    #login-password {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    #login-submit {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #login-spinner {
+      display: none;
+      align-items: center;
+    }
+
+    .mb-4 {
+      font-size: 3.5rem;
+      margin-top: 0;
+    }
+
+    #new-suitable-for-btn,
+    #new-type-btn {
+      margin: 0;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      box-shadow: none;
+      border: 0;
+    }
+    
+    #start-text,
+    #middle-text,
+    #end-text {
+      min-height: 150px;
+    }
+
+    #start-list,
+    #middle-list,
+    #end-list {
+      min-height: 64px;
+    }
+
+    #text-list-outer-container {
+      padding-bottom: 0 !important;
+      position: sticky;
+      top: 0;
+      height: 100vh; /* Ensure full height */
+      overflow-y: auto; /* Allow scrolling if necessary */
+    }
+
+    .container-fluid {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .btn.disabled, .btn:disabled, fieldset:disabled .btn {
+    color: black;
+    pointer-events: none;
+    background-color: #B6C867;
+    border-color: #B6C867;
+    opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+
+<div id="login-modal" style="display: none;">
+  <div>
+    <h2 style="margin-top: 0; margin-bottom: 15pxS; text-align: center;">sudEdu tekstų duomenų bazė</h2>
+    <p style="margin-bottom: 20px; text-align: center;">Įveskite slaptažodį</p>
+    
+    <div id="login-message"></div>
+    
+    <input type="password" id="login-password" placeholder="Slaptažodis">
+    
+    <div style="display: flex; justify-content: space-between;">
+      <button id="login-submit" class="btn btn-primary">Prisijungti</button>
+      <div id="login-spinner">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Kraunama...</span>
+        </div>
+        <span style="margin-left: 10px;">Tikrinamas slaptažodis...</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid vh-100" id="main-app" style="display: none;">
+  <div class="row">
+    <!-- Left Sidebar -->
+    <div id="text-list-outer-container" class="col-md-4 p-3 d-flex flex-column" style="position: sticky; top: 0; height: 100vh; overflow-y: auto;">
+      <div class="mb-3">
+        <button id="new-entry-btn" class="btn btn-primary w-100 py-2">Naujas įrašas</button>
+      </div>
+      <div class="mb-3">
+        <input type="text" id="search-bar" class="form-control" placeholder="Ieškoti..." onkeyup="filterEntries()">
+      </div>
+      <h5 class="mb-3">Tekstai</h5>
+      <div class="flex-grow-1 overflow-auto">
+        <ul id="database-entries" class="list-unstyled"></ul>
+      </div>
+    </div>
+
+    <!-- Right Form Section -->
+    <div class="col-md-8 p-4 d-flex flex-column" id="form-section">
+      <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-outline-secondary me-2 btn btn-primary" onclick="downloadDatabaseInJsonFormat()">Atsisiųsti duomenų bazę (JSON)</button>
+        <button class="btn btn-outline-secondary btn btn-primary" onclick="downloadExcelSummary()">Atsisiųsti santrauką</button>
+      </div>
+      
+      <div id="message-container" class="mb-3">
+        <div id="message-field" class="alert" role="alert"></div>
+      </div>
+      
+      <div class="d-flex mb-3">
+        <button id="edit-toggle-btn" class="btn btn-success me-2 btn btn-primary" onclick="toggleEditMode()" disabled>Redaguoti pasirinktą įrašą</button>
+        <button id="delete-btn" class="btn btn-danger btn btn-primary" onclick="deleteEntry()" disabled>Ištrinti pasirinktą įrašą</button>
+      </div>
+      
+      <h1 class="mb-4">SudEdu Tekstų Pridėjimas</h1>
+      
+      <form id="main-form">
+        <div class="mb-3">
+          <label for="title" class="form-label fw-bold">Pavadinimas</label>
+          <input type="text" id="title" class="form-control" placeholder="Įveskite pavadinimą" disabled>
+        </div>
+        
+        <div class="mb-3">
+          <label for="author" class="form-label fw-bold">Autorius</label>
+          <input type="text" id="author" class="form-control" placeholder="Įveskite autorių" disabled>
+        </div>
+        
+        <div class="mb-3">
+          <label for="reference" class="form-label fw-bold">Šaltinis</label>
+          <input type="text" id="reference" class="form-control" placeholder="Įveskite šaltinį" disabled>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label fw-bold">Teksto tipas</label>
+          <div id="type-options" class="mb-2"></div>
+          <div class="input-group mb-3">
+            <input type="text" id="new-type" class="form-control" placeholder="Įveskite naują tipą" disabled>
+            <button id="new-type-btn" class="btn btn-outline-secondary btn btn-primary" type="button" onclick="addOption('type')" disabled>Pridėti tipą</button>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label fw-bold">Užduočių suderinamumas</label>
+          <div id="suitable-for-options" class="mb-2"></div>
+          <div class="input-group mb-3">
+            <input type="text" id="new-suitable-for" class="form-control" placeholder="Įveskite naują užduotį" disabled>
+            <button id="new-suitable-for-btn" class="btn btn-outline-secondary btn btn-primary" type="button" onclick="addOption('suitable-for')" disabled>Pridėti užduotį</button>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label fw-bold">Klasėms</label>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="class-choice-1-2" name="class-choice" value="1_2_klase" disabled>
+            <label class="form-check-label" for="class-choice-1-2">1-2 klasėms</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="class-choice-3-4" name="class-choice" value="3_4_klase" disabled>
+            <label class="form-check-label" for="class-choice-3-4">3-4 klasėms</label>
+          </div>
+        </div>
+        
+        <h3 class="mt-4 mb-3">Tekstas</h3>
+        
+        <div class="text-section">
+          <label for="start-text" class="form-label">Pradžia</label>
+          <textarea class="form-control autoResize mb-2" id="start-text" placeholder="Įveskite pradžią" disabled></textarea>
+          <button class="btn btn-sm btn-outline-primary mb-3 btn btn-primary" type="button" onclick="addText('start')" disabled>Pridėti</button>
+          <div class="text-list list p-2 border rounded bg-light" id="start-list"></div>
+        </div>
+        
+        <div class="text-section">
+          <label for="middle-text" class="form-label">Įvykių raida</label>
+          <textarea class="form-control autoResize mb-2" id="middle-text" placeholder="Įveskite įvykių raidą" disabled></textarea>
+          <button class="btn btn-sm btn-outline-primary mb-3 btn btn-primary" type="button" onclick="addText('middle')" disabled>Pridėti</button>
+          <div class="text-list list p-2 border rounded bg-light" id="middle-list"></div>
+        </div>
+        
+        <div class="text-section">
+          <label for="end-text" class="form-label">Pabaiga</label>
+          <textarea class="form-control autoResize mb-2" id="end-text" placeholder="Įveskite pabaigą" disabled></textarea>
+          <button class="btn btn-sm btn-outline-primary mb-3 btn btn-primary" type="button" onclick="addText('end')" disabled>Pridėti</button>
+          <div class="text-list list p-2 border rounded bg-light" id="end-list"></div>
+        </div>
+        
+        <button id="save-btn" class="btn btn-primary mt-3 btn btn-primary" type="button" onclick="saveEntry()" disabled>Išsaugoti tekstą</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const apiBase = 'https://sudedu-text-database-server.onrender.com';
+const messageField = document.querySelector("#message-field");
+let database = [];
+const textSections = { start: [], middle: [], end: [] };
+let editIndex = null;
+let isEditMode = false;
+let currentEntryId = null;
+let isAuthenticated = false;
+
+// Auth token management
+const AUTH_TOKEN_KEY = 'sudEduAuthToken';
+
+
+if (getAuthToken()) {
+  isAuthenticated = true;
+}
+
+function getAuthToken() {
+  return localStorage.getItem(AUTH_TOKEN_KEY);
+}
+
+function setAuthToken(token) {
+  localStorage.setItem(AUTH_TOKEN_KEY, token);
+}
+
+function removeAuthToken() {
+  localStorage.removeItem(AUTH_TOKEN_KEY);
+}
+
+// Authenticated request wrapper
+async function makeAuthenticatedRequest(url, options = {}) {
+  if (!isAuthenticated) {
+    showLoginModal();
+    throw new Error('Reikia prisijungti');
+  }
+  
+  const token = getAuthToken();
+  if (!token) {
+    showLoginModal();
+    throw new Error('Reikia prisijungti');
+  }
+
+  const headers = {
+    ...options.headers,
+    'Authorization': getAuthToken()
+  };
+
+  const response = await fetch(url, {
+    ...options,
+    headers
+  });
+
+  if (response.status === 401) {
+    isAuthenticated = false;
+    removeAuthToken();
+    showLoginModal();
+    throw new Error('Sesija pasibaigė. Prisijunkite iš naujo.');
+  }
+
+  return response;
+}
+
+// Login function
+async function handleLogin(password) {
+  const loginSubmit = document.getElementById('login-submit');
+  const loginSpinner = document.getElementById('login-spinner');
+  const loginMessage = document.getElementById('login-message');
+  
+  // UI state changes
+  loginSubmit.style.display = 'none';
+  loginSpinner.style.display = 'flex';
+  loginMessage.style.display = 'none';
+  
+  try {
+    const response = await fetch(`${apiBase}auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': getAuthToken()
+      },
+      body: JSON.stringify({ password })
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Prisijungimo klaida');
+    }
+    
+    // Save token and hide modal
+    isAuthenticated = true;
+    setAuthToken(data.token);
+    hideLoginModal();
+    showMainApp();
+    
+    // Initialize the app
+    initializeData();
+  } catch (error) {
+    console.error('Login error:', error);
+    loginMessage.textContent = error.message || 'Prisijungimo klaida. Bandykite dar kartą.';
+    loginMessage.style.display = 'block';
+  } finally {
+    loginSubmit.style.display = 'block';
+    loginSpinner.style.display = 'none';
+  }
+}
+
+function showLoginModal() {
+  document.getElementById('login-modal').style.display = 'flex';
+  document.getElementById('main-app').style.display = 'none';
+  if (input) {
+    input.value = ''; // Clear the text input value
+  }
+}
+
+function hideLoginModal() {
+  document.getElementById('login-modal').style.display = 'none';
+}
+
+function showMainApp() {
+  document.getElementById('main-app').style.display = 'block';
+}
+
+// Helper functions
+function disableButtons() {
+  const buttons = document.querySelectorAll('button');
+  buttons.forEach(button => {
+    if (button.id !== 'login-submit' && button.id !== 'edit-toggle-btn' && button.id !== 'delete-btn' && button.id !== 'new-entry-btn') {
+      button.disabled = true;
+    }
+  });
+}
+
+function enableButtons() {
+  const buttons = document.querySelectorAll('button');
+  buttons.forEach(button => {
+    if (button.id !== 'edit-toggle-btn' && button.id !== 'delete-btn') {
+      button.disabled = false;
+    }
+  });
+  updateEditDeleteButtons();
+}
+
+function disableForm() {
+  const inputs = document.querySelectorAll('input, textarea, select');
+  inputs.forEach(input => {
+    if (input.id !== 'search-bar') {
+      input.disabled = true;
+    }
+  });
+  document.getElementById('save-btn').disabled = true;
+  
+  // Also disable text add buttons
+  document.querySelectorAll('.text-section button').forEach(btn => {
+    btn.disabled = true;
+  });
+  
+  // Disable option add buttons
+  document.getElementById('new-type-btn').disabled = true;
+  document.getElementById('new-suitable-for-btn').disabled = true;
+}
+
+function enableForm() {
+  const inputs = document.querySelectorAll('input, textarea, select');
+  inputs.forEach(input => {
+    if (input.id !== 'new-type' && input.id !== 'new-suitable-for') {
+      input.disabled = false;
+    }
+  });
+  document.getElementById('save-btn').disabled = false;
+  
+  // Enable text add buttons
+  document.querySelectorAll('.text-section button').forEach(btn => {
+    btn.disabled = false;
+  });
+  
+  // Enable option add buttons
+  document.getElementById('new-type-btn').disabled = false;
+  document.getElementById('new-suitable-for-btn').disabled = false;
+}
+
+function showAlert(message) {
+  alert(message);
+}
+
+function showMessage(message, type) {
+  messageField.textContent = message;
+  messageField.className = type;
+  messageField.style.display = 'block';
+  setTimeout(() => {
+    messageField.style.display = 'none';
+  }, 5000);
+}
+
+function scrollToTop() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
+
+function updateEditDeleteButtons() {
+  const editBtn = document.getElementById('edit-toggle-btn');
+  const deleteBtn = document.getElementById('delete-btn');
+  
+  if (currentEntryId) {
+    editBtn.disabled = false;
+    deleteBtn.disabled = false;
+  } else {
+    editBtn.disabled = true;
+    deleteBtn.disabled = true;
+  }
+  
+  if (isEditMode) {
+    editBtn.textContent = 'Atšaukti redagavimą';
+    editBtn.classList.add('cancel');
+  } else {
+    editBtn.textContent = 'Redaguoti pasirinktą įrašą';
+    editBtn.classList.remove('cancel');
+  }
+}
+
+function toggleEditMode() {
+  if (!currentEntryId) {
+    showAlert('Pasirinkite įrašą redagavimui');
+    return;
+  }
+
+  isEditMode = !isEditMode;
+  
+  if (isEditMode) {
+    enableForm();
+    document.getElementById('form-section').classList.add('edit-mode');
+    
+    // Enable "Add option" fields only in edit mode
+    document.getElementById('new-type').disabled = false;
+    document.getElementById('new-suitable-for').disabled = false;
+  } else {
+    disableForm();
+    document.getElementById('form-section').classList.remove('edit-mode');
+    // Reload the entry to reset any changes
+    const entry = database.find(e => e.id === currentEntryId);
+    if (entry) {
+      const listItem = document.querySelector(`li[data-id="${currentEntryId}"]`);
+      loadEntry(database.indexOf(entry), entry, listItem);
+    }
+    
+    // Disable "Add option" fields when not in edit mode
+    document.getElementById('new-type').disabled = true;
+    document.getElementById('new-suitable-for').disabled = true;
+  }
+  
+  updateEditDeleteButtons();
+}
+
+function prepareNewEntry() {
+  if (isEditMode && !confirm('Redagavimas vyksta. Ar norite išeiti neišsaugojus pakeitimų?')) {
+    return;
+  }
+
+  // Clear selection
+  document.querySelectorAll('#database-entries li').forEach(item => {
+    item.classList.remove('selected');
+    item.style.fontWeight = '';
+  });
+
+  // Reset all form fields
+  clearForm();
+
+  // Enable form for new entry
+  enableForm();
+  
+  // Enable "Add option" fields
+  document.getElementById('new-type').disabled = false;
+  document.getElementById('new-suitable-for').disabled = false;
+  document.getElementById('new-type-btn').disabled = false;
+  document.getElementById('new-suitable-for-btn').disabled = false;
+
+  // Reset state variables
+  editIndex = null;
+  currentEntryId = null;
+  isEditMode = false;
+  
+  // Update UI
+  document.getElementById('form-section').classList.remove('edit-mode');
+  document.getElementById('edit-toggle-btn').textContent = 'Redaguoti pasirinktą įrašą';
+  document.getElementById('edit-toggle-btn').classList.remove('cancel');
+  document.getElementById('save-btn').textContent = 'Išsaugoti tekstą';
+  
+  // Update button states
+  updateEditDeleteButtons();
+  
+  // Scroll to top
+  scrollToTop();
+  
+  showMessage('Pasiruošta naujam įrašui', 'info');
+}
+
+// Initialize data
+function initializeData() {
+  disableButtons();
+  showMessage('Kraunami duomenys...', 'info');
+
+  Promise.all([
+    makeAuthenticatedRequest(`${apiBase}text/get-options`).then(res => res.json()),
+    makeAuthenticatedRequest(`${apiBase}text/get-database`).then(res => res.json())
+  ])
+  .then(([optionsData, dbData]) => {
+    displayOptions('type', optionsData.types);
+    displayOptions('suitable-for', optionsData['suitable-for']);
+    database = dbData;
+    displayEntries();
+    showMessage('Duomenys sėkmingai įkelti', 'success');
+    // Prepare for new entry after load
+    prepareNewEntry();
+  })
+  .catch(error => {
+    console.error('Error initializing data:', error);
+    showMessage('Klaida įkeliant duomenis. Bandykite vėliau.', 'error');
+    if (error.message.includes('401') || error.message.includes('Reikia prisijungti')) {
+      isAuthenticated = false;
+      removeAuthToken();
+      showLoginModal();
+    }
+  })
+  .finally(() => {
+    enableButtons();
+  });
+}
+
+// Core functions
+function displayOptions(category, options) {
+  const container = document.getElementById(`${category}-options`);
+  container.innerHTML = '';
+  options.forEach(option => {
+    const optionDiv = document.createElement('div');
+    optionDiv.classList.add('individual-option');
+
+    const input = document.createElement('input');
+    input.type = category === 'type' ? 'radio' : 'checkbox';
+    input.classList = category === 'type' ? 'radio' : 'checkbox';
+    input.value = option;
+    input.id = `${category}-${option}`;
+    input.name = category;
+    input.disabled = true;
+
+    const label = document.createElement('label');
+    label.setAttribute('for', `${category}-${option}`);
+    label.classList.add('type-text');
+    label.textContent = option;
+
+    if (category === 'suitable-for') {
+      const select = document.createElement('select');
+      select.id = `${category}-difficulty-${option}`;
+      select.disabled = true;
+      ['', 'lengvas', 'vidutinis', 'sunkus'].forEach(diff => {
+        const optionElem = document.createElement('option');
+        optionElem.value = diff;
+        optionElem.textContent = diff;
+        select.appendChild(optionElem);
+      });
+      optionDiv.append(input, label, select);
+    } else {
+      optionDiv.append(input, label);
+    }
+    container.appendChild(optionDiv);
+  });
+}
+
+function displayEntries() {
+  const list = document.getElementById('database-entries');
+  list.innerHTML = '';
+  
+  database.sort((a, b) => a.id - b.id);
+  
+  database.forEach((entry) => {
+    const listItem = document.createElement('li');
+    listItem.dataset.id = entry.id;
+    listItem.innerHTML = `
+      <span class="entry-id">${entry.id}.</span>
+      <span class="entry-title">${entry.title || 'Rašybos sakiniai'}</span>
+    `;
+    
+    listItem.addEventListener('click', () => {
+      disableForm();
+      if (isEditMode) {
+        if (confirm('Redagavimas vyksta. Ar norite išeiti neišsaugojus pakeitimų?')) {
+          toggleEditMode();
+          loadSelectedEntry(entry, listItem);
+        }
+      } else {
+        loadSelectedEntry(entry, listItem);
+      }
+    });
+    
+    list.appendChild(listItem);
+  });
+}
+
+function loadSelectedEntry(entry, listItem) {
+  const index = database.findIndex(e => e.id === entry.id);
+  if (index >= 0) {
+    currentEntryId = entry.id;
+    loadEntry(index, entry, listItem);
+    updateEditDeleteButtons();
+  }
+}
+
+function loadEntry(index, entry, listItem) {
+  // Clear previous selection
+  document.querySelectorAll('#database-entries li').forEach(item => {
+    item.classList.remove('selected');
+    item.style.fontWeight = '';
+  });
+  
+  // Highlight selected
+  listItem.classList.add('selected');
+  listItem.style.fontWeight = 'bold';
+  editIndex = index;
+  
+  // Scroll to entry
+  listItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  
+  // Populate form
+  document.getElementById('title').value = entry.title || '';
+  document.getElementById('author').value = entry.author || '';
+  document.getElementById('reference').value = entry.reference || '';
+  
+  // Set type
+  const typeInput = document.querySelector(`input[name="type"][value="${entry.type}"]`);
+  if (typeInput) typeInput.checked = true;
+  
+  // Clear all suitable-for checkboxes first
+  document.querySelectorAll('input[name="suitable-for"]').forEach(input => {
+    input.checked = false;
+    const difficultySelect = document.getElementById(`suitable-for-difficulty-${input.value}`);
+    if (difficultySelect) difficultySelect.value = '';
+  });
+  
+  // Set suitable-for options and difficulties
+  if (entry['suitable-for']) {
+    Object.entries(entry['suitable-for']).forEach(([key, value]) => {
+      const input = document.querySelector(`input[name="suitable-for"][value="${key}"]`);
+      if (input) {
+        input.checked = true;
+        const difficultySelect = document.getElementById(`suitable-for-difficulty-${key}`);
+        if (difficultySelect) {
+          difficultySelect.value = value.difficulty || '';
+        }
+      }
+    });
+  }
+  
+  // Set class choices
+  document.querySelectorAll('input[name="class-choice"]').forEach(input => {
+    input.checked = entry['class-choice']?.includes(input.value) || false;
+  });
+  
+  // Load text sections
+  ['start', 'middle', 'end'].forEach(section => {
+    const textData = entry.text?.[section] || [];
+    textSections[section] = Array.isArray(textData) ? [...textData] : [];
+    updateTextList(section);
+  });
+  
+  // Update UI
+  document.getElementById('save-btn').textContent = 'Atnaujinti tekstą';
+  document.title = `Redaguojama: ${entry.title || entry.id}`;
+}
+
+function saveEntry() {
+  // Get form values
+  const title = document.getElementById('title').value.trim();
+  const author = document.getElementById('author').value.trim();
+  const reference = document.getElementById('reference').value.trim();
+  const type = document.querySelector('input[name="type"]:checked')?.value;
+  
+  // Build suitableFor object and validate
+  const suitableFor = {};
+  let hasSuitableFor = false;
+  document.querySelectorAll('input[name="suitable-for"]:checked').forEach(input => {
+    hasSuitableFor = true;
+    const difficultySelect = document.getElementById(`suitable-for-difficulty-${input.value}`);
+    suitableFor[input.value] = {
+      difficulty: difficultySelect ? difficultySelect.value : '',
+      classChoices: [...document.querySelectorAll('input[name="class-choice"]:checked')].map(cb => cb.value)
+    };
+  });
+
+  // Validate class choices
+  const hasClassChoices = document.querySelectorAll('input[name="class-choice"]:checked').length > 0;
+
+  // Validate text sections
+  const hasStartText = textSections.start.length > 0;
+  const hasMiddleText = textSections.middle.length > 0;
+  const hasEndText = textSections.end.length > 0;
+  const hasAnyText = hasStartText || hasMiddleText || hasEndText;
+
+  // Collect validation errors
+  const errors = [];
+  
+  if (!type) {
+    errors.push('• Pasirinkite tekstų tipą');
+  }
+  
+  if (!hasSuitableFor) {
+    errors.push('• Pasirinkite bent vieną užduoties rūšį');
+  }
+  
+  if (!hasClassChoices) {
+    errors.push('• Pasirinkite bent vieną klasę');
+  }
+  
+  if (!hasAnyText) {
+    errors.push('• Įveskite bent vieną teksto dalį (pradžią, įvykių raidą arba pabaigą)');
+  }
+
+  // Show errors if any
+  if (errors.length > 0) {
+    showAlert('Pataisykite šias klaidas:\n\n' + errors.join('\n'));
+    return;
+  }
+
+  // Prepare data for submission
+  const entryData = {
+    title,
+    author,
+    reference,
+    type,
+    suitableFor,
+    text: textSections
+  };
+
+  // Include ID if editing
+  if (editIndex !== null && database[editIndex]?.id) {
+    entryData.id = database[editIndex].id;
+  }
+
+  // Visual feedback - disable buttons during submission
+  disableButtons();
+  showMessage('Siunčiama...', 'info');
+
+  // Submit data
+  makeAuthenticatedRequest(`${apiBase}text/save-entry`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json',
+                'Authorization': getAuthToken()
+     },
+    body: JSON.stringify(entryData)
+  })
+  .then(response => {
+    if (!response.ok) {
+      return response.json().then(err => { throw new Error(err.message || 'Server error'); });
+    }
+    return response.json();
+  })
+  .then(data => {
+    showAlert(editIndex !== null ? 'Įrašas sėkmingai atnaujintas!' : 'Įrašas sėkmingai sukurtas!');
+    // Reload the database
+    return makeAuthenticatedRequest(`${apiBase}text/get-database`);
+  })
+  .then(response => response.json())
+  .then(data => {
+    database = data;
+    displayEntries();
+    editIndex = null;
+    currentEntryId = null;
+    isEditMode = false;
+    document.getElementById('form-section').classList.remove('edit-mode');
+    document.getElementById('save-btn').textContent = 'Išsaugoti tekstą';
+    clearForm();
+    scrollToTop();
+    updateEditDeleteButtons();
+    // Prepare for new entry after save
+    prepareNewEntry();
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    showAlert('Klaida: ' + (error.message || 'Serverio klaida'));
+
+    if (error.message === "Unauthorized") {
+      removeAuthToken();
+      showLoginModal();
+    }
+
+  })
+  .finally(() => {
+    enableButtons();
+  });
+}
+
+function deleteEntry() {
+  if (!currentEntryId) {
+    showAlert('Pasirinkite įrašą, kurį norite ištrinti');
+    return;
+  }
+
+  if (!confirm('Ar tikrai norite ištrinti šį įrašą? Šio veiksmo atšaukti negalėsite.')) {
+    return;
+  }
+
+  disableButtons();
+  showMessage('Trinamas įrašas...', 'info');
+
+  makeAuthenticatedRequest(`${apiBase}text/delete-entry`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json',
+                'Authorization': getAuthToken()
+     },
+    body: JSON.stringify({ id: currentEntryId })
+  })
+  .then(response => {
+    if (!response.ok) {
+      return response.json().then(err => { throw new Error(err.message || 'Server error'); });
+    }
+    return response.json();
+  })
+  .then(data => {
+    showAlert('Įrašas sėkmingai ištrintas!');
+    return makeAuthenticatedRequest(`${apiBase}text/get-database`);
+  })
+  .then(response => response.json())
+  .then(data => {
+    database = data;
+    displayEntries();
+    editIndex = null;
+    currentEntryId = null;
+    isEditMode = false;
+    document.getElementById('form-section').classList.remove('edit-mode');
+    document.getElementById('save-btn').textContent = 'Išsaugoti tekstą';
+    clearForm();
+    scrollToTop();
+    updateEditDeleteButtons();
+    // Prepare for new entry after delete
+    prepareNewEntry();
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    showAlert('Klaida: ' + (error.message || 'Serverio klaida'));
+
+    if (error.message === "Unauthorized") {
+      removeAuthToken();
+      showLoginModal();
+    }
+
+  })
+  .finally(() => {
+    enableButtons();
+  });
+}
+
+function clearForm() {
+  document.getElementById('title').value = '';
+  document.getElementById('author').value = '';
+  document.getElementById('reference').value = '';
+  
+  document.querySelectorAll('input[name="type"]').forEach(input => {
+    input.checked = false;
+  });
+  
+  document.querySelectorAll('input[name="suitable-for"]').forEach(input => {
+    input.checked = false;
+    const difficultySelect = document.getElementById(`suitable-for-difficulty-${input.value}`);
+    if (difficultySelect) difficultySelect.value = '';
+  });
+  
+  document.querySelectorAll('input[name="class-choice"]').forEach(input => {
+    input.checked = false;
+  });
+  
+  // Clear text sections and textareas
+  ['start', 'middle', 'end'].forEach(section => {
+    textSections[section] = [];
+    updateTextList(section);
+    document.getElementById(`${section}-text`).value = '';
+  });
+}
+
+function updateTextList(section) {
+  const listDiv = document.getElementById(`${section}-list`);
+  listDiv.innerHTML = '';
+  textSections[section].forEach((text, index) => {
+    const span = document.createElement('span');
+    span.textContent = text.replace(/\n/g, "\\n");
+    span.dataset.index = index;
+    span.onclick = (e) => {
+      e.stopPropagation();
+      removeText(section, index);
+    };
+    listDiv.appendChild(span);
+  });
+}
+
+function addText(section) {
+  const textarea = document.getElementById(`${section}-text`);
+  const text = textarea.value.trim();
+  if (text) {
+    textSections[section].push(text);
+    updateTextList(section);
+    textarea.value = '';
+    adjustTextareaHeight(textarea);
+  }
+}
+
+function removeText(section, index) {
+  if (!isEditMode && currentEntryId) {
+    showAlert('Norėdami redaguoti tekstą, pirmiausia įjunkite redagavimo režimą');
+    return;
+  }
+  textSections[section].splice(index, 1);
+  updateTextList(section);
+}
+
+function addOption(category) {
+  const input = document.getElementById(`new-${category}`);
+  const value = input.value.trim();
+  if (value) {
+    if (category === 'type') {
+      const container = document.getElementById('type-options');
+      const optionDiv = document.createElement('div');
+      optionDiv.classList.add('individual-option');
+      
+      optionDiv.innerHTML = `
+        <input type="radio" class="radio" value="${value}" id="type-${value}" name="type" />
+        <label class="type-text" for="type-${value}">${value}</label>
+      `;
+      container.appendChild(optionDiv);
+      
+      document.getElementById(`type-${value}`).checked = true;
+    } else if (category === 'suitable-for') {
+      const container = document.getElementById('suitable-for-options');
+      const optionDiv = document.createElement('div');
+      optionDiv.classList.add('individual-option');
+      
+      optionDiv.innerHTML = `
+        <input type="checkbox" class="checkbox" value="${value}" id="suitable-for-${value}" name="suitable-for" />
+        <label class="type-text" for="suitable-for-${value}">${value}</label>
+        <select id="suitable-for-difficulty-${value}">
+          <option value=""></option>
+          <option value="lengvas">lengvas</option>
+          <option value="vidutinis">vidutinis</option>
+          <option value="sunkus">sunkus</option>
+        </select>
+      `;
+      container.appendChild(optionDiv);
+      
+      document.getElementById(`suitable-for-${value}`).checked = true;
+    }
+    
+    input.value = '';
+    showMessage('Parinktis pridėta - bus išsaugota kartu su įrašu', 'success');
+  }
+}
+
+function filterEntries() {
+  const searchTerm = document.getElementById('search-bar').value.toLowerCase();
+  document.querySelectorAll('#database-entries li').forEach((listItem, index) => {
+    const entry = database[index];
+    const isMatch = 
+      (entry.title?.toLowerCase().includes(searchTerm)) ||
+      (entry.author?.toLowerCase().includes(searchTerm)) ||
+      (entry.reference?.toLowerCase().includes(searchTerm)) ||
+      (entry.text?.start?.some(part => part.toLowerCase().includes(searchTerm))) ||
+      (entry.text?.middle?.some(part => part.toLowerCase().includes(searchTerm))) ||
+      (entry.text?.end?.some(part => part.toLowerCase().includes(searchTerm)));
+    listItem.style.display = isMatch ? 'block' : 'none';
+  });
+}
+
+function adjustTextareaHeight(textarea) {
+  textarea.style.height = 'auto';
+  textarea.style.height = textarea.scrollHeight + 'px';
+}
+
+function addAutoResizeEventListener() {
+  document.querySelectorAll('.autoResize').forEach(ta => {
+    ta.addEventListener('input', function() {
+      adjustTextareaHeight(this);
+    });
+    adjustTextareaHeight(ta);
+  });
+}
+
+async function downloadExcelSummary() {
+  disableButtons();
+  showMessage('Generuojama Excel santrauka...', 'info');
+  
+  try {
+    const response = await makeAuthenticatedRequest(`${apiBase}text/download-excel`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': getAuthToken()
+      },
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Server returned an error');
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'sudedu_duomenu_bazes_santrauka.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    showAlert('Excel santrauka sėkmingai atsisiųsta!');
+  } catch (error) {
+    console.error('Download failed:', error);
+    showAlert(`Klaida: ${error.message}`);
+
+    if (error.message === "Unauthorized") {
+      removeAuthToken();
+      showLoginModal();
+    }
+
+  } finally {
+    enableButtons();
+  }
+}
+
+async function downloadDatabaseInJsonFormat() {
+  disableButtons();
+  showMessage('Ruošiamas JSON failas...', 'info');
+  
+  try {
+    const response = await makeAuthenticatedRequest(`${apiBase}text/download-db`);
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Server returned an error');
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'sudedu_duomenu_baze.json';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    showAlert('Duomenų bazė sėkmingai atsisiųsta JSON formatu!');
+  } catch (error) {
+    console.error('Download failed:', error);
+    showAlert(`Klaida: ${error.message}`);
+
+    if (error.message === "Unauthorized") {
+      removeAuthToken();
+      showLoginModal();
+    }
+
+  } finally {
+    enableButtons();
+  }
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  addAutoResizeEventListener();
+  disableForm();
+  
+  // Check authentication status
+  const authToken = getAuthToken();
+  if (authToken) {
+    // Verify token is still valid
+    makeAuthenticatedRequest(`${apiBase}auth/verify-token`)
+      .then(() => {
+        isAuthenticated = true;
+        document.getElementById('login-modal').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        initializeData();
+      })
+      .catch(() => {
+        if (!getAuthToken()) {
+          isAuthenticated = false;
+          removeAuthToken();
+        }
+        document.getElementById('login-modal').style.display = 'flex';
+        document.getElementById('main-app').style.display = 'none';
+      });
+  } else {
+    document.getElementById('login-modal').style.display = 'flex';
+    document.getElementById('main-app').style.display = 'none';
+  }
+  
+  // Setup login form
+  document.getElementById('login-submit').addEventListener('click', () => {
+    const password = document.getElementById('login-password').value.trim();
+    if (password) {
+      handleLogin(password);
+    } else {
+      document.getElementById('login-message').textContent = 'Įveskite slaptažodį';
+      document.getElementById('login-message').style.display = 'block';
+    }
+  });
+  
+  // Allow login on Enter key
+  document.getElementById('login-password').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      const password = document.getElementById('login-password').value.trim();
+      if (password) {
+        handleLogin(password);
+      }
+    }
+  });
+  
+  document.getElementById('new-entry-btn').addEventListener('click', prepareNewEntry);
+  
+  // Prevent form submission on Enter key
+  document.getElementById('main-form').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  });
+});
+
+const input = document.getElementById('login-password');
+
+const observer = new MutationObserver(() => {
+  if (input.disabled) {
+    input.disabled = false;
+  }
+});
+
+// Observe attribute changes
+observer.observe(input, { attributes: true, attributeFilter: ['disabled'] });
+
+// Prevent disabling via JavaScript
+Object.defineProperty(input, 'disabled', {
+  set: () => {},
+  get: () => false
+});
+
+</script>
+</body>
+</html>
