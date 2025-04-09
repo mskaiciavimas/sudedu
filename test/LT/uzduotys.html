@@ -2398,11 +2398,6 @@
                 studentTaskCompletionDateForStudents.innerHTML = `<span class="task-info-subtitle">Atlikimo data</span>: ${task.completionDate.split('T')[0]}`
             }
 
-            const taskInfo = JSON.parse(task.taskInstructions)
-                if ((taskInfo[0] === "math" && taskInfo[4] === "C40") || (taskInfo[0] === "lang" && taskInfo[5] === "C40")) {
-                    studentScoreDurationForStudent.innerHTML = `<span class="task-info-subtitle">Atlikimo trukmė:</span> ${JSON.parse(task.result)[2]}`
-            }
-
             if (task.status) {
                 completeTaskButton.style.display = "none"
             } else {
@@ -2413,6 +2408,12 @@
                 const parsedTaskResult = JSON.parse(task.result)
                 const score = parsedTaskResult[0]
                 const textComprehensionrResults = parsedTaskResult[1]
+
+                const taskInfo = JSON.parse(task.taskInstructions)
+                if ((taskInfo[0] === "math" && taskInfo[4] === "C40") || (taskInfo[0] === "lang" && taskInfo[5] === "C40")) {
+                    studentScoreDurationForStudent.innerHTML = `<span class="task-info-subtitle">Atlikimo trukmė:</span> ${JSON.parse(task.result)[2]}`
+                }
+
  
                 if (parsedTaskDescription[0] === "math") {
                     studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Atlikti veiksmai:</span> ${score[0]}`;
@@ -2427,7 +2428,6 @@
                     }
                 }
 
-                const taskInfo = JSON.parse(task.taskInstructions)
                 if (taskInfo[0] === "math" || (taskInfo[0] === "lang" && taskInfo[2] === "C50")) {
                     let mistakesList = [];
                     mistakesList = JSON.parse(task.result)[1]
