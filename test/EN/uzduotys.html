@@ -93,6 +93,7 @@
         }
         
         #teacher-message-line,
+        #teacher-data-retrieval-message,
         #student-message {
             text-align: center;
             margin-right: 4vw;
@@ -337,10 +338,6 @@
             justify-content: space-between;
         }
 
-        #student-score-asnwer-number {
-            margin-top: 5px;
-        }
-
         #student-task-group,
         #student-task-group-for-student {
             font-weight: bold;
@@ -510,6 +507,7 @@
 
         @media (max-width: 1999px) {
             #teacher-message-line,
+            #teacher-data-retrieval-message,
             #student-message {
                 margin-right: 8vw;
             }
@@ -520,7 +518,8 @@
                 padding-left: 0;
                 margin-top: 20px;
             }
-            #teacher-message-line {
+            #teacher-message-line,
+            #teacher-data-retrieval-message {
                 margin-right: 0;
             }
 
@@ -574,7 +573,8 @@
                 flex-direction: column;
             }
 
-            #teacher-message-line {
+            #teacher-message-line,
+            #teacher-data-retrieval-message {
                 margin-bottom: 15px;
             }
         }
@@ -590,7 +590,7 @@
 				<span class="language-option language-option-LT" onclick="setLanguage('LT')">LT</span>
 			</div>
 			<div class="col-6 d-flex justify-content-end align-items-end" id="user-login-div">
-				<a id="user-login-anchor" href="/test/prisijungimas.html" class="log-in">Log In</a>
+				<a id="user-login-anchor" href="./prisijungimas.html" class="log-in">Log In</a>
 
 				<div id="loggedin-user-menu">
 	<div class="profile">
@@ -604,8 +604,8 @@
 	</div>
 	<div class="menu">
 		<ul>
-            <li><a href="/test/EN"><i class="ph-bold ph-envelope-simple"></i>Home</a></li>
-			<li><a href="/test/EN" onclick="clearUserData()"><i class="ph-bold ph-envelope-simple"></i>Log Out</a></li>
+            <li><a href="/EN"><i class="ph-bold ph-envelope-simple"></i>Home</a></li>
+			<li><a href="/EN" onclick="clearUserData()"><i class="ph-bold ph-envelope-simple"></i>Log Out</a></li>
 		</ul>
 	</div>
 				</div>
@@ -644,8 +644,9 @@
                 </div>
             </div>
 
-                <div class="col-lg-6 col-md-4 col-12 d-flex align-items-center justify-content-center teacher-button-line">
+                <div class="col-lg-6 col-md-4 col-12 d-flex flex-column align-items-center justify-content-center teacher-button-line">
                     <div id="teacher-message-line"></div>
+                    <div id="teacher-data-retrieval-message"></div>
                 </div>
             </div>
             </div>
@@ -656,7 +657,7 @@
                 <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" id="task-group-sorting">
                 </select>
                 <div id="outer-student-list-container">
-                <div class="align-items-center justify-content-between" id="student-list-header">
+                <div class="d-flex align-items-center justify-content-between" id="student-list-header">
                 <div class="align-items-center justify-content-start" id="student-list-header-checkbox-container" style="display: none;">
                     <input type="checkbox" id="select-all-checkbox">
                     <div>select all</div>
@@ -839,6 +840,7 @@
                         <div class="col-12" id="student-statistics-math-error-frequency"></div>
                     </div>
 
+                    <div class="col-12" id="student-score-duration"></div>      
                     <div class="col-12" id="student-score-asnwer-number"></div>
                     <div class="col-12" id="student-score-mistake-number"></div>
 
@@ -904,6 +906,7 @@
                                     <div id="student-task-status-indicator-for-student"></div>
                                 </div>
                                 <div class="col-12" id="student-task-completion-date-for-students"></div>
+                                <div class="col-12" id="student-score-duration-for-student"></div>  
                                 <div class="col-12" id="student-score-asnwer-number-for-student"></div>
                                 <div class="col-12" id="student-score-mistake-number-for-student"></div>
 
@@ -976,7 +979,7 @@
         if (userDataString) {
             userData = JSON.parse(userDataString);
         } else {
-            window.location.href = '/test/LT';
+            window.location.href = '/LT';
         }
 
         let studentList;
@@ -1001,6 +1004,7 @@
         const deleteTaskButton = document.getElementById('delete-task-button');
         const confirmDeleteTaskButton = document.getElementById('confirm-delete-task-button');
         const teacherMessageLine = document.getElementById('teacher-message-line');
+        const teacherDataRetrievalMessage = document.getElementById('teacher-data-retrieval-message');
         const teacherMessageLine2 = document.getElementById('teacher-message-line-2');
         const newTaskOptions = document.getElementById('new-task-options-container');
         const studentTaskInfoContainer = document.getElementById('student-task-info-container');
@@ -1011,6 +1015,8 @@
         const studentScoreAnswerNumber = document.getElementById('student-score-asnwer-number');
         const studentScoreMistakeNumber = document.getElementById('student-score-mistake-number');
 
+        const studentScoreDuration= document.getElementById('student-score-duration');
+        const studentScoreDurationForStudent = document.getElementById('student-score-duration-for-student');
 
         let dynamicStudentContent = document.getElementById('dynamic-student-content');
 
@@ -1386,11 +1392,12 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    const errorData  = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
                 }
 
                 // Optionally, handle the response if needed (e.g., confirm deletion or update the UI)
-                const result = await response.json();
+                const result = await response.json().catch(() => ({}));
                 if (result.message === "Student removal successful.") {
                     fetchDataForTeachers()
                     teacherMessageLine.innerHTML = "Student removal successful.";
@@ -1398,8 +1405,12 @@
 
             } catch (error) {
                 console.log('Error deleting tasks:', error);
-                teacherMessageLine.innerHTML = 'Student removal failed. Please try again later.';
-
+                if (error.message === "Unauthorized") {
+                    clearUserData();
+                    window.location.href = "prisijungimas.html";
+                } else {
+                    studentMessage.innerHTML = 'Nepavyko pašalinti mokinių. Bandykite vėl vėliau.';
+                }
             } finally {
                 deleteStudentButton.disabled = false
                 confirmDeleteStudentButton.disabled = false;
@@ -1430,10 +1441,13 @@
                 });
 
                 // Safely parse response (fallback if JSON fails)
-                const responseData = await response.json().catch(() => ({}));
+                const responseData = await response.json().catch(() => ({}))
 
                 if (!response.ok) {
-                    if (responseData.error === 'Invalid teacher ID') {
+                    if (responseData.message === "Unauthorized") {
+                        clearUserData();
+                        window.location.href = "prisijungimas.html";
+                    } else if (responseData.error === 'Invalid teacher ID') {
                         alert("Invalid teacher ID");
                     } else if (responseData.error === 'Relationship already exists') {
                         alert("This teacher is already added");
@@ -1442,24 +1456,22 @@
                     } else {
                         throw new Error(`Server error: ${response.status}`);
                     }
-                    return;
-                }
-
-                userData.teacher = responseData.teacherInfo
-                localStorage.setItem('userData', JSON.stringify(userData))
-
-                if (userData.teacher === '') {
-                    addTeacherInput.style.display = "block";
-                    addTeacherButton.style.display = "block";
-                    changeTeacherToggleButton.style.display = "none"
                 } else {
-                    teacherName.innerHTML = `Teacher ${userData.teacher}`
-                    addTeacherInput.style.display = "none";
-                    addTeacherButton.style.display = "none";
-                    changeTeacherToggleButton.style.display = "block"
-                }
+                    userData.teacher = responseData.teacherInfo
+                    localStorage.setItem('userData', JSON.stringify(userData))
 
-                studentMessage.innerHTML = "Teacher added successfully."
+                    if (userData.teacher === '') {
+                        addTeacherInput.style.display = "block";
+                        addTeacherButton.style.display = "block";
+                        changeTeacherToggleButton.style.display = "none"
+                    } else {
+                        teacherName.innerHTML = `Teacher ${userData.teacher}`
+                        addTeacherInput.style.display = "none";
+                        addTeacherButton.style.display = "none";
+                        changeTeacherToggleButton.style.display = "block"
+                    }
+                    studentMessage.innerHTML = "Teacher added successfully."
+                }
             } catch (error) {
                 console.log('Full error:', error);
                 studentMessage.innerHTML = "An error has occurred. Please try again later."
@@ -1485,10 +1497,13 @@
                 });
 
                 // Safely parse response (fallback if JSON fails)
-                const responseData = await response.json().catch(() => ({}));
+                const responseData = await response.json().catch(() => ({}))
 
                 if (!response.ok) {
-                    if (response.status === 400 && responseData.error === 'Invalid teacher ID') {
+                    if (responseData.message === "Unauthorized") {
+                        clearUserData();
+                        window.location.href = "prisijungimas.html";
+                    } else if (response.status === 400 && responseData.error === 'Invalid teacher ID') {
                         studentMessage.innerHTML = "Invalid teacher ID'."
                     } else if (response.status === 404 && responseData.error === 'No existing teacher relationship found') {
                         studentMessage.innerHTML = "No teacher added."
@@ -1499,30 +1514,27 @@
                     } else {
                         throw new Error(`Server error: ${response.status}`);
                     }
-                    return;
-                }
-                
-                userData.teacher = responseData.teacherInfo
-                localStorage.setItem('userData', JSON.stringify(userData))
-
-                if (userData.teacher === '') {
-                    addTeacherInput.style.display = "block";
-                    addTeacherButton.style.display = "block";
-                    changeTeacherToggleButton.style.display = "none"
                 } else {
-                    teacherName.innerHTML = `Teacher ${userData.teacher}`
-                    teacherName.style.display = "block"
-                    addTeacherInput.style.display = "none";
-                    addTeacherButton.style.display = "none";
-                    changeTeacherInput.style.display = "none";
-                    changeTeacherButton.style.display = "none";
-                    changeTeacherToggleButton.style.display = "block"
-                    changeTeacherToggle();
+                    userData.teacher = responseData.teacherInfo
+                    localStorage.setItem('userData', JSON.stringify(userData))
+
+                    if (userData.teacher === '') {
+                        addTeacherInput.style.display = "block";
+                        addTeacherButton.style.display = "block";
+                        changeTeacherToggleButton.style.display = "none"
+                    } else {
+                        teacherName.innerHTML = `Teacher ${userData.teacher}`
+                        teacherName.style.display = "block"
+                        addTeacherInput.style.display = "none";
+                        addTeacherButton.style.display = "none";
+                        changeTeacherInput.style.display = "none";
+                        changeTeacherButton.style.display = "none";
+                        changeTeacherToggleButton.style.display = "block"
+                        changeTeacherToggle();
+                    }
+                    deleteAllTasks();
+                    studentMessage.innerHTML = "Teacher changed successfully."
                 }
-
-                deleteAllTasks();
-                studentMessage.innerHTML = "Teacher added successfully."
-
             } catch (error) {
                 console.log('Full error:', error);
                 studentMessage.innerHTML = "Error adding a teacher. Please try again later."
@@ -1547,6 +1559,7 @@
             document.querySelector("#mistakes-summary-math").style.display = "none";
             studentStatisticsLangTitle.innerHTML = '';
             studentStatisticsLangMessage.innerHTML = '';
+            studentScoreDuration.innerHTML = ""
         }
 
         function clearTaskInfoContainerForStudents() {
@@ -1556,6 +1569,7 @@
             document.querySelector("#summary-table-for-student").innerHTML = '';
             taskDescriptionForStudent.innerHTML = '';
             teacherDispalyStudentTaskIndicatorForStudent.style.display = "none"
+            studentScoreDurationForStudent.innerHTML = ""
         }
 
         function clearTeacherMessage() {
@@ -1719,10 +1733,15 @@
             studentTaskGroup.innerHTML = `Task: ${task.group}`;
             teacherDispalyStudentTaskIndicator.style.backgroundColor = task.status ? greenCircleColorCode : redCircleColorCode;
             if (task.status) {
-                studentTaskCompletionDate.innerHTML = `<span class="task-info-subtitle">Atlikimo data</span>: ${task.completionDate.split('T')[0]}`
+                studentTaskCompletionDate.innerHTML = `<span class="task-info-subtitle">Completion date</span>: ${task.completionDate.split('T')[0]}`
             }
             if (task.result !== '') {
-                score = JSON.parse(task.result)[0]
+                const taskInfo = JSON.parse(task.taskDescription)
+                if (taskInfo[0] === "math" && taskInfo[4] === "C40") {
+                    studentScoreDuration.innerHTML = `<span class="task-info-subtitle">Task duration:</span> ${JSON.parse(task.result)[2]}`
+                }
+
+                const score = JSON.parse(task.result)[0]
                 if (parsedTaskDescription[0] === "math") {
                     studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Total equations:</span> ${score[0]}`;
                     studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Mistakes:</span> ${score[1]}`;
@@ -1781,6 +1800,11 @@
             teacherDispalyStudentTaskIndicatorForStudent.style.backgroundColor = task.status ? greenCircleColorCode : redCircleColorCode;
             if (task.status) {
                 studentTaskCompletionDateForStudents.innerHTML = `<span class="task-info-subtitle">Atlikimo data</span>: ${task.completionDate.split('T')[0]}`
+            }
+
+            const taskInfo = JSON.parse(task.taskInstructions)
+                if (taskInfo[0] === "math" && taskInfo[4] === "C40") {
+                    studentScoreDurationForStudent.innerHTML = `<span class="task-info-subtitle">Atlikimo trukmė:</span> ${JSON.parse(task.result)[2]}`
             }
 
             if (task.status) {
@@ -1892,6 +1916,8 @@
                         .filter(student => student.tasks.length > 0); // Remove students with no tasks after filtering
 
                 // Re-render with the filtered student list
+                taskContainerVisible = false;
+                toggleTaskVisibility();
                 renderDataForTeachers(filteredStudents);
                 clearTeacherMessage();
             });
@@ -2140,7 +2166,7 @@
 
         async function fetchDataForTeachers() {
             let success = false;
-            teacherMessageLine.innerHTML = "The student and task data are being retrieved from the database. This might take a few minutes."
+            teacherDataRetrievalMessage.innerHTML = "The student and task data are being retrieved from the database. This might take a few minutes."
             newTaskButton.disabled = true
             deleteTaskButton.disabled = true
             deleteStudentButton.disabled = true
@@ -2151,19 +2177,25 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    const errorData  = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
                 }
 
-                studentList = await response.json();
+                studentList = await response.json().catch(() => ({}));
                 success = true;
                 populateTaskGroupDropdown();
                 renderDataForTeachers();
             } catch (error) {
                 console.log('Error fetching data:', error);
-                teacherMessageLine.innerHTML = "Database not accessible. Please try again later."
+                if (error.message === "Unauthorized") {
+                    clearUserData();
+                    window.location.href = "prisijungimas.html";
+                } else {
+                    teacherDataRetrievalMessage.innerHTML = "Database not accessible. Please try again later."
+                }
             }
             if (success) {
-                teacherMessageLine.innerHTML = ""
+                teacherDataRetrievalMessage.innerHTML = ""
             }
             newTaskButton.disabled = false
             deleteTaskButton.disabled = false
@@ -2181,16 +2213,22 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    const errorData  = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
                 }
 
-                tasksList = await response.json();
+                tasksList = await response.json().catch(() => ({}));
                 success = true;
                 renderDataForStudents();
 
             } catch (error) {
-                console.log('Error fetching tasks:', error);
-                studentMessage.innerHTML = 'Database not accessible. Please try again later.';
+                console.log('Error fetching data:', error);
+                if (error.message === "Unauthorized") {
+                    clearUserData();
+                    window.location.href = "prisijungimas.html";
+                } else {
+                    studentMessage.innerHTML = 'Database not accessible. Please try again later.'
+                }
             }
             if (success) {
                 studentMessage.innerHTML = ""
@@ -2304,16 +2342,22 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    const errorData  = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
                 }
 
-                const allStudentsTasks = await response.json();
+                const allStudentsTasks = await response.json().catch(() => ({}));
                 const assignmentIds = allStudentsTasks.map(task => task.assignmentId);
                 deleteTasks(assignmentIds)
                 
             } catch (error) {
                 console.log('Error fetching tasks:', error);
-                alert('Database not accessible. Please try again later.');
+                if (error.message === "Unauthorized") {
+                    clearUserData();
+                    window.location.href = "prisijungimas.html";
+                } else {
+                    teacherMessageLine.innerHTML = 'Nepavyko pasiekti duomenų. Bandykite vėl vėliau.'
+                }
             }
     }
 
@@ -2338,21 +2382,25 @@
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                const errorData  = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
             }
 
             // Optionally, handle the response if needed (e.g., confirm deletion or update the UI)
-            const result = await response.json();
+            const result = await response.json().catch(() => ({}));
             if (result.message === "Tasks and their associated assignments deleted successfully.") {
                 teacherMessageLine.innerHTML = "Užduotys pašalintos sėkmingai!"
                 fetchDataForTeachers()
-            } else if (result.message === "An error occurred while deleting tasks.") {
-                teacherMessageLine.innerHTML = "Nepavyko pašalinti užduočių. Bandykite vėl vėliau."
             }
 
         } catch (error) {
-            console.log('Error deleting tasks:', error);
-            teacherMessageLine.innerHTML = "Nepavyko pašalinti užduočių. Bandykite vėl vėliau."
+            console.log('Error fetching tasks:', error);
+            if (error.message === "Unauthorized") {
+                clearUserData();
+                window.location.href = "prisijungimas.html";
+            } else {
+                teacherMessageLine.innerHTML = "An error occurred while deleting tasks. Please try later."
+            }
         } finally {
             deleteTaskButton.disabled = false
             confirmDeleteTaskButton.disabled = false
@@ -2463,7 +2511,7 @@
         });
 
         // First parse the response as JSON
-        const responseData = await response.json();
+        const responseData = await response.json().catch(() => ({}));
 
         if (responseData.message === 'Task set successfully') {
             teacherMessageLine.innerHTML = 'Task successfully added!'
@@ -2477,20 +2525,21 @@
             }, 500);
             teacherMessageLine2.innerHTML = 'Some students already have the maximum allowed tasks (2) per student. Delete old tasks to add new ones.'
         } else {
-            clearTimeout(timeoutReference);
-            submitNewTaskButton.classList.add('invalid-submition')
-            var timeoutReference = setTimeout(function() {
-                removeError(submitNewTaskButton);
-            }, 500);
-            teacherMessageLine2.innerHTML = 'Task assignment failed. Try again later.'
+            throw new Error(responseData.message || `HTTP error! Status: ${response.status}`);
         }
         } catch (error) {
-            clearTimeout(timeoutReference);
-            submitNewTaskButton.classList.add('invalid-submition')
-            var timeoutReference = setTimeout(function() {
-                removeError(submitNewTaskButton);
-            }, 500);
-            teacherMessageLine2.innerHTML = 'Task assignment failed. Try again later.';
+            console.log('Error fetching tasks:', error);
+            if (error.message === "Unauthorized") {
+                clearUserData();
+                window.location.href = "prisijungimas.html";
+            } else {            
+                clearTimeout(timeoutReference);
+                submitNewTaskButton.classList.add('invalid-submition')
+                var timeoutReference = setTimeout(function() {
+                    removeError(submitNewTaskButton);
+                }, 500);
+                teacherMessageLine2.innerHTML = 'Nepavyko pridėti užduoties. Bandykite vėl vėliau.';
+        }
         } finally {
             newTaskButton.disabled = false
             enableTeacherControlPannel();
@@ -2662,7 +2711,7 @@ async function deleteInactiveUsers() {
             }
         });
 
-        const responseData = await response.json();
+        const responseData = await response.json().catch(() => ({}));
         
         if (!response.ok) {
             throw new Error(responseData.message || 'Failed to delete inactive users');

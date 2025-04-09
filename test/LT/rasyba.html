@@ -408,9 +408,9 @@ window.onload = function () {
 		return null; // Return null or empty object in case of error
 	}))).then(([sentenceLibrary]) => {
 
-
 		let sakiniai = [];
-		let atsakymai = {};
+		window.atsakymai = {};
+		window.mistakeRecords = {};
 		let questionsToDisplay = Number(controller.modeChoice2);
 		let totalSentencesCompleted = 0;
 		let firstTimeChecking = true;
@@ -602,7 +602,8 @@ window.onload = function () {
 									let wordsThatCanBeUsedForQuestions = {};
 									let wordsOneMustBeUsed = {};
 									// Loop through sentence and process word information
-									sentence["sentence"].map(([beforePunctuation, word, afterPunctuation, wordInfo]) => {
+									sentence["sentence"].map(([wordData, id]) => {
+										const [beforePunctuation, word, afterPunctuation, wordInfo] = wordData
 										if(wordInfo) {
 											let matchesCondition = false;
 											let matchesSubCondition = false;
@@ -825,7 +826,8 @@ window.onload = function () {
 									} else {
 									// Now loop through the sentence again and build the final formatted sentence
 									
-									const formattedSentence = sentence["sentence"].reduce((acc, [beforePunctuation, word, afterPunctuation, wordInfo]) => {
+									const formattedSentence = sentence["sentence"].reduce((acc, [wordData, id]) => {
+										const [beforePunctuation, word, afterPunctuation, wordInfo] = wordData;
 										if (word in wordsToBeUsed) {
 											let pagalbaText = "";
 											let valuesToShow = [];
@@ -902,6 +904,7 @@ window.onload = function () {
 												atsakymai[`id-${questionId}`]["klausimas"] = [wordInfo["gal-c"][0][0][0], '']
 												atsakymai[`id-${questionId}`]["atsakymas"] = [wordInfo["gal-c"][0][1]];
 												atsakymai[`id-${questionId}`]["kl-grupe"] = wordsToBeUsed[word];
+												atsakymai[`id-${questionId}`]["zodzio-id"] = id;
 												questionId++;
 												
 												}
@@ -946,7 +949,7 @@ window.onload = function () {
 														atsakymai[`id-${questionId}`]["klausimas"] = [randomElement[0][0], randomElement[2][0]]
 														atsakymai[`id-${questionId}`]["atsakymas"] = [randomElement[1]];
 														atsakymai[`id-${questionId}`]["kl-grupe"] = wordsToBeUsed[word];
-
+														atsakymai[`id-${questionId}`]["zodzio-id"] = id;
 														questionId++;
 													}
 											} else {
@@ -959,6 +962,7 @@ window.onload = function () {
 														atsakymai[`id-${questionId}`]["klausimas"] = [randomElement[0][0], randomElement[2][0]]
 														atsakymai[`id-${questionId}`]["atsakymas"] = [randomElement[1]];
 														atsakymai[`id-${questionId}`]["kl-grupe"] = wordsToBeUsed[word];
+														atsakymai[`id-${questionId}`]["zodzio-id"] = id;
 														questionId++;
 														
 												}
@@ -1186,31 +1190,19 @@ function setupDynamicListeners() {
     });
 }
 
-function recordGrammarMistakes (asnwer) {
-    while (controller.currentMistakes.length > 29) {
-      controller.currentMistakes.splice(0, 1)
-    }
-
-	const mistakeEncoudingIndex = {
-		"fsc-gal": "C61",
-		"dkt": "C62",
-		"bdv": "C63",
-		"prv": "C64",
-		"vks": "C65",
-		"įsi-r": "C66",
-		"fsc-con": "C67",
-		"fsc-vow": "C68",
-		"prš": "C69",
-		"prs": "C70",
-		"asim": "C71",
-		"md": "C72"
+function recordGrammarMistakes (inputId, userInput) {
+	if (!mistakeRecords[inputId]) {
+		mistakeRecords[inputId] = {};
+		mistakeRecords[inputId] = {
+		"mistakesCounter": 0,
+		"wrongAnswer": []
+		};
 	}
-    controller.currentMistakes.push([[asnwer["klausimas"][0], asnwer["atsakymas"][0][0], asnwer["klausimas"][1]], mistakeEncoudingIndex[asnwer["kl-grupe"]]])
-    while (controller.totalMistakes.length > 29) {
-      controller.totalMistakes.splice(0, 1)
-    }
-    controller.totalMistakes.push([[asnwer["klausimas"][0], asnwer["atsakymas"][0][0], asnwer["klausimas"][1]], mistakeEncoudingIndex[asnwer["kl-grupe"]]])
-  }
+	mistakeRecords[inputId]["mistakesCounter"]+=1
+	if (mistakeRecords[inputId]["wrongAnswer"].length < 3) {
+		mistakeRecords[inputId]["wrongAnswer"].push(userInput);
+	}
+}
 
 function checkAnswers() {
     const inputs = document.querySelectorAll('.question-input');
@@ -1244,7 +1236,7 @@ function checkAnswers() {
 
             // Compare the stripped value with the corresponding value from atsakymai
 			if (atsakymai[inputId] && atsakymai[inputId]["atsakymas"] && atsakymai[inputId]["atsakymas"].some(answerArray => {
-				return answerArray.some(answer => inputValue.replace(/\s+/g, '') === answer.replace(/\s+/g, ''));
+				return answerArray.some(answer => inputValue === answer.replace(/\s+/g, ''));
 			})) {
 				input.classList.add('correct-answer');
 				input.classList.remove('wrong-answer');
@@ -1256,9 +1248,8 @@ function checkAnswers() {
 				input.classList.add('wrong-answer');
 				input.classList.remove('correct-answer');
 				answersCorrect = false;
-				if (firstTimeChecking) {
-					recordGrammarMistakes(atsakymai[input.id])
-				}
+				controller.mistakesTracker+=1;
+				recordGrammarMistakes(input.id, inputValue);
 			}
 
 
@@ -1271,7 +1262,6 @@ function checkAnswers() {
             controller.answeredQuestionTracker += NumberOfQuestionsInRound;
 			localStorage.setItem('controller', JSON.stringify(controller));
             document.getElementById('mistake-tracker').innerHTML = `Teisingai: ${totalCorrectAnswers}/${controller.answeredQuestionTracker}`;
-			controller.mistakesTracker = controller.answeredQuestionTracker - totalCorrectAnswers;
 			localStorage.setItem('controller', JSON.stringify(controller));
         }
 
@@ -1282,15 +1272,6 @@ function checkAnswers() {
 			}
 
 			controller.correctAnswerTracker = totalCorrectAnswers
-			if (controller.modeChoice4 === "C40") {
-				if (totalSentencesCompleted === controller.questionNumber) {
-					localStorage.setItem("elapsedTime", timerDisplay.textContent);
-					controller.taskCompleted = true;
-					formatFinalMessageForGrammar();
-					controller.questionsStopped = true;
-					localStorage.setItem('controller', JSON.stringify(controller));
-				}
-			}
 
 			controller.randomSelection = [];
 			localStorage.setItem("controller", JSON.stringify(controller));
@@ -1341,7 +1322,19 @@ function helpToggle() {
 
 
 			function nextQuestion() {
-				displaySentences()
+				if (controller.modeChoice4 === "C40") {
+					if (totalSentencesCompleted === controller.questionNumber) {
+						localStorage.setItem("elapsedTime", timerDisplay.textContent);
+						controller.taskCompleted = true;
+						formatFinalMessageForGrammar();
+						controller.questionsStopped = true;
+						localStorage.setItem('controller', JSON.stringify(controller));
+					}
+				}
+				
+				if (!controller.questionsStopped) {
+					displaySentences()
+				}
 				toggleHelpButton();
 				document.getElementById('check-answers').style.display = "flex"
 				nextQuestionButton.style.display = "none";
@@ -1475,7 +1468,10 @@ if (controller.questionsStopped) {
 }
 
 window.addEventListener("beforeunload", () => {
-    controller.taskId = 0;
+	if (!redirectingToAuthentication) {
+		controller.taskId = 0;
+		controller.taskCompleted = false;
+	}
     localStorage.setItem("controller", JSON.stringify(controller));
 	localStorage.setItem("elapsedTime", timerDisplay.textContent);
 	localStorage.setItem("elapsedTime", timerDisplay.textContent);

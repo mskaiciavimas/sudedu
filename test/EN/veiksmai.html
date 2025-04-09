@@ -711,6 +711,14 @@ window.addEventListener('resize', function() {
 	}
 }
 });
+
+window.addEventListener("beforeunload", () => {
+	if (!redirectingToAuthentication) {
+		controller.taskId = 0;
+		controller.taskCompleted = false;
+	}
+	localStorage.setItem("controller", JSON.stringify(controller));
+});
 	</script>
 </body>
 

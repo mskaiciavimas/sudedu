@@ -263,7 +263,6 @@ document.querySelectorAll('.control').forEach(control => {
 		stopButtonSpanElement.innerHTML = "refresh";
         timerDisplay.textContent = localStorage.getItem("elapsedTime");
     }
-	console.log(controller)
     stylePage();
 };
 
@@ -560,8 +559,11 @@ window.addEventListener('resize', function() {
 });
 
 window.addEventListener("beforeunload", () => {
-    controller.taskId = 0;
-    localStorage.setItem("controller", JSON.stringify(controller));
+	if (!redirectingToAuthentication) {
+		controller.taskId = 0;
+		controller.taskCompleted = false;
+	}
+	localStorage.setItem("controller", JSON.stringify(controller));
 });
 
 

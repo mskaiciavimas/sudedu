@@ -126,12 +126,12 @@
 	<script>
 	function redirectToIndex() {
 		localStorage.setItem('controller', JSON.stringify(controller))
-		window.location.href = "/test";
+		window.location.href = "./";
 	}
 
 	let userData = localStorage.getItem('userData');
 	if (userData) {
-		window.location.href = `/test/LT`;
+		window.location.href = `/LT`;
 	}
 
 	document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
@@ -155,6 +155,12 @@
 	nickname.style.display = 'none';
 	isTeacherDiv.style.display = 'none';
 
+	controller = JSON.parse(localStorage.getItem('controller'));
+
+	if (controller.taskId !== 0 && controller.taskCompleted === true) {
+		errorField.innerHTML = "Prisijunkite, kad rezultatai būtų išsaugoti."
+	}
+
 	async function toggleIsRegister() {
         isRegistration = !isRegistration
         registerBtn.innerText = isRegistration ? 'Prisijungti' : 'Sukurti paskyrą';
@@ -167,9 +173,9 @@
 
 	async function authenticate() {
 		// access email and pass values
-		const emailVal = email.value
-		const passVal = password.value
-		const nicknameVal = nickname.value
+		const emailVal = email.value.trim();
+		const passVal = password.value.trim();
+		const nicknameVal = nickname.value.trim();
 		const isTeacherVal = isTeacher.checked
 
 		// guard clauses... if authenticating, return
@@ -241,7 +247,20 @@
 				};
 
 				localStorage.setItem('userData', JSON.stringify(userData));
-				window.location.href = `/test/LT`;
+
+					if (controller.taskId !== 0 && controller.taskCompleted === true) {
+						if (controller.mode === "math") {
+						window.location.href = `veiksmai.html`;
+						} else if (controller.mode === "lang") {
+							if (controller.modeChoice1 === "C49") {
+								window.location.href = `teksto-suvokimas.html`;
+							} else if (controller.modeChoice1 === "C50") {
+								window.location.href = `rasyba.html`;
+							}
+						}
+					} else {
+						window.location.href = `/LT`;
+					}
 			} else {
 				if (data.message == 'User not found') {
 					errorField.innerHTML = 'Vartotojas nerastas';

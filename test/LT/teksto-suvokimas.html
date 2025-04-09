@@ -434,6 +434,9 @@ window.onload = function () {
     let mistakesTracker = document.getElementById('mistakes-tracker'); 
     const helpDiv = document.getElementById('help');
     let filteredTextLibrary = [];
+    let currentTextId;
+    let answeredTexts = [];
+    window.mistakesSummary = {};
 
     function generateFilteredTextLibrary() {
     var tempTextLibrary = Array.from(textDatabase);
@@ -487,6 +490,22 @@ window.onload = function () {
         selectedItem = controller.randomSelection[0];
       }
     
+      currentTextId = selectedItem.id;
+      answeredTexts.push(currentTextId);
+
+      console.log("currentTextId", currentTextId);
+
+      if (!mistakesSummary[currentTextId]) {
+        mistakesSummary[currentTextId] = {};
+      }
+
+      textIncidenceCount = answeredTexts.filter(id => id === currentTextId).length;
+
+      if (!mistakesSummary[currentTextId][`${textIncidenceCount}`]) {
+        mistakesSummary[currentTextId][`${textIncidenceCount}`] = 0;
+      }
+
+
       const originalTitle = selectedItem.title;
       const fullText = [...selectedItem.text.start, ...selectedItem.text.middle, ...selectedItem.text.end];
       const paragraphAuthor = selectedItem.author;
@@ -648,40 +667,40 @@ document.addEventListener('touchmove', function (event) {
         }, 500);
         }
 
-  function arraysAreEqual(items, arr1, arr2, field) {
-  var answerCorrect = true;
-  
-  // Check for length mismatch
-  if (arr1.length !== arr2.length) {
-    answerCorrect = false;
-  }
+      function arraysAreEqual(items, arr1, arr2, field) {
+      var answerCorrect = true;
+      
+      // Check for length mismatch
+      if (arr1.length !== arr2.length) {
+        answerCorrect = false;
+      }
 
-  const minLength = Math.min(arr1.length, arr2.length);
-  
-  // Compare items up to the shortest length
-  for (let i = 0; i < minLength; i++) {
-    if (arr1[i].trim() !== arr2[i].trim()) {
-      answerCorrect = false;
-      items[i].style.backgroundColor = '#D57E7C';
-    } else {
-      items[i].style.backgroundColor = 'rgb(182, 200, 103)';
+      const minLength = Math.min(arr1.length, arr2.length);
+      
+      // Compare items up to the shortest length
+      for (let i = 0; i < minLength; i++) {
+        if (arr1[i].trim() !== arr2[i].trim()) {
+          answerCorrect = false;
+          items[i].style.backgroundColor = '#D57E7C';
+        } else {
+          items[i].style.backgroundColor = 'rgb(182, 200, 103)';
+        }
+      }
+
+      // Handle extra items in arr1 if it's longer than arr2
+      if (arr1.length > arr2.length) {
+        answerCorrect = false;
+        for (let i = minLength; i < arr1.length; i++) {
+          items[i].style.backgroundColor = '#D57E7C';
     }
   }
 
-  // Handle extra items in arr1 if it's longer than arr2
-  if (arr1.length > arr2.length) {
-    answerCorrect = false;
-    for (let i = minLength; i < arr1.length; i++) {
-      items[i].style.backgroundColor = '#D57E7C';
+    // Trigger error indicator if arrays are not equal
+    if (!answerCorrect) {
+      errorIndicator(field);
     }
-  }
 
-  // Trigger error indicator if arrays are not equal
-  if (!answerCorrect) {
-    errorIndicator(field);
-  }
-
-  return answerCorrect;
+    return answerCorrect;
 }
 
 
@@ -772,10 +791,17 @@ document.addEventListener('touchmove', function (event) {
         }
 
         controller.mistakesTracker++;
+        recordTextComprehensionMistake()
         localStorage.setItem('controller', JSON.stringify(controller));
         mistakesTracker.innerHTML = `Klaidos: ${controller.mistakesTracker}`;
     }
     });
+
+    function recordTextComprehensionMistake() {
+      console.log(currentTextId)
+      mistakesSummary[currentTextId][`${textIncidenceCount}`]+=1
+      console.log(mistakesSummary)
+    }
 
 
 
@@ -1054,6 +1080,8 @@ document.addEventListener('touchmove', function (event) {
           helpTracker = 0;
           controller.mistakesTracker = 0;
 					controller.answeredQuestionTracker = 0;
+          answeredTexts = [];
+          mistakesSummary = {};
 
           if (controller.modeChoice4 === "C40") {
             questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
@@ -1081,7 +1109,10 @@ document.addEventListener('touchmove', function (event) {
     initiateTheProgram();
 
     window.addEventListener("beforeunload", () => {
-        controller.taskId = 0;
+        if (!redirectingToAuthentication) {
+          controller.taskId = 0;
+          controller.taskCompleted = false;
+        }
         localStorage.setItem("controller", JSON.stringify(controller));
         localStorage.setItem("elapsedTime", timerDisplay.textContent);
         localStorage.setItem("elapsedTime", timerDisplay.textContent);

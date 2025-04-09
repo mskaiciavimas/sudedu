@@ -93,6 +93,7 @@
         }
         
         #teacher-message-line,
+        #teacher-data-retrieval-message,
         #student-message {
             text-align: center;
             margin-right: 4vw;
@@ -104,6 +105,8 @@
             margin-top: 0;
             margin-bottom: 15px;
             padding: 5px;
+            border-radius: 0;
+            border: none;
         }
 
         #outer-student-list-container {
@@ -193,10 +196,6 @@
             box-shadow: 0 0 0 5px #fdf7e8; /* Adds a glow effect around the selected element */
         }
 
-        .selection-option.temp-disabled {
-            pointer-events: none;
-        }
-
         #student-list li { 
             padding: 10px 0 0 10px; 
         }
@@ -236,7 +235,7 @@
 
         #student-task-info-container {
             width: 100%;
-            padding-left: 25px;
+            padding-left: 15px;
         }
 
         #student-task-info-container-inner {
@@ -250,7 +249,12 @@
             padding: 15px;
         }
 
-        .summary-inner-container {
+        .accordion-item:first-of-type .accordion-button,
+        .accordion-item:last-of-type .accordion-button.collapsed {
+            border-radius: 0;
+        }
+
+        .summary-inner-container:not(:empty) {
             margin-top: 10px;
             max-height: 200px;
             overflow-y: scroll;
@@ -335,10 +339,6 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-        }
-
-        #student-score-asnwer-number {
-            margin-top: 5px;
         }
 
         #student-task-group,
@@ -448,13 +448,6 @@
             margin-left: 15px;
         }
 
-        .incorrect-part {
-        font-weight: bold;
-        padding: 2px 1px;
-        border-radius: 3px;
-        color: #D57E7E;
-        }
-
         .grammar-view-selector {
             position: relative;
             border: none;
@@ -511,6 +504,43 @@
             font-size: 1.5rem;
         }
 
+        #text-viewer {
+            width: 100%;
+            margin-top: 15px;
+            background-color: #FAEDCD;
+        }
+
+        .accordion-item {
+            border-radius: 0 !important;
+            border: none;
+        }
+
+        .accordion-body {
+            background-color: #FAEDCD;
+        }
+
+        .accordion-button:not(.collapsed)::after {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+        }        
+        
+        .accordion-button {
+            background-color: #FAEDCD;
+            color: black;
+            font-size: 1.3rem;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
+            border: none;
+        }
+
+        .accordion-button:focus,
+        .accordion-button:active,
+        .accordion-button:not(.collapsed) {
+            background-color: #FAEDCD;
+            border: none;
+            color: black;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
         @keyframes shake {
         0% { margin-left: 0rem; }
         25% { margin-left: 0.5rem; }
@@ -518,8 +548,78 @@
         100% { margin-left: 0rem; }
         }
 
+        .clickable-word {
+            cursor: pointer;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .clickable-word:hover {
+            text-decoration: underline;
+        }
+
+
+        .incorrect-part {
+            pointer-events: none;
+            padding: 0;
+            font-weight: bold;
+            padding: 2px 1px;
+            border-radius: 3px;
+            color: #01937C;
+        }
+
+        .user-incorrect-answer {
+            color: #D57E7E;
+            font-weight: bold;
+        }
+
+        #sentence-with-mistake-field:not(:empty),
+        #sentence-with-mistake-field-for-students:not(:empty) {
+            margin: 10px 0;
+        }
+
+        #view-text-id-input {
+            width: 30%;
+        }
+
+        #submitButton {
+            margin-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        #text-container-row {
+            margin-top: 25px;
+        }
+
+        #text-subtitle {
+            font-weight: bold;
+        }
+
+        #text-compatibility ul {
+            margin-left: 30px;
+        }
+
+        .text-title {
+            margin-top: 10px;
+        }
+
+        .text-individual-items {
+            background-color: #fdf7e8;
+            margin: 5px 0;
+        }
+        
+        .text-comprehenstion-text-id {
+            cursor: pointer;
+        }
+
+        .text-comprehenstion-text-id:hover {
+            text-decoration: underline;
+        }
+
         @media (max-width: 1999px) {
             #teacher-message-line,
+            #teacher-data-retrieval-message,
             #student-message {
                 margin-right: 8vw;
             }
@@ -530,7 +630,8 @@
                 padding-left: 0;
                 margin-top: 20px;
             }
-            #teacher-message-line {
+            #teacher-message-line,
+            #teacher-data-retrieval-message {
                 margin-right: 0;
             }
 
@@ -584,7 +685,8 @@
                 flex-direction: column;
             }
 
-            #teacher-message-line {
+            #teacher-message-line,
+            #teacher-data-retrieval-message {
                 margin-bottom: 15px;
             }
         }
@@ -600,7 +702,7 @@
             <span class="language-option language-option-LT selected" onclick="setLanguage('LT')">LT</span>
         </div>
         <div class="col-6 d-flex justify-content-end align-items-end" id="user-login-div">
-                    <a id="user-login-anchor" href="/test/prisijungimas.html" class="log-in">Prisijungti</a>
+                    <a id="user-login-anchor" href="./prisijungimas.html" class="log-in">Prisijungti</a>
 
                     <div id="loggedin-user-menu">
         <div class="profile">
@@ -614,8 +716,8 @@
         </div>
         <div class="menu">
             <ul>
-                <li><a href="/test/index.html"><i class="ph-bold ph-user"></i>Pradžia</a></li>
-                <li><a href="/test/LT" onclick="clearUserData()"><i class="ph-bold ph-envelope-simple"></i>Atsijungti</a></li>
+                <li><a href="index.html"><i class="ph-bold ph-user"></i>Pradžia</a></li>
+                <li><a href="/LT" onclick="clearUserData()"><i class="ph-bold ph-envelope-simple"></i>Atsijungti</a></li>
             </ul>
         </div>
                     </div>
@@ -654,8 +756,9 @@
                 </div>
             </div>
 
-                <div class="col-lg-6 col-md-4 col-12 d-flex align-items-center justify-content-center teacher-button-line">
+                <div class="col-lg-6 col-md-4 col-12 d-flex flex-column align-items-center justify-content-center teacher-button-line">
                     <div id="teacher-message-line"></div>
+                    <div id="teacher-data-retrieval-message"></div>
                 </div>
             </div>
             </div>
@@ -970,8 +1073,10 @@
                         <div class="col-12" id="student-statistics-math-error-frequency"></div>
                     </div>
 
+                    <div class="col-12" id="student-score-duration"></div>      
                     <div class="col-12" id="student-score-asnwer-number"></div>
-                    <div class="col-12" id="student-score-mistake-number"></div>
+                    <div class="col-12" id="student-score-mistake-number"></div>  
+                    <div class="col-12" id="text-comprehension-mistakes-summary"></div>
 
                     <div id="mistakes-summary-math" style="display: none;">
                             <div id="mistakes-table-title-math" class="task-info-subtitle">Dažniausios skaičiavimo klaidos:</div>
@@ -997,11 +1102,15 @@
                     </div>
                     </div>
 
+                    <div id="sentence-with-mistake-field"></div>
+
                     <div id="student-statistics-lang-text-comprahension" style="display: none;">
                         <div class="student-statistics-subtitle" id="student-statistics-lang-text-comprahension-komponavimas" style="display: none;">Turinio komponavimas</div>
                         <div class="col-12" id="student-statistics-komponavimas-error-frequency"></div>
+                        <div class="col-12" id="student-statistics-komponavimas-completed-texts"></div>
                         <div class="student-statistics-subtitle" id="student-statistics-lang-text-comprahension-isdestymas" style="display: none;">Struktūros išdėstymas</div>
                         <div class="col-12" id="student-statistics-isdestymas-error-frequency"></div>
+                        <div class="col-12" id="student-statistics-isdestymas-completed-texts"></div>
                     </div>
 
 
@@ -1014,6 +1123,46 @@
                 </div>
             </div>
             </div>
+
+
+
+            <div class="accordion" id="text-viewer">
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="text-viewer-heading">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                      Tekstų naršyklė
+                    </button>
+                  </h2>
+                  <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="text-viewer-heading" data-bs-parent="#text-viewer">
+                    <div class="accordion-body">
+                        <div class="row d-flex align-items-center justify-content-center">
+                            <input type="text" class="form-control" id="view-text-id-input" placeholder="Teksto ID" />
+                            <div class="col">
+                              <button type="button" class="btn btn-primary" id="submitButton" onclick="passTextIdToTheLocatorFunction()">Ieškoti</button>
+                            </div>
+                        </div>
+                        <div class="col-12" id="text-message"></div>
+
+                        <div class="row" id="text-container-row">
+                            <div class="col-12" id="text-id"></div>
+                            <div class="col-12" id="text-compatibility"></div>
+                            <div class="col-12" id="text-title"></div>
+                            <div class="col-12" id="text-author"></div>
+                            <div class="col-12" id="text-start"></div>
+                            <div class="col-12" id="text-middle"></div>
+                            <div class="col-12" id="text-end"></div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+
+
+
+
+
+
         </div>
 
             <div id="student-gui" class="row" style="display: none;">
@@ -1052,6 +1201,7 @@
                                     <div id="student-task-status-indicator-for-student"></div>
                                 </div>
                                 <div class="col-12" id="student-task-completion-date-for-students"></div>
+                                <div class="col-12" id="student-score-duration-for-student"></div>  
                                 <div class="col-12" id="student-score-asnwer-number-for-student"></div>
                                 <div class="col-12" id="student-score-mistake-number-for-student"></div>
 
@@ -1069,6 +1219,7 @@
                                     <div class="col-12 table-container">
                                         <div id="summary-table-grammar-for-student"></div>
                                     </div>
+                                    <div id="sentence-with-mistake-field-for-student"></div>
                                 </div>
                                 </div>
                                 <div id="task-description-outer-container-for-student">
@@ -1132,7 +1283,7 @@
         if (userDataString) {
             userData = JSON.parse(userDataString);
         } else {
-            window.location.href = '/test/LT';
+            window.location.href = '/LT';
         }
 
         let studentList;
@@ -1156,6 +1307,7 @@
         const deleteTaskButton = document.getElementById('delete-task-button');
         const confirmDeleteTaskButton = document.getElementById('confirm-delete-task-button');
         const teacherMessageLine = document.getElementById('teacher-message-line');
+        const teacherDataRetrievalMessage = document.getElementById('teacher-data-retrieval-message');
         const teacherMessageLine2 = document.getElementById('teacher-message-line-2');
         const newTaskOptions = document.getElementById('new-task-options-container');
         const studentTaskInfoContainer = document.getElementById('student-task-info-container');
@@ -1166,6 +1318,10 @@
         const studentScoreAnswerNumber = document.getElementById('student-score-asnwer-number');
         const studentScoreMistakeNumber = document.getElementById('student-score-mistake-number');
 
+        const textComprehensionMistakesSummary = document.getElementById('text-comprehension-mistakes-summary');
+
+        const studentScoreDuration= document.getElementById('student-score-duration');
+        const studentScoreDurationForStudent = document.getElementById('student-score-duration-for-student');
 
         let dynamicStudentContent = document.getElementById('dynamic-student-content');
 
@@ -1648,11 +1804,12 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    const errorData  = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
                 }
 
                 // Optionally, handle the response if needed (e.g., confirm deletion or update the UI)
-                const result = await response.json();
+                const result = await response.json().catch(() => ({}));
                 if (result.message === "Student removal successful.") {
                     fetchDataForTeachers()
                     teacherMessageLine.innerHTML = "Mokinių šalinimas sėkmingas.";
@@ -1660,8 +1817,12 @@
 
             } catch (error) {
                 console.log('Error deleting tasks:', error);
-                teacherMessageLine.innerHTML = 'Nepavyko pašalinti mokinių. Bandykite vėl vėliau.';
-
+                if (error.message === "Unauthorized") {
+                    clearUserData();
+                    window.location.href = "prisijungimas.html";
+                } else {
+                    studentMessage.innerHTML = 'Nepavyko pašalinti mokinių. Bandykite vėl vėliau.';
+                }
             } finally {
                 deleteStudentButton.disabled = false
                 confirmDeleteStudentButton.disabled = false;
@@ -1692,21 +1853,22 @@
                 });
 
                 // Safely parse response (fallback if JSON fails)
-                const responseData = await response.json().catch(() => ({}));
+                const responseData = await response.json().catch(() => ({}))
 
                 if (!response.ok) {
-                    if (responseData.error === 'Invalid teacher ID') {
-                        alert("Neteisingas mokytojo ID numeris.");
+                    if (responseData.message === "Unauthorized") {
+                        clearUserData();
+                        window.location.href = "prisijungimas.html";
+                    } else if (responseData.error === 'Invalid teacher ID') {
+                        studentMessage.innerHTML = "Neteisingas mokytojo ID numeris."
                     } else if (responseData.error === 'Relationship already exists') {
-                        alert("Šis mokytojas jau yra jūsų sąraše.");
+                        studentMessage.innerHTML = "Šis mokytojas jau yra jūsų sąraše."
                     } else if (responseData.error === 'Student already has a teacher. Use PUT to update instead.') {
-                        alert("Jau turi pridėtą mokytoją.");
+                        studentMessage.innerHTML = "Jau turi pridėtą mokytoją."
                     } else {
                         throw new Error(`Server error: ${response.status}`);
                     }
-                    return;
-                }
-
+                } else {
                 userData.teacher = responseData.teacherInfo
                 localStorage.setItem('userData', JSON.stringify(userData))
 
@@ -1720,8 +1882,8 @@
                     addTeacherButton.style.display = "none";
                     changeTeacherToggleButton.style.display = "block"
                 }
-
                 studentMessage.innerHTML = "Mokytojas pridėtas sėkmingai."
+            }
             } catch (error) {
                 console.log('Full error:', error);
                 studentMessage.innerHTML = "Įvyko klaida. Bandykite vėl vėliau."
@@ -1747,10 +1909,13 @@
                 });
 
                 // Safely parse response (fallback if JSON fails)
-                const responseData = await response.json().catch(() => ({}));
+                const responseData = await response.json().catch(() => ({}))
 
                 if (!response.ok) {
-                    if (response.status === 400 && responseData.error === 'Invalid teacher ID') {
+                    if (responseData.message === "Unauthorized") {
+                        clearUserData();
+                        window.location.href = "prisijungimas.html";
+                    } else if (response.status === 400 && responseData.error === 'Invalid teacher ID') {
                         studentMessage.innerHTML = "Neteisingas mokytojo ID numeris."
                     } else if (response.status === 404 && responseData.error === 'No existing teacher relationship found') {
                         studentMessage.innerHTML = "Nerastas esamas mokytojo ryšys. Pirmiausia pridėkite mokytoją."
@@ -1761,30 +1926,27 @@
                     } else {
                         throw new Error(`Server error: ${response.status}`);
                     }
-                    return;
-                }
-                
-                userData.teacher = responseData.teacherInfo
-                localStorage.setItem('userData', JSON.stringify(userData))
-
-                if (userData.teacher === '') {
-                    addTeacherInput.style.display = "block";
-                    addTeacherButton.style.display = "block";
-                    changeTeacherToggleButton.style.display = "none"
                 } else {
-                    teacherName.innerHTML = `Mok. ${userData.teacher}`
-                    teacherName.style.display = "block"
-                    addTeacherInput.style.display = "none";
-                    addTeacherButton.style.display = "none";
-                    changeTeacherInput.style.display = "none";
-                    changeTeacherButton.style.display = "none";
-                    changeTeacherToggleButton.style.display = "block"
-                    changeTeacherToggle();
+                    userData.teacher = responseData.teacherInfo
+                    localStorage.setItem('userData', JSON.stringify(userData))
+
+                    if (userData.teacher === '') {
+                        addTeacherInput.style.display = "block";
+                        addTeacherButton.style.display = "block";
+                        changeTeacherToggleButton.style.display = "none"
+                    } else {
+                        teacherName.innerHTML = `Mok. ${userData.teacher}`
+                        teacherName.style.display = "block"
+                        addTeacherInput.style.display = "none";
+                        addTeacherButton.style.display = "none";
+                        changeTeacherInput.style.display = "none";
+                        changeTeacherButton.style.display = "none";
+                        changeTeacherToggleButton.style.display = "block"
+                        changeTeacherToggle();
+                    }
+                    deleteAllTasks();
+                    studentMessage.innerHTML = "Mokytojas sėkmingai pakeistas."
                 }
-
-                deleteAllTasks();
-                studentMessage.innerHTML = "Mokytojas sėkmingai pakeistas."
-
             } catch (error) {
                 console.log('Full error:', error);
                 studentMessage.innerHTML = "Įvyko klaida keičiant mokytoją. Bandykite vėl vėliau."
@@ -1816,6 +1978,13 @@
             studentStatisticsTextComprahensionIsdestymasTitle.style.display = "none";
             studentStatisticsTextComprahensionKomponavimasTitle.style.display = "none";
             studentTaskCompletionDate.innerHTML = '';
+            document.querySelector("#summary-table-grammar").innerHTML = "";
+            document.querySelector("#summary-table").innerHTML = "";
+            document.querySelector("#sentence-with-mistake-field").innerHTML = "";
+            textComprehensionMistakesSummary.innerHTML = "";
+            studentScoreDuration.innerHTML = "";
+            studentStatisticsIsdestymasCompletedTexts.innerHTML = "";
+            studentStatisticsKomponavimasCompletedTexts.innerHTML = "";
         }
 
         function clearTaskInfoContainerForStudents() {
@@ -1826,6 +1995,10 @@
             taskDescriptionForStudent.innerHTML = '';
             teacherDispalyStudentTaskIndicatorForStudent.style.display = "none"
             studentTaskCompletionDateForStudents.innerHTML = '';
+            document.querySelector("#summary-table-grammar-for-student").innerHTML = "";
+            document.querySelector("#summary-table-for-student").innerHTML = "";
+            document.querySelector("#sentence-with-mistake-field-for-student").innerHTML = "";
+            studentScoreDurationForStudent.innerHTML = ""
         }
 
         function clearTeacherMessage() {
@@ -1845,6 +2018,9 @@
         const studentStatisticsTextComprahensionDiv = document.querySelector("#student-statistics-lang-text-comprahension")
         const studentStatisticsKomponavimasErrorFrequency = document.querySelector("#student-statistics-komponavimas-error-frequency"); 
         const studentStatisticsIsdestymasErrorFrequency = document.querySelector("#student-statistics-isdestymas-error-frequency"); 
+
+        const studentStatisticsKomponavimasCompletedTexts = document.querySelector("#student-statistics-komponavimas-completed-texts"); 
+        const studentStatisticsIsdestymasCompletedTexts= document.querySelector("#student-statistics-isdestymas-completed-texts"); 
 
         const studentStatisticsTextComprahensionIsdestymasTitle = document.querySelector("#student-statistics-lang-text-comprahension-isdestymas")
         const studentStatisticsTextComprahensionKomponavimasTitle = document.querySelector("#student-statistics-lang-text-comprahension-komponavimas")
@@ -1886,11 +2062,13 @@
                                     komponavimasTasks[0][0] += result[0][0];
                                     komponavimasTasks[0][1] += result[0][1];
                                     komponavimasTasks[1].push(...result[1]);
+                                    komponavimasTasks[1].push(task.completionDate.split("T")[0]);
                                 } else if (taskDesc[3] === "C52") {
                                     // Process isdestymas tasks
                                     isdestymasTasks[0][0] += result[0][0];
                                     isdestymasTasks[0][1] += result[0][1];
                                     isdestymasTasks[1].push(...result[1]);
+                                    isdestymasTasks[1].push(task.completionDate.split("T")[0]);
                                 }
                             }
                         }
@@ -2012,7 +2190,69 @@
             document.querySelector("#mistakes-summary-grammar").style.display = "none";
         }
 
+        function displayComletedTextIdsForTextComp(textInfo, htmlContainer) {
+            const ul = document.createElement("ol");
+            const textComprehensionTextsTitle = document.createElement("div");
+            textComprehensionTextsTitle.innerHTML = "Sudėlioti tekstai:";
+            textComprehensionTextsTitle.classList.add("task-info-subtitle");
 
+            // 1. Extract all [textId, mistakes, date] triples
+            const allEntries = [];
+            const entries = textInfo.slice(1); // Skip metadata (e.g., [2, 1])
+
+            for (const entry of entries) {
+                for (let i = 0; i < entry.length; i += 2) {
+                    const [textId, textMistakes] = entry[i];
+                    const date = entry[i + 1];
+                    allEntries.push({ textId, textMistakes, date });
+                }
+            }
+
+            // 2. Sort by textId (ascending, converted to number)
+            allEntries.sort((a, b) => Number(a.textId) - Number(b.textId));
+
+            // 3. Display sorted entries
+            for (const { textId, textMistakes, date } of allEntries) {
+                const li = document.createElement("li");
+                const textIdSpan = document.createElement("span");
+                const mistakesNumberSpan = document.createElement("span");
+                const completionDataSpan = document.createElement("span");
+
+                textIdSpan.innerHTML = `ID${textId}`;
+                textIdSpan.classList.add("text-comprehenstion-text-id");
+
+                // Lithuanian pluralization
+                let numberLabel;
+                const mistakesNum = Number(textMistakes);
+                if (mistakesNum === 0 || (mistakesNum > 9 && mistakesNum < 21)) {
+                    numberLabel = "klaidų";
+                } else if (mistakesNum === 1 || String(mistakesNum).endsWith("1")) {
+                    numberLabel = "klaida";
+                } else {
+                    numberLabel = "klaidos";
+                }
+
+                mistakesNumberSpan.innerHTML = `: ${textMistakes} ${numberLabel}`;
+                completionDataSpan.innerHTML = ` (${date})`;
+                textIdSpan.dataset.textId = textId;
+
+                textIdSpan.addEventListener("click", () => {
+                    const id = event.currentTarget.dataset.textId;
+                    textDatabaseEntryLocator(id);
+                });
+
+                li.appendChild(textIdSpan);
+                li.appendChild(mistakesNumberSpan);
+                li.appendChild(completionDataSpan);
+                ul.appendChild(li);
+            }
+
+            htmlContainer.appendChild(textComprehensionTextsTitle);
+            htmlContainer.appendChild(ul);
+        }
+
+        displayComletedTextIdsForTextComp(categorizedStudentTasks.isdestymas, studentStatisticsIsdestymasCompletedTexts)
+        displayComletedTextIdsForTextComp(categorizedStudentTasks.komponavimas, studentStatisticsKomponavimasCompletedTexts)
     }
                 
 
@@ -2033,7 +2273,52 @@
                 studentTaskCompletionDate.innerHTML = `<span class="task-info-subtitle">Atlikimo data</span>: ${task.completionDate.split('T')[0]}`
             }
             if (task.result !== '') {
-                score = JSON.parse(task.result)[0]
+                const parsedTaskResult = JSON.parse(task.result)
+                const score = parsedTaskResult[0]
+                const textComprehensionrResults = parsedTaskResult[1]
+
+                if (JSON.parse(task.taskDescription)[2] === "C49") {
+                    const ul = document.createElement("ol");
+                    const textComprehensionTextsTitle = document.createElement("div");
+                    textComprehensionTextsTitle.innerHTML = "Sudėlioti tekstai:";
+                    textComprehensionTextsTitle.classList.add("task-info-subtitle");
+
+                    textComprehensionrResults.forEach(([outerKey, value]) => {
+                        const li = document.createElement("li");
+                        const textIdSpan = document.createElement("span");
+                        const mistakesNumberSpan = document.createElement("span");
+                        textIdSpan.innerHTML = `ID${outerKey}`;
+                        textIdSpan.classList.add("text-comprehenstion-text-id");
+                        let numberLabel = ''
+                        if (Number(value) === 0 || (Number(value) > 9 && Number(value) < 21)) {
+                            numberLabel = "klaidų";
+                        } else if (Number(value) === 1 || Number(value.toString().slice(-1)) === 1) {
+                            numberLabel = "klaida";
+                        } else if (Number(value) < 10 || Number(value) > 21) {
+                            numberLabel = "klaidos";
+                        }
+                        mistakesNumberSpan.innerHTML = `: ${value} ${numberLabel}`;
+                        textIdSpan.dataset.textId = outerKey;
+
+                        li.appendChild(textIdSpan)
+                        li.appendChild(mistakesNumberSpan)
+
+                        textIdSpan.addEventListener("click", () => {
+                            const id = event.currentTarget.dataset.textId;
+                            textDatabaseEntryLocator(id);
+                        });
+
+                        ul.appendChild(li);
+                    });
+                    textComprehensionMistakesSummary.appendChild(textComprehensionTextsTitle);
+                    textComprehensionMistakesSummary.appendChild(ul);
+                }
+
+                const taskInfo = JSON.parse(task.taskDescription)
+                if ((taskInfo[0] === "math" && taskInfo[4] === "C40") || (taskInfo[0] === "lang" && taskInfo[5] === "C40")) {
+                    studentScoreDuration.innerHTML = `<span class="task-info-subtitle">Atlikimo trukmė:</span> ${JSON.parse(task.result)[2]}`
+                }
+
                 if (parsedTaskDescription[0] === "math") {
                     studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Atlikti veiksmai:</span> ${score[0]}`;
                     studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Padarytos klaidos:</span> ${score[1]}`;
@@ -2042,14 +2327,17 @@
                         studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Įrašytos raidės:</span> ${score[0]}`;
                         studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Padarytos klaidos:</span> ${score[1]}`;
                     } else if (parsedTaskDescription[2] === "C49") {
-                        studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Sudėlioti tekstai:</span> ${score[0]}`;
+                        studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Sudėliotų tekstų skaičius:</span> ${score[0]}`;
                         studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
                     }
                 }
-                let mistakesList = [];
-                mistakesList = JSON.parse(task.result)[1]
-                if (mistakesList.length > 0) {
-                    generateSummaryTable("custom", mistakesList) 
+
+                if (taskInfo[0] === "math" || (taskInfo[0] === "lang" && taskInfo[2] === "C50")) {
+                    let mistakesList = [];
+                    mistakesList = JSON.parse(task.result)[1]
+                    if (mistakesList.length > 0) {
+                        generateSummaryTable("custom", mistakesList) 
+                    }
                 }
 
                 if (parsedTaskDescription[0] === "math") {
@@ -2065,7 +2353,8 @@
 
                 if (document.querySelector("#summary-table").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table").innerHTML === '') {
                     document.querySelector("#mistakes-summary-math").style.display = "none";
-                } else if (document.querySelector("#summary-table-grammar").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table-grammar").innerHTML === '') {
+                }
+                if (document.querySelector("#summary-table-grammar").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table-grammar").innerHTML === '') {
                     document.querySelector("#mistakes-summary-grammar").style.display = "none";
                 }
             }
@@ -2109,6 +2398,11 @@
                 studentTaskCompletionDateForStudents.innerHTML = `<span class="task-info-subtitle">Atlikimo data</span>: ${task.completionDate.split('T')[0]}`
             }
 
+            const taskInfo = JSON.parse(task.taskInstructions)
+                if ((taskInfo[0] === "math" && taskInfo[4] === "C40") || (taskInfo[0] === "lang" && taskInfo[5] === "C40")) {
+                    studentScoreDurationForStudent.innerHTML = `<span class="task-info-subtitle">Atlikimo trukmė:</span> ${JSON.parse(task.result)[2]}`
+            }
+
             if (task.status) {
                 completeTaskButton.style.display = "none"
             } else {
@@ -2116,9 +2410,10 @@
             }
 
             if (task.result !== '') {
-
-
-                score = JSON.parse(task.result)[0]
+                const parsedTaskResult = JSON.parse(task.result)
+                const score = parsedTaskResult[0]
+                const textComprehensionrResults = parsedTaskResult[1]
+ 
                 if (parsedTaskDescription[0] === "math") {
                     studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Atlikti veiksmai:</span> ${score[0]}`;
                     studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Padarytos klaidos</span>: ${score[1]}`;
@@ -2127,14 +2422,18 @@
                         studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Irašytos raidės:</span> ${score[0]}`;
                         studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Padarytos klaidos:</span> ${score[1]}`;
                     } else if (parsedTaskDescription[2] === "C49") {
-                        studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Sudėlioti tekstai:</span> ${score[0]}`;
+                        studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Sudėliotų tekstų skaičius:</span> ${score[0]}`;
                         studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
                     }
                 }
-                let mistakesList = [];
-                mistakesList = JSON.parse(task.result)[1]
-                if (mistakesList.length > 0) {
-                    generateSummaryTable("custom", mistakesList, "summary-table-for-student", "summary-table-grammar-for-student") 
+
+                const taskInfo = JSON.parse(task.taskInstructions)
+                if (taskInfo[0] === "math" || (taskInfo[0] === "lang" && taskInfo[2] === "C50")) {
+                    let mistakesList = [];
+                    mistakesList = JSON.parse(task.result)[1]
+                    if (mistakesList.length > 0) {
+                        generateSummaryTable("custom", mistakesList, "summary-table-for-student", "summary-table-grammar-for-student") 
+                    }
                 }
 
                 if (parsedTaskDescription[0] === "math") {
@@ -2150,14 +2449,18 @@
 
                 if (document.querySelector("#summary-table-for-student").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table-for-student").innerHTML === "") {
                     document.querySelector("#mistakes-summary-math-for-student").style.display = "none";
-                } else if (document.querySelector("#summary-table-grammar-for-student").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table-grammar-for-student").innerHTML === "") {
+                }
+                if (document.querySelector("#summary-table-grammar-for-student").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table-grammar-for-student").innerHTML === "") {
                     document.querySelector("#mistakes-summary-grammar-for-student").style.display = "none";
                 }
 
-            mistakesList = JSON.parse(task.result)[1]
-            if (mistakesList.length > 0) {
-                generateSummaryTable("custom", mistakesList, "summary-table-for-student") 
-            }
+                if (taskInfo[0] === "math" || (taskInfo[0] === "lang" && taskInfo[2] === "C50")) {
+                    let mistakesList = [];
+                    mistakesList = JSON.parse(task.result)[1]
+                    if (mistakesList.length > 0) {
+                        generateSummaryTable("custom", mistakesList, "summary-table-for-student") 
+                    }
+                }
             }
 
             taskDescriptionList = document.createElement('ul');
@@ -2228,6 +2531,8 @@
                         .filter(student => student.tasks.length > 0); // Remove students with no tasks after filtering
 
                 // Re-render with the filtered student list
+                taskContainerVisible = false;
+                toggleTaskVisibility();
                 renderDataForTeachers(filteredStudents);
                 clearTeacherMessage();
             });
@@ -2274,6 +2579,9 @@
 
             // Display task info
             displayStudentStatistics([student.id, student.nickname], student.tasks);
+            if (document.querySelector(`#tasks-${student.id}`).style.display === "none") {
+                document.querySelector(`#tasks-${student.id}`).style.display = "block";
+            }
         });
 
         // Student-level task status circles
@@ -2460,7 +2768,7 @@
 
         async function fetchDataForTeachers() {
             let success = false;
-            teacherMessageLine.innerHTML = "Mokinių ir užduočių informacija ieškoma duomenų bazėje. Procesas gali užtrukti kelias minutes."
+            teacherDataRetrievalMessage.innerHTML = "Mokinių ir užduočių informacija ieškoma duomenų bazėje. Procesas gali užtrukti kelias minutes."
             newTaskButton.disabled = true
             deleteTaskButton.disabled = true
             deleteStudentButton.disabled = true
@@ -2471,19 +2779,25 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    const errorData  = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
                 }
 
-                studentList = await response.json();
+                studentList = await response.json().catch(() => ({}));
                 success = true;
                 populateTaskGroupDropdown();
                 renderDataForTeachers();
             } catch (error) {
                 console.log('Error fetching data:', error);
-                teacherMessageLine.innerHTML = "Nepavyko pasiekti duomenų. Bandykite vėl vėliau."
+                if (error.message === "Unauthorized") {
+                    clearUserData();
+                    window.location.href = "prisijungimas.html";
+                } else {
+                    teacherDataRetrievalMessage.innerHTML = 'Nepavyko pasiekti duomenų. Bandykite vėl vėliau.'
+                }
             }
             if (success) {
-                teacherMessageLine.innerHTML = ""
+                teacherDataRetrievalMessage.innerHTML = ""
             }
             newTaskButton.disabled = false
             deleteTaskButton.disabled = false
@@ -2501,16 +2815,22 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    const errorData  = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
                 }
 
-                tasksList = await response.json();
+                tasksList = await response.json().catch(() => ({}));
                 success = true;
                 renderDataForStudents();
 
             } catch (error) {
-                console.log('Error fetching tasks:', error);
-                studentMessage.innerHTML = 'Nepavyko pasiekti duomenų. Bandykite vėl vėliau.'
+                console.log('Error fetching data:', error);
+                if (error.message === "Unauthorized") {
+                    clearUserData();
+                    window.location.href = "prisijungimas.html";
+                } else {
+                    studentMessage.innerHTML = 'Nepavyko pasiekti duomenų. Bandykite vėl vėliau.'
+                }
             }
             if (success) {
                 studentMessage.innerHTML = ""
@@ -2547,9 +2867,7 @@
             newTaskOptions.style.display = 'block';
             deleteTaskButton.disabled = true;
             deleteStudentButton.disabled = true;
-            document.querySelectorAll('.selection-option').forEach(element => {
-                element.classList.add('temp-disabled');
-            });
+
             
         } else {
             taskContainerVisible = false;
@@ -2564,9 +2882,6 @@
             deleteTaskButton.disabled = false;
             deleteStudentButton.disabled = false;
             dropdown.disabled = false;
-            document.querySelectorAll('.selection-option').forEach(element => {
-                element.classList.remove('temp-disabled');
-            });
         }
     }
 
@@ -2624,16 +2939,22 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    const errorData  = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
                 }
 
-                const allStudentsTasks = await response.json();
+                const allStudentsTasks = await response.json().catch(() => ({}));
                 const assignmentIds = allStudentsTasks.map(task => task.assignmentId);
                 deleteTasks(assignmentIds)
                 
             } catch (error) {
                 console.log('Error fetching tasks:', error);
-                alert('Nepavyko pasiekti duomenų. Bandykite vėl vėliau.');
+                if (error.message === "Unauthorized") {
+                    clearUserData();
+                    window.location.href = "prisijungimas.html";
+                } else {
+                    teacherMessageLine.innerHTML = 'Nepavyko pasiekti duomenų. Bandykite vėl vėliau.'
+                }
             }
     }
 
@@ -2658,21 +2979,25 @@
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                const errorData  = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
             }
 
             // Optionally, handle the response if needed (e.g., confirm deletion or update the UI)
-            const result = await response.json();
+            const result = await response.json().catch(() => ({}));
             if (result.message === "Tasks and their associated assignments deleted successfully.") {
                 teacherMessageLine.innerHTML = "Užduotys pašalintos sėkmingai!"
                 fetchDataForTeachers()
-            } else if (result.message === "An error occurred while deleting tasks.") {
-                teacherMessageLine.innerHTML = "Nepavyko pašalinti užduočių. Bandykite vėl vėliau."
             }
 
         } catch (error) {
-            console.log('Error deleting tasks:', error);
-            teacherMessageLine.innerHTML = "Nepavyko pašalinti užduočių. Bandykite vėl vėliau."
+            console.log('Error fetching tasks:', error);
+            if (error.message === "Unauthorized") {
+                clearUserData();
+                window.location.href = "prisijungimas.html";
+            } else {
+                teacherMessageLine.innerHTML = "Nepavyko pašalinti užduočių. Bandykite vėl vėliau."
+            }
         } finally {
             deleteTaskButton.disabled = false
             confirmDeleteTaskButton.disabled = false
@@ -2838,7 +3163,8 @@
         });
 
         // First parse the response as JSON
-        const responseData = await response.json();
+        const responseData = await response.json().catch(() => ({}));
+        
 
         if (responseData.message === 'Task set successfully') {
             teacherMessageLine.innerHTML = 'Užduotis sukurta sėkmingai!'
@@ -2852,20 +3178,21 @@
             }, 500);
             teacherMessageLine2.innerHTML = 'Galima sukurti tik 6 užduotis per mokinį. Išstrinkite seną užduotį, kad galėtumėte sukurti naują.'
         } else {
-            clearTimeout(timeoutReference);
-            submitNewTaskButton.classList.add('invalid-submition')
-            var timeoutReference = setTimeout(function() {
-                removeError(submitNewTaskButton);
-            }, 500);
-            teacherMessageLine2.innerHTML = 'Nepavyko pridėti užduoties. Bandykite vėl vėliau.'
+            throw new Error(responseData.message || `HTTP error! Status: ${response.status}`);
         }
         } catch (error) {
-            clearTimeout(timeoutReference);
-            submitNewTaskButton.classList.add('invalid-submition')
-            var timeoutReference = setTimeout(function() {
-                removeError(submitNewTaskButton);
-            }, 500);
-            teacherMessageLine2.innerHTML = 'Nepavyko pridėti užduoties. Bandykite vėl vėliau.';
+            console.log('Error fetching tasks:', error);
+            if (error.message === "Unauthorized") {
+                clearUserData();
+                window.location.href = "prisijungimas.html";
+            } else {            
+                clearTimeout(timeoutReference);
+                submitNewTaskButton.classList.add('invalid-submition')
+                var timeoutReference = setTimeout(function() {
+                    removeError(submitNewTaskButton);
+                }, 500);
+                teacherMessageLine2.innerHTML = 'Nepavyko pridėti užduoties. Bandykite vėl vėliau.';
+        }
         } finally {
             newTaskButton.disabled = false
             enableTeacherControlPannel();
@@ -3031,7 +3358,7 @@ async function deleteInactiveUsers() {
             }
         });
 
-        const responseData = await response.json();
+        const responseData = await response.json().catch(() => ({}));
         
         if (!response.ok) {
             throw new Error(responseData.message || 'Failed to delete inactive users');
@@ -3081,6 +3408,144 @@ function enableNewTaskContainer() {
     const children = parentDiv.querySelectorAll('button, input, select, textarea');
     children.forEach(child => child.disabled = false);
 }
+
+function passTextIdToTheLocatorFunction() {
+    // Get the input value
+    const inputElement = document.getElementById('view-text-id-input');
+        const inputValue = inputElement.value;
+        
+    // Extract only the numeric part
+    const id = parseInt(inputValue.replace(/\D/g, '')) || 0;
+    textDatabaseEntryLocator(id)
+}
+
+async function textDatabaseEntryLocator(id) { 
+    id = Number(id)
+    document.querySelector("#text-message").innerHTML = ''
+    document.querySelector("#text-title").innerHTML = ''
+    document.querySelector("#text-author").innerHTML = ''
+    document.querySelector("#text-start").innerHTML = ''
+    document.querySelector("#text-middle").innerHTML = ''
+    document.querySelector("#text-end").innerHTML = ''
+    document.querySelector("#text-compatibility").innerHTML = ''
+    document.querySelector("#text-id").innerHTML = ''
+
+    try {
+        // Fetch the JSON data (note: this path is relative to where the HTML is served)
+        const response = await fetch('../databases/sudedu_duomenu_baze.json');
+        if (!response.ok) {
+            throw new Error('Failed to load database');
+        }
+        
+        const data = await response.json();
+        
+        // Find the entry with matching ID
+        const entry = data.find(item => item.id === id);
+        
+        if (!entry) {
+            document.querySelector("#text-message").innerHTML = `Tekstas su ID${id} nerastas.`;
+            return
+        }
+
+        // Check if "komponavimas" or "struktura" exists in suitable-for
+        const suitableKeys = entry["suitable-for"] ? Object.keys(entry["suitable-for"]) : [];
+        const hasKomponavimasOrStruktura = suitableKeys.includes("komponavimas") || suitableKeys.includes("struktura");
+        if (!hasKomponavimasOrStruktura) {
+            document.querySelector("#text-message").innerHTML = `Tekstas su ID${id} nerastas.`;
+            return;
+        }
+
+        document.querySelector("#text-title").innerHTML = `<span id="text-subtitle">Pavadinimas:</span> ${entry.title}`
+        document.querySelector("#text-author").innerHTML = `<span id="text-subtitle">Autorius:</span> ${entry.author}`
+        const containerStart = document.querySelector("#text-start");
+        // Start with a subtitle
+        let htmlStart = `<span id="text-subtitle">Pradžia:</span>`;
+        // Add each item in its own div
+        entry.text.start.forEach(item => {
+            htmlStart += `<div class="text-individual-items">${item}</div>`;
+        });
+        containerStart.innerHTML = htmlStart;
+
+        const containerMiddle = document.querySelector("#text-middle");
+        // Start with a subtitle
+        let htmlMiddle = `<span id="text-subtitle">Ivykio raida:</span>`;
+        // Add each item in its own div
+        entry.text.middle.forEach(item => {
+            htmlMiddle += `<div class="text-individual-items">${item}</div>`;
+        });
+        containerMiddle.innerHTML = htmlMiddle;
+
+        const containerEnd = document.querySelector("#text-end");
+        // Start with a subtitle
+        let htmlEnd = `<span id="text-subtitle">Pabaiga:</span>`;
+        // Add each item in its own div
+        entry.text.end.forEach(item => {
+            htmlEnd += `<div class="text-individual-items">${item}</div>`;
+        });
+        containerEnd.innerHTML = htmlEnd;
+
+        let compatibilityList = document.createElement('ul');
+        // Add class-choice items
+        if (entry["class-choice"].includes("1_2_klase")) {
+            let classListItem = document.createElement('li');
+            classListItem.textContent = "1-2 klasėms";
+            compatibilityList.appendChild(classListItem);
+        }
+
+        if (entry["class-choice"].includes("3_4_klase")) {
+            let classListItem = document.createElement('li');
+            classListItem.textContent = "3-4 klasėms";
+            compatibilityList.appendChild(classListItem);
+        }
+
+        // Add filtered suitable-for items with label replacements
+        if (entry["suitable-for"]) {
+            const labelMap = {
+                komponavimas: "turinio komponavimui",
+                struktura: "struktūros išdėstymui"
+            };
+
+            Object.entries(entry["suitable-for"]).forEach(([key, value]) => {
+                if (key === "komponavimas" || key === "struktura") {
+                    let suitableListItem = document.createElement('li');
+                    suitableListItem.textContent = `${labelMap[key]}: ${value}`;
+                    compatibilityList.appendChild(suitableListItem);
+                }
+            });
+        }
+
+        const textCompatibilityTitle = document.createElement('div');
+        textCompatibilityTitle.innerHTML = '<span id="text-subtitle">Tinkamumas:</span>';
+
+        const container = document.querySelector("#text-compatibility");
+        container.innerHTML = ""; // Clear previous content
+        container.appendChild(textCompatibilityTitle);
+        container.appendChild(compatibilityList);
+
+        document.querySelector("#text-id").innerHTML = `<span id="text-subtitle">Teksto ID:</span> ${entry.id}`
+
+
+        const accordionButton = document.querySelector('#text-viewer-heading button');
+        if (accordionButton.classList.contains('collapsed')) {
+            accordionButton.click();
+            
+            setTimeout(() => {
+                document.querySelector("#text-viewer").scrollIntoView({
+                    behavior: "smooth"
+                });
+            }, 250);
+        } else {
+            document.querySelector("#text-viewer").scrollIntoView({
+                behavior: "smooth"
+            });
+        }
+    } catch (error) {
+        console.error('Error retrieving data:', error);
+        document.querySelector("#text-message").innerHTML = `Nepavyko pasiekti duomenų. Bandykite vėl vėliau`;
+        return null;
+    }
+}
+
 
 
 	</script>

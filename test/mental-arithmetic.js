@@ -80,6 +80,7 @@ if (document.querySelector("#stop-button-span")) {
         formatEquation()
       }
       if (controller.answeredQuestionTracker === controller.questionNumber) {
+        localStorage.setItem("elapsedTime", timerDisplay.textContent)
         controller.taskCompleted = true;
         formatFinalMessage()
       }
@@ -282,8 +283,6 @@ if (document.querySelector("#stop-button-span")) {
         controller.equation = '';
         if (controller.taskCompleted === true) {
           sendSetTaskResultsToDatabase();
-          controller.taskId = 0;
-          controller.taskCompleted = false;
         } else {
           if (controller.language === 'LT') {
             taskSavingMessageDiv.innerHTML = 'Užduotis nebaigta iki galo. Rezultatai neišsaugoti.';
@@ -305,7 +304,46 @@ if (document.querySelector("#stop-button-span")) {
     localStorage.setItem('controller', JSON.stringify(controller))
 }
 
+function recordGrammarFinalMistakes() {
+  const mistakeEncodingIndex = {
+		"fsc-gal": "C61",
+		"dkt": "C62",
+		"bdv": "C63",
+		"prv": "C64",
+		"vks": "C65",
+		"įsi-r": "C66",
+		"fsc-con": "C67",
+		"fsc-vow": "C68",
+		"prš": "C69",
+		"prs": "C70",
+		"asim": "C71",
+		"md": "C72"
+	}
+
+	Object.keys(mistakeRecords).forEach(key => {
+		const answer = atsakymai[key]
+		mistakeRecords[key]["wordWithAnswer"] = [answer["klausimas"][0], answer["atsakymas"][0][0], answer["klausimas"][1]],
+		mistakeRecords[key]["wordGrammarType"] = mistakeEncodingIndex[answer["kl-grupe"]]
+		mistakeRecords[key]["wordId"] = answer["zodzio-id"]
+	});
+
+	Object.keys(mistakeRecords).forEach(key => {
+		controller.currentMistakes.push([mistakeRecords[key]["wordWithAnswer"], mistakeRecords[key]["wordGrammarType"], [mistakeRecords[key]["mistakesCounter"], mistakeRecords[key]["wrongAnswer"]], mistakeRecords[key]["wordId"]])
+		controller.totalMistakes.push([mistakeRecords[key]["wordWithAnswer"], mistakeRecords[key]["wordGrammarType"], [mistakeRecords[key]["mistakesCounter"], mistakeRecords[key]["wrongAnswer"]], mistakeRecords[key]["wordId"]])
+	});
+
+	while (controller.currentMistakes.length > 29) {
+      controller.currentMistakes.splice(0, 1)
+    }
+	
+	while (controller.totalMistakes.length > 29) {
+      controller.totalMistakes.splice(0, 1)
+    }
+  }
+
 function formatFinalMessageForGrammar() {
+  localStorage.setItem("elapsedTime", timerDisplay.textContent)
+  recordGrammarFinalMistakes();
   document.querySelector('#restart-reset-button-row').style.display = "flex";
   document.getElementById('next-question').style.display = "none";
   document.getElementById('check-answers').style.visibility = "hidden";
@@ -317,8 +355,6 @@ function formatFinalMessageForGrammar() {
   if (controller.taskId !== 0) {
     if (controller.taskCompleted === true) {
       sendSetTaskResultsToDatabase();
-      controller.taskId = 0;
-      controller.taskCompleted = false;
     } else {
       document.getElementById("field-for-final-message").innerHTML = ''
       if (controller.language === 'LT') {
@@ -333,12 +369,23 @@ function formatFinalMessageForGrammar() {
   localStorage.setItem('controller', JSON.stringify(controller))
 }
 
+function recordFinalMistakesForTextComprehension() {
+  let mistakeList = [];
+  for (const outerKey in mistakesSummary) {
+    const innerObj = mistakesSummary[outerKey];
+    for (const innerKey in innerObj) {
+      mistakeList.push([outerKey, innerObj[innerKey]]);
+    }
+  }
+  controller.currentMistakes = mistakeList
+}
+
 function formatFinalMessageForTextcomprehension() {
+    localStorage.setItem("elapsedTime", timerDisplay.textContent)
+    recordFinalMistakesForTextComprehension();
     if (controller.taskId !== 0) {
       if (controller.taskCompleted === true) {
         sendSetTaskResultsToDatabase();
-        controller.taskId = 0;
-        controller.taskCompleted = false;
       } else {
         document.getElementById("final-message-div").innerHTML = '';
         if (controller.language === 'LT') {
@@ -360,19 +407,31 @@ function formatFinalMessageForTextcomprehension() {
     localStorage.setItem('controller', JSON.stringify(controller))
 }
 
+let redirectingToAuthentication = false;
+
 async function sendSetTaskResultsToDatabase() {
+
+  function clearUserDataCookie() {
+    localStorage.removeItem('userData');
+  }
+
   const userDataString = localStorage.getItem('userData');
   let userData;
 
   if (userDataString) {
       userData = JSON.parse(userDataString);
   } else {
-      window.location.href = '/LT/index.html'; // Redirect to login if no userData
-      return; // Stop execution after redirect
+      window.location.href = '/LT/index.html';
+      return;
+  }
+
+  let elapsedTime = 0;
+  if (localStorage.getItem("elapsedTime")) {
+    elapsedTime = localStorage.getItem("elapsedTime")
   }
 
   resultsData = [ [controller.answeredQuestionTracker, controller.mistakesTracker],
-                  controller.currentMistakes
+                  controller.currentMistakes, elapsedTime
                 ]
   resultsDataString = JSON.stringify(resultsData);
 
@@ -410,9 +469,12 @@ async function sendSetTaskResultsToDatabase() {
       });
 
       if (!response.ok) {
-          // If the response is not okay (non-2xx status), throw an error
-          throw new Error(`Failed to send data: ${response.statusText}`);
+          const errorData  = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
       } else {
+        controller.taskId = 0;
+        controller.taskCompleted = false;
+        localStorage.setItem('controller', JSON.stringify(controller))
         if (controller.language === 'LT') {
           taskSavingMessageDiv.innerHTML = "Rezultatai sėkmingai išsaugoti."
         } else if (controller.language === 'EN') {
@@ -421,13 +483,22 @@ async function sendSetTaskResultsToDatabase() {
       }
 
   } catch (error) {
-      // Log any error that occurs during the fetch or response handling
-      console.error('Error sending task results:', error);
-      if (controller.language === 'LT') {
-        taskSavingMessageDiv.innerHTML = "Įvyko klaida. Rezultatai neišsaugoti. Bandykite vėl vėliau."
-      } else if (controller.language === 'EN') {
-        taskSavingMessageDiv.innerHTML = "An error has occurred. Results were not saved. Please try again later."
-      }
+      console.log('Error saving task results:', error);
+      if (error.message === "Unauthorized") {
+        redirectingToAuthentication = true;
+          clearUserDataCookie();
+          localStorage.setItem('controller', JSON.stringify(controller))
+          window.location.href = "prisijungimas.html";
+      } else {
+        if (controller.language === 'LT') {
+          taskSavingMessageDiv.innerHTML = "Įvyko klaida. Rezultatai neišsaugoti. Bandykite vėl vėliau."
+        } else if (controller.language === 'EN') {
+          taskSavingMessageDiv.innerHTML = "An error has occurred. Results were not saved. Please try again later."
+        }
+        controller.taskId = 0;
+        controller.taskCompleted = false;
+        localStorage.setItem('controller', JSON.stringify(controller))
+    }
   }
   if (document.querySelector("#stopButton")) {
     document.querySelector("#stopButton").disabled = false;
@@ -1390,7 +1461,7 @@ async function sendSetTaskResultsToDatabase() {
       formEquation();
       displayEquation();
       answerInputElement.setAttribute("style", "background-color: #FAEDCD")
-      answerRemainderWesternInputElement.setAttribute("style", "background-color: #FAEDCD")
+      //answerRemainderWesternInputElement.setAttribute("style", "background-color: #FAEDCD") recently removed
     } else {
       updateScore();
       setMargins();
@@ -1412,8 +1483,8 @@ async function sendSetTaskResultsToDatabase() {
     answerRemainderInputElement.value = '';
     answerInputElement.setAttribute("style", "background-color: #FAEDCD");
     if (controller.modeChoice8 === 'C78') {
-    answerRemainderWesternInputElement.value = '';
-    answerRemainderWesternInputElement.setAttribute("style", "background-color: #FAEDCD");
+      answerRemainderWesternInputElement.value = '';
+      answerRemainderWesternInputElement.setAttribute("style", "background-color: #FAEDCD");
     }
     controller.result = ['', '', '', '', ''];
     controller.equation = '';
@@ -1774,109 +1845,307 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
 
 
 
-  if (grammarMistakes.length > 0) {
-    // Process mistakes into word forms and categories
-    const mistakeData = grammarMistakes.reduce((result, [wordParts, wordCategory]) => {
-      const [prefix, answer, suffix] = wordParts;
+ if (grammarMistakes.length > 0) {
+  // First, group all word occurrences by their base form (prefix+answer+suffix)
+  const wordOccurrences = grammarMistakes.reduce((acc, [wordParts, wordCategory, usersMistakes, wordId]) => {
+    const key = wordParts.join('|');
+    if (!acc[key]) {
+      acc[key] = {
+        wordParts,
+        wordCategory,
+        occurrences: [],
+        totalMistakes: 0
+      };
+    }
+    acc[key].occurrences.push({ usersMistakes, wordId });
+    acc[key].totalMistakes += usersMistakes[0];
+    return acc;
+  }, {});
 
-      const wordCategoryCoding = 
-      {
-				"C61": "žodžio pabaiga",
-        "C62": "daiktavardžio pabaiga",
-        "C63": "būdvardžio pabaiga",
-        "C64": "prieveiksmio pabaiga", 
-        "C65": "veiksmažodžio pabaiga",
-        "C66": "įsimintina rašyba",
-				"C67": "panašiai skambančios priebalsės",
-				"C68": "balsės ir dvibalsės",
-				"C69": "priešdėliai",
-				"C70": "priesagos",
-				"C71": "priebalsių supanašėjimas",
-				"C72": "mišrieji dvigarsiai",
-      }
-
-      const decodedWordCategory = wordCategoryCoding[wordCategory]
-      
-      // Create highlighted word form
-      const highlightedWord = `${prefix}<span class="incorrect-part" data-category="${decodedWordCategory}">${answer}</span>${suffix}`;
-      
-      // Count word occurrences
-      if (!result.words[highlightedWord]) {
-        result.words[highlightedWord] = 0;
-      }
-      result.words[highlightedWord]++;
-      
-      // Count category occurrences
-      result.categories[decodedWordCategory] = (result.categories[decodedWordCategory] || 0) + 1;
-      
-      return result;
-    }, { words: {}, categories: {} });
-  
-    // Generate table data for current view
-    const getTableData = (viewType) => {
-      const data = viewType === 'words' ? mistakeData.words : mistakeData.categories;
-      return Object.entries(data)
-        .map(([display, count]) => ({ display, count }))
-        .sort((a, b) => b.count - a.count);
+  // Then process into the final mistake data structure
+  const mistakeData = Object.values(wordOccurrences).reduce((result, { wordParts, wordCategory, occurrences, totalMistakes }) => {
+    const wordCategoryCoding = {
+      "C61": "žodžio pabaiga",
+      "C62": "daiktavardžio pabaiga",
+      "C63": "būdvardžio pabaiga",
+      "C64": "prieveiksmio pabaiga", 
+      "C65": "veiksmažodžio pabaiga",
+      "C66": "įsimintina rašyba",
+      "C67": "panašiai skambančios priebalsės",
+      "C68": "balsės ir dvibalsės",
+      "C69": "priešdėliai",
+      "C70": "priesagos",
+      "C71": "priebalsių supanašėjimas",
+      "C72": "mišrieji dvigarsiai",
     };
-  
-    // Create the table with integrated view selector
-    const createTable = (viewType) => {
-      const tableData = getTableData(viewType);
-      const isLT = controller.language === 'LT';
-      
-      const table = document.createElement('table');
-      table.className = 'grammar-mistakes-table';
-      
-      // Create header with integrated selector
-      const headerRow = document.createElement('tr');
-      
-      // Word Form header with dropdown
-      const wordHeader = document.createElement('th');
-      wordHeader.className = 'header-with-selector';
-      wordHeader.innerHTML = `
-        <div class="header-selector-container">
-          <select class="grammar-view-selector">
-            <option value="words" ${viewType === 'words' ? 'selected' : ''}>${isLT ? 'Žodžiai' : 'Words'}</option>
-            <option value="categories" ${viewType === 'categories' ? 'selected' : ''}>${isLT ? 'Kategorijos' : 'Categories'}</option>
-          </select>
-        </div>
-      `;
-      
-      // Mistakes header
-      const countHeader = document.createElement('th');
-      countHeader.textContent = isLT ? 'Suklysta (kartai)' : 'Mistakes';
-      
-      // Bar header (empty)
-      const barHeader = document.createElement('th');
-      
-      headerRow.appendChild(wordHeader);
-      headerRow.appendChild(countHeader);
-      headerRow.appendChild(barHeader);
-      
-      // Create table structure
-      const thead = document.createElement('thead');
-      thead.appendChild(headerRow);
-      
-      const tbody = document.createElement('tbody');
-      tbody.innerHTML = tableData.map(item => `
-        <tr>
-          <td>${item.display}</td>
-          <td>${item.count}</td>
-          <td>
-            <div class="bar" style="width: ${Math.min(item.count * 10, 100)}px;
-                 background-color: ${getBarColor(item.count)};">
+
+    const decodedWordCategory = wordCategoryCoding[wordCategory];
+    const [prefix, answer, suffix] = wordParts;
+
+    // Create highlighted word form with all occurrence data
+    const highlightedWord = `
+      <span class="clickable-word" 
+            data-word-parts='${JSON.stringify(wordParts)}'
+            data-category="${decodedWordCategory}"
+            data-occurrences='${encodeURIComponent(JSON.stringify(occurrences))}'>
+        ${prefix}<span class="incorrect-part">${answer}</span>${suffix}
+      </span>
+    `;
+    
+    // Store in words collection
+    result.words[highlightedWord] = totalMistakes;
+    
+    // Count category occurrences
+    result.categories[decodedWordCategory] = (result.categories[decodedWordCategory] || 0) + totalMistakes;
+    
+    return result;
+  }, { words: {}, categories: {} });
+
+  // Generate table data for current view
+  const getTableData = (viewType) => {
+    const data = viewType === 'words' ? mistakeData.words : mistakeData.categories;
+    return Object.entries(data)
+      .map(([display, count]) => ({ display, count }))
+      .sort((a, b) => b.count - a.count);
+  };
+
+  // Create the table with integrated view selector
+  const createTable = (viewType) => {
+    const tableData = getTableData(viewType);
+    const isLT = controller.language === 'LT';
+    
+    const table = document.createElement('table');
+    table.className = 'grammar-mistakes-table';
+    
+    // Create header with integrated selector
+    const headerRow = document.createElement('tr');
+    
+    // Word Form header with dropdown
+    const wordHeader = document.createElement('th');
+    wordHeader.className = 'header-with-selector';
+    wordHeader.innerHTML = `
+      <div class="header-selector-container">
+        <select class="grammar-view-selector">
+          <option value="words" ${viewType === 'words' ? 'selected' : ''}>${isLT ? 'Žodžiai' : 'Words'}</option>
+          <option value="categories" ${viewType === 'categories' ? 'selected' : ''}>${isLT ? 'Kategorijos' : 'Categories'}</option>
+        </select>
+      </div>
+    `;
+    
+    // Mistakes header
+    const countHeader = document.createElement('th');
+    countHeader.textContent = isLT ? 'Suklysta (kartai)' : 'Mistakes';
+    
+    // Bar header (empty)
+    const barHeader = document.createElement('th');
+    
+    headerRow.appendChild(wordHeader);
+    headerRow.appendChild(countHeader);
+    headerRow.appendChild(barHeader);
+    
+    // Create table structure
+    const thead = document.createElement('thead');
+    thead.appendChild(headerRow);
+    
+    const tbody = document.createElement('tbody');
+    tbody.innerHTML = tableData.map(item => `
+      <tr>
+        <td>${item.display}</td>
+        <td>${item.count}</td>
+        <td>
+          <div class="bar" style="width: ${Math.min(item.count * 10, 100)}px;
+               background-color: ${getBarColor(item.count)};">
+          </div>
+        </td>
+      </tr>
+    `).join('');
+    
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    
+    return table;
+  };
+
+  // Function to process and display all sentences for a word
+  async function showAllSentencesForWord(wordParts, occurrences) {
+    // 1. Get the results container first
+    const resultsContainer = document.getElementById('sentence-with-mistake-field');
+    const resultsContainerForStudents = document.getElementById('sentence-with-mistake-field-for-student');
+    if (!resultsContainer) {
+        console.error("Results container not found");
+        return;
+    }
+
+    // Show loading state
+    userData = JSON.parse(userDataString);
+
+    if (userData.accType === "teacher") {
+      resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
+      resultsContainer.innerHTML += '<div class="loading">Ieškoma sakinių...</div>';
+    } else if (userData.accType === "student") {
+      resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
+      resultsContainerForStudents.innerHTML += '<div class="loading">Loading sentences...</div>';
+    }
+
+    try {
+        // 2. Load the database
+        const response = await fetch('../databases/sudedu_duomenu_baze.json');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const sudedu_duomenu_baze = await response.json();
+
+        // 3. Process each occurrence
+        const processOccurrence = async ({ usersMistakes, wordId }) => {
+            try {
+                // Validate wordId structure
+                if (!Array.isArray(wordId) || wordId.length < 3) {
+                    throw new Error(`Invalid wordId structure: ${JSON.stringify(wordId)}`);
+                }
+
+                const entry = sudedu_duomenu_baze.find(item => item.id === wordId[0]);
+                if (!entry) {
+                    if (userData.accType === "teacher") {
+                      resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
+                      resultsContainer.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
+                    } else if (userData.accType === "student") {
+                      resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
+                      resultsContainerForStudents.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
+                    }
+                    return
+                }
+
+                // Combine text parts safely
+                const allTextParts = [
+                    ...(entry.text?.start || []),
+                    ...(entry.text?.middle || []),
+                    ...(entry.text?.end || [])
+                ];
+                const allTextPartsMerged = allTextParts.join(" ").trim();
+                
+                // Split sentences more reliably
+                const allTextPartsSentences = allTextPartsMerged.match(/[^.!?]*[.!?]+/g) || [allTextPartsMerged];
+                if (wordId[1] < 0 || wordId[1] >= allTextPartsSentences.length) {
+                    console.error("Invalid sentence index:", wordId[1]);
+                    return `<div class="sentence-error">Invalid sentence index</div>`;
+                }
+
+                const originalSentence = allTextPartsSentences[wordId[1]].trim();
+                
+                // Process words with punctuation handling
+                const sentenceWithoutPunctuation = originalSentence.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, " ");
+                const words = sentenceWithoutPunctuation.split(/\s+/).filter(word => word.trim() !== '');
+                
+                if (wordId[2] < 0 || wordId[2] >= words.length) {
+                    console.error("Invalid word index:", wordId[2]);
+                    return `<div class="sentence-error">Invalid word index</div>`;
+                }
+
+                const targetWord = words[wordId[2]];
+                const originalWord = wordParts.join("")
+
+                if (targetWord.toLowerCase().trim() !== originalWord.toLowerCase().trim()) {
+                  console.error("Mismatch between targetWord and originalWord:", error);
+                  if (userData.accType === "teacher") {
+                    resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
+                    resultsContainer.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
+                  } else if (userData.accType === "student") {
+                    resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
+                    resultsContainerForStudents.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
+                  }
+                  return
+                }
+
+                const fullWordForm = wordParts.join('');
+
+                // Create case-insensitive regex with word boundaries
+                const escapedTarget = targetWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`(^|\\s)${escapedTarget}(?=\\s|$|[.,!?])`, 'gi');
+                
+                // Find all matches safely
+                const matches = [];
+                let match;
+                while (match = regex.exec(originalSentence)) {
+                    matches.push(match);
+                    // Prevent infinite loop for zero-length matches
+                    if (match.index === regex.lastIndex) regex.lastIndex++;
+                }
+
+                if (matches.length === 0) {
+                    return `
+                        <div class="sentence-occurrence">
+                            ${originalSentence} 
+                            <span class="error-marker">
+                                (Target word "${fullWordForm}" not found in sentence)
+                            </span>
+                        </div>
+                    `;
+                }
+
+                // Get the correct instance
+                const instanceIndex = Math.min(wordId[2], matches.length - 1);
+                const matchData = matches[instanceIndex];
+                const matchedText = matchData[0].trim();
+
+                // Prepare user mistakes display
+                const wrappedMistakes = Array.isArray(usersMistakes[1]) 
+                    ? usersMistakes[1].map(m => `<span class="user-incorrect-answer">${m}</span>`).join(",")
+                    : '';
+
+                // Construct marked sentence
+                const beforeMatch = originalSentence.substring(0, matchData.index);
+                const afterMatch = originalSentence.substring(matchData.index + matchData[0].length);
+                
+                return `
+                    <div class="sentence-occurrence">
+                        ${beforeMatch} <span class="answered-word">${wordParts[0]}<span class="incorrect-part">${wordParts[1]}</span>${wordParts[2]}(${wrappedMistakes})</span> ${afterMatch}</div>
+                `;
+
+            } catch (error) {
+                console.error("Error processing occurrence:", error);
+                if (userData.accType === "teacher") {
+                  resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
+                  resultsContainer.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
+                } else if (userData.accType === "student") {
+                  resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
+                  resultsContainerForStudents.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
+                }
+                return
+            }
+        };
+
+        // 4. Execute all processing and display results
+        const sentencesHtml = await Promise.all(occurrences.map(processOccurrence));
+
+      if (userData.accType === "teacher") {
+          resultsContainer.innerHTML = '';
+          resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>'
+          resultsContainer.innerHTML += sentencesHtml.join('');
+        } else if (userData.accType === "student") {
+          resultsContainerForStudents.innerHTML = '';
+          resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>'
+          resultsContainerForStudents.innerHTML += sentencesHtml.join('');
+        }
+
+    } catch (error) {
+        console.error("Error in showAllSentencesForWord:", error);
+        if (userData.accType === "teacher") {
+              resultsContainer.innerHTML = `
+              <div class="error">
+                  Failed to load sentences: ${error.message}
+                  <button onclick="location.reload()">Retry</button>
+              </div>
+            `;
+          } else if (userData.accType === "student") {
+            resultsContainerForStudents.innerHTML = `
+            <div class="error">
+                Failed to load sentences: ${error.message}
+                <button onclick="location.reload()">Retry</button>
             </div>
-          </td>
-        </tr>
-      `).join('');
-      
-      table.appendChild(thead);
-      table.appendChild(tbody);
-      
-      return table;
-    };
-    if (customDivForGrammarSummaryTable !== "none") {
+          `;
+          }
+    }
+}
+
+  if (customDivForGrammarSummaryTable !== "none") {
     // Initialize display
     let currentView = 'words';
     const container = document.getElementById(customDivForGrammarSummaryTable) || 
@@ -1885,6 +2154,22 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
     container.innerHTML = '';
     const table = createTable(currentView);
     container.appendChild(table);
+
+    // Add click handler for word rows
+    container.addEventListener('click', (e) => {
+      // Only process if we're in words view
+      if (currentView === 'words') {
+        const clickableWord = e.target.closest('.clickable-word');
+        if (clickableWord) {
+          // Extract stored data
+          const wordParts = JSON.parse(clickableWord.getAttribute('data-word-parts'));
+          const occurrences = JSON.parse(decodeURIComponent(clickableWord.getAttribute('data-occurrences')));
+          
+          // Show all sentences for this word
+          showAllSentencesForWord(wordParts, occurrences);
+        }
+      }
+    });
   
     // Handle view changes from the integrated selector
     container.addEventListener('change', (e) => {
@@ -1893,8 +2178,8 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
         container.replaceChild(createTable(currentView), container.querySelector('table'));
       }
     });
-    }
-  } else {
+  }
+} else {
     if (customDivForGrammarSummaryTable !== "none") {
     // No mistakes case
     document.getElementById('summary-table-grammar').innerHTML = controller.language === 'LT' 
