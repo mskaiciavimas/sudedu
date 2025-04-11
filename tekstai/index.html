@@ -1183,7 +1183,7 @@ function updateTextList(section) {
     span.dataset.index = index;
     span.onclick = (e) => {
       e.stopPropagation();
-      removeText(section, index);
+      handleTextItemClick(section, index);
     };
     listDiv.appendChild(span);
   });
@@ -1200,13 +1200,58 @@ function addText(section) {
   }
 }
 
-function removeText(section, index) {
+function handleTextItemClick(section, index) {
   if (!isEditMode && currentEntryId) {
     showAlert('Norėdami redaguoti tekstą, pirmiausia įjunkite redagavimo režimą');
     return;
   }
-  textSections[section].splice(index, 1);
-  updateTextList(section);
+
+  const list = document.getElementById(`${section}-list`);
+  const span = list.querySelector(`span[data-index="${index}"]`);
+  const originalText = textSections[section][index];
+
+  // Replace span content with editable UI
+  const wrapper = document.createElement('div');
+  wrapper.className = 'editable-item mb-2';
+
+  const textarea = document.createElement('textarea');
+  textarea.className = 'form-control mb-1';
+  textarea.value = originalText;
+
+  const btnGroup = document.createElement('div');
+  btnGroup.className = 'btn-group btn-group-sm';
+
+  const saveBtn = document.createElement('button');
+  saveBtn.textContent = 'Save';
+  saveBtn.className = 'btn btn-success';
+  saveBtn.onclick = () => {
+    textSections[section][index] = textarea.value;
+    updateTextList(section);
+  };
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.className = 'btn btn-secondary';
+  cancelBtn.onclick = () => {
+    updateTextList(section);
+  };
+
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'Delete';
+  deleteBtn.className = 'btn btn-danger';
+  deleteBtn.onclick = () => {
+    textSections[section].splice(index, 1);
+    updateTextList(section);
+  };
+
+  btnGroup.appendChild(saveBtn);
+  btnGroup.appendChild(cancelBtn);
+  btnGroup.appendChild(deleteBtn);
+
+  wrapper.appendChild(textarea);
+  wrapper.appendChild(btnGroup);
+
+  span.replaceWith(wrapper);
 }
 
 function addOption(category) {
