@@ -536,6 +536,8 @@ async function makeAuthenticatedRequest(url, options = {}) {
   if (!token) {
     showLoginModal();
     throw new Error('Reikia prisijungti');
+  } else {
+    showMainApp();
   }
 
   const headers = {
@@ -548,7 +550,7 @@ async function makeAuthenticatedRequest(url, options = {}) {
     headers
   });
 
-  if (response.status === 401) {
+  if (response.status === 401 || response.status === 403) {
     isAuthenticated = false;
     removeAuthToken();
     showLoginModal();
