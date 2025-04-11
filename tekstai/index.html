@@ -1224,7 +1224,7 @@ function handleTextItemClick(section, index) {
   btnGroup.className = 'btn-group btn-group-sm';
 
   const saveBtn = document.createElement('button');
-  saveBtn.textContent = 'Save';
+  saveBtn.textContent = 'Išsaugoti';
   saveBtn.className = 'btn btn-success';
   saveBtn.onclick = () => {
     textSections[section][index] = textarea.value;
@@ -1232,14 +1232,14 @@ function handleTextItemClick(section, index) {
   };
 
   const cancelBtn = document.createElement('button');
-  cancelBtn.textContent = 'Cancel';
+  cancelBtn.textContent = 'Atšaukti';
   cancelBtn.className = 'btn btn-secondary';
   cancelBtn.onclick = () => {
     updateTextList(section);
   };
 
   const deleteBtn = document.createElement('button');
-  deleteBtn.textContent = 'Delete';
+  deleteBtn.textContent = 'Ištrinti';
   deleteBtn.className = 'btn btn-danger';
   deleteBtn.onclick = () => {
     textSections[section].splice(index, 1);
