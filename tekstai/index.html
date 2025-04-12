@@ -333,7 +333,8 @@
 
     #start-list,
     #middle-list,
-    #end-list {
+    #end-list,
+    #distractor-list {
       min-height: 64px;
     }
 
@@ -485,6 +486,13 @@
           <button class="btn btn-sm btn-outline-primary mb-3 btn btn-primary" type="button" onclick="addText('end')" disabled>Pridėti</button>
           <div class="text-list list p-2 border rounded bg-light" id="end-list"></div>
         </div>
+
+        <div class="text-section">
+          <label for="end-text" class="form-label">Distraktorius</label>
+          <textarea class="form-control autoResize mb-2" id="distractor-text" placeholder="Įveskite distraktorių" disabled></textarea>
+          <button class="btn btn-sm btn-outline-primary mb-3 btn btn-primary" type="button" onclick="addText('distractor')" disabled>Pridėti</button>
+          <div class="text-list list p-2 border rounded bg-light" id="distractor-list"></div>
+        </div>
         
         <button id="save-btn" class="btn btn-primary mt-3 btn btn-primary" type="button" onclick="saveEntry()" disabled>Išsaugoti tekstą</button>
       </form>
@@ -496,10 +504,10 @@
 <!-- Bootstrap JS Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-const apiBase = 'https://sudedu-text-database-server.onrender.com/';
+const apiBase = 'http://localhost:5000/';
 const messageField = document.querySelector("#message-field");
 let database = [];
-const textSections = { start: [], middle: [], end: [] };
+const textSections = { start: [], middle: [], end: [], distractor: [] };
 let editIndex = null;
 let isEditMode = false;
 let currentEntryId = null;
@@ -957,7 +965,7 @@ function loadEntry(index, entry, listItem) {
   });
   
   // Load text sections
-  ['start', 'middle', 'end'].forEach(section => {
+  ['start', 'middle', 'end', 'distractor'].forEach(section => {
     const textData = entry.text?.[section] || [];
     textSections[section] = Array.isArray(textData) ? [...textData] : [];
     updateTextList(section);
@@ -1169,7 +1177,7 @@ function clearForm() {
   });
   
   // Clear text sections and textareas
-  ['start', 'middle', 'end'].forEach(section => {
+  ['start', 'middle', 'end', 'distractor'].forEach(section => {
     textSections[section] = [];
     updateTextList(section);
     document.getElementById(`${section}-text`).value = '';
@@ -1307,7 +1315,8 @@ function filterEntries() {
       (entry.reference?.toLowerCase().includes(searchTerm)) ||
       (entry.text?.start?.some(part => part.toLowerCase().includes(searchTerm))) ||
       (entry.text?.middle?.some(part => part.toLowerCase().includes(searchTerm))) ||
-      (entry.text?.end?.some(part => part.toLowerCase().includes(searchTerm)));
+      (entry.text?.end?.some(part => part.toLowerCase().includes(searchTerm))) ||
+      (entry.text?.distractor?.some(part => part.toLowerCase().includes(searchTerm)));
     listItem.style.display = isMatch ? 'block' : 'none';
   });
 }
