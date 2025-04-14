@@ -72,7 +72,7 @@
 		background: transparent;
 		outline: none;        
 		font-size: var(--font-size);       
-  	color: black; 
+  		color: black; 
 		width: 23ch;
 		min-width: 0.5ch; 
 		text-align: center;
@@ -410,6 +410,7 @@ window.onload = function () {
 
 		let sakiniai = [];
 		window.atsakymai = {};
+		let questionId = 1;
 		window.mistakeRecords = {};
 		let questionsToDisplay = Number(controller.modeChoice2);
 		let totalSentencesCompleted = 0;
@@ -580,8 +581,6 @@ window.onload = function () {
 
 			function assembleAndFormatSentences() {
 				sakiniai = [];
-				atsakymai = {};
-				let questionId = 1;
 				while(sakiniai.length < noOfQuestionsGeneratedPerRound) {
 					for(const [condition, subcondition] of Object.entries(conditions)) {
 						if(tempfilteredSentenceLibrary.length === 0) {
@@ -899,7 +898,7 @@ window.onload = function () {
 
 												// Join the results into a single string separated by commas
 												const valuesToShowString = valuesToShow.join(', ');
-												formattedWord = [`${beforePunctuation}<span class="question-word-span end" style="display: inline; white-space: nowrap;">${wordInfo["gal-c"][0][0][0]}<input type="text" autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input end"> <span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
+												formattedWord = [`${beforePunctuation}<span class="question-word-span end" style="display: inline; white-space: nowrap;">${wordInfo["gal-c"][0][0][0]}<input type="text" autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input end" maxlength="6"> <span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
 												atsakymai[`id-${questionId}`] = {};
 												atsakymai[`id-${questionId}`]["klausimas"] = [wordInfo["gal-c"][0][0][0], '']
 												atsakymai[`id-${questionId}`]["atsakymas"] = [wordInfo["gal-c"][0][1]];
@@ -941,9 +940,9 @@ window.onload = function () {
 														}
 														const valuesToShowString = valuesToShow.join('/');
 														if (wordsToBeUsed[word] === "fsc-vow") {
-															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<input type="text" autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input middle">${randomElement[2][0]} <span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
+															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<input type="text" autocapitalize="none" autocomplete="off" maxlength="6" id="id-${questionId}" class="question-input middle">${randomElement[2][0]} <span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
 														} else if (wordsToBeUsed[word] === "fsc-con" ) {
-															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<input type="text" autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input middle">${randomElement[2][0]} <span class="pagalba-span-perm">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];															
+															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<input type="text" autocapitalize="none" autocomplete="off" maxlength="6" id="id-${questionId}" class="question-input middle">${randomElement[2][0]} <span class="pagalba-span-perm">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];															
 														}
 														atsakymai[`id-${questionId}`] = {};
 														atsakymai[`id-${questionId}`]["klausimas"] = [randomElement[0][0], randomElement[2][0]]
@@ -957,7 +956,7 @@ window.onload = function () {
 												if (combinations && combinations.length > 0) {
 														let randomIndex = Math.floor(Math.random() * combinations.length);
 														let randomElement = combinations[randomIndex];
-														formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<input type="text" autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input middle"><span class="pagalba-div"></span>${randomElement[2][0]}${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
+														formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<input type="text" autocapitalize="none" autocomplete="off" maxlength="6" id="id-${questionId}" class="question-input middle"><span class="pagalba-div"></span>${randomElement[2][0]}${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
 														atsakymai[`id-${questionId}`] = {};
 														atsakymai[`id-${questionId}`]["klausimas"] = [randomElement[0][0], randomElement[2][0]]
 														atsakymai[`id-${questionId}`]["atsakymas"] = [randomElement[1]];
@@ -1334,14 +1333,14 @@ function helpToggle() {
 				
 				if (!controller.questionsStopped) {
 					displaySentences()
+					toggleHelpButton();
+					document.getElementById('check-answers').style.display = "flex"
+					nextQuestionButton.style.display = "none";
+					document.querySelectorAll('.pagalba-span').forEach(element => {
+					element.style.display = 'none';
+					});
+					firstTimeChecking = true;
 				}
-				toggleHelpButton();
-				document.getElementById('check-answers').style.display = "flex"
-				nextQuestionButton.style.display = "none";
-				document.querySelectorAll('.pagalba-span').forEach(element => {
-            	element.style.display = 'none';
-				});
-				firstTimeChecking = true;
 			}
 
 			function stopQuestions() {
