@@ -347,7 +347,6 @@ function formatFinalMessageForGrammar() {
   document.querySelector('#restart-reset-button-row').style.display = "flex";
   document.getElementById('next-question').style.display = "none";
   document.getElementById('check-answers').style.visibility = "hidden";
-  document.getElementById('show-answers').style.visibility = "hidden";
   document.getElementById('help-button').style.visibility = "hidden";
   document.getElementById('warning').style.visibility = "hidden";
   clearInterval(timerInterval);
@@ -1972,7 +1971,8 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
     // 1. Get the results container first
     const resultsContainer = document.getElementById('sentence-with-mistake-field');
     const resultsContainerForStudents = document.getElementById('sentence-with-mistake-field-for-student');
-    if (!resultsContainer && !resultsContainerForStudents) {
+    if (!resultsContainer) {
+        console.error("Results container not found");
         return;
     }
 
@@ -1980,15 +1980,11 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
     userData = JSON.parse(userDataString);
 
     if (userData.accType === "teacher") {
-      if (resultsContainer) {
-        resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-        resultsContainer.innerHTML += '<div class="loading">Ieškoma sakinių...</div>';
-      }
+      resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
+      resultsContainer.innerHTML += '<div class="loading">Ieškoma sakinių...</div>';
     } else if (userData.accType === "student") {
-      if (resultsContainerForStudents) {
-        resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-        resultsContainerForStudents.innerHTML += '<div class="loading">Loading sentences...</div>';
-      }
+      resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
+      resultsContainerForStudents.innerHTML += '<div class="loading">Loading sentences...</div>';
     }
 
     try {
@@ -2008,15 +2004,11 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
                 const entry = sudedu_duomenu_baze.find(item => item.id === wordId[0]);
                 if (!entry) {
                     if (userData.accType === "teacher") {
-                      if (resultsContainer) {
-                        resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-                        resultsContainer.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
-                      }
+                      resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
+                      resultsContainer.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
                     } else if (userData.accType === "student") {
-                      if (resultsContainerForStudents) {
-                        resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-                        resultsContainerForStudents.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
-                      }
+                      resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
+                      resultsContainerForStudents.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
                     }
                     return
                 }
@@ -2027,46 +2019,24 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
                     ...(entry.text?.middle || []),
                     ...(entry.text?.end || [])
                 ];
-
                 const allTextPartsMerged = allTextParts.join(" ").trim();
-
+                
                 // Split sentences more reliably
-                const allTextPartsSentences = allTextPartsMerged.match(/[^.!?]+[.!?]+(?:[”"’'»“]*)/g) || [allTextPartsMerged];
+                const allTextPartsSentences = allTextPartsMerged.match(/[^.!?]*[.!?]+/g) || [allTextPartsMerged];
                 if (wordId[1] < 0 || wordId[1] >= allTextPartsSentences.length) {
                     console.error("Invalid sentence index:", wordId[1]);
-                    if (userData.accType === "teacher") {
-                      if (resultsContainer) {
-                        resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-                        resultsContainer.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
-                      }
-                    } else if (userData.accType === "student") {
-                      if (resultsContainerForStudents) {
-                        resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-                        resultsContainerForStudents.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
-                      }
-                    }
-                    return
+                    return `<div class="sentence-error">Invalid sentence index</div>`;
                 }
+
                 const originalSentence = allTextPartsSentences[wordId[1]].trim();
                 
                 // Process words with punctuation handling
-                const sentenceWithoutPunctuation = originalSentence.replace(/\p{P}/gu, " ");;
+                const sentenceWithoutPunctuation = originalSentence.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, " ");
                 const words = sentenceWithoutPunctuation.split(/\s+/).filter(word => word.trim() !== '');
                 
                 if (wordId[2] < 0 || wordId[2] >= words.length) {
                     console.error("Invalid word index:", wordId[2]);
-                    if (userData.accType === "teacher") {
-                      if (resultsContainer) {
-                        resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-                        resultsContainer.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
-                      }
-                    } else if (userData.accType === "student") {
-                      if (resultsContainerForStudents) {
-                        resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-                        resultsContainerForStudents.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
-                      }
-                    }
-                    return
+                    return `<div class="sentence-error">Invalid word index</div>`;
                 }
 
                 const targetWord = words[wordId[2]];

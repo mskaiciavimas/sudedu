@@ -314,17 +314,5 @@ const parameterDictionary = {
     "C79": {
         "parameter": "C79",
         "decodedParameterText": "EASTERN EUROPE VERSION"
-    },
-    "C80": {
-        "parameter": "lengvas",
-        "decodedParameterText": "LENGVAS SU DISTRAKTORIUMI"
-    },
-    "C81": {
-        "parameter": "vidutinis",
-        "decodedParameterText": "VIDUTINIS SU DISTRAKTORIUMI"
-    },
-    "C82": {
-        "parameter": "sunkus",
-        "decodedParameterText": "SUNKUS SU DISTRAKTORIUMI"
     }
 }
