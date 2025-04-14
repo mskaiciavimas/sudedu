@@ -189,6 +189,8 @@
         .task-li-item .selection-option {
             width: calc(80% - 5px);
             transition: box-shadow 0.3s ease; /* Smooth transition for highlighting */
+            white-space: normal;
+            overflow-wrap: break-word;
         }
 
         .selected-option {
@@ -343,23 +345,26 @@
 
         #student-task-group,
         #student-task-group-for-student {
+            max-width: 95%;
             font-weight: bold;
             text-transform: uppercase;
             font-size: 1.25rem;
+            white-space: normal;
+            overflow-wrap: break-word;
         }
 
         .student-list-task-indicatior {
             display: inline-block;
             margin-left: 5px;
             width: 10px;
-            height: 10px;
+            aspect-ratio: 1 / 1;
             border-radius: 50%;
         }
 
         #student-task-status-indicator,
         #student-task-status-indicator-for-student {
             width: 20px;
-            height: 20px;
+            aspect-ratio: 1 / 1;
             border-radius: 50%;
         }
 
@@ -935,6 +940,9 @@
                                 <option value="C58">LENGVAS</option>
                                 <option value="C59">VIDUTINIS</option>
                                 <option value="C60">SUNKUS</option>
+                                <option value="C80">LENGVAS SU DISTRAKTORIUMI</option>
+                                <option value="C81">VIDUTINIS SU DISTRAKTORIUMI</option>
+                                <option value="C82">SUNKUS SU DISTRAKTORIUMI</option>
                             </select>
                         </div>
                     </div>
@@ -1136,7 +1144,7 @@
                   <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="text-viewer-heading" data-bs-parent="#text-viewer">
                     <div class="accordion-body">
                         <div class="row d-flex align-items-center justify-content-center">
-                            <input type="text" class="form-control" id="view-text-id-input" placeholder="Teksto ID" />
+                            <input type="text" class="form-control" id="view-text-id-input" autocomplete="off" placeholder="Teksto ID" />
                             <div class="col">
                               <button type="button" class="btn btn-primary" id="submitButton" onclick="passTextIdToTheLocatorFunction()">Ieškoti</button>
                             </div>
@@ -1151,6 +1159,7 @@
                             <div class="col-12" id="text-start"></div>
                             <div class="col-12" id="text-middle"></div>
                             <div class="col-12" id="text-end"></div>
+                            <div class="col-12" id="text-distractor"></div>
                         </div>
                     </div>
                   </div>
@@ -2270,7 +2279,7 @@
             studentTaskGroup.innerHTML = `Užduotis: ${task.group}`;
             teacherDispalyStudentTaskIndicator.style.backgroundColor = task.status ? greenCircleColorCode : redCircleColorCode;
             if (task.status) {
-                studentTaskCompletionDate.innerHTML = `<span class="task-info-subtitle">Atlikimo data</span>: ${task.completionDate.split('T')[0]}`
+                studentTaskCompletionDate.innerHTML = `<span class="task-info-subtitle">Data</span>: ${task.completionDate.split('T')[0]}`
             }
             if (task.result !== '') {
                 const parsedTaskResult = JSON.parse(task.result)
@@ -2316,16 +2325,16 @@
 
                 const taskInfo = JSON.parse(task.taskDescription)
                 if ((taskInfo[0] === "math" && taskInfo[4] === "C40") || (taskInfo[0] === "lang" && taskInfo[5] === "C40")) {
-                    studentScoreDuration.innerHTML = `<span class="task-info-subtitle">Atlikimo trukmė:</span> ${JSON.parse(task.result)[2]}`
+                    studentScoreDuration.innerHTML = `<span class="task-info-subtitle">Trukmė:</span> ${JSON.parse(task.result)[2]}`
                 }
 
                 if (parsedTaskDescription[0] === "math") {
                     studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Atlikti veiksmai:</span> ${score[0]}`;
-                    studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Padarytos klaidos:</span> ${score[1]}`;
+                    studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
                 } else if (parsedTaskDescription[0] === "lang") {
                     if (parsedTaskDescription[2] === "C50") {
                         studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Įrašytos raidės:</span> ${score[0]}`;
-                        studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Padarytos klaidos:</span> ${score[1]}`;
+                        studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
                     } else if (parsedTaskDescription[2] === "C49") {
                         studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Sudėliotų tekstų skaičius:</span> ${score[0]}`;
                         studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
@@ -2395,7 +2404,7 @@
             teacherDispalyStudentTaskIndicatorForStudent.style.display = "block";
             teacherDispalyStudentTaskIndicatorForStudent.style.backgroundColor = task.status ? greenCircleColorCode : redCircleColorCode;
             if (task.status) {
-                studentTaskCompletionDateForStudents.innerHTML = `<span class="task-info-subtitle">Atlikimo data</span>: ${task.completionDate.split('T')[0]}`
+                studentTaskCompletionDateForStudents.innerHTML = `<span class="task-info-subtitle">Data</span>: ${task.completionDate.split('T')[0]}`
             }
 
             if (task.status) {
@@ -2411,17 +2420,17 @@
 
                 const taskInfo = JSON.parse(task.taskInstructions)
                 if ((taskInfo[0] === "math" && taskInfo[4] === "C40") || (taskInfo[0] === "lang" && taskInfo[5] === "C40")) {
-                    studentScoreDurationForStudent.innerHTML = `<span class="task-info-subtitle">Atlikimo trukmė:</span> ${JSON.parse(task.result)[2]}`
+                    studentScoreDurationForStudent.innerHTML = `<span class="task-info-subtitle">Trukmė:</span> ${JSON.parse(task.result)[2]}`
                 }
 
  
                 if (parsedTaskDescription[0] === "math") {
                     studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Atlikti veiksmai:</span> ${score[0]}`;
-                    studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Padarytos klaidos</span>: ${score[1]}`;
+                    studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Klaidos</span>: ${score[1]}`;
                 } else if (parsedTaskDescription[0] === "lang") {
                     if (parsedTaskDescription[2] === "C50") {
                         studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Irašytos raidės:</span> ${score[0]}`;
-                        studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Padarytos klaidos:</span> ${score[1]}`;
+                        studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
                     } else if (parsedTaskDescription[2] === "C49") {
                         studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Sudėliotų tekstų skaičius:</span> ${score[0]}`;
                         studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
@@ -3427,6 +3436,7 @@ async function textDatabaseEntryLocator(id) {
     document.querySelector("#text-start").innerHTML = ''
     document.querySelector("#text-middle").innerHTML = ''
     document.querySelector("#text-end").innerHTML = ''
+    document.querySelector("#text-distractor").innerHTML = ''
     document.querySelector("#text-compatibility").innerHTML = ''
     document.querySelector("#text-id").innerHTML = ''
 
@@ -3483,6 +3493,15 @@ async function textDatabaseEntryLocator(id) {
             htmlEnd += `<div class="text-individual-items">${item}</div>`;
         });
         containerEnd.innerHTML = htmlEnd;
+
+        const containerDistractor = document.querySelector("#text-distractor");
+        // Start with a subtitle
+        let htmlDistractor = `<span id="text-subtitle">Distraktorius:</span>`;
+        // Add each item in its own div
+        entry.text.distractor.forEach(item => {
+            htmlDistractor += `<div class="text-individual-items">${item}</div>`;
+        });
+        containerDistractor.innerHTML = htmlDistractor;
 
         let compatibilityList = document.createElement('ul');
         // Add class-choice items

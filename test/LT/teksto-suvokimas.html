@@ -493,8 +493,6 @@ window.onload = function () {
       currentTextId = selectedItem.id;
       answeredTexts.push(currentTextId);
 
-      console.log("currentTextId", currentTextId);
-
       if (!mistakesSummary[currentTextId]) {
         mistakesSummary[currentTextId] = {};
       }
@@ -516,10 +514,21 @@ window.onload = function () {
 
       let combinedItems = [];
       if (controller.modeChoice2 === "C51") {
-        orderedSentences = splitParagraphToSentences(fullText);
-        combinedItems = [originalTitle, ...orderedSentences];
+        if (controller.modeChoiceLtDifficulty === "C58" || controller.modeChoiceLtDifficulty === "C59" || controller.modeChoiceLtDifficulty === "C60") {
+          orderedSentences = splitParagraphToSentences(fullText);
+          combinedItems = [originalTitle, ...orderedSentences];
+        } else if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+          orderedSentences = splitParagraphToSentences(fullText);
+          distractorSentences = splitParagraphToSentences(selectedItem.text.distractor);
+          combinedItems = [originalTitle, ...orderedSentences, ...distractorSentences];
+        }
       } else if (controller.modeChoice2 === "C52") {
-        combinedItems = [...fullText, ...[originalTitle]]
+        if (controller.modeChoiceLtDifficulty === "C58" || controller.modeChoiceLtDifficulty === "C59" || controller.modeChoiceLtDifficulty === "C60") {
+          combinedItems = [...fullText, ...[originalTitle]];
+        } else if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+          distractorItems = selectedItem.text.distractor;
+          combinedItems = [...fullText, ...distractorItems, ...[originalTitle]];
+        }
       }
       
       // Shuffle the combined items (title + sentences)
