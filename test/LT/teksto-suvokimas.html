@@ -399,6 +399,7 @@ window.onload = function () {
   }
 
   controller = JSON.parse(localStorage.getItem('controller')) 
+  console.log(controller)
   let jsonFiles = [];
 
 	// Define an array of URLs for the JSON files you want to fetch
@@ -418,6 +419,7 @@ window.onload = function () {
     var triesToHelp = 0;
     var helpTracker = 0;
     var orderedSentences;
+    var distractorSentences;
     controller = JSON.parse(localStorage.getItem('controller')) 
     var drake; 
     const answersField = document.getElementById('answers-field');
@@ -820,14 +822,15 @@ document.addEventListener('touchmove', function (event) {
 
 
       if (controller.modeChoice2 === "C51") {
+        console.log(distractorSentences)
         if (helpTracker === 1) {
         answersField.innerHTML = 'Tekstas';
         titleField.innerHTML = 'Pavadinimas';
         optionsField.innerHTML = '';
   
         const splitIndex = Math.floor(orderedSentences.length / 3);
-        const orderedSentencesfirstPart = orderedSentences.slice(0, splitIndex);
-        const orderedSentencessecondPart = orderedSentences.slice(splitIndex);
+        let orderedSentencesfirstPart = orderedSentences.slice(0, splitIndex);
+        let orderedSentencessecondPart = orderedSentences.slice(splitIndex);
 
         const correctTitle = document.createElement('div');
         correctTitle.classList.add('item');
@@ -841,11 +844,15 @@ document.addEventListener('touchmove', function (event) {
         answersField.appendChild(itemDiv);
         });
 
+        if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+          orderedSentencessecondPart = [...orderedSentencessecondPart, ...distractorSentences]
+        }
+
         shuffleArray(orderedSentencessecondPart).forEach(item => {
-        const itemDiv = document.createElement('div');
-        itemDiv.classList.add('item');
-        itemDiv.textContent = item;
-        optionsField.appendChild(itemDiv);
+          const itemDiv = document.createElement('div');
+          itemDiv.classList.add('item');
+          itemDiv.textContent = item;
+          optionsField.appendChild(itemDiv);
         });
       } else if (helpTracker === 2) {
         answersField.innerHTML = 'Tekstas';
@@ -853,8 +860,8 @@ document.addEventListener('touchmove', function (event) {
         optionsField.innerHTML = '';
   
         const splitIndex = Math.floor(orderedSentences.length / 3 * 2);
-        const orderedSentencesfirstPart = orderedSentences.slice(0, splitIndex);
-        const orderedSentencessecondPart = orderedSentences.slice(splitIndex);
+        let orderedSentencesfirstPart = orderedSentences.slice(0, splitIndex);
+        let orderedSentencessecondPart = orderedSentences.slice(splitIndex);
 
         const correctTitle = document.createElement('div');
         correctTitle.classList.add('item');
@@ -867,6 +874,10 @@ document.addEventListener('touchmove', function (event) {
         itemDiv.textContent = item;
         answersField.appendChild(itemDiv);
         });
+
+        if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+          orderedSentencessecondPart = [...orderedSentencessecondPart, ...distractorSentences]
+        }
 
         shuffleArray(orderedSentencessecondPart).forEach(item => {
         const itemDiv = document.createElement('div');
@@ -890,6 +901,15 @@ document.addEventListener('touchmove', function (event) {
         itemDiv.textContent = item;
         answersField.appendChild(itemDiv);
         });
+
+        if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+        distractorSentences.forEach(item => {
+          const itemDiv = document.createElement('div');
+          itemDiv.classList.add('item');
+          itemDiv.textContent = item;
+          optionsField.appendChild(itemDiv);
+        });
+      }
       }
       } else if (controller.modeChoice2 === "C52") {
         if (helpTracker === 1) {
@@ -911,7 +931,12 @@ document.addEventListener('touchmove', function (event) {
         answersFieldStart.appendChild(itemDiv);
         });
 
-        shuffleArray([...selectedItem.text.middle, ...selectedItem.text.end]).forEach(item => {
+        let remainingText = [...selectedItem.text.middle, ...selectedItem.text.end]
+        if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+          remainingText = [...remainingText, ...selectedItem.text.distractor]
+        }
+
+        shuffleArray(remainingText).forEach(item => {
         const itemDiv = document.createElement('div');
         itemDiv.classList.add('item');
         itemDiv.textContent = item;
@@ -947,11 +972,16 @@ document.addEventListener('touchmove', function (event) {
         answersFieldMiddle.appendChild(itemDiv);
         });
 
-        shuffleArray([...middleOptionsSecondPart, ...selectedItem.text.end]).forEach(item => {
-        const itemDiv = document.createElement('div');
-        itemDiv.classList.add('item');
-        itemDiv.textContent = item;
-        optionsField.appendChild(itemDiv);
+        let remainingText = [...middleOptionsSecondPart, ...selectedItem.text.end]
+        if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+          remainingText = [...remainingText, ...selectedItem.text.distractor]
+        }
+
+        shuffleArray(remainingText).forEach(item => {
+          const itemDiv = document.createElement('div');
+          itemDiv.classList.add('item');
+          itemDiv.textContent = item;
+          optionsField.appendChild(itemDiv);
         });
       } else if (helpTracker >= 3) {
         answersFieldStart.innerHTML = 'Pradžia';
@@ -985,6 +1015,15 @@ document.addEventListener('touchmove', function (event) {
         itemDiv.textContent = item;
         answersFieldEnd.appendChild(itemDiv);
         });
+
+        if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+          shuffleArray(selectedItem.text.distractor).forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.classList.add('item');
+            itemDiv.textContent = item;
+            optionsField.appendChild(itemDiv);
+          });
+        }
       }
       }
       
@@ -1040,6 +1079,7 @@ document.addEventListener('touchmove', function (event) {
     }
 
     nextQuestionBtn.addEventListener('click', function () {
+      helpTracker = 0;
       clearInputFields()
       if (controller.modeChoice4 === "C40") {
           if (controller.answeredQuestionTracker === controller.questionNumber) {
