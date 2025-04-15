@@ -612,6 +612,7 @@
         .text-individual-items {
             background-color: #fdf7e8;
             margin: 5px 0;
+	    white-space: pre-line;
         }
         
         .text-comprehenstion-text-id {
@@ -3565,9 +3566,13 @@ async function textDatabaseEntryLocator(id) {
     }
 }
 
-
-
-	</script>
+  document.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Optional: prevent form submission or other default behavior
+      document.getElementById("submitButton").click();
+    }
+  });
+</script>
 </body>
 
 </html>
