@@ -2028,9 +2028,10 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
                     ...(entry.text?.end || [])
                 ];
 
-                const allTextPartsMerged = allTextParts.join(" ").trim();
+                let allTextPartsMerged = allTextParts.join(" ").trim();
 
                 // Split sentences more reliably
+		allTextPartsMerged = allTextPartsMerged.replace(/\n/g, ' ');
                 const allTextPartsSentences = allTextPartsMerged.match(/[^.!?]+[.!?]+(?:[”"’'»“]*)/g) || [allTextPartsMerged];
                 if (wordId[1] < 0 || wordId[1] >= allTextPartsSentences.length) {
                     console.error("Invalid sentence index:", wordId[1]);
