@@ -2261,8 +2261,12 @@
             htmlContainer.appendChild(ul);
         }
 
-        displayComletedTextIdsForTextComp(categorizedStudentTasks.isdestymas, studentStatisticsIsdestymasCompletedTexts)
-        displayComletedTextIdsForTextComp(categorizedStudentTasks.komponavimas, studentStatisticsKomponavimasCompletedTexts)
+        if (categorizedStudentTasks.isdestymas[1].length > 0) {
+            displayComletedTextIdsForTextComp(categorizedStudentTasks.isdestymas, studentStatisticsIsdestymasCompletedTexts)
+        }
+        if (categorizedStudentTasks.komponavimas[1].length > 0) {
+            displayComletedTextIdsForTextComp(categorizedStudentTasks.komponavimas, studentStatisticsKomponavimasCompletedTexts)
+        }
     }
                 
 
