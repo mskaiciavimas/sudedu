@@ -605,14 +605,10 @@
             margin-left: 30px;
         }
 
-        .text-title {
-            margin-top: 10px;
-        }
-
         .text-individual-items {
             background-color: #fdf7e8;
             margin: 5px 0;
-	    white-space: pre-line;
+            white-space: pre-line;
         }
         
         .text-comprehenstion-text-id {
@@ -722,7 +718,7 @@
         </div>
         <div class="menu">
             <ul>
-                <li><a href="index.html"><i class="ph-bold ph-user"></i>Pradžia</a></li>
+                <li><a href="./"><i class="ph-bold ph-user"></i>Pradžia</a></li>
                 <li><a href="./" onclick="clearUserData()"><i class="ph-bold ph-envelope-simple"></i>Atsijungti</a></li>
             </ul>
         </div>
@@ -939,9 +935,9 @@
                             <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_10"
                                 id="mode_choice_10" style="display: none;">
                                 <option value="C58">LENGVAS</option>
-				<option value="C80">LENGVAS SU DISTRAKTORIUMI</option>
+                                <option value="C80">LENGVAS SU DISTRAKTORIUMI</option>
                                 <option value="C59">VIDUTINIS</option>
-				<option value="C81">VIDUTINIS SU DISTRAKTORIUMI</option>
+                                <option value="C81">VIDUTINIS SU DISTRAKTORIUMI</option>
                                 <option value="C60">SUNKUS</option>
                                 <option value="C82">SUNKUS SU DISTRAKTORIUMI</option>
                             </select>
@@ -1230,7 +1226,7 @@
                                         <div id="summary-table-grammar-for-student"></div>
                                     </div>
                                 </div>
-				<div id="sentence-with-mistake-field-for-student"></div>
+                                <div id="sentence-with-mistake-field-for-student"></div>
                                 </div>
                                 <div id="task-description-outer-container-for-student">
                                     <div id="task-description-title-for-student" class="task-info-subtitle" style="display: none;">Užduoties aprašymas:</div>
@@ -2030,7 +2026,7 @@
         const studentStatisticsIsdestymasErrorFrequency = document.querySelector("#student-statistics-isdestymas-error-frequency"); 
 
         const studentStatisticsKomponavimasCompletedTexts = document.querySelector("#student-statistics-komponavimas-completed-texts"); 
-        const studentStatisticsIsdestymasCompletedTexts= document.querySelector("#student-statistics-isdestymas-completed-texts"); 
+        const studentStatisticsIsdestymasCompletedTexts = document.querySelector("#student-statistics-isdestymas-completed-texts"); 
 
         const studentStatisticsTextComprahensionIsdestymasTitle = document.querySelector("#student-statistics-lang-text-comprahension-isdestymas")
         const studentStatisticsTextComprahensionKomponavimasTitle = document.querySelector("#student-statistics-lang-text-comprahension-komponavimas")
@@ -2778,7 +2774,8 @@
 
 
 
-        const apiBase = 'https://sudedu-server.onrender.com/'
+        //const apiBase = 'https://sudedu-server.onrender.com/'
+        const apiBase = 'http://localhost:5000/'
 
         async function fetchDataForTeachers() {
             let success = false;
@@ -3570,13 +3567,14 @@ async function textDatabaseEntryLocator(id) {
     }
 }
 
-  document.addEventListener("keydown", function(event) {
+document.addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
-      event.preventDefault(); // Optional: prevent form submission or other default behavior
-      document.getElementById("submitButton").click();
+        event.preventDefault(); // Optional: prevent form submission or other default behavior
+        document.getElementById("submitButton").click();
     }
-  });
-</script>
+});
+
+	</script>
 </body>
 
 </html>

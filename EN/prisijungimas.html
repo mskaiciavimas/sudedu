@@ -131,12 +131,13 @@
 
 	let userData = localStorage.getItem('userData');
 	if (userData) {
-		window.location.href = `/LT`;
+		window.location.href = `./`;
 	}
 
 	document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
 
-	const apiBase = 'https://sudedu-server.onrender.com/'
+	//const apiBase = 'https://sudedu-server.onrender.com/'
+	const apiBase = 'http://localhost:5000/'
 
     const registerBtn = document.getElementById('registerBtn')
 	const logInTitle = document.getElementById('log-in-text')
@@ -259,7 +260,7 @@
 							}
 						}
 					} else {
-						window.location.href = `/EN`;
+						window.location.href = `./`;
 					}
 			} else {
 				if (data.message == 'User not found') {

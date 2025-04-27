@@ -969,6 +969,7 @@ window.onload = function () {
 									 } else {
 										formattedWord = [`${beforePunctuation}${word}${afterPunctuation}`, "none"];
 										}
+										console.log(formattedWord)
 										if (allowAdjacentEndlessWords) {
 											acc.push(formattedWord)
 										} else {
@@ -1398,6 +1399,8 @@ function helpToggle() {
 					controller.mistakesTracker = 0;
 					controller.answeredQuestionTracker = 0;
 					totalCorrectAnswers = 0;
+					atsakymai = {};
+					questionId = 1;
 					resetMistakeButtonsElement.style.display = "none";
 					localStorage.setItem('controller', JSON.stringify(controller));
 					initiateTheProgram();

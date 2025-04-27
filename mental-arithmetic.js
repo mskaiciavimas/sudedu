@@ -441,7 +441,8 @@ async function sendSetTaskResultsToDatabase() {
       results: resultsDataString
   };
 
-  const apiBase = 'https://sudedu-server.onrender.com/';
+  //const apiBase = 'https://sudedu-server.onrender.com/';
+  const apiBase = 'http://localhost:5000/'
 
   if (document.querySelector("#stopButton")) {
     document.querySelector("#stopButton").disabled = true;
@@ -2031,7 +2032,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
                 let allTextPartsMerged = allTextParts.join(" ").trim();
 
                 // Split sentences more reliably
-		allTextPartsMerged = allTextPartsMerged.replace(/\n/g, ' ');
+                allTextPartsMerged = allTextPartsMerged.replace(/\n/g, ' ');
                 const allTextPartsSentences = allTextPartsMerged.match(/[^.!?]+[.!?]+(?:[”"’'»“]*)/g) || [allTextPartsMerged];
                 if (wordId[1] < 0 || wordId[1] >= allTextPartsSentences.length) {
                     console.error("Invalid sentence index:", wordId[1]);
