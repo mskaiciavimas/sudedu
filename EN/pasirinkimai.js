@@ -85,7 +85,6 @@ localStorage.removeItem("startTime");
     controller.combinations = controller.combinations.sort(() => 0.5 - Math.random()).slice(0, controller.questionNumber);
     }
     localStorage.setItem('controller', JSON.stringify(controller));
-    console.log(controller)
     redirectToQuestions();
 
 }

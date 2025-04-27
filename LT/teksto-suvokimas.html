@@ -399,7 +399,6 @@ window.onload = function () {
   }
 
   controller = JSON.parse(localStorage.getItem('controller')) 
-  console.log(controller)
   let jsonFiles = [];
 
 	// Define an array of URLs for the JSON files you want to fetch
@@ -809,9 +808,7 @@ document.addEventListener('touchmove', function (event) {
     });
 
     function recordTextComprehensionMistake() {
-      console.log(currentTextId)
       mistakesSummary[currentTextId][`${textIncidenceCount}`]+=1
-      console.log(mistakesSummary)
     }
 
 
@@ -822,7 +819,6 @@ document.addEventListener('touchmove', function (event) {
 
 
       if (controller.modeChoice2 === "C51") {
-        console.log(distractorSentences)
         if (helpTracker === 1) {
         answersField.innerHTML = 'Tekstas';
         titleField.innerHTML = 'Pavadinimas';

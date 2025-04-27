@@ -2067,14 +2067,12 @@
                                     // Process komponavimas tasks
                                     komponavimasTasks[0][0] += result[0][0];
                                     komponavimasTasks[0][1] += result[0][1];
-                                    komponavimasTasks[1].push(...result[1]);
-                                    komponavimasTasks[1].push(task.completionDate.split("T")[0]);
+                                    komponavimasTasks[1].push([[...result[1]], task.completionDate.split("T")[0]]);
                                 } else if (taskDesc[3] === "C52") {
                                     // Process isdestymas tasks
                                     isdestymasTasks[0][0] += result[0][0];
                                     isdestymasTasks[0][1] += result[0][1];
-                                    isdestymasTasks[1].push(...result[1]);
-                                    isdestymasTasks[1].push(task.completionDate.split("T")[0]);
+                                    isdestymasTasks[1].push([[...result[1]], task.completionDate.split("T")[0]]);
                                 }
                             }
                         }
@@ -2204,12 +2202,13 @@
 
             // 1. Extract all [textId, mistakes, date] triples
             const allEntries = [];
-            const entries = textInfo.slice(1); // Skip metadata (e.g., [2, 1])
+            const entries = textInfo.slice(1)[0]; // Skip metadata (e.g., [2, 1])
 
             for (const entry of entries) {
-                for (let i = 0; i < entry.length; i += 2) {
-                    const [textId, textMistakes] = entry[i];
-                    const date = entry[i + 1];
+                const [texts, date] = entry; // each entry is [texts, taskDate]
+
+                for (const text of texts) { // texts is an array of [textId, textMistakes]
+                    const [textId, textMistakes] = text;
                     allEntries.push({ textId, textMistakes, date });
                 }
             }
