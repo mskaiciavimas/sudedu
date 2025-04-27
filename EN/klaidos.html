@@ -4,7 +4,7 @@
 <head>
     <title>sudEdu - Mental Arithmetic</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="../../images/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Josefin+Sans&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="../../summary.css">
+    <link rel="stylesheet" type="text/css" href="../summary.css">
 
 </head>
 
@@ -39,7 +39,7 @@
 
         <div class="row d-flex align-items-center justify-content-center text-center">
             <div id="summary-table-outer-div" class="col-12 d-flex justify-content-center align-items-center">
-                <div class="col-12 table-container">
+                <div class="col-12 table-container" id="table-container">
                     <div id="summary-table"></div>
                 </div>
             </div>
@@ -57,7 +57,7 @@
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="../../mental-arithmetic.js"></script>
+    <script src="../mental-arithmetic.js"></script>
     <script>
         window.onload = function () {
             if (localStorage.getItem('controller') === null) {
@@ -78,11 +78,25 @@
             const prevPage = document.referrer;
 
             if (prevPage.includes("veiksmai")) {
-                generateSummaryTable('current');
+                generateSummaryTable('current', customDivForGrammarSummaryTable="none");
             } else {
-                generateSummaryTable('total');
+                generateSummaryTable('total', customDivForGrammarSummaryTable="none");
             }
         });
+
+        function displayMathSummary () {
+            if (document.querySelector("#summary-table").innerHTML === "No mistakes!") {
+                document.querySelector("#table-container").style.boxShadow = "none";
+                document.querySelector("#summary-table").style.fontSize = "2rem";
+                document.querySelector("#summary-table").style.height = "200px";
+                document.querySelector("#summary-table").style.display = "flex";
+                document.querySelector("#summary-table").style.alignItems = "center";
+                document.querySelector("#summary-table").style.justifyContent = "center";
+            }
+        }
+
+        setTimeout(displayMathSummary, 100);
+        
     </script>
 </body>
 

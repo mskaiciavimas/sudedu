@@ -23,26 +23,70 @@
 
 </head>
 <style>
-		@media (min-width: 768px) {
+
+	ul {
+		text-align: start;
+	}
+
+	.image-div {
+		margin: 10px 0;
+		display: flex;
+		align-items: start;
+	}
+
+	.user-instruction-image {
+		width: 50%; 
+		max-width: 500px;
+		height: auto; 
+		border: gray 2px solid; 
+		padding: 5px; 
+		margin: 5px; 
+		border-radius: 10px;
+	}
+
+	#prisijungimas,
+	#susiejimas,
+	#mokytojo-paskyra,
+	#mokinio-paskyra {
+		margin-top: 5px;
+	}
+
+	@media (max-width: 576px) {
+		.image-div {
+			flex-direction: column;
+		}
+
+		.user-instruction-image {
+			width: 100%; 
+		}
+		}
+
+		@media (min-width: 1400px) and (min-height: 783px) {
+		body {
+			width: 95vw;
+		}
+
 	    .container-fluid {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh; /* Ensure the container covers the full viewport height */
-    }
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh; /* Ensure the container covers the full viewport height */
+		}
 
-    .row {
-      flex: 1; /* Allow the row to take up the remaining vertical space */
-    }
+		.row {
+		flex: 1; /* Allow the row to take up the remaining vertical space */
+		}
 
-    .sticky-column {
-      position: sticky;
-      top: 0; /* Stick to the top of the viewport */
-      height: 100vh; /* Occupy the full viewport height */
-    }
+		.sticky-column {
+			position: sticky;
+			top: 0; /* Stick to the top of the viewport */
+			height: 100vh; /* Occupy the full viewport height */
+			padding-top: 10px;
+		}
+
 		.logo-row {
 			padding: 3vh 0 2vh 0;
 		}
-	}
+		}
 </style>
 
 <body>
@@ -59,14 +103,12 @@
   </div>
   
 		<div class="row d-flex text-center">
-			<div class="col-sm-3 sticky-column">
+			<div class="col-xxl-3 col-12 sticky-column">
 				<h5>Turinys</h5>
-				<p>
 					<ul>
 						<li><a href="#matematika" style="font-weight: bold;">MATEMATIKA</a></li>
 					<ul>
 						<li><a href="#mskaiciavimas">Mintinis skaičiavimas</a></li>
-						<li><a href="#galimybes">sudEdu galimybės</a></li>
 						<li><a href="#turinys">Mokymosi turinys</a></li>
 						<ul style="padding-left: 10px;">
 							<li><a href="#pirma">1 klasė</a></li>
@@ -90,14 +132,30 @@
 							</uL>
 						</li>
 					</ul>
+					<li><a href="#naudojimo-instrukcijos" style="font-weight: bold;">PASKYRŲ NAUDOJIMAS</a></li>
+						<ul>
+							<li><a href="#prisijungimas">Prisijungimas</a></li>
+							<li><a href="#susiejimas">Mokytojo ir mokinio susiejimas</a></li>
+							<li><a href="#mokytojo-paskyra">Mokytojo paskyra</a></li>
+							<ul>
+								<li><a href="#uzduociu-skyrimas">Užduočių skyrimas</a></li>
+								<li><a href="#rezultatu-analize">Rezultatų analizė</a></li>
+								<li><a href="#uzduociu-trynimas">Užduočių trynimas</a></li>
+								<li><a href="#mokiniu-salinimas">Mokinių šalinimas</a></li>
+								<li><a href="#tekstu-narsykle">Tekstų naršyklė</a></li>
+							</ul>
+							<li><a href="#mokinio-paskyra">Mokinio paskyra</a></li>
+							<ul>
+								<li><a href="#rezultatu-analize-mokiniams">Rezultatų analizė mokiniams</a></li>
+							</ul>
+						</ul>
 					<li><a href="#susisiekite" style="font-weight: bold;">SUSISIEKITE</a></li>
 					<li><a href="https://www.sudedu.lt/" style="font-weight: bold;">PRAKTIKUOTIS</a></li>
 				</ul>
-				</p>
 
 
 			</div>
-			<div class="col-sm-9">
+			<div class="col-xxl-9 col-12">
 				<h2 id="matematika">MATEMATIKA</h2>
 				<p><span style="color: #01937C; font-weight: bold; font-size: 1.5rem;" id="mskaiciavimas">Mintinis skaičiavimas</span> (mentalinė aritmetika) yra puiki smegenų treniruotė, gerinanti vaiko atmintį ir dėmesio koncentraciją. Geri skaičiavimo mintinai įgūdžiai būtini ne tik geram matematikos mokymo(si) turinyje numatytų faktinių žinių supratimui, bet ir išmokimui sklandžiai atlikti matematines procedūras. Efektyvus mintinis skaičiavimas reikalauja daug praktikos ir kantrybės. 
 					Siekiate maksimalaus rezultato? 
@@ -365,22 +423,129 @@
 							</p>
 							</ul>
 
-
-								
-
-
-
-
-
-
-
 							<h6 id="atsakymai">Teisingi atsakymai</h6>
 								<p>
 							Po kiekvieno bandymo būtina ištaisyti visus neteisingus atsakymus. Po trijų nesėkmingų bandymų atsiranda naujas mygtukas („Atsakymai“), kurį paspaudus pateikiami teisingi atsakymai.
 						</p>
 							</p>
 
-						<p><span style="color: #01937C; font-weight: bold;" id="susisiekite">Turite klausimų ar pasiūlymų? Parašykite mums!</span><span id="email"> Mūsų elektroninio pašto adresas: <a href="mailto:sudedult@gmail.com">sudedult@gmail.com</a></span></p>
+							<h2 id="naudojimo-instrukcijos">PASKYRŲ NAUDOJIMAS</h2>
+
+							<p><strong>sudEdu paskyrų funkcija kol kas yra eksperimentinėje stadijoje, tad gali pasitaikyti techninių nesklandumų, klaidų; duomenys, įskaitant paskyras, gali būti ištrinti neperspėjus.</strong></p>
+							<p>Platforma sudEdu galima naudotis neturint paskyros. Tačiau, jei norite pilnai išnaudoti visus tinklalapio privalumus (užduočių skyrimą, rezultatų peržiūrą ir kt.), rekomenduojame užsiregistruoti.<br>
+								</p>
+
+							<h5 id="prisijungimas">Prisijungimas</h5>
+
+							<p>Registracijos arba prisijungimo mygtukas <strong>„Prisijungti“</strong> yra pagrindinio puslapio viršutiniame dešiniajame kampe. SudEdu paskyros kūrimui būtina atlikti šiuos veiksmus:</p>
+
+							<ul>
+								<li>nurodyti jūsų elektroninio pašto adresą;</li>
+								<li>sugalvoti slaptažodį (nuo 6 iki 15 simbolių);</li>
+								<li>nurodyti savo vartotojo vardą;</li>
+								<li>pažymėti, jei esate mokytojas.</li>
+							</ul>
+
+							<div class="image-div">
+								<img src="../images/user-instructions-1.png" class="user-instruction-image">
+								<img src="../images/user-instructions-2.png" class="user-instruction-image">
+								</div>
+
+							<p>
+								Svarbu įsidėmėti paskyros slaptažodį, nes jį pakeisti ar atkurti nėra galimybės. Jei pamiršote savo slaptažodį ir nebegalite prisijungti prie paskyros, parašykite mums elektroninį laišką iš elektroninio pašto adreso, kurį naudojote kurdami savąją paskyrą. Mes ištrinsime jūsų paskyrą, kad galėtumėte susikurti naują, naudodami tą patį elektroninio pašto adresą. Svarbu paminėti, kad visos užduotys, susietos su jūsų paskyra, bus ištrintos.
+							</p>
+
+							<h5 id="susiejimas">Mokytojo ir mokinio susiejimas</h5>
+							<p>Prisijungus prie paskyros, pagrindinio puslapio viršutiniame dešiniajame kampe yra <strong>vartotojo vardas</strong> ir unikalus <strong>ID</strong> numeris. Paspaudus vartotojo vardo mygtuką, atsidaro meniu, per kurį galima patekti į puslapį <strong>„Užduotys“</strong>. Norėdami susieti mokinio ir mokytojo paskyras, mokiniai turėtų įvesti mokytojo ID numerį.</p>
+
+							<div class="image-div">
+								<img src="../images/user-instructions-3.png" class="user-instruction-image">
+								<img src="../images/user-instructions-4.png" class="user-instruction-image">
+
+							</div>
+
+							<h5 id="mokytojo-paskyra">Mokytojo paskyra</h5>
+
+							<p>Puslapyje <strong>„Užduotys“</strong> mokytojas mato mokinių, kurie jau yra susieję savo paskyras su mokytoju, sąrašą.</p>
+
+							<h6 id="uzduociu-skyrimas">Užduočių skyrimas</h6>
+
+							<p>Paspaudęs mygtuką <strong>„Nauja užduotis“</strong>, mokytojas, naudodamasis visais galimais sudEdu užduočių nustatymais, gali priskirti naujas užduotis. Prie kiekvienos užduoties nurodykite grupės pavadinimą (pvz., dalyko pavadinimą, datą ir pan.). Atskirai skirtingiems mokiniams priskirtos užduotys (pvz., diferencijuotos užduotys pagal sudėtingumą, atlikimo būdą, laiką ir pan.), gali būti pavadintos identiškai. Užduočių grupės pavadinimas yra naudingas tuomet, kai norima peržiūrėti ar ištrinti tam tikras užduotis, nes pagal pavadinimą užduotys gali būti filtruojamos.</p>
+
+							<div class="image-div">
+								<img src="../images/user-instructions-5.png" class="user-instruction-image">
+								<img src="../images/user-instructions-6.png" class="user-instruction-image">
+
+							</div>
+
+							<p>Šalia kiekvienos užduoties mokinių sąraše yra skritulio formos indikatorius, kuris nurodo ar užduotis atlikta (žalias), ar ne (rožinis). Paspaudus atliktos užduoties pavadinimo mygtuką, galima matyti visus užduoties nustatymus, atlikimo laiką, klaidas bei kitus duomenis. Paspaudus mokinio vardo mygtuką, galima matyti visų atliktų užduočių rezultatų suvestinę.</p>
+
+							<p><strong>Maksimalus užduočių skyrimo kiekis</strong> – 6 užduotys vienam mokiniui (nesvarbu, ar jos jau atliktos, ar dar ne). Todėl, jei mokiniui jau priskirtos 6 užduotys, naują galėsite užduoti tik ištrynę vieną ar daugiau senųjų.</p>
+
+							<div class="image-div">
+								<img src="../images/user-instructions-7.png" class="user-instruction-image">
+								<img src="../images/user-instructions-8.png" class="user-instruction-image">
+
+							</div>
+
+							<h6 id="rezultatu-analize">Rezultatų analizė</h6>
+							<p><strong>Klaidų dažnis</strong>: klaidų skaičius lyginant su atliktų veiksmų kiekiu (matematinių veiksmų, sudėliotų tekstų, įrašytų raidžių). Pavyzdžiui, 10% klaidų dažnis reiškia, kad mokinys vidutiniškai padarė vieną klaidą kas dešimt atliktų veiksmų.</p>
+
+							<p><strong>Dažniausios skaičiavimo klaidos</strong>: dažniausių skaičiavimo klaidų suvestinė pateikiama lentelėje. Maksimalus rodomų klaidų kiekis vienoje užduotyje – 30 paskutiniųjų klaidų.</p>
+
+							<p><strong>Dažniausios rašybos klaidos</strong>: dažniausių rašybos klaidų suvestinė pateikiama lentelėje. Klaidos gali būti rodomos atskirai arba grupuojamos pagal kategoriją (lentelėje paspauskite mygtuką „Žodžiai“ ir pasirinkite „Kategorijos“). Lentelėje, pažymėjus žodį, parodomas sakinys, kuriame šis žodis buvo pateiktas ir nurodomos pirmos trys padarytos klaidos. Vienoje užduotyje maksimaliai pateikiama 30 paskutiniųjų žodžių, kurių trūkstamos raidės nebuvo teisingai įrašytos iš pirmo bandymo.</p>
+
+
+							<div class="image-div">
+								<img src="../images/user-instructions-9.png" class="user-instruction-image">
+								<img src="../images/user-instructions-10.png" class="user-instruction-image">
+
+							</div>
+
+
+							<p><strong>Sudėlioti tekstai</strong>: nurodomas sudėliotų tekstų ID numeris ir klaidų skaičius, padarytas juos dėliojant. Mokytojo paskyroje, paspaudus teksto ID numerio mygtuką, galima peržiūrėti tekstą bei jo parametrus. </p>
+						
+							<div class="image-div">
+								<img src="../images/user-instructions-11.png" class="user-instruction-image">
+								<img src="../images/user-instructions-12.png" class="user-instruction-image">
+							</div>
+
+							<h6 id="uzduociu-trynimas">Užduočių trynimas</h6>
+
+							<p>Užduotis gali ištrinti tik mokytojas, paspaudęs mygtuką <strong>„Ištrinti užduotis“</strong>. Trinant galima pasirinkti individualias užduotis arba trinti visas iš karto. Taip pat galima išfiltruoti užduotis pagal grupės pavadinimą ir ištrinti viskas kartu – užduotys su kitais grupės pavadinimais nebus ištrintos.</p>
+
+							<h6 id="mokiniu-salinimas">Mokinių šalinimas</h6>
+
+							<p>Iš sąrašo mokiniai pašalinami mygtuku <strong>„Pašalinti mokinius“</strong>.</p>
+
+							<h6 id="tekstu-narsykle">Tekstų naršyklė</h6>
+
+							<p>Tekstų naršyklė leidžia peržiūrėti tekstus, skirtus turinio komponavimui arba struktūros išdėstymui. Norėdami peržiūrėti tekstą, įveskite teksto ID numerį arba paspauskite teksto ID numerio mygtuką, kuris nurodomas užduočių rezultatų suvestinėje.</p>
+
+							<h5 id="mokinio-paskyra">Mokinio paskyra</h5>
+
+							<p>Instrukciją, kaip mokiniui susieti savo paskyrą su mokytojo, galite rasti <a href="#susiejimas">čia</a>.</p>
+
+							<p>Mokinys jam priskirtas užduotis mato sąraše „UŽDUOTYS“. Paspaudęs užduoties mygtuką, mokinys gali matyti užduoties nustatymus ir, jei užduotis jau atlikta, rezultatus. Norėdamas atlikti užduotį, mokinys pasirenka mygtuką <strong>„Atlikti užduotį“</strong> – užduotis bus automatiškai pradėta. Pabaigus užduotį, mokinys turi sulaukti žinutės, nurodančios, kad užduoties rezultatai buvo sėkmingai išsaugoti. Techninių problemų atveju, mokinys bus informuotas – rezultatai nebus išsaugoti ir užduotis bus rodoma kaip neatlikta.</p>
+
+							<div class="image-div">
+								<img src="../images/user-instructions-13.png" class="user-instruction-image">
+								<img src="../images/user-instructions-14.png" class="user-instruction-image">
+							</div>
+
+							<h6 id="rezultatu-analize-mokiniams">Rezultatų analizė mokiniams</h6>
+							<p><strong>Dažniausios skaičiavimo klaidos</strong>: dažniausių skaičiavimo klaidų suvestinė pateikiama lentelėje. Maksimalus rodomų klaidų kiekis vienoje užduotyje – 30 paskutiniųjų klaidų.</p>
+
+							<p><strong>Dažniausios rašybos klaidos</strong>: dažniausių rašybos klaidų suvestinė pateikiama lentelėje. Klaidos gali būti rodomos atskirai arba grupuojamos pagal kategoriją (lentelėje paspauskite mygtuką „Žodžiai“ ir pasirinkite „Kategorijos“). Lentelėje, pažymėjus žodį, parodomas sakinys, kuriame šis žodis buvo pateiktas ir nurodomos pirmos trys padarytos klaidos. Vienoje užduotyje maksimaliai pateikiama 30 paskutiniųjų žodžių, kurių trūkstamos raidės nebuvo teisingai įrašytos iš pirmo bandymo.</p>
+
+
+							<div class="image-div">
+								<img src="../images/user-instructions-15.png" class="user-instruction-image">
+								<img src="../images/user-instructions-16.png" class="user-instruction-image">
+
+							</div>
+
+							<p><span style="color: #01937C; font-weight: bold;" id="susisiekite">Turite klausimų ar pasiūlymų? Parašykite mums!</span><span id="email"> Mūsų elektroninio pašto adresas: <a href="mailto:sudedult@gmail.com">sudedult@gmail.com</a></span></p>
 
 
 		
