@@ -422,7 +422,7 @@ async function sendSetTaskResultsToDatabase() {
   if (userDataString) {
       userData = JSON.parse(userDataString);
   } else {
-      window.location.href = '/LT/index.html';
+      window.location.href = '/LT/';
       return;
   }
 
@@ -490,7 +490,7 @@ async function sendSetTaskResultsToDatabase() {
         redirectingToAuthentication = true;
           clearUserDataCookie();
           localStorage.setItem('controller', JSON.stringify(controller))
-          window.location.href = "prisijungimas.html";
+          window.location.href = "prisijungimas";
       } else {
         if (controller.language === 'LT') {
           taskSavingMessageDiv.innerHTML = "Įvyko klaida. Rezultatai neišsaugoti. Bandykite vėl vėliau."
@@ -1628,18 +1628,18 @@ async function sendSetTaskResultsToDatabase() {
 }
 
 function redirectToIntermediate() {
-  window.location.href = "./pasirinkimai.html";
+  window.location.href = "./pasirinkimai";
 }
 
   function redirectToQuestions() {
     if (controller.mode === "lang") {
     if (controller.modeChoice1 === "C50") {
-      window.location.href = "./rasyba.html";
+      window.location.href = "./rasyba";
     } else if (controller.modeChoice1 === "C49") {
-      window.location.href = "./teksto-suvokimas.html";
+      window.location.href = "./teksto-suvokimas";
     } 
   } else if (controller.mode === "math") {
-      window.location.href = "./veiksmai.html";
+      window.location.href = "./veiksmai";
   }
   }
 
@@ -1649,7 +1649,7 @@ function redirectToIntermediate() {
   }
 
   function redirectToSummary () {
-    window.location.href = "./klaidos.html";
+    window.location.href = "./klaidos";
   }
 
  // Function to calculate bar color based on the number of mistakes

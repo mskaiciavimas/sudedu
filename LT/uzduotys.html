@@ -704,7 +704,7 @@
             <span class="language-option language-option-LT selected" onclick="setLanguage('LT')">LT</span>
         </div>
         <div class="col-6 d-flex justify-content-end align-items-end" id="user-login-div">
-                    <a id="user-login-anchor" href="./prisijungimas.html" class="log-in">Prisijungti</a>
+                    <a id="user-login-anchor" href="./prisijungimas" class="log-in">Prisijungti</a>
 
                     <div id="loggedin-user-menu">
         <div class="profile">
@@ -1825,7 +1825,7 @@
                 console.log('Error deleting tasks:', error);
                 if (error.message === "Unauthorized") {
                     clearUserData();
-                    window.location.href = "prisijungimas.html";
+                    window.location.href = "prisijungimas";
                 } else {
                     studentMessage.innerHTML = 'Nepavyko pašalinti mokinių. Bandykite vėl vėliau.';
                 }
@@ -1864,7 +1864,7 @@
                 if (!response.ok) {
                     if (responseData.message === "Unauthorized") {
                         clearUserData();
-                        window.location.href = "prisijungimas.html";
+                        window.location.href = "prisijungimas";
                     } else if (responseData.error === 'Invalid teacher ID') {
                         studentMessage.innerHTML = "Neteisingas mokytojo ID numeris."
                     } else if (responseData.error === 'Relationship already exists') {
@@ -1920,7 +1920,7 @@
                 if (!response.ok) {
                     if (responseData.message === "Unauthorized") {
                         clearUserData();
-                        window.location.href = "prisijungimas.html";
+                        window.location.href = "prisijungimas";
                     } else if (response.status === 400 && responseData.error === 'Invalid teacher ID') {
                         studentMessage.innerHTML = "Neteisingas mokytojo ID numeris."
                     } else if (response.status === 404 && responseData.error === 'No existing teacher relationship found') {
@@ -2802,7 +2802,7 @@
                 console.log('Error fetching data:', error);
                 if (error.message === "Unauthorized") {
                     clearUserData();
-                    window.location.href = "prisijungimas.html";
+                    window.location.href = "prisijungimas";
                 } else {
                     teacherDataRetrievalMessage.innerHTML = 'Nepavyko pasiekti duomenų. Bandykite vėl vėliau.'
                 }
@@ -2838,7 +2838,7 @@
                 console.log('Error fetching data:', error);
                 if (error.message === "Unauthorized") {
                     clearUserData();
-                    window.location.href = "prisijungimas.html";
+                    window.location.href = "prisijungimas";
                 } else {
                     studentMessage.innerHTML = 'Nepavyko pasiekti duomenų. Bandykite vėl vėliau.'
                 }
@@ -2962,7 +2962,7 @@
                 console.log('Error fetching tasks:', error);
                 if (error.message === "Unauthorized") {
                     clearUserData();
-                    window.location.href = "prisijungimas.html";
+                    window.location.href = "prisijungimas";
                 } else {
                     teacherMessageLine.innerHTML = 'Nepavyko pasiekti duomenų. Bandykite vėl vėliau.'
                 }
@@ -3005,7 +3005,7 @@
             console.log('Error fetching tasks:', error);
             if (error.message === "Unauthorized") {
                 clearUserData();
-                window.location.href = "prisijungimas.html";
+                window.location.href = "prisijungimas";
             } else {
                 teacherMessageLine.innerHTML = "Nepavyko pašalinti užduočių. Bandykite vėl vėliau."
             }
@@ -3195,7 +3195,7 @@
             console.log('Error fetching tasks:', error);
             if (error.message === "Unauthorized") {
                 clearUserData();
-                window.location.href = "prisijungimas.html";
+                window.location.href = "prisijungimas";
             } else {            
                 clearTimeout(timeoutReference);
                 submitNewTaskButton.classList.add('invalid-submition')
