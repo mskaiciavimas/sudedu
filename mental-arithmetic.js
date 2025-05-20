@@ -956,7 +956,7 @@ async function sendSetTaskResultsToDatabase() {
     } else if (controller.result[0] === 'Correct') {
       upperLineElement.setAttribute("style", "background-color: #B6C867")
     } else {
-      upperLineElement.setAttribute("style", "background-color: #FAEDCD")
+      upperLineElement.setAttribute("style", "background-color: #ffeccc")
     };
     previousEquationElement.innerHTML = controller.result[4];
     updateScore();
@@ -1001,7 +1001,7 @@ async function sendSetTaskResultsToDatabase() {
         } else if (corectness === true) {
           element.setAttribute("style", "background-color: #B6C867")
         } else {
-          element.setAttribute("style", "background-color: #FAEDCD")
+          element.setAttribute("style", "background-color: #ffeccc")
         };
       }
 
@@ -1461,8 +1461,8 @@ async function sendSetTaskResultsToDatabase() {
     if (isCorrect || controller.modeChoice7 !== "C48") {
       formEquation();
       displayEquation();
-      answerInputElement.setAttribute("style", "background-color: #FAEDCD")
-      //answerRemainderWesternInputElement.setAttribute("style", "background-color: #FAEDCD") recently removed
+      answerInputElement.setAttribute("style", "background-color: #ffeccc")
+      //answerRemainderWesternInputElement.setAttribute("style", "background-color: #ffeccc") recently removed
     } else {
       updateScore();
       setMargins();
@@ -1482,10 +1482,10 @@ async function sendSetTaskResultsToDatabase() {
     }
     answerInputElement.value = '';
     answerRemainderInputElement.value = '';
-    answerInputElement.setAttribute("style", "background-color: #FAEDCD");
+    answerInputElement.setAttribute("style", "background-color: #ffeccc");
     if (controller.modeChoice8 === 'C78') {
       answerRemainderWesternInputElement.value = '';
-      answerRemainderWesternInputElement.setAttribute("style", "background-color: #FAEDCD");
+      answerRemainderWesternInputElement.setAttribute("style", "background-color: #ffeccc");
     }
     controller.result = ['', '', '', '', ''];
     controller.equation = '';
