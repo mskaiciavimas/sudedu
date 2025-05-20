@@ -2089,7 +2089,9 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
 
                 // Create case-insensitive regex with word boundaries
                 const escapedTarget = targetWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                const regex = new RegExp(`(^|\\s)${escapedTarget}(?=\\s|$|[.,!?])`, 'gi');
+                const hyphens = '\u002D\u2010\u2011\u2012\u2013\u2014\u2015';
+                const punctuation = '.,!?;:';
+                const regex = new RegExp(`(^|\\s)${escapedTarget}(?=\\s|$|[${punctuation}${hyphens}])`, 'gi');
                 
                 // Find all matches safely
                 const matches = [];
@@ -2105,7 +2107,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
                         <div class="sentence-occurrence">
                             ${originalSentence} 
                             <span class="error-marker">
-                                (Target word "${fullWordForm}" not found in sentence)
+                                (žodis "${fullWordForm}" sakinyje nerastas)
                             </span>
                         </div>
                     `;
