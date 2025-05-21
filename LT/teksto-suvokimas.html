@@ -12,21 +12,27 @@
     <link rel="stylesheet"
 		href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
+      	html {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background-image: linear-gradient(to top, #ffbf9c, #ffbf92, #ffbf89, #ffbf7e, #ffc074);
+            min-height: 100dvh;
+        }
+
         body {
-          height: 100vh;
-          background-color: #FFC074;
+  		    background: transparent;
           font-family: 'Andika', sans-serif;
           padding: 20px;
           overscroll-behavior: none;
           user-select: none;
           -webkit-user-select: none;
           -ms-user-select: none;
-          
-          /* Add Flexbox to center content */
           display: flex;
           justify-content: center;
           align-items: center;
-          margin: 0; /* Remove default body margin */
+          width: 100vw;
+          margin: 0;
         }
 
         .container {
@@ -35,7 +41,7 @@
           justify-content: space-between;
           width: 100%;
           max-width: 1200px; /* Optional: limit the maximum width */
-          height: 100%;
+  		    min-height: 95dvh;
         }
 
         .field {
@@ -112,7 +118,7 @@
         .dot {
             width: 15px; /* Size of each circle */
             height: 15px; /* Size of each circle */
-            background-color: #FFC074; /* Circle color */
+            background-color: #ffbf92; /* Circle color */
             border: 2px solid #D57E7C; /* Creates a border around the element */
             border-radius: 50%; /* Make it round */
             margin: 0 2px; /* Space between circles */
@@ -169,7 +175,7 @@
         .trackers-row,
         #stop-restart-button-row {
           padding: 0;
-          margin: 20px 0 0 0;
+          margin: 0;
         }
 
         .material-symbols-rounded {
@@ -257,6 +263,18 @@
         
         }
         
+        @media (max-width: 575px) {
+
+      .stop-button {
+        width: 4.25rem;
+        height: 4.25rem;
+      }
+
+      .reset-button {
+        width: 4.25rem;
+        height: 4.25rem;
+      }
+    }
 
     </style>
 </head>
@@ -572,7 +590,7 @@ window.onload = function () {
       const dots = document.querySelectorAll('#dots .dot');
       for (let i = 0; i < dots.length; i++) {
           const dot = dots[i];
-          dot.style.backgroundColor = '#FFC074';
+          dot.style.backgroundColor = '#ffbf92';
           }
     }
 
@@ -775,7 +793,7 @@ document.addEventListener('touchmove', function (event) {
         localStorage.setItem("controller", JSON.stringify(controller));
       } else {
         const dots = document.querySelectorAll('#dots .dot');
-        const targetColor = 'rgb(255, 192, 116)'; // Example target color (white in RGB)
+        const targetColor = 'rgb(255, 191, 146)'; // Example target color (white in RGB)
         let foundMatch = false;
 
         for (let i = 0; i < dots.length; i++) {
@@ -1028,7 +1046,7 @@ document.addEventListener('touchmove', function (event) {
       const dots = document.querySelectorAll('#dots .dot');
       for (let i = 0; i < dots.length; i++) {
           const dot = dots[i];
-          dot.style.backgroundColor = '#FFC074';
+          dot.style.backgroundColor = '#ffbf92';
           }
     });
 
