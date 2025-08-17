@@ -954,7 +954,7 @@ async function sendSetTaskResultsToDatabase() {
     if (controller.result[0] === 'Incorrect') {
       upperLineElement.setAttribute("style", "background-color: #D57E7E")
     } else if (controller.result[0] === 'Correct') {
-      upperLineElement.setAttribute("style", "background-color: #B6C867")
+      upperLineElement.setAttribute("style", "background-color: #40c9a9")
     } else {
       upperLineElement.setAttribute("style", "background-color: #ffeccc")
     };
@@ -999,7 +999,7 @@ async function sendSetTaskResultsToDatabase() {
             removeError(element);
         }, 500);
         } else if (corectness === true) {
-          element.setAttribute("style", "background-color: #B6C867")
+          element.setAttribute("style", "background-color: #40c9a9")
         } else {
           element.setAttribute("style", "background-color: #ffeccc")
         };
@@ -1654,7 +1654,7 @@ function redirectToIntermediate() {
  // Function to calculate bar color based on the number of mistakes
 function getBarColor(value) {
   if (value < 3) {
-      return "#B6C867";
+      return "#40c9a9";
   } else if (value <= 6) {
       return "#E7B10A";
   } else {

@@ -23,18 +23,30 @@
 	<link rel="stylesheet" type="text/css" href="../index.css">
 	<link rel="stylesheet" type="text/css" href="../user-nav-menu.css">
 <style>
+	.lm-animated-bg {
+		position: absolute;
+		width: 100vw;
+		height: auto;
+		top: -18px;
+		left: -18px;
+		right: -18px;
+		bottom: -18px;
+		background-image: url(../images/main_bg.png);
+		background-position: center center;
+		background-size: cover;
+		background-repeat: no-repeat;
+		z-index: -1;
+		opacity: 1;
+	}
 </style>
 </head>
 
 <body>
 	<div class="container" id="template-container"
 		style="display: flex; flex-direction: column; justify-content: space-between;" hidden>
-		<div class="position-absolute image-container kid-5 bottom-0 end-0"
-			style="top: 45%; left: 15%; width: 300px; height: 300px;"> <img src="../images/alt_kid_1_smaller.png"
-				style="width: 100%; height: 100%;" class="img-fluid"> </div>
-		<div class="position-absolute image-container kid-6 bottom-0 end-0"
-			style="top: 30%; left: 67%; width: 300px; height: 300px;"> <img src="../images/alt_kid_2.png"
-				style="width: 250px; height: auto;" class="img-fluid"> </div>
+
+
+
 		<div id="language-about-row" class="row d-flex align-items-start">
 			<div class="col-6" id="language-switcher" onmousedown="return false;" onselectstart="return false;" style="-webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;">
 				<span class="language-option language-option-EN" onclick="setLanguage('EN')">EN</span>
@@ -63,13 +75,19 @@
 			</div>
 		</div>
 			<div class="col-12 d-flex justify-content-center align-items-center text-center">
-				<img id="sudedu-main-page-logo" src="../images/alt-logo-5.png" alt="sudEdu">
+				<img id="sudedu-main-page-logo" src="../images/sudedu_logo.png" alt="sudEdu">
 			</div>
 		<div class="row d-flex align-items-center justify-content-center text-center">
+			<label class="mode-choice-label" for="mode_choice">PRAKTIKUOTIS</label>
 			<div class="col-12 d-flex justify-content-center align-items-center middle-div">
-				<div class="row" id="middle-div-row">
+				<div class="row position-relative" id="middle-div-row">
+		<div class="position-absolute image-container kid-5"
+			style="width: 300px; height: 300px;"> <img src="../images/alt_kid_1_smaller.png"
+				style="width: 100%; height: 100%;" class="img-fluid"> </div>
+		<div class="position-absolute image-container kid-6"
+			style="width: 300px; height: 300px;"> <img src="../images/alt_kid_2.png"
+				style="width: 250px; height: auto;" class="img-fluid"> </div>
 					<div class="d-flex flex-column align-items-center">
-						<label class="mode-choice-label" for="mode_choice">PRAKTIKUOTIS</label>
 						
 						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
 							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice"
@@ -305,7 +323,7 @@
 						</div>
 						<div class="row">
 							<div class="col-12 d-flex justify-content-center align-items-center submit-button">
-								<button class="btn btn-primary submit-button">Pirmyn!</button>
+								<button class="btn btn-primary submit-button highlight-btn">Pirmyn!</button>
 							</div>
 						</div>
 					</div>
