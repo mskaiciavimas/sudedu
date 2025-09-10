@@ -55,6 +55,43 @@ if (document.querySelector("#stop-button-span")) {
   document.querySelector("#stop-button-span").disabled = false;
 }
 
+
+    function formatFinalMessage () {
+      document.querySelector('#invisibleRow').style.display = "none";
+      if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.answeredQuestionTracker >= 10) {
+        triggerFireworks();
+      }
+
+      setFontSize();
+      var contentContainerElement = document.getElementById('content-container');
+      contentContainerElement.style.width = '100%';
+      contentContainerElement.style.marginRight = '0';
+			contentContainerElement.style.marginLeft = '0';
+
+      if (controller.taskId !== 0) {
+        controller.equation = '';
+        if (controller.taskCompleted === true) {
+          sendSetTaskResultsToDatabase();
+        } else {
+          if (controller.language === 'LT') {
+            taskSavingMessageDiv.innerHTML = 'Užduotis nebaigta iki galo. Rezultatai neišsaugoti.';
+          } else if (controller.language === 'EN') {
+            taskSavingMessageDiv.innerHTML = 'Task was not completed. Results were not saved.';
+          }
+        }
+      } else {
+        controller.equation = finalMessageText();
+      }
+      
+      controller.equation2 = '';
+      controller.result = ['', '', '', '', ''];
+      controller.questionsStopped = true;
+      clearInterval(timerInterval);
+      const stopButtonSpanElement = document.querySelector('#stop-button-span');
+      stopButtonSpanElement.innerHTML = "refresh";
+      localStorage.setItem('controller', JSON.stringify(controller))
+    }
+
 	function formEquation () {
     taskSavingMessageDiv.innerHTML = ''
     let remainingTime = parseInt(localStorage.getItem('remainingTime'));
@@ -267,40 +304,6 @@ if (document.querySelector("#stop-button-span")) {
 
     } 
 
-    function formatFinalMessage () {
-      document.querySelector('#invisibleRow').style.display = "none";
-      if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.answeredQuestionTracker >= 10) {
-        triggerFireworks();
-      }
-
-      setFontSize();
-      var contentContainerElement = document.getElementById('content-container');
-      contentContainerElement.style.width = '100%';
-      contentContainerElement.style.marginRight = '0';
-			contentContainerElement.style.marginLeft = '0';
-
-      if (controller.taskId !== 0) {
-        controller.equation = '';
-        if (controller.taskCompleted === true) {
-          sendSetTaskResultsToDatabase();
-        } else {
-          if (controller.language === 'LT') {
-            taskSavingMessageDiv.innerHTML = 'Užduotis nebaigta iki galo. Rezultatai neišsaugoti.';
-          } else if (controller.language === 'EN') {
-            taskSavingMessageDiv.innerHTML = 'Task was not completed. Results were not saved.';
-          }
-        }
-      } else {
-        controller.equation = finalMessageText();
-      }
-      
-      controller.equation2 = '';
-      controller.result = ['', '', '', '', ''];
-      controller.questionsStopped = true;
-      clearInterval(timerInterval);
-      const stopButtonSpanElement = document.querySelector('#stop-button-span');
-      stopButtonSpanElement.innerHTML = "refresh";
-    }
     localStorage.setItem('controller', JSON.stringify(controller))
 }
 
