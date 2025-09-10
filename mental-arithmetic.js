@@ -353,6 +353,11 @@ function formatFinalMessageForGrammar() {
   clearInterval(timerInterval);
   document.querySelector('#stop-button-span').innerHTML = "refresh";
   document.getElementById("field-for-sentences").innerHTML = "";
+
+  if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.answeredQuestionTracker >= 1) {
+    triggerFireworks();
+  }
+
   if (controller.taskId !== 0) {
     if (controller.taskCompleted === true) {
       sendSetTaskResultsToDatabase();
@@ -384,6 +389,11 @@ function recordFinalMistakesForTextComprehension() {
 function formatFinalMessageForTextcomprehension() {
     localStorage.setItem("elapsedTime", timerDisplay.textContent)
     recordFinalMistakesForTextComprehension();
+
+    if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.answeredQuestionTracker >= 1) {
+      triggerFireworks();
+    }
+
     if (controller.taskId !== 0) {
       if (controller.taskCompleted === true) {
         sendSetTaskResultsToDatabase();
