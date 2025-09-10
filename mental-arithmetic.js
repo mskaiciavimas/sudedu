@@ -513,7 +513,7 @@ async function sendSetTaskResultsToDatabase() {
 }
 
   function triggerFireworks () {
-    fireworksDiv.innerHTML = '<img src="../images/fireworks.gif" style="width: 500px; height: auto;" id="fireworks">';
+    fireworksDiv.innerHTML = '<img src="../images/sudedu_logo_animation_transparent.gif" style="width: 500px; height: auto;" id="fireworks">';
     setTimeout(disableFireworks, 4500);
   }
 
