@@ -55,7 +55,6 @@ if (document.querySelector("#stop-button-span")) {
   document.querySelector("#stop-button-span").disabled = false;
 }
 
-
     function formatFinalMessage () {
       document.querySelector('#invisibleRow').style.display = "none";
       if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.answeredQuestionTracker >= 10) {
@@ -375,6 +374,7 @@ function formatFinalMessageForGrammar() {
   } else {
     document.getElementById("field-for-final-message").innerHTML = `<div style="min-height: 200px; display: flex; justify-content: center; align-items: center;">${finalMessageText()}</div>`;
   }
+  controller.questionsStopped = true;
   localStorage.setItem('controller', JSON.stringify(controller))
 }
 
@@ -418,6 +418,7 @@ function formatFinalMessageForTextcomprehension() {
     document.querySelector('#stop-button-span').innerHTML = "refresh";
     document.getElementById("fields-row").style.display = "none";
     document.getElementById("final-message-row").style.display = "flex";
+    controller.questionsStopped = true;
     localStorage.setItem('controller', JSON.stringify(controller))
 }
 
@@ -2294,11 +2295,11 @@ function countDown() {
       localStorage.setItem("remainingTime", remainingTime);
       clearInterval(timerInterval);
       timerDisplay.textContent = "00:00:00";
-      controller.questionsStopped = true;
       controller.taskCompleted = true;
       localStorage.setItem('controller', JSON.stringify(controller))
       if (controller.mode === "math") {
         formatFinalMessage();
+        displayEquation();
       } else if (controller.mode === "lang") {
         if (controller.modeChoice1 === "C50") {
         formatFinalMessageForGrammar();
