@@ -354,7 +354,7 @@ function formatFinalMessageForGrammar() {
   document.querySelector('#stop-button-span').innerHTML = "refresh";
   document.getElementById("field-for-sentences").innerHTML = "";
 
-  if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.answeredQuestionTracker >= 1) {
+  if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.answeredQuestionTracker >= 10) {
     triggerFireworks();
   }
 
@@ -390,7 +390,7 @@ function formatFinalMessageForTextcomprehension() {
     localStorage.setItem("elapsedTime", timerDisplay.textContent)
     recordFinalMistakesForTextComprehension();
 
-    if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.answeredQuestionTracker >= 1) {
+    if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.answeredQuestionTracker >= 5) {
       triggerFireworks();
     }
 
