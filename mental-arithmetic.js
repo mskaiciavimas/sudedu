@@ -2295,8 +2295,7 @@ function countDown() {
       controller.taskCompleted = true;
       localStorage.setItem('controller', JSON.stringify(controller))
       if (controller.mode === "math") {
-        formEquation();
-        displayEquation();
+        formatFinalMessage();
       } else if (controller.mode === "lang") {
         if (controller.modeChoice1 === "C50") {
         formatFinalMessageForGrammar();
