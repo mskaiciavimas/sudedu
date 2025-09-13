@@ -28,7 +28,8 @@ let controller = {
   equation2: '',
   result: ['', '', '', '', ''],
 	answeredQuestionTracker: 0,
-  questionsStopped: false
+  questionsStopped: false,
+  tempTracking: true
 }
 
 const fireworksDiv = document.querySelector('#fireworks-div');
@@ -56,6 +57,12 @@ if (document.querySelector("#stop-button-span")) {
 }
 
     function formatFinalMessage () {
+
+      if (controller.taskCompleted && controller.tempTracking) {
+        sendTaskInfoToDatabase();
+        controller.tempTracking = false
+      }
+
       document.querySelector('#invisibleRow').style.display = "none";
       if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.answeredQuestionTracker >= 10) {
         triggerFireworks();
@@ -346,6 +353,12 @@ function recordGrammarFinalMistakes() {
 function formatFinalMessageForGrammar() {
   localStorage.setItem("elapsedTime", timerDisplay.textContent)
   recordGrammarFinalMistakes();
+
+      if (controller.taskCompleted && controller.tempTracking) {
+        sendTaskInfoToDatabase();
+        controller.tempTracking = false
+      }
+
   document.querySelector('#restart-reset-button-row').style.display = "flex";
   document.getElementById('next-question').style.display = "none";
   document.getElementById('check-answers').style.visibility = "hidden";
@@ -392,6 +405,11 @@ function recordFinalMistakesForTextComprehension() {
 function formatFinalMessageForTextcomprehension() {
     localStorage.setItem("elapsedTime", timerDisplay.textContent)
     recordFinalMistakesForTextComprehension();
+
+      if (controller.taskCompleted && controller.tempTracking) {
+        sendTaskInfoToDatabase();
+        controller.tempTracking = false
+      }
 
     if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.answeredQuestionTracker >= 1) {
       triggerFireworks();
@@ -1508,6 +1526,7 @@ async function sendSetTaskResultsToDatabase() {
     controller.answeredQuestionTracker = 0;
     controller.randomSelection = [];
     controller.questionsStopped = false;
+    controller.tempTracking = true;
     answerFieldDivElement.style.display = "flex";
     questionsSubmitButtonRowElement.style.display = "flex";
     resetMistakeButtonsElement.style.display = "none";
@@ -2355,3 +2374,173 @@ function setLanguage(lang) {
 		window.location.href = `/${lang}`;
 }
 }
+
+//TASK INFO COLLECTION START
+
+async function sendTaskInfoToDatabase() {
+    // Restore controller
+
+    if (!controller) {
+        const storedController = localStorage.getItem("controller");
+        if (storedController) {
+            try {
+                controller = JSON.parse(storedController);
+            } catch {
+                controller = {};
+            }
+        }
+    }
+
+    // Prepare results
+    const resultsData = [
+        [controller.answeredQuestionTracker || 0, controller.mistakesTracker || 0],
+        controller.currentMistakes || []
+    ];
+
+    // Task info template
+    let taskInfo = {
+        "userClass": -1,
+        "lang": false,
+        "math": false,
+        "C1": false,
+        "C2": false,
+        "C3": false,
+        "C4": false,
+        "C5": false,
+        "C6": false,
+        "C7": false,
+        "C8": false,
+        "C9": false,
+        "C10": false,
+        "C11": false,
+        "C12": false,
+        "C13": false,
+        "C14": false,
+        "C15": false,
+        "C16": false,
+        "C17": false,
+        "C18": false,
+        "C19": false,
+        "C20": false,
+        "C21": false,
+        "C22": false,
+        "C23": false,
+        "C24": false,
+        "C25": false,
+        "C26": false,
+        "C27": false,
+        "C28": false,
+        "C29": false,
+        "C30": false,
+        "C31": false,
+        "C32": false,
+        "C33": false,
+        "C34": false,
+        "C35": false,
+        "C36": false,
+        "C37": false,
+        "C38": false,
+        "C41": false,
+        "C42": false,
+        "C47": false,
+        "C48": false,
+        "C49": false,
+        "C50": false,
+        "C51": false,
+        "C52": false,
+        "C58": false,
+        "C59": false,
+        "C60": false,
+        "C75": false,
+        "C76": false,
+        "C77": false,
+        "C80": false,
+        "C81": false,
+        "C82": false,
+        "remainder": false,
+        "mult-table-selection": [],
+        "correct-ans": 0,
+        "total-ans": 0
+    };
+
+    // Restore user class
+    const storedClass = localStorage.getItem("userClass");
+    if (storedClass) {
+        try {
+            taskInfo.userClass = JSON.parse(storedClass).value;
+        } catch {
+            taskInfo.userClass = -1;
+        }
+    }
+
+    // Mark C-flags from controller values
+    for (let key in controller) {
+        const val = controller[key];
+        if (taskInfo.hasOwnProperty(val)) {
+            taskInfo[val] = true;
+        }
+    }
+
+    if (controller.withRemainder) {
+        taskInfo.remainder = true;
+    }
+
+    if (controller.modeChoice2 === "C18") {
+        taskInfo["mult-table-selection"] = controller.selectedNumbers || [];
+    }
+
+    // Calculate correctness
+    let correctAnswers = 0;
+    let totalAnswers = 0;
+
+    if (controller.mode === "lang") {
+        if (controller.modeChoice1 === "C49") {
+            let totalTexts = 0;
+            let textsWithoutError = 0;
+            resultsData[1].forEach(([outerKey, value]) => {
+                totalTexts++;
+                if (value === 0) textsWithoutError++;
+            });
+            correctAnswers = textsWithoutError;
+            totalAnswers = totalTexts;
+        } else if (controller.modeChoice1 === "C50") {
+            correctAnswers = resultsData[0][0] - resultsData[0][1];
+            totalAnswers = resultsData[0][0];
+        }
+        taskInfo["C47"] = false;
+        taskInfo["C48"] = false;
+        taskInfo["remainder"] = false;
+    } else if (controller.mode === "math") {
+        correctAnswers = resultsData[0][0] - resultsData[0][1];
+        totalAnswers = resultsData[0][0];
+        taskInfo["C49"] = false;
+        taskInfo["C50"] = false;
+        taskInfo["C51"] = false;
+        taskInfo["C52"] = false;
+        taskInfo["C58"] = false;
+        taskInfo["C59"] = false;
+        taskInfo["C60"] = false;
+        taskInfo["C75"] = false;
+        taskInfo["C76"] = false;
+        taskInfo["C80"] = false;
+        taskInfo["C81"] = false;
+        taskInfo["C82"] = false;
+    }
+
+    taskInfo["correct-ans"] = correctAnswers;
+    taskInfo["total-ans"] = totalAnswers;
+
+    // Send to server
+    //https://sudedu-server.onrender.com/record
+   try {
+        const response = await fetch("https://sudedu-task-info-server.onrender.com/record", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(taskInfo)
+        });
+    } catch (error) {
+        console.error("Error saving task results:", error);
+    }
+}
+
+//TASK INFO COLLECTION END

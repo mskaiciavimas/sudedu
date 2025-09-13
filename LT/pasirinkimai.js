@@ -66,6 +66,7 @@ const resetButtonElement = document.querySelector('.reset-button');
         if (controller.mode === "math") {
           generateCombinations();
         }
+        controller.tempTracking = true;
         localStorage.setItem('controller', JSON.stringify(controller));
         redirectToQuestions();
 		};
@@ -94,6 +95,7 @@ const resetButtonElement = document.querySelector('.reset-button');
       if (controller.mode === "math") {
 			  generateCombinations();
       }
+      controller.tempTracking = true;
       if (controller.combinations.length > controller.questionNumber) {
         controller.combinations = controller.combinations.sort(() => 0.5 - Math.random()).slice(0, controller.questionNumber);
       }
