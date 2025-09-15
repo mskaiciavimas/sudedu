@@ -652,7 +652,7 @@ function getClassLocalStorage() {
 function showClassPopup() {
     const popup = document.getElementById('classPopup');
     const nextButton = document.getElementById('classPopupButton');
-    let selectedClass = null;
+    let selectedClassV2 = null;
     
     popup.classList.add('active');
     document.body.classList.add('popup-active');
@@ -667,7 +667,7 @@ function showClassPopup() {
             this.classList.add('selected');
             
             // Store the selected class
-            selectedClass = this.getAttribute('data-class');
+            selectedClassV2 = this.getAttribute('data-class');
             
             // Enable the Next button
             nextButton.disabled = false;
@@ -676,9 +676,9 @@ function showClassPopup() {
     
     // Add event listener to Next button
     nextButton.addEventListener('click', function() {
-        if (selectedClass) {
+        if (selectedClassV2) {
             // Set localStorage with selected class and expiration
-            setClassLocalStorage(selectedClass);
+            setClassLocalStorage(selectedClassV2);
             
             // Close popup
             popup.classList.remove('active');
