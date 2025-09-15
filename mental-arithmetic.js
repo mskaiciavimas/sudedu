@@ -2464,7 +2464,7 @@ async function sendTaskInfoToDatabase() {
     };
 
     // Restore user class
-    const storedClass = localStorage.getItem("userClass");
+    const storedClass = localStorage.getItem("userClassV2");
     if (storedClass) {
         try {
             taskInfo.userClass = JSON.parse(storedClass).value;
@@ -2544,3 +2544,4 @@ async function sendTaskInfoToDatabase() {
 }
 
 //TASK INFO COLLECTION END
+
