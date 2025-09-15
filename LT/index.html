@@ -623,12 +623,12 @@ function setClassLocalStorage(classValue) {
         expiration: expiration.getTime()
     };
     
-    localStorage.setItem("userClass", JSON.stringify(item));
+    localStorage.setItem("userClassV2", JSON.stringify(item));
 }
 
 // Function to get value from localStorage and check expiration
 function getClassLocalStorage() {
-    const itemStr = localStorage.getItem("userClass");
+    const itemStr = localStorage.getItem("userClassV2");
     
     // If the item doesn't exist, return null
     if (!itemStr) {
@@ -641,7 +641,7 @@ function getClassLocalStorage() {
     // Compare the expiration time with the current time
     if (now.getTime() > item.expiration) {
         // If the item is expired, delete it and return null
-        localStorage.removeItem("userClass");
+        localStorage.removeItem("userClassV2");
         return null;
     }
     
@@ -652,7 +652,7 @@ function getClassLocalStorage() {
 function showClassPopup() {
     const popup = document.getElementById('classPopup');
     const nextButton = document.getElementById('classPopupButton');
-    let selectedClassV2 = null;
+    let selectedClass = null;
     
     popup.classList.add('active');
     document.body.classList.add('popup-active');
@@ -667,7 +667,7 @@ function showClassPopup() {
             this.classList.add('selected');
             
             // Store the selected class
-            selectedClassV2 = this.getAttribute('data-class');
+            selectedClass = this.getAttribute('data-class');
             
             // Enable the Next button
             nextButton.disabled = false;
@@ -676,9 +676,9 @@ function showClassPopup() {
     
     // Add event listener to Next button
     nextButton.addEventListener('click', function() {
-        if (selectedClassV2) {
+        if () {
             // Set localStorage with selected class and expiration
-            setClassLocalStorage(selectedClassV2);
+            setClassLocalStorage(selectedClass);
             
             // Close popup
             popup.classList.remove('active');
