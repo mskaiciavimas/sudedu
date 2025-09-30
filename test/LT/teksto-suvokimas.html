@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sudedu - teksto supratimas</title>
+
+    <!-- Include Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Include Dragula CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/dragula@3.7.3/dist/dragula.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+		href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-96Q83PW8XY"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-96Q83PW8XY');
+    </script>	
+    
+    <style>
+      	html {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background-image: linear-gradient(to top, #ffbf9c, #ffbf92, #ffbf89, #ffbf7e, #ffc074);
+          min-height: 100dvh;
+        }
+
+        body {
+  		    background: transparent;
+          font-family: 'Andika', sans-serif;
+          padding: 20px;
+          overscroll-behavior: none;
+          user-select: none;
+          -webkit-user-select: none;
+          -ms-user-select: none;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100vw;
+          margin: 0;
+        }
+
+        .container {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          width: 100%;
+          max-width: 1200px; /* Optional: limit the maximum width */
+  		    min-height: 95dvh;
+        }
+
+        .field {
+          background-color: #e0e0e0;
+          padding: 10px;
+          width: 100%;
+          margin-top: 10px;
+        }
+
+        .item {
+          font-size: 1rem;
+          color: black;;
+          padding: 10px;
+          margin: 5px;
+          background-color: #FAF1E6;
+          cursor: move;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          box-shadow: 0px 0.1px 3px rgba(0, 0, 0, 0.2);
+          white-space: pre-line;
+        }
+
+        /* Ensure the drop targets fill the column */
+
+        #title-field {
+          min-height: 100px;
+          margin-top: 20px;
+        }
+
+        .button-row {
+          margin-top: 10px;
+        }
+
+        #options-field,
+        #answers-field {
+          margin-top: 20px;
+          display: flex;
+          flex-direction: column;
+        }
+        
+        #final-message-row {
+          min-height: 330px;
+          background-color: #FAF1E6;
+          box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
+          border-radius: 10px 10px 10px 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        #final-message-div {
+          font-size: 3.5rem;
+          color: black;
+          display: flex;
+        }
+
+        #result-message {
+          margin-top: 20px;
+          font-weight: bold;
+        }
+
+        #author {
+          margin-top: 10px;
+          margin-left: 10px;
+        }
+
+        #dots {
+          padding-top: 5px;
+          display: flex;
+          justify-content: space-between;
+          width: 100%; /* Ensure it takes up the same space as the button */
+        }
+
+        .dot {
+            width: 15px; /* Size of each circle */
+            height: 15px; /* Size of each circle */
+            background-color: #ffbf92; /* Circle color */
+            border: 2px solid #D57E7C; /* Creates a border around the element */
+            border-radius: 50%; /* Make it round */
+            margin: 0 2px; /* Space between circles */
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .field {
+          color: gray;
+          background-color: #FAF1E6;
+          box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
+          border-radius: 10px 10px 10px 10px;
+        }
+
+        .btn-primary {
+          font-size: 1rem;
+          align-items: center;
+          justify-content: center;
+          width: 11.5vw;
+          margin: 10px 0 10px 0;
+          background-color: #40c9a9;
+          border-color: #40c9a9;
+          color: black;
+          font-weight: bold;
+          box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-primary:focus,
+        .btn-primary:active,
+        .btn-primary:hover,
+        .btn-primary:disabled {
+          background-color: #32ac93;
+          border-color: #32ac93;
+          color: black;
+        }
+
+        #task-saving-message {
+          font-size: 1.35rem;
+          text-align: center;
+        }
+
+        #check-answer-btn {
+          margin-bottom: 0;
+        }
+
+        #tries,
+        #help {
+          font-size: 1.25rem;
+        }
+
+        .stop-reset-button-div .col-2 {
+          padding: 0;
+        }
+
+        .trackers-row,
+        #stop-restart-button-row {
+          padding: 0;
+          margin: 0;
+        }
+
+        .material-symbols-rounded {
+          font-size: 3.5rem;
+        }
+
+        .reset-button-div {
+          display: flex;
+          justify-content: flex-end;
+          z-index: 3;
+      }
+
+        .reset-button {
+          width: 5rem;
+          height: 5rem;
+          margin-top: 20px;
+          border-radius: 0.25rem;
+          background-color: #40c9a9;
+          border-color: #40c9a9;
+          box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 3;
+        }
+
+        .stop-button-div {
+            display: flex;
+            justify-content: flex-start;
+            z-index: 3;
+          }
+
+        .stop-button {
+          width: 5rem;
+          height: 5rem;
+          border-radius: 0.25rem;
+          background-color: #40c9a9;
+          border-color: #40c9a9;
+          box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 3;
+        }
+
+        .reset-row {
+          padding: 0;
+        }
+
+        .error {
+            animation: shake 0.2s ease-in-out 0s 2;
+        }
+
+        @keyframes shake {
+          0% { margin-left: 0rem; }
+          25% { margin-left: 0.5rem; }
+          75% { margin-left: -0.5rem; }
+          100% { margin-left: 0rem; }
+        }
+
+        #fireworks-div {
+          position: absolute;
+          bottom: -10%;
+          right: 0;
+          width: 250px;
+        }
+
+        @media (max-width: 1150px) {
+        #next-question-btn,
+        #check-answer-btn {
+          width: 17vw;
+        }
+
+        #final-message-div {
+          font-size: 2.25rem;
+        }
+        }
+
+        @media (max-width: 767px) {
+        body {
+          display: block; /* Change to block on mobile */
+          }
+
+          #next-question-btn,
+          #check-answer-btn {
+          width: 35vw;
+        }
+
+        #help-btn {
+          width: 28vw;
+        }
+
+        #fireworks-div {
+          width: 200px;
+          bottom: -5%;
+        }
+        
+        }
+        
+        @media (max-width: 575px) {
+
+      .stop-button {
+        width: 4.25rem;
+        height: 4.25rem;
+      }
+
+      .reset-button {
+        width: 4.25rem;
+        height: 4.25rem;
+      }
+
+      #fireworks-div {
+        width: 150px;
+        bottom: 60%;
+      }
+    }
+
+    @media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)  {
+		  body {
+      font-size: 1.4rem;
+    }
+
+    
+      :root {
+        	--font-size: 32px; /* Smaller font size for tablets */
+    	}
+		
+		.stop-button {
+			height: 6rem;
+			width: 6rem;
+		}
+
+		.reset-button {
+			height: 6rem;
+			width: 6rem;	
+		}
+
+		.material-symbols-rounded {
+			font-size: 4.5rem;
+		}
+
+		.summary-button {
+			font-size: 1.5rem;
+		}
+
+		.question-submit-button {
+			font-size: 1.5rem;
+		}
+
+		h3 {
+			font-size: 2rem;
+		}
+
+		#check-answer-btn,
+		#help-btn,
+		#next-question-btn {
+			font-size: 1.5rem;
+			width: 25vw;
+		}
+
+    .item {
+      font-size: 1.4rem;
+    }
+
+    #task-saving-message {
+			font-size: 1.75rem
+		}
+	}
+
+    </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="row">
+      <div class="row justify-content-center align-items-center trackers-row">
+        <div class="col-6 d-flex justify-content-start align-items-left">
+          <div class="trackers">
+              <div>
+                <h3 id="question-number-tracker"></h3>
+              </div>
+              <div>
+                <h3 id="mistakes-tracker"></h3>
+              </div>
+              <div id="help">
+              </div>
+          </div>
+      </div>
+      <div class="col-6 d-flex justify-content-end align-items-left">
+        <h3>
+          <div id="timer"></div>
+        </h3>
+      </div>
+      </div>
+    </div>
+    
+    
+    <!-- First row: Left column empty, Right column with item -->
+    <div class="row" id="fields-row">
+      <div class="col-12 col-md-6">
+        <div id="options-field-div" class="col-12">
+          <div id="options-field" class="field">
+          </div>
+          <div id="author">
+          </div>
+        </div>
+      </div>
+
+      <!-- Second row: Draggable items and Bottom right -->
+      <div class="col-12 col-md-6">
+        <div class="col-12">
+          <div id="title-field" class="field">
+            Pavadinimas
+          </div>
+        </div>
+        <div id="answers-field-div" class="col-12 komponavimas">
+          <div id="answers-field" class="field" style="display: none;">
+            Tekstas
+          </div>
+        </div>
+
+        <!-- Right column with bottom-right item -->
+        <div id="answers-field-start-div" class="col-12 isdestymas">
+          <div id="answers-field-start" class="field" style="display: none;">
+            Pradžia
+          </div>
+        </div>
+
+        <div id="answers-field-middle-div" class="col-12 isdestymas">
+          <div id="answers-field-middle" class="field" style="display: none;">
+            Įvykio raida
+          </div>
+        </div>
+
+        <div id="answers-field-end-div" class="col-12 isdestymas">
+          <div id="answers-field-end" class="field" style="display: none;">
+            Pabaiga
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="final-message-row" style="display: none; position: relative;">
+          <div id="fireworks-div" class="image-container fireworks-div"></div>
+          <div id="final-message-div"></div>
+          <div id="task-saving-message"></div>
+    </div>
+
+    <!-- Check answer button -->
+    <!-- Check answer button -->
+    <div class="row button-row">
+      <div class="col-6 d-flex justify-content-start">
+        <div class="justify-content-end">
+        <button id="help-btn" class="btn btn-primary">Pagalba</button>
+        <div id="dots" class="d-flex ml-2">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+      </div>
+
+      </div>
+    </div>
+
+    <div class="col-6 d-flex justify-content-end">
+      <div class="justify-content-end">
+        <button id="check-answer-btn" class="btn btn-primary">Tikrinti</button>
+        <div class="d-flex ml-2">
+      <button id="next-question-btn" class="btn btn-primary" style="display: none;">Kita užduotis</button>
+    </div>
+    </div>
+  </div>
+
+  <div class="row justify-content-center align-items-center" id="stop-restart-button-row">
+    <div class="row d-flex d-flex align-items-end justify-content-center stop-reset-button-div">
+      <div class="col-2">
+        <div class="stop-button-div">
+          <button id="stopButton" class="btn btn-primary stop-button"><span id="stop-button-span"
+              class="material-symbols-rounded">close</span></button>
+        </div>
+      </div>
+      <div class="col-8"></div>
+      <div class="col-2">
+        <div class="reset-button-div">
+          <button class="btn btn-primary reset-button"><span class="material-symbols-rounded">roofing</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+  <!-- Include Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pzjw8f+ua7Kw1TIq0r3ry7kAop5z3XMJ4g/4dWl56h3xW00tiy8b6Bc5tbtiq5x7" crossorigin="anonymous"></script>
+  <!-- Include Dragula JS -->
+  <script src="https://cdn.jsdelivr.net/npm/dragula@3.7.3/dist/dragula.min.js"></script>
+  <script src="../parameter_dictionary.js"></script>
+  <script src="../mental-arithmetic.js"></script>
+  
+  <script>
+
+window.onload = function () {
+    if (localStorage.getItem('controller') === null) {
+        window.location.href = "./";
+    } else {
+      controller = JSON.parse(localStorage.getItem('controller')) 
+      if (controller.mode !== "lang") {
+			window.location.href = "./";
+		}
+    }
+  }
+
+  controller = JSON.parse(localStorage.getItem('controller')) 
+  let jsonFiles = [];
+
+	// Define an array of URLs for the JSON files you want to fetch
+	if (controller.classChoice === "C75") {
+		jsonFile = '../databases/1_2_klase_teksto_suvokimas.json';
+	} else if (controller.classChoice === "C76") {
+		jsonFile = '../databases/3_4_klase_teksto_suvokimas.json';
+	}
+
+  fetch(jsonFile)
+      .then(response => {
+          if (!response.ok) throw new Error("Network error");
+          return response.json();
+      })
+      .then(textDatabase => {
+    var helpUsed = 0;
+    var triesToHelp = 0;
+    var helpTracker = 0;
+    var orderedSentences;
+    var distractorSentences;
+    controller = JSON.parse(localStorage.getItem('controller')) 
+    var drake; 
+    const answersField = document.getElementById('answers-field');
+    const answersFieldStart = document.getElementById('answers-field-start');
+    const answersFieldMiddle = document.getElementById('answers-field-middle');
+    const answersFieldEnd = document.getElementById('answers-field-end');
+    const titleField = document.getElementById('title-field');
+    const optionsField = document.getElementById('options-field');
+    const checkAnswerBtn = document.getElementById('check-answer-btn');
+    const nextQuestionBtn = document.getElementById('next-question-btn');
+    const helpBtn = document.getElementById('help-btn');
+    var selectedItem;
+    let questionNumberTracker = document.getElementById('question-number-tracker');
+    let mistakesTracker = document.getElementById('mistakes-tracker'); 
+    const helpDiv = document.getElementById('help');
+    let filteredTextLibrary = [];
+    let currentTextId;
+    let answeredTexts = [];
+    window.mistakesSummary = {};
+
+    function generateFilteredTextLibrary() {
+    var tempTextLibrary = Array.from(textDatabase);
+
+    if (controller.modeChoice2 === "C51") {
+      filteredTextLibrary = tempTextLibrary.filter(entry =>
+      entry['suitable-for']?.[parameterDictionary["C51"]["parameter"]]?.includes(parameterDictionary[controller.modeChoiceLtDifficulty]["parameter"])
+    );
+      answersField.style.display = "block";
+    } else if (controller.modeChoice2 === "C52") {
+      filteredTextLibrary = tempTextLibrary.filter(entry =>
+      entry['suitable-for']?.['struktura']?.includes(parameterDictionary[controller.modeChoiceLtDifficulty]["parameter"])
+    );
+      answersFieldStart.style.display = "block";
+      answersFieldMiddle.style.display = "block";
+      answersFieldEnd.style.display = "block";
+    }
+    }
+
+    helpBtn.disabled = true;
+
+    // Function to shuffle the array of sentences
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+      }
+      return array;
+    }
+
+    function selectRandomItem() {
+    // Generate a random index
+    const randomIndex = Math.floor(Math.random() * filteredTextLibrary.length);
+    
+    // Remove the selected item from the array and return it
+    const selectedItem = filteredTextLibrary.splice(randomIndex, 1)[0];
+    
+    return selectedItem;
+    }
+
+    function displayQuestion() {
+      if (filteredTextLibrary.length === 0) {
+        generateFilteredTextLibrary();
+      }
+      
+      if (controller.randomSelection.length === 0) {
+        selectedItem = selectRandomItem();
+        controller.randomSelection = [selectedItem];
+        localStorage.setItem("controller", JSON.stringify(controller));
+      } else {
+        selectedItem = controller.randomSelection[0];
+      }
+    
+      currentTextId = selectedItem.id;
+      answeredTexts.push(currentTextId);
+
+      if (!mistakesSummary[currentTextId]) {
+        mistakesSummary[currentTextId] = {};
+      }
+
+      textIncidenceCount = answeredTexts.filter(id => id === currentTextId).length;
+
+      if (!mistakesSummary[currentTextId][`${textIncidenceCount}`]) {
+        mistakesSummary[currentTextId][`${textIncidenceCount}`] = 0;
+      }
+
+
+      const originalTitle = selectedItem.title;
+      const fullText = [...selectedItem.text.start, ...selectedItem.text.middle, ...selectedItem.text.end];
+      const paragraphAuthor = selectedItem.author;
+      optionsField.style.minHeight = `auto`;
+
+      const authorDiv = document.getElementById('author');
+      authorDiv.innerHTML = paragraphAuthor;
+
+      let combinedItems = [];
+      if (controller.modeChoice2 === "C51") {
+        if (controller.modeChoiceLtDifficulty === "C58" || controller.modeChoiceLtDifficulty === "C59" || controller.modeChoiceLtDifficulty === "C60") {
+          orderedSentences = splitParagraphToSentences(fullText);
+          combinedItems = [originalTitle, ...orderedSentences];
+        } else if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+          orderedSentences = splitParagraphToSentences(fullText);
+          distractorSentences = splitParagraphToSentences(selectedItem.text.distractor);
+          combinedItems = [originalTitle, ...orderedSentences, ...distractorSentences];
+        }
+      } else if (controller.modeChoice2 === "C52") {
+        if (controller.modeChoiceLtDifficulty === "C58" || controller.modeChoiceLtDifficulty === "C59" || controller.modeChoiceLtDifficulty === "C60") {
+          combinedItems = [...fullText, ...[originalTitle]];
+        } else if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+          distractorItems = selectedItem.text.distractor;
+          combinedItems = [...fullText, ...distractorItems, ...[originalTitle]];
+        }
+      }
+      
+      // Shuffle the combined items (title + sentences)
+      const shuffledItems = shuffleArray(combinedItems);
+
+      // Append shuffled items (title + sentences) as draggable items
+      optionsField.innerHTML = '';  // Clear previous items before appending
+      shuffledItems.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('item');
+        itemDiv.textContent = item;
+        optionsField.appendChild(itemDiv);
+      });
+
+      // After the items are appended, set the height of the fields to fixed
+      const optionsHeight = optionsField.scrollHeight;
+      const answersHeight = answersField.scrollHeight;
+      const answerFieldStartHeight = answersFieldStart.scrollHeight;
+      const answerFieldMiddleHeight = answersFieldMiddle.scrollHeight;
+      const answerFieldEndHeight = answersFieldEnd.scrollHeight;
+
+      optionsField.style.minHeight = `${optionsHeight+120}px`;
+      answersField.style.minHeight = `${optionsHeight}px`;
+      answersFieldStart.style.minHeight = `${Math.max(optionsHeight/3*0.75, 100)}px`
+      answersFieldMiddle.style.minHeight = `${Math.max(optionsHeight/3*1.5, 100)}px`
+      answersFieldEnd.style.minHeight = `${Math.max(optionsHeight/3*0.75, 100)}px`
+      
+
+      initializeDragula();
+
+      if (controller.modeChoice4 === "C40") {
+        questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
+      } else {
+        questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}`;
+      }
+      mistakesTracker.innerHTML = `Klaidos: ${controller.mistakesTracker}`;
+
+      //helpDiv.innerHTML = `Panaudota pagalba: ${helpTracker}`;
+
+      const dots = document.querySelectorAll('#dots .dot');
+      for (let i = 0; i < dots.length; i++) {
+          const dot = dots[i];
+          dot.style.backgroundColor = '#ffbf92';
+          }
+    }
+
+    function splitParagraphToSentences(paragraph) {
+        let allSentences = [];
+
+        // Iterate through each sentence in the combined sections of the paragraph
+        for (let part of paragraph) {
+            // Split each sentence in the part by sentence-ending punctuation (.!?) followed by a space
+            let sentences = part.split(/(?<=[.!?])\s+/);
+            allSentences.push(...sentences); // Add each sentence to the allSentences array
+        }
+
+        return allSentences;
+    }
+
+    function initializeDragula() {
+      // Destroy the previous instance if it exists
+      if (drake) {
+        drake.destroy();
+      }
+
+      // Create a new Dragula instance
+      drake = dragula([document.getElementById('options-field'), document.getElementById('title-field'), document.getElementById('answers-field'), document.getElementById('answers-field-start'), document.getElementById('answers-field-middle'), document.getElementById('answers-field-end')]);
+
+      drake.on('drag', function (el) {
+        // Disable touch scrolling while dragging
+        if (window.ontouchstart !== undefined) {
+          document.body.style.overflow = 'hidden'; // Disable body scroll
+        }
+        // Change color of the item while dragging
+        el.style.backgroundColor = '#FAF1E6';  // Change background to white
+      })
+      .on('dragend', function (el) {
+        // Re-enable scrolling when drag ends
+        if (window.ontouchstart !== undefined) {
+          document.body.style.overflow = ''; // Re-enable body scroll
+        }
+        // Reset the color when drag ends
+        el.style.backgroundColor = ''; // Reset background color
+      })
+      .on('drop', function (el, target) {
+        // Handle drop event if needed
+      });
+    }
+
+    // Add touch event listener for scroll behavior on mobile
+    let isDragging = false;
+    let dragStartY = 0;
+
+    document.addEventListener('touchstart', function (event) {
+  if (event.target.classList.contains('item')) {
+    event.preventDefault(); // Prevent scroll from starting
+    dragStartY = event.touches[0].clientY;
+    isDragging = true;
+  }
+}, { passive: false });
+
+document.addEventListener('touchmove', function (event) {
+  if (isDragging) {
+    event.preventDefault(); // Ensure scroll remains disabled
+    const dragY = event.touches[0].clientY;
+    const screenHeight = window.innerHeight;
+
+    // Only scroll near edges
+    if (dragY < 50) {
+      window.scrollBy(0, -20);
+    } else if (dragY > screenHeight - 50) {
+      window.scrollBy(0, 20);
+    }
+  }
+}, { passive: false });
+
+    document.addEventListener('touchend', function () {
+      isDragging = false;
+    });
+
+
+    checkAnswerBtn.addEventListener('click', function () {
+      const titleAnswerItems = titleField.querySelectorAll('.item');
+      const titleAnswer = Array.from(titleAnswerItems).map(item => item.textContent);
+
+      const titleItems = titleField.querySelectorAll('.item');
+      const titleList = Array.from(titleItems).map(item => item.textContent);
+
+      const paragraphAnswerItems = answersField.querySelectorAll('.item');
+      const paragraphAnswerOrder = Array.from(paragraphAnswerItems).map(item => item.textContent);
+
+      const paragraphAnswerStartItems = answersFieldStart.querySelectorAll('.item');
+      const paragraphAnswerStartOrder = Array.from(paragraphAnswerStartItems).map(item => item.textContent);
+
+      const paragraphAnswerMiddleItems = answersFieldMiddle.querySelectorAll('.item');
+      const paragraphAnswerMiddleOrder = Array.from(paragraphAnswerMiddleItems).map(item => item.textContent);
+
+      const paragraphAnswerEndItems = answersFieldEnd.querySelectorAll('.item');
+      const paragraphAnswerEndOrder = Array.from(paragraphAnswerEndItems).map(item => item.textContent);
+
+      function errorIndicator (field) {
+        field.classList.add('error')
+          var timeoutReference = setTimeout(function() {
+            field.classList.remove('error'); 
+        }, 500);
+        }
+
+      function arraysAreEqual(items, arr1, arr2, field) {
+      var answerCorrect = true;
+      
+      // Check for length mismatch
+      if (arr1.length !== arr2.length) {
+        answerCorrect = false;
+      }
+
+      const minLength = Math.min(arr1.length, arr2.length);
+      
+      // Compare items up to the shortest length
+      for (let i = 0; i < minLength; i++) {
+        if (arr1[i].trim() !== arr2[i].trim()) {
+          answerCorrect = false;
+          items[i].style.backgroundColor = '#D57E7C';
+        } else {
+          items[i].style.backgroundColor = 'rgb(182, 200, 103)';
+        }
+      }
+
+      // Handle extra items in arr1 if it's longer than arr2
+      if (arr1.length > arr2.length) {
+        answerCorrect = false;
+        for (let i = minLength; i < arr1.length; i++) {
+          items[i].style.backgroundColor = '#D57E7C';
+    }
+  }
+
+    // Trigger error indicator if arrays are not equal
+    if (!answerCorrect) {
+      errorIndicator(field);
+    }
+
+    return answerCorrect;
+}
+
+
+      function titlesAreEqual(items, answer, title) {
+        var answerCorrect = true;
+        if (answer.length !== title.length) {
+          answerCorrect = false;
+        } 
+
+        for (let i = 0; i < answer.length; i++) {
+          if (answer[i].trim() !== title[0].trim()) {
+            answerCorrect = false;
+            items[i].style.backgroundColor = '#D57E7C'
+          } else if (answer[i].trim() === title[0].trim()) {
+            items[i].style.backgroundColor = 'rgb(182, 200, 103)'
+          }
+        }
+        if (!answerCorrect) {
+          errorIndicator(titleField);
+        }
+        return answerCorrect;
+      }
+
+      allFieldsCorrect = false;
+
+      const titleIsCorrect = titlesAreEqual(titleItems, titleAnswer, [selectedItem.title]);
+      if (controller.modeChoice2 === "C51") {
+          if (titleAnswer.length === 0 && paragraphAnswerOrder.length === 0) {
+          return
+        } else {
+          const sentenceOrderIsCorrect = arraysAreEqual(paragraphAnswerItems, paragraphAnswerOrder, orderedSentences, answersField);
+          if (titleIsCorrect && sentenceOrderIsCorrect) {
+            allFieldsCorrect = true;
+          }
+        }
+      } else if (controller.modeChoice2 === "C52") {
+          if (titleAnswer.length === 0 && paragraphAnswerStartOrder.length === 0 && paragraphAnswerMiddleOrder.length === 0 && paragraphAnswerEndOrder.length === 0) {
+          return
+        } else {
+          const sentenceOrderStartIsCorrect = arraysAreEqual(paragraphAnswerStartItems, paragraphAnswerStartOrder, selectedItem.text.start, answersFieldStart);
+          const sentenceOrderMiddleIsCorrect = arraysAreEqual(paragraphAnswerMiddleItems, paragraphAnswerMiddleOrder, selectedItem.text.middle, answersFieldMiddle);
+          const sentenceOrderEndIsCorrect = arraysAreEqual(paragraphAnswerEndItems, paragraphAnswerEndOrder, selectedItem.text.end, answersFieldEnd);
+          if (titleIsCorrect && sentenceOrderStartIsCorrect && sentenceOrderMiddleIsCorrect && sentenceOrderEndIsCorrect) {
+            allFieldsCorrect = true;
+          }
+        }
+      }
+
+      if (allFieldsCorrect) {
+        controller.answeredQuestionTracker++;
+        localStorage.setItem('controller', JSON.stringify(controller));
+        if (controller.modeChoice4 === "C40") {
+        questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
+        } else {
+          questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}`;
+        }
+        drake.destroy();
+        nextQuestionBtn.style.display = 'flex';
+        checkAnswerBtn.style.display = "none";
+        checkAnswerBtn.disabled = true;
+        controller.randomSelection = [];
+        localStorage.setItem("controller", JSON.stringify(controller));
+      } else {
+        const dots = document.querySelectorAll('#dots .dot');
+        const targetColor = 'rgb(255, 191, 146)'; // Example target color (white in RGB)
+        let foundMatch = false;
+
+        for (let i = 0; i < dots.length; i++) {
+            const dot = dots[i];
+            const backgroundColor = window.getComputedStyle(dot).backgroundColor;
+
+            if (backgroundColor === targetColor) {
+                dot.style.backgroundColor = '#D57E7C';
+                break;
+            }
+        }
+
+        for (let i = 0; i < dots.length; i++) {
+            const dot = dots[i];
+            const backgroundColor = window.getComputedStyle(dot).backgroundColor;
+
+            if (backgroundColor === targetColor) {
+                foundMatch = true;
+            }
+        }
+        if (!foundMatch) {
+            helpBtn.disabled = false;
+        }
+
+        controller.mistakesTracker++;
+        recordTextComprehensionMistake()
+        localStorage.setItem('controller', JSON.stringify(controller));
+        mistakesTracker.innerHTML = `Klaidos: ${controller.mistakesTracker}`;
+    }
+    });
+
+    function recordTextComprehensionMistake() {
+      mistakesSummary[currentTextId][`${textIncidenceCount}`]+=1
+    }
+
+
+
+    helpBtn.addEventListener('click', function () {
+      helpTracker++;
+      //helpDiv.innerHTML = `Panaudota pagalba: ${helpTracker}`;
+
+
+      if (controller.modeChoice2 === "C51") {
+        if (helpTracker === 1) {
+        answersField.innerHTML = 'Tekstas';
+        titleField.innerHTML = 'Pavadinimas';
+        optionsField.innerHTML = '';
+  
+        const splitIndex = Math.floor(orderedSentences.length / 3);
+        let orderedSentencesfirstPart = orderedSentences.slice(0, splitIndex);
+        let orderedSentencessecondPart = orderedSentences.slice(splitIndex);
+
+        const correctTitle = document.createElement('div');
+        correctTitle.classList.add('item');
+        correctTitle.textContent = selectedItem.title;
+        titleField.appendChild(correctTitle);
+
+        orderedSentencesfirstPart.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('item');
+        itemDiv.textContent = item;
+        answersField.appendChild(itemDiv);
+        });
+
+        if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+          orderedSentencessecondPart = [...orderedSentencessecondPart, ...distractorSentences]
+        }
+
+        shuffleArray(orderedSentencessecondPart).forEach(item => {
+          const itemDiv = document.createElement('div');
+          itemDiv.classList.add('item');
+          itemDiv.textContent = item;
+          optionsField.appendChild(itemDiv);
+        });
+      } else if (helpTracker === 2) {
+        answersField.innerHTML = 'Tekstas';
+        titleField.innerHTML = 'Pavadinimas';
+        optionsField.innerHTML = '';
+  
+        const splitIndex = Math.floor(orderedSentences.length / 3 * 2);
+        let orderedSentencesfirstPart = orderedSentences.slice(0, splitIndex);
+        let orderedSentencessecondPart = orderedSentences.slice(splitIndex);
+
+        const correctTitle = document.createElement('div');
+        correctTitle.classList.add('item');
+        correctTitle.textContent = selectedItem.title;
+        titleField.appendChild(correctTitle);
+
+        orderedSentencesfirstPart.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('item');
+        itemDiv.textContent = item;
+        answersField.appendChild(itemDiv);
+        });
+
+        if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+          orderedSentencessecondPart = [...orderedSentencessecondPart, ...distractorSentences]
+        }
+
+        shuffleArray(orderedSentencessecondPart).forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('item');
+        itemDiv.textContent = item;
+        optionsField.appendChild(itemDiv);
+        });
+      } else if (helpTracker >= 3) {
+        answersField.innerHTML = 'Tekstas';
+        titleField.innerHTML = 'Pavadinimas';
+        optionsField.innerHTML = '';
+  
+        const correctTitle = document.createElement('div');
+        correctTitle.classList.add('item');
+        correctTitle.textContent = selectedItem.title;
+        titleField.appendChild(correctTitle);
+
+        orderedSentences.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('item');
+        itemDiv.textContent = item;
+        answersField.appendChild(itemDiv);
+        });
+
+        if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+        distractorSentences.forEach(item => {
+          const itemDiv = document.createElement('div');
+          itemDiv.classList.add('item');
+          itemDiv.textContent = item;
+          optionsField.appendChild(itemDiv);
+        });
+      }
+      }
+      } else if (controller.modeChoice2 === "C52") {
+        if (helpTracker === 1) {
+        answersFieldStart.innerHTML = 'Pradžia';
+        answersFieldMiddle.innerHTML = 'Įvykio raida';
+        answersFieldEnd.innerHTML = 'Pabaiga';
+        titleField.innerHTML = 'Pavadinimas';
+        optionsField.innerHTML = '';
+  
+        const correctTitle = document.createElement('div');
+        correctTitle.classList.add('item');
+        correctTitle.textContent = selectedItem.title;
+        titleField.appendChild(correctTitle);
+
+        selectedItem.text.start.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('item');
+        itemDiv.textContent = item;
+        answersFieldStart.appendChild(itemDiv);
+        });
+
+        let remainingText = [...selectedItem.text.middle, ...selectedItem.text.end]
+        if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+          remainingText = [...remainingText, ...selectedItem.text.distractor]
+        }
+
+        shuffleArray(remainingText).forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('item');
+        itemDiv.textContent = item;
+        optionsField.appendChild(itemDiv);
+        });
+      } else if (helpTracker === 2) {
+        answersFieldStart.innerHTML = 'Pradžia';
+        answersFieldMiddle.innerHTML = 'Įvykio raida';
+        answersFieldEnd.innerHTML = 'Pabaiga';
+        titleField.innerHTML = 'Pavadinimas';
+        optionsField.innerHTML = '';
+  
+        const splitIndex = Math.ceil(selectedItem.text.middle.length / 2);
+        const middleOptionsFirstPart = selectedItem.text.middle.slice(0, splitIndex);
+        const middleOptionsSecondPart = selectedItem.text.middle.slice(splitIndex);
+
+        const correctTitle = document.createElement('div');
+        correctTitle.classList.add('item');
+        correctTitle.textContent = selectedItem.title;
+        titleField.appendChild(correctTitle);
+
+        selectedItem.text.start.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('item');
+        itemDiv.textContent = item;
+        answersFieldStart.appendChild(itemDiv);
+        });
+
+        middleOptionsFirstPart.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('item');
+        itemDiv.textContent = item;
+        answersFieldMiddle.appendChild(itemDiv);
+        });
+
+        let remainingText = [...middleOptionsSecondPart, ...selectedItem.text.end]
+        if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+          remainingText = [...remainingText, ...selectedItem.text.distractor]
+        }
+
+        shuffleArray(remainingText).forEach(item => {
+          const itemDiv = document.createElement('div');
+          itemDiv.classList.add('item');
+          itemDiv.textContent = item;
+          optionsField.appendChild(itemDiv);
+        });
+      } else if (helpTracker >= 3) {
+        answersFieldStart.innerHTML = 'Pradžia';
+        answersFieldMiddle.innerHTML = 'Įvykio raida';
+        answersFieldEnd.innerHTML = 'Pabaiga';
+        titleField.innerHTML = 'Pavadinimas';
+        optionsField.innerHTML = '';
+  
+        const correctTitle = document.createElement('div');
+        correctTitle.classList.add('item');
+        correctTitle.textContent = selectedItem.title;
+        titleField.appendChild(correctTitle);
+
+        selectedItem.text.start.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('item');
+        itemDiv.textContent = item;
+        answersFieldStart.appendChild(itemDiv);
+        });
+
+        selectedItem.text.middle.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('item');
+        itemDiv.textContent = item;
+        answersFieldMiddle.appendChild(itemDiv);
+        });
+
+        selectedItem.text.end.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('item');
+        itemDiv.textContent = item;
+        answersFieldEnd.appendChild(itemDiv);
+        });
+
+        if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+          shuffleArray(selectedItem.text.distractor).forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.classList.add('item');
+            itemDiv.textContent = item;
+            optionsField.appendChild(itemDiv);
+          });
+        }
+      }
+      }
+      
+      helpBtn.disabled = true;
+
+      const dots = document.querySelectorAll('#dots .dot');
+      for (let i = 0; i < dots.length; i++) {
+          const dot = dots[i];
+          dot.style.backgroundColor = '#ffbf92';
+          }
+    });
+
+    function initiateTheProgram() {
+        clearInputFields()
+        displayQuestion();
+
+        if (!controller.questionsStopped) {
+        if (controller.modeChoice4 === "C39") {
+          countDown();
+        } else if (controller.modeChoice4 === "C40") {
+          startTimer();
+        }
+    } else {
+	    if (controller.questionsStopped) {
+        if (localStorage.getItem("elapsedTime") !== null) {
+          timerDisplay.textContent = localStorage.getItem("elapsedTime");
+        } else {
+          timerDisplay.textContent = "00:00:00";
+        }
+      }
+      formatFinalMessageForTextcomprehension();
+    }
+
+    if (controller.modeChoice4 === "C40") {
+    questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
+    } else {
+      questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}`;
+    }
+    mistakesTracker.innerHTML = `Klaidos: ${controller.mistakesTracker}`;
+    }
+
+    function clearInputFields() {
+      answersField.innerHTML = 'Tekstas';
+      answersFieldStart.innerHTML = 'Pradžia';
+      answersFieldMiddle.innerHTML = 'Įvykio raida';
+      answersFieldEnd.innerHTML = 'Pabaiga';
+      titleField.innerHTML = 'Pavadinimas';
+      optionsField.innerHTML = '';
+      nextQuestionBtn.style.display = 'none';
+      checkAnswerBtn.style.display = "flex"
+      helpBtn.disabled = true;
+      checkAnswerBtn.disabled = false;
+    }
+
+    nextQuestionBtn.addEventListener('click', function () {
+      helpTracker = 0;
+      clearInputFields()
+      if (controller.modeChoice4 === "C40") {
+          if (controller.answeredQuestionTracker === controller.questionNumber) {
+            controller.taskCompleted = true;
+            localStorage.setItem("elapsedTime", timerDisplay.textContent);
+            formatFinalMessageForTextcomprehension();
+            controller.questionsStopped = true;
+					  localStorage.setItem('controller', JSON.stringify(controller));
+          } else {
+            displayQuestion();
+          }
+			  } else {
+           displayQuestion();
+        }
+    });
+
+    const stopButtonElement = document.querySelector('.stop-button');
+    let stopButtonSpanElement = document.querySelector('#stop-button-span');
+
+    function stopQuestions() {
+				if (stopButtonSpanElement.innerHTML === "close") {
+          controller.questionsStopped = true;
+					clearInterval(timerInterval);
+					stopButtonSpanElement.innerHTML = "refresh";
+          checkAnswerBtn.disabled = true;
+          helpBtn.disabled = true;
+          nextQuestionBtn.disabled = true;
+          drake.destroy();
+          controller.questionsStopped = true;
+          localStorage.setItem("elapsedTime", timerDisplay.textContent);
+					localStorage.setItem('controller', JSON.stringify(controller));
+          initiateTheProgram() 
+
+				} else if (stopButtonSpanElement.innerHTML === "refresh") {
+          controller.questionsStopped = false;
+					stopButtonSpanElement.innerHTML = "close";
+          if (localStorage.getItem("startTime")) {
+            localStorage.removeItem("startTime");
+          };
+          if (localStorage.getItem("remainingTime")) {
+            localStorage.removeItem("remainingTime");
+          };
+          checkAnswerBtn.disabled = false;
+          nextQuestionBtn.disabled = false;
+
+          controller.randomSelection = [];
+          helpTracker = 0;
+          controller.mistakesTracker = 0;
+					controller.answeredQuestionTracker = 0;
+          answeredTexts = [];
+          mistakesSummary = {};
+
+          if (controller.modeChoice4 === "C40") {
+            questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
+          } else {
+            questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}`;
+          }
+          mistakesTracker.innerHTML = `Klaidos: ${controller.mistakesTracker}`;
+          //helpDiv.innerHTML = `Panaudota pagalba: ${helpTracker}`;
+
+          document.getElementById("fields-row").style.display = "flex";
+          document.getElementById("final-message-row").style.display = "none";
+
+          controller.tempTracking = true;
+          localStorage.setItem('controller', JSON.stringify(controller));
+          initiateTheProgram();
+				}
+			}
+
+      if (controller.questionsStopped) {
+        stopButtonSpanElement.innerHTML === "close"
+      }
+
+      stopButtonElement.addEventListener("click", stopQuestions)
+
+    const resetButtonElement = document.querySelector('.reset-button');
+		resetButtonElement.addEventListener("click", redirectToIndex);
+    initiateTheProgram();
+
+    window.addEventListener("beforeunload", () => {
+        if (!redirectingToAuthentication) {
+          controller.taskId = 0;
+          controller.taskCompleted = false;
+        }
+        localStorage.setItem("controller", JSON.stringify(controller));
+        localStorage.setItem("elapsedTime", timerDisplay.textContent);
+        localStorage.setItem("elapsedTime", timerDisplay.textContent);
+      });
+    })
+    .catch(error => console.error('Error:', error));
+        
+  </script>
+
+</body>
+</html>

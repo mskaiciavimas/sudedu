@@ -1,0 +1,4214 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>sudedu - užduotys</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Josefin+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+	<link rel="stylesheet" type="text/css" href="../index.css">
+    <link rel="stylesheet" href="../main-nav-bar.css">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-96Q83PW8XY"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-96Q83PW8XY');
+    </script>	
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            height: 100svh;
+            width: 100vw;
+        }
+
+        .row {
+            width: 100%;
+            min-width: 100%;
+            --bs-gutter-x: 0; 
+        }
+
+        #template-container {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            max-width: none;
+            display: flex;
+            align-items: start;
+            justify-content: center;
+        }
+        
+        #content-container {
+            flex: 1;
+            height: calc(100% - 80px - 16px - 16px);
+            width: calc(100% - (2 * 16px));
+            display: flex;
+            justify-content: start;
+            background: rgba(255, 255, 255, 0.08);
+            margin: 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        #inner-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #teacher-gui {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            flex-direction: row;
+        }
+
+        .left-side-bar {
+            height: 100%;
+            padding: 15px;
+            flex: 1 1 35%;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.15);
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #dynamic-teacher-content {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+        }
+
+        .initial-button-div {
+            min-width: 250px;
+            margin-bottom: 15px;
+        }
+
+        .teacher-button {
+            width: 100%;
+        }
+
+        #timer-input-div,
+        #question-number-input-div {
+            margin-top: 5px;
+        }
+
+        .teacher-button:disabled {
+            background-color: #40c9a9;
+            border-color: #40c9a9;
+            color: black;
+            filter: grayscale(25%);
+        }
+
+        .confirmation-button-div {
+            min-width: 150px;
+            margin: 0 0 15px 15px;
+        }
+
+        #confirm-delete-task-button,
+        #confirm-delete-student-button {
+            width: 100%;
+        }
+
+        #teacher-message-line-2 {
+            text-align: center;
+            margin: 15px 0;
+            min-height: 48px;
+        }
+        
+        #teacher-message-line,
+        #teacher-data-retrieval-message,
+        #student-message {
+            text-align: center;
+            margin-right: 4vw;
+        }
+
+        #task-group-sorting {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 8px;
+            color: #212529;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+            box-shadow: none;
+            text-align: center;
+        }
+        
+        .left-side-bar-inner {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        #student-details-for-teachers {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        #outer-student-list-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            flex: 1 0 60svh;
+        }
+
+        #student-list-header {
+            background: rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #student-list-header-checkbox-container,
+        #student-list-title-container {
+            padding: 10px 0 10px 0;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        #student-list-title-container {
+            margin-left: 10px;
+        }
+
+        #select-all-checkbox {
+            margin-right: 10px;
+        }
+
+        #student-list {
+            background: transparent;
+            height: 50vh;
+            overflow: auto;
+            padding: 15px;
+        }
+
+        .student-checkbox,
+        .task-checkbox {
+            margin-right: 10px;
+        }
+
+        #student-list ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .outer-student-list-entry-item {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            justify-content: center;
+        }
+
+        .student-li-item {
+            display: flex;
+            align-items: center;
+            justify-content: start;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .task-li-item {
+            margin-left: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: start;
+        }
+
+        .student-li-item,
+        .task-container {
+            width: 100%;
+        }
+
+        .task-li-item {
+            width: calc(100% - 20px);
+        }
+
+        .student-li-item .selection-option {
+            width: 80%;
+            transition: box-shadow 0.3s ease; /* Smooth transition for highlighting */
+        }
+
+        .task-li-item .selection-option {
+            width: calc(80% - 5px);
+            transition: box-shadow 0.3s ease; /* Smooth transition for highlighting */
+            white-space: normal;
+            overflow-wrap: break-word;
+        }
+
+        .selected-option {
+            background: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.5); /* Adds a glow effect around the selected element */
+        }
+
+        #student-list li { 
+            padding: 10px 0 0 0; 
+        }
+
+        #new-task-options-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            max-width: 500px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        #group_name,
+        #mode_choice,
+        #mode_choice_1,
+        #mode_choice_2,
+        #mode_choice_3,
+        #mode_choice_4,
+        #mode_choice_5,
+        #mode_choice_6,
+        #mode_choice_7,
+        #mode_choice_8,
+        #mode_choice_9,
+        #mode_choice_10,
+        #mode_choice_13,
+        #class_choice {
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+            background: #FAF1E6;
+            box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        #mode_choice_11_div {
+            box-sizing: border-box;
+        }
+
+        #mode_choice_12 {
+            width: auto;
+        }
+
+        .remainder-div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #remainder-option {
+            font-weight: 600;
+        }
+
+        .selected_numbers_inner_div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .number-choice-label-iki,
+        .number-choice-label-nuo {
+            font-weight: 600;
+            font-size: 1.75rem;
+        }
+
+        .timer-question-number-div,
+        .timer-input-div,
+        .question-number-input-div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #timer-input,
+        #question-number-input {
+            padding: 0.5rem;
+            font-size: 1rem;
+            width: 55px;
+            border: 0;
+            margin: 0;
+            outline: none;
+            background: #FAF1E6;
+            box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        #timer-input:focus,
+        #question-number-input:focus,
+        #timer-input:active,
+        #question-number-input:active {
+            border: 0;
+            margin: 0;
+            outline: none;
+        }
+
+        .timer-label-teacher,
+        .answer-number-label-teacher {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        #new-task-options-container > * {
+            width: 100%;;
+        }
+
+        .new-task-input-holder {
+            width: 100%;
+        }
+
+        #group_name {
+            border: 0;
+            outline: 0;
+            font-size: 1rem;
+            text-align: start;
+            padding-left: 15px;
+        }
+
+        #group_name:focus,
+        #group_name:active,
+        #group_name:hover {
+            border: 0;
+            outline: none;
+        }
+
+        .modeChoice4_div {
+            width: 100%;
+            padding: 0;
+        }
+        
+        .empty-placeholder-between-options {
+            padding: 0;
+            width: 100%;
+        }
+
+        .timer-label-teacher,
+        .answer-number-label-teacher {
+            margin-left: 10px;
+        }
+
+        #student-task-info-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex: 1;
+        }
+
+        #student-task-info-container-inner {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 25px;
+        }
+
+        .summary-inner-container:not(:empty) {
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            height: 100%;
+            border-collapse: collapse;
+            border-color: rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            margin: 0 !important;
+            table-layout: fixed;
+        }
+
+        th,
+        td {
+            padding: 5px 5px 5px 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            font-size: 1rem;
+        }
+
+        th:first-child, th:nth-child(2) {
+            text-align: center;
+        }
+
+        td:first-child, td:nth-child(2) {
+            text-align: center;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        tbody td:hover:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: -9999px;
+            bottom: -9999px;
+            background-color: rgba(255, 255, 255, 0.2);
+            z-index: 2;
+        }
+
+        tbody td {
+            position: relative;
+        }
+
+        .bar {
+            height: 20px;
+            border-radius: 5px;
+        }
+
+        .table-container {
+            width: 100%;
+            max-height: 50% !important;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .table-container::-webkit-scrollbar {
+        display: none;
+        }
+
+        .table-container:hover {
+        overflow-y: scroll;
+        }
+
+        #student-task-student-name {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        #student-task-group-and-status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        #student-task-group,
+        #student-task-group-for-student {
+            max-width: 95%;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 1.25rem;
+            white-space: normal;
+            overflow-wrap: break-word;
+        }
+
+        .student-list-task-indicatior {
+            display: inline-block;
+            margin-left: 5px;
+            width: 10px;
+            aspect-ratio: 1 / 1;
+            border-radius: 50%;
+        }
+
+        #student-task-status-indicator,
+        #student-task-status-indicator-for-student {
+            width: 20px;
+            aspect-ratio: 1 / 1;
+            border-radius: 50%;
+        }
+
+        #task-description-title,
+        #task-description-title-for-student {
+            margin-top: 15px;
+        }
+
+        #task-description-for-student {
+            margin-top: 15px;
+        }
+
+        .reset-button-div {
+            margin-top: 40px;
+        }
+
+        .task-description-list {
+            margin-bottom: 0;
+            margin-top: 5px;
+            padding: 0;
+        }
+
+        .task-description-list-item {
+            text-transform: lowercase;
+            margin-left: 2rem;
+        }
+
+        #change-teacher-input {
+            margin-bottom: 5px;
+        }
+
+        #teacher-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        #change-teacher-toggle-button {
+            text-decoration: underline;
+            cursor: pointer;
+            text-align: start;
+            color: #32ac93;
+            background-color: transparent;
+            border: none;
+            padding: 0;
+        }
+
+        #change-teacher-toggle-button:disabled {
+            color: gray;
+        }
+
+        #add-change-teacher-buttons {
+            height: 38px;
+            margin: 10px 0;
+        }
+
+        #student-task-for-students-title-container {
+            background-color: #FAF1E6;
+            padding: 10px 0 10px 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: #6c757d 1px solid;
+        }
+
+        #student-tasks-list {
+            background-color: #FAF1E6;
+            list-style: none;
+            height: 50vh;
+            overflow: auto;
+            padding: 0 0 10px 0;
+        }
+
+        .task-li-item-for-students {
+            padding-top: 10px;
+            margin-left: 15px;
+        }
+
+        #dynamic-student-content {
+            padding-left: 25px;
+        }
+
+        #task-info-container-for-students {
+            height: 100%;
+            width: 100%;
+        }
+
+        .grammar-params-list {
+            margin-left: 15px;
+            padding: 0;
+        }
+
+        .grammar-view-selector {
+            position: relative;
+            border: none;
+            border-radius: 4px;
+            background-color: transparent;
+            text-align: center;
+            font-weight: bold;
+            z-index: 10;
+            pointer-events: auto; 
+        }
+
+        .task-info-subtitle {
+            font-style: italic;
+        }
+
+        .student-statistics-title {
+            font-size: 1.35rem;
+            margin-top: 15px;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        .student-statistics-subtitle {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .btn:disabled {
+            background-color: #40c9a9;
+            border-color: #40c9a9;
+            color: black;
+            filter: grayscale(25%);
+        }
+
+        .dropdown:disabled {
+            filter: grayscale(25%);
+            background-color: #FAF1E6;
+            border-color: #6c757d;
+        }
+
+        .invalid-submition {
+        animation: shake 0.2s ease-in-out 0s 2 !important;
+        }
+
+        #expand-student-info-button {
+            background-color: transparent;
+            border: none;
+            font-size: 1.5rem;
+        }
+
+        #text-viewer {
+            width: 100%;
+            margin-top: 15px;
+            background-color: transparent;
+        }
+
+        .accordion-item {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px !important;
+            overflow: hidden;
+        }
+
+
+.accordion-button {
+    background-color: transparent;
+    border: none;
+    color: #212529;
+    margin: 0;
+    font-size: 1.5rem;
+    transition: background 0.3s ease;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+/* Icon */
+.accordion-icon {
+    transition: transform 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.accordion-button[aria-expanded="true"] .accordion-icon {
+    transform: rotate(180deg); /* + becomes × */
+}
+
+
+.accordion-input-button-holder {
+    display: flex;
+    align-items: center;
+    gap: 10px
+}
+
+/* Collapse animation */
+.accordion-collapse {
+    height: 0;
+    overflow: hidden;
+    border-top: none;
+}
+
+.accordion-collapse.show {
+    height: auto;
+}
+
+.accordion-body {
+    border-radius: 8px !important;
+    margin-bottom: 10px;
+    overflow: hidden;
+    padding: 0 20px;
+}
+
+.accordion-body {
+    margin-bottom: 0;
+}
+
+/* Form and button styles */
+.form-control {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+#student-statistics-komponavimas-completed-texts ol,
+#text-comprehension-mistakes-summary ol {
+    margin: 5px 0;
+}
+
+
+        #view-text-id-input {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 8px;
+            border: none;
+            color: #212529;
+            width: 100px;
+            height: 35px;
+            padding: 5px 5px 5px 15px;
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        #view-text-id-input:focus,
+        #view-text-id-input:active {
+            outline: none;
+            border: none;
+        }
+
+        @keyframes shake {
+        0% { margin-left: 0rem; }
+        25% { margin-left: 0.5rem; }
+        75% { margin-left: -0.5rem; }
+        100% { margin-left: 0rem; }
+        }
+
+        .clickable-word {
+            cursor: pointer;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .clickable-word:hover {
+            text-decoration: underline;
+        }
+
+
+        .incorrect-part {
+            pointer-events: none;
+            padding: 0;
+            font-weight: bold;
+            padding: 2px 1px;
+            border-radius: 3px;
+            color: #32ac93;
+        }
+
+        .user-incorrect-answer {
+            color: #D57E7E;
+            font-weight: bold;
+        }
+
+        #sentence-with-mistake-field:not(:empty),
+        #sentence-with-mistake-field-for-students:not(:empty) {
+            margin: 10px 0;
+        }
+
+        #text-browser-button {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: linear-gradient(135deg, #3288AC, #286D8A);
+            font-size: 1rem;
+            color: #F5F5F7;
+            padding: 8px 8px;
+            border-radius: 8px;
+            margin: 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .text-viewer-heading {
+            margin-bottom: 0;
+        }
+
+        #text-container-row {
+            margin-top: 10px;
+        }
+
+        #text-subtitle {
+            font-weight: bold;
+        }
+
+        #text-compatibility ul {
+            margin-left: 30px;
+        }
+
+        .text-individual-items {
+            background: rgba(255, 255, 255, 0.5);
+            margin: 5px 0;
+            white-space: pre-line;
+        }
+        
+        .text-comprehenstion-text-id {
+            cursor: pointer;
+        }
+
+        .text-comprehenstion-text-id:hover {
+            text-decoration: underline;
+        }
+
+        
+
+        @media (max-width: 1999px) {
+            #teacher-message-line,
+            #teacher-data-retrieval-message,
+            #student-message {
+                margin-right: 8vw;
+            }
+        }
+
+        @media (max-width: 767px) {
+            #student-task-info-container {
+                padding-left: 0;
+            }
+
+            #teacher-button-holder-outer {
+                display: flex;
+                justify-content: end;
+            }
+
+            .teacher-button-holder {
+                width: 90%;
+            }
+
+            #action-buttons-container, 
+            #confirmation-buttons-container {
+                gap: 8px;
+            }
+
+            #student-task-info-container-inner {
+                padding: 15px;
+            }
+            
+            #content-container {
+                margin: 0;
+                flex: 1;
+                width: 100vw;
+                justify-content: start;
+                background: transparent;
+                border: none;
+                box-shadow: none
+            }
+
+            #teacher-gui {
+                align-items: center;
+            }
+
+            .left-side-bar {
+                height: 100%;
+                background: transparent;
+                border-right: none;
+                border-radius: 0;
+            }
+
+            .dropdown {
+                margin: 7px 0;
+            }
+
+            #dynamic-student-content {
+                padding-left: 0;
+                margin-top: 20px;
+            }
+
+        }
+
+        @media (max-width: 575px) {
+            html,
+            body {
+                width: 100vw;
+            }
+
+            .initial-button-div {
+                width: 100%;
+            }
+
+            .confirmation-button-div {
+                width: 100%;
+                margin: 0;
+            }
+
+            #confirm-delete-task-button {
+                margin-bottom: 15px;
+            }
+
+            #confirm-delete-student-button {
+                margin-bottom: 15px;
+            }
+
+            .teacher-button-line {
+                flex-direction: column;
+            }
+
+            #teacher-message-line,
+            #teacher-data-retrieval-message {
+                margin-bottom: 15px;
+            }
+        }
+
+    @media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)  {
+        body {
+            font-size: 1.5rem;
+        }
+
+        #new-task-button,
+        #delete-task-button,
+        #delete-student-button,
+        #confirm-delete-task-button,
+        #confirm-delete-student-button,
+        #submitButton,
+        #add-teacher,
+        #change-teacher {
+            font-size: 1.5rem;
+        }
+
+        #add-change-teacher-buttons {
+            margin: 10px 0 30px 0;
+        }
+
+        #complete-task-button {
+            font-size: 1.4rem;
+        }
+
+        #student-message {
+            margin-right: 0;
+        }
+
+        #teacher-name {
+            font-size: 1.75rem;
+        }
+
+        .accordion-button {
+            font-size: 2.25rem;
+        }
+
+        .form-control {
+            font-size: 1.75rem;
+        }
+
+        .menu ul li a {
+            font-size: 1.75rem;
+        }
+
+        .menu {
+            width: 160px;
+        }
+
+        .reset-button {
+            width: 6rem;
+            height: 6rem;
+        }
+    }
+
+
+
+
+
+
+    .container {
+      display: flex;
+      min-height: 0;
+    }
+
+    /* Sidebar wrapper */
+    .sidebar-wrapper {
+      position: relative;
+      flex: 1 1 65%;
+      height: 100%;
+      margin-right: 10px;
+    }
+
+    /* Sidebar content */
+    .sidebar {
+        position: relative;
+        padding: 16px;
+        height: 100%;
+        width: 100%;
+        overflow-y: auto;
+        margin-right: 15px;
+    }
+
+    .sidebar-content {
+      min-height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Toggle tab - always visible */
+    .toggle-tab {
+      position: absolute;
+      right: -10%;
+      top: 30px;
+      transform: translateY(-50%);
+      border: none;
+      width: 10%;
+      height: 60px;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    -webkit-backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.5);
+    padding: 0;
+    }
+
+    .toggle-tab svg {
+      width: 24px;
+      height: 24px;
+      transition: transform 0.3s ease;
+    }
+
+    /* Main content */
+    .main-content {
+      flex: 1;
+      padding: 2rem;
+      background: #f5f5f5;
+    }
+
+    .main-content h1 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+
+    .main-content p {
+      line-height: 1.6;
+      color: #555;
+      margin-bottom: 1rem;
+    }
+
+    /* Desktop: sidebar always visible, hide toggle */
+    @media (min-width: 769px) {
+      .toggle-tab {
+        display: none;
+      }
+    }
+
+    /* Mobile: collapsible sidebar */
+    @media (max-width: 768px) {
+      .sidebar {
+        padding: 16px;
+        height: 100%;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        background: rgba(255, 255, 255, 0.5);
+        border-bottom-right-radius: 8px;
+        margin: 0;
+      }
+
+      .sidebar-wrapper {
+        position: fixed;
+        left: 0;
+        top: 85px;
+        height: calc(100% - 70px - 30px);
+        width: 90vw;
+        z-index: 100;
+        transition: transform 0.3s ease;
+        transform: translateX(-90vw);
+        padding-left: 0;
+      }
+
+      .sidebar-wrapper.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-wrapper.open .toggle-tab svg {
+        transform: rotate(180deg);
+      }
+
+      .main-content {
+        padding: 1.5rem;
+        width: 100%;
+      }
+
+      /* Overlay */
+      .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 99;
+      }
+
+      .overlay.active {
+        display: block;
+      }
+
+      .accordion-button {
+        font-size: 1.25rem;
+      }
+
+      .accordion-header {
+        margin: 10px 0;
+      }
+    }
+
+    #action-buttons-container,
+    #confirmation-buttons-container {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+        height: 60px;
+    }
+
+    #confirmation-buttons-container {
+        display: none;
+    }
+
+
+
+.teacher-action-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  background: linear-gradient(135deg, #3288AC, #286D8A);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  color: #F5F5F7;
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
+  padding: 16px 15px;
+}
+
+.teacher-action-btn .btn-label {
+   width: 90%;
+}
+
+.teacher-action-btn:hover,
+.cancel-btn:hover,
+.confirm-btn:hover {
+    transform: translateY(-1.5px);
+}
+
+.confirm-btn,
+.cancel-btn {
+    position: relative;
+    flex: 1;
+    padding: 1rem 0.75rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    color: #F5F5F7;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.confirm-btn {
+    background: linear-gradient(135deg, #A0C58F, #32ac93);
+}
+
+.cancel-btn {
+    background: linear-gradient(135deg, #f76859, #e74c3c);
+}
+
+#confirmation-buttons-container {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+    
+    </style>
+</head>
+
+<body>
+   <nav class="main-navbar" id="mainNavbar">
+        <div class="main-nav-container">
+            <!-- Logo -->
+            <a href="#" class="main-nav-logo">
+                <div class="main-nav-logo-icon">
+                 <img id="sudedu-main-nav-bar-logo" src="../images/sudedu_logo.png" alt="sudEdu">
+                </div>
+            </a>
+
+            <!-- Desktop Navigation -->
+            <div class="main-nav-links">
+                <a href="pradzia.html" class="main-nav-link">Pradžia</a>
+                <a href="uzduotys.html" class="main-nav-link main-nav-link-active">Užduotys</a>
+                <a href="klase.html" class="main-nav-link">Klasė</a>
+                <a href="augintiniai.html" class="main-nav-link">Augintiniai</a>
+                <a href="apie.html" class="main-nav-link">Apie Sudedu</a>
+                
+                <div class="main-nav-language-dropdown" id="languageDropdown">
+                    <button class="main-nav-language-btn" id="languageBtn">
+                        <span id="currentLanguage">LT</span>
+                        <span class="main-nav-language-arrow"></span>
+                    </button>
+                    <div class="main-nav-language-menu">
+                        <button class="main-nav-language-option selected" data-lang="LT">LT</button>
+                        <button class="main-nav-language-option" data-lang="EN">EN</button>
+                    </div>
+                </div>
+                
+                
+                <div class="main-nav-connect-wrapper">
+                    <div class="main-nav-connect-glow"></div>
+                    <button class="main-nav-connect-btn">
+                        <span class="main-nav-connect-text">Atsijungti</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Button -->
+            <button class="main-nav-mobile-btn" id="mainNavMobileBtn">
+                <span class="main-nav-hamburger"></span>
+                <span class="main-nav-hamburger"></span>
+                <span class="main-nav-hamburger"></span>
+            </button>
+
+            <!-- Mobile Menu -->
+            <div class="main-nav-mobile-menu" id="mainNavMobileMenu">
+                <a href="pradzia.html" class="main-nav-mobile-link">Pradžia</a>
+                <a href="uzduotys.html" class="main-nav-mobile-link active">Užduotys</a>
+                <a href="klase.html" class="main-nav-mobile-link">Klasė</a>
+                <a href="augintiniai.html" class="main-nav-mobile-link">Augintiniai</a>
+                <a href="apie.html" class="main-nav-mobile-link">Apie Sudedu</a>
+                
+                <div class="main-nav-mobile-language">
+                    <button class="language-option language-option-LT selected" onclick="setLanguage('LT')">LT</button>
+                    <span class="language-separator">/</span>
+                    <button class="language-option language-option-EN" onclick="setLanguage('EN')">EN</button>
+                </div>
+                
+                <button class="main-nav-mobile-connect">
+                    <span class="main-nav-connect-text">Atsijungti</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="content-container">
+	<div class="container" id="template-container">
+        <div id="inner-container">
+            <!-- TEACHER GUI -->
+<div id="teacher-gui" style="display: none;">
+
+    <!-- LEFT SIDE: Student List (always visible) -->
+    <div class="left-side-bar">
+        <div class="left-side-bar-inner">
+                <!-- Button and Message Section (stays on top, full width) -->
+        <div id="teacher-button-holder-outer">
+                <div class="teacher-button-holder">
+                    <!-- Action buttons that transform -->
+                    <div id="action-buttons-container">
+                        <button id="new-task-button" class="teacher-action-btn" data-action="new-task">
+                            <span class="btn-label">Kurti užduotį</span>
+                        </button>
+                        
+                        <button id="delete-task-button" class="teacher-action-btn" data-action="delete-task">
+                            <span class="btn-label">Trinti užduotis</span>
+                        </button>
+                        
+                        <button id="delete-student-button" class="teacher-action-btn" data-action="delete-student">
+                            <span class="btn-label">Šalinti mokinius</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Confirmation buttons (hidden by default) -->
+                    <div id="confirmation-buttons-container">
+                        <button id="confirm-button" class="confirm-btn">
+                            <span id="confirm-label">Patvirtinti</span>
+                        </button>
+                        <button id="cancel-button" class="cancel-btn">
+                            <span>Atšaukti</span>
+                        </button>
+                    </div>
+                </div>
+        </div>
+
+
+            <div id="student-details-for-teachers">
+                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" id="task-group-sorting"></select>
+                <div id="outer-student-list-container">
+                    <div class="d-flex justify-content-between" id="student-list-header">
+                        <div class="align-items-center justify-content-start" id="student-list-header-checkbox-container" style="display: none;">
+                            <input type="checkbox" id="select-all-checkbox">
+                            <div>pasirinkti visus</div>
+                        </div>
+                        <div class="align-items-center justify-content-start" id="student-list-title-container">
+                            <div>Mokinių sąrašas:</div>
+                        </div>
+                        <button type="button" id="expand-student-info-button" style="margin-left: auto;" onclick="toggleTaskVisibility()">&#x2212;</button>
+                    </div>
+                    <div id="student-list"></div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <!-- RIGHT SIDE: Collapsible Sidebar with Task Options and Info -->
+        <div class="sidebar-wrapper" id="sidebarWrapper">
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-content" id="sidebarContent">
+                    <div id="dynamic-teacher-content">
+                        <!-- New Task Options Container -->
+                        <div id="new-task-options-container" style="display: none;">
+                            <div class="new-task-input-holder">
+                                <input type="text" id="group_name" placeholder="Užduočių grupės pavadinimas" class="form-control">
+                            </div>
+
+                            <div class="ode_choice_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice" id="mode_choice">
+                                    <option value="matematika">MATEMATIKĄ</option>
+                                    <option value="kalba">LIETUVIŲ KALBĄ</option>
+                                </select>
+                            </div>
+
+                            <div class="mode_choice_1_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_1" id="mode_choice_1">
+                                    <option value="C1">SUDĖTĮ</option>
+                                    <option value="C2">ATIMTĮ</option>
+                                    <option value="C3">SUDĖTĮ IR ATIMTĮ</option>
+                                    <option value="C4">DAUGYBĄ</option>
+                                    <option value="C5">DALYBĄ</option>
+                                    <option value="C6">DAUGYBĄ IR DALYBĄ</option>
+                                    <option value="C7">ĮVAIRIUS VEIKSMUS</option>
+                                </select>
+                            </div>
+
+                            <div class="mode_choice_2_div">
+                                <div class="col-12 d-flex justify-content-center align-items-center mode_choice_2_div text-center" id="mode_choice_2_div">
+                                    <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_2" id="mode_choice_2">
+                                        <option value="C8">VIENAŽENKLIŲ SKAIČIŲ IKI 10</option>
+                                        <option value="C9">VIENAŽENKLIŲ SKAIČIŲ IKI 20 (LENTELINĖ SUDĖTIS)</option>
+                                        <option value="C10">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 20</option>
+                                        <option value="C11">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 100</option>
+                                        <option value="C12">DVIŽENKLIŲ SKAIČIŲ IKI 100</option>
+                                        <option value="C13">SKAIČIŲ IKI 1 000</option>
+                                        <option value="C14">SKAIČIŲ IKI 10 000</option>
+                                        <option value="C15">SKAIČIŲ IKI 1 000 000</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="selected_numbers_div">
+                                <div class="selected_numbers_inner_div">
+                                    <label class="number-choice-label-nuo" for="selected_number" id="number_label" style="display: none;">NUO</label>
+                                    <select class="btn btn-secondary dropdown-toggle dropdown text-center" name="selected_number" id="selected_number" style="display: none;">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+                                    </select>
+                                    <label class="number-choice-label-iki" for="selected_number_2" id="number_label_2" style="display: none;">IKI</label>
+                                    <select class="btn btn-secondary dropdown-toggle dropdown text-center" name="selected_number_2" id="selected_number_2" style="display: none;">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="remainder-div">
+                                <label id="remainder-option" style="display: none;">
+                                    <input id="remainder-input" type="checkbox" name="myCheckbox"> DALYBA SU LIEKANA
+                                </label>
+                            </div>
+
+                            <div class="mode_choice_3_div">
+                                <div class="col-12 d-flex justify-content-center align-items-center text-center mode_choice_3_div" id="mode_choice_3_div">
+                                    <select class="btn btn-secondary dropdown-toggle dropdown text-center" name="mode_choice_3" id="mode_choice_3">
+                                        <option value="C37">NEPERŽENGIANT DEŠIMTIES</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mode_choice_5_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_5" id="mode_choice_5">
+                                    <option value="C41">SKAITINĖ LYGYBĖ</option>
+                                    <option value="C42">SKAITINĖ LYGYBĖ SU NEŽINOMUOJU</option>
+                                </select>
+                            </div>
+
+                            <div class="mode_choice_6_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_6" id="mode_choice_6" style="display: none;">
+                                    <option value="C43">NEŽINOMAS DĖMUO</option>
+                                </select>
+                            </div>
+
+                            <div class="mode_choice_7_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_7" id="mode_choice_7" style="display: block;">
+                                    <option value="C47">EILUTE</option>
+                                    <option value="C48">STULPELIU / KAMPU</option>
+                                </select>
+                            </div>
+
+                            <div class="class_choice_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="class_choice" id="class_choice" style="display: none;">
+                                    <option value="C75">1-2 KLASĖ</option>
+                                    <option value="C76">3-4 KLASĖ</option>
+                                </select>
+                            </div>
+
+                            <div class="mode_choice_8_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_8" id="mode_choice_8" style="display: none;">
+                                    <option value="tekstas">TEKSTO SUPRATIMĄ</option>
+                                    <option value="rasyba">RAŠYBĄ</option>
+                                </select>
+                            </div>
+
+                            <div class="mode_choice_9_div">
+                                <div class="col-12 d-flex justify-content-center align-items-center mode_choice_9_div text-center" id="mode_choice_9_div">
+                                    <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_9" id="mode_choice_9" style="display: none;">
+                                        <option value="C51">TURINIO KOMPONAVIMĄ</option>
+                                        <option value="C52">STRUKTŪROS IŠDĖSTYMĄ</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mode_choice_10_div">
+                                <div class="col-12 d-flex justify-content-center align-items-center mode_choice_10_div text-center" id="mode_choice_10_div">
+                                    <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_10" id="mode_choice_10" style="display: none;">
+                                        <option value="C58">LENGVAS</option>
+                                        <option value="C80">LENGVAS SU DISTRAKTORIUMI</option>
+                                        <option value="C59">VIDUTINIS</option>
+                                        <option value="C81">VIDUTINIS SU DISTRAKTORIUMI</option>
+                                        <option value="C60">SUNKUS</option>
+                                        <option value="C82">SUNKUS SU DISTRAKTORIUMI</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="rasyba-options-row">
+                                <div class="mode_choice_11_div" id="mode_choice_11_div" style="display: none;">
+                                    <label class="rasyba-options-label">
+                                        <input type="checkbox" class="r" name="r" value='GALŪNĖS' checked><span class="rasyba-options-label-text" id="rasyba-options-label-text-galune">ŽODŽIO PABAIGA:</span>
+                                    </label>
+                                    <br>
+                                    <div id="galuniu-div">
+                                        <label class="rasyba-options-label" style="display: none;">
+                                            <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" id="first-second-class-endings" name="rasyba-option" value='{"C61": []}' checked><span class="rasyba-options-label-text">DAIKTAVARDIS</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C62": []}'><span class="rasyba-options-label-text">DAIKTAVARDŽIAI</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C63": [], "C64": []}'><span class="rasyba-options-label-text">BŪDVARDŽIAI IR PRIEVEIKSMIAI</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C65": []}'><span class="rasyba-options-label-text">VEIKSMAŽODŽIAI</span>
+                                            <br>
+                                        </label>
+                                        <div class="mode_choice_12_div" id="mode_choice_12_div">
+                                            <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_12" id="mode_choice_12">
+                                                <option value="C73">LENGVESNĖS KOMBINACIJOS</option>
+                                                <option value="C74">SUNKESNĖS KOMBINACIJOS</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <label class="rasyba-options-label">
+                                        <input id="C66" type="checkbox" class="rasyba-options" name="rasyba-option" value='{"C66": []}' checked><span class="rasyba-options-label-text">ĮSIDĖMĖTINA RAŠYBA</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C71": []}'><span class="rasyba-options-label-text">PRIEBALSIŲ SUPANAŠĖJIMAS</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-first-second-classes" style="display: block;">
+                                        <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C67": []}'checked><span class="rasyba-options-label-text">PANAŠIAI SKAMBANČIOS PRIEBALSĖS</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label" style="display: block;">
+                                        <input type="checkbox" class="rasyba-options" name="rasyba-option" value='{"C68": []}' checked><span class="rasyba-options-label-text">BALSĖS IR DVIBALSĖS</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C72": []}'><span class="rasyba-options-label-text">MIŠRIEJI DVIGARSIAI</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C69": []}'><span class="rasyba-options-label-text">PRIEŠDĖLIAI</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C70": []}'><span class="rasyba-options-label-text">PRIESAGOS</span>
+                                        <br>
+                                    </label>
+                                </div>
+
+                                <div class="mode_choice_13_div">
+                                    <div class="row"></div>
+                                    <div class="col-12 d-flex justify-content-center align-items-center mode_choice_13_div text-center" id="mode_choice_13_div">
+                                        <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_13" id="mode_choice_13" style="display: none;">
+                                            <option value="3">RETESNI ATVEJAI</option>
+                                            <option value="1">DAŽNESNI ATVEJAI</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modeChoice4_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="modeChoice4" id="mode_choice_4" style="display: block;">
+                                    <option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>
+                                    <option value="C40">NUSTATYTI VEIKSMŲ KIEKĮ</option>
+                                </select>
+                            </div>
+
+                            <div class="timer-question-number-div">
+                                <div class="timer-input-div" id="timer-input-div">
+                                    <div class="col-6 d-flex justify-content-end">
+                                        <input type="number" id="timer-input" min="1" max="60" step="1" value="5">
+                                    </div>
+                                    <div class="">
+                                        <h3 class="timer-label-teacher">minutes</h3>
+                                    </div>
+                                </div>
+                                <div class="question-number-input-div" id="question-number-input-div" style="display: none;">
+                                    <div class="col-6 d-flex justify-content-end">
+                                        <input type="number" id="question-number-input" min="1" max="200" step="1" value="20">
+                                    </div>
+                                    <div class="">
+                                        <h3 class="answer-number-label-teacher" id="answer-number-label-teacher">veiksmus</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Student Task Info Container -->
+                        <div id="student-task-info-container">
+                            <div id="student-task-info-container-inner">
+                                <div>
+                                    <div class="col-12 d-flex align-items-center justify-content-start" id="student-task-student-name"></div>
+                                    <div id="student-task-group-and-status-indicator">
+                                        <div id="student-task-group"></div>
+                                        <div id="student-task-status-indicator"></div>
+                                    </div>
+                                    <div class="col-12" id="student-task-completion-date"></div>
+                                    <div class="col-12" id="student-statistics-completed-tasks" style="display: none;"></div>
+
+                                    <div id="student-statistics-math" style="display: none;">
+                                        <div class="student-statistics-title">Matematika</div>
+                                        <div class="col-12" id="student-statistics-math-error-frequency"></div>
+                                    </div>
+
+                                    <div class="col-12" id="student-score-duration"></div>
+                                    <div class="col-12" id="student-score-asnwer-number"></div>
+                                    <div class="col-12" id="student-score-mistake-number"></div>
+                                    <div class="col-12" id="text-comprehension-mistakes-summary"></div>
+
+                                    <div id="mistakes-summary-math" style="display: none;">
+                                        <div id="mistakes-table-title-math" class="task-info-subtitle">Dažniausios skaičiavimo klaidos:</div>
+                                        <div class="summary-inner-container">
+                                            <div class="col-12 table-container">
+                                                <div id="summary-table"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="student-statistics-lang-grammar" style="display: none;">
+                                        <div class="student-statistics-title">Lietuvių kalba</div>
+                                        <div class="student-statistics-subtitle">Rašyba</div>
+                                        <div class="col-12" id="student-statistics-grammar-error-frequency"></div>
+                                    </div>
+
+                                    <div id="mistakes-summary-grammar" style="display: none;">
+                                        <div id="mistakes-table-title-grammar" class="task-info-subtitle">Dažniausios rašybos klaidos:</div>
+                                        <div class="summary-inner-container">
+                                            <div class="col-12 table-container">
+                                                <div id="summary-table-grammar"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="sentence-with-mistake-field"></div>
+
+                                    <div id="student-statistics-lang-text-comprahension" style="display: none;">
+                                        <div class="student-statistics-subtitle" id="student-statistics-lang-text-comprahension-komponavimas" style="display: none;">Turinio komponavimas</div>
+                                        <div class="col-12" id="student-statistics-komponavimas-error-frequency"></div>
+                                        <div class="col-12" id="student-statistics-komponavimas-completed-texts"></div>
+                                        <div class="student-statistics-subtitle" id="student-statistics-lang-text-comprahension-isdestymas" style="display: none;">Struktūros išdėstymas</div>
+                                        <div class="col-12" id="student-statistics-isdestymas-error-frequency"></div>
+                                        <div class="col-12" id="student-statistics-isdestymas-completed-texts"></div>
+                                    </div>
+
+                                    <div id="task-description-outer-container">
+                                        <div id="task-description-title" class="task-info-subtitle" style="display: none;">Užduoties aprašymas:</div>
+                                        <div id="task-description"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                        <div class="accordion" id="text-viewer">
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="text-viewer-heading">
+            <button class="accordion-button collapsed" type="button" aria-expanded="false" aria-controls="collapseOne">
+            Tekstų naršyklė
+            <span class="accordion-icon">
+                <svg width="32" height="32" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+        </button>
+
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="text-viewer-heading">
+            <div class="accordion-body">
+                <div class="accordion-input-button-holder">
+                    <input type="text" class="form-control" id="view-text-id-input" autocomplete="off" placeholder="Teksto ID" />
+                    <div class="">
+                        <button type="button" id="text-browser-button" onclick="passTextIdToTheLocatorFunction()">Ieškoti</button>
+                    </div>
+                </div>
+                <div class="col-12" id="text-message"></div>
+
+                <div class="row" id="text-container-row">
+                    <div class="col-12" id="text-id"></div>
+                    <div class="col-12" id="text-compatibility"></div>
+                    <div class="col-12" id="text-title"></div>
+                    <div class="col-12" id="text-author"></div>
+                    <div class="col-12" id="text-start"></div>
+                    <div class="col-12" id="text-middle"></div>
+                    <div class="col-12" id="text-end"></div>
+                    <div class="col-12" id="text-distractor"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <button class="toggle-tab" id="toggleTab" aria-label="Toggle sidebar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+<!-- STUDENT GUI -->
+<div id="student-gui" class="row" style="display: none;">
+    <!-- Teacher Connection Section (stays on top, full width) -->
+    <div class="row">
+        <div class="col-md-6 col-12">
+            <div id="teacher-name"></div>
+            <input id="add-teacher-input" type="text" placeholder="mokytojo ID" style="display: none;" class="item-to-be-disabled-while-talking-to-server">
+            <input id="change-teacher-input" type="text" placeholder="mokytojo ID" style="display: none;" class="item-to-be-disabled-while-talking-to-server">
+            <button onclick="changeTeacherToggle()" id="change-teacher-toggle-button" class="item-to-be-disabled-while-talking-to-server">Keisti mokytoją</button>
+            <div id="add-change-teacher-buttons">
+                <button id="add-teacher" class="btn btn-primary item-to-be-disabled-while-talking-to-server" onclick="addTeacher()" style="display: none;">Pridėti mokytoją</button>
+                <button id="change-teacher" class="btn btn-primary item-to-be-disabled-while-talking-to-server" onclick="changeTeacher()" style="display: none;">Keisti mokytoją</button>
+            </div>
+        </div>
+        <div class="">
+            <div id="student-message"></div>
+        </div>
+    </div>
+
+    <!-- Two Column Layout -->
+    <div class="row">
+        <!-- LEFT SIDE: Task List (always visible) -->
+        <div class="" id="student-tasks-list-outer-container">
+            <div class="align-items-center justify-content-start" id="student-task-for-students-title-container">
+                <div id="task-list-title-for-students"></div>
+            </div>
+            <div id="student-tasks-list"></div>
+        </div>
+
+        <!-- RIGHT SIDE: Task Info (collapsible on mobile) -->
+        <div class="" id="dynamic-student-content">
+            <div id="task-info-container-for-students">
+                <div id="student-task-info-container-inner">
+                    <div>
+                        <div id="student-task-group-and-status-indicator">
+                            <div id="student-task-group-for-student"></div>
+                            <div id="student-task-status-indicator-for-student"></div>
+                        </div>
+                        <div class="col-12" id="student-task-completion-date-for-students"></div>
+                        <div class="col-12" id="student-score-duration-for-student"></div>
+                        <div class="col-12" id="student-score-asnwer-number-for-student"></div>
+                        <div class="col-12" id="student-score-mistake-number-for-student"></div>
+
+                        <div id="mistakes-summary-math-for-student" style="display: none;">
+                            <div id="mistakes-table-title-math-for-students" class="task-info-subtitle">Dažniausios skaičiavimo klaidos:</div>
+                            <div class="summary-inner-container">
+                                <div class="table-container">
+                                    <div id="summary-table-for-student"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="mistakes-summary-grammar-for-student" style="display: none;">
+                            <div id="mistakes-table-title-grammar-for-student" class="task-info-subtitle">Dažniausios rašybos klaidos:</div>
+                            <div class="summary-inner-container">
+                                <div class="table-container">
+                                    <div id="summary-table-grammar-for-student"></div>
+                                </div>
+                            </div>
+                            <div id="sentence-with-mistake-field-for-student"></div>
+                        </div>
+
+                        <div id="task-description-outer-container-for-student">
+                            <div id="task-description-title-for-student" class="task-info-subtitle" style="display: none;">Užduoties aprašymas:</div>
+                            <div id="task-description-for-student"></div>
+                        </div>
+                    </div>
+                    <div class="">
+                        <button id="complete-task-button" class="btn btn-primary" onclick="completeTask()" style="display: none;">Atlikti užduotį</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ADMIN GUI -->
+<div id="admin-gui" class="flex-column justify-content-center align-items-center" style="display: none;">
+    <div class="row d-flex flex-column justify-content-center align-items-center" style="width: 50%; min-width: 50%;">
+        <h2>REMOVE USER</h2>
+        <input id="admin-remove-user-input" placeholder="user email">
+        <button id="admin-remove-user-button" onclick="deleteUser()" class="btn btn-primary" style="margin-top: 15px;">Remove user</button>
+    </div>
+    <div class="row d-flex flex-column justify-content-center align-items-center" style="width: 50%; min-width: 50%; margin-top: 100px;">
+        <h2>DELETE INACTIVE USERS</h2>
+        <input type="number" id="inactivePeriod" placeholder="period of inactivity (days)" min="1" />
+        <p id="statusMessage"></p>
+        <button onclick="deleteInactiveUsers()" class="btn btn-primary" style="margin-top: 15px;">Delete Inactive Users</button>
+    </div>
+</div>
+
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="../mental-arithmetic.js"></script>
+	<script src="../mental-arithmetic-combinations.js"></script>
+    <script src="matematika_options.js"></script>
+    <script src="pasirinkimai.js"></script>
+    <script src="../parameter_dictionary.js"></script>
+    <script src="../main-nav-bar.js"></script>
+
+	<script>
+        const redCircleColorCode = '#D57E7E';
+        const greenCircleColorCode = '#40c9a9';
+        let userData;
+
+        if (userDataString) {
+            userData = JSON.parse(userDataString);
+        } else {
+            window.location.href = '/LT';
+        }
+
+        let studentList;
+        let tasksList;
+        let currentTaskId;
+        let currentTaskInstructions;
+        let studentListDiv = document.getElementById('student-list')
+        let addingNewTask = false;
+        let deletingTask = false;
+        let deletingStudent = false;
+        let showingSelectAllCheckbox = false;
+        let taskContainerVisible = true;
+        let changingTeacher = false;
+        const teacherGUI = document.getElementById('teacher-gui');
+        const studentGUI = document.getElementById('student-gui');
+        const adminGUI = document.getElementById('admin-gui');
+        let studentTasksList = document.getElementById('student-tasks-list')
+        let taskInfoContainerForStudents = document.getElementById('task-info-container-for-students')
+        const newTaskButton = document.getElementById('new-task-button');
+        const deleteTaskButton = document.getElementById('delete-task-button');
+        const teacherMessageLine = document.getElementById('teacher-message-line');
+        const teacherDataRetrievalMessage = document.getElementById('teacher-data-retrieval-message');
+        const teacherMessageLine2 = document.getElementById('teacher-message-line-2');
+        const newTaskOptions = document.getElementById('new-task-options-container');
+        const studentTaskInfoContainer = document.getElementById('student-task-info-container');
+        const studentTaskStudentName = document.getElementById('student-task-student-name');
+        const studentTaskGroup = document.getElementById('student-task-group');
+
+        const studentTaskStatus = document.getElementById('student-task-status');
+        const studentScoreAnswerNumber = document.getElementById('student-score-asnwer-number');
+        const studentScoreMistakeNumber = document.getElementById('student-score-mistake-number');
+
+        const textComprehensionMistakesSummary = document.getElementById('text-comprehension-mistakes-summary');
+
+        const studentScoreDuration= document.getElementById('student-score-duration');
+        const studentScoreDurationForStudent = document.getElementById('student-score-duration-for-student');
+
+        let dynamicStudentContent = document.getElementById('dynamic-student-content');
+
+        let taskGroupForStudents = document.getElementById('task-group-for-students');
+        let taskStatusForStudents = document.getElementById('task-status-for-students');
+
+        let teacherName = document.getElementById('teacher-name');
+        const addTeacherInput = document.getElementById('add-teacher-input');
+        const addTeacherButton = document.getElementById('add-teacher');
+
+        const changeTeacherToggleButton = document.getElementById('change-teacher-toggle-button');
+        const changeTeacherInput = document.getElementById('change-teacher-input');
+        const changeTeacherButton = document.getElementById('change-teacher');
+
+        const deleteStudentButton = document.getElementById('delete-student-button');
+        const confirmDeleteStudentButton = document.getElementById('confirm-delete-student-button');
+
+        const studentListTitle = document.getElementById('student-list-title-container');
+        const studentListSelectAllCheckbox = document.getElementById('student-list-header-checkbox-container');
+        const selectAllCheckbox = document.getElementById('select-all-checkbox');
+
+        const studentMessage = document.getElementById('student-message');
+
+        const teacherDispalyStudentTaskIndicator = document.getElementById('student-task-status-indicator');
+        const mistakesSummaryTable = document.querySelector('#summary-table');
+
+        const taskDescriptionTitle = document.querySelector('#task-description-title');
+        const taskDescription = document.querySelector('#task-description');
+
+        const timerInputElementTeacher = document.querySelector('#timer-input');
+        let timerLabelElementTeacher = document.querySelector('.timer-label-teacher');
+
+        const studentTaskGroupForStudent = document.getElementById('student-task-group-for-student');
+        const studentScoreAnswerNumberForStudent = document.getElementById('student-score-asnwer-number-for-student');
+        const studentScoreMistakeNumberForStudent = document.getElementById('student-score-mistake-number-for-student');
+        const taskDescriptionForStudent = document.querySelector('#task-description-for-student');
+        const teacherDispalyStudentTaskIndicatorForStudent = document.getElementById('student-task-status-indicator-for-student');
+        const taskListTitleForStudents = document.getElementById('task-list-title-for-students');
+        const expandStudentInfoButton = document.getElementById('expand-student-info-button')
+
+        const completeTaskButton = document.getElementById('complete-task-button');
+
+        enableTeacherControlPannel();
+        enableNewTaskContainer();
+        document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
+
+
+        if (userData.teacher !== '' && userData.accType === "student") {
+            teacherName.innerHTML = `Mok. ${userData.teacher}`
+            addTeacherInput.style.display = "none";
+            addTeacherButton.style.display = "none";
+            changeTeacherToggleButton.style.display = "block"
+        } else {
+            addTeacherInput.style.display = "block";
+            addTeacherButton.style.display = "block";
+            changeTeacherToggleButton.style.display = "none"
+        }
+
+
+    function changeQuestionNumberLabel () {
+        if (document.getElementById('mode_choice').value === "kalba") {
+        if (document.getElementById('mode_choice_8').value === "tekstas") {
+            if (document.getElementById('mode_choice_4').value === "C40") {
+                    document.getElementById("question-number-input").value = 5;
+                    document.getElementById('answer-number-label-teacher').innerHTML = 'tekstus';
+                }
+        } else if (document.getElementById('mode_choice_8').value === "rasyba") {
+            if (document.getElementById('mode_choice_4').value === "C40") {
+                    document.getElementById("question-number-input").value = 20;
+                    document.getElementById('answer-number-label-teacher').innerHTML = 'sakinių';
+                }
+        } 
+        } else {
+            document.getElementById("question-number-input").value = 20;
+            document.getElementById('answer-number-label-teacher').innerHTML = 'veiksmų';
+        }
+        }
+
+    function updateModeChoice4() {
+        let modeChoice4ElementSelection = modeChoice4Element.value;
+        if (modeChoice4ElementSelection === "C39") {
+            timerInputDiv.style.display = 'flex';
+            questionNumberInputDiv.style.display = 'none';
+        } else if (modeChoice4ElementSelection === "C40") {
+            timerInputDiv.style.display = 'none';
+            questionNumberInputDiv.style.display = 'flex';
+        }
+        changeQuestionNumberLabel();
+    }
+
+    document.querySelector("#mode_choice_4").addEventListener('change', updateModeChoice4);
+
+    
+    function updateModeChoice4Options () {
+        document.getElementById('mode_choice_4').innerHTML = '';
+        if (document.getElementById('mode_choice').value === "kalba") {
+            if (document.getElementById('mode_choice_8').value === "tekstas") {
+                document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
+                document.getElementById('mode_choice_4').innerHTML += '<option value="C40">NUSTATYTI TEKSTŲ KIEKĮ</option>';
+
+            } else if (document.getElementById('mode_choice_8').value === "rasyba") {
+                document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
+                document.getElementById('mode_choice_4').innerHTML += '<option value="C40">NUSTATYTI SAKINIŲ KIEKĮ</option>';
+            }
+        } else {
+            document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
+            document.getElementById('mode_choice_4').innerHTML += '<option value="C40">NUSTATYTI VEIKSMŲ KIEKĮ</option>'; 
+        }
+        updateModeChoice4();
+    }
+
+
+    document.getElementById('mode_choice').addEventListener('change', updateModeChoice4Options);
+    document.getElementById('mode_choice_8').addEventListener('change', updateModeChoice4Options);
+    
+
+    timerInputElementTeacher.addEventListener("input", function(event) {
+      if (parseInt(timerInputElementTeacher.value) === 1 || parseInt(timerInputElementTeacher.value.slice(-1)[0]) === 1 && parseInt(timerInputElementTeacher.value) !== 11) {
+        timerLabelElementTeacher.innerHTML = 'minutę';
+      } else if ((parseInt(timerInputElementTeacher.value) > 1 && parseInt(timerInputElementTeacher.value) < 10) || (parseInt(timerInputElementTeacher.value) > 20 && parseInt(timerInputElementTeacher.value.slice(-1)[0]) !== 0)) {
+        timerLabelElementTeacher.innerHTML = 'minutes';
+      } else if (parseInt(timerInputElementTeacher.value) >= 10 ) {
+        timerLabelElementTeacher.innerHTML = 'minučių';
+      }
+    })
+
+    const questionNumberInputElementTeacher = document.querySelector('#question-number-input');
+    let answerNumberLabelTeacher = document.querySelector('.answer-number-label-teacher');
+
+    questionNumberInputElementTeacher.addEventListener("input", function(event) {
+        if (document.getElementById('mode_choice').value === "kalba") {
+        if (document.getElementById('mode_choice_8').value === "tekstas") {
+            if (parseInt(questionNumberInputElementTeacher.value) === 1 || parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElementTeacher.value) !== 11) {
+                answerNumberLabelTeacher.innerHTML = 'tekstą';
+            } else if ((parseInt(questionNumberInputElementTeacher.value) > 1 && parseInt(questionNumberInputElementTeacher.value) < 10) || (parseInt(questionNumberInputElementTeacher.value) > 20 && parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) !== 0))  {
+                answerNumberLabelTeacher.innerHTML = 'tekstus';
+            } else if (parseInt(questionNumberInputElementTeacher.value) >= 10) {
+                answerNumberLabelTeacher.innerHTML = 'tekstų';
+            }
+
+        } else if (document.getElementById('mode_choice_8').value === "rasyba") {
+            if (parseInt(questionNumberInputElementTeacher.value) === 1 || parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElementTeacher.value) !== 11) {
+                answerNumberLabelTeacher.innerHTML = 'sakinį';
+            } else if ((parseInt(questionNumberInputElementTeacher.value) > 1 && parseInt(questionNumberInputElementTeacher.value) < 10) || (parseInt(questionNumberInputElementTeacher.value) > 20 && parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) !== 0))  {
+                answerNumberLabelTeacher.innerHTML = 'sakinius';
+            } else if (parseInt(questionNumberInputElementTeacher.value) >= 10) {
+                answerNumberLabelTeacher.innerHTML = 'sakinių';
+            }
+        }
+        } else if (parseInt(questionNumberInputElementTeacher.value) === 1 || parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElementTeacher.value) !== 11) {
+            answerNumberLabelTeacher.innerHTML = 'veiksmą';
+        } else if ((parseInt(questionNumberInputElementTeacher.value) > 1 && parseInt(questionNumberInputElementTeacher.value) < 10) || (parseInt(questionNumberInputElementTeacher.value) > 20 && parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) !== 0))  {
+            answerNumberLabelTeacher.innerHTML = 'veiksmus';
+        } else if (parseInt(questionNumberInputElementTeacher.value) >= 10) {
+            answerNumberLabelTeacher.innerHTML = 'veiksmų';
+        }
+    })
+
+
+        function getOptionTextFromValues(values) {
+            function determineQuestionNumberTimeLabelEnding(type, string) {
+                if (type === "NUSTATYTI LAIKO TRUKMĘ") {
+                    durationTypeTag = ''
+                    if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                        durationTypeTag = 'MINUTĘ';
+                    } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                        durationTypeTag = 'MINUTES';
+                    } else if (parseInt(string) >= 10 ) {
+                        durationTypeTag = 'MINUČIŲ';
+                    }
+                    return ("PRAKTIKUOTIS " + string + " " + durationTypeTag)  
+                } else {
+                    if (values[0] === "math") {
+                    durationTypeTag = ''
+                    if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                        durationTypeTag = 'VEIKSMĄ';
+                    } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                        durationTypeTag = 'VEIKSMUS';
+                    } else if (parseInt(string) >= 10 ) {
+                        durationTypeTag = 'VEIKSMŲ';
+                    }
+                    return ("ATLIKTI " + string + " " + durationTypeTag)  
+                } else if (values[0] === "lang") {
+                    if (values[2] === "C49") {
+                        if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                            durationTypeTag = 'TEKSTĄ';
+                        } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                            durationTypeTag = 'TEKSTUS';
+                        } else if (parseInt(string) >= 10 ) {
+                            durationTypeTag = 'TEKSTŲ';
+                        }
+                        return ("SUDĖLIOTI " + string + " " + durationTypeTag)  
+                    } else if (values[2] === "C50") {
+                        if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                            durationTypeTag = 'SAKINYS';
+                        } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                            durationTypeTag = 'SAKINIAI';
+                        } else if (parseInt(string) >= 10 ) {
+                            durationTypeTag = 'SAKINIŲ';
+                        }
+                        return (string + " " + durationTypeTag)  
+                    }
+
+                }
+            }
+            }
+ 
+            result = []
+            final_results = []
+            if (values[0] === "math") {
+
+            result.push(parameterDictionary[values[1]]["decodedParameterText"])
+            result.push(parameterDictionary[values[2]]["decodedParameterText"])
+            result.push(values[3] ? "PERŽENGIANT DEŠIMTĮ" : "NEPERŽENGIANT DEŠIMTIES")
+            result.push(parameterDictionary[values[4]]["decodedParameterText"])
+            result.push(parameterDictionary[values[5]]["decodedParameterText"])
+            if (values[5] === "C42") {
+                if (values[1] === "C1") {
+                    result.push("NEŽINOMAS DĖMUO")
+                } else if (values[1] === "C2") {
+                    if (values[6] === "C43") {
+                        result.push("NEŽINOMAS TURINYS")
+                    } else if (values[6] === "C44") {
+                        result.push("NEŽINOMAS ATĖMINYS")
+                    } 
+                } else if (values[1] === "C3") {
+                    result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS")
+                } else if (values[1] === "C4") {
+                    result.push("NEŽINOMAS DAUGINAMASIS")
+                } else if (values[1] === "C5") {
+                    if (values[6] === "C45") {
+                        result.push("NEŽINOMAS DALINYS")
+                    } else if (values[6] === "C46") {
+                        result.push("NEŽINOMAS DALIKLIS")
+                    }
+                } else if (values[1] === "C6") {
+                    result.push("NEŽINOMAS DAUGINAMASIS / DALINYS / DALIKLIS")
+                } else if (values[1] === "C7") {
+                    result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS / DAUGINAMASIS / DALINYS / DALIKLIS")
+                }
+            } else {
+                result.push(parameterDictionary[values[6]]["decodedParameterText"])
+            }
+
+            result.push(parameterDictionary[values[7]]["decodedParameterText"])
+            result.push(values[8])
+            result.push(values[9] ? "DALYBA SU LIEKANA" : "DALYBA BE LIEKANOS")
+            result.push(values[10])
+
+            final_results.push(result[0])
+
+            if (result[0] === "SUDĖTIS" || result[0] === "ATIMTIS" || result[0] === "SUDĖTIS IR ATIMTIS") {
+                final_results.push(result[1])
+                final_results.push(result[2])
+                final_results.push(result[4])
+                if (result[4] === "SKAITINĖ LYGYBĖ") {
+                    final_results.push(result[6])  
+                } else if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+                    final_results.push(result[5])  
+                }
+                final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))
+            } else if (result[0] === "DAUGYBA") {
+                final_results.push(result[1])
+                if (result[1] === "DAUGYBOS LENTELĖ") {
+                final_results.push(`FROM ${result[7][0]} TO ${result[7][1]}`)
+                }
+                final_results.push(result[4])
+                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+                    final_results.push(result[5])    
+                }
+                final_results.push(result[6])
+                final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))    
+            } else if (result[0] === "DALYBA" || result[0] === "DAUGYBA IR DALYBA") {
+                final_results.push(result[1])
+                if (result[1] === "DAUGYBOS LENTELĖ") {
+                final_results.push(`FROM ${result[7][0]} TO ${result[7][1]}`)
+                }
+                final_results.push(result[8])
+                final_results.push(result[4])
+                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+                    final_results.push(result[5])    
+                }
+                final_results.push(result[6])
+                final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))    
+            } else if (result[0] === "ĮVAIRŪS VEIKSMAI") {
+                final_results.push(result[1])
+                final_results.push(result[4])
+                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+                    final_results.push(result[5])    
+                }
+                final_results.push(result[6]) 
+                final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))       
+            }
+
+        } else if (values[0] === "lang") {
+            result.push(parameterDictionary[values[1]]["decodedParameterText"])
+            result.push(parameterDictionary[values[2]]["decodedParameterText"])
+            
+            if (values[3] === "1") {
+                result.push("1 SAKINYS EKRANE")
+            } else if (values[3] === "2") {
+                result.push("2 SAKINIAI EKRANE")
+            } else if (values[3] === "3") {
+                result.push("3 SAKINIAI EKRANE")
+            } else if (values[3] === "4") {
+                result.push("4 SAKINIAI EKRANE")
+            } else if (values[3] === "5") {
+                result.push("5 SAKINIAI EKRANE")
+            } else {
+                result.push(values[3])
+            }      
+
+            let outerLiItem = document.createElement('li');
+            outerLiItem.textContent = "RAŠYBOS NUSTATYMAI:"; // Add a label for the outer <li>
+
+            let grammarParamsList = document.createElement('ul');
+            grammarParamsList.classList.add('grammar-params-list');
+
+            Object.keys(values[4]).forEach(key => {
+                let listItem = document.createElement('li');
+                listItem.innerHTML = parameterDictionary[key]["decodedParameterText"]; // Use innerHTML instead of textContent
+                grammarParamsList.appendChild(listItem);
+            });
+
+            outerLiItem.appendChild(grammarParamsList);
+
+
+            // Store as an HTML string
+            result.push(outerLiItem.outerHTML);
+
+            result.push(parameterDictionary[values[5]]["decodedParameterText"])
+            result.push(parameterDictionary[values[6]]["decodedParameterText"])
+            result.push(values[9])
+            if (values[8] === 1) {
+                result.push("DAŽNESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
+            } else {
+                result.push("RETESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
+            }
+            result.push(parameterDictionary[values[7]]["decodedParameterText"])
+
+            final_results.push(result[0])
+            final_results.push(result[1])
+            if (result[1] === "TEKSTO SUPRATIMAS") {
+                final_results.push(parameterDictionary[result[2]]["decodedParameterText"])
+                final_results.push(result[8])
+                final_results.push(determineQuestionNumberTimeLabelEnding(result[4], result[6])) 
+            } else if (result[1] === "RAŠYBA") {
+                final_results.push(result[2])
+                final_results.push(result[3])
+                if (result[0] === "3-4 KLASĖ") {
+                    if ("C62" in values[4] || "C63" in values[4] || "C64" in values[4] || "C65" in values[4]) {
+                            final_results.push(result[5])
+                        } 
+                    } else {
+                        final_results.push(result[7])
+                    }
+                final_results.push(determineQuestionNumberTimeLabelEnding(result[4], result[6])) 
+            }
+        }
+
+            return final_results;
+        }
+
+        function toggleStudentListLabel() {
+            showingSelectAllCheckbox = !showingSelectAllCheckbox
+            const dropdown = document.getElementById("task-group-sorting");
+            if (showingSelectAllCheckbox) {
+                studentListTitle.style.display = "none"
+                studentListSelectAllCheckbox.style.display = "flex"
+                selectAllCheckbox.checked = false
+            } else {
+                studentListTitle.style.display = "flex"
+                studentListSelectAllCheckbox.style.display = "none"
+                selectAllCheckbox.checked = false
+            }
+        }
+
+        document.getElementById('select-all-checkbox').addEventListener('change', function () {
+            const checkboxes = document.querySelectorAll('#student-list input[type="checkbox"]');
+
+            checkboxes.forEach(checkbox => {
+                if (getComputedStyle(checkbox).visibility !== 'hidden') {
+                    checkbox.checked = this.checked;
+                }
+            });
+        });
+
+        function toggleDeleteStudent() {
+            deletingStudent = !deletingStudent
+            const dropdown = document.getElementById("task-group-sorting");
+            toggleStudentListLabel();
+            clearTaskInfoContainer();
+            if (deletingStudent) {
+                // Set the selected option to "Visos užduočių grupės"
+                dropdown.value = "Visos užduočių grupės";
+                // Manually trigger the change event
+                dropdown.dispatchEvent(new Event("change"));
+                dropdown.disabled = true;
+                taskContainerVisible = true;
+                toggleTaskVisibility()
+
+                document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+                checkbox.style.visibility = "visible";
+                checkbox.disabled = false;
+            });
+            } else {
+                taskContainerVisible = false;
+                toggleTaskVisibility()
+                document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+                checkbox.style.visibility = "hidden";
+                checkbox.checked = false;
+            });
+                dropdown.disabled = false;
+            }
+        }
+
+        async function deleteStudents() {
+            let studentsToRemove = [];
+            document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+                if (checkbox.checked) {
+                    studentsToRemove.push(parseInt(checkbox.value));
+                }
+            });
+            
+            if (studentsToRemove.length === 0) {
+                messageToTheUser("Pasirinkite bent vieną mokinį pašalinimui!");
+                return
+            }
+
+            const studentIdsBeingRemoved = studentsToRemove.map(id => parseInt(id));
+    
+            // Find matching students and collect assignmentIds
+            const assignmentIds = [];
+            
+            studentList.forEach(student => {
+                if (studentIdsBeingRemoved.includes(student.id)) {
+                    student.tasks.forEach(task => {
+                        assignmentIds.push(task.assignmentId);
+                    });
+                }
+            });
+
+            disableTeacherControlPannel();
+
+            deletingTask = true
+            await deleteTasks(assignmentIds)
+
+            try {
+                // Prepare the list of tasks to delete (assuming tasksToTemove is already populated)
+                const studentsToDelete = studentsToRemove;  // Ensure this array holds task IDs to be deleted
+
+                const response = await fetch(apiBase + 'students', {
+                    method: 'DELETE',  // Change to DELETE method
+                    headers: {
+                        'Authorization': userData.token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ studentIds: studentsToDelete })  // Send the list as JSON in the body
+                });
+
+                if (!response.ok) {
+                    const errorData  = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+                }
+
+                // Optionally, handle the response if needed (e.g., confirm deletion or update the UI)
+                const result = await response.json().catch(() => ({}));
+                if (result.message === "Student removal successful.") {
+                    fetchDataForTeachers()
+                    messageToTheUser("Mokinių šalinimas sėkmingas.");
+                } 
+
+            } catch (error) {
+                console.log('Error deleting tasks:', error);
+                if (error.message === "Unauthorized") {
+                    clearUserData();
+                    window.location.href = "prisijungimas";
+                } else {
+                    messageToTheUser('Nepavyko pašalinti mokinių. Bandykite vėl vėliau.');
+                }
+            } finally {
+                enableTeacherControlPannel();
+                showingSelectAllCheckbox = true;
+                toggleDeleteStudent() 
+                clearTaskInfoContainer();
+                hideConfirmationButtons();
+            }
+        }
+
+
+        async function addTeacher() {
+            const teacherId = addTeacherInput.value;
+            if (!teacherId) return;
+
+            addTeacherButton.innerHTML = "Pridedama...";
+            document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = true);
+            disableTeacherControlPannel();
+            try {
+                const response = await fetch(apiBase + 'students', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': userData.token
+                    },
+                    body: JSON.stringify({ teacherId })
+                });
+
+                // Safely parse response (fallback if JSON fails)
+                const responseData = await response.json().catch(() => ({}))
+
+                if (!response.ok) {
+                    if (responseData.message === "Unauthorized") {
+                        clearUserData();
+                        window.location.href = "prisijungimas";
+                    } else if (responseData.error === 'Invalid teacher ID') {
+                        studentMessage.innerHTML = "Neteisingas mokytojo ID numeris."
+                    } else if (responseData.error === 'Relationship already exists') {
+                        studentMessage.innerHTML = "Šis mokytojas jau yra jūsų sąraše."
+                    } else if (responseData.error === 'Student already has a teacher. Use PUT to update instead.') {
+                        studentMessage.innerHTML = "Jau turi pridėtą mokytoją."
+                    } else {
+                        throw new Error(`Server error: ${response.status}`);
+                    }
+                } else {
+                userData.teacher = responseData.teacherInfo
+                localStorage.setItem('userData', JSON.stringify(userData))
+
+                if (userData.teacher === '') {
+                    addTeacherInput.style.display = "block";
+                    addTeacherButton.style.display = "block";
+                    changeTeacherToggleButton.style.display = "none"
+                } else {
+                    teacherName.innerHTML = `Mok. ${userData.teacher}`
+                    addTeacherInput.style.display = "none";
+                    addTeacherButton.style.display = "none";
+                    changeTeacherToggleButton.style.display = "block"
+                }
+                studentMessage.innerHTML = "Mokytojas pridėtas sėkmingai."
+            }
+            } catch (error) {
+                console.log('Full error:', error);
+                studentMessage.innerHTML = "Įvyko klaida. Bandykite vėl vėliau."
+            }
+            addTeacherButton.innerHTML = "Pridėti mokytoją";
+            document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
+        }
+
+        async function changeTeacher() {
+            const teacherId = changeTeacherInput.value;
+            if (!teacherId) return;
+
+            changeTeacherButton.innerHTML = "Keičiama..."
+            document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = true);   
+            try {
+                const response = await fetch(apiBase + 'students', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': userData.token
+                    },
+                    body: JSON.stringify({ teacherId })
+                });
+
+                // Safely parse response (fallback if JSON fails)
+                const responseData = await response.json().catch(() => ({}))
+
+                if (!response.ok) {
+                    if (responseData.message === "Unauthorized") {
+                        clearUserData();
+                        window.location.href = "prisijungimas";
+                    } else if (response.status === 400 && responseData.error === 'Invalid teacher ID') {
+                        studentMessage.innerHTML = "Neteisingas mokytojo ID numeris."
+                    } else if (response.status === 404 && responseData.error === 'No existing teacher relationship found') {
+                        studentMessage.innerHTML = "Nerastas esamas mokytojo ryšys. Pirmiausia pridėkite mokytoją."
+                    } else if (response.status === 400 && responseData.error === 'Student already has this teacher') {
+                        studentMessage.innerHTML = "Šis mokytojas jua pridėtas."
+                    } else if (response.status === 400 && responseData.error === 'No existing teacher relationship found. Use POST to create one.') {
+                        studentMessage.innerHTML = "Neturi pridėto mokytojo."
+                    } else {
+                        throw new Error(`Server error: ${response.status}`);
+                    }
+                } else {
+                    userData.teacher = responseData.teacherInfo
+                    localStorage.setItem('userData', JSON.stringify(userData))
+
+                    if (userData.teacher === '') {
+                        addTeacherInput.style.display = "block";
+                        addTeacherButton.style.display = "block";
+                        changeTeacherToggleButton.style.display = "none"
+                    } else {
+                        teacherName.innerHTML = `Mok. ${userData.teacher}`
+                        teacherName.style.display = "block"
+                        addTeacherInput.style.display = "none";
+                        addTeacherButton.style.display = "none";
+                        changeTeacherInput.style.display = "none";
+                        changeTeacherButton.style.display = "none";
+                        changeTeacherToggleButton.style.display = "block"
+                        changeTeacherToggle();
+                    }
+                    deleteAllTasks();
+                    studentMessage.innerHTML = "Mokytojas sėkmingai pakeistas."
+                }
+            } catch (error) {
+                console.log('Full error:', error);
+                studentMessage.innerHTML = "Įvyko klaida keičiant mokytoją. Bandykite vėl vėliau."
+            }
+            changeTeacherButton.innerHTML = "Keisti mokytoją"
+            document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
+        }
+
+        function clearTaskInfoContainer() {
+            studentTaskStudentName.innerHTML = '';
+            studentTaskGroup.innerHTML = '';
+            studentScoreAnswerNumber.innerHTML = '';
+            studentScoreMistakeNumber.innerHTML = '';
+            mistakesSummaryTable.innerHTML = '';
+            taskDescription.innerHTML = '';
+            taskDescriptionTitle.style.display = "none"
+            teacherDispalyStudentTaskIndicator.style.display = "none"
+            studentStatisticsCompletedTasks.innerHTML = '';
+            studentStatisticsCompletedTasks.style.display = "none";
+            studentStatisticsMathDiv.style.display = "none";
+            studentStatisticsMathErrorFrequency.innerHTML = '';
+            studentStatisticsLangDiv.style.display = "none";
+            studentStatisticsGrammarErrorFrequency.innerHTML = '';
+            studentStatisticsTextComprahensionDiv.style.display = "none";
+            studentStatisticsKomponavimasErrorFrequency.innerHTML = '';
+            studentStatisticsIsdestymasErrorFrequency.innerHTML = '';
+            document.querySelector("#mistakes-summary-math").style.display = "none";
+            document.querySelector("#mistakes-summary-grammar").style.display = "none";
+            studentStatisticsTextComprahensionIsdestymasTitle.style.display = "none";
+            studentStatisticsTextComprahensionKomponavimasTitle.style.display = "none";
+            studentTaskCompletionDate.innerHTML = '';
+            document.querySelector("#summary-table-grammar").innerHTML = "";
+            document.querySelector("#summary-table").innerHTML = "";
+            document.querySelector("#sentence-with-mistake-field").innerHTML = "";
+            textComprehensionMistakesSummary.innerHTML = "";
+            studentScoreDuration.innerHTML = "";
+            studentStatisticsIsdestymasCompletedTexts.innerHTML = "";
+            studentStatisticsKomponavimasCompletedTexts.innerHTML = "";
+        }
+
+        function clearTaskInfoContainerForStudents() {
+            studentTaskGroupForStudent.innerHTML = '';
+            studentScoreAnswerNumberForStudent.innerHTML = '';
+            studentScoreMistakeNumberForStudent.innerHTML = '';
+            document.querySelector("#summary-table-for-student").innerHTML = '';
+            taskDescriptionForStudent.innerHTML = '';
+            teacherDispalyStudentTaskIndicatorForStudent.style.display = "none"
+            studentTaskCompletionDateForStudents.innerHTML = '';
+            document.querySelector("#summary-table-grammar-for-student").innerHTML = "";
+            document.querySelector("#summary-table-for-student").innerHTML = "";
+            document.querySelector("#sentence-with-mistake-field-for-student").innerHTML = "";
+            studentScoreDurationForStudent.innerHTML = ""
+        }
+
+        function clearStudentMessage() {
+            studentMessage.innerHTML = '';
+        }
+
+        let studentStatisticsCompletedTasks = document.querySelector("#student-statistics-completed-tasks");
+        const studentStatisticsMathDiv = document.querySelector("#student-statistics-math");
+        const studentStatisticsMathErrorFrequency = document.querySelector("#student-statistics-math-error-frequency");
+        const studentStatisticsLangDiv = document.querySelector("#student-statistics-lang-grammar") 
+        const studentStatisticsGrammarErrorFrequency = document.querySelector("#student-statistics-grammar-error-frequency");
+        const studentStatisticsTextComprahensionDiv = document.querySelector("#student-statistics-lang-text-comprahension")
+        const studentStatisticsKomponavimasErrorFrequency = document.querySelector("#student-statistics-komponavimas-error-frequency"); 
+        const studentStatisticsIsdestymasErrorFrequency = document.querySelector("#student-statistics-isdestymas-error-frequency"); 
+
+        const studentStatisticsKomponavimasCompletedTexts = document.querySelector("#student-statistics-komponavimas-completed-texts"); 
+        const studentStatisticsIsdestymasCompletedTexts = document.querySelector("#student-statistics-isdestymas-completed-texts"); 
+
+        const studentStatisticsTextComprahensionIsdestymasTitle = document.querySelector("#student-statistics-lang-text-comprahension-isdestymas")
+        const studentStatisticsTextComprahensionKomponavimasTitle = document.querySelector("#student-statistics-lang-text-comprahension-komponavimas")
+
+        const studentTaskCompletionDate = document.querySelector("#student-task-completion-date")
+        const studentTaskCompletionDateForStudents = document.querySelector("#student-task-completion-date-for-students")
+        
+
+        function displayStudentStatistics(student, studentTasks) {
+            function processStudentTasks(studentTasks) {
+                // Initialize the result objects
+                const mathTasks = [[0, 0], []];
+                const grammarTasks = [[0, 0], []];
+                const komponavimasTasks = [[0, 0], []];
+                const isdestymasTasks = [[0, 0], []];
+
+                // Filter tasks with status true
+                const filteredTasks = studentTasks.filter(task => task.status);
+
+                for (const task of filteredTasks) {
+                    try {
+                        const taskDesc = JSON.parse(task.taskDescription);
+                        const result = JSON.parse(task.result);
+
+                        if (taskDesc[0] === "math") {
+                            // Process math tasks
+                            mathTasks[0][0] += result[0][0];
+                            mathTasks[0][1] += result[0][1];
+                            mathTasks[1].push(...result[1]);
+                        } else if (taskDesc[0] === "lang") {
+                            if (taskDesc[2] === "C50") {
+                                // Process grammar tasks
+                                grammarTasks[0][0] += result[0][0];
+                                grammarTasks[0][1] += result[0][1];
+                                grammarTasks[1].push(...result[1]);
+                            } else if (taskDesc[2] === "C49") {
+                                if (taskDesc[3] === "C51") {
+                                    // Process komponavimas tasks
+                                    komponavimasTasks[0][0] += result[0][0];
+                                    komponavimasTasks[0][1] += result[0][1];
+                                    komponavimasTasks[1].push([[...result[1]], task.completionDate.split("T")[0]]);
+                                } else if (taskDesc[3] === "C52") {
+                                    // Process isdestymas tasks
+                                    isdestymasTasks[0][0] += result[0][0];
+                                    isdestymasTasks[0][1] += result[0][1];
+                                    isdestymasTasks[1].push([[...result[1]], task.completionDate.split("T")[0]]);
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        // Skip tasks with invalid taskDescription or result format
+                        console.error("Error processing task:", error);
+                        continue;
+                    }
+                }
+
+                    return {
+                        math: mathTasks,
+                        grammar: grammarTasks,
+                        komponavimas: komponavimasTasks,
+                        isdestymas: isdestymasTasks
+                    };
+            }
+
+            function countTaskStatuses(studentTasks, category = null) {
+                let trueCount = 0;
+                let falseCount = 0;
+                let filteredTasks = studentTasks;
+
+                if (category) {
+                    filteredTasks = studentTasks.filter(task => {
+                        try {
+                            const taskDesc = JSON.parse(task.taskDescription);
+                            // Check for different possible category locations
+                            return taskDesc[0] === category || 
+                                taskDesc[2] === category || 
+                                taskDesc[3] === category;
+                        } catch (e) {
+                            console.error("Error parsing taskDescription:", e);
+                            return false;
+                        }
+                    });
+                }
+
+                const total = filteredTasks.length;
+
+                for (const task of filteredTasks) {
+                    if (task.status === true) {
+                        trueCount++;
+                    } else if (task.status === false) {
+                        falseCount++;
+                    }
+                }
+
+                return {
+                    total: total,
+                    completed: trueCount,
+                    pending: falseCount,
+                };
+            }
+
+        clearTaskInfoContainer();
+        studentTaskInfoContainer.style.display = 'flex';
+        studentTaskStudentName.innerHTML = `${student[1]} (ID: ${student[0]})`;
+
+
+        studentStatisticsCompletedTasks.style.display = "block";
+
+        const taskStatusSummary = countTaskStatuses(studentTasks)
+        studentStatisticsCompletedTasks.innerHTML = `<span class="task-info-subtitle">Baigtos užduotys:</span> ${taskStatusSummary.completed}/${taskStatusSummary.total}`
+
+        const categorizedStudentTasks = processStudentTasks(studentTasks)
+
+
+        if (countTaskStatuses(studentTasks, "math").completed > 0)
+            studentStatisticsMathDiv.style.display = "block";
+            mistakeFrequency = Math.round(categorizedStudentTasks.math[0][1]/categorizedStudentTasks.math[0][0]*100)
+            if (!isNaN(mistakeFrequency)) {
+            studentStatisticsMathErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.math[0][1]}/${categorizedStudentTasks.math[0][0]} (${mistakeFrequency}%)`;
+            }
+
+        if (countTaskStatuses(studentTasks, "C50").completed > 0) {
+            studentStatisticsLangDiv.style.display = "block";
+            mistakeFrequency = Math.round(categorizedStudentTasks.grammar[0][1]/categorizedStudentTasks.grammar[0][0]*100)
+            if (!isNaN(mistakeFrequency)) {
+                studentStatisticsGrammarErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.grammar[0][1]}/${categorizedStudentTasks.grammar[0][0]} (${mistakeFrequency}%)`;
+            }
+        }
+
+        if (countTaskStatuses(studentTasks, "C51").completed > 0 || countTaskStatuses(studentTasks, "C52").completed > 0) {
+            studentStatisticsTextComprahensionDiv.style.display = "block";
+        }
+
+        if (countTaskStatuses(studentTasks, "C51").completed > 0) {
+            mistakeFrequency = Math.round(categorizedStudentTasks.komponavimas[0][1]/categorizedStudentTasks.komponavimas[0][0]*100)
+            if (!isNaN(mistakeFrequency)) {
+                studentStatisticsKomponavimasErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.komponavimas[0][1]}/${categorizedStudentTasks.komponavimas[0][0]} (${mistakeFrequency}%)`;
+                studentStatisticsTextComprahensionKomponavimasTitle.style.display = "block";
+            }
+        }
+
+        if (countTaskStatuses(studentTasks, "C52").completed > 0) {
+            mistakeFrequency = Math.round(categorizedStudentTasks.isdestymas[0][1]/categorizedStudentTasks.isdestymas[0][0]*100)
+            if (!isNaN(mistakeFrequency)) {
+                studentStatisticsIsdestymasErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.isdestymas[0][1]}/${categorizedStudentTasks.isdestymas[0][0]} (${mistakeFrequency}%)`;
+                studentStatisticsTextComprahensionIsdestymasTitle.style.display = "block";
+            }
+        }
+
+
+        const combinedMathAndGrammarMistakes = [...categorizedStudentTasks.math[1], ...categorizedStudentTasks.grammar[1]]
+
+        if (combinedMathAndGrammarMistakes.length > 0) {
+            generateSummaryTable("custom", combinedMathAndGrammarMistakes, "summary-table", "summary-table-grammar") 
+        }
+
+
+        document.querySelector("#mistakes-summary-math").style.display = "block";
+        document.querySelector("#mistakes-summary-grammar").style.display = "block";
+        if (document.querySelector("#summary-table").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table").innerHTML === '') {
+            document.querySelector("#mistakes-summary-math").style.display = "none";
+        }
+        if (document.querySelector("#summary-table-grammar").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table-grammar").innerHTML === '') {
+            document.querySelector("#mistakes-summary-grammar").style.display = "none";
+        }
+
+        function displayComletedTextIdsForTextComp(textInfo, htmlContainer) {
+            const ul = document.createElement("ol");
+            const textComprehensionTextsTitle = document.createElement("div");
+            textComprehensionTextsTitle.innerHTML = "Sudėlioti tekstai:";
+            textComprehensionTextsTitle.classList.add("task-info-subtitle");
+
+            // 1. Extract all [textId, mistakes, date] triples
+            const allEntries = [];
+            const entries = textInfo.slice(1)[0]; // Skip metadata (e.g., [2, 1])
+
+            for (const entry of entries) {
+                const [texts, date] = entry; // each entry is [texts, taskDate]
+
+                for (const text of texts) { // texts is an array of [textId, textMistakes]
+                    const [textId, textMistakes] = text;
+                    allEntries.push({ textId, textMistakes, date });
+                }
+            }
+
+            // 2. Sort by textId (ascending, converted to number)
+            allEntries.sort((a, b) => Number(a.textId) - Number(b.textId));
+
+            // 3. Display sorted entries
+            for (const { textId, textMistakes, date } of allEntries) {
+                const li = document.createElement("li");
+                const textIdSpan = document.createElement("span");
+                const mistakesNumberSpan = document.createElement("span");
+                const completionDataSpan = document.createElement("span");
+
+                textIdSpan.innerHTML = `ID${textId}`;
+                textIdSpan.classList.add("text-comprehenstion-text-id");
+
+                // Lithuanian pluralization
+                let numberLabel;
+                const mistakesNum = Number(textMistakes);
+                if (mistakesNum === 0 || (mistakesNum > 9 && mistakesNum < 21)) {
+                    numberLabel = "klaidų";
+                } else if (mistakesNum === 1 || String(mistakesNum).endsWith("1")) {
+                    numberLabel = "klaida";
+                } else {
+                    numberLabel = "klaidos";
+                }
+
+                mistakesNumberSpan.innerHTML = `: ${textMistakes} ${numberLabel}`;
+                completionDataSpan.innerHTML = ` (${date})`;
+                textIdSpan.dataset.textId = textId;
+
+                textIdSpan.addEventListener("click", () => {
+                    const id = event.currentTarget.dataset.textId;
+                    textDatabaseEntryLocator(id);
+                });
+
+                li.appendChild(textIdSpan);
+                li.appendChild(mistakesNumberSpan);
+                li.appendChild(completionDataSpan);
+                ul.appendChild(li);
+            }
+
+            htmlContainer.appendChild(textComprehensionTextsTitle);
+            htmlContainer.appendChild(ul);
+        }
+
+        if (categorizedStudentTasks.isdestymas[1].length > 0) {
+            displayComletedTextIdsForTextComp(categorizedStudentTasks.isdestymas, studentStatisticsIsdestymasCompletedTexts)
+        }
+        if (categorizedStudentTasks.komponavimas[1].length > 0) {
+            displayComletedTextIdsForTextComp(categorizedStudentTasks.komponavimas, studentStatisticsKomponavimasCompletedTexts)
+        }
+    }
+                
+
+        function displayTaskInfo(student, task) {
+            clearTaskInfoContainer();
+
+            studentTaskInfoContainer.style.display = 'flex';
+            taskDescriptionTitle.style.display = "block"
+            teacherDispalyStudentTaskIndicator.style.display = "block"
+
+            const parsedTaskDescription = JSON.parse(task.taskDescription);
+            const formattedTaskDescription = getOptionTextFromValues(parsedTaskDescription);
+            studentTaskStudentName.innerHTML = `${student[1]} (ID: ${student[0]})`;
+            studentTaskGroup.innerHTML = `Užduotis: ${task.group}`;
+            teacherDispalyStudentTaskIndicator.style.backgroundColor = task.status ? greenCircleColorCode : redCircleColorCode;
+            if (task.status) {
+                studentTaskCompletionDate.innerHTML = `<span class="task-info-subtitle">Data</span>: ${task.completionDate.split('T')[0]}`
+            }
+            if (task.result !== '') {
+                const parsedTaskResult = JSON.parse(task.result)
+                const score = parsedTaskResult[0]
+                const textComprehensionrResults = parsedTaskResult[1]
+
+                if (JSON.parse(task.taskDescription)[2] === "C49") {
+                    const ul = document.createElement("ol");
+                    const textComprehensionTextsTitle = document.createElement("div");
+                    textComprehensionTextsTitle.innerHTML = "Sudėlioti tekstai:";
+                    textComprehensionTextsTitle.classList.add("task-info-subtitle");
+
+                    textComprehensionrResults.forEach(([outerKey, value]) => {
+                        const li = document.createElement("li");
+                        const textIdSpan = document.createElement("span");
+                        const mistakesNumberSpan = document.createElement("span");
+                        textIdSpan.innerHTML = `ID${outerKey}`;
+                        textIdSpan.classList.add("text-comprehenstion-text-id");
+                        let numberLabel = ''
+                        if (Number(value) === 0 || (Number(value) > 9 && Number(value) < 21)) {
+                            numberLabel = "klaidų";
+                        } else if (Number(value) === 1 || Number(value.toString().slice(-1)) === 1) {
+                            numberLabel = "klaida";
+                        } else if (Number(value) < 10 || Number(value) > 21) {
+                            numberLabel = "klaidos";
+                        }
+                        mistakesNumberSpan.innerHTML = `: ${value} ${numberLabel}`;
+                        textIdSpan.dataset.textId = outerKey;
+
+                        li.appendChild(textIdSpan)
+                        li.appendChild(mistakesNumberSpan)
+
+                        textIdSpan.addEventListener("click", () => {
+                            const id = event.currentTarget.dataset.textId;
+                            textDatabaseEntryLocator(id);
+                        });
+
+                        ul.appendChild(li);
+                    });
+                    textComprehensionMistakesSummary.appendChild(textComprehensionTextsTitle);
+                    textComprehensionMistakesSummary.appendChild(ul);
+                }
+
+                const taskInfo = JSON.parse(task.taskDescription)
+                if ((taskInfo[0] === "math" && taskInfo[4] === "C40") || (taskInfo[0] === "lang" && taskInfo[5] === "C40")) {
+                    studentScoreDuration.innerHTML = `<span class="task-info-subtitle">Trukmė:</span> ${JSON.parse(task.result)[2]}`
+                }
+
+                if (parsedTaskDescription[0] === "math") {
+                    studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Atlikti veiksmai:</span> ${score[0]}`;
+                    studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
+                } else if (parsedTaskDescription[0] === "lang") {
+                    if (parsedTaskDescription[2] === "C50") {
+                        studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Įrašytos raidės:</span> ${score[0]}`;
+                        studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
+                    } else if (parsedTaskDescription[2] === "C49") {
+                        studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Sudėliotų tekstų skaičius:</span> ${score[0]}`;
+                        studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
+                    }
+                }
+
+                if (taskInfo[0] === "math" || (taskInfo[0] === "lang" && taskInfo[2] === "C50")) {
+                    let mistakesList = [];
+                    mistakesList = JSON.parse(task.result)[1]
+                    if (mistakesList.length > 0) {
+                        generateSummaryTable("custom", mistakesList) 
+                    }
+                }
+
+                if (parsedTaskDescription[0] === "math") {
+                    document.querySelector("#mistakes-summary-math").style.display = "block";
+                    document.querySelector("#mistakes-summary-grammar").style.display = "none";
+                } else if (parsedTaskDescription[0] === "lang" && parsedTaskDescription[2] === "C50") {
+                    document.querySelector("#mistakes-summary-math").style.display = "none";
+                    document.querySelector("#mistakes-summary-grammar").style.display = "block";
+                } else {
+                    document.querySelector("#mistakes-summary-math").style.display = "none";
+                    document.querySelector("#mistakes-summary-grammar").style.display = "none";
+                }
+
+                if (document.querySelector("#summary-table").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table").innerHTML === '') {
+                    document.querySelector("#mistakes-summary-math").style.display = "none";
+                }
+                if (document.querySelector("#summary-table-grammar").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table-grammar").innerHTML === '') {
+                    document.querySelector("#mistakes-summary-grammar").style.display = "none";
+                }
+            }
+
+            taskDescriptionList = document.createElement('ul');
+            taskDescriptionList.classList.add("task-description-list");
+
+            formattedTaskDescription.forEach(item => {
+                if (item) {  // Ensure empty values are not added
+                    let listItem = document.createElement('li');
+                    
+                    // Check if item contains an HTML tag, then use innerHTML
+                    if (item.includes("<")) {
+                        listItem.innerHTML = item; // Render HTML properly
+                    } else {
+                        listItem.textContent = item; // Use textContent for plain text
+                    }
+                    
+                    listItem.classList.add("task-description-list-item");
+                    taskDescriptionList.appendChild(listItem);
+                }
+            });
+
+            taskDescription.appendChild(taskDescriptionList);
+
+        }
+
+        function displayStudentTaskInfo(task) {
+            clearTaskInfoContainerForStudents()
+            currentTaskInstructions = task.taskInstructions;
+            currentTaskId = task.assignmentId
+            const parsedTaskDescription = JSON.parse(task.taskInstructions);
+            const formattedTaskDescription = getOptionTextFromValues(parsedTaskDescription);
+
+
+            studentTaskGroupForStudent.innerHTML = `Užduotis: ${task.group}`;
+
+            teacherDispalyStudentTaskIndicatorForStudent.style.display = "block";
+            teacherDispalyStudentTaskIndicatorForStudent.style.backgroundColor = task.status ? greenCircleColorCode : redCircleColorCode;
+            if (task.status) {
+                studentTaskCompletionDateForStudents.innerHTML = `<span class="task-info-subtitle">Data</span>: ${task.completionDate.split('T')[0]}`
+            }
+
+            if (task.status) {
+                completeTaskButton.style.display = "none"
+            } else {
+                completeTaskButton.style.display = "block"
+            }
+
+            if (task.result !== '') {
+                const parsedTaskResult = JSON.parse(task.result)
+                const score = parsedTaskResult[0]
+                const textComprehensionrResults = parsedTaskResult[1]
+
+                const taskInfo = JSON.parse(task.taskInstructions)
+                if ((taskInfo[0] === "math" && taskInfo[4] === "C40") || (taskInfo[0] === "lang" && taskInfo[5] === "C40")) {
+                    studentScoreDurationForStudent.innerHTML = `<span class="task-info-subtitle">Trukmė:</span> ${JSON.parse(task.result)[2]}`
+                }
+
+ 
+                if (parsedTaskDescription[0] === "math") {
+                    studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Atlikti veiksmai:</span> ${score[0]}`;
+                    studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Klaidos</span>: ${score[1]}`;
+                } else if (parsedTaskDescription[0] === "lang") {
+                    if (parsedTaskDescription[2] === "C50") {
+                        studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Irašytos raidės:</span> ${score[0]}`;
+                        studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
+                    } else if (parsedTaskDescription[2] === "C49") {
+                        studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Sudėliotų tekstų skaičius:</span> ${score[0]}`;
+                        studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
+                    }
+                }
+
+                if (taskInfo[0] === "math" || (taskInfo[0] === "lang" && taskInfo[2] === "C50")) {
+                    let mistakesList = [];
+                    mistakesList = JSON.parse(task.result)[1]
+                    if (mistakesList.length > 0) {
+                        generateSummaryTable("custom", mistakesList, "summary-table-for-student", "summary-table-grammar-for-student") 
+                    }
+                }
+
+                if (parsedTaskDescription[0] === "math") {
+                    document.querySelector("#mistakes-summary-math-for-student").style.display = "block";
+                    document.querySelector("#mistakes-summary-grammar-for-student").style.display = "none";
+                } else if (parsedTaskDescription[0] === "lang" && parsedTaskDescription[2] === "C50") {
+                    document.querySelector("#mistakes-summary-math-for-student").style.display = "none";
+                    document.querySelector("#mistakes-summary-grammar-for-student").style.display = "block";
+                } else {
+                    document.querySelector("#mistakes-summary-math-for-student").style.display = "none";
+                    document.querySelector("#mistakes-summary-grammar-for-student").style.display = "none";
+                }
+
+                if (document.querySelector("#summary-table-for-student").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table-for-student").innerHTML === "") {
+                    document.querySelector("#mistakes-summary-math-for-student").style.display = "none";
+                }
+                if (document.querySelector("#summary-table-grammar-for-student").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table-grammar-for-student").innerHTML === "") {
+                    document.querySelector("#mistakes-summary-grammar-for-student").style.display = "none";
+                }
+
+                if (taskInfo[0] === "math" || (taskInfo[0] === "lang" && taskInfo[2] === "C50")) {
+                    let mistakesList = [];
+                    mistakesList = JSON.parse(task.result)[1]
+                    if (mistakesList.length > 0) {
+                        generateSummaryTable("custom", mistakesList, "summary-table-for-student") 
+                    }
+                }
+            }
+
+            taskDescriptionList = document.createElement('ul');
+            taskDescriptionList.classList.add("task-description-list")
+            formattedTaskDescription.forEach(item => {
+                if (item) {  // Ensure empty values are not added
+                    let listItem = document.createElement('li');
+                    
+                    // Check if item contains an HTML tag, then use innerHTML
+                    if (item.includes("<")) {
+                        listItem.innerHTML = item; // Render HTML properly
+                    } else {
+                        listItem.textContent = item; // Use textContent for plain text
+                    }
+                    
+                    listItem.classList.add("task-description-list-item");
+                    taskDescriptionList.appendChild(listItem);
+                }
+            });
+            let description = document.createElement('div');
+            description.innerHTML = '<span class="task-info-subtitle">Užduoties aprašymas:</span>'
+
+            taskDescriptionForStudent.appendChild(description);
+            taskDescriptionForStudent.appendChild(taskDescriptionList);
+            clearStudentMessage();
+        }
+
+        function populateTaskGroupDropdown() {
+            const dropdown = document.getElementById("task-group-sorting");
+            dropdown.innerHTML = ''; // Clear existing options
+
+            // Create a Set to store unique task groups
+            const taskGroups = new Set();
+
+            // Iterate through students and collect unique task group names
+            studentList.forEach(student => {
+                student.tasks.forEach(task => {
+                    taskGroups.add(task.group);
+                });
+            });
+
+            // Convert Set to sorted array
+            const sortedGroups = ["Visos užduočių grupės", ...Array.from(taskGroups).sort()];
+
+            // Populate dropdown with options
+            sortedGroups.forEach(group => {
+                const option = document.createElement("option");
+                option.value = group;
+                option.textContent = group;
+                dropdown.appendChild(option);
+            });
+        }
+
+        function handleTaskGroupChange() {
+            const dropdown = document.getElementById("task-group-sorting");
+            
+            dropdown.addEventListener("change", () => {
+                const selectedGroup = dropdown.value;
+
+                // Filter students based on the selected task group
+                const filteredStudents = selectedGroup === "Visos užduočių grupės"
+                    ? studentList
+                    : studentList
+                        .map(student => ({
+                            ...student,
+                            tasks: student.tasks.filter(task => task.group === selectedGroup)
+                        }))
+                        .filter(student => student.tasks.length > 0); // Remove students with no tasks after filtering
+
+                // Re-render with the filtered student list
+                taskContainerVisible = false;
+                toggleTaskVisibility();
+                renderDataForTeachers(filteredStudents);
+            });
+        }
+
+        // Ensure the function runs after populating the dropdown
+        handleTaskGroupChange();
+        
+        function renderDataForTeachers(filteredList = studentList) {
+        studentListDiv.innerHTML = '';
+
+        // Sort students alphabetically by nickname
+        const sortedStudents = [...filteredList].sort((a, b) => a.nickname.localeCompare(b.nickname));
+
+        const listContainer = document.createElement('ul');
+
+        sortedStudents.forEach((student, studentIndex) => {
+        const studentElement = document.createElement('li');
+        studentElement.classList.add('student-li-item');
+
+        // Student checkbox
+        const studentCheckbox = document.createElement('input');
+        studentCheckbox.type = 'checkbox';
+        studentCheckbox.id = `student-${student.id}`;
+        studentCheckbox.value = student.id;
+        studentCheckbox.classList.add('student-checkbox');
+        studentCheckbox.style.visibility = 'hidden';
+
+        // Student label with numbering
+        const studentName = document.createElement('div');
+        studentName.classList.add('student-name');
+        studentName.classList.add('selection-option');
+        studentName.style.cursor = 'pointer';
+        studentName.innerHTML = `${studentIndex + 1}. ${student.nickname} (ID: ${student.id})`;
+
+        studentName.addEventListener('click', () => {
+            // Remove 'selected-option' class from all task names
+            document.querySelectorAll('.selection-option').forEach(name => {
+                name.classList.remove('selected-option');
+            });
+
+            // Add 'selected-option' class to the clicked task
+            studentName.classList.add('selected-option');
+
+            // Display task info
+            displayStudentStatistics([student.id, student.nickname], student.tasks);
+            if (document.querySelector(`#tasks-${student.id}`).style.display === "none") {
+                document.querySelector(`#tasks-${student.id}`).style.display = "block";
+            }
+
+            openSidebar();
+        });
+
+        // Student-level task status circles
+        const studentCircleContainer = document.createElement('div');
+        studentCircleContainer.classList.add('student-li-entry-tasks-indicatior');
+
+        // Tasks container
+        const tasksContainer = document.createElement('ul');
+        tasksContainer.id = `tasks-${student.id}`;
+        tasksContainer.classList.add('task-container');
+
+        student.tasks.forEach((task, taskIndex) => {
+            const taskWrapper = document.createElement('li');
+            taskWrapper.classList.add('task-li-item');
+
+            // Task checkbox
+            const taskCheckbox = document.createElement('input');
+            taskCheckbox.type = 'checkbox';
+            taskCheckbox.id = `task-${task.assignmentId}`;
+            taskCheckbox.value = task.assignmentId;
+            taskCheckbox.classList.add('task-checkbox');
+            taskCheckbox.style.visibility = "hidden";
+            taskCheckbox.disabled = true;
+
+            // Task label with numbering
+            const taskName = document.createElement('div');
+            taskName.innerHTML = `${taskIndex + 1}. ${task.group}`;
+            taskName.style.cursor = 'pointer';
+            taskName.classList.add('task-name');
+            taskName.classList.add('selection-option');
+            taskName.addEventListener('click', () => {
+                // Remove 'selected-option' class from all task names
+                document.querySelectorAll('.selection-option').forEach(task => {
+                    task.classList.remove('selected-option');
+                });
+
+                // Add 'selected-option' class to the clicked task
+                taskName.classList.add('selected-option');
+
+                // Display task info
+                displayTaskInfo([student.id, student.nickname], task);
+
+                openSidebar();
+            });
+
+            // Task status circle
+            const taskCircle = document.createElement('div');
+            taskCircle.classList.add('student-list-task-indicatior');
+            taskCircle.style.backgroundColor = task.status ? greenCircleColorCode : redCircleColorCode;
+
+            // Append elements to task wrapper
+            taskWrapper.appendChild(taskCheckbox);
+            taskName.appendChild(taskCircle);
+            taskWrapper.appendChild(taskName);
+
+            // Append task to tasks container
+            tasksContainer.appendChild(taskWrapper);
+        });
+
+        // Append elements to student element
+        studentElement.appendChild(studentCheckbox);
+        studentElement.appendChild(studentName);
+
+        const outerStudentListItem = document.createElement('div');
+        outerStudentListItem.classList.add('outer-student-list-entry-item');
+        outerStudentListItem.appendChild(studentElement);
+        outerStudentListItem.appendChild(tasksContainer);
+
+        // Append student element to main list
+        listContainer.appendChild(outerStudentListItem);
+    });
+
+    studentListDiv.appendChild(listContainer);
+
+    if (deletingTask) {  
+        document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+        checkbox.style.visibility = "visible";
+        checkbox.disabled = false;
+        });
+    }
+}
+
+
+
+        function toggleTaskVisibility() {
+            taskContainerVisible = !taskContainerVisible;
+            if (taskContainerVisible) {
+                expandStudentInfoButton.innerHTML = '&#x2212;';
+                document.querySelectorAll('.task-container').forEach(container => {
+                    container.style.display = 'block';
+                });
+            } else {
+                expandStudentInfoButton.innerHTML = '+';
+                document.querySelectorAll('.task-container').forEach(container => {
+                    container.style.display = 'none';
+                });
+            }
+        }
+
+        function changeTeacherToggle () {
+            changingTeacher = !changingTeacher;
+            if (changingTeacher) {
+                changeTeacherInput.style.display = "block";
+                changeTeacherButton.style.display = "block";
+                teacherName.style.display = "none";
+                changeTeacherToggleButton.innerHTML = "Atšaukti"
+            } else {
+                changeTeacherInput.style.display = "none";
+                changeTeacherButton.style.display = "none";
+                teacherName.style.display = "block";
+                changeTeacherToggleButton.innerHTML = "Keisti mokytoją"   
+            }
+        }
+
+
+        function renderDataForStudents() {
+
+        if (userData.teacher === '') {
+            addTeacherInput.style.display = "block";
+            addTeacherButton.style.display = "block";
+            changeTeacherToggleButton.style.display = "none"
+        } else {
+            teacherName.innerHTML = `Mok. ${userData.teacher}`
+        }
+
+            tasksList.forEach((task, taskIndex) => {
+                const taskWrapper = document.createElement('li');
+                taskWrapper.classList.add('task-li-item');
+                taskWrapper.classList.add('task-li-item-for-students');
+
+                // Task checkbox
+                const taskCheckbox = document.createElement('input');
+                taskCheckbox.type = 'checkbox';
+                taskCheckbox.id = `task-${task.assignmentId}`;
+                taskCheckbox.value = task.assignmentId;
+                taskCheckbox.classList.add('task-checkbox');
+                taskCheckbox.style.visibility = "hidden";
+                taskCheckbox.disabled = true;
+
+                // Task label with numbering
+                const taskName = document.createElement('div');
+                taskName.innerHTML = `${taskIndex + 1}. ${task.group}`;
+                taskName.style.cursor = 'pointer';
+                taskName.classList.add('task-name');
+                taskName.classList.add('selection-option');
+                taskName.addEventListener('click', () => {
+                    // Remove 'selected-option' class from all task names
+                    document.querySelectorAll('.selection-option').forEach(task => {
+                        task.classList.remove('selected-option');
+                    });
+
+                    // Add 'selected-option' class to the clicked task
+                    taskName.classList.add('selected-option');
+
+                    // Display task info
+                    displayStudentTaskInfo(task);
+                });
+
+                // Task status circle
+                const taskCircle = document.createElement('div');
+                taskCircle.classList.add('student-list-task-indicatior');
+                taskCircle.style.backgroundColor = task.status ? greenCircleColorCode : redCircleColorCode;
+
+                // Append elements to task wrapper
+                //taskWrapper.appendChild(taskCheckbox);
+                taskName.appendChild(taskCircle);
+                taskWrapper.appendChild(taskName);
+
+                // Append task to tasks container
+                studentTasksList.appendChild(taskWrapper);
+            });
+
+            const totalTasks = tasksList.length;
+            const completedTasks = tasksList.filter(task => task.status === true).length;
+            if (totalTasks.length === 0) {
+                taskListTitleForStudents.innerHTML = "Užduotys:"
+            } else {
+                taskListTitleForStudents.innerHTML = `Užduotys (atlikta ${completedTasks}/${totalTasks}):`
+            }
+        }
+
+
+
+
+        const apiBase = 'http://localhost:5000/'
+
+        async function fetchDataForTeachers() {
+            let success = false;
+            const closer = messageToTheUser("Mokinių ir užduočių informacija ieškoma duomenų bazėje. Procesas gali užtrukti kelias minutes.", false);
+            newTaskButton.disabled = true
+            deleteTaskButton.disabled = true
+            deleteStudentButton.disabled = true
+            try {
+                const response = await fetch(apiBase + 'students', {
+                    method: 'GET',
+                    headers: { 'Authorization': userData.token }
+                });
+
+                if (!response.ok) {
+                    const errorData  = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+                }
+
+                studentList = await response.json().catch(() => ({}));
+                success = true;
+                populateTaskGroupDropdown();
+                renderDataForTeachers();
+            } catch (error) {
+                console.log('Error fetching data:', error);
+                if (error.message === "Unauthorized") {
+                    clearUserData();
+                    window.location.href = "prisijungimas";
+                } else {
+                    messageToTheUser('Nepavyko pasiekti duomenų. Bandykite vėl vėliau.');
+                }
+            }
+            if (success) {
+                setTimeout(() => closer(), 0);
+            }
+            newTaskButton.disabled = false
+            deleteTaskButton.disabled = false
+            deleteStudentButton.disabled = false
+        }
+
+
+        async function fetchDataForStudents() {
+            let success = false;
+            studentMessage.innerHTML = 'Užduočių informacija ieškoma duomenų bazėje. Procesas gali užtrukti kelias minutes.'
+            try {
+                const response = await fetch(apiBase + 'tasks', {
+                    method: 'GET',
+                    headers: { 'Authorization': userData.token }
+                });
+
+                if (!response.ok) {
+                    const errorData  = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+                }
+
+                tasksList = await response.json().catch(() => ({}));
+                success = true;
+                renderDataForStudents();
+
+            } catch (error) {
+                console.log('Error fetching data:', error);
+                if (error.message === "Unauthorized") {
+                    clearUserData();
+                    window.location.href = "prisijungimas";
+                } else {
+                    studentMessage.innerHTML = 'Nepavyko pasiekti duomenų. Bandykite vėl vėliau.'
+                }
+            }
+            if (success) {
+                studentMessage.innerHTML = ""
+            }
+        }
+    
+
+    function toggleAddNewTask() {
+        addingNewTask = !addingNewTask
+        toggleStudentListLabel();
+        const dropdown = document.getElementById("task-group-sorting");
+        if (addingNewTask) {
+            // Set the selected option to "Visos užduočių grupės"
+            dropdown.value = "Visos užduočių grupės";
+            // Manually trigger the change event
+            dropdown.dispatchEvent(new Event("change"));
+            dropdown.disabled = true;
+            
+            taskContainerVisible = true;
+            toggleTaskVisibility();
+            studentTaskInfoContainer.style.display = 'none'; 
+            document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+            checkbox.style.visibility = 'visible';
+
+            const taskGroup = document.querySelector('#task-group-sorting');
+            const groupName = document.querySelector('#group_name');
+
+            openSidebar();
+        });
+            newTaskOptions.style.display = 'flex';
+
+        } else {
+            taskContainerVisible = false;
+            toggleTaskVisibility();
+            studentTaskInfoContainer.style.display = 'flex'; 
+            document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+            checkbox.style.visibility = 'hidden';
+            checkbox.checked = false;
+        });
+            newTaskOptions.style.display = 'none';
+            dropdown.disabled = false;
+        }
+    }
+
+    function toggleDeleteTask() {
+        deletingTask = !deletingTask
+        toggleStudentListLabel();
+        if (deletingTask) {
+            taskContainerVisible = false;
+            toggleTaskVisibility();
+            document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+            checkbox.style.visibility = "visible";
+            checkbox.disabled = false;
+        });
+        } else {
+            taskContainerVisible = false;
+            toggleTaskVisibility();
+            document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+            checkbox.style.visibility = "hidden";
+            checkbox.checked = false;
+            checkbox.disabled = true;
+        });
+        }
+    }
+
+    function deleteSelectedTasks() {
+        let tasksToRemove = [];
+        document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+            if (checkbox.checked) {
+                tasksToRemove.push(parseInt(checkbox.value));
+            }
+        });
+
+        if (tasksToRemove.length === 0) {
+            messageToTheUser( "Pasirinkite bent vieną užduotį ištrynimui!")
+            return
+        }
+
+        deleteTasks(tasksToRemove)
+    }
+
+    async function deleteAllTasks() {
+        try {
+                const response = await fetch(apiBase + 'tasks', {
+                    method: 'GET',
+                    headers: { 'Authorization': userData.token }
+                });
+
+                if (!response.ok) {
+                    const errorData  = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+                }
+
+                const allStudentsTasks = await response.json().catch(() => ({}));
+                const assignmentIds = allStudentsTasks.map(task => task.assignmentId);
+                deleteTasks(assignmentIds)
+                
+            } catch (error) {
+                console.log('Error fetching tasks:', error);
+                if (error.message === "Unauthorized") {
+                    clearUserData();
+                    window.location.href = "prisijungimas";
+                } else {
+                    teacherMessageLine.innerHTML = 'Nepavyko pasiekti duomenų. Bandykite vėl vėliau.'
+                }
+            }
+    }
+
+
+    async function deleteTasks(tasksToRemove) {
+
+        try {
+            // Prepare the list of tasks to delete (assuming tasksToTemove is already populated)
+            const tasksToDelete = tasksToRemove;  // Ensure this array holds task IDs to be deleted
+
+            disableTeacherControlPannel()
+            const response = await fetch(apiBase + 'tasks', {
+                method: 'DELETE',  // Change to DELETE method
+                headers: {
+                    'Authorization': userData.token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ tasks: tasksToDelete })  // Send the list as JSON in the body
+            });
+
+            if (!response.ok) {
+                const errorData  = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+            }
+
+            // Optionally, handle the response if needed (e.g., confirm deletion or update the UI)
+            const result = await response.json().catch(() => ({}));
+            if (result.message === "Tasks and their associated assignments deleted successfully.") {
+                messageToTheUser("Užduotys pašalintos sėkmingai!")
+                fetchDataForTeachers()
+            }
+
+        } catch (error) {
+            console.log('Error fetching tasks:', error);
+            if (error.message === "Unauthorized") {
+                clearUserData();
+                window.location.href = "prisijungimas";
+            } else {
+                messageToTheUser("Nepavyko pašalinti užduočių. Bandykite vėl vėliau.")
+            }
+        } finally {
+            enableTeacherControlPannel();
+            clearTaskInfoContainer();
+            hideConfirmationButtons();
+            toggleDeleteTask()
+        }
+    }
+    
+    async function setTask() {
+        function removeError(element) { 
+            element.classList.remove('invalid-submition'); 
+        };
+
+        const selectedStudents = Array.from(document.querySelectorAll('.student-checkbox'))
+            .filter(checkbox => checkbox.checked)
+            .map(checkbox => parseInt(checkbox.value))
+
+        if (selectedStudents.length === 0) {
+            messageToTheUser("Pasirinkite bent vieną mokinį!");
+            return
+        }
+
+        const groupName = document.getElementById('group_name').value.trim();
+        let modeChoice1 = document.getElementById('mode_choice_1').value
+        let modeChoice2 = document.getElementById('mode_choice_2').value
+        let modeChoice3 = document.getElementById('mode_choice_3').value
+        const modeChoice4 = document.getElementById('mode_choice_4').value
+        let modeChoice5 = document.getElementById('mode_choice_5').value
+        const modeChoice6 = document.getElementById('mode_choice_6').value
+        const modeChoice7 = document.getElementById('mode_choice_7').value
+        const classChoiceSelection = document.querySelector('#class_choice').value;
+        const timerInput = document.getElementById('timer-input').value
+        const questionNumberInput = document.getElementById('question-number-input').value
+        const remainderInput = document.getElementById('remainder-input').checked
+
+        const selectedNumberElement = document.querySelector('#selected_number');
+        const selectedNumber2Element = document.querySelector('#selected_number_2');
+        let selectedNumbers = [selectedNumberElement.value, selectedNumber2Element.value].sort();
+
+        let modeChoiceSelection = document.querySelector('#mode_choice').value;
+        let mode;
+        if (modeChoiceSelection === "matematika") {
+            mode = 'math';
+        } else if (modeChoiceSelection === "kalba") {
+            mode = 'lang';
+        }
+
+        if (groupName.length === 0) {
+            messageToTheUser("Įveskite grupės pavadinimą!")
+            return
+        } else if (groupName.length >= 60) {
+            messageToTheUser("Maksimalus grupės pavadinimo ilgis yra 60 simbolių.")
+            return
+        }
+
+        let modeChoice3Processed;
+        if (modeChoice3 === "C37") {
+            modeChoice3Processed = true;
+			} else if (modeChoice3 === "C38") {
+				modeChoice3Processed = false;
+			}
+
+        let durationType;
+        if (modeChoice4 === "C39") {
+            durationType = timerInput;
+        } else if (modeChoice4 === "C40") {
+            durationType = questionNumberInput;
+        }
+
+        const modeChoiceElementSelection = document.querySelector('#mode_choice').value;
+        let task = []
+        if (modeChoiceElementSelection === "matematika") {
+            task = [
+                mode, modeChoice1, modeChoice2, modeChoice3Processed, modeChoice4, 
+                modeChoice5, modeChoice6, modeChoice7, selectedNumbers, 
+                remainderInput, durationType, "C79"
+            ];
+        } else if (modeChoiceElementSelection === "kalba") {
+            const classChoiceSelection = document.querySelector('#class_choice').value;
+            classChoice = classChoiceSelection;
+
+            let modeChoice8Selection = document.querySelector('#mode_choice_8').value;
+            if (modeChoice8Selection === "tekstas") {
+                modeChoice1 = "C49";
+            } else if (modeChoice8Selection === "rasyba") {
+                modeChoice1 = "C50";
+            }
+
+            const modeChoice9Selection = document.querySelector('#mode_choice_9').value;
+
+            if (modeChoice9Selection === "C53") {
+                modeChoice2 = "1";
+            } else if (modeChoice9Selection === "C54") {
+                modeChoice2 = "2";
+            } else if (modeChoice9Selection === "C55") {
+                modeChoice2 = "3";
+            } else if (modeChoice9Selection === "C56") {
+                modeChoice2 = "4";
+            } else if (modeChoice9Selection === "C57") {
+                modeChoice2 = "5";
+            } else {
+                modeChoice2 = modeChoice9Selection;
+            }
+
+            modeChoice3 = getSelectedRasybaConditions();
+
+            const modeChoice12Selection = document.querySelector('#mode_choice_12').value;
+            modeChoice5 = modeChoice12Selection;
+
+            const modeChoiceLtDifficulty = document.getElementById('mode_choice_10').value;
+
+            let questionFrequency;
+            if (classChoice === "C75") {
+                    let modeChoice13Selection = document.querySelector('#mode_choice_13').value;
+					questionFrequency = Number(modeChoice13Selection);
+				} else {
+					questionFrequency = 1;
+				}
+
+            task = [
+                mode, classChoiceSelection, modeChoice1, modeChoice2, modeChoice3, modeChoice4,
+                modeChoice5, modeChoiceLtDifficulty, questionFrequency, durationType
+            ];
+        }
+
+        const normalizedTask = JSON.stringify(task);
+
+        const taskData = {
+            students: selectedStudents,
+            group_name: groupName,
+            task: normalizedTask
+        }
+
+        disableNewTaskContainer();
+        disableTeacherControlPannel();
+        try {
+        const response = await fetch(apiBase + 'tasks', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': userData.token
+            },
+            body: JSON.stringify(taskData)
+        });
+
+        // First parse the response as JSON
+        const responseData = await response.json().catch(() => ({}));
+        
+
+        if (responseData.message === 'Task set successfully') {
+            messageToTheUser('Užduotis sukurta sėkmingai!')
+            toggleAddNewTask();
+            fetchDataForTeachers()
+        } else if (responseData.message === 'Some students already have the maximum allowed tasks per student.') {
+            messageToTheUser('Galima sukurti tik 6 užduotis per mokinį. Išstrinkite seną užduotį, kad galėtumėte sukurti naują.')
+        } else {
+            throw new Error(responseData.message || `HTTP error! Status: ${response.status}`);
+        }
+        } catch (error) {
+            console.log('Error fetching tasks:', error);
+            if (error.message === "Unauthorized") {
+                clearUserData();
+                window.location.href = "prisijungimas";
+            } else {            
+                clearTimeout(timeoutReference);
+                submitNewTaskButton.classList.add('invalid-submition')
+                var timeoutReference = setTimeout(function() {
+                    removeError(submitNewTaskButton);
+                }, 500);
+                messageToTheUser('Nepavyko pridėti užduoties. Bandykite vėl vėliau.');
+        }
+        } finally {
+            enableTeacherControlPannel();
+            enableNewTaskContainer();
+            hideConfirmationButtons();
+        }
+    }
+
+
+    function completeTask() {
+        const parsedCurrentTaskInstructions = JSON.parse(currentTaskInstructions);
+
+        if (localStorage.getItem('controller') !== null) {
+				controller = JSON.parse(localStorage.getItem('controller'))
+			}
+
+			var checkbox = document.getElementById("remainder-input");
+
+            controller.language = "LT";
+            if (parsedCurrentTaskInstructions[0] === "math") {
+                controller.mode = 'math';
+                controller.modeChoice1 = parsedCurrentTaskInstructions[1];
+                controller.modeChoice2 = parsedCurrentTaskInstructions[2];
+                controller.selectedNumbers = parsedCurrentTaskInstructions[8];
+                controller.withRemainder = parsedCurrentTaskInstructions[9];
+                controller.modeChoice3 = parsedCurrentTaskInstructions[3];
+                controller.modeChoice4 = parsedCurrentTaskInstructions[4];
+                controller.modeChoice5 = parsedCurrentTaskInstructions[5];
+                controller.modeChoice6 = parsedCurrentTaskInstructions[6];
+                controller.modeChoice7 = parsedCurrentTaskInstructions[7];
+                controller.modeChoice8 = "C79";
+                controller.taskId = currentTaskId;
+                controller.taskCompleted = false;
+                controller.setTaskDuration = parsedCurrentTaskInstructions[10];
+
+            } else if (parsedCurrentTaskInstructions[0] === "lang") {
+                controller.mode = 'lang';
+                controller.classChoice = parsedCurrentTaskInstructions[1];
+				controller.modeChoice1 = parsedCurrentTaskInstructions[2];
+				controller.modeChoice2 = parsedCurrentTaskInstructions[3];
+				controller.modeChoice3 = parsedCurrentTaskInstructions[4];
+                controller.modeChoice4 = parsedCurrentTaskInstructions[5];
+				controller.modeChoice5 = parsedCurrentTaskInstructions[6];
+				controller.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[7];
+	            controller.questionFrequency = parsedCurrentTaskInstructions[8];
+                controller.taskId = currentTaskId;
+                controller.taskCompleted = false;
+                controller.setTaskDuration = parsedCurrentTaskInstructions[9];
+            }
+
+			localStorage.setItem('controller', JSON.stringify(controller))
+
+            startQuestions();
+    }
+
+    if (userData) {
+        if (userData.accType === 'teacher') {
+            teacherGUI.style.display = 'flex';
+            fetchDataForTeachers();
+        } else if (userData.accType === 'student') {
+            studentGUI.style.display = 'flex';
+            fetchDataForStudents();
+        } else if (userData.accType === 'admin') {
+            adminGUI.style.display = 'flex';
+        }
+    }
+
+    async function deleteUser() {
+    const usernameInput = document.getElementById('admin-remove-user-input');
+    const username = usernameInput.value.trim();
+    
+    if (!username) {
+        alert('Please enter a username');
+        return;
+    }
+    
+    try {
+        // 1. Verify current user is admin
+        if (userData.accType !== 'admin') {
+            alert('Only admin accounts can delete users');
+            return;
+        }
+
+        // 2. Get target user info
+        const userResponse = await fetch(`${apiBase}auth/?username=${encodeURIComponent(username)}`, {
+            headers: {
+                'Authorization': userData.token
+            }
+        });
+        
+        const userInfo = await userResponse.json();
+        
+        if (!userInfo.id) {
+            alert('User not found');
+            return;
+        }
+
+        // 3. Delete user's task assignments
+        if (userInfo.assignmentIds?.length > 0) {
+            await deleteTasks(userInfo.assignmentIds);
+        }
+
+        // 4. Delete user and all associations
+        const deleteResponse = await fetch(`${apiBase}auth/${userInfo.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': userData.token
+            }
+        });
+
+        if (!deleteResponse.ok) {
+            throw new Error(deleteResponse.status === 403 
+                ? 'Admin privileges required' 
+                : 'Failed to delete user');
+        }
+
+        alert('User deleted successfully');
+        usernameInput.value = '';
+    } catch (error) {
+        console.error('Deletion error:', error);
+        alert(`Error: ${error.message}`);
+    }
+}
+
+async function deleteInactiveUsers() {
+    const inactivePeriod = document.getElementById('inactivePeriod').value;
+    const statusElement = document.getElementById('statusMessage');
+    statusElement.innerHTML = ''; // Clear previous messages
+    
+    try {
+        // Validate admin access
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        if (userData?.accType !== 'admin') {
+            statusElement.innerHTML = '<span class="error">Only admin accounts can delete users</span>';
+            return;
+        }
+
+        // Validate input
+        if (!inactivePeriod || isNaN(inactivePeriod)) {
+            statusElement.innerHTML = '<span class="error">Please enter a valid number of days</span>';
+            return;
+        }
+
+        // Make API request
+        const response = await fetch(`${apiBase}admin/inactive?inactivePeriod=${encodeURIComponent(inactivePeriod)}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': userData.token,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const responseData = await response.json().catch(() => ({}));
+        
+        if (!response.ok) {
+            throw new Error(responseData.message || 'Failed to delete inactive users');
+        }
+
+        // Display success message with count and threshold
+        statusElement.innerHTML = `
+            <span class="success">${responseData.message}</span><br>
+            <span class="info">Deleted ${responseData.deletedCount || 0} users inactive for more than ${responseData.inactiveThresholdDays} days</span>
+        `;
+        
+    } catch (error) {
+        // Handle different error cases
+        let errorMessage = error.message;
+        
+        if (error.message.includes('No inactive users found')) {
+            errorMessage = `No users found inactive for ${inactivePeriod} days`;
+        } else if (error.message.includes('Failed to fetch')) {
+            errorMessage = 'Network error - please check your connection';
+        }
+
+        statusElement.innerHTML = `<span class="error">${errorMessage}</span>`;
+        console.error('Delete inactive users error:', error);
+    }
+}
+
+function disableTeacherControlPannel() {
+    const parentDiv = document.getElementById('student-details-for-teachers');
+    const children = parentDiv.querySelectorAll('button, input, select, textarea');  // Add more form elements if needed
+    children.forEach(child => child.disabled = true);
+}
+
+function enableTeacherControlPannel() {
+    const parentDiv = document.getElementById('student-details-for-teachers');
+    const children = parentDiv.querySelectorAll('button, input, select, textarea');
+    children.forEach(child => child.disabled = false);
+}
+
+function disableNewTaskContainer() {
+    const parentDiv = document.getElementById('new-task-options-container');
+    const children = parentDiv.querySelectorAll('button, input, select, textarea');  // Add more form elements if needed
+    children.forEach(child => child.disabled = true);
+}
+
+function enableNewTaskContainer() {
+    const parentDiv = document.getElementById('new-task-options-container');
+    const children = parentDiv.querySelectorAll('button, input, select, textarea');
+    children.forEach(child => child.disabled = false);
+}
+
+function passTextIdToTheLocatorFunction() {
+    // Get the input value
+    const inputElement = document.getElementById('view-text-id-input');
+        const inputValue = inputElement.value;
+        
+    // Extract only the numeric part
+    const id = parseInt(inputValue.replace(/\D/g, '')) || 0;
+    textDatabaseEntryLocator(id)
+}
+
+async function textDatabaseEntryLocator(id) { 
+    id = Number(id)
+    document.querySelector("#text-message").innerHTML = ''
+    document.querySelector("#text-title").innerHTML = ''
+    document.querySelector("#text-author").innerHTML = ''
+    document.querySelector("#text-start").innerHTML = ''
+    document.querySelector("#text-middle").innerHTML = ''
+    document.querySelector("#text-end").innerHTML = ''
+    document.querySelector("#text-distractor").innerHTML = ''
+    document.querySelector("#text-compatibility").innerHTML = ''
+    document.querySelector("#text-id").innerHTML = ''
+
+    try {
+        // Fetch the JSON data (note: this path is relative to where the HTML is served)
+        const response = await fetch('../databases/sudedu_duomenu_baze.json');
+        if (!response.ok) {
+            throw new Error('Failed to load database');
+        }
+        
+        const data = await response.json();
+        
+        // Find the entry with matching ID
+        const entry = data.find(item => item.id === id);
+        
+        if (!entry) {
+            document.querySelector("#text-message").innerHTML = `Tekstas su ID${id} nerastas.`;
+            return
+        }
+
+        // Check if "komponavimas" or "struktura" exists in suitable-for
+        const suitableKeys = entry["suitable-for"] ? Object.keys(entry["suitable-for"]) : [];
+        const hasKomponavimasOrStruktura = suitableKeys.includes("komponavimas") || suitableKeys.includes("struktura");
+        if (!hasKomponavimasOrStruktura) {
+            document.querySelector("#text-message").innerHTML = `Tekstas su ID${id} nerastas.`;
+            return;
+        }
+
+        document.querySelector("#text-title").innerHTML = `<span id="text-subtitle">Pavadinimas:</span> ${entry.title}`
+        document.querySelector("#text-author").innerHTML = `<span id="text-subtitle">Autorius:</span> ${entry.author}`
+        const containerStart = document.querySelector("#text-start");
+        // Start with a subtitle
+        let htmlStart = `<span id="text-subtitle">Pradžia:</span>`;
+        // Add each item in its own div
+        entry.text.start.forEach(item => {
+            htmlStart += `<div class="text-individual-items">${item}</div>`;
+        });
+        containerStart.innerHTML = htmlStart;
+
+        const containerMiddle = document.querySelector("#text-middle");
+        // Start with a subtitle
+        let htmlMiddle = `<span id="text-subtitle">Ivykio raida:</span>`;
+        // Add each item in its own div
+        entry.text.middle.forEach(item => {
+            htmlMiddle += `<div class="text-individual-items">${item}</div>`;
+        });
+        containerMiddle.innerHTML = htmlMiddle;
+
+        const containerEnd = document.querySelector("#text-end");
+        // Start with a subtitle
+        let htmlEnd = `<span id="text-subtitle">Pabaiga:</span>`;
+        // Add each item in its own div
+        entry.text.end.forEach(item => {
+            htmlEnd += `<div class="text-individual-items">${item}</div>`;
+        });
+        containerEnd.innerHTML = htmlEnd;
+
+        const containerDistractor = document.querySelector("#text-distractor");
+        // Start with a subtitle
+        let htmlDistractor = `<span id="text-subtitle">Distraktorius:</span>`;
+        // Add each item in its own div
+        entry.text.distractor.forEach(item => {
+            htmlDistractor += `<div class="text-individual-items">${item}</div>`;
+        });
+        containerDistractor.innerHTML = htmlDistractor;
+
+        let compatibilityList = document.createElement('ul');
+        // Add class-choice items
+        if (entry["class-choice"].includes("1_2_klase")) {
+            let classListItem = document.createElement('li');
+            classListItem.textContent = "1-2 klasėms";
+            compatibilityList.appendChild(classListItem);
+        }
+
+        if (entry["class-choice"].includes("3_4_klase")) {
+            let classListItem = document.createElement('li');
+            classListItem.textContent = "3-4 klasėms";
+            compatibilityList.appendChild(classListItem);
+        }
+
+        // Add filtered suitable-for items with label replacements
+        if (entry["suitable-for"]) {
+            const labelMap = {
+                komponavimas: "turinio komponavimui",
+                struktura: "struktūros išdėstymui"
+            };
+
+            Object.entries(entry["suitable-for"]).forEach(([key, value]) => {
+                if (key === "komponavimas" || key === "struktura") {
+                    let suitableListItem = document.createElement('li');
+                    suitableListItem.textContent = `${labelMap[key]}: ${value}`;
+                    compatibilityList.appendChild(suitableListItem);
+                }
+            });
+        }
+
+        const textCompatibilityTitle = document.createElement('div');
+        textCompatibilityTitle.innerHTML = '<span id="text-subtitle">Tinkamumas:</span>';
+
+        const container = document.querySelector("#text-compatibility");
+        container.innerHTML = ""; // Clear previous content
+        container.appendChild(textCompatibilityTitle);
+        container.appendChild(compatibilityList);
+
+        document.querySelector("#text-id").innerHTML = `<span id="text-subtitle">Teksto ID:</span> ${entry.id}`
+
+
+        const accordionButton = document.querySelector('#text-viewer-heading button');
+        if (accordionButton.classList.contains('collapsed')) {
+            accordionButton.click();
+            
+            setTimeout(() => {
+                document.querySelector("#text-viewer").scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+            }, 250);
+        } else {
+            document.querySelector("#text-viewer").scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+    } catch (error) {
+        console.error('Error retrieving data:', error);
+        messageToTheUser(`Nepavyko pasiekti duomenų. Bandykite vėl vėliau`);
+        return null;
+    }
+}
+
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault(); // Optional: prevent form submission or other default behavior
+        document.getElementById("submitButton").click();
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+ const sidebarWrapper = document.getElementById('sidebarWrapper');
+    const toggleTab = document.getElementById('toggleTab');
+    const overlay = document.getElementById('overlay');
+    const sidebarContent = document.getElementById('sidebarContent');
+
+    // Toggle sidebar function
+    function toggleSidebar() {
+      // Only works on mobile
+      if (window.innerWidth <= 768) {
+        sidebarWrapper.classList.toggle('open');
+      }
+    }
+
+    // Open sidebar function
+    function openSidebar() {
+      if (window.innerWidth <= 768) {
+        sidebarWrapper.classList.add('open');
+      }
+    }
+
+    // Close sidebar function
+    function closeSidebar() {
+      if (window.innerWidth <= 768) {
+        sidebarWrapper.classList.remove('open');
+      }
+    }
+
+    // Event listeners
+    toggleTab.addEventListener('click', toggleSidebar);
+
+    // Handle escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && sidebarWrapper.classList.contains('open')) {
+        closeSidebar();
+      }
+    });
+
+    // Close sidebar on window resize if it becomes desktop size
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        closeSidebar();
+      }
+    });
+
+
+
+
+
+
+
+// Initialize button state
+let currentAction = null;
+
+
+function showConfirmationButtons(action) {
+    currentAction = action;
+    
+    // Update confirm button label based on action
+    const confirmLabel = document.getElementById('confirm-label');
+    switch(action) {
+        case 'new-task':
+            confirmLabel.textContent = 'Sukurti užduotį';
+            toggleAddNewTask();
+            break;
+        case 'delete-task':
+            confirmLabel.textContent = 'Trinti užduotis';
+            toggleDeleteTask();
+            break;
+        case 'delete-student':
+            confirmLabel.textContent = 'Šalinti mokinius';
+            toggleDeleteStudent();
+            break;
+    }
+    
+    document.getElementById('action-buttons-container').style.display = 'none';
+    document.getElementById('confirmation-buttons-container').style.display = 'flex';
+}
+
+function hideConfirmationButtons() {
+    document.getElementById('confirmation-buttons-container').style.display = 'none';
+    document.getElementById('action-buttons-container').style.display = 'flex';
+    currentAction = null;
+}
+
+// Set up button click handlers
+document.addEventListener('DOMContentLoaded', () => {
+    // Action buttons
+    document.getElementById('new-task-button').addEventListener('click', () => {
+        showConfirmationButtons('new-task');
+    });
+    
+    document.getElementById('delete-task-button').addEventListener('click', () => {
+        showConfirmationButtons('delete-task');
+    });
+    
+    document.getElementById('delete-student-button').addEventListener('click', () => {
+        showConfirmationButtons('delete-student');
+    });
+    
+    // Confirmation buttons
+    document.getElementById('confirm-button').addEventListener('click', () => {
+        if (currentAction === 'new-task') {
+            setTask();
+        } else if (currentAction === 'delete-task') {
+            deleteSelectedTasks();
+        } else if (currentAction === 'delete-student') {
+            deleteStudents();
+        }
+    });
+    
+    document.getElementById('cancel-button').addEventListener('click', () => {
+         if (currentAction === 'new-task') {
+            toggleAddNewTask();
+        } else if (currentAction === 'delete-task') {
+            toggleDeleteTask();
+        } else if (currentAction === 'delete-student') {
+            toggleDeleteStudent();
+        }
+        hideConfirmationButtons();
+    });
+
+     const accordionButtons = document.querySelectorAll(".accordion-button");
+
+    accordionButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            const collapse = button.parentElement.nextElementSibling;
+            const expanded = button.getAttribute("aria-expanded") === "true";
+
+            // Close all others (exclusive mode like Bootstrap)
+            document.querySelectorAll(".accordion-collapse").forEach(el => {
+                el.classList.remove("show");
+                el.previousElementSibling.querySelector(".accordion-button").classList.add("collapsed");
+                el.previousElementSibling.querySelector(".accordion-button").setAttribute("aria-expanded", "false");
+            });
+
+            if (!expanded) {
+                collapse.classList.add("show");
+                button.classList.remove("collapsed");
+                button.setAttribute("aria-expanded", "true");
+            }
+        });
+    });
+});
+
+	</script>
+</body>
+
+</html>
