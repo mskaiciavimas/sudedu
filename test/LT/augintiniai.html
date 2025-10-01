@@ -731,6 +731,121 @@
 
 
 
+#toggle-edit-save-btn,
+.pet-stats-selection-button.active,
+.department-btn.active,
+.pet-btn.active,
+.pet-supply-tab.active,
+.pay-tax-btn:not(.paid) {
+    border: #286D8A 1px solid;
+}
+
+.use-btn,
+.purchase-btn,
+.treat-use-btn,
+.food-use-btn,
+.fill-water-bowl-btn {
+    border: #32ac93 1px solid;
+}
+
+
+#toggle-edit-save-btn,
+#cancel-edit-btn,
+.pet-stats-selection-button.active,
+.pet-btn.active,
+.department-btn.active,
+.use-btn,
+.pet-supply-tab.active,
+.purchase-btn,
+.item-requires,
+.pay-tax-btn,
+.pet-delete-btn:hover,
+#customConfirmNo,
+#customConfirmYes,
+.treat-use-btn,
+.food-use-btn,
+.fill-water-bowl-btn  {
+  letter-spacing: 0.01em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 4px 12px rgba(50, 136, 172, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative; /* required for :before absolute positioning */
+}
+
+#toggle-edit-save-btn::before,
+#cancel-edit-btn::before,
+.pet-stats-selection-button.active::before,
+.pet-btn.active::before,
+.department-btn.active::before,
+.use-btn::before,
+.pet-supply-tab.active::before,
+.purchase-btn::before,
+.item-requires::before,
+.pay-tax-btn::before,
+.pet-delete-btn:hover::before,
+#customConfirmNo::before,
+#customConfirmYes::before,
+.treat-use-btn::before,
+.food-use-btn::before,
+.fill-water-bowl-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+  border-radius: 8px;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+#toggle-edit-save-btn::after,
+#cancel-edit-btn::after,
+.pet-stats-selection-button.active::after,
+.pet-btn.active::after,
+.department-btn.active::after,
+.use-btn::after,
+.pet-supply-tab.active::after,
+.purchase-btn::after,
+.item-requires::after,
+.pay-tax-btn::after,
+.pet-delete-btn:hover::after,
+#customConfirmNo::after,
+#customConfirmYes::after,
+.treat-use-btn::after,
+.food-use-btn::after,
+.fill-water-bowl-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+#toggle-edit-save-btn:hover::before,
+#cancel-edit-btn:hover::before,
+.pet-stats-selection-button.active:hover::before,
+.pet-btn.active:hover::before,
+.use-btn:hover::before,
+.purchase-btn:hover::before,
+.item-requires:hover::before,
+.pay-tax-btn:hover::before,
+#customConfirmNo:hover::before,
+#customConfirmYes:hover::before,
+.treat-use-btn:hover::before,
+.food-use-btn:hover::before,
+.fill-water-bowl-btn:hover::before   {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+
+
+
         .nav-items {
             display: flex;
             padding: 16px;
@@ -769,6 +884,11 @@
         .nav-item.active {
             background: linear-gradient(135deg, #A0C58F, #32ac93) !important;
             color: #F5F5F7;
+              box-shadow: 
+                0 1px 2px rgba(0, 0, 0, 0.2),
+                0 4px 12px rgba(50, 136, 172, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                        
         }
 
         .game-navigation:not(.mobile) .nav-item:before {
@@ -908,21 +1028,19 @@
             transition: all 0.2s;
             font-size: 1rem;
             background: linear-gradient(135deg, #40c9a9, #32ac93);
+            border: 1px solid #32ac93;
             margin-left: 0;
             padding: 10px 16px
         }
 
         #toggle-edit-save-btn.edit {
             background: linear-gradient(135deg, #3288AC, #286D8A);
+            border: 1px solid #286D8A;
         }
 
         #cancel-edit-btn {
             background: linear-gradient(135deg, #f76859, #e74c3c);
-        }
-
-        #toggle-edit-save-btn:hover, 
-        #cancel-edit-btn:hover {
-            transform: translateY(-1.5px);
+            border: 1px solid #e74c3c;
         }
 
         .shop-header {
@@ -1135,7 +1253,6 @@
             padding: 0.75rem 1.5rem;
             background: linear-gradient(135deg, #40c9a9, #32ac93);
             color: #F5F5F7;
-            border: none;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
@@ -1182,6 +1299,14 @@
             color: #F5F5F7;
             cursor: not-allowed;
             transform: translateY(0px) !important;
+            border: 1px solid #6b7280;
+        }
+
+        .purchase-btn.owned:hover::before,
+        .use-btn.used:hover::before,
+        .use-btn.equipped:hover::before,
+        .pay-tax-btn.paid:hover::before {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
         }
 
         .pet-supply-use-quantity-holder {
@@ -1274,7 +1399,6 @@
             border: 1px solid #286D8A;
             transform: translateY(0px) !important;
             color: #F5F5F7;
-            border: none;
         }
         
         .item-name {
@@ -1473,10 +1597,6 @@
             margin: 0;
         }
 
-         .pay-tax-btn:hover {
-            transform: translateY(-1.5px);
-        }
-
         .pay-tax-btn:active {
             transform: translateY(0);
         }
@@ -1591,7 +1711,6 @@
 
         .department-btn:hover,
         .pet-supply-tab:hover {
-            transform: translateY(-1.5px);
             background: rgba(255, 255, 255, 0.4);
         }
 
@@ -2012,23 +2131,18 @@
   justify-content: space-around;
 }
 
-.btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
 .btn-confirm {
   font-size: 1rem;
   background: linear-gradient(135deg, #f76859, #e74c3c);
   color: #F5F5F7;
+  border: 1px solid #e74c3c;
 }
 
 .btn-cancel {
   font-size: 1rem;
   background: linear-gradient(135deg, #95a5a6, #aeb4b5);
   color: #F5F5F7;
+  border: 1px solid #95a5a6;
 }
 
 .item-delete-btn-holder {
@@ -2169,10 +2283,6 @@
     color: #F5F5F7;
     margin: 0;
     padding: 10px 16px;
-}
-
-.fill-water-bowl-btn:hover {
-    transform: translateY(-1.5px);
 }
 
 .object-popup-title-subtitle-wrapper {
@@ -2366,6 +2476,13 @@
         min-width: 100px;
     }
 
+    .pet-stats-bars {
+    margin-left: 10px;
+  }
+
+  #button-container {
+    padding-left: 10px;
+  }
     
 }
 
@@ -2848,7 +2965,7 @@
 
             <!-- Desktop Navigation -->
             <div class="main-nav-links">
-                <a href="pradzia.html" class="main-nav-link">Pradžia</a>
+                <a href="praktika.html" class="main-nav-link">Praktika</a>
                 <a href="uzduotys.html" class="main-nav-link">Užduotys</a>
                 <a href="klase.html" class="main-nav-link">Klasė</a>
                 <a href="augintiniai.html" class="main-nav-link main-nav-link-active">Augintiniai</a>
@@ -2883,7 +3000,7 @@
 
             <!-- Mobile Menu -->
             <div class="main-nav-mobile-menu" id="mainNavMobileMenu">
-                <a href="pradzia.html" class="main-nav-mobile-link">Pradžia</a>
+                <a href="praktika.html" class="main-nav-mobile-link">Praktika</a>
                 <a href="uzduotys.html" class="main-nav-mobile-link">Užduotys</a>
                 <a href="klase.html" class="main-nav-mobile-link">Klasė</a>
                 <a href="augintiniai.html" class="main-nav-mobile-link active">Augintiniai</a>

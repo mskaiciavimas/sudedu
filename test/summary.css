@@ -9,12 +9,10 @@ html {
 
 body {
   background: transparent;
-  color: #1A132F;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  font-family: 'Andika', sans-serif;
 }
 
 .container {
@@ -98,7 +96,6 @@ tbody td {
   max-height: 50vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -115,12 +112,15 @@ tbody td {
   margin-top: 8px;
 }
 
-h1 {
-  font-family: 'Amatic SC', cursive;
-  font-weight: 700;
-  color: #32ac93;
-  font-size: 5.5rem;
+.mistakes-summary-forstudents-title {
+    width: 100%;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 15px;
 }
+
+
 
 .incorrect-part {
   font-weight: bold;
@@ -135,22 +135,35 @@ h1 {
   background-color: transparent;
   text-align: center;
   font-weight: bold;
+  max-width: 100%;
 }
 
 #summary-table-grammar {
   text-align: center;
 }
 
+.summary-choices-button-holder {
+  display: flex;
+  justify-content: start;
+  margin-bottom: 15px;
+  gap: 5px;
+}
+
 .display-summary-button {
   background-color: transparent;
-  border: none;
-  padding: 15px 20px 15px 20px;
-  font-weight: bold;
-  font-size: 1.5rem;
+  border: rgba(33, 37, 41, 0.5) 1px solid;
+  padding: 12px 16px 12px 16px;
+  margin: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-size: 1rem;
 }
 
 .active-summary-button {
-  text-decoration: underline;
+  background: linear-gradient(135deg, #3288AC, #286D8A);
+  border: #286D8A 1px solid;
+  color: #F5F5F7;
 }
 
 @media (max-width: 1400px) {
@@ -182,6 +195,11 @@ h1 {
     font-size: 3rem;
   }
 
+  .display-summary-button {
+    padding: 6px 8px 6px 8px;
+    font-size: 1rem;
+  }
+
   .table-container {
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
@@ -206,11 +224,7 @@ h1 {
   .bar {
     height: 15px;
     border-radius: 5px;
-
-  }
-
-  .display-summary-button {
-    font-size: 1.25rem;
+    max-width: 100%;
   }
 }
 

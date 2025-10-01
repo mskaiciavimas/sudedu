@@ -10,7 +10,8 @@
 	<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Josefin+Sans&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-	<link rel="stylesheet" type="text/css" href="../index.css">
+	<link rel="stylesheet" type="text/css" href="../summary.css">
+    <link rel="stylesheet" type="text/css" href="../index.css">
     <link rel="stylesheet" href="../main-nav-bar.css">
 
     <!-- Google tag (gtag.js) -->
@@ -118,7 +119,7 @@
 
         #timer-input-div,
         #question-number-input-div {
-            margin-top: 5px;
+            margin-top: 10px;
         }
 
         .teacher-button:disabled {
@@ -186,6 +187,8 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             flex: 1 0 60svh;
+            display: flex;
+            flex-direction: column;
         }
 
         #student-list-header {
@@ -211,11 +214,14 @@
             margin-right: 10px;
         }
 
+        #student-list-container {
+            overflow: auto;
+            flex: 1;
+        }
+
         #student-list {
             background: transparent;
-            height: 50vh;
-            overflow: auto;
-            padding: 15px;
+            padding: 15px 15px 20px 15px;
         }
 
         .student-checkbox,
@@ -270,6 +276,10 @@
             transition: box-shadow 0.3s ease; /* Smooth transition for highlighting */
             white-space: normal;
             overflow-wrap: break-word;
+        }
+
+        #student-task-list-container .task-li-item .selection-option {
+            width: calc(100% - 15px);
         }
 
         .selected-option {
@@ -353,13 +363,12 @@
         #timer-input,
         #question-number-input {
             padding: 0.5rem;
-            font-size: 1rem;
+            font-size: 1.3rem;
             width: 55px;
             border: 0;
             margin: 0;
             outline: none;
             background: #FAF1E6;
-            box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
             border-radius: 8px;
             text-align: center;
         }
@@ -373,8 +382,8 @@
             outline: none;
         }
 
-        .timer-label-teacher,
-        .answer-number-label-teacher {
+        .timer-choice-label,
+        .answer-number-label {
             font-size: 1.75rem;
             font-weight: 600;
             margin-top: 0;
@@ -385,6 +394,10 @@
             width: 100%;;
         }
 
+        #text-distractor {
+            margin-bottom: 15px;
+        }
+
         .new-task-input-holder {
             width: 100%;
         }
@@ -392,7 +405,7 @@
         #group_name {
             border: 0;
             outline: 0;
-            font-size: 1rem;
+            font-size: 1.3rem;
             text-align: start;
             padding-left: 15px;
         }
@@ -414,8 +427,8 @@
             width: 100%;
         }
 
-        .timer-label-teacher,
-        .answer-number-label-teacher {
+        .timer-choice-label,
+        .answer-number-label {
             margin-left: 10px;
         }
 
@@ -439,8 +452,10 @@
 
         .summary-inner-container:not(:empty) {
             margin-top: 10px;
+            margin-bottom: 10px;
             max-height: 200px;
             overflow-y: auto;
+            border-radius: 8px;
         }
 
         table {
@@ -451,11 +466,12 @@
             overflow: hidden;
             margin: 0 !important;
             table-layout: fixed;
+            border-radius: 8px;
         }
 
         th,
         td {
-            padding: 5px 5px 5px 10px;
+            padding: 5px 5px 5px 5px;
             background-color: rgba(255, 255, 255, 0.2);
             font-size: 1rem;
         }
@@ -490,6 +506,7 @@
         .bar {
             height: 20px;
             border-radius: 5px;
+            max-width: 100%;
         }
 
         .table-container {
@@ -498,9 +515,9 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             scrollbar-width: none;
             -ms-overflow-style: none;
+            border-radius: 8px;
         }
 
         .table-container::-webkit-scrollbar {
@@ -525,12 +542,34 @@
             margin-bottom: 5px;
         }
 
+        #frequent-mistakes-container {
+            display: none;
+        }
+
+        #frequent-mistakes-container .clickable-word {
+            cursor: default;
+        }
+
+        #frequent-mistakes-container .clickable-word:hover,
+        #frequent-mistakes-container .clickable-word:active {
+            text-decoration: none;
+        }
+
         #student-task-group,
         #student-task-group-for-student {
             max-width: 95%;
             font-weight: 600;
             text-transform: uppercase;
             font-size: 1.25rem;
+            white-space: normal;
+            overflow-wrap: break-word;
+        }
+
+        #student-task-group-for-student {
+            max-width: 95%;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 1.5rem;
             white-space: normal;
             overflow-wrap: break-word;
         }
@@ -543,6 +582,16 @@
             border-radius: 50%;
         }
 
+        .mistakes-summary-forstudents-title {
+            width: 100%;
+            text-align: start;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+
         #student-task-status-indicator,
         #student-task-status-indicator-for-student {
             width: 20px;
@@ -552,11 +601,11 @@
 
         #task-description-title,
         #task-description-title-for-student {
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         #task-description-for-student {
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         .reset-button-div {
@@ -603,29 +652,37 @@
             margin: 10px 0;
         }
 
+        #student-gui {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            flex-direction: row;
+        }
+
         #student-task-for-students-title-container {
-            background-color: #FAF1E6;
-            padding: 10px 0 10px 15px;
-            font-weight: bold;
-            text-transform: uppercase;
-            border-bottom: #6c757d 1px solid;
+            background: rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #student-task-list-container {
+            overflow: auto;
+            flex: 1;
+            padding-top: 10px;
         }
 
         #student-tasks-list {
-            background-color: #FAF1E6;
-            list-style: none;
-            height: 50vh;
-            overflow: auto;
+            background-color: transparent;
             padding: 0 0 10px 0;
         }
 
         .task-li-item-for-students {
             padding-top: 10px;
             margin-left: 15px;
-        }
-
-        #dynamic-student-content {
-            padding-left: 25px;
         }
 
         #task-info-container-for-students {
@@ -646,7 +703,8 @@
             text-align: center;
             font-weight: bold;
             z-index: 10;
-            pointer-events: auto; 
+            pointer-events: auto;
+            font-size: 1rem;
         }
 
         .task-info-subtitle {
@@ -655,7 +713,7 @@
 
         .student-statistics-title {
             font-size: 1.35rem;
-            margin-top: 15px;
+            margin: 10px 0 5px 0;
             font-weight: 600;
             text-decoration: underline;
         }
@@ -663,7 +721,6 @@
         .student-statistics-subtitle {
             font-size: 1.15rem;
             font-weight: 600;
-            margin-top: 10px;
         }
 
         .btn:disabled {
@@ -689,6 +746,59 @@
             font-size: 1.5rem;
         }
 
+        .complete-task-holder {
+            display: flex;
+            justify-content: end;
+        }
+
+        #complete-task-button {
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 12px 18px 12px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0;
+            background: linear-gradient(135deg, #3288AC, #286D8A);
+            border: 1px solid #286D8A;
+            color: #F5F5F7;
+            margin-top: 10px;
+            letter-spacing: 0.01em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 1px 2px rgba(0, 0, 0, 0.2),
+                0 4px 12px rgba(50, 136, 172, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        #complete-task-button::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+        border-radius: 8px;
+        pointer-events: none;
+        transition: background 0.3s ease;
+        }
+
+        #complete-task-button::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 8px;
+        padding: 1px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+        }
+
+        #complete-task-button:hover::before {
+        background: rgba(255, 255, 255, 0.15);
+        }
+
         #text-viewer {
             width: 100%;
             margin-top: 15px;
@@ -704,6 +814,7 @@
             overflow: hidden;
         }
 
+        
 
 .accordion-button {
     background-color: transparent;
@@ -760,6 +871,10 @@
     margin-bottom: 0;
 }
 
+.accordion-header {
+    margin: 15px 0;
+}
+
 /* Form and button styles */
 .form-control {
     padding: 0.5rem;
@@ -771,6 +886,21 @@
     margin: 5px 0;
 }
 
+
+.task-info-holder,
+.task-info-holder-student {
+    flex-direction: column;
+}
+
+
+#task-list-title-for-students {
+    font-weight: 700;
+}
+
+.task-info-holder > :not(:empty),
+.task-info-holder-student > :not(:empty) {
+  margin-top: 5px;
+}
 
         #view-text-id-input {
             background: rgba(255, 255, 255, 0.25);
@@ -784,6 +914,7 @@
             padding: 5px 5px 5px 15px;
             margin: 0;
             font-size: 1rem;
+            height: 39px;
         }
 
         #view-text-id-input:focus,
@@ -809,6 +940,14 @@
             text-decoration: underline;
         }
 
+        .student-name,
+        .selection-option {
+            user-select: none;       /* Standard */
+            -webkit-user-select: none; /* Chrome/Safari */
+            -moz-user-select: none;    /* Firefox */
+            -ms-user-select: none;     /* IE/Edge */
+        }
+
 
         .incorrect-part {
             pointer-events: none;
@@ -824,17 +963,12 @@
             font-weight: bold;
         }
 
-        #sentence-with-mistake-field:not(:empty),
-        #sentence-with-mistake-field-for-students:not(:empty) {
-            margin: 10px 0;
-        }
-
         #text-browser-button {
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: none;
+            border: 1px solid #286D8A;
             background: linear-gradient(135deg, #3288AC, #286D8A);
             font-size: 1rem;
             color: #F5F5F7;
@@ -842,7 +976,54 @@
             border-radius: 8px;
             margin: 0;
             cursor: pointer;
-            transition: all 0.3s ease;
+            letter-spacing: 0.01em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 1px 2px rgba(0, 0, 0, 0.2),
+                0 4px 12px rgba(50, 136, 172, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        #text-browser-button:hover::before {
+            background: rgba(255, 255, 255, 0.15);
+            }
+
+
+        #text-browser-button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 8px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            }
+
+
+        #text-browser-button::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+            border-radius: 8px;
+            pointer-events: none;
+            transition: background 0.3s ease;
+            }
+
+        #student-tasks-list-outer-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            flex: 1 0 60svh;
+            display: flex;
+            flex-direction: column;
         }
 
         .text-viewer-heading {
@@ -858,7 +1039,10 @@
         }
 
         #text-compatibility ul {
-            margin-left: 30px;
+            margin-left: 0;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            padding-left: 25px;
         }
 
         .text-individual-items {
@@ -875,6 +1059,339 @@
             text-decoration: underline;
         }
 
+           .container {
+      display: flex;
+      min-height: 0;
+    }
+
+    /* Sidebar wrapper */
+    .sidebar-wrapper {
+      position: relative;
+      flex: 1 1 65%;
+      height: 100%;
+      margin-right: 10px;
+    }
+
+    /* Sidebar content */
+    .sidebar {
+        position: relative;
+        padding: 16px;
+        height: 100%;
+        width: 100%;
+        overflow-y: auto;
+        margin-right: 15px;
+    }
+
+    .sidebar-content {
+      min-height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Toggle tab - always visible */
+    .toggle-tab {
+      position: absolute;
+      right: -33.75px;
+      top: 31px;
+      transform: translateY(-50%);
+      border: none;
+      width: 33.75px;
+      height: 62px;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.5);
+    padding: 0;
+    }
+
+    .toggle-tab svg {
+      width: 24px;
+      height: 24px;
+      transition: transform 0.3s ease;
+    }
+
+    /* Main content */
+    .main-content {
+      flex: 1;
+      padding: 2rem;
+      background: #f5f5f5;
+    }
+
+    .main-content h1 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+
+    .main-content p {
+      line-height: 1.6;
+      color: #555;
+      margin-bottom: 1rem;
+    }
+
+      #action-buttons-container,
+    #confirmation-buttons-container {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+        height: 60px;
+    }
+
+    #confirmation-buttons-container {
+        display: none;
+    }
+
+
+#student-action-buttons-container {
+    display: flex;
+    justify-content: end;
+    margin-bottom: 10px;
+    height: 60px;
+}
+
+#text-message {
+    margin-top: 10px;
+}
+
+.student-action-btn {
+    flex: 0 0 auto;
+    width: 100px;
+}
+
+.teacher-action-btn,
+.confirm-btn,
+.cancel-btn {
+    flex: 1;
+}
+
+.teacher-action-btn,
+.student-action-btn,
+.confirm-btn,
+.cancel-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: #286D8A 1px solid;
+  background: linear-gradient(135deg, #3288AC, #286D8A);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #F5F5F7;
+  overflow: hidden;
+  min-width: 0;
+  padding: 16px 15px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 4px 12px rgba(50, 136, 172, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.teacher-action-btn::before,
+.student-action-btn::before,
+.confirm-btn::before,
+.cancel-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+  border-radius: 8px;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+.teacher-action-btn::after,
+.student-action-btn::after,
+.confirm-btn::after,
+.cancel-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.teacher-action-btn:hover::before,
+.student-action-btn:hover::before,
+.confirm-btn:hover::before,
+.cancel-btn:hover::before {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+
+.confirm-btn {
+    background: linear-gradient(135deg, #A0C58F, #32ac93);
+    border: 1px solid #32ac93;
+}
+
+.cancel-btn {
+    background: linear-gradient(135deg, #f76859, #e74c3c);
+    border: 1px solid #e74c3c;
+}
+
+#confirm-button:disabled,
+#cancel-button:disabled,
+#new-task-button:disabled,
+#delete-task-button:disabled,
+#delete-student-button:disabled {
+    opacity: 0.7;
+}
+
+#confirmation-buttons-container {
+    animation: slideIn 0.3s ease-out;
+}
+
+.active-summary-button {
+      letter-spacing: 0.01em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 4px 12px rgba(50, 136, 172, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.active-summary-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+  border-radius: 8px;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+.active-summary-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.active-summary-button:hover::before {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+ .input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            background: #FAF1E6;
+            border-radius: 8px;
+            box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .control-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #FAF1E6;
+            color: #333;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: #f0e5d6;
+        }
+
+        .control-btn:active {
+            background: #e6dbc6;
+        }
+
+        .timer-input, .question-number-input {
+            padding: 0.5rem;
+            font-size: 1rem;
+            width: 55px;
+            border: 0;
+            margin: 0;
+            outline: none;
+            background: #FAF1E6;
+            text-align: center;
+            -moz-appearance: textfield;
+        }
+
+        /* Hide number input spinners */
+        .timer-input::-webkit-outer-spin-button,
+        .timer-input::-webkit-inner-spin-button,
+        .question-number-input::-webkit-outer-spin-button,
+        .question-number-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .timer-label {
+            font-size: 1rem;
+            color: #333;
+            margin: 0;
+            font-weight: 500;
+        }
+   
+#delete-task-button-label,
+#create-task-button-label,
+#delete-student-button-label {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.two-rows-button-label {
+    flex-direction: column !important;
+    gap: 0 !important;
+    flex-wrap: nowrap !important;
+}
+
+.btn-label span {
+    display: block;
+}
+
         
 
         @media (max-width: 1999px) {
@@ -885,8 +1402,23 @@
             }
         }
 
-        @media (max-width: 767px) {
-            #student-task-info-container {
+    @media (max-width: 992px) {
+        .sidebar-wrapper,
+        .left-side-bar {
+            flex: 1 1 50%;
+        }
+    }
+
+    /* Desktop: sidebar always visible, hide toggle */
+    @media (min-width: 769px) {
+      .toggle-tab {
+        display: none;
+      }
+    }
+
+    /* Mobile: collapsible sidebar */
+    @media (max-width: 768px) {
+        #student-task-info-container {
                 padding-left: 0;
             }
 
@@ -935,187 +1467,23 @@
 
             #dynamic-student-content {
                 padding-left: 0;
-                margin-top: 20px;
             }
 
-        }
-
-        @media (max-width: 575px) {
-            html,
-            body {
-                width: 100vw;
+            #timer-input,
+            #question-number-input {
+                font-size: 1.1rem;
             }
 
-            .initial-button-div {
-                width: 100%;
+            .timer-choice-label, 
+            .answer-number-label {
+                font-size: 1.25rem;
             }
 
-            .confirmation-button-div {
-                width: 100%;
-                margin: 0;
+            #group_name {
+                font-size: 1.1rem;
             }
 
-            #confirm-delete-task-button {
-                margin-bottom: 15px;
-            }
 
-            #confirm-delete-student-button {
-                margin-bottom: 15px;
-            }
-
-            .teacher-button-line {
-                flex-direction: column;
-            }
-
-            #teacher-message-line,
-            #teacher-data-retrieval-message {
-                margin-bottom: 15px;
-            }
-        }
-
-    @media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)  {
-        body {
-            font-size: 1.5rem;
-        }
-
-        #new-task-button,
-        #delete-task-button,
-        #delete-student-button,
-        #confirm-delete-task-button,
-        #confirm-delete-student-button,
-        #submitButton,
-        #add-teacher,
-        #change-teacher {
-            font-size: 1.5rem;
-        }
-
-        #add-change-teacher-buttons {
-            margin: 10px 0 30px 0;
-        }
-
-        #complete-task-button {
-            font-size: 1.4rem;
-        }
-
-        #student-message {
-            margin-right: 0;
-        }
-
-        #teacher-name {
-            font-size: 1.75rem;
-        }
-
-        .accordion-button {
-            font-size: 2.25rem;
-        }
-
-        .form-control {
-            font-size: 1.75rem;
-        }
-
-        .menu ul li a {
-            font-size: 1.75rem;
-        }
-
-        .menu {
-            width: 160px;
-        }
-
-        .reset-button {
-            width: 6rem;
-            height: 6rem;
-        }
-    }
-
-
-
-
-
-
-    .container {
-      display: flex;
-      min-height: 0;
-    }
-
-    /* Sidebar wrapper */
-    .sidebar-wrapper {
-      position: relative;
-      flex: 1 1 65%;
-      height: 100%;
-      margin-right: 10px;
-    }
-
-    /* Sidebar content */
-    .sidebar {
-        position: relative;
-        padding: 16px;
-        height: 100%;
-        width: 100%;
-        overflow-y: auto;
-        margin-right: 15px;
-    }
-
-    .sidebar-content {
-      min-height: 100%;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    /* Toggle tab - always visible */
-    .toggle-tab {
-      position: absolute;
-      right: -10%;
-      top: 30px;
-      transform: translateY(-50%);
-      border: none;
-      width: 10%;
-      height: 60px;
-      border-radius: 0 8px 8px 0;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-    -webkit-backdrop-filter: blur(15px);
-    background: rgba(255, 255, 255, 0.5);
-    padding: 0;
-    }
-
-    .toggle-tab svg {
-      width: 24px;
-      height: 24px;
-      transition: transform 0.3s ease;
-    }
-
-    /* Main content */
-    .main-content {
-      flex: 1;
-      padding: 2rem;
-      background: #f5f5f5;
-    }
-
-    .main-content h1 {
-      color: #2c3e50;
-      margin-bottom: 1rem;
-    }
-
-    .main-content p {
-      line-height: 1.6;
-      color: #555;
-      margin-bottom: 1rem;
-    }
-
-    /* Desktop: sidebar always visible, hide toggle */
-    @media (min-width: 769px) {
-      .toggle-tab {
-        display: none;
-      }
-    }
-
-    /* Mobile: collapsible sidebar */
-    @media (max-width: 768px) {
       .sidebar {
         padding: 16px;
         height: 100%;
@@ -1131,10 +1499,10 @@
         left: 0;
         top: 85px;
         height: calc(100% - 70px - 30px);
-        width: 90vw;
+        width: calc(100vw - 33.75px - 5px);
         z-index: 100;
         transition: transform 0.3s ease;
-        transform: translateX(-90vw);
+        transform: translateX(calc(-1*(100vw - 33.75px - 5px)));
         padding-left: 0;
       }
 
@@ -1174,95 +1542,252 @@
       .accordion-header {
         margin: 10px 0;
       }
+
+    .timer-input, .question-number-input {
+            pointer-events: none;
+        }
+        
+    /* Re-enable for buttons */
+    .control-btn {
+        pointer-events: auto;
     }
 
-    #action-buttons-container,
-    #confirmation-buttons-container {
-        display: flex;
-        flex-direction: row;
-        gap: 5px;
-        height: 60px;
+    #complete-task-button {
+            padding: 10px 16px;
+            margin-top: 10px;
+        }
+
+    #summary-table-frequent-mistakes table {
+        border-color: transparent;
     }
 
-    #confirmation-buttons-container {
-        display: none;
+    th,
+    td {
+        background-color: rgba(255, 255, 255, 0.8);
     }
 
-
-
-.teacher-action-btn {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  border: none;
-  background: linear-gradient(135deg, #3288AC, #286D8A);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 1rem;
-  color: #F5F5F7;
-  flex: 1;
-  overflow: hidden;
-  min-width: 0;
-  padding: 16px 15px;
-}
-
-.teacher-action-btn .btn-label {
-   width: 90%;
-}
-
-.teacher-action-btn:hover,
-.cancel-btn:hover,
-.confirm-btn:hover {
-    transform: translateY(-1.5px);
-}
-
-.confirm-btn,
-.cancel-btn {
-    position: relative;
-    flex: 1;
-    padding: 1rem 0.75rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1rem;
-    color: #F5F5F7;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
-
-.confirm-btn {
-    background: linear-gradient(135deg, #A0C58F, #32ac93);
-}
-
-.cancel-btn {
-    background: linear-gradient(135deg, #f76859, #e74c3c);
-}
-
-#confirmation-buttons-container {
-    animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
+    .summary-table-frequent-mistakes-outer-div th,
+    .summary-table-frequent-mistakes-outer-div td {
+        background-color: transparent;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+
+    .summary-table-frequent-mistakes-outer-div .table-container {
+        box-shadow: none;
     }
-}
 
-
+    .summary-table-frequent-mistakes-outer-div td:first-child {
+        padding-left: 0;
+        padding-right: 0;
+    }
     
+    }
+
+    @media (max-width: 578px) {
+                    html,
+            body {
+                width: 100vw;
+            }
+
+            .initial-button-div {
+                width: 100%;
+            }
+
+            .confirmation-button-div {
+                width: 100%;
+                margin: 0;
+            }
+
+            #confirm-delete-task-button {
+                margin-bottom: 15px;
+            }
+
+            #confirm-delete-student-button {
+                margin-bottom: 15px;
+            }
+
+            .teacher-button-line {
+                flex-direction: column;
+            }
+
+            #teacher-message-line,
+            #teacher-data-retrieval-message {
+                margin-bottom: 15px;
+            }
+
+        #student-task-group-for-student {
+            font-size: 1.25rem;
+        }
+
+         .mistakes-summary-forstudents-title {
+            font-size: 1.25rem;
+        }
+
+
+    }
+
+
+    @media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)  {
+        body {
+            font-size: 1.5rem;
+        }
+
+        #new-task-button,
+        #delete-task-button,
+        #delete-student-button,
+        #confirm-delete-task-button,
+        #confirm-delete-student-button,
+        #submitButton,
+        #add-teacher,
+        #change-teacher,
+        #confirm-button,
+        #cancel-button,
+        #frequent-mistakes-btn,
+        .display-summary-button {
+            font-size: 1.5rem;
+        }
+
+        #add-change-teacher-buttons {
+            margin: 10px 0 30px 0;
+        }
+
+        #complete-task-button {
+            font-size: 1.4rem;
+        }
+
+        #student-message {
+            margin-right: 0;
+        }
+
+        #teacher-name {
+            font-size: 1.75rem;
+        }
+
+        .form-control {
+            font-size: 1.75rem;
+        }
+
+        .menu ul li a {
+            font-size: 1.75rem;
+        }
+
+        .menu {
+            width: 160px;
+        }
+
+        .reset-button {
+            width: 6rem;
+            height: 6rem;
+        }
+
+        .sidebar {
+        padding: 16px;
+        height: 100%;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        background: rgba(255, 255, 255, 0.5);
+        border-bottom-right-radius: 8px;
+        margin: 0;
+      }
+
+      .sidebar-wrapper {
+        position: fixed;
+        left: 0;
+        top: 114px;
+        height: calc(100% - 100px - 30px);
+        width: calc(100vw - 33.75px - 5px);
+        z-index: 100;
+        transition: transform 0.3s ease;
+        transform: translateX(calc(-1*(100vw - 33.75px - 5px)));
+        padding-left: 0;
+      }
+
+      .sidebar-wrapper.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-wrapper.open .toggle-tab svg {
+        transform: rotate(180deg);
+      }
+
+      .main-content {
+        padding: 1.5rem;
+        width: 100%;
+      }
+
+    .toggle-tab {
+        display: flex;
+      }
+
+       #student-task-info-container {
+                padding-left: 0;
+            }
+
+            #teacher-button-holder-outer {
+                display: flex;
+                justify-content: end;
+            }
+
+            .teacher-button-holder {
+                width: 90%;
+            }
+
+            #action-buttons-container, 
+            #confirmation-buttons-container {
+                gap: 8px;
+            }
+
+            #student-task-info-container-inner {
+                padding: 15px;
+            }
+            
+            #content-container {
+                margin: 0;
+                flex: 1;
+                width: 100vw;
+                justify-content: start;
+                background: transparent;
+                border: none;
+                box-shadow: none
+            }
+
+            #teacher-gui {
+                align-items: center;
+            }
+
+            .accordion-button {
+                font-size: 2rem;
+            }
+
+            #view-text-id-input {
+                width: 200px;
+                font-size: 1.5rem;
+            }
+
+            #text-browser-button {
+                font-size: 1.5rem;
+            }
+
+            table * {
+                font-size: 1.5rem;
+            }
+
+            .grammar-view-selector {
+                font-size: 1.5rem;
+            }
+
+            th,
+            td {
+                background-color: rgba(255, 255, 255, 0.8);
+            }
+
+            .student-action-btn {
+                flex: 0 0 auto;
+                width: auto;
+            }
+    }
+
+
+  
     </style>
 </head>
 
@@ -1278,7 +1803,7 @@
 
             <!-- Desktop Navigation -->
             <div class="main-nav-links">
-                <a href="pradzia.html" class="main-nav-link">Pradžia</a>
+                <a href="praktika.html" class="main-nav-link">Praktika</a>
                 <a href="uzduotys.html" class="main-nav-link main-nav-link-active">Užduotys</a>
                 <a href="klase.html" class="main-nav-link">Klasė</a>
                 <a href="augintiniai.html" class="main-nav-link">Augintiniai</a>
@@ -1313,7 +1838,7 @@
 
             <!-- Mobile Menu -->
             <div class="main-nav-mobile-menu" id="mainNavMobileMenu">
-                <a href="pradzia.html" class="main-nav-mobile-link">Pradžia</a>
+                <a href="praktika.html" class="main-nav-mobile-link">Praktika</a>
                 <a href="uzduotys.html" class="main-nav-mobile-link active">Užduotys</a>
                 <a href="klase.html" class="main-nav-mobile-link">Klasė</a>
                 <a href="augintiniai.html" class="main-nav-mobile-link">Augintiniai</a>
@@ -1347,15 +1872,15 @@
                     <!-- Action buttons that transform -->
                     <div id="action-buttons-container">
                         <button id="new-task-button" class="teacher-action-btn" data-action="new-task">
-                            <span class="btn-label">Kurti užduotį</span>
+                            <span id="create-task-button-label" class="btn-label"><span>Kurti</span><span>užduotį</span></span>
                         </button>
                         
                         <button id="delete-task-button" class="teacher-action-btn" data-action="delete-task">
-                            <span class="btn-label">Trinti užduotis</span>
+                            <span id="delete-task-button-label"  class="btn-label"><span>Trinti</span><span>užduotis</span></span>
                         </button>
                         
                         <button id="delete-student-button" class="teacher-action-btn" data-action="delete-student">
-                            <span class="btn-label">Šalinti mokinius</span>
+                            <span id="delete-student-button-label"  class="btn-label"><span>Šalinti</span><span>mokinius</span></span>
                         </button>
                     </div>
                     
@@ -1385,11 +1910,13 @@
                         </div>
                         <button type="button" id="expand-student-info-button" style="margin-left: auto;" onclick="toggleTaskVisibility()">&#x2212;</button>
                     </div>
+                    <div id="student-list-container">
                     <div id="student-list"></div>
+                    </div>
                 </div>
             </div>
         </div>
-        </div>
+    </div>
 
         <!-- RIGHT SIDE: Collapsible Sidebar with Task Options and Info -->
         <div class="sidebar-wrapper" id="sidebarWrapper">
@@ -1617,20 +2144,24 @@
 
                             <div class="timer-question-number-div">
                                 <div class="timer-input-div" id="timer-input-div">
-                                    <div class="col-6 d-flex justify-content-end">
-                                        <input type="number" id="timer-input" min="1" max="60" step="1" value="5">
+                                    <div class="input-group">
+                                    <div class="input-wrapper">
+                                        <button class="control-btn" onclick="decrementValue('timer-input', 1, 60)">−</button>
+                                        <input type="number" class="timer-input" id="timer-input" min="1" max="60" step="1" value="5">
+                                        <button class="control-btn" onclick="incrementValue('timer-input', 1, 60)">+</button>
                                     </div>
-                                    <div class="">
-                                        <h3 class="timer-label-teacher">minutes</h3>
-                                    </div>
+                                    <h3 class="timer-choice-label">minutes</h3>
+                                </div>
                                 </div>
                                 <div class="question-number-input-div" id="question-number-input-div" style="display: none;">
-                                    <div class="col-6 d-flex justify-content-end">
-                                        <input type="number" id="question-number-input" min="1" max="200" step="1" value="20">
+                                    <div class="input-group">
+                                    <div class="input-wrapper">
+                                        <button class="control-btn" onclick="decrementValue('question-number-input', 1, 200)">−</button>
+                                        <input type="number" class="question-number-input" id="question-number-input" min="1" max="200" step="1" value="20">
+                                        <button class="control-btn" onclick="incrementValue('question-number-input', 1, 200)">+</button>
                                     </div>
-                                    <div class="">
-                                        <h3 class="answer-number-label-teacher" id="answer-number-label-teacher">veiksmus</h3>
-                                    </div>
+                                    <h3 class="answer-number-label">veiksmus</h3>
+                                </div>
                                 </div>
                             </div>
                         </div>
@@ -1638,8 +2169,8 @@
                         <!-- Student Task Info Container -->
                         <div id="student-task-info-container">
                             <div id="student-task-info-container-inner">
-                                <div>
-                                    <div class="col-12 d-flex align-items-center justify-content-start" id="student-task-student-name"></div>
+                                <div class="task-info-holder">
+                                    <div class="" id="student-task-student-name"></div>
                                     <div id="student-task-group-and-status-indicator">
                                         <div id="student-task-group"></div>
                                         <div id="student-task-status-indicator"></div>
@@ -1750,39 +2281,44 @@
     </div>
 
 <!-- STUDENT GUI -->
-<div id="student-gui" class="row" style="display: none;">
-    <!-- Teacher Connection Section (stays on top, full width) -->
-    <div class="row">
-        <div class="col-md-6 col-12">
-            <div id="teacher-name"></div>
-            <input id="add-teacher-input" type="text" placeholder="mokytojo ID" style="display: none;" class="item-to-be-disabled-while-talking-to-server">
-            <input id="change-teacher-input" type="text" placeholder="mokytojo ID" style="display: none;" class="item-to-be-disabled-while-talking-to-server">
-            <button onclick="changeTeacherToggle()" id="change-teacher-toggle-button" class="item-to-be-disabled-while-talking-to-server">Keisti mokytoją</button>
-            <div id="add-change-teacher-buttons">
-                <button id="add-teacher" class="btn btn-primary item-to-be-disabled-while-talking-to-server" onclick="addTeacher()" style="display: none;">Pridėti mokytoją</button>
-                <button id="change-teacher" class="btn btn-primary item-to-be-disabled-while-talking-to-server" onclick="changeTeacher()" style="display: none;">Keisti mokytoją</button>
-            </div>
-        </div>
-        <div class="">
-            <div id="student-message"></div>
-        </div>
-    </div>
+<div id="student-gui" style="display: none;">
 
-    <!-- Two Column Layout -->
-    <div class="row">
-        <!-- LEFT SIDE: Task List (always visible) -->
+        <!-- LEFT SIDE: Student List (always visible) -->
+    <div class="left-side-bar">
+        <div class="left-side-bar-inner">
+                <div id="student-button-holder-outer">
+                <div class="student-button-holder">
+                    <!-- Action buttons that transform -->
+                    <div id="student-action-buttons-container">
+                        <button id="frequent-mistakes-btn" class="student-action-btn" onclick="displayFrequentMistakes()">
+                            <span class="btn-label">Paskutinės klaidos</span>
+                        </button>
+                    </div>
+                </div>
+        </div>
+
         <div class="" id="student-tasks-list-outer-container">
             <div class="align-items-center justify-content-start" id="student-task-for-students-title-container">
                 <div id="task-list-title-for-students"></div>
             </div>
+            <div id="student-task-list-container">
             <div id="student-tasks-list"></div>
+            </div>
         </div>
+
+        </div>
+    </div>
+
+
+<div class="sidebar-wrapper" id="sidebarWrapperStudent">
+    <aside class="sidebar" id="sidebarStudent">
+        <div class="sidebar-content" id="sidebarContentStudent">
 
         <!-- RIGHT SIDE: Task Info (collapsible on mobile) -->
         <div class="" id="dynamic-student-content">
             <div id="task-info-container-for-students">
                 <div id="student-task-info-container-inner">
-                    <div>
+                    <div class="task-info-holder-student">
                         <div id="student-task-group-and-status-indicator">
                             <div id="student-task-group-for-student"></div>
                             <div id="student-task-status-indicator-for-student"></div>
@@ -1816,13 +2352,62 @@
                             <div id="task-description-for-student"></div>
                         </div>
                     </div>
-                    <div class="">
-                        <button id="complete-task-button" class="btn btn-primary" onclick="completeTask()" style="display: none;">Atlikti užduotį</button>
+                    <div class="complete-task-holder">
+                        <button id="complete-task-button" class="" onclick="completeTask()" style="display: none;">Atlikti užduotį</button>
+                    </div>
+
+                    <div id="frequent-mistakes-container"
+                    style="flex-direction: column; justify-content: space-between;" hidden>
+                    <div class="row d-flex align-items-start">
+                        <div class="mistakes-summary-forstudents-title">
+                            Paskutinės klaidos
+                        </div>
+                    </div>
+
+                    <div id="mistakes-summary-math">
+                    <div class="summary-choices-button-holder">
+                    <button class="display-summary-button active-summary-button" onclick="displayMathSummary()" id="display-math-summary-button">Matematika</button>
+                    <button class="display-summary-button" onclick="displayGrammarSummary()" id="display-grammar-summary-button">Rašyba</button>
+                    </div>
+                    <div class="summary-table-frequent-mistakes-outer-div">
+                        <div id="summary-table-outer-div" class="">
+                            <div class="table-container" id="table-container-math">
+                                <div id="summary-table-frequent-mistakes"></div>
+                            </div>
+                        </div>
+                        </div>
+
+                        <div id="mistakes-summary-grammar" class="summary-table-frequent-mistakes-outer-div">
+                        <div id="summary-table-grammar-outer-div" class="" style="display: none;">
+                            <div class="table-container" id="table-container-grammar">
+                                <div id="summary-table-grammar-frequent-mistakes"></div>
+                            </div>
+                        </div>
+                        </div>
                     </div>
                 </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
             </div>
         </div>
-    </div>
+        </div>
+        </aside>
+                    <button class="toggle-tab" id="toggleTabStudent" aria-label="Toggle sidebar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+        </div>
+        
 </div>
 
 <!-- ADMIN GUI -->
@@ -1900,14 +2485,6 @@
         let taskGroupForStudents = document.getElementById('task-group-for-students');
         let taskStatusForStudents = document.getElementById('task-status-for-students');
 
-        let teacherName = document.getElementById('teacher-name');
-        const addTeacherInput = document.getElementById('add-teacher-input');
-        const addTeacherButton = document.getElementById('add-teacher');
-
-        const changeTeacherToggleButton = document.getElementById('change-teacher-toggle-button');
-        const changeTeacherInput = document.getElementById('change-teacher-input');
-        const changeTeacherButton = document.getElementById('change-teacher');
-
         const deleteStudentButton = document.getElementById('delete-student-button');
         const confirmDeleteStudentButton = document.getElementById('confirm-delete-student-button');
 
@@ -1915,16 +2492,14 @@
         const studentListSelectAllCheckbox = document.getElementById('student-list-header-checkbox-container');
         const selectAllCheckbox = document.getElementById('select-all-checkbox');
 
-        const studentMessage = document.getElementById('student-message');
-
         const teacherDispalyStudentTaskIndicator = document.getElementById('student-task-status-indicator');
         const mistakesSummaryTable = document.querySelector('#summary-table');
 
         const taskDescriptionTitle = document.querySelector('#task-description-title');
         const taskDescription = document.querySelector('#task-description');
 
-        const timerInputElementTeacher = document.querySelector('#timer-input');
-        let timerLabelElementTeacher = document.querySelector('.timer-label-teacher');
+        const timerInputChoiceElement = document.querySelector('#timer-input');
+        let timerChoiceLabel = document.querySelector('.timer-choice-label');
 
         const studentTaskGroupForStudent = document.getElementById('student-task-group-for-student');
         const studentScoreAnswerNumberForStudent = document.getElementById('student-score-asnwer-number-for-student');
@@ -1936,41 +2511,33 @@
 
         const completeTaskButton = document.getElementById('complete-task-button');
 
+        const frequentMistakeContainerElement = document.getElementById("frequent-mistakes-container");
+
         enableTeacherControlPannel();
         enableNewTaskContainer();
         document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
 
 
-        if (userData.teacher !== '' && userData.accType === "student") {
-            teacherName.innerHTML = `Mok. ${userData.teacher}`
-            addTeacherInput.style.display = "none";
-            addTeacherButton.style.display = "none";
-            changeTeacherToggleButton.style.display = "block"
-        } else {
-            addTeacherInput.style.display = "block";
-            addTeacherButton.style.display = "block";
-            changeTeacherToggleButton.style.display = "none"
-        }
-
-
     function changeQuestionNumberLabel () {
+        if (document.getElementById('answer-number-label')) {
         if (document.getElementById('mode_choice').value === "kalba") {
         if (document.getElementById('mode_choice_8').value === "tekstas") {
             if (document.getElementById('mode_choice_4').value === "C40") {
                     document.getElementById("question-number-input").value = 5;
-                    document.getElementById('answer-number-label-teacher').innerHTML = 'tekstus';
+                    document.getElementById('answer-number-label').innerHTML = 'tekstus';
                 }
         } else if (document.getElementById('mode_choice_8').value === "rasyba") {
             if (document.getElementById('mode_choice_4').value === "C40") {
                     document.getElementById("question-number-input").value = 20;
-                    document.getElementById('answer-number-label-teacher').innerHTML = 'sakinių';
+                    document.getElementById('answer-number-label').innerHTML = 'sakinių';
                 }
         } 
         } else {
             document.getElementById("question-number-input").value = 20;
-            document.getElementById('answer-number-label-teacher').innerHTML = 'veiksmų';
+            document.getElementById('answer-number-label').innerHTML = 'veiksmų';
         }
         }
+    }
 
     function updateModeChoice4() {
         let modeChoice4ElementSelection = modeChoice4Element.value;
@@ -2010,47 +2577,59 @@
     document.getElementById('mode_choice_8').addEventListener('change', updateModeChoice4Options);
     
 
-    timerInputElementTeacher.addEventListener("input", function(event) {
-      if (parseInt(timerInputElementTeacher.value) === 1 || parseInt(timerInputElementTeacher.value.slice(-1)[0]) === 1 && parseInt(timerInputElementTeacher.value) !== 11) {
-        timerLabelElementTeacher.innerHTML = 'minutę';
-      } else if ((parseInt(timerInputElementTeacher.value) > 1 && parseInt(timerInputElementTeacher.value) < 10) || (parseInt(timerInputElementTeacher.value) > 20 && parseInt(timerInputElementTeacher.value.slice(-1)[0]) !== 0)) {
-        timerLabelElementTeacher.innerHTML = 'minutes';
-      } else if (parseInt(timerInputElementTeacher.value) >= 10 ) {
-        timerLabelElementTeacher.innerHTML = 'minučių';
-      }
+    timerInputChoiceElement.addEventListener("input", function(event) {
+        setLabelEndingForDuration();
     })
 
-    const questionNumberInputElementTeacher = document.querySelector('#question-number-input');
-    let answerNumberLabelTeacher = document.querySelector('.answer-number-label-teacher');
+    function setLabelEndingForDuration () {
+      if (timerChoiceLabel) {
+        if (parseInt(timerInputChoiceElement.value) === 1 || parseInt(timerInputChoiceElement.value.slice(-1)[0]) === 1 && parseInt(timerInputChoiceElement.value) !== 11) {
+            timerChoiceLabel.innerHTML = 'minutę';
+        } else if ((parseInt(timerInputChoiceElement.value) > 1 && parseInt(timerInputChoiceElement.value) < 10) || (parseInt(timerInputChoiceElement.value) > 20 && parseInt(timerInputChoiceElement.value.slice(-1)[0]) !== 0)) {
+            timerChoiceLabel.innerHTML = 'minutes';
+        } else if (parseInt(timerInputChoiceElement.value) >= 10 ) {
+            timerChoiceLabel.innerHTML = 'minučių';
+        }
+    }
+    }
 
-    questionNumberInputElementTeacher.addEventListener("input", function(event) {
+    const questionNumberInputChoiceElement = document.querySelector('#question-number-input');
+    let answerNumberLabelTeacher = document.querySelector('.answer-number-label');
+
+    questionNumberInputChoiceElement.addEventListener("input", function(event) {
+        setLabelEndingForQuestionNumber();
+    })
+
+    function setLabelEndingForQuestionNumber () {
+        if (answerNumberLabelTeacher) {
         if (document.getElementById('mode_choice').value === "kalba") {
         if (document.getElementById('mode_choice_8').value === "tekstas") {
-            if (parseInt(questionNumberInputElementTeacher.value) === 1 || parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElementTeacher.value) !== 11) {
+            if (parseInt(questionNumberInputChoiceElement.value) === 1 || parseInt(questionNumberInputChoiceElement.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputChoiceElement.value) !== 11) {
                 answerNumberLabelTeacher.innerHTML = 'tekstą';
-            } else if ((parseInt(questionNumberInputElementTeacher.value) > 1 && parseInt(questionNumberInputElementTeacher.value) < 10) || (parseInt(questionNumberInputElementTeacher.value) > 20 && parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) !== 0))  {
+            } else if ((parseInt(questionNumberInputChoiceElement.value) > 1 && parseInt(questionNumberInputChoiceElement.value) < 10) || (parseInt(questionNumberInputChoiceElement.value) > 20 && parseInt(questionNumberInputChoiceElement.value.slice(-1)[0]) !== 0))  {
                 answerNumberLabelTeacher.innerHTML = 'tekstus';
-            } else if (parseInt(questionNumberInputElementTeacher.value) >= 10) {
+            } else if (parseInt(questionNumberInputChoiceElement.value) >= 10) {
                 answerNumberLabelTeacher.innerHTML = 'tekstų';
             }
 
         } else if (document.getElementById('mode_choice_8').value === "rasyba") {
-            if (parseInt(questionNumberInputElementTeacher.value) === 1 || parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElementTeacher.value) !== 11) {
+            if (parseInt(questionNumberInputChoiceElement.value) === 1 || parseInt(questionNumberInputChoiceElement.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputChoiceElement.value) !== 11) {
                 answerNumberLabelTeacher.innerHTML = 'sakinį';
-            } else if ((parseInt(questionNumberInputElementTeacher.value) > 1 && parseInt(questionNumberInputElementTeacher.value) < 10) || (parseInt(questionNumberInputElementTeacher.value) > 20 && parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) !== 0))  {
+            } else if ((parseInt(questionNumberInputChoiceElement.value) > 1 && parseInt(questionNumberInputChoiceElement.value) < 10) || (parseInt(questionNumberInputChoiceElement.value) > 20 && parseInt(questionNumberInputChoiceElement.value.slice(-1)[0]) !== 0))  {
                 answerNumberLabelTeacher.innerHTML = 'sakinius';
-            } else if (parseInt(questionNumberInputElementTeacher.value) >= 10) {
+            } else if (parseInt(questionNumberInputChoiceElement.value) >= 10) {
                 answerNumberLabelTeacher.innerHTML = 'sakinių';
             }
         }
-        } else if (parseInt(questionNumberInputElementTeacher.value) === 1 || parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputElementTeacher.value) !== 11) {
+        } else if (parseInt(questionNumberInputChoiceElement.value) === 1 || parseInt(questionNumberInputChoiceElement.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputChoiceElement.value) !== 11) {
             answerNumberLabelTeacher.innerHTML = 'veiksmą';
-        } else if ((parseInt(questionNumberInputElementTeacher.value) > 1 && parseInt(questionNumberInputElementTeacher.value) < 10) || (parseInt(questionNumberInputElementTeacher.value) > 20 && parseInt(questionNumberInputElementTeacher.value.slice(-1)[0]) !== 0))  {
+        } else if ((parseInt(questionNumberInputChoiceElement.value) > 1 && parseInt(questionNumberInputChoiceElement.value) < 10) || (parseInt(questionNumberInputChoiceElement.value) > 20 && parseInt(questionNumberInputChoiceElement.value.slice(-1)[0]) !== 0))  {
             answerNumberLabelTeacher.innerHTML = 'veiksmus';
-        } else if (parseInt(questionNumberInputElementTeacher.value) >= 10) {
+        } else if (parseInt(questionNumberInputChoiceElement.value) >= 10) {
             answerNumberLabelTeacher.innerHTML = 'veiksmų';
         }
-    })
+    }
+    }
 
 
         function getOptionTextFromValues(values) {
@@ -2341,6 +2920,7 @@
             deletingTask = true
             await deleteTasks(assignmentIds)
 
+            disableConfirmationButtons();
             try {
                 // Prepare the list of tasks to delete (assuming tasksToTemove is already populated)
                 const studentsToDelete = studentsToRemove;  // Ensure this array holds task IDs to be deleted
@@ -2383,126 +2963,6 @@
             }
         }
 
-
-        async function addTeacher() {
-            const teacherId = addTeacherInput.value;
-            if (!teacherId) return;
-
-            addTeacherButton.innerHTML = "Pridedama...";
-            document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = true);
-            disableTeacherControlPannel();
-            try {
-                const response = await fetch(apiBase + 'students', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': userData.token
-                    },
-                    body: JSON.stringify({ teacherId })
-                });
-
-                // Safely parse response (fallback if JSON fails)
-                const responseData = await response.json().catch(() => ({}))
-
-                if (!response.ok) {
-                    if (responseData.message === "Unauthorized") {
-                        clearUserData();
-                        window.location.href = "prisijungimas";
-                    } else if (responseData.error === 'Invalid teacher ID') {
-                        studentMessage.innerHTML = "Neteisingas mokytojo ID numeris."
-                    } else if (responseData.error === 'Relationship already exists') {
-                        studentMessage.innerHTML = "Šis mokytojas jau yra jūsų sąraše."
-                    } else if (responseData.error === 'Student already has a teacher. Use PUT to update instead.') {
-                        studentMessage.innerHTML = "Jau turi pridėtą mokytoją."
-                    } else {
-                        throw new Error(`Server error: ${response.status}`);
-                    }
-                } else {
-                userData.teacher = responseData.teacherInfo
-                localStorage.setItem('userData', JSON.stringify(userData))
-
-                if (userData.teacher === '') {
-                    addTeacherInput.style.display = "block";
-                    addTeacherButton.style.display = "block";
-                    changeTeacherToggleButton.style.display = "none"
-                } else {
-                    teacherName.innerHTML = `Mok. ${userData.teacher}`
-                    addTeacherInput.style.display = "none";
-                    addTeacherButton.style.display = "none";
-                    changeTeacherToggleButton.style.display = "block"
-                }
-                studentMessage.innerHTML = "Mokytojas pridėtas sėkmingai."
-            }
-            } catch (error) {
-                console.log('Full error:', error);
-                studentMessage.innerHTML = "Įvyko klaida. Bandykite vėl vėliau."
-            }
-            addTeacherButton.innerHTML = "Pridėti mokytoją";
-            document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
-        }
-
-        async function changeTeacher() {
-            const teacherId = changeTeacherInput.value;
-            if (!teacherId) return;
-
-            changeTeacherButton.innerHTML = "Keičiama..."
-            document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = true);   
-            try {
-                const response = await fetch(apiBase + 'students', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': userData.token
-                    },
-                    body: JSON.stringify({ teacherId })
-                });
-
-                // Safely parse response (fallback if JSON fails)
-                const responseData = await response.json().catch(() => ({}))
-
-                if (!response.ok) {
-                    if (responseData.message === "Unauthorized") {
-                        clearUserData();
-                        window.location.href = "prisijungimas";
-                    } else if (response.status === 400 && responseData.error === 'Invalid teacher ID') {
-                        studentMessage.innerHTML = "Neteisingas mokytojo ID numeris."
-                    } else if (response.status === 404 && responseData.error === 'No existing teacher relationship found') {
-                        studentMessage.innerHTML = "Nerastas esamas mokytojo ryšys. Pirmiausia pridėkite mokytoją."
-                    } else if (response.status === 400 && responseData.error === 'Student already has this teacher') {
-                        studentMessage.innerHTML = "Šis mokytojas jua pridėtas."
-                    } else if (response.status === 400 && responseData.error === 'No existing teacher relationship found. Use POST to create one.') {
-                        studentMessage.innerHTML = "Neturi pridėto mokytojo."
-                    } else {
-                        throw new Error(`Server error: ${response.status}`);
-                    }
-                } else {
-                    userData.teacher = responseData.teacherInfo
-                    localStorage.setItem('userData', JSON.stringify(userData))
-
-                    if (userData.teacher === '') {
-                        addTeacherInput.style.display = "block";
-                        addTeacherButton.style.display = "block";
-                        changeTeacherToggleButton.style.display = "none"
-                    } else {
-                        teacherName.innerHTML = `Mok. ${userData.teacher}`
-                        teacherName.style.display = "block"
-                        addTeacherInput.style.display = "none";
-                        addTeacherButton.style.display = "none";
-                        changeTeacherInput.style.display = "none";
-                        changeTeacherButton.style.display = "none";
-                        changeTeacherToggleButton.style.display = "block"
-                        changeTeacherToggle();
-                    }
-                    deleteAllTasks();
-                    studentMessage.innerHTML = "Mokytojas sėkmingai pakeistas."
-                }
-            } catch (error) {
-                console.log('Full error:', error);
-                studentMessage.innerHTML = "Įvyko klaida keičiant mokytoją. Bandykite vėl vėliau."
-            }
-            changeTeacherButton.innerHTML = "Keisti mokytoją"
-            document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
-        }
 
         function clearTaskInfoContainer() {
             studentTaskStudentName.innerHTML = '';
@@ -2547,11 +3007,14 @@
             document.querySelector("#summary-table-grammar-for-student").innerHTML = "";
             document.querySelector("#summary-table-for-student").innerHTML = "";
             document.querySelector("#sentence-with-mistake-field-for-student").innerHTML = "";
-            studentScoreDurationForStudent.innerHTML = ""
-        }
-
-        function clearStudentMessage() {
-            studentMessage.innerHTML = '';
+            document.querySelector("#mistakes-table-title-grammar-for-student").innerHTML = "";
+            document.querySelector("#mistakes-table-title-math-for-students").innerHTML = "";
+            document.querySelector("#mistakes-summary-math-for-student").style.display = "none";
+            document.querySelector("#mistakes-summary-grammar-for-student").style.display = "none";
+            studentScoreDurationForStudent.innerHTML = "";
+            document.querySelector("#frequent-mistakes-container").style.display = "none";
+            document.querySelector('.task-info-holder-student').style.display = "none";
+            completeTaskButton.style.display = "none";
         }
 
         let studentStatisticsCompletedTasks = document.querySelector("#student-statistics-completed-tasks");
@@ -2667,7 +3130,6 @@
             }
 
         clearTaskInfoContainer();
-        studentTaskInfoContainer.style.display = 'flex';
         studentTaskStudentName.innerHTML = `${student[1]} (ID: ${student[0]})`;
 
 
@@ -2805,7 +3267,6 @@
         function displayTaskInfo(student, task) {
             clearTaskInfoContainer();
 
-            studentTaskInfoContainer.style.display = 'flex';
             taskDescriptionTitle.style.display = "block"
             teacherDispalyStudentTaskIndicator.style.display = "block"
 
@@ -2929,6 +3390,7 @@
 
         function displayStudentTaskInfo(task) {
             clearTaskInfoContainerForStudents()
+            document.querySelector('.task-info-holder-student').style.display = "flex";
             currentTaskInstructions = task.taskInstructions;
             currentTaskId = task.assignmentId
             const parsedTaskDescription = JSON.parse(task.taskInstructions);
@@ -3030,7 +3492,6 @@
 
             taskDescriptionForStudent.appendChild(description);
             taskDescriptionForStudent.appendChild(taskDescriptionList);
-            clearStudentMessage();
         }
 
         function populateTaskGroupDropdown() {
@@ -3113,6 +3574,13 @@
         studentName.innerHTML = `${studentIndex + 1}. ${student.nickname} (ID: ${student.id})`;
 
         studentName.addEventListener('click', () => {
+            if (document.querySelector(`#tasks-${student.id}`).style.display === "none") {
+                document.querySelector(`#tasks-${student.id}`).style.display = "block";
+            } else {
+                if (studentName.classList.contains("selected-option"))
+                document.querySelector(`#tasks-${student.id}`).style.display = "none";
+            }
+
             // Remove 'selected-option' class from all task names
             document.querySelectorAll('.selection-option').forEach(name => {
                 name.classList.remove('selected-option');
@@ -3123,11 +3591,10 @@
 
             // Display task info
             displayStudentStatistics([student.id, student.nickname], student.tasks);
-            if (document.querySelector(`#tasks-${student.id}`).style.display === "none") {
-                document.querySelector(`#tasks-${student.id}`).style.display = "block";
-            }
 
-            openSidebar();
+            if (currentAction !== "new-task") {
+                openSidebar();
+            }
         });
 
         // Student-level task status circles
@@ -3170,7 +3637,9 @@
                 // Display task info
                 displayTaskInfo([student.id, student.nickname], task);
 
-                openSidebar();
+                if (currentAction !== "new-task") {
+                    openSidebar();
+                }
             });
 
             // Task status circle
@@ -3227,31 +3696,7 @@
             }
         }
 
-        function changeTeacherToggle () {
-            changingTeacher = !changingTeacher;
-            if (changingTeacher) {
-                changeTeacherInput.style.display = "block";
-                changeTeacherButton.style.display = "block";
-                teacherName.style.display = "none";
-                changeTeacherToggleButton.innerHTML = "Atšaukti"
-            } else {
-                changeTeacherInput.style.display = "none";
-                changeTeacherButton.style.display = "none";
-                teacherName.style.display = "block";
-                changeTeacherToggleButton.innerHTML = "Keisti mokytoją"   
-            }
-        }
-
-
         function renderDataForStudents() {
-
-        if (userData.teacher === '') {
-            addTeacherInput.style.display = "block";
-            addTeacherButton.style.display = "block";
-            changeTeacherToggleButton.style.display = "none"
-        } else {
-            teacherName.innerHTML = `Mok. ${userData.teacher}`
-        }
 
             tasksList.forEach((task, taskIndex) => {
                 const taskWrapper = document.createElement('li');
@@ -3284,6 +3729,7 @@
 
                     // Display task info
                     displayStudentTaskInfo(task);
+                    openSidebarStudent();
                 });
 
                 // Task status circle
@@ -3320,6 +3766,7 @@
             newTaskButton.disabled = true
             deleteTaskButton.disabled = true
             deleteStudentButton.disabled = true
+
             try {
                 const response = await fetch(apiBase + 'students', {
                     method: 'GET',
@@ -3346,16 +3793,16 @@
             }
             if (success) {
                 setTimeout(() => closer(), 0);
+                newTaskButton.disabled = false
+                deleteTaskButton.disabled = false
+                deleteStudentButton.disabled = false
             }
-            newTaskButton.disabled = false
-            deleteTaskButton.disabled = false
-            deleteStudentButton.disabled = false
         }
 
 
         async function fetchDataForStudents() {
             let success = false;
-            studentMessage.innerHTML = 'Užduočių informacija ieškoma duomenų bazėje. Procesas gali užtrukti kelias minutes.'
+            const closer = messageToTheUser( 'Užduočių informacija ieškoma duomenų bazėje. Procesas gali užtrukti kelias minutes.', false);
             try {
                 const response = await fetch(apiBase + 'tasks', {
                     method: 'GET',
@@ -3377,11 +3824,11 @@
                     clearUserData();
                     window.location.href = "prisijungimas";
                 } else {
-                    studentMessage.innerHTML = 'Nepavyko pasiekti duomenų. Bandykite vėl vėliau.'
+                    messageToTheUser('Nepavyko pasiekti duomenų. Bandykite vėl vėliau.')
                 }
             }
             if (success) {
-                studentMessage.innerHTML = ""
+                setTimeout(() => closer(), 0);
             }
         }
     
@@ -3489,7 +3936,7 @@
 
 
     async function deleteTasks(tasksToRemove) {
-
+        disableConfirmationButtons();
         try {
             // Prepare the list of tasks to delete (assuming tasksToTemove is already populated)
             const tasksToDelete = tasksToRemove;  // Ensure this array holds task IDs to be deleted
@@ -3659,6 +4106,7 @@
 
         disableNewTaskContainer();
         disableTeacherControlPannel();
+        disableConfirmationButtons();
         try {
         const response = await fetch(apiBase + 'tasks', {
             method: 'POST',
@@ -3675,7 +4123,6 @@
 
         if (responseData.message === 'Task set successfully') {
             messageToTheUser('Užduotis sukurta sėkmingai!')
-            toggleAddNewTask();
             fetchDataForTeachers()
         } else if (responseData.message === 'Some students already have the maximum allowed tasks per student.') {
             messageToTheUser('Galima sukurti tik 6 užduotis per mokinį. Išstrinkite seną užduotį, kad galėtumėte sukurti naują.')
@@ -3688,14 +4135,10 @@
                 clearUserData();
                 window.location.href = "prisijungimas";
             } else {            
-                clearTimeout(timeoutReference);
-                submitNewTaskButton.classList.add('invalid-submition')
-                var timeoutReference = setTimeout(function() {
-                    removeError(submitNewTaskButton);
-                }, 500);
                 messageToTheUser('Nepavyko pridėti užduoties. Bandykite vėl vėliau.');
         }
         } finally {
+            toggleAddNewTask();
             enableTeacherControlPannel();
             enableNewTaskContainer();
             hideConfirmationButtons();
@@ -4064,49 +4507,79 @@ document.addEventListener("keydown", function(event) {
 
 
 
- const sidebarWrapper = document.getElementById('sidebarWrapper');
-    const toggleTab = document.getElementById('toggleTab');
-    const overlay = document.getElementById('overlay');
-    const sidebarContent = document.getElementById('sidebarContent');
+const sidebarWrapper = document.getElementById('sidebarWrapper');
+const toggleTab = document.getElementById('toggleTab');
+const sidebarContent = document.getElementById('sidebarContent');
 
-    // Toggle sidebar function
-    function toggleSidebar() {
-      // Only works on mobile
-      if (window.innerWidth <= 768) {
-        sidebarWrapper.classList.toggle('open');
-      }
+// Toggle sidebar function
+function toggleSidebar() {
+    // Only works on mobile
+    sidebarWrapper.classList.toggle('open');
+}
+
+// Open sidebar function
+function openSidebar() {
+    sidebarWrapper.classList.add('open');
+}
+
+// Close sidebar function
+function closeSidebar() {
+    sidebarWrapper.classList.remove('open');
+}
+
+// Event listeners
+toggleTab.addEventListener('click', toggleSidebar);
+
+// Handle escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebarWrapper.classList.contains('open')) {
+    closeSidebar();
     }
+});
 
-    // Open sidebar function
-    function openSidebar() {
-      if (window.innerWidth <= 768) {
-        sidebarWrapper.classList.add('open');
-      }
+// Close sidebar on window resize if it becomes desktop size
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+    closeSidebar();
     }
+});
 
-    // Close sidebar function
-    function closeSidebar() {
-      if (window.innerWidth <= 768) {
-        sidebarWrapper.classList.remove('open');
-      }
+
+const sidebarWrapperStudent = document.getElementById('sidebarWrapperStudent');
+const toggleTabStudent = document.getElementById('toggleTabStudent');
+const sidebarContentStudent = document.getElementById('sidebarContentStudent');
+
+// Toggle sidebar function
+function toggleSidebarStudent() {
+    sidebarWrapperStudent.classList.toggle('open');
+}
+
+// Open sidebar function
+function openSidebarStudent() {
+    sidebarWrapperStudent.classList.add('open');
+}
+
+// Close sidebar function
+function closeSidebarStudent() {
+    sidebarWrapperStudent.classList.remove('open');
+}
+
+// Event listeners
+toggleTabStudent.addEventListener('click', toggleSidebarStudent);
+
+// Handle escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebarWrapperStudent.classList.contains('open')) {
+        closeSidebarStudent();
     }
+});
 
-    // Event listeners
-    toggleTab.addEventListener('click', toggleSidebar);
-
-    // Handle escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && sidebarWrapper.classList.contains('open')) {
-        closeSidebar();
-      }
-    });
-
-    // Close sidebar on window resize if it becomes desktop size
-    window.addEventListener('resize', () => {
-      if (window.innerWidth > 768) {
-        closeSidebar();
-      }
-    });
+// Close sidebar on window resize if it becomes desktop size
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+        closeSidebarStudent();
+    }
+});
 
 
 
@@ -4143,9 +4616,16 @@ function showConfirmationButtons(action) {
 }
 
 function hideConfirmationButtons() {
+    document.getElementById('confirm-button').disabled = false;
+    document.getElementById('cancel-button').disabled = false;
     document.getElementById('confirmation-buttons-container').style.display = 'none';
     document.getElementById('action-buttons-container').style.display = 'flex';
     currentAction = null;
+}
+
+function disableConfirmationButtons() {
+    document.getElementById('confirm-button').disabled = true;
+    document.getElementById('cancel-button').disabled = true;
 }
 
 // Set up button click handlers
@@ -4206,8 +4686,119 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    document.getElementById("view-text-id-input").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      event.preventDefault(); // stops form submission/reload
+      passTextIdToTheLocatorFunction();
+    }
+  });
 });
 
+function incrementValue(inputId, min, max) {
+    const input = document.getElementById(inputId);
+    let value = parseInt(input.value) || min;
+    if (value < max) {
+        input.value = value + 1;
+    }
+    setLabelEndingForDuration();
+    setLabelEndingForQuestionNumber();
+}
+
+function decrementValue(inputId, min, max) {
+    const input = document.getElementById(inputId);
+    let value = parseInt(input.value) || min;
+    if (value > min) {
+        input.value = value - 1;
+    }
+    setLabelEndingForDuration();
+    setLabelEndingForQuestionNumber();
+}
+
+// Validate input on change
+document.querySelectorAll('input[type="number"]').forEach(input => {
+    input.addEventListener('change', function() {
+        const min = parseInt(this.min);
+        const max = parseInt(this.max);
+        let value = parseInt(this.value);
+        
+        if (isNaN(value) || value < min) {
+            this.value = min;
+        } else if (value > max) {
+            this.value = max;
+        }
+    });
+});
+
+function displayFrequentMistakes () {
+    generateSummaryTable('total', null, "summary-table-frequent-mistakes", "summary-table-grammar-frequent-mistakes");
+    clearTaskInfoContainerForStudents();
+    frequentMistakeContainerElement.style.display = "flex";
+    openSidebarStudent();
+}
+
+    function displayMathSummary () {
+            document.querySelector("#display-math-summary-button").classList.add("active-summary-button")
+            document.querySelector("#display-grammar-summary-button").classList.remove("active-summary-button")
+            document.querySelector("#summary-table-outer-div").style.display = "flex";
+            document.querySelector("#summary-table-grammar-outer-div").style.display = "none";
+            if (document.querySelector("#summary-table").innerHTML === "Nėra klaidų!") {
+                document.querySelector("#table-container-math").style.boxShadow = "none";
+                document.querySelector("#mistakes-summary-math").style.fontSize = "2rem";
+                document.querySelector("#summary-table").style.height = "200px";
+            }
+        }
+
+    function displayGrammarSummary () {
+        document.querySelector("#display-math-summary-button").classList.remove("active-summary-button")
+        document.querySelector("#display-grammar-summary-button").classList.add("active-summary-button")
+        document.querySelector("#summary-table-outer-div").style.display = "none";
+        document.querySelector("#summary-table-grammar-outer-div").style.display = "flex";
+
+        if ((document.querySelector("#summary-table-grammar").innerHTML === "Nėra klaidų!")) {
+                document.querySelector("#table-container-grammar").style.boxShadow = "none";
+                document.querySelector("#mistakes-summary-grammar").style.fontSize = "2rem";
+                document.querySelector("#summary-table-grammar").style.height = "200px";
+        }
+    }
+   
+function updateButtonLayout() {
+  const container = document.getElementById('action-buttons-container');
+  const buttons = Array.from(container.querySelectorAll('.teacher-action-btn'));
+  const labels = container.querySelectorAll('.btn-label');
+  
+  // Remove two-row class from all
+  labels.forEach(label => label.classList.remove('two-rows-button-label'));
+  
+  // Force reflow
+  container.offsetHeight;
+  
+  setTimeout(() => {
+    // Check if ANY label has wrapped internally (height > one line)
+    let anyLabelWrapped = false;
+    
+    labels.forEach(label => {
+      const spans = label.querySelectorAll('span');
+      if (spans.length >= 2) {
+        const firstSpanTop = spans[0].getBoundingClientRect().top;
+        const secondSpanTop = spans[1].getBoundingClientRect().top;
+        
+        // If spans are on different lines, this label wrapped
+        if (Math.abs(secondSpanTop - firstSpanTop) > 5) {
+          anyLabelWrapped = true;
+        }
+      }
+    });
+    
+    // If ANY label wrapped, make ALL labels two-row
+    if (anyLabelWrapped) {
+      labels.forEach(label => label.classList.add('two-rows-button-label'));
+    }
+  }, 50);
+}
+
+window.addEventListener('load', updateButtonLayout);
+window.addEventListener('resize', updateButtonLayout);
 	</script>
 </body>
 
