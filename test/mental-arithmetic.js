@@ -2557,11 +2557,11 @@ function messageToTheUser(message, errorMessage = true) {
     popup.className = errorMessage ? 'modern-popup error' : 'modern-popup';
 
     const iconSvg = errorMessage
-        ? `<svg viewBox="0 0 24 24" width="20" height="20">
-            <path fill="currentColor" d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+    ? `<svg viewBox="0 0 24 24" class="popup-icon-svg">
+          <path fill="currentColor" d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
         </svg>`
-        : `<svg viewBox="0 0 24 24" width="20" height="20">
-            <path fill="currentColor" d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+    : `<svg viewBox="0 0 24 24" class="popup-icon-svg">
+          <path fill="currentColor" d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
         </svg>`;
 
     popup.innerHTML = `

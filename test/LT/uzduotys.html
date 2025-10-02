@@ -56,7 +56,8 @@
         
         #content-container {
             flex: 1;
-            height: calc(100% - 80px - 16px - 16px);
+            max-height: calc(100% - 80px - 16px - 16px);
+            min-height: calc(100% - 80px - 16px - 16px);
             width: calc(100% - (2 * 16px));
             display: flex;
             justify-content: start;
@@ -65,6 +66,11 @@
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-info-holder > :not(:empty),
+        .task-info-holder-student > :not(:empty) {
+        margin-top: 5px;
         }
 
         #inner-container {
@@ -157,7 +163,7 @@
             background: rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            border-radius: 8px;
+            border-radius: 20px;
             color: #212529;
             padding: 12px 16px;
             transition: all 0.3s ease;
@@ -183,7 +189,7 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
+            border-radius: 20px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             flex: 1 0 60svh;
@@ -319,7 +325,7 @@
             text-align: center;
             background: #FAF1E6;
             box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
+            border-radius: 20px;
         }
 
         #mode_choice_11_div {
@@ -369,7 +375,7 @@
             margin: 0;
             outline: none;
             background: #FAF1E6;
-            border-radius: 8px;
+            border-radius: 20px;
             text-align: center;
         }
 
@@ -446,7 +452,7 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
+            border-radius: 20px;
             padding: 25px;
         }
 
@@ -455,7 +461,7 @@
             margin-bottom: 10px;
             max-height: 200px;
             overflow-y: auto;
-            border-radius: 8px;
+            border-radius: 20px;
         }
 
         table {
@@ -466,7 +472,7 @@
             overflow: hidden;
             margin: 0 !important;
             table-layout: fixed;
-            border-radius: 8px;
+            border-radius: 20px;
         }
 
         th,
@@ -505,7 +511,7 @@
 
         .bar {
             height: 20px;
-            border-radius: 5px;
+            border-radius: 8px;
             max-width: 100%;
         }
 
@@ -517,7 +523,7 @@
             flex-direction: column;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            border-radius: 8px;
+            border-radius: 20px;
         }
 
         .table-container::-webkit-scrollbar {
@@ -716,6 +722,9 @@
             margin: 10px 0 5px 0;
             font-weight: 600;
             text-decoration: underline;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .student-statistics-subtitle {
@@ -756,20 +765,21 @@
             display: flex;
             align-items: center;
             padding: 12px 18px 12px 18px;
-            border-radius: 8px;
+            border-radius: 20px;
             cursor: pointer;
             font-size: 1rem;
             margin: 0;
             background: linear-gradient(135deg, #3288AC, #286D8A);
-            border: 1px solid #286D8A;
+            border: none;
+            /*border: 1px solid #286D8A;*/
             color: #F5F5F7;
             margin-top: 10px;
             letter-spacing: 0.01em;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 
+            /*box-shadow: 
                 0 1px 2px rgba(0, 0, 0, 0.2),
                 0 4px 12px rgba(50, 136, 172, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);*/
         }
 
         #complete-task-button::before {
@@ -777,7 +787,7 @@
         position: absolute;
         inset: 0;
         background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
-        border-radius: 8px;
+        border-radius: 20px;
         pointer-events: none;
         transition: background 0.3s ease;
         }
@@ -786,7 +796,7 @@
         content: '';
         position: absolute;
         inset: 0;
-        border-radius: 8px;
+        border-radius: 20px;
         padding: 1px;
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
         -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -810,11 +820,57 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px !important;
+            border-radius: 20px !important;
             overflow: hidden;
         }
 
+#student-task-student-knowledge-level,
+#student-task-student-performance-mean {
+    flex: 1;
+}
+
+#student-task-student-performance-mean {
+    padding-left: 10%;
+}
+
+.categories-dropdown-holder,
+.student-points-holder {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    gap: 5px;
+}
+
+.knowledge-level-select-text, 
+.student-points-label {
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.student-points {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+#student-statistics-completed-tasks {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+#student-statistics-completed-tasks .task-info-subtitle {
+    font-style: normal;
+}
         
+.student-statistic-top-section {
+    display: flex;
+    align-items: start;
+    margin-top: 20px !important;
+}
 
 .accordion-button {
     background-color: transparent;
@@ -861,7 +917,7 @@
 }
 
 .accordion-body {
-    border-radius: 8px !important;
+    border-radius: 20px !important;
     margin-bottom: 10px;
     overflow: hidden;
     padding: 0 20px;
@@ -897,16 +953,11 @@
     font-weight: 700;
 }
 
-.task-info-holder > :not(:empty),
-.task-info-holder-student > :not(:empty) {
-  margin-top: 5px;
-}
-
         #view-text-id-input {
             background: rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            border-radius: 8px;
+            border-radius: 20px;
             border: none;
             color: #212529;
             width: 100px;
@@ -968,20 +1019,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid #286D8A;
+            border: none;
+            /*border: 1px solid #286D8A;*/
             background: linear-gradient(135deg, #3288AC, #286D8A);
             font-size: 1rem;
             color: #F5F5F7;
-            padding: 8px 8px;
-            border-radius: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
             margin: 0;
             cursor: pointer;
             letter-spacing: 0.01em;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 
+            /*box-shadow: 
                 0 1px 2px rgba(0, 0, 0, 0.2),
                 0 4px 12px rgba(50, 136, 172, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);*/
         }
 
         #text-browser-button:hover::before {
@@ -993,7 +1045,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            border-radius: 8px;
+            border-radius: 20px;
             padding: 1px;
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -1008,7 +1060,7 @@
             position: absolute;
             inset: 0;
             background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
-            border-radius: 8px;
+            border-radius: 20px;
             pointer-events: none;
             transition: background 0.3s ease;
             }
@@ -1018,7 +1070,7 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
+            border-radius: 20px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             flex: 1 0 60svh;
@@ -1081,6 +1133,23 @@
         overflow-y: auto;
         margin-right: 15px;
     }
+    
+    #knowledge-level-select {
+        padding: 6px 8px;
+        font-size: 1rem;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        width: 150px;
+        text-align: center;
+        cursor: pointer;
+        width: auto;
+    }
+
+    #knowledge-level-select:focus,
+    #knowledge-level-select:active {
+        outline: none;
+    }
 
     .sidebar-content {
       min-height: 100%;
@@ -1099,7 +1168,7 @@
       border: none;
       width: 33.75px;
       height: 62px;
-      border-radius: 0 8px 8px 0;
+      border-radius: 0 20px 20px 0;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -1161,7 +1230,7 @@
 
 .student-action-btn {
     flex: 0 0 auto;
-    width: 100px;
+    width: 150px;
 }
 
 .teacher-action-btn,
@@ -1179,9 +1248,10 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border: #286D8A 1px solid;
+  border: none;
+  /*border: #286D8A 1px solid;*/
   background: linear-gradient(135deg, #3288AC, #286D8A);
-  border-radius: 8px;
+  border-radius: 20px;
   cursor: pointer;
   font-size: 1rem;
   color: #F5F5F7;
@@ -1191,10 +1261,10 @@
   font-weight: 500;
   letter-spacing: 0.01em;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
-    0 1px 2px rgba(0, 0, 0, 0.2),
-    0 4px 12px rgba(50, 136, 172, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  /*box-shadow: 
+        0 1px 2px rgba(0, 0, 0, 0.2),
+        0 4px 12px rgba(50, 136, 172, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);*/
 }
 
 .teacher-action-btn::before,
@@ -1205,7 +1275,7 @@
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
-  border-radius: 8px;
+  border-radius: 20px;
   pointer-events: none;
   transition: background 0.3s ease;
 }
@@ -1217,7 +1287,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 8px;
+  border-radius: 20px;
   padding: 1px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -1236,12 +1306,14 @@
 
 .confirm-btn {
     background: linear-gradient(135deg, #A0C58F, #32ac93);
-    border: 1px solid #32ac93;
+    border: none;
+    /*border: 1px solid #32ac93;*/
 }
 
 .cancel-btn {
-    background: linear-gradient(135deg, #f76859, #e74c3c);
-    border: 1px solid #e74c3c;
+    background: linear-gradient(135deg, #ff8073, #e74c3c);
+    border: none;
+    /*border: 1px solid #e74c3c;*/
 }
 
 #confirm-button:disabled,
@@ -1257,41 +1329,14 @@
 }
 
 .active-summary-button {
-      letter-spacing: 0.01em;
+  position: relative;
+  letter-spacing: 0.01em;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
+  /*box-shadow: 
     0 1px 2px rgba(0, 0, 0, 0.2),
     0 4px 12px rgba(50, 136, 172, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);*/
 }
-
-.active-summary-button::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
-  border-radius: 8px;
-  pointer-events: none;
-  transition: background 0.3s ease;
-}
-
-.active-summary-button::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 8px;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
-
-.active-summary-button:hover::before {
-  background: rgba(255, 255, 255, 0.15);
-}
-
 
 @keyframes slideIn {
     from {
@@ -1316,7 +1361,7 @@
             display: flex;
             align-items: center;
             background: #FAF1E6;
-            border-radius: 8px;
+            border-radius: 20px;
             box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
             overflow: hidden;
         }
@@ -1418,6 +1463,13 @@
 
     /* Mobile: collapsible sidebar */
     @media (max-width: 768px) {
+
+        #content-container {
+            max-height: none;
+            min-height: none;
+        }
+
+
         #student-task-info-container {
                 padding-left: 0;
             }
@@ -1579,8 +1631,23 @@
         padding-left: 0;
         padding-right: 0;
     }
-    
+
+    #knowledge-level-select {
+        background: rgba(255, 255, 255, 0.8);
     }
+
+    .student-statistics-title {
+        border-top: 1px solid rgba(255, 255, 255, 1);
+    }
+
+    #student-statistics-completed-tasks {
+        border-top: 1px solid rgba(255, 255, 255, 1);
+        font-size: 1.15rem;
+    }
+
+    tr:last-child td {
+    padding-bottom: 10px;
+}
 
     @media (max-width: 578px) {
                     html,
@@ -1621,12 +1688,20 @@
          .mistakes-summary-forstudents-title {
             font-size: 1.25rem;
         }
-
-
+        .student-points {
+            font-size: 1.25rem;
+            padding-top: 0.25rem;
+        }
     }
 
 
     @media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)  {
+        #content-container {
+            max-height: none;
+            min-height: none;
+        }
+
+
         body {
             font-size: 1.5rem;
         }
@@ -1784,6 +1859,19 @@
                 flex: 0 0 auto;
                 width: auto;
             }
+
+            #knowledge-level-select {
+                background: rgba(255, 255, 255, 0.8);
+                font-size: 1.5rem;
+            }
+
+    .student-statistics-title {
+        border-top: 1px solid rgba(255, 255, 255, 1);
+    }
+
+    #student-statistics-completed-tasks {
+        border-top: 1px solid rgba(255, 255, 255, 1);
+    }
     }
 
 
@@ -2170,7 +2258,11 @@
                         <div id="student-task-info-container">
                             <div id="student-task-info-container-inner">
                                 <div class="task-info-holder">
-                                    <div class="" id="student-task-student-name"></div>
+                                    <div id="student-task-student-name"></div>
+                                    <div class="student-statistic-top-section">
+                                    <div id="student-task-student-knowledge-level"></div>
+                                    <div id="student-task-student-performance-mean"></div>
+                                    </div>
                                     <div id="student-task-group-and-status-indicator">
                                         <div id="student-task-group"></div>
                                         <div id="student-task-status-indicator"></div>
@@ -2456,6 +2548,7 @@
         let showingSelectAllCheckbox = false;
         let taskContainerVisible = true;
         let changingTeacher = false;
+        let classScoreMedian;
         const teacherGUI = document.getElementById('teacher-gui');
         const studentGUI = document.getElementById('student-gui');
         const adminGUI = document.getElementById('admin-gui');
@@ -2975,6 +3068,10 @@
             teacherDispalyStudentTaskIndicator.style.display = "none"
             studentStatisticsCompletedTasks.innerHTML = '';
             studentStatisticsCompletedTasks.style.display = "none";
+            studentStatisticsKnowledgeLevel.innerHTML = '';
+            studentStatisticsKnowledgeLevel.style.display = "none";
+            studentStatisticsPerformanceMean.innerHTML = '';
+            studentStatisticsPerformanceMean.style.display = "none";
             studentStatisticsMathDiv.style.display = "none";
             studentStatisticsMathErrorFrequency.innerHTML = '';
             studentStatisticsLangDiv.style.display = "none";
@@ -3018,6 +3115,9 @@
         }
 
         let studentStatisticsCompletedTasks = document.querySelector("#student-statistics-completed-tasks");
+
+        let studentStatisticsPerformanceMean = document.querySelector("#student-task-student-performance-mean");
+        let studentStatisticsKnowledgeLevel = document.querySelector("#student-task-student-knowledge-level");
         const studentStatisticsMathDiv = document.querySelector("#student-statistics-math");
         const studentStatisticsMathErrorFrequency = document.querySelector("#student-statistics-math-error-frequency");
         const studentStatisticsLangDiv = document.querySelector("#student-statistics-lang-grammar") 
@@ -3035,7 +3135,6 @@
         const studentTaskCompletionDate = document.querySelector("#student-task-completion-date")
         const studentTaskCompletionDateForStudents = document.querySelector("#student-task-completion-date-for-students")
         
-
         function displayStudentStatistics(student, studentTasks) {
             function processStudentTasks(studentTasks) {
                 // Initialize the result objects
@@ -3132,11 +3231,77 @@
         clearTaskInfoContainer();
         studentTaskStudentName.innerHTML = `${student[1]} (ID: ${student[0]})`;
 
+        const knowledgeOptions = [
+            { value: -1, label: "Nustatykite lygį", hidden: true }, // placeholder, shown only if -1
+            { value: 0, label: "Priešmokyklinis" },
+            { value: 1, label: "1 klasė" },
+            { value: 2, label: "2 klasė" },
+            { value: 3, label: "3 klasė" },
+            { value: 4, label: "4 klasė" },
+            { value: 5, label: "Aukštesnis" },
+        ];
 
-        studentStatisticsCompletedTasks.style.display = "block";
+        // Build the dropdown
+        let selectHTML = `<div class="categories-dropdown-holder">
+            <div class="knowledge-level-select-text">Žinių lygis</div>
+            <select id="knowledge-level-select">
+                ${knowledgeOptions.map(opt => `
+                    <option value="${opt.value}" ${opt.hidden ? "hidden" : ""}>${opt.label}</option>
+                `).join("")}
+            </select>
+        </div>`;
+
+        studentStatisticsKnowledgeLevel.innerHTML = selectHTML;
+        studentStatisticsKnowledgeLevel.style.display = "block";
+
+        studentStatisticsPerformanceMean.innerHTML = `<div class="student-points-holder"><div class="student-points-label">Taškai</div> <div class="student-points">${student[3]} (${classScoreMedian})</div></div>`;
+        studentStatisticsPerformanceMean.style.display = "block";
+
+        const knowledgeSelect = document.getElementById("knowledge-level-select");
+
+        // Preselect based on DB value
+        if (student[2] !== undefined) {
+            knowledgeSelect.value = student[2];
+        }
+
+        // Event listener to update when changed
+        knowledgeSelect.addEventListener("change", async (e) => {
+            const newValue = parseInt(e.target.value, 10);
+            console.log(student)
+            if (newValue !== student[2]) {
+                try {
+                    const response = await fetch(apiBase + `students/knowledge-level`, {
+                        method: "PATCH",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": userData.token
+                        },
+                        body: JSON.stringify({
+                            studentId: Number(student[0]),
+                            knowledgeLvl: Number(newValue)
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Nepavyko atnaujinti lygio");
+                    }
+
+                    const data = await response.json();
+                    student[2] = data.knowledgeLvl; // update local student object
+                    messageToTheUser("Žinių lygis sėkmingai atnaujintas!", false);
+                } catch (error) {
+                    console.error("Error updating knowledge level:", error);
+                    messageToTheUser("Nepavyko atnaujinti žinių lygio. Bandykite vėliau vėl");
+                }
+            }
+        });
 
         const taskStatusSummary = countTaskStatuses(studentTasks)
-        studentStatisticsCompletedTasks.innerHTML = `<span class="task-info-subtitle">Baigtos užduotys:</span> ${taskStatusSummary.completed}/${taskStatusSummary.total}`
+
+        if (taskStatusSummary.total > 0) {
+            studentStatisticsCompletedTasks.style.display = "block";
+            studentStatisticsCompletedTasks.innerHTML = `<span class="task-info-subtitle">Baigtos užduotys:</span> ${taskStatusSummary.completed}/${taskStatusSummary.total}`
+        }
 
         const categorizedStudentTasks = processStudentTasks(studentTasks)
 
@@ -3552,6 +3717,20 @@
         // Sort students alphabetically by nickname
         const sortedStudents = [...filteredList].sort((a, b) => a.nickname.localeCompare(b.nickname));
 
+        const scores = sortedStudents.map(s => s.totalPoints).sort((a, b) => a - b);
+
+        if (scores.length === 0) {
+            classScoreMedian = 0; // or null, if no students
+        } else if (scores.length % 2 === 1) {
+            // Odd number of students → middle element
+            classScoreMedian = scores[Math.floor(scores.length / 2)];
+        } else {
+            // Even number → average of middle two
+            const mid1 = scores[scores.length / 2 - 1];
+            const mid2 = scores[scores.length / 2];
+            classScoreMedian = (mid1 + mid2) / 2;
+        }
+
         const listContainer = document.createElement('ul');
 
         sortedStudents.forEach((student, studentIndex) => {
@@ -3590,7 +3769,7 @@
             studentName.classList.add('selected-option');
 
             // Display task info
-            displayStudentStatistics([student.id, student.nickname], student.tasks);
+            displayStudentStatistics([student.id, student.nickname, student.knowledgeLvl, student.totalPoints], student.tasks);
 
             if (currentAction !== "new-task") {
                 openSidebar();
