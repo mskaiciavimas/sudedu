@@ -1166,8 +1166,7 @@
     .toggle-tab {
       position: absolute;
       right: -34px;
-      top: 30px;
-      transform: translateY(-50%);
+      top: 0;
       border: none;
       width: 34px;
       height: 62px;
@@ -1547,7 +1546,7 @@
         background: rgba(255, 255, 255, 0.5);
         border-bottom-right-radius: 8px;
         margin: 0;
-        margin-top: -1px;
+        margin-top: 0;
       }
 
       .sidebar-wrapper {
@@ -3951,7 +3950,7 @@
         async function fetchDataForTeachers() {
             let success = false;
             let showMessageTimeout;
-let closer;
+            let closer;
 
             // Schedule showing the message after 500ms
             showMessageTimeout = setTimeout(() => {
@@ -3985,8 +3984,7 @@ let closer;
                 } else {
                     messageToTheUser('Nepavyko pasiekti duomenų. Bandykite vėl vėliau.');
                 }
-            }
-            if (success) {
+            } finally {
                  // Cancel showing the message if not yet displayed
                 clearTimeout(showMessageTimeout);
 
@@ -3994,6 +3992,8 @@ let closer;
                 if (closer) {
                     setTimeout(() => closer(), 0); // close after 0.5s
                 }
+            }
+            if (success) {
                 newTaskButton.disabled = false
                 deleteTaskButton.disabled = false
                 deleteStudentButton.disabled = false
