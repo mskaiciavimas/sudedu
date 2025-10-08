@@ -77,6 +77,12 @@
         font-style: italic;
         }
 
+        * {
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
         :root {
             --unit-size: 25px;
             --original-unit-size: 25px;
@@ -2539,7 +2545,7 @@
 }
 
 .game-navigation .nav-item.active .nav-label {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     opacity: 1;          /* show label */
     height: auto;        /* expand to fit */
 }
@@ -2602,7 +2608,7 @@
             overflow-y: scroll;
         }
   .game-content-panel {
-        padding: 20px 15px !important;
+        padding: 35px !important;
     }
 
   #gameContainer {
@@ -3790,6 +3796,17 @@ function parseGameData(dataFromServer) {
 }
 
 async function fetchGameData() {
+    let showMessageTimeout;
+    let closer;
+    // Schedule showing the message after 500ms
+    showMessageTimeout = setTimeout(() => {
+        closer = messageToTheUser("Duomenys ieškomi duomenų bazėje. Procesas gali užtrukti kelias minutes.", false);
+    }, 500);
+
+    Array.from(document.getElementById("gameContainer").children).forEach(child => {
+        child.style.pointerEvents = "none";  // disables clicks
+        child.style.opacity = "0.5";         // optional visual cue
+    });
     try {
         const response = await fetch(apiBase + 'petGame/gameData', {
             method: 'POST',
@@ -3805,11 +3822,23 @@ async function fetchGameData() {
         }
 
         const result = await response.json();
+        Array.from(document.getElementById("gameContainer").children).forEach(child => {
+            child.style.pointerEvents = "auto";  // enables clicks
+            child.style.opacity = "1";           // restore visual
+        });
         parseGameData(result)
 
     } catch (error) {
         messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
         console.error("Error fetching game data:", error);
+    } finally {
+        // Cancel showing the message if not yet displayed
+        clearTimeout(showMessageTimeout);
+
+        // Close message if it was displayed
+        if (closer) {
+            setTimeout(() => closer(), 0); // close after 0.5s
+        }
     }
 }
 
@@ -5923,68 +5952,6 @@ let shopState = {
     tab: 'supplies',
     showUnpurchasedOnly: false
 };
-
-// Modern popup system
-function messageToTheUser(message, errorMessage=true) {
-    // Remove any existing popup
-    const existingPopup = document.querySelector('.modern-popup');
-    if (existingPopup) {
-        existingPopup.remove();
-    }
-
-    // Create popup element
-    const popup = document.createElement('div');
-    if (errorMessage) {
-        popup.className = `modern-popup error`;
-    } else {
-        popup.className = `modern-popup`;
-    }
-    
-    const iconSvg = errorMessage 
-        ? `<svg viewBox="0 0 24 24" width="20" height="20">
-            <path fill="currentColor" d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
-        </svg>` // warning triangle with exclamation mark
-        : `<svg viewBox="0 0 24 24" width="20" height="20">
-            <path fill="currentColor" d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
-        </svg>`; // check mark
-
-    popup.innerHTML = `
-        <div class="popup-content">
-            <div class="popup-icon">${iconSvg}</div>
-            <div class="popup-message">${message}</div>
-            <button class="popup-close">&times;</button>
-        </div>
-    `;
-
-    // Add to page
-    document.body.appendChild(popup);
-
-    // Auto-close after 4 seconds
-    const autoClose = setTimeout(() => {
-        closePopup();
-    }, 6000);
-
-    // Close button functionality
-    const closeBtn = popup.querySelector('.popup-close');
-    const closePopup = () => {
-        clearTimeout(autoClose);
-        popup.style.animation = 'slideOutRight 0.3s ease-in';
-        setTimeout(() => {
-            if (popup.parentNode) {
-                popup.remove();
-            }
-        }, 300);
-    };
-
-    closeBtn.addEventListener('click', closePopup);
-
-    // Click outside to close (optional)
-    popup.addEventListener('click', (e) => {
-        if (e.target === popup) {
-            closePopup();
-        }
-    });
-}
 
 async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn) {
     updateShopState();
