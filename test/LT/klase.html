@@ -124,7 +124,7 @@
             position: relative;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 5px;
             padding: 1rem 0.75rem;
             border: none;
             background: transparent;
@@ -342,8 +342,8 @@
 
         .is-you-div-week-challenge {
             position: absolute;
-            bottom: 0;
-            left: 0;
+            bottom: -5px;
+            left: -5px;
             background: linear-gradient(135deg, #3288AC, #286D8A);
             border-radius: 20px;
             color: #F5F5F7;
@@ -465,7 +465,7 @@
             font-size: 2rem;
             font-weight: 600;
             border-radius: 20px;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.1);
             padding-left: 20px;
             width: 200px;
@@ -882,7 +882,7 @@
             margin-bottom: 20px;
             gap: 15px;
             flex-wrap: wrap;
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.15);
             padding: 18px;
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -902,7 +902,7 @@
         }
 
         .class-challenge-task-box {
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.15);
             padding: 18px;
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -1151,7 +1151,7 @@
             flex-direction: column;
             gap: 5px;
             align-items: center;
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.15);
             padding: 18px;
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -1180,7 +1180,7 @@
             flex-direction: column;
             gap: 5px;
             position: relative0;
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.15);
             padding: 18px;
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -1214,6 +1214,13 @@
             gap: 4px;
         }
 
+        .coin-display-chl-winners {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
         .coin-icon {
             display: flex;
             align-items: center;
@@ -1229,6 +1236,12 @@
             font-weight: 700;
             font-size: 1rem;
         }
+
+        .last-winner-name {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
         
         .previous-challenge-winners-title {
             font-size: 0.85rem;
@@ -1238,6 +1251,76 @@
 
         .side-navigation.mobile .nav-item {
             min-width: 25vw;
+        }
+
+        .carousel-controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .carousel-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+            color: #bf9b30;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            font-weight: 700;
+        }
+
+        .carousel-btn:hover:not(:disabled) {
+            background: rgba(255, 215, 0, 0.2);
+            transform: scale(1.1);
+        }
+
+        .carousel-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .carousel-dots {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(191, 155, 48, 0.3);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .carousel-dot.active {
+            background: #bf9b30;
+            transform: scale(1.3);
+        }
+
+        .tied-count {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background: linear-gradient(135deg, #bf9b30, #d4af37);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            white-space: nowrap;
         }
 
         @media (max-width: 800px) {
@@ -1427,6 +1510,133 @@
             font-size: 1.2rem;
         }
 
+        .class-challenge-title {
+            font-size: 2.5rem;
+        }
+
+        .class-challenge-task-label,
+        .class-challenge-time,
+        .my-score-label,
+        .previous-challenge-winners-title {
+            font-size: 1.5rem;
+        }
+
+        #class-challenge-user-points {
+            font-size: 1.5rem;
+        }
+
+        .task-description-list-item {
+            font-size: 1.25rem !important;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .pedestal {
+            width: 150px;
+            font-size: 2.25rem
+        }
+
+        .third .pedestal {
+            height: 110px;
+        }
+
+        .second .pedestal {
+            height: 140px;
+        }
+
+        .first .pedestal {
+            height: 180px;
+        }
+
+        .coin-amount {
+            font-size: 1.5rem;
+        }
+
+        .podium-avatar {
+            width: 120px;
+            height: 120px;
+        }
+
+        .podium-name {
+            font-size: 1.5rem;
+        }
+
+        .podium-id {
+            font-size: 1.25rem;
+        }
+
+        .coin-icon img {
+            height: 48px;
+            width: 48px;
+        }
+
+        .podium-points {
+            font-size: 1.35rem;
+        }
+
+        .previous-challenge-winners-title {
+            font-size: 1.75rem;
+        }
+
+        .last-winner-name {
+            font-size: 1.5rem;
+        }
+
+        .last-winner-card {
+            padding-top: 10px;
+        }
+
+        .is-you-div-last-winner,
+        .is-you-div-week-challenge {
+            font-size: 1.15rem;
+        }
+
+        .class-challenge-btn {
+            max-height: 52px;
+        }
+
+        .personal-info-header {
+            font-size: 2.5rem;
+        }
+
+        .user-info-section-label {
+            font-size: 1.5rem !important;
+        }
+
+        .field-display,
+        .field-display,
+        #accountTypeSelect,
+        #fullName,
+        #featureSelect,
+        .arrow {
+            font-size: 1.35rem;
+        }
+
+        .color-btn {
+            height: 32px;
+            width: 32px;
+        }
+
+        .avatar-wrap {
+            width: 190px;
+            height: 190px;
+        }
+        
+        .avatar-section {
+            width: 230px;
+        }
+
+        .profile-grid {
+            grid-template-columns: 250px 1fr;
+        }
+
+        .field-display,
+        #fullName,
+        #accountTypeSelect {
+            max-width: none;
+        }
 
         }
 
@@ -1509,6 +1719,22 @@
             .third .pedestal {
                 height: 70px;
             }
+
+            .carousel-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 0.9rem;
+            }
+
+            .carousel-dot {
+                width: 7px;
+                height: 7px;
+            }
+
+            .tied-count {
+                font-size: 0.65rem;
+                padding: 3px 6px;
+            }
         }
 
 
@@ -1539,6 +1765,10 @@
 
             .pupils-list-title {
                 font-size: 1.25rem;
+            }
+
+            .is-you-div-week-challenge {
+                font-size: 0.65rem;
             }
 
         }
@@ -1627,19 +1857,19 @@
             <div class="nav-items">
                 <button class="nav-item active" data-target="nariai">
                     <span class="nav-icon">
-                        <img src="../images/icons/icon-home.svg">
+                        <img src="../images/icons/icon-class-members.svg">
                     </span>
                     <span class="nav-label">Nariai</span>
                 </button>
                 <button class="nav-item" data-target="issukis">
                     <span class="nav-icon">
-                        <img src="../images/icons/icon-pets.svg">
+                        <img src="../images/icons/icon-challenge.svg">
                     </span>
                     <span class="nav-label">Iššūkis</span>
                 </button>
                 <button class="nav-item" data-target="profilis">
                     <span class="nav-icon">
-                        <img src="../images/icons/icon-furniture.svg">
+                        <img src="../images/icons/icon-profile.svg">
                     </span>
                     <span class="nav-label">Profilis</span>
                 </button>
@@ -1704,26 +1934,21 @@
                         
                         <div class="section-title">Iššūkio lyderiai</div>
                                     <div class="class-challenge-leaders-div">
-                                    <div class="podium-container-outer">
-                                    <div class="podium-container">
-                                        <div class="podium-place second">
-                                            <div class="podium-student">
+                                        <div class="podium-container-outer">
+                                        <div id="podium-container" class="podium-container">
+                                            <div class="podium-place second">
+                                                <div class="podium-student"></div>
+                                                <div class="pedestal">2</div>
                                             </div>
-                                            <div class="pedestal">2</div>
-                                        </div>
-
-                                        <div class="podium-place first">
-                                            <div class="podium-student">
+                                            <div class="podium-place first">
+                                                <div class="podium-student"></div>
+                                                <div class="pedestal">1</div>
                                             </div>
-                                            <div class="pedestal">1</div>
-                                        </div>
-
-                                        <div class="podium-place third">
-                                            <div class="podium-student">
+                                            <div class="podium-place third">
+                                                <div class="podium-student"></div>
+                                                <div class="pedestal">3</div>
                                             </div>
-                                            <div class="pedestal">3</div>
                                         </div>
-                                    </div>
                                     </div>
                                     <div class="previous-challenge-winners-holder-outer">
                                         <div class="previous-challenge-winners-holder">
@@ -1818,8 +2043,8 @@
 
         const PALETTES = {
           hairColor: ["2c1b18","4a312c","724133","a55728","b58143","c93305","d6b370","e8e1e1","ecdcbf","f59797"],
-          hatColor: ["262e33","2f4f4f","3c4f5c","5199e4","65c9ff","929598","a7ffc4","b1e2ff","d6b370","e6e6e6","ff5c5c","ff488e","ffafb9","ffffb1"],
-          clothesColor: ["3c4f5c","65c9ff","262e33","5199e4","25557c","929598","a7ffc4","b1e2ff","e6e6e6","ff5c5c","ff488e","ffafb9","ffffb1","ffffff"],
+          hatColor: ["262e33","2f4f4f","3c4f5c","5199e4","65c9ff","929598","a7ffc4","d6b370","e6e6e6","ff5c5c","ff488e","ffafb9","ffffb1"],
+          clothesColor: ["3c4f5c","65c9ff","262e33","5199e4","25557c","929598","a7ffc4","e6e6e6","ff5c5c","ff488e","ffafb9","ffffb1","ffffff"],
           skinColor: ["614335","ae5d29","d08b5b","edb98a","f8d25c","fd9841","ffdbb4"]
         };
 
@@ -1845,26 +2070,6 @@
         const changeTeacherButton = document.getElementById('change-teacher');
 
         const pupilsListTitle = document.querySelector(".pupils-list-title")
-
-        if (userData.teacher !== '' && userData.accType === "student") {
-            teacherName.innerHTML = `<span class="teachers-name">Mok. ${userData.teacher.split(" ")[0]}</span><span class="teachers-id">ID: ${userData.teacher.split(" ")[2].replace(/[^a-zA-Z0-9]/g, "")}</span>`
-            addTeacherInput.style.display = "none";
-            addTeacherButton.style.display = "none";
-            changeTeacherToggleButton.style.display = "flex";
-            pupilsListTitle.innerHTML = "Klasiokai";
-        } else if (userData.accType === "teacher") {
-            teacherName.innerHTML = `<span class="teachers-name">Mok. ${userData.nickname}</span><span class="teachers-id">ID: ${userData.userId}</span>`
-            addTeacherInput.style.display = "none";
-            addTeacherButton.style.display = "none";
-            changeTeacherToggleButton.style.display = "none";
-            pupilsListTitle.innerHTML = "Mokiniai";
-            document.querySelector(".avatar-section").style.display = "none";
-            document.querySelector('.profile-grid').style.gridTemplateColumns = '100%';
-        } else {
-            addTeacherInput.style.display = "flex";
-            addTeacherButton.style.display = "flex";
-            changeTeacherToggleButton.style.display = "none";
-        }
 
         addTeacherButton.addEventListener('click', async () => {
             const teacherId = addTeacherInput.value;
@@ -1918,7 +2123,13 @@
                     addTeacherButton.style.display = "none";
                     changeTeacherToggleButton.style.display = "flex"
                 }
+
+                Array.from(document.getElementById("contentContainer").children).forEach(child => {
+                    child.style.pointerEvents = "auto";
+                    child.style.opacity = "1";
+                });
                 messageToTheUser("Mokytojas pridėtas sėkmingai.")
+                location.reload();
             }
             } catch (error) {
                 console.log('Full error:', error);
@@ -2221,7 +2432,8 @@ function updateAvatarDisplay() {
                 { value: 'clothing', label: 'Drabužiai' },
                 { value: 'eyes', label: 'Akys' },
                 { value: 'eyebrows', label: 'Antakiai' },
-                { value: 'mouth', label: 'Burna' }
+                { value: 'mouth', label: 'Burna' },
+                { value: 'skin', label: 'Odos spalva' } 
             ];
             
             features.forEach(f => {
@@ -2239,32 +2451,50 @@ function updateAvatarDisplay() {
             palette.innerHTML = '';
             
             let colors = [];
+            let colorKey = '';
+            
+            // Determine which colors to show based on current feature
             if (currentFeature === 'top') {
-                colors = PALETTES.hairColor || [];
+                const currentTop = avatarSettings.top[0];
+                // Check if current top style is a hat
+                const hatStyles = ["hat", "hijab", "turban", "winterHat1", "winterHat02", "winterHat03", "winterHat04"];
+                
+                if (hatStyles.includes(currentTop)) {
+                    colors = PALETTES.hatColor || [];
+                    colorKey = 'hatColor';
+                } else {
+                    colors = PALETTES.hairColor || [];
+                    colorKey = 'hairColor';
+                }
                 palette.classList.remove('hidden');
             } else if (currentFeature === 'clothing') {
                 colors = PALETTES.clothesColor || [];
+                colorKey = 'clothesColor';
+                palette.classList.remove('hidden');
+            } else if (currentFeature === 'skin') {  // Add this condition
+                colors = PALETTES.skinColor || [];
+                colorKey = 'skinColor';
                 palette.classList.remove('hidden');
             } else {
                 palette.classList.add('hidden');
                 return;
             }
             
+            // Create color buttons
             colors.forEach(color => {
                 const btn = document.createElement('button');
                 btn.className = 'color-btn';
                 btn.style.backgroundColor = '#' + color;
                 
-                const colorKey = currentFeature === 'top' ? 'hairColor' : 'clothesColor';
+                // Check if this color is currently active
                 if (avatarSettings[colorKey] && avatarSettings[colorKey][0] === color) {
                     btn.classList.add('active');
                 }
                 
                 btn.onclick = () => {
-                    const key = currentFeature === 'top' ? 'hairColor' : 'clothesColor';
-                    avatarSettings[key] = [color];
+                    avatarSettings[colorKey] = [color];
                     updateAvatarDisplay();
-                    updateColorPalette();
+                    updateColorPalette(); // Refresh to update active state
                 };
                 
                 palette.appendChild(btn);
@@ -2272,6 +2502,11 @@ function updateAvatarDisplay() {
         }
 
         function cycleFeature(direction) {
+            // Skin color has no styles to cycle, only color palette
+            if (currentFeature === 'skin') {
+                return; // Don't cycle, user can only pick from color palette
+            }
+            
             const options = OPTIONS[currentFeature];
             if (!options) return;
             
@@ -2286,7 +2521,7 @@ function updateAvatarDisplay() {
             
             avatarSettings[currentFeature] = [options[index]];
             updateAvatarDisplay();
-            updateColorPalette();
+            updateColorPalette(); // Refresh color palette (important for hat/hair switch)
         }
 
         function encodeAvatarSettings() {
@@ -2465,13 +2700,35 @@ function updateAvatarDisplay() {
 
 
 function renderMembers() {
+    if (userData) {
+    if (userData.teacher !== '' && userData.accType === "student") {
+        teacherName.innerHTML = `<span class="teachers-name">Mok. ${userData.teacher.split(" ")[0]}</span><span class="teachers-id">ID: ${userData.teacher.split(" ")[2].replace(/[^a-zA-Z0-9]/g, "")}</span>`
+        addTeacherInput.style.display = "none";
+        addTeacherButton.style.display = "none";
+        changeTeacherToggleButton.style.display = "flex";
+        pupilsListTitle.innerHTML = "Klasiokai";
+    } else if (userData.accType === "teacher") {
+        teacherName.innerHTML = `<span class="teachers-name">Mok. ${userData.nickname}</span><span class="teachers-id">ID: ${userData.userId}</span>`
+        addTeacherInput.style.display = "none";
+        addTeacherButton.style.display = "none";
+        changeTeacherToggleButton.style.display = "none";
+        pupilsListTitle.innerHTML = "Mokiniai";
+        document.querySelector(".avatar-section").style.display = "none";
+        document.querySelector('.profile-grid').style.gridTemplateColumns = '100%';
+    } else {
+        addTeacherInput.style.display = "flex";
+        addTeacherButton.style.display = "flex";
+        changeTeacherToggleButton.style.display = "none";
+    }
+    }
+
   if (!classDataCache) return;
 
   const grid = document.getElementById('membersGrid');
   grid.innerHTML = '';
 
   const students = [...classDataCache.remainingStudents];
-  const top3 = (classDataCache.top3TotalPoints || []).sort((a, b) => b.totalPoints - a.totalPoints);
+  const topEntries = (classDataCache.top3TotalPoints || []).sort((a, b) => b.totalPoints - a.totalPoints);
   const requestingStudent = classDataCache.requestingStudent;
 
   // Map from ID to student object
@@ -2501,7 +2758,7 @@ function renderMembers() {
     if (isYou) {
         const isYouDiv = document.createElement('div');
         isYouDiv.className = 'is-you-div';
-        isYouDiv.innerHTML = "AŠ"
+        isYouDiv.innerHTML = "AŠ";
         avatarOuterDiv.appendChild(isYouDiv);
     }
     
@@ -2524,33 +2781,55 @@ function renderMembers() {
     grid.appendChild(memberCard);
   }
 
-  // --- 1️⃣ Render top 3 students with medals ---
+  // --- Determine medals for ties ---
   const medalPaths = [
     '../images/icons/icon-first-place-medal.svg',
     '../images/icons/icon-second-place-medal.svg',
     '../images/icons/icon-third-place-medal.svg'
   ];
 
-  const top3Ids = [];
-  top3.forEach((entry, index) => {
+  const rankedStudents = [];
+  let currentRank = 0;
+  let previousPoints = null;
+  let medalIndex = 0; // 0 = gold, 1 = silver, 2 = bronze
+
+  for (let i = 0; i < topEntries.length; i++) {
+    const entry = topEntries[i];
+    if (previousPoints === null || entry.totalPoints < previousPoints) {
+      currentRank++;
+      if (currentRank > 3) break; // Only assign up to bronze rank
+      medalIndex = currentRank - 1;
+    }
+
+    rankedStudents.push({
+      ...entry,
+      medalPath: medalPaths[medalIndex] || null
+    });
+
+    previousPoints = entry.totalPoints;
+  }
+
+  // --- Render top students with medals ---
+  const topIds = [];
+  rankedStudents.forEach((entry) => {
     const member = studentMap[entry.id];
     if (member) {
       const isYou = requestingStudent && member.id === requestingStudent.id;
       const extraClass = isYou ? 'member-card-top3 member-card-requesting' : 'member-card-top3';
-      createMemberCard(member, extraClass, entry.totalPoints, medalPaths[index] || null, isYou);
-      top3Ids.push(entry.id);
+      createMemberCard(member, extraClass, entry.totalPoints, entry.medalPath, isYou);
+      topIds.push(entry.id);
     }
   });
 
-  // --- 2️⃣ Render requesting student if not in top 3 ---
-  if (requestingStudent && !top3Ids.includes(requestingStudent.id)) {
+  // --- Render requesting student if not in top group ---
+  if (requestingStudent && !topIds.includes(requestingStudent.id)) {
     createMemberCard(requestingStudent, 'member-card-requesting', classDataCache.requestingStudentTotalPoints || 0, null, true);
   }
 
-  // --- 3️⃣ Render remaining students in random order ---
-  const remaining = students.filter(s => !top3Ids.includes(s.id) && (!requestingStudent || s.id !== requestingStudent.id));
+  // --- Render remaining students ---
+  const remaining = students.filter(s => !topIds.includes(s.id) && (!requestingStudent || s.id !== requestingStudent.id));
 
-  // Shuffle
+  // Shuffle remaining
   for (let i = remaining.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [remaining[i], remaining[j]] = [remaining[j], remaining[i]];
@@ -2560,6 +2839,7 @@ function renderMembers() {
     createMemberCard(member);
   });
 }
+
     
 
   function loadClassDataCache() {
@@ -2585,17 +2865,17 @@ function renderMembers() {
   }
   
 async function fetchClassData() {
-    let showMessageTimeout;
-    let closer;
-    // Schedule showing the message after 500ms
-    showMessageTimeout = setTimeout(() => {
-        closer = messageToTheUser('Klasės narių informacija ieškoma.', false);
-    }, 500);
+  let showMessageTimeout;
+  let closer;
 
-    Array.from(document.getElementById("contentContainer").children).forEach(child => {
-        child.style.pointerEvents = "none";  // disables clicks
-        child.style.opacity = "0.5";         // optional visual cue
-    });
+  showMessageTimeout = setTimeout(() => {
+    closer = messageToTheUser('Klasės narių informacija ieškoma.', false);
+  }, 500);
+
+  Array.from(document.getElementById("contentContainer").children).forEach(child => {
+    child.style.pointerEvents = "none";
+    child.style.opacity = "0.5";
+  });
 
   if (loadClassDataCache()) {
     await updateClassStats();
@@ -2611,9 +2891,12 @@ async function fetchClassData() {
       body: JSON.stringify({ studentId: userData.userId })
     });
 
-    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-
     const raw = await response.json();
+
+    // ✅ Handle backend error messages
+    if (!response.ok || raw.error) {
+      throw new Error(raw.error || `HTTP error ${response.status}`);
+    }
 
     const [
       [teacherId, teacherNickname],
@@ -2626,7 +2909,6 @@ async function fetchClassData() {
       weekChlWinnerStudentId
     ] = raw;
 
-    // Separate requesting student
     const requestingStudentData = allStudents.find(s => s[0] === userData.userId);
     const remainingStudents = allStudents
       .filter(s => s[0] !== userData.userId)
@@ -2660,23 +2942,25 @@ async function fetchClassData() {
     saveClassDataCache();
 
     Array.from(document.getElementById("contentContainer").children).forEach(child => {
-        child.style.pointerEvents = "auto";  // enables clicks
-        child.style.opacity = "1";           // restore visual
+      child.style.pointerEvents = "auto";
+      child.style.opacity = "1";
     });
 
   } catch (error) {
     console.error('Error fetching students:', error);
-    messageToTheUser('Nepavyko pasiekti klasės narių duomenų. Bandykite vėl vėliau.');
-  } finally {
-    // Cancel showing the message if not yet displayed
-    clearTimeout(showMessageTimeout);
-
-    // Close message if it was displayed
-    if (closer) {
-        setTimeout(() => closer(), 0); // close after 0.5s
+    // ✅ Display backend error or fallback message
+    
+    if (error.message === 'Student is not associated with any teacher') {
+        await handleNoTeacherMessage();
+    } else {
+        messageToTheUser('Nepavyko pasiekti klasės narių duomenų. Bandykite vėl vėliau.');
     }
+  } finally {
+    clearTimeout(showMessageTimeout);
+    if (closer) setTimeout(() => closer(), 0);
   }
 }
+
 
 
 async function updateClassStats() {
@@ -2691,9 +2975,14 @@ async function updateClassStats() {
       },
       body: JSON.stringify({ studentId: userData.userId })
     });
-    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
 
     const raw = await response.json();
+
+    // ✅ Handle backend error
+    if (!response.ok || raw.error) {
+      throw new Error(raw.error || `HTTP error ${response.status}`);
+    }
+
     const [top3TotalPoints = [], top3WeekChl = [], requestingStudentTotalPoints = 0, requestingStudentWeekChlScore = 0] = raw;
 
     classDataCache.top3TotalPoints = top3TotalPoints.map(s => ({ id: s[0], totalPoints: s[1] }));
@@ -2702,13 +2991,83 @@ async function updateClassStats() {
     classDataCache.requestingStudentWeekChlScore = requestingStudentWeekChlScore;
 
     Array.from(document.getElementById("contentContainer").children).forEach(child => {
-        child.style.pointerEvents = "auto";  // enables clicks
-        child.style.opacity = "1";           // restore visual
+      child.style.pointerEvents = "auto";
+      child.style.opacity = "1";
     });
 
   } catch (err) {
     console.error('Error updating class stats:', err);
+    // ✅ Optional: show specific error if relevant
+    if (err.message === 'Student is not associated with any teacher') {
+      await handleNoTeacherMessage();
+    }
   }
+}
+
+
+// When you receive message that student is not associated with any teacher:
+async function handleNoTeacherMessage() {
+    // 1️⃣ FULLY REVERSE: Re-enable all children of contentContainer
+Array.from(document.getElementById("contentContainer").children).forEach(child => {
+    child.style.pointerEvents = "auto";
+    child.style.opacity = "1";
+});
+
+// 2️⃣ DISABLE ALL except teacher-info-div and its children
+const teacherInfoDiv = document.querySelector('.teacher-info-div');
+
+Array.from(document.getElementById("contentContainer").children).forEach(child => {
+    // Check if this child is the teacher-info-div or contains it
+    const isTeacherDiv = child.classList.contains('teacher-info-div');
+    const containsTeacherDiv = child.contains(teacherInfoDiv);
+    
+    // Only disable if it's NOT the teacher div and does NOT contain it
+    if (!isTeacherDiv && !containsTeacherDiv) {
+        child.style.pointerEvents = "none";
+        child.style.opacity = "0.5";
+    }
+});
+
+const storedClassCache = localStorage.getItem('classDataCache');
+const storedCacheExpiry = localStorage.getItem('classDataCacheExpiry');
+
+if (storedClassCache) {
+    try {
+        localStorage.removeItem('classDataCache');
+        console.log("classDataCache removed from localStorage");
+    } catch (err) {
+        console.error("Error removing classDataCache from localStorage:", err);
+    }
+}
+
+if (storedCacheExpiry) {
+    try {
+        localStorage.removeItem('classDataCacheExpiry');
+        console.log("classDataCacheExpiry removed from localStorage");
+    } catch (err) {
+        console.error("Error removing classDataCacheExpiry from localStorage:", err);
+    }
+}
+
+    // 2️⃣ Update userData in localStorage to clear teacher value
+    const storedUserData = localStorage.getItem('userData');
+    if (storedUserData) {
+        try {
+            const parsedUserData = JSON.parse(storedUserData);
+            parsedUserData.teacher = ""; // set to empty string
+            localStorage.setItem('userData', JSON.stringify(parsedUserData));
+            if (typeof userData !== "undefined") {
+                userData = parsedUserData;
+            }
+            console.log("Teacher value cleared in userData:", parsedUserData);
+        } catch (err) {
+            console.error("Error parsing userData from localStorage:", err);
+        }
+    }
+
+    classDataCache = null;
+    classDataExpiry = null;
+    messageToTheUser("Pridėk mokytoją!", false)
 }
 
     function decodeAvatarCode(encoded) {
@@ -3077,142 +3436,274 @@ async function renderClassWeekChallenge () {
     renderPodiumRewards();
 
     if (classDataCache.top3WeekChl.length === 0) {
-        document.getElementById("podium-container").style.display = "none";
-    } else {
-        let studentCounter = 1
-        const allStudents = classDataCache.remainingStudents.concat(classDataCache.requestingStudent);
-        for (const topStudent of classDataCache.top3WeekChl) {
-            const studentInfo = allStudents.find(s => s.id === topStudent.id);
-
-        let podiumClass;
-
-        if (studentCounter === 1) {
-            podiumClass = ".podium-place.first";
-        } else if (studentCounter === 2) {
-            podiumClass = ".podium-place.second";
+            document.getElementById("podium-container").style.display = "none";
         } else {
-            podiumClass = ".podium-place.third";
-        }
-
-        if (studentInfo) {
-            const podiumStudentDiv = document.querySelector(`${podiumClass} > .podium-student`);
-            if (!podiumStudentDiv) continue;
-
-            podiumStudentDiv.innerHTML = '';
-
-            const podiumAvatarWrap = document.createElement('div');
-            podiumAvatarWrap.className = "podium-avatar-wrap";
-
-            const podiumAvatar = document.createElement('div');
-            podiumAvatar.className = "podium-avatar";
-            podiumAvatar.innerHTML = studentInfo.avatarSvg
-
-            if (classDataCache.requestingStudent && classDataCache.requestingStudent.id === studentInfo.id) {
-                const isYouDiv = document.createElement('div');
-                isYouDiv.className = "is-you-div-week-challenge";
-                isYouDiv.innerHTML = "AŠ";
-                podiumAvatarWrap.appendChild(isYouDiv)
-            }
-
-            const podiumName = document.createElement('div');
-            podiumName.className = "podium-name";
-            podiumName.innerHTML = studentInfo.nickname
-
-            const podiumId = document.createElement('div');
-            podiumId.className = "podium-id";
-            podiumId.innerHTML = `ID: ${studentInfo.id}`
-
-            const podiumPoints = document.createElement('div');
-            podiumPoints.className = "podium-points";
-
-            const points = topStudent.weekChlScore
-            const pointsLabel = pointsLabelDeterminator(points);
-
-            podiumPoints.innerHTML = `${points} ${pointsLabel}`
-
-            podiumAvatarWrap.appendChild(podiumAvatar)
-            podiumStudentDiv.appendChild(podiumAvatarWrap)
-            podiumStudentDiv.appendChild(podiumName)
-            podiumStudentDiv.appendChild(podiumId)
-            podiumStudentDiv.appendChild(podiumPoints)
-        }
-
-        studentCounter+=1;
-        }
-
-        const classChallengeUserInfoHolder = document.getElementById("class-challenge-user-info-holder");
-        
-        if (classDataCache.requestingStudent) {
-            const classChallengeUserPoints = document.getElementById("class-challenge-user-points");
+            const allStudents = classDataCache.remainingStudents.concat(classDataCache.requestingStudent);
             
-            classChallengeUserPoints.innerHTML = "";
+            // Group students by score
+            const scoreGroups = {};
+            classDataCache.top3WeekChl.forEach(student => {
+                if (!scoreGroups[student.weekChlScore]) {
+                    scoreGroups[student.weekChlScore] = [];
+                }
+                scoreGroups[student.weekChlScore].push(student);
+            });
 
-            const userPoints = classDataCache.requestingStudentWeekChlScore;
+            // Sort scores and get top 3 unique scores
+            const uniqueScores = Object.keys(scoreGroups)
+                .map(Number)
+                .sort((a, b) => b - a)
+                .slice(0, 3);
 
-            if (userPoints > 0) {
-                document.querySelector(".class-challenge-btn").innerHTML = "Bandyti vėl"
+            const placeClasses = ['first', 'second', 'third'];
+            const placeNumbers = ['1', '2', '3'];
+            const carouselStates = {};
+
+            uniqueScores.forEach((score, index) => {
+                const students = scoreGroups[score];
+                const placeClass = placeClasses[index];
+                const placeNumber = placeNumbers[index];
+
+                const podiumPlaceDiv = document.querySelector(`.podium-place.${placeClass}`);
+                if (!podiumPlaceDiv) return;
+
+                // Clear any existing carousel controls
+                const existingControls = podiumPlaceDiv.querySelector('.carousel-controls');
+                if (existingControls) {
+                    existingControls.remove();
+                }
+
+                // Clear any existing tied count badge
+                const existingTiedCount = podiumPlaceDiv.querySelector('.tied-count');
+                if (existingTiedCount) {
+                    existingTiedCount.remove();
+                }
+
+                const podiumStudentDiv = podiumPlaceDiv.querySelector('.podium-student');
+                const pedestalDiv = podiumPlaceDiv.querySelector('.pedestal');
+
+                // Initialize carousel state
+                carouselStates[placeClass] = {
+                    currentIndex: 0,
+                    students: students,
+                    allStudents: allStudents
+                };
+
+                // Add carousel controls if more than 1 student
+                if (students.length > 1) {
+                    const controls = document.createElement('div');
+                    controls.className = 'carousel-controls';
+
+                    const prevBtn = document.createElement('button');
+                    prevBtn.className = 'carousel-btn';
+                    prevBtn.innerHTML = '‹';
+                    prevBtn.disabled = true;
+                    prevBtn.onclick = () => navigateCarousel(placeClass, -1);
+
+                    const dotsContainer = document.createElement('div');
+                    dotsContainer.className = 'carousel-dots';
+                    
+                    for (let i = 0; i < students.length; i++) {
+                        const dot = document.createElement('div');
+                        dot.className = `carousel-dot ${i === 0 ? 'active' : ''}`;
+                        dot.onclick = () => goToSlide(placeClass, i);
+                        dotsContainer.appendChild(dot);
+                    }
+
+                    const nextBtn = document.createElement('button');
+                    nextBtn.className = 'carousel-btn';
+                    nextBtn.innerHTML = '›';
+                    nextBtn.onclick = () => navigateCarousel(placeClass, 1);
+
+                    controls.appendChild(prevBtn);
+                    controls.appendChild(dotsContainer);
+                    controls.appendChild(nextBtn);
+
+                    podiumPlaceDiv.insertBefore(controls, podiumStudentDiv);
+
+                    // Add tied count badge
+                    const tiedCount = document.createElement('div');
+                    tiedCount.className = 'tied-count';
+                    tiedCount.innerHTML = `${students.length} lygiosios`;
+                    pedestalDiv.appendChild(tiedCount);
+                }
+
+                // Render first student
+                renderStudent(placeClass, 0);
+            });
+
+            function renderStudent(placeClass, studentIndex) {
+                const state = carouselStates[placeClass];
+                const topStudent = state.students[studentIndex];
+                const studentInfo = state.allStudents.find(s => s.id === topStudent.id);
+
+                const podiumPlaceDiv = document.querySelector(`.podium-place.${placeClass}`);
+                const podiumStudentDiv = podiumPlaceDiv.querySelector('.podium-student');
+
+                if (studentInfo) {
+                    podiumStudentDiv.innerHTML = '';
+
+                    const podiumAvatarWrap = document.createElement('div');
+                    podiumAvatarWrap.className = "podium-avatar-wrap";
+
+                    const podiumAvatar = document.createElement('div');
+                    podiumAvatar.className = "podium-avatar";
+                    podiumAvatar.innerHTML = studentInfo.avatarSvg;
+
+                    if (classDataCache.requestingStudent && classDataCache.requestingStudent.id === studentInfo.id) {
+                        const isYouDiv = document.createElement('div');
+                        isYouDiv.className = "is-you-div-week-challenge";
+                        isYouDiv.innerHTML = "AŠ";
+                        podiumAvatarWrap.appendChild(isYouDiv);
+                    }
+
+                    const podiumName = document.createElement('div');
+                    podiumName.className = "podium-name";
+                    podiumName.innerHTML = studentInfo.nickname;
+
+                    const podiumId = document.createElement('div');
+                    podiumId.className = "podium-id";
+                    podiumId.innerHTML = `ID: ${studentInfo.id}`;
+
+                    const podiumPoints = document.createElement('div');
+                    podiumPoints.className = "podium-points";
+
+                    const points = topStudent.weekChlScore;
+                    const pointsLabel = pointsLabelDeterminator(points);
+
+                    podiumPoints.innerHTML = `${points} ${pointsLabel}`;
+
+                    podiumAvatarWrap.appendChild(podiumAvatar);
+                    podiumStudentDiv.appendChild(podiumAvatarWrap);
+                    podiumStudentDiv.appendChild(podiumName);
+                    podiumStudentDiv.appendChild(podiumId);
+                    podiumStudentDiv.appendChild(podiumPoints);
+                }
             }
 
-            const userPointsLabel = pointsLabelDeterminator(userPoints);
-            classChallengeUserPoints.innerHTML = `${userPoints} ${userPointsLabel}`;
-        } else {
-            document.querySelector(".class-challenge-action-box").style.display = "none";
-            document.querySelector('.class-challenge-content-grid').style.gridTemplateColumns = '1fr'
-            classChallengeUserInfoHolder.style.display = "none"
+            function navigateCarousel(placeClass, direction) {
+                const state = carouselStates[placeClass];
+                const newIndex = state.currentIndex + direction;
+                
+                if (newIndex >= 0 && newIndex < state.students.length) {
+                    goToSlide(placeClass, newIndex);
+                }
+            }
+
+            function goToSlide(placeClass, index) {
+                const state = carouselStates[placeClass];
+                state.currentIndex = index;
+
+                renderStudent(placeClass, index);
+
+                const podiumPlaceDiv = document.querySelector(`.podium-place.${placeClass}`);
+                const dots = podiumPlaceDiv.querySelectorAll('.carousel-dot');
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
+
+                const prevBtn = podiumPlaceDiv.querySelector('.carousel-btn:first-of-type');
+                const nextBtn = podiumPlaceDiv.querySelector('.carousel-btn:last-of-type');
+                
+                if (prevBtn) prevBtn.disabled = index === 0;
+                if (nextBtn) nextBtn.disabled = index === state.students.length - 1;
+            }
+        }   
+
+if (classDataCache.weekChlWinnerStudentId && classDataCache.weekChlWinnerStudentId.length !== 0) {
+    const medalPaths = [
+        '../images/icons/icon-first-place-medal.svg',
+        '../images/icons/icon-second-place-medal.svg',
+        '../images/icons/icon-third-place-medal.svg'
+    ];
+
+    const weekChallengeWinnings = {
+        firstPlace: 10,
+        secondPlace: 5,
+        thirdPlace: 3
+    };
+
+    // Combine requesting student with remaining students
+    const allStudents = classDataCache.requestingStudent 
+        ? classDataCache.remainingStudents.concat(classDataCache.requestingStudent)
+        : classDataCache.remainingStudents;
+
+    // Sort winners by position (1, 2, 3)
+    const sortedWinners = classDataCache.weekChlWinnerStudentId
+        .filter(w => w && w.position > 0)
+        .sort((a, b) => a.position - b.position);
+
+    const lastWinnerContainer = document.getElementById("previous-challenge-winners-winner");
+    lastWinnerContainer.innerHTML = '';
+
+    // Count how many winners per position
+    const winnersByPosition = sortedWinners.reduce((acc, winner) => {
+        acc[winner.position] = (acc[winner.position] || 0) + 1;
+        return acc;
+    }, {});
+
+    let lastPosition = null;
+    let medalIndex = -1;
+
+    for (const winner of sortedWinners) {
+        const student = allStudents.find(s => s && s.id === winner.id);
+        if (!student) {
+            console.warn(`No student found with ID ${winner.id}`);
+            continue;
         }
-    }   
 
-    if (classDataCache.weekChlWinnerStudentId.length !== 0) {
-        const medalPaths = [
-            '../images/icons/icon-first-place-medal.svg',
-            '../images/icons/icon-second-place-medal.svg',
-            '../images/icons/icon-third-place-medal.svg'
-        ];
-
-
-        const allStudents = classDataCache.remainingStudents.concat(classDataCache.requestingStudent);
-        let studentCounter = 0
-        const lastWinnerContainer = document.getElementById("previous-challenge-winners-winner")
-        lastWinnerContainer.innerHTML = '';
-        for (const id of classDataCache.weekChlWinnerStudentId) {
-            // Find the student with an exact ID match
-            const student = allStudents.find(s => s.id === id);
-
-            if (student) {
-
-            const lastWinnerName = document.createElement('div');
-            lastWinnerName.className = "last-winner-name";
-            lastWinnerName.innerHTML = `${student.nickname} (ID: ${student.id})`
-
-            const lastWinnerCard = document.createElement('div');
-            lastWinnerCard.className = "last-winner-card";
-
-            const medalPath = medalPaths[studentCounter]
-
-            if (medalPath) {
-                const medalImg = document.createElement('img');
-                medalImg.src = medalPath;
-                medalImg.className = 'last-winner-top-students-medal';
-                lastWinnerCard.appendChild(medalImg)
-            }
-
-            lastWinnerCard.appendChild(lastWinnerName)
-
-            if (classDataCache.requestingStudent && classDataCache.requestingStudent.id === student.id) {
-                const isYouDiv = document.createElement('div');
-                isYouDiv.className = "is-you-div-last-winner";
-                isYouDiv.innerHTML = "AŠ";
-                lastWinnerCard.appendChild(isYouDiv)
-            }
-
-            lastWinnerContainer.appendChild(lastWinnerCard)
-
-            } else {
-                console.warn(`No student found with ID ${id}`);
-            }
-            studentCounter+=1
+        if (winner.position !== lastPosition) {
+            medalIndex = winner.position - 1;
+            lastPosition = winner.position;
         }
+
+        // Determine winnings based on position
+        let baseWinnings = 0;
+        if (winner.position === 1) baseWinnings = weekChallengeWinnings.firstPlace;
+        else if (winner.position === 2) baseWinnings = weekChallengeWinnings.secondPlace;
+        else if (winner.position === 3) baseWinnings = weekChallengeWinnings.thirdPlace;
+
+        const numberOfWinners = winnersByPosition[winner.position] || 1;
+        let winnings = Math.floor(baseWinnings / numberOfWinners);
+        if (winnings < 1) winnings = 1;
+
+        // Create card
+        const lastWinnerCard = document.createElement('div');
+        lastWinnerCard.className = "last-winner-card";
+
+        const medalPath = medalPaths[medalIndex];
+        if (medalPath) {
+            const medalImg = document.createElement('img');
+            medalImg.src = medalPath;
+            medalImg.className = 'last-winner-top-students-medal';
+            lastWinnerCard.appendChild(medalImg);
+        }
+
+        const lastWinnerName = document.createElement('div');
+        lastWinnerName.className = "last-winner-name";
+        lastWinnerName.innerHTML = `
+            ${student.nickname} (ID: ${student.id})
+            <div class="coin-display-chl-winners">
+                <span class="coin-icon">
+                    <img src="../images/icons/icon-sudedu-coin.png" alt="coin">
+                </span>
+                <span class="coin-amount">${winnings}</span>
+            </div>
+        `;
+        lastWinnerCard.appendChild(lastWinnerName);
+
+        if (classDataCache.requestingStudent && classDataCache.requestingStudent.id === student.id) {
+            const isYouDiv = document.createElement('div');
+            isYouDiv.className = "is-you-div-last-winner";
+            isYouDiv.innerHTML = "AŠ";
+            lastWinnerCard.appendChild(isYouDiv);
+        }
+
+        lastWinnerContainer.appendChild(lastWinnerCard);
     }
+}
+
+
 }
 
 function pointsLabelDeterminator (points) {

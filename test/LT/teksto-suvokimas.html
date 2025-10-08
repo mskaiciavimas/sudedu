@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>sudedu - teksto supratimas</title>
 
-    <!-- Include Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <!-- Include Dragula CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/dragula@3.7.3/dist/dragula.min.css" rel="stylesheet">
     <link rel="stylesheet"
 		href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <!-- Google tag (gtag.js) -->
@@ -22,6 +18,17 @@
     </script>	
     
     <style>
+
+        * {
+          -webkit-user-select: none;
+          -webkit-tap-highlight-color: transparent;
+          user-select: none;
+          box-sizing: border-box;
+          -webkit-user-drag: none;
+          user-drag: none;
+        }
+
+
       	html {
           display: flex;
           justify-content: center;
@@ -57,8 +64,6 @@
         .field {
           background-color: #e0e0e0;
           padding: 10px;
-          width: 100%;
-          margin-top: 10px;
         }
 
         .item {
@@ -78,7 +83,6 @@
 
         #title-field {
           min-height: 100px;
-          margin-top: 20px;
         }
 
         .button-row {
@@ -87,9 +91,12 @@
 
         #options-field,
         #answers-field {
-          margin-top: 20px;
           display: flex;
           flex-direction: column;
+        }
+
+        #answers-field {
+          margin-top: 15px;
         }
         
         #final-message-row {
@@ -239,11 +246,89 @@
             animation: shake 0.2s ease-in-out 0s 2;
         }
 
+        #fields-row {
+          display: flex;
+          flex: 1 1 auto;
+          min-height: 0;
+          gap: 10px;
+        }
+
+        .right-side-panel {
+            flex: 1 1 50%;
+            min-height: 0;  /* Important! Allows flex children to not overflow */
+        }
+
+        /* Sidebar wrapper */
+        .sidebar-wrapper {
+            position: relative;
+            flex: 1 1 50%;
+            height: 100%;
+            margin-right: 10px;
+        }
+
+        /* Sidebar content */
+        .sidebar {
+            position: relative;
+            height: 100%;
+            width: 100%;
+            margin-right: 15px;
+        }
+
+        .sidebar-content {
+            min-height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Toggle tab - always visible */
+        .toggle-tab {
+            position: absolute;
+            right: -34px;
+            top: 0;
+            border: none;
+            width: 34px;
+            height: 62px;
+            border-radius: 0 20px 20px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.5);
+            padding: 0;
+        }
+
+        .toggle-tab svg {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        /* Overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
         @keyframes shake {
-          0% { margin-left: 0rem; }
-          25% { margin-left: 0.5rem; }
-          75% { margin-left: -0.5rem; }
-          100% { margin-left: 0rem; }
+          0% { transform: translateX(0); }
+          25% { transform: translateX(0.5rem); }
+          75% { transform: translateX(-0.5rem); }
+          100% { transform: translateX(0); }
         }
 
         #fireworks-div {
@@ -251,6 +336,25 @@
           bottom: -10%;
           right: 0;
           width: 250px;
+        }
+
+        .drag-ghost {
+          opacity: 0.5;
+        }
+
+        .drag-chosen {
+          background-color: #faf1e6;
+          border: 2px dashed #40c9a9;
+        }
+
+        .drag-dragging {
+          background-color: #FAF1E6;
+        }
+
+        .item.hold-indicator {
+          position: relative;
+          box-shadow: 0 0 0 2px #40c9a9 inset; /* subtle glow */
+          transition: box-shadow 0.2s ease;
         }
 
         @media (max-width: 1150px) {
@@ -262,6 +366,12 @@
         #final-message-div {
           font-size: 2.25rem;
         }
+        }
+
+        @media (min-width: 769px) {
+            .toggle-tab {
+                display: none;
+            }
         }
 
         @media (max-width: 767px) {
@@ -282,10 +392,41 @@
           width: 200px;
           bottom: -5%;
         }
-        
+
+        .sidebar {
+          padding: 0;
+          height: 100%;
+          backdrop-filter: blur(15px);
+          -webkit-backdrop-filter: blur(15px);
+          background: rgba(255, 255, 255, 0.5);
+          border-bottom-right-radius: 8px;
+          margin: 0;
+          margin-top: 0;
+          overflow-y: auto;
+        }
+
+        .sidebar-wrapper {
+            position: fixed;
+            left: 0;
+            top: 85px;
+            height: calc(100% - 70px - 30px);
+            width: calc(100vw - 34px - 5px);
+            z-index: 100;
+            transition: transform 0.3s ease;
+            transform: translateX(calc(-1*(100vw - 34px - 5px)));
+            padding-left: 0;
+        }
+
+        .sidebar-wrapper.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-wrapper.open .toggle-tab svg {
+            transform: rotate(180deg);
+        }        
         }
         
-        @media (max-width: 575px) {
+      @media (max-width: 575px) {
 
       .stop-button {
         width: 4.25rem;
@@ -301,6 +442,11 @@
         width: 150px;
         bottom: 60%;
       }
+
+      .sidebar-wrapper {
+        top: 70px;
+        height: calc(100% - 70px);
+    }
     }
 
     @media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)  {
@@ -384,43 +530,56 @@
     
     
     <!-- First row: Left column empty, Right column with item -->
-    <div class="row" id="fields-row">
-      <div class="col-12 col-md-6">
-        <div id="options-field-div" class="col-12">
-          <div id="options-field" class="field">
-          </div>
-          <div id="author">
-          </div>
+    <div class="" id="fields-row">
+
+    <div class="sidebar-wrapper" id="sidebarWrapper">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-content" id="sidebarContent">
+
+            <div id="options-field-div" class="col-12">
+              <div id="options-field" class="field">
+              </div>
+              <div id="author">
+              </div>
+            </div>
+
         </div>
-      </div>
+      </aside>
+
+      <button class="toggle-tab" id="toggleTab" aria-label="Toggle sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M9 18l6-6-6-6"/>
+          </svg>
+      </button>
+    </div>
 
       <!-- Second row: Draggable items and Bottom right -->
-      <div class="col-12 col-md-6">
-        <div class="col-12">
+      <div class="right-side-panel">
+        <div class="">
           <div id="title-field" class="field">
             Pavadinimas
           </div>
         </div>
-        <div id="answers-field-div" class="col-12 komponavimas">
+        <div id="answers-field-div" class="komponavimas">
           <div id="answers-field" class="field" style="display: none;">
             Tekstas
           </div>
         </div>
 
         <!-- Right column with bottom-right item -->
-        <div id="answers-field-start-div" class="col-12 isdestymas">
+        <div id="answers-field-start-div" class="isdestymas">
           <div id="answers-field-start" class="field" style="display: none;">
             Pradžia
           </div>
         </div>
 
-        <div id="answers-field-middle-div" class="col-12 isdestymas">
+        <div id="answers-field-middle-div" class="isdestymas">
           <div id="answers-field-middle" class="field" style="display: none;">
             Įvykio raida
           </div>
         </div>
 
-        <div id="answers-field-end-div" class="col-12 isdestymas">
+        <div id="answers-field-end-div" class="isdestymas">
           <div id="answers-field-end" class="field" style="display: none;">
             Pabaiga
           </div>
@@ -476,15 +635,12 @@
   </div>
   
 
-  <!-- Include Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pzjw8f+ua7Kw1TIq0r3ry7kAop5z3XMJ4g/4dWl56h3xW00tiy8b6Bc5tbtiq5x7" crossorigin="anonymous"></script>
-  <!-- Include Dragula JS -->
-  <script src="https://cdn.jsdelivr.net/npm/dragula@3.7.3/dist/dragula.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script src="../parameter_dictionary.js"></script>
   <script src="../mental-arithmetic.js"></script>
   
   <script>
-
+let sortableInstances = [];
 window.onload = function () {
     if (localStorage.getItem('controller') === null) {
         window.location.href = "./";
@@ -650,13 +806,11 @@ window.onload = function () {
       const answerFieldEndHeight = answersFieldEnd.scrollHeight;
 
       optionsField.style.minHeight = `${optionsHeight+120}px`;
-      answersField.style.minHeight = `${optionsHeight}px`;
+      answersField.style.minHeight = `${optionsHeight-15}px`;
       answersFieldStart.style.minHeight = `${Math.max(optionsHeight/3*0.75, 100)}px`
       answersFieldMiddle.style.minHeight = `${Math.max(optionsHeight/3*1.5, 100)}px`
       answersFieldEnd.style.minHeight = `${Math.max(optionsHeight/3*0.75, 100)}px`
       
-
-      initializeDragula();
 
       if (controller.modeChoice4 === "C40") {
         questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
@@ -687,67 +841,7 @@ window.onload = function () {
         return allSentences;
     }
 
-    function initializeDragula() {
-      // Destroy the previous instance if it exists
-      if (drake) {
-        drake.destroy();
-      }
-
-      // Create a new Dragula instance
-      drake = dragula([document.getElementById('options-field'), document.getElementById('title-field'), document.getElementById('answers-field'), document.getElementById('answers-field-start'), document.getElementById('answers-field-middle'), document.getElementById('answers-field-end')]);
-
-      drake.on('drag', function (el) {
-        // Disable touch scrolling while dragging
-        if (window.ontouchstart !== undefined) {
-          document.body.style.overflow = 'hidden'; // Disable body scroll
-        }
-        // Change color of the item while dragging
-        el.style.backgroundColor = '#FAF1E6';  // Change background to white
-      })
-      .on('dragend', function (el) {
-        // Re-enable scrolling when drag ends
-        if (window.ontouchstart !== undefined) {
-          document.body.style.overflow = ''; // Re-enable body scroll
-        }
-        // Reset the color when drag ends
-        el.style.backgroundColor = ''; // Reset background color
-      })
-      .on('drop', function (el, target) {
-        // Handle drop event if needed
-      });
-    }
-
-    // Add touch event listener for scroll behavior on mobile
-    let isDragging = false;
-    let dragStartY = 0;
-
-    document.addEventListener('touchstart', function (event) {
-  if (event.target.classList.contains('item')) {
-    event.preventDefault(); // Prevent scroll from starting
-    dragStartY = event.touches[0].clientY;
-    isDragging = true;
-  }
-}, { passive: false });
-
-document.addEventListener('touchmove', function (event) {
-  if (isDragging) {
-    event.preventDefault(); // Ensure scroll remains disabled
-    const dragY = event.touches[0].clientY;
-    const screenHeight = window.innerHeight;
-
-    // Only scroll near edges
-    if (dragY < 50) {
-      window.scrollBy(0, -20);
-    } else if (dragY > screenHeight - 50) {
-      window.scrollBy(0, 20);
-    }
-  }
-}, { passive: false });
-
-    document.addEventListener('touchend', function () {
-      isDragging = false;
-    });
-
+    updateSortables();
 
     checkAnswerBtn.addEventListener('click', function () {
       const titleAnswerItems = titleField.querySelectorAll('.item');
@@ -865,7 +959,7 @@ document.addEventListener('touchmove', function (event) {
         } else {
           questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}`;
         }
-        drake.destroy();
+        updateSortables()
         nextQuestionBtn.style.display = 'flex';
         checkAnswerBtn.style.display = "none";
         checkAnswerBtn.disabled = true;
@@ -1201,7 +1295,7 @@ document.addEventListener('touchmove', function (event) {
           checkAnswerBtn.disabled = true;
           helpBtn.disabled = true;
           nextQuestionBtn.disabled = true;
-          drake.destroy();
+          updateSortables()
           controller.questionsStopped = true;
           localStorage.setItem("elapsedTime", timerDisplay.textContent);
 					localStorage.setItem('controller', JSON.stringify(controller));
@@ -1264,7 +1358,242 @@ document.addEventListener('touchmove', function (event) {
       });
     })
     .catch(error => console.error('Error:', error));
+
+
+
+
+
+    // Sidebar functionality
+const sidebarWrapper = document.getElementById('sidebarWrapper');
+const toggleTab = document.getElementById('toggleTab');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+// Toggle sidebar function
+function toggleSidebar() {
+    // Only works on mobile
+    if (window.innerWidth <= 768) {
+        sidebarWrapper.classList.toggle('open');
         
+        // Toggle overlay
+        if (sidebarOverlay) {
+            sidebarOverlay.classList.toggle('active');
+        }
+    }
+}
+
+// Open sidebar function
+function openSidebar() {
+    if (window.innerWidth <= 768) {
+        sidebarWrapper.classList.add('open');
+        if (sidebarOverlay) {
+            sidebarOverlay.classList.add('active');
+        }
+    }
+}
+
+// Close sidebar function
+function closeSidebar() {
+    sidebarWrapper.classList.remove('open');
+    if (sidebarOverlay) {
+        sidebarOverlay.classList.remove('active');
+    }
+}
+
+// Event listeners
+if (toggleTab) {
+    toggleTab.addEventListener('click', toggleSidebar);
+}
+
+// Close sidebar when clicking on overlay
+if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', closeSidebar);
+}
+
+// Handle escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebarWrapper.classList.contains('open')) {
+        closeSidebar();
+    }
+});
+
+// Close sidebar on window resize if it becomes desktop size
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+        closeSidebar();
+    }
+});
+
+// Optional: Close sidebar when clicking on a link inside it
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebarLinks = sidebarWrapper.querySelectorAll('a');
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
+        });
+    });
+});
+
+let mobileOptionsSortable = null;
+
+
+function initializeSortableJS() {
+  // Destroy previous instances
+  sortableInstances.forEach(instance => instance.destroy());
+  sortableInstances = [];
+
+  const containers = [
+    'title-field',
+    'answers-field',
+    'answers-field-start',
+    'answers-field-middle',
+    'answers-field-end'
+  ];
+
+  // On desktop, also include options-field
+  if (window.innerWidth > 768) {
+    containers.push('options-field');
+  }
+
+  containers.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    const sortable = new Sortable(el, {
+      group: 'shared',
+      animation: 150,
+      swapThreshold: 0.65,
+      ghostClass: 'drag-ghost',
+      chosenClass: 'drag-chosen',
+      dragClass: 'drag-dragging',
+      forceFallback: true, 
+      fallbackOnBody: true,
+      scroll: true,
+      scrollSensitivity: 60,
+      scrollSpeed: 10,
+      onStart: function(evt) {
+        // Close sidebar when drag starts on desktop
+        if (sidebarWrapper.classList.contains('open')) {
+          closeSidebar();
+        }
+      }
+    });
+
+    sortableInstances.push(sortable);
+  });
+}
+
+
+function initializeOptionsFieldSortable() {
+  const optionsField = document.getElementById('options-field');
+  const mobileDelay = 300; // hold delay in ms
+  let holdTimeout = null;
+  let dragInitiated = false;
+
+  // Destroy previous mobile Sortable if it exists
+  if (mobileOptionsSortable) {
+    mobileOptionsSortable.destroy();
+    mobileOptionsSortable = null;
+  }
+
+  mobileOptionsSortable = Sortable.create(optionsField, {
+    group: 'shared',
+    animation: 150,
+    ghostClass: 'sortable-ghost',
+    fallbackOnBody: true,
+    forceFallback: false,
+    delay: mobileDelay,
+    delayOnTouchOnly: true, // only apply delay on touch devices
+
+    onChoose: function(evt) {
+      const item = evt.item;
+      dragInitiated = false;
+      item.classList.remove('hold-indicator');
+
+      holdTimeout = setTimeout(() => {
+        dragInitiated = true;
+        item.classList.add('hold-indicator'); // optional visual cue
+      }, mobileDelay);
+
+      const cancelHold = (e) => {
+        clearTimeout(holdTimeout);
+        item.classList.remove('hold-indicator');
+        dragInitiated = false;
+
+        if (['contextmenu','touchend','mouseup'].includes(e.type)) e.preventDefault();
+
+        document.removeEventListener('touchend', cancelHold);
+        document.removeEventListener('mouseup', cancelHold);
+        document.removeEventListener('contextmenu', cancelHold);
+      };
+
+      document.addEventListener('touchend', cancelHold);
+      document.addEventListener('mouseup', cancelHold);
+      document.addEventListener('contextmenu', cancelHold);
+    },
+
+    onStart: function(evt) {
+      if (!dragInitiated) {
+        evt.item.parentNode.insertBefore(evt.item, evt.item); // cancel drag
+        return;
+      }
+      evt.item.classList.remove('hold-indicator');
+      if (sidebarWrapper.classList.contains('open')) {
+        closeSidebar();
+      }
+      clearTimeout(holdTimeout);
+    },
+
+    onEnd: function(evt) {
+      evt.item.classList.remove('hold-indicator');
+      clearTimeout(holdTimeout);
+    }
+  });
+}
+
+function isTouchDevice() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+}
+
+function updateSortables() {
+  initializeSortableJS(); // initializes everything except options-field on mobile
+
+  const touchDevice = isTouchDevice();
+
+  if (window.innerWidth <= 768 && touchDevice) {
+    initializeOptionsFieldSortable(); // mobile touch behavior with hold delay
+  } else {
+    // Always allow normal drag (even on small screens if using mouse)
+    const optionsField = document.getElementById('options-field');
+    if (mobileOptionsSortable) {
+      mobileOptionsSortable.destroy();
+      mobileOptionsSortable = null;
+    }
+
+    if (optionsField) {
+    const sortable = new Sortable(optionsField, {
+        group: 'shared',
+        animation: 150,
+        ghostClass: 'drag-ghost',
+        chosenClass: 'drag-chosen',
+        dragClass: 'drag-dragging',
+        forceFallback: true,
+        fallbackOnBody: true,
+        onStart: function(evt) {
+            // Close sidebar when dragging options-field
+            if (sidebarWrapper.classList.contains('open')) {
+                closeSidebar();
+            }
+        }
+    });
+    sortableInstances.push(sortable);
+}
+  }
+}
+
+window.addEventListener('resize', updateSortables);
+
   </script>
 
 </body>
