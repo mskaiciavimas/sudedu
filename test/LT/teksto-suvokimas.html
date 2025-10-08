@@ -1534,16 +1534,19 @@ function initializeOptionsFieldSortable() {
     },
 
     onStart: function(evt) {
-      if (!dragInitiated) {
-        evt.item.parentNode.insertBefore(evt.item, evt.item); // cancel drag
-        return;
-      }
-      evt.item.classList.remove('hold-indicator');
-      if (sidebarWrapper.classList.contains('open')) {
-        closeSidebar();
-      }
-      clearTimeout(holdTimeout);
-    },
+  // Close sidebar regardless of whether drag will be canceled
+  if (sidebarWrapper.classList.contains('open')) {
+    closeSidebar();
+  }
+  
+  if (!dragInitiated) {
+    evt.item.parentNode.insertBefore(evt.item, evt.item); // cancel drag
+    return;
+  }
+  
+  evt.item.classList.remove('hold-indicator');
+  clearTimeout(holdTimeout);
+},
 
     onEnd: function(evt) {
       evt.item.classList.remove('hold-indicator');
