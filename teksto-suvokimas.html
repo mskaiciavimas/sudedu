@@ -1437,6 +1437,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let mobileOptionsSortable = null;
 
+
 function initializeSortableJS() {
   // Destroy previous instances
   sortableInstances.forEach(instance => instance.destroy());
@@ -1471,12 +1472,22 @@ function initializeSortableJS() {
       scroll: true,
       scrollSensitivity: 60,
       scrollSpeed: 10,
-      onStart: function(evt) {
-        // Close sidebar when drag starts on desktop
-        if (sidebarWrapper.classList.contains('open')) {
+      
+    onStart: function(evt) {
+      if (!dragInitiated) {
+        evt.item.parentNode.insertBefore(evt.item, evt.item); // cancel drag
+        return;
+      }
+      evt.item.classList.remove('hold-indicator');
+      clearTimeout(holdTimeout);
+      
+      // Force close sidebar with a small delay to ensure it happens
+      setTimeout(() => {
+        if (sidebarWrapper && sidebarWrapper.classList.contains('open')) {
           closeSidebar();
         }
-      }
+      }, 0);
+    },
     });
 
     sortableInstances.push(sortable);
@@ -1513,11 +1524,6 @@ function initializeOptionsFieldSortable() {
       holdTimeout = setTimeout(() => {
         dragInitiated = true;
         item.classList.add('hold-indicator'); // optional visual cue
-
-        // ✅ Only close sidebar when actual drag is about to start (after hold)
-        if (sidebarWrapper.classList.contains('open')) {
-          closeSidebar();
-        }
       }, mobileDelay);
 
       const cancelHold = (e) => {
@@ -1537,16 +1543,21 @@ function initializeOptionsFieldSortable() {
       document.addEventListener('contextmenu', cancelHold);
     },
 
+    
     onStart: function(evt) {
       if (!dragInitiated) {
         evt.item.parentNode.insertBefore(evt.item, evt.item); // cancel drag
         return;
       }
       evt.item.classList.remove('hold-indicator');
-      if (sidebarWrapper.classList.contains('open')) {
-        closeSidebar();
-      }
       clearTimeout(holdTimeout);
+      
+      // Force close sidebar with a small delay to ensure it happens
+      setTimeout(() => {
+        if (sidebarWrapper && sidebarWrapper.classList.contains('open')) {
+          closeSidebar();
+        }
+      }, 0);
     },
 
     onEnd: function(evt) {
@@ -1584,12 +1595,22 @@ function updateSortables() {
         dragClass: 'drag-dragging',
         forceFallback: true,
         fallbackOnBody: true,
-        onStart: function(evt) {
-            // Close sidebar when dragging options-field
-            if (sidebarWrapper.classList.contains('open')) {
-                closeSidebar();
-            }
+        
+    onStart: function(evt) {
+      if (!dragInitiated) {
+        evt.item.parentNode.insertBefore(evt.item, evt.item); // cancel drag
+        return;
+      }
+      evt.item.classList.remove('hold-indicator');
+      clearTimeout(holdTimeout);
+      
+      // Force close sidebar with a small delay to ensure it happens
+      setTimeout(() => {
+        if (sidebarWrapper && sidebarWrapper.classList.contains('open')) {
+          closeSidebar();
         }
+      }, 0);
+    },
     });
     sortableInstances.push(sortable);
 }
