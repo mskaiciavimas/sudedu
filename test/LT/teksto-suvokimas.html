@@ -112,7 +112,7 @@
         }
 
         .tracker-timer-holder {
-          padding: 0 30px;
+          padding: 0 15px;
           margin-bottom: 10px;
         }
 
@@ -155,7 +155,6 @@
           -webkit-backdrop-filter: blur(15px);
           background: rgba(255, 255, 255, 0.15);
           border-radius: 20px;
-          padding-right: 15px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -163,7 +162,7 @@
         }
 
         #final-message-div {
-          font-size: 2.5rem;
+          font-size: 2rem;
           display: flex;
         }
 
@@ -213,7 +212,7 @@
 
         #stopButtonTextComp {
           width: 6vw;
-          min-width: 42.5px;
+          min-width: 75px;
           height: 42.5px;
           border-radius: 100px;
           font-size: 2rem;
@@ -360,7 +359,7 @@
             top: 0;
             border: none;
             width: 34px;
-            height: 62px;
+            height: 58px;
             border-radius: 0 20px 20px 0;
             cursor: pointer;
             display: flex;
@@ -532,6 +531,10 @@
           width: 10vw;
         }
 
+        .tracker-timer-holder {
+          padding: 0 15px 0 30px;
+        }
+
         #fireworks-div {
           width: 200px;
           bottom: -5%;
@@ -552,7 +555,7 @@
         #author {
           margin-top: 10px;
           padding-top: 10px;
-          border-top: 1px solid rgba(255, 255, 255, 0.3);
+          border-top: 1px solid rgba(255, 255, 255, 1);
           margin-left: 0;
           text-align: center;
           }
@@ -588,7 +591,7 @@
           background: transparent;
           border: none;
           border-radius: 0;
-          padding: 15px;
+          padding: 30px;
       }
 
       .sidebar {
@@ -629,12 +632,17 @@
 
         .toggle-tab {
             display: flex;
+            height: 93px;
+        }
+
+        .tracker-timer-holder {
+          padding: 0 15px 0 30px;
         }
         
         #author {
           margin-top: 10px;
           padding-top: 10px;
-          border-top: 1px solid rgba(255, 255, 255, 0.3);
+          border-top: 1px solid rgba(255, 255, 255, 1);
           margin-left: 0;
           text-align: center;
           }
@@ -657,7 +665,7 @@
 
       #stopButtonTextComp {
           width: 10vw;
-          min-width: 51.5px;
+          min-width: 90px;
           height: 51.5px;
           border-radius: 100px;
           font-size: 2rem;
@@ -1538,6 +1546,7 @@ window.onload = function () {
             controller.questionsStopped = true;
             localStorage.setItem("elapsedTime", timerDisplay.textContent);
             localStorage.setItem('controller', JSON.stringify(controller));
+            document.querySelector(".tracker-timer-holder").style.paddingLeft = "15px";
             initiateTheProgram() 
           }
 				} else if (stopButtonSpanElement.innerHTML === "refresh") {
@@ -1551,6 +1560,8 @@ window.onload = function () {
           };
           checkAnswerBtn.disabled = false;
           nextQuestionBtn.disabled = false;
+
+          document.querySelector(".tracker-timer-holder").style.paddingLeft = "30px";
 
           controller.randomSelection = [];
           helpTracker = 0;
