@@ -14,21 +14,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentLanguage = document.getElementById('currentLanguage');
     const languageOptions = document.querySelectorAll('.main-nav-language-option');
 
-    // Toggle dropdown
-    languageBtn.addEventListener('click', function(e) {
+    
+    languageBtn?.addEventListener('click', function(e) {
         e.stopPropagation();
         languageDropdown.classList.toggle('open');
     });
 
     // Close dropdown when clicking outside
     document.addEventListener('click', function(e) {
-        if (!languageDropdown.contains(e.target)) {
-            languageDropdown.classList.remove('open');
+        if (!languageDropdown?.contains(e.target)) {
+            languageDropdown?.classList.remove('open');
         }
     });
 
     // Language option click
-    languageOptions.forEach(option => {
+    languageOptions?.forEach(option => {
         option.addEventListener('click', function() {
             const lang = this.getAttribute('data-lang');
             setLanguage(lang);
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Mobile menu toggle
-    mainNavMobileBtn.addEventListener('click', function() {
+    mainNavMobileBtn?.addEventListener('click', function() {
         mainNavMobileBtn.classList.toggle('main-nav-mobile-active');
         mainNavMobileMenu.classList.toggle('main-nav-mobile-open');
     });

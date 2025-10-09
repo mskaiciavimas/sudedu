@@ -2602,3 +2602,37 @@ function messageToTheUser(message, errorMessage = true) {
     // return manual closer
     return closePopup;
 }
+
+
+//CUSTOM CONFIRM MODAL
+function showCustomConfirm(text, onConfirm, item=null) {
+      const modal = document.getElementById('customConfirmModal');
+      const modalText = document.getElementById('customModalText');
+      const yesBtn = document.getElementById('customConfirmYes');
+      const noBtn = document.getElementById('customConfirmNo');
+
+      // Set text
+      modalText.textContent = text;
+
+      // Show modal
+      modal.style.display = 'flex';
+
+      // Remove previous click handlers
+      yesBtn.onclick = null;
+      noBtn.onclick = null;
+
+      // Yes click
+      yesBtn.onclick = () => {
+          if (item !== undefined && item !== null) {
+            onConfirm(item);
+          } else {
+            onConfirm();
+          }
+          modal.style.display = 'none';
+      };
+
+      // No click
+      noBtn.onclick = () => {
+          modal.style.display = 'none';
+      };
+  }
