@@ -148,6 +148,12 @@
         #answers-field {
           margin-top: 15px;
         }
+
+        #answers-field-start,
+        #answers-field-middle,
+        #answers-field-end {
+          margin-top: 15px;
+        }
         
         #final-message-row {
           position: relative;
@@ -349,6 +355,7 @@
             flex-direction: column;
             justify-content: space-between;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 15px;
         }
 
@@ -1057,7 +1064,7 @@ window.onload = function () {
       const answerFieldEndHeight = answersFieldEnd.scrollHeight;
 
       optionsField.style.minHeight = `${optionsHeight}px`;
-      answersField.style.minHeight = `${optionsHeight-80}px`;
+      answersField.style.minHeight = `${optionsHeight-40}px`;
       answersFieldStart.style.minHeight = `${Math.max(optionsHeight/3*0.75, 100)}px`
       answersFieldMiddle.style.minHeight = `${Math.max(optionsHeight/3*1.5, 100)}px`
       answersFieldEnd.style.minHeight = `${Math.max(optionsHeight/3*0.75, 100)}px`
@@ -1561,7 +1568,11 @@ window.onload = function () {
           checkAnswerBtn.disabled = false;
           nextQuestionBtn.disabled = false;
 
-          document.querySelector(".tracker-timer-holder").style.paddingLeft = "30px";
+          if (window.matchMedia("(max-width: 767px), (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)").matches) {
+            document.querySelector(".tracker-timer-holder").style.paddingLeft = "30px";
+          } else {
+            document.querySelector(".tracker-timer-holder").style.paddingLeft = "15px";
+          }
 
           controller.randomSelection = [];
           helpTracker = 0;
@@ -1638,6 +1649,11 @@ if (toggleTab) {
 
 // Close sidebar on window resize if it becomes desktop size
 window.addEventListener('resize', () => {
+    if (window.matchMedia("(max-width: 767px), (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)").matches) {
+      document.querySelector(".tracker-timer-holder").style.paddingLeft = "30px";
+    } else {
+      document.querySelector(".tracker-timer-holder").style.paddingLeft = "15px";
+    }
     if (window.innerWidth > 768) {
         closeSidebar();
     }
