@@ -38,8 +38,7 @@ let previousEquationElement = document.querySelector('.previous-equation');
 let answerTrackerElement = document.querySelector('#answer-tracker');
 let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 let stulpeliuDivElement = document.querySelector('#stulpeliu-div');
-let divisionStulp1Element = document.querySelector('#division-stulp-1');
-let divisionStulp2Element = document.querySelector('#division-stulp-2');
+let divisionStulp2InnerElement = document.querySelector('#division-stulp-2-inner');
 let divisionStulp3Element = document.querySelector('#division-stulp-3');
 let divisionStulp4Element = document.querySelector('#division-stulp-4')
 let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
@@ -188,7 +187,7 @@ if (document.querySelector("#stop-button-span")) {
     
         // Concatenate the padded items
         if (controller.modeChoice8 === "" || controller.modeChoice8 === 'C79') {
-          controller.equation = `<div id="dalinys-outer-div" style="display: flex; position: relative;"><div id="dalinys">${item1}</div><div id="daliklis" style="border-bottom: 2px solid black; border-left: 2px solid black;">${item2}</div></div>`;
+          controller.equation = `<div id="equation-div-kampu-holder" style="display: flex; position: relative;"><div id="dalinys-outer" style="display: flex; position: relative;"><div id="dalinys">${item1}</div></div><div id="daliklis-outer"><div id="daliklis" style="border-bottom: 2px solid black; border-left: 2px solid black;">${item2}</div></div></div>`;
         } else if (controller.modeChoice8 === 'C78') {
           controller.equation = `<div id="first-number-outer-div" style="display: flex; position: relative;"><div id="daliklis">${item2}</div><div id="dalinys" style="border-top: 2px solid black; border-left: 2px solid black;">${item1}</div></div>`;
         }
@@ -680,9 +679,11 @@ async function sendSetTaskResultsToDatabase() {
     if (controller.modeChoice7 === "C48") {
       // Need to adjust the modofier
       fontSizeFullREM = 3*1.3;
+      if (window.innerWidth <= 575) {
+				fontSizeFullREM = 2.5*1.3;
+			}
       stulpeliuDivElement.innerHTML = '';
-      divisionStulp1Element .innerHTML = '';
-      divisionStulp2Element .innerHTML = '';
+      divisionStulp2InnerElement .innerHTML = '';
 
       if (controller.language !== 'LT') {
         answerFieldDivInvisibleDiv.innerHTML = '';
@@ -726,7 +727,7 @@ async function sendSetTaskResultsToDatabase() {
             if (i === 0) {
               stulpeliuDivElement.innerHTML += '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-right: 0; margin-bottom: 10px;"><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></div>';
             } else {
-            stulpeliuDivElement.innerHTML += '<div style="position: relative;"><div class="stulpeliu-symbol" style="position: absolute; left: calc((-0.65 * 3rem) + ' + (i*fontSizeFullREM*-0.9) + 'px); top: ' + -100 + '%;">+</div><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-right: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (i) + ')) !important; margin-bottom: 10px;"><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></div></div>';
+            stulpeliuDivElement.innerHTML += '<div style="position: relative;"><div class="stulpeliu-symbol" style="position: absolute; left: calc((-0.65 * 3rem) + ' + (i*fontSizeFullREM*-0.9) + 'px); top: ' + -100 + '%;">+</div><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-right: calc(' + fontSizeFullREM*0.45 + 'rem * (' + (i) + ')) !important; margin-bottom: 10px;"><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></div></div>';
             }
         }
     }
@@ -756,7 +757,9 @@ async function sendSetTaskResultsToDatabase() {
       var halfpush = false;
       var stopAddingTwoExtraDigits = false;
       var partialSub = '';
+      var movedDownNumber;
       let number1 = controller.randomSelection[0];
+      let totalNumberDigits = number1.toString().length
       const number2 = controller.randomSelection[1];
       const daliklisDigits = controller.randomSelection[1].toString().length;
       for (var i = 0; i < subAnswerNumber*2; i++) {
@@ -805,6 +808,7 @@ async function sendSetTaskResultsToDatabase() {
           }
 
           } else if (subtractedValueLength < number1.toString().length) {
+            
             if (!halfpush) {
               offset = offset + 1 * (Number(number1).toString().length - (subtractedValueLength)); 
             } else {
@@ -817,28 +821,41 @@ async function sendSetTaskResultsToDatabase() {
           if (startsWithZero) {
             subtract = [0, false];
           } else if (Number(number1) > number2) {
+            
             if (Number(number1.toString().slice(0, daliklisDigits)) < number2 && !stopAddingTwoExtraDigits) { 
-              subtract = [Math.floor(Number(number1.toString().slice(0, daliklisDigits+1)) / number2) * number2, true];
+              movedDownNumber = Number(number1.toString().slice(0, daliklisDigits+1))
+              subtract = [Math.floor(movedDownNumber / number2) * number2, true];
               if (subtract[0].toString().length < daliklisDigits+1) {
                 offset = offset + 1;  
                 halfpush = true;
               }
+            } else if (stopAddingTwoExtraDigits) {
+              let digitsToTake = 1
+              if (Number(partialSub) !== 0) {
+                digitsToTake = digitsToTake + partialSub.length
+              }
+              movedDownNumber = Number(number1.toString().slice(0, digitsToTake))
+              subtract = [Math.floor(movedDownNumber / number2) * number2, false]; 
+              stopAddingTwoExtraDigits = false; 
             } else {
-              subtract = [Math.floor(Number(number1.toString().slice(0, daliklisDigits)) / number2) * number2, false]; 
+              movedDownNumber = Number(number1.toString().slice(0, daliklisDigits))
+              subtract = [Math.floor(movedDownNumber / number2) * number2, false]; 
               stopAddingTwoExtraDigits = false;  
             }
             } else if (Number(number1) === number2) {
+              movedDownNumber = number1
               subtract = [number1, false];
             } else if (Number(number1) < number2) {
+              movedDownNumber = number1
               subtract = [0, false];
             }
             if (i > 1) {
               if (subtract[1]) {
-                interSplitNumber1Str = number1.toString().slice(0, daliklisDigits+1);
+                interSplitNumber1Str = number1.toString().slice(0, movedDownNumber.toString().length);
               } else {
-                interSplitNumber1Str = number1.toString().slice(0, daliklisDigits)
+                interSplitNumber1Str = number1.toString().slice(0, movedDownNumber.toString().length)
               }
-              if (interSplitNumber1Str.length > subtract[0].toString.length && !halfpush) {
+              if (interSplitNumber1Str.length > subtract[0].toString().length && !halfpush) {
                 tempOffset = 1 * (interSplitNumber1Str.length - subtract[0].toString().length);
               }
             }
@@ -846,42 +863,56 @@ async function sendSetTaskResultsToDatabase() {
         }
 
         if (controller.modeChoice8 === '' || controller.modeChoice8 === 'C79') {
-
         if (i === 0) {
-          divisionStulp1Element.innerHTML += '<div style="position: relative;"><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-underline" style="margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset) + ')) !important;"><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></div></div>';
-          var dalinysOuterDivElement = document.getElementById('dalinys-outer-div');
-          dalinysOuterDivElement.innerHTML += '<div style="position: absolute; left: calc((-1.5 * 1.95rem) + ' + (offset)*47 + 'px); top: 40% !important" class="stulpeliu-symbol-div">-</div>';
+        divisionStulp2InnerElement.innerHTML +=
+          '<div class="stulpeliu-input-outer-holder" style="position: relative;">' +
+            '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-underline" style="margin-bottom: 10px;">' +
+              '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off" ' +
+              'style="width:' + ((totalNumberDigits + 1 - offset) + 'ch') + ';">' +
+            '</div>' +
+          '</div>';
+          var dalinys = document.getElementById('dalinys');
+          dalinys.innerHTML += '<div style="position: absolute; left: calc((-1.5 * 1.5rem) + ' + (offset)*47 + 'px); top: 40% !important" class="stulpeliu-symbol-div">-</div>';
         } else {
           if (counter !== 0) {
-            divisionStulp2Element.innerHTML += '<div class="d-flex justify-content-center align-items-center"><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub stulpeliu-field-underline" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset+tempOffset) + ')) !important;"><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></div><div class="invisibleDiv" style="visibility: hidden; display: block;"></div></div>';
-          } else if (i+1 !== subAnswerNumber*2) {
-            divisionStulp2Element.innerHTML += '<div class="d-flex justify-content-center align-items-center">' +
-            '<div style="position: relative;">' +
-            '<div style="position: absolute; left: calc((-1.5 * 1.5rem) + ' + (offset)*60 + 'px);" class="stulpeliu-symbol-div">-</div>' +
-            '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset+tempOffset) + ')) !important;">' +
-            '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off">' +
-            '</div>' +
-            '</div>' +
-            '<div class="invisibleDiv" style="visibility: hidden; display: block;"></div>' +
+            divisionStulp2InnerElement.innerHTML +=
+            '<div class="stulpeliu-input-outer-holder">' +
+              '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub stulpeliu-field-underline" style="margin-bottom: 10px;">' +
+                '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off" ' +
+                'style="width:' + ((totalNumberDigits + 1 - offset - tempOffset) + 'ch') + ';">' +
+              '</div>' +
             '</div>';
+
+          } else if (i+1 !== subAnswerNumber*2) {
+            divisionStulp2InnerElement.innerHTML += 
+            '<div class="d-flex justify-content-center align-items-center">' +
+              '<div class="stulpeliu-input-outer-holder" style="position: relative;">' +
+                '<div style="position: absolute; left: calc((-1.5 * 1.05rem) + ' + (offset * 25) + 'px);" class="stulpeliu-symbol-div">-</div>' +
+                '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px;">' +
+                  '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off" style="width:' + ((totalNumberDigits + 1 - offset - tempOffset) + 'ch') + ';">' +
+                '</div>' +
+              '</div>' +
+            '</div>';
+
           } else {
             if (controller.language === 'LT') {
-              divisionStulp2Element.innerHTML += '<div class="d-flex justify-content-center align-items-center">' +
-              '<div style="position: relative;">' +
-              '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset+tempOffset) + ')) !important;">' +
-              '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off">' +
-              '</div>' +
-              '</div>' +
-              '<div id="liek" class="invisibleDiv" style="visibility: hidden; display: block;">(liek.)</div>' +
+              divisionStulp2InnerElement.innerHTML +=
+              '<div class="d-flex justify-content-center align-items-center">' +
+                '<div class="stulpeliu-input-outer-holder" style="position: relative;">' +
+                  '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px;">' +
+                    '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off" ' +
+                    'style="width:' + ((totalNumberDigits + 1 - offset - tempOffset) + 'ch') + ';">' +
+                  '</div>' +
+                '</div>' +
               '</div>';
+
             } else {
-              divisionStulp2Element.innerHTML += '<div class="d-flex justify-content-center align-items-center">' +
+              divisionStulp2InnerElement.innerHTML += '<div class="d-flex justify-content-center align-items-center">' +
               '<div style="position: relative;">' +
-              '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset+tempOffset) + ')) !important;">' +
+              '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.45 + 'rem * (' + (offset+tempOffset) + ')) !important;">' +
               '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off">' +
               '</div>' +
               '</div>' +
-              '<div id="liek" class="invisibleDiv" style="visibility: hidden; display: block;">(remainder)</div>' +
               '</div>';
             }
           }
@@ -891,7 +922,7 @@ async function sendSetTaskResultsToDatabase() {
     answerFieldDivInvisibleDiv.innerHTML += '<div class="invisibleDiv" style="visibility: hidden; display: block;"></div>';
 
     if (i === 0) {
-      divisionStulp3Element.innerHTML += '<div class="d-flex justify-content-center align-items-center"><div class="invisibleDiv" style="visibility: hidden; display: block;"></div><div style="position: relative;"><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub stulpeliu-field-underline" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset+tempOffset) + ')) !important;"> <div style="position: absolute; transform: translatex(-150%); top: -14%" class="stulpeliu-symbol-div">-</div><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></div></div></div>';
+      divisionStulp3Element.innerHTML += '<div class="d-flex justify-content-center align-items-center"><div class="invisibleDiv" style="visibility: hidden; display: block;"></div><div style="position: relative;"><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub stulpeliu-field-underline" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.45 + 'rem * (' + (offset+tempOffset) + ')) !important;"> <div style="position: absolute; transform: translatex(-150%); top: -14%" class="stulpeliu-symbol-div">-</div><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></div></div></div>';
     } else {
       if (counter !== 0) {
         divisionStulp4Element.innerHTML += `
@@ -921,7 +952,7 @@ async function sendSetTaskResultsToDatabase() {
         divisionStulp4Element.innerHTML += '<div class="d-flex justify-content-center align-items-center">' +
         '<div id="liek" class="invisibleDiv" style="visibility: hidden; display: block;"></div>' +
         '<div style="position: relative;">' +
-        '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.9 + 'rem * (' + (offset+tempOffset) + ')) !important;">' +
+        '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.45 + 'rem * (' + (offset+tempOffset) + ')) !important;">' +
         '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off">' +
         '</div>' +
         '</div>' +
@@ -984,11 +1015,11 @@ async function sendSetTaskResultsToDatabase() {
     }
 
     if (controller.result[0] === 'Incorrect') {
-      upperLineElement.setAttribute("style", "background-color: #D57E7E")
+      upperLineElement.setAttribute("style", "background-color: rgba(213, 126, 126, 0.6)")
     } else if (controller.result[0] === 'Correct') {
-      upperLineElement.setAttribute("style", "background-color: #40c9a9")
+      upperLineElement.setAttribute("style", "background-color: rgba(64, 201, 169, 0.6)")
     } else {
-      upperLineElement.setAttribute("style", "background-color: #ffeccc")
+      upperLineElement.setAttribute("style", "background-color: rgba(255, 255, 255, 0.6)")
     };
     previousEquationElement.innerHTML = controller.result[4];
     updateScore();
@@ -1023,18 +1054,18 @@ async function sendSetTaskResultsToDatabase() {
 
       function answerFieldColor(element, corectness) {
         if (corectness === false) {
-          element.setAttribute("style", "background-color: #D57E7E")
+          element.style.backgroundColor = 'rgba(213, 126, 126, 0.6)';
           clearTimeout(timeoutReference);
-          removeError(element)
-          element.classList.add('error')
+          removeError(element);
+          element.classList.add('error');
           var timeoutReference = setTimeout(function() {
             removeError(element);
-        }, 500);
+          }, 500);
         } else if (corectness === true) {
-          element.setAttribute("style", "background-color: #40c9a9")
+          element.style.backgroundColor = 'rgba(64, 201, 169, 0.6)';
         } else {
-          element.setAttribute("style", "background-color: #ffeccc")
-        };
+          element.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
+        }
       }
 
       function flipNumber(number) {
@@ -1219,7 +1250,14 @@ async function sendSetTaskResultsToDatabase() {
                 if (subtract[0].toString().length < daliklisDigits+1) {
                   offset = offset + 1;  
                   halfpush = true;
+                } 
+              } else if (stopAddingTwoExtraDigits) {
+                let digitsToTake = 1
+                if (Number(partialSub) !== 0) {
+                  digitsToTake = digitsToTake + partialSub.length
                 }
+                subtract = [Math.floor(Number(number1.toString().slice(0, digitsToTake)) / number2) * number2, false]; 
+                stopAddingTwoExtraDigits = false; 
               } else {
                 subtract = [Math.floor(Number(number1.toString().slice(0, daliklisDigits)) / number2) * number2, false];  
                 stopAddingTwoExtraDigits = false;      
@@ -1493,8 +1531,8 @@ async function sendSetTaskResultsToDatabase() {
     if (isCorrect || controller.modeChoice7 !== "C48") {
       formEquation();
       displayEquation();
-      answerInputElement.setAttribute("style", "background-color: #ffeccc")
-      //answerRemainderWesternInputElement.setAttribute("style", "background-color: #ffeccc") recently removed
+      answerInputElement.setAttribute("style", "background-color: rgba(255, 255, 255, 0.6)")
+      //answerRemainderWesternInputElement.setAttribute("style", "background-color: rgba(255, 255, 255, 0.6)") recently removed
     } else {
       updateScore();
       setMargins();
@@ -1514,10 +1552,10 @@ async function sendSetTaskResultsToDatabase() {
     }
     answerInputElement.value = '';
     answerRemainderInputElement.value = '';
-    answerInputElement.setAttribute("style", "background-color: #ffeccc");
+    answerInputElement.setAttribute("style", "background-color: rgba(255, 255, 255, 0.6)");
     if (controller.modeChoice8 === 'C78') {
       answerRemainderWesternInputElement.value = '';
-      answerRemainderWesternInputElement.setAttribute("style", "background-color: #ffeccc");
+      answerRemainderWesternInputElement.setAttribute("style", "background-color: rgba(255, 255, 255, 0.6)");
     }
     controller.result = ['', '', '', '', ''];
     controller.equation = '';
@@ -1687,11 +1725,11 @@ function redirectToIntermediate() {
  // Function to calculate bar color based on the number of mistakes
 function getBarColor(value) {
   if (value < 3) {
-      return "#40c9a9";
+      return "rgba(64, 201, 169, 0.6)";
   } else if (value <= 6) {
       return "#E7B10A";
   } else {
-      return "#D57E7E";
+      return "rgba(213, 126, 126, 0.6)";
   }
 }
 

@@ -489,7 +489,7 @@
         #change-teacher-toggle-button,
         #add-teacher,
         #change-teacher,
-        .class-challenge-btn,
+        .complete-task-btn,
         .edit-btn,
         .cancel-btn,
         .save-btn {
@@ -523,7 +523,7 @@
         #change-teacher-toggle-button::before ,
         #add-teacher::before ,
         #change-teacher::before,
-        .class-challenge-btn::before,
+        .complete-task-btn::before,
         .edit-btn::before,
         .cancel-btn::before,
         .save-btn::before {
@@ -539,7 +539,7 @@
         #change-teacher-toggle-button::after,
         #add-teacher::after,
         #change-teacher::after,
-        .class-challenge-btn::after,
+        .complete-task-btn::after,
         .edit-btn::after,
         .cancel-btn::after,
         .save-btn::after {
@@ -558,7 +558,7 @@
         #change-teacher-toggle-button:hover::before,
         #add-teacher:hover::before,
         #change-teacher:hover::before,
-        .class-challenge-btn:hover::before,
+        .complete-task-btn:hover::before,
         .edit-btn:hover::before,
         .cancel-btn:hover::before,
         .save-btn:hover::before {
@@ -1046,7 +1046,7 @@
             color: #3288AC;
         }
 
-        .class-challenge-btn {
+        .complete-task-btn {
             max-height: 42.5px;
         }
 
@@ -1383,7 +1383,7 @@
             font-size: 1.95rem;
         }
         
-        #change-teacher-toggle-button, #add-teacher, #change-teacher, .class-challenge-btn, .edit-btn, .cancel-btn, .save-btn {
+        #change-teacher-toggle-button, #add-teacher, #change-teacher, .complete-task-btn, .edit-btn, .cancel-btn, .save-btn {
             font-size: 1.5rem;
         }
 
@@ -1504,7 +1504,7 @@
             font-size: 1.15rem;
         }
 
-        .class-challenge-btn {
+        .complete-task-btn {
             max-height: 52px;
         }
 
@@ -1839,7 +1839,7 @@
                                         <div id="class-challenge-user-points"></div>
                                         </div>
                                     </div>
-                                    <button class="class-challenge-btn">Atlikti</button>
+                                    <button class="complete-task-btn">Atlikti</button>
                                 </div>
                             </div>
                         
@@ -3316,6 +3316,17 @@ async function renderClassWeekChallenge () {
     timeLeftDiv.innerHTML = `Liko ${daysLeft} ${dayLabel}`;
 
     renderPodiumRewards();
+
+    if (classDataCache && classDataCache.requestingStudent) {
+        document.querySelector("#class-challenge-user-points").innerHTML = ""
+        const points = classDataCache.requestingStudentWeekChlScore;
+        const pointsLabel = pointsLabelDeterminator(points);
+        document.querySelector("#class-challenge-user-points").innerHTML = `${points} ${pointsLabel}`
+    } else {
+        document.querySelector(".class-challenge-action-box").style.display = "none";
+        document.querySelector(".class-challenge-content-grid").style.gap = "0px";
+
+    }
 
     if (classDataCache.top3WeekChl.length === 0) {
             document.getElementById("podium-container").style.display = "none";
