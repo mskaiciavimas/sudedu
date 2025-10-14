@@ -152,7 +152,7 @@
 			align-items: center;
 		}
 
-		input,
+		textarea,
 		#answer {
 			border-radius: 20px;
 			background: rgba(255, 255, 255, 0.6);
@@ -161,8 +161,8 @@
 			cursor: pointer;
 		}
 
-		input:focus,
-		input:active,
+		textarea:focus,
+		textarea:active,
 		#answer:focus,
 		#answer:active {
 			border: 1px solid rgba(255, 255, 255, 1);
@@ -172,8 +172,15 @@
 
 		.equation,
 		.equation_2,
-		input {
+		textarea {
 			font-family: 'SFMono', sans-serif;
+		}
+
+		textarea {
+			padding: 0 12px;
+			resize: none;
+  			overflow: hidden;
+			line-height: var(--input-size-full);
 		}
 
 		.stulpeliu-symbol-div {
@@ -407,7 +414,7 @@
 							<div id="answer-field-outer">
 							<div id="answer-field" class="answer-field">
 								<textarea type="text" id="answer" name="answer" class="form-control text-center answer-input"
-									placeholder="" autofocus autocomplete="off" style="display: none; resize: none;       /* disables the resize handle */overflow: hidden;   /* hides scrollbars */"></textarea>
+									placeholder="" autofocus autocomplete="off" style="display: none;"></textarea>
 							</div>
 							</div>
 						</div>
