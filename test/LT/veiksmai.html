@@ -304,7 +304,7 @@
 			font-size: 1.75rem
 		}
 
-		.question-submit-button {
+		#next-question-btn {
 			font-size: 1.25rem;
 			min-width: 25vw;
 		}
@@ -407,14 +407,14 @@
 							<div id="answer-field-outer">
 							<div id="answer-field" class="answer-field">
 								<input type="text" id="answer" name="answer" class="form-control text-center answer-input"
-									placeholder="" autofocus autocomplete="new-password" style="display: none;">
+									placeholder="" autofocus autocomplete="off" style="display: none;">
 							</div>
 							</div>
 						</div>
 
 							<div id="remainder-field" class="remainder-field">
 								<input type="text" id="remainder" name="remainder" class="form-control text-center remainder-input"
-									placeholder="liek." autocomplete="new-password">
+									placeholder="liek." autocomplete="off">
 							</div>
 
 
@@ -588,7 +588,7 @@ document.querySelectorAll('.control').forEach(control => {
     displayEquation();
     
     if (!controller.questionsStopped) {
-			answerInputElement.style.display = "block";
+			answerInputElement.style.display = "flex";
 			questionsSubmitButtonRowElement.style.display = "flex";
     } else {
 			resetMistakeButtonsElement.style.display = "flex";
@@ -600,11 +600,17 @@ document.querySelectorAll('.control').forEach(control => {
     stylePage();
 };
 
+function setInputAttributes (element) {
+	element.setAttribute("inputmode", "numeric");
+	element.setAttribute("pattern", "[0-9]*");
+	element.setAttribute("autocomplete", "new-password");
+}
+
 let answerInputElement = document.querySelector('#answer');
-		answerInputElement.setAttribute("inputmode", "numeric");
+setInputAttributes(answerInputElement)
 
 let answerRemainderInputElement = document.querySelector('#remainder');
-		answerRemainderInputElement.setAttribute("inputmode", "numeric");
+setInputAttributes(answerRemainderInputElement)
 
 		// Sanitize input field value on input event
 		answerInputElement.addEventListener("input", function (event) {
@@ -780,6 +786,10 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 		let daliklis = document.querySelector("#daliklis")
 		answerInput.style.width = `${(controller.randomSelection[0]/controller.randomSelection[1]).toString().length + 1.25}ch`;
 		daliklis.style.width = `${(controller.randomSelection[0]/controller.randomSelection[1]).toString().length + 1.25}ch`;
+
+		document.querySelectorAll('.stulpeliu-input').forEach(el => {
+			setInputAttributes(el)
+		});
 
 		} else {
 
