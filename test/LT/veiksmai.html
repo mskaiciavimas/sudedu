@@ -73,6 +73,12 @@
 			border: 1px solid rgba(255, 255, 255, 0.1);
 			flex-direction: column;
 			padding: 20px;
+			transition: min-height 0.3s ease, max-height 0.3s ease;
+		}
+
+		.container.keyboard-open {
+			max-height: calc(100% - 32px); /* removes navbar height from calculation */
+			min-height: calc(100% - 32px);
 		}
 
 		.trackers-row {
@@ -1060,12 +1066,16 @@ function detectMobileKeyboard() {
 // Usage:
 // 1. Define your callback functions globally or in accessible scope:
 function onShow(info) {
-	const navbar = document.getElementById('mainNavbar');
+	const navbar = document.querySelector('#mainNavbar');
+	const container = document.querySelector('.container');
+	container.classList.add('keyboard-open');
 	navbar.classList.add('keyboard-open');
 }
 
 function onHide(info) {
-  	const navbar = document.getElementById('mainNavbar');
+  	const navbar = document.querySelector('#mainNavbar');
+	const container = document.querySelector('.container');
+	container.classList.remove('keyboard-open');
     navbar.classList.remove('keyboard-open');
 }
 
