@@ -725,9 +725,9 @@ async function sendSetTaskResultsToDatabase() {
         for (var i = 0; i < digitNumber.length; i++) {
             // Add divs for input fields
             if (i === 0) {
-              stulpeliuDivElement.innerHTML += '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-right: 0; margin-bottom: 10px;"><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></div>';
+              stulpeliuDivElement.innerHTML += '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-right: 0; margin-bottom: 10px;"><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="new-password"></div>';
             } else {
-            stulpeliuDivElement.innerHTML += '<div style="position: relative;"><div class="stulpeliu-symbol" style="position: absolute; left: calc((-0.65 * 3rem) + ' + (i*fontSizeFullREM*-0.9) + 'px); top: ' + -100 + '%;">+</div><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-right: calc(' + fontSizeFullREM*0.45 + 'rem * (' + (i) + ')) !important; margin-bottom: 10px;"><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></div></div>';
+            stulpeliuDivElement.innerHTML += '<div style="position: relative;"><div class="stulpeliu-symbol" style="position: absolute; left: calc((-0.65 * 3rem) + ' + (i*fontSizeFullREM*-0.9) + 'px); top: ' + -100 + '%;">+</div><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-right: calc(' + fontSizeFullREM*0.45 + 'rem * (' + (i) + ')) !important; margin-bottom: 10px;"><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="new-password"></div></div>';
             }
         }
     }
@@ -867,7 +867,7 @@ async function sendSetTaskResultsToDatabase() {
         divisionStulp2InnerElement.innerHTML +=
           '<div class="stulpeliu-input-outer-holder" style="position: relative;">' +
             '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-underline" style="margin-bottom: 10px;">' +
-              '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off" ' +
+              '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="new-password" ' +
               'style="width:' + ((totalNumberDigits + 1 - offset) + 'ch') + ';">' +
             '</div>' +
           '</div>';
@@ -878,7 +878,7 @@ async function sendSetTaskResultsToDatabase() {
             divisionStulp2InnerElement.innerHTML +=
             '<div class="stulpeliu-input-outer-holder">' +
               '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub stulpeliu-field-underline" style="margin-bottom: 10px;">' +
-                '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off" ' +
+                '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="new-password" ' +
                 'style="width:' + ((totalNumberDigits + 1 - offset - tempOffset) + 'ch') + ';">' +
               '</div>' +
             '</div>';
@@ -889,7 +889,7 @@ async function sendSetTaskResultsToDatabase() {
               '<div class="stulpeliu-input-outer-holder" style="position: relative;">' +
                 '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px;">' +
                     '<div class="stulpeliu-symbol-div">-</div>' +
-                  '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off" style="width:' + ((totalNumberDigits + 1 - offset - tempOffset) + 'ch') + ';">' +
+                  '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="new-password" style="width:' + ((totalNumberDigits + 1 - offset - tempOffset) + 'ch') + ';">' +
                 '</div>' +
               '</div>' +
             '</div>';
@@ -900,7 +900,7 @@ async function sendSetTaskResultsToDatabase() {
               '<div class="d-flex justify-content-center align-items-center">' +
                 '<div class="stulpeliu-input-outer-holder" style="position: relative;">' +
                   '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px;">' +
-                    '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off" ' +
+                    '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="new-password" ' +
                     'style="width:' + ((totalNumberDigits + 1 - offset - tempOffset) + 'ch') + ';">' +
                   '</div>' +
                 '</div>' +
@@ -910,7 +910,7 @@ async function sendSetTaskResultsToDatabase() {
               divisionStulp2InnerElement.innerHTML += '<div class="d-flex justify-content-center align-items-center">' +
               '<div style="position: relative;">' +
               '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.45 + 'rem * (' + (offset+tempOffset) + ')) !important;">' +
-              '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off">' +
+              '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="new-password">' +
               '</div>' +
               '</div>' +
               '</div>';
@@ -922,7 +922,7 @@ async function sendSetTaskResultsToDatabase() {
     answerFieldDivInvisibleDiv.innerHTML += '<div class="invisibleDiv" style="visibility: hidden; display: block;"></div>';
 
     if (i === 0) {
-      divisionStulp3Element.innerHTML += '<div class="d-flex justify-content-center align-items-center"><div class="invisibleDiv" style="visibility: hidden; display: block;"></div><div style="position: relative;"><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub stulpeliu-field-underline" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.45 + 'rem * (' + (offset+tempOffset) + ')) !important;"> <div style="position: absolute; transform: translatex(-150%); top: -14%" class="stulpeliu-symbol-div">-</div><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></div></div></div>';
+      divisionStulp3Element.innerHTML += '<div class="d-flex justify-content-center align-items-center"><div class="invisibleDiv" style="visibility: hidden; display: block;"></div><div style="position: relative;"><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub stulpeliu-field-underline" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.45 + 'rem * (' + (offset+tempOffset) + ')) !important;"> <div style="position: absolute; transform: translatex(-150%); top: -14%" class="stulpeliu-symbol-div">-</div><input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="new-password"></div></div></div>';
     } else {
       if (counter !== 0) {
         divisionStulp4Element.innerHTML += `
@@ -931,7 +931,7 @@ async function sendSetTaskResultsToDatabase() {
           <div style="position: relative;">
             <div id="stulpeliu-field-${i}" class="stulpeliu-field stulpeliu-field-sub stulpeliu-field-underline" style="margin-bottom: 10px; margin-left: calc(${fontSizeFullREM * 0.9}rem * (${offset + tempOffset})) !important;">
               <div style="position: absolute; transform: translatex(-150%); top: -14%" class="stulpeliu-symbol-div">-</div>
-              <input type="text" id="stulpeliu-${i}" name="stulpeliu-${i}" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off">
+              <input type="text" id="stulpeliu-${i}" name="stulpeliu-${i}" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="new-password">
             </div>
           </div>
         </div>
@@ -942,7 +942,7 @@ async function sendSetTaskResultsToDatabase() {
           <div class="invisibleDiv" style="visibility: hidden; display: block;"></div>
           <div style="position: relative;">
             <div id="stulpeliu-field-${i}" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(${fontSizeFullREM * 0.9}rem * (${offset + tempOffset})) !important;">
-              <input type="text" id="stulpeliu-${i}" name="stulpeliu-${i}" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off">
+              <input type="text" id="stulpeliu-${i}" name="stulpeliu-${i}" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="new-password">
             </div>
           </div>
         </div>
@@ -953,7 +953,7 @@ async function sendSetTaskResultsToDatabase() {
         '<div id="liek" class="invisibleDiv" style="visibility: hidden; display: block;"></div>' +
         '<div style="position: relative;">' +
         '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.45 + 'rem * (' + (offset+tempOffset) + ')) !important;">' +
-        '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off">' +
+        '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="new-password">' +
         '</div>' +
         '</div>' +
         '</div>';
