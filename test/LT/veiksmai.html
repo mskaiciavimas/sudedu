@@ -177,10 +177,14 @@
 		}
 
 		textarea {
-			padding: 0 12px;
-			resize: none;
-  			overflow: hidden;
+			resize: none;          /* disable manual resize */
+			overflow-x: auto;      /* allow horizontal scroll */
+			overflow-y: hidden;    /* hide vertical scroll */
+			white-space: nowrap;   /* prevent wrapping to next line */
 			line-height: var(--input-size-full);
+			padding-top: 0;   
+			padding-bottom: 0;
+			scrollbar-width: none;    /* Firefox */                 
 		}
 
 		.stulpeliu-symbol-div {

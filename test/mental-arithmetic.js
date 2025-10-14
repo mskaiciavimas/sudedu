@@ -765,6 +765,7 @@ async function sendSetTaskResultsToDatabase() {
       for (var i = 0; i < subAnswerNumber*2; i++) {
         tempOffset = 0;
         if (counter === 1) {
+          console.log(i, "here1")
           if (startsWithZero) {
             splitNumber1Str = subtractedValueStr.slice(0, daliklisDigits);
             splitNumber2Str = subtractedValueStr.slice(daliklisDigits);
@@ -808,16 +809,20 @@ async function sendSetTaskResultsToDatabase() {
           }
 
           } else if (subtractedValueLength < number1.toString().length) {
-            
+            console.log("trigger")
             if (!halfpush) {
               offset = offset + 1 * (Number(number1).toString().length - (subtractedValueLength)); 
             } else {
               halfpush = false;
+              if (subtract[0].toString().length > partialSub.length) {
+                offset = offset + 1 * (subtract[0].toString().length - partialSub.length);
+              }
             }
             number1 = subtractedValue;
           }
           counter--;
         } else {
+          console.log(i, "here2")
           if (startsWithZero) {
             subtract = [0, false];
           } else if (Number(number1) > number2) {
@@ -861,6 +866,9 @@ async function sendSetTaskResultsToDatabase() {
             }
             counter++;
         }
+
+        console.log(i, splitNumber1Str, splitNumber2Str, `partialSub: ${partialSub}`, `subtract: ${subtract}`, )
+
 
         if (controller.modeChoice8 === '' || controller.modeChoice8 === 'C79') {
         if (i === 0) {
@@ -1237,6 +1245,9 @@ async function sendSetTaskResultsToDatabase() {
                 offset = offset + 1 * (Number(number1).toString().length - (subtractedValueLength)); 
               } else {
                 halfpush = false;
+                if (subtract[0].toString().length > partialSub.length) {
+                  offset = offset + 1 * (subtract[0].toString().length - partialSub.length);
+                }
               }
               number1 = subtractedValue;
             }
