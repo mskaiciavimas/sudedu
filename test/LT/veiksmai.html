@@ -924,9 +924,15 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 	} else if (controller.randomSelection[2] === 'D') {
 		let answerInput = document.querySelector("#answer")
 		let daliklis = document.querySelector("#daliklis")
-		answerInput.style.width = `${(controller.randomSelection[0]/controller.randomSelection[1]).toString().length + 1.25}ch`;
-		daliklis.style.width = `${(controller.randomSelection[0]/controller.randomSelection[1]).toString().length + 1.25}ch`;
-
+		answerInput.style.width = `${(Math.ceil(controller.randomSelection[0]/controller.randomSelection[1])).toString().length + 1.25}ch`;
+		daliklis.style.width = `${(Math.ceil(controller.randomSelection[0]/controller.randomSelection[1])).toString().length + 1.25}ch`;
+		if (controller.withRemainder) {
+			const elements = document.querySelectorAll('.stulpeliu-input');
+			const lastElement = elements[elements.length - 1];
+			lastElement.placeholder = controller.language === 'LT' 
+				? 'liek.' 
+				: 'R';
+		}
 		} else {
 
 			var demAtTur = document.getElementsByClassName('demuo-turinys-ateminys');
@@ -957,7 +963,9 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 
 		if (controller.withRemainder && controller.randomSelection[2] === 'D') {
     var liekElement = document.getElementById("liek");
-    liekElement.style.visibility = "visible";
+    if (liekElement) {
+		liekElement.style.visibility = "visible";
+	}
   }
 
   		adjustMiddleLineHeight();
