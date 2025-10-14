@@ -406,8 +406,8 @@
 							</div>
 							<div id="answer-field-outer">
 							<div id="answer-field" class="answer-field">
-								<input type="text" id="answer" name="answer" class="form-control text-center answer-input"
-									placeholder="" autofocus autocomplete="off" style="display: none;">
+								<textarea type="text" id="answer" name="answer" class="form-control text-center answer-input"
+									placeholder="" autofocus autocomplete="off" style="display: none; resize: none;       /* disables the resize handle */overflow: hidden;   /* hides scrollbars */"></textarea>
 							</div>
 							</div>
 						</div>
@@ -600,17 +600,11 @@ document.querySelectorAll('.control').forEach(control => {
     stylePage();
 };
 
-function setInputAttributes (element) {
-	element.setAttribute("inputmode", "numeric");
-	element.setAttribute("pattern", "[0-9]*");
-	element.setAttribute("autocomplete", "new-password");
-}
-
 let answerInputElement = document.querySelector('#answer');
-setInputAttributes(answerInputElement)
+		answerInputElement.setAttribute("inputmode", "numeric");
 
 let answerRemainderInputElement = document.querySelector('#remainder');
-setInputAttributes(answerRemainderInputElement)
+		answerRemainderInputElement.setAttribute("inputmode", "numeric");
 
 		// Sanitize input field value on input event
 		answerInputElement.addEventListener("input", function (event) {
@@ -786,10 +780,6 @@ setInputAttributes(answerRemainderInputElement)
 		let daliklis = document.querySelector("#daliklis")
 		answerInput.style.width = `${(controller.randomSelection[0]/controller.randomSelection[1]).toString().length + 1.25}ch`;
 		daliklis.style.width = `${(controller.randomSelection[0]/controller.randomSelection[1]).toString().length + 1.25}ch`;
-
-		document.querySelectorAll('.stulpeliu-input').forEach(el => {
-			setInputAttributes(el)
-		});
 
 		} else {
 
