@@ -407,14 +407,14 @@
 							<div id="answer-field-outer">
 							<div id="answer-field" class="answer-field">
 								<input type="text" id="answer" name="answer" class="form-control text-center answer-input"
-									placeholder="" autofocus autocomplete="off" style="display: none;">
+									placeholder="" autofocus autocomplete="new-password" style="display: none;">
 							</div>
 							</div>
 						</div>
 
 							<div id="remainder-field" class="remainder-field">
 								<input type="text" id="remainder" name="remainder" class="form-control text-center remainder-input"
-									placeholder="liek." autocomplete="off">
+									placeholder="liek." autocomplete="new-password">
 							</div>
 
 
@@ -600,22 +600,11 @@ document.querySelectorAll('.control').forEach(control => {
     stylePage();
 };
 
-// Find the inputs and add the necessary attributes
 let answerInputElement = document.querySelector('#answer');
-answerInputElement.setAttribute("inputmode", "numeric");
-answerInputElement.setAttribute("autocomplete", "off");
-answerInputElement.setAttribute("autocorrect", "off");
-answerInputElement.setAttribute("autocapitalize", "off");
-answerInputElement.setAttribute("spellcheck", "false");
-answerInputElement.setAttribute("data-form-type", "other");
+		answerInputElement.setAttribute("inputmode", "numeric");
 
 let answerRemainderInputElement = document.querySelector('#remainder');
-answerRemainderInputElement.setAttribute("inputmode", "numeric");
-answerRemainderInputElement.setAttribute("autocomplete", "off");
-answerRemainderInputElement.setAttribute("autocorrect", "off");
-answerRemainderInputElement.setAttribute("autocapitalize", "off");
-answerRemainderInputElement.setAttribute("spellcheck", "false");
-answerRemainderInputElement.setAttribute("data-form-type", "other");
+		answerRemainderInputElement.setAttribute("inputmode", "numeric");
 
 		// Sanitize input field value on input event
 		answerInputElement.addEventListener("input", function (event) {
@@ -627,30 +616,6 @@ answerRemainderInputElement.setAttribute("data-form-type", "other");
 			const sanitizedValue = event.target.value.replace(/[^0-9]/g, '');
 			event.target.value = sanitizedValue;
 		});
-
-		// Prevent scroll on focus for all inputs
-		document.querySelectorAll('input').forEach(input => {
-			input.addEventListener('focus', function(e) {
-				// Prevent default scroll behavior
-				setTimeout(() => {
-					this.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'nearest' });
-				}, 0);
-			}, { passive: true });
-		});
-
-		// Prevent the division-stulp-2-outer from jumping
-		const divisionStulpOuter = document.getElementById('division-stulp-2-outer');
-		if (divisionStulpOuter) {
-			const originalScrollTop = divisionStulpOuter.scrollTop;
-			
-			document.querySelectorAll('input').forEach(input => {
-				input.addEventListener('focus', function() {
-					requestAnimationFrame(() => {
-						divisionStulpOuter.scrollTop = originalScrollTop;
-					});
-				});
-			});
-		}
 
 		// Add event listener to checkAnswer function with condition
 		let questionsSubmitButtonElement = document.querySelector('.question-submit-button')
@@ -701,59 +666,6 @@ answerRemainderInputElement.setAttribute("data-form-type", "other");
 				return false;
 			}
 		}
-
-		// Function to configure any input element
-function configureInput(inputElement) {
-    inputElement.setAttribute("autocomplete", "off");
-    inputElement.setAttribute("autocorrect", "off");
-    inputElement.setAttribute("autocapitalize", "off");
-    inputElement.setAttribute("spellcheck", "false");
-    inputElement.setAttribute("data-form-type", "other");
-    inputElement.setAttribute("data-lpignore", "true");
-    inputElement.setAttribute("data-1p-ignore", "true");
-	inputElement.setAttribute("inputmode", "numeric");
-    
-    // Prevent scroll on focus
-    inputElement.addEventListener('focus', function(e) {
-        const divisionStulpOuter = document.getElementById('division-stulp-2-outer');
-        const scrollPos = divisionStulpOuter ? divisionStulpOuter.scrollTop : 0;
-        
-        setTimeout(() => {
-            this.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'nearest' });
-            if (divisionStulpOuter) {
-                divisionStulpOuter.scrollTop = scrollPos;
-            }
-        }, 0);
-    }, { passive: true });
-}
-
-// Apply to existing inputs
-document.querySelectorAll('input').forEach(input => {
-    configureInput(input);
-});
-
-// Use MutationObserver to catch dynamically added inputs
-const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((node) => {
-            if (node.nodeType === 1) { // Element node
-                if (node.tagName === 'INPUT') {
-                    configureInput(node);
-                }
-                // Also check children
-                node.querySelectorAll && node.querySelectorAll('input').forEach(input => {
-                    configureInput(input);
-                });
-            }
-        });
-    });
-});
-
-// Start observing
-observer.observe(document.body, {
-    childList: true,
-    subtree: true
-});
 
 	// Function to set the margin of element2
 	function setMargins() {
