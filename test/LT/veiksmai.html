@@ -884,15 +884,6 @@ container.addEventListener('focusin', e => {
   }
 });
 
-container.addEventListener('scroll', e => {
-  if (document.activeElement.tagName === 'INPUT') {
-    clearTimeout(lockTimeout);
-    lockTimeout = setTimeout(() => {
-      container.scrollTop = scrollTop;
-    }, 10);
-  }
-});
-
 	</script>
 </body>
 
