@@ -27,13 +27,22 @@
 </script>
 <style>
 	 * {
-          -webkit-user-select: none;
           -webkit-tap-highlight-color: transparent;
-          user-select: none;
           box-sizing: border-box;
           -webkit-user-drag: none;
           user-drag: none;
         }
+
+		*:not(input):not(textarea) {
+			-webkit-user-select: none;
+			user-select: none;
+		}
+
+		input, textarea {
+			-webkit-user-select: text !important;
+			user-select: text !important;
+			-webkit-text-security: none !important;
+		}
 
       	html {
             display: flex;
@@ -864,6 +873,25 @@ window.addEventListener("beforeunload", () => {
 	localStorage.setItem("controller", JSON.stringify(controller));
 });
 
+let scrollTop = 0;
+let lockTimeout;
+
+const container = document.getElementById('division-stulp-2-outer');
+
+container.addEventListener('focusin', e => {
+  if (e.target.tagName === 'INPUT') {
+    scrollTop = container.scrollTop;
+  }
+});
+
+container.addEventListener('scroll', e => {
+  if (document.activeElement.tagName === 'INPUT') {
+    clearTimeout(lockTimeout);
+    lockTimeout = setTimeout(() => {
+      container.scrollTop = scrollTop;
+    }, 10);
+  }
+});
 
 	</script>
 </body>
