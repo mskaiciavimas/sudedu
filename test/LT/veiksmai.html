@@ -1061,12 +1061,12 @@ function detectMobileKeyboard() {
 // 1. Define your callback functions globally or in accessible scope:
 function onShow(info) {
 	const navbar = document.getElementById('mainNavbar');
-	navbar.classList.remove('keyboard-open');
+	navbar.classList.add('keyboard-open');
 }
 
 function onHide(info) {
   	const navbar = document.getElementById('mainNavbar');
-    navbar.classList.add('keyboard-open');
+    navbar.classList.remove('keyboard-open');
 }
 
 // 2. Initialize the detector (only runs on mobile devices):
