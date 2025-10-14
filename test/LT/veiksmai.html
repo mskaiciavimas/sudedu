@@ -27,22 +27,13 @@
 </script>
 <style>
 	 * {
+          -webkit-user-select: none;
           -webkit-tap-highlight-color: transparent;
+          user-select: none;
           box-sizing: border-box;
           -webkit-user-drag: none;
           user-drag: none;
         }
-
-		*:not(input):not(textarea) {
-			-webkit-user-select: none;
-			user-select: none;
-		}
-
-		input, textarea {
-			-webkit-user-select: text !important;
-			user-select: text !important;
-			-webkit-text-security: none !important;
-		}
 
       	html {
             display: flex;
@@ -609,11 +600,22 @@ document.querySelectorAll('.control').forEach(control => {
     stylePage();
 };
 
+// Find the inputs and add the necessary attributes
 let answerInputElement = document.querySelector('#answer');
-		answerInputElement.setAttribute("inputmode", "numeric");
+answerInputElement.setAttribute("inputmode", "numeric");
+answerInputElement.setAttribute("autocomplete", "off");
+answerInputElement.setAttribute("autocorrect", "off");
+answerInputElement.setAttribute("autocapitalize", "off");
+answerInputElement.setAttribute("spellcheck", "false");
+answerInputElement.setAttribute("data-form-type", "other");
 
 let answerRemainderInputElement = document.querySelector('#remainder');
-		answerRemainderInputElement.setAttribute("inputmode", "numeric");
+answerRemainderInputElement.setAttribute("inputmode", "numeric");
+answerRemainderInputElement.setAttribute("autocomplete", "off");
+answerRemainderInputElement.setAttribute("autocorrect", "off");
+answerRemainderInputElement.setAttribute("autocapitalize", "off");
+answerRemainderInputElement.setAttribute("spellcheck", "false");
+answerRemainderInputElement.setAttribute("data-form-type", "other");
 
 		// Sanitize input field value on input event
 		answerInputElement.addEventListener("input", function (event) {
@@ -625,6 +627,30 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 			const sanitizedValue = event.target.value.replace(/[^0-9]/g, '');
 			event.target.value = sanitizedValue;
 		});
+
+		// Prevent scroll on focus for all inputs
+		document.querySelectorAll('input').forEach(input => {
+			input.addEventListener('focus', function(e) {
+				// Prevent default scroll behavior
+				setTimeout(() => {
+					this.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'nearest' });
+				}, 0);
+			}, { passive: true });
+		});
+
+		// Prevent the division-stulp-2-outer from jumping
+		const divisionStulpOuter = document.getElementById('division-stulp-2-outer');
+		if (divisionStulpOuter) {
+			const originalScrollTop = divisionStulpOuter.scrollTop;
+			
+			document.querySelectorAll('input').forEach(input => {
+				input.addEventListener('focus', function() {
+					requestAnimationFrame(() => {
+						divisionStulpOuter.scrollTop = originalScrollTop;
+					});
+				});
+			});
+		}
 
 		// Add event listener to checkAnswer function with condition
 		let questionsSubmitButtonElement = document.querySelector('.question-submit-button')
@@ -675,6 +701,59 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 				return false;
 			}
 		}
+
+		// Function to configure any input element
+function configureInput(inputElement) {
+    inputElement.setAttribute("autocomplete", "off");
+    inputElement.setAttribute("autocorrect", "off");
+    inputElement.setAttribute("autocapitalize", "off");
+    inputElement.setAttribute("spellcheck", "false");
+    inputElement.setAttribute("data-form-type", "other");
+    inputElement.setAttribute("data-lpignore", "true");
+    inputElement.setAttribute("data-1p-ignore", "true");
+	inputElement.setAttribute("inputmode", "numeric");
+    
+    // Prevent scroll on focus
+    inputElement.addEventListener('focus', function(e) {
+        const divisionStulpOuter = document.getElementById('division-stulp-2-outer');
+        const scrollPos = divisionStulpOuter ? divisionStulpOuter.scrollTop : 0;
+        
+        setTimeout(() => {
+            this.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'nearest' });
+            if (divisionStulpOuter) {
+                divisionStulpOuter.scrollTop = scrollPos;
+            }
+        }, 0);
+    }, { passive: true });
+}
+
+// Apply to existing inputs
+document.querySelectorAll('input').forEach(input => {
+    configureInput(input);
+});
+
+// Use MutationObserver to catch dynamically added inputs
+const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === 1) { // Element node
+                if (node.tagName === 'INPUT') {
+                    configureInput(node);
+                }
+                // Also check children
+                node.querySelectorAll && node.querySelectorAll('input').forEach(input => {
+                    configureInput(input);
+                });
+            }
+        });
+    });
+});
+
+// Start observing
+observer.observe(document.body, {
+    childList: true,
+    subtree: true
+});
 
 	// Function to set the margin of element2
 	function setMargins() {
@@ -873,16 +952,6 @@ window.addEventListener("beforeunload", () => {
 	localStorage.setItem("controller", JSON.stringify(controller));
 });
 
-let scrollTop = 0;
-let lockTimeout;
-
-const container = document.getElementById('division-stulp-2-outer');
-
-container.addEventListener('focusin', e => {
-  if (e.target.tagName === 'INPUT') {
-    scrollTop = container.scrollTop;
-  }
-});
 
 	</script>
 </body>
