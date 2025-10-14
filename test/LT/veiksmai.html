@@ -14,6 +14,7 @@
 	<link rel="stylesheet" href="../main-nav-bar.css">
     <link rel="stylesheet" type="text/css" href="../index.css">
 	<link id="questionsStyleSheet" rel="stylesheet" type="text/css" href="../questions-bigger.css">
+	<link rel="stylesheet" type="text/css" href="../summary.css">
 </head>
 
 <!-- Google tag (gtag.js) -->
@@ -59,6 +60,11 @@
             height: 100%;
             overflow: hidden;
         }
+
+		textarea {
+			font-family: 'SFpro', sans-serif;
+			color: #212529;
+		}
 
 		.container {
 			flex: 1;
@@ -116,10 +122,59 @@
 
 		.middle-and-upper-lines-holder {
 			display: flex;
+			flex-direction: column;
 			flex: 1 1 auto;
 			min-height: 0;
-			overflow-y: auto;
+			align-items: center;
 		}
+
+		.upper-line {
+			display: flex;
+			position: absolute;
+			min-height: 98.5px;
+			top: 0;
+			justify-content: center;
+			align-items: center;
+			border-top-left-radius: 20px;
+			border-top-right-radius: 20px;
+			padding: 0 20px;
+			margin-bottom: 15px;
+			width: 100%;
+		}
+
+		/*
+		#equation-and-symbol,
+		#equation {
+			height: 100%;
+		}
+		*/
+
+		#mistakes-summary-math,
+		.summary-table-frequent-mistakes-outer-div {
+			height: 100%;
+		}
+
+		#summary-table-outer-div {
+			height: 100%;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.table-container {
+			display: flex;
+			height: 80%;
+		}
+
+		#summary-table-frequent-mistakes table {
+			border-radius: 20px;
+		}
+
+		#frequent-mistakes-container {
+			min-width: 300px;
+  			min-height: 80px;
+		}
+
 
 		.stop-reset-button-outer-div {
 			padding-top: 15px;
@@ -130,6 +185,7 @@
 
 		#middle-line {
 			display: flex;
+			flex-direction: column;
 			justify-content: center;
 			align-items: center;
 			flex: 1;
@@ -138,7 +194,6 @@
 			-webkit-backdrop-filter: blur(15px);
 			background: rgba(255, 255, 255, 0.15);
 			border-radius: 20px;
-			overflow: hidden;
 			width: 100%;
 		}
 
@@ -146,6 +201,7 @@
 			width: 100%;
 			height: 100%;
 			display: flex;
+			flex-direction: column;
 			justify-content: center;
 			align-items: center;
 		}
@@ -176,10 +232,10 @@
 			outline: none;
 		}
 
-		.equation,
-		.equation_2,
-		textarea {
-			font-family: 'SFMono', sans-serif;
+		.equation {
+			text-align: center;
+			justify-content: center;
+    		align-items: center;
 		}
 
 		textarea {
@@ -193,19 +249,15 @@
 			scrollbar-width: none;    /* Firefox */                 
 		}
 
-		.stulpeliu-symbol-div {
-			font-family: 'SFPro', sans-serif;
+		#answer-field {
+			display: flex;
+			justify-content: center;
+			align-items: center;
 		}
-
-		.answer-field-div,
-		#stulp-div-ans-and-first {
-			flex: 1 1 auto;
-			min-height: 0;
-		}
-
 
 		.question-submit-button,
-        #stopButton {
+        #stopButton,
+		.summary-button {
             position: relative;
             background: linear-gradient(135deg, #3288AC, #286D8A);
             border: none;
@@ -224,6 +276,10 @@
             min-width: 10vw;
         }
 
+		.summary-button {
+			margin-top: 15px;
+		}
+
         #stopButton {
           width: 6vw;
           min-width: 75px;
@@ -233,7 +289,8 @@
         }
 
 		.question-submit-button::before,
-        #stopButton::before {
+        #stopButton::before,
+		.summary-button::before  {
             content: '';
             position: absolute;
             inset: 0;
@@ -244,7 +301,8 @@
         }
 
 		.question-submit-button::after,
-        #stopButton::after {
+        #stopButton::after,
+		.summary-button::after {
             content: '';
             position: absolute;
             inset: 0;
@@ -258,7 +316,8 @@
         }
 
 		.question-submit-button:hover::before
-        #stopButton:hover::before {
+        #stopButton:hover::before,
+		.summary-button:hover::before {
             background: rgba(255, 255, 255, 0.15);
         }
 
@@ -267,10 +326,51 @@
 			font-weight: 300;
 		}
 
+		.previous-equation {
+			margin: 0;
+			padding: 10px 0;
+			width: 100%;
+			height: 100%;
+			display: flex;
+			align-items: center;   /* vertical center */
+			justify-content: center; /* horizontal center */
+			overflow: hidden;
+			white-space: nowrap;
+			text-align: center; /* optional — redundant with justify-content */
+		}
+
+	.stop-reset-button-div {
+		padding: 0;
+	}
+	#frequent-mistakes-container {
+		width: 60%;
+	}
+
+	
+	@media (max-width: 1400px) {
+		#frequent-mistakes-container {
+			width: 60%;
+		}
+	}
+
+	@media (max-width: 1200px) {
+		#frequent-mistakes-container {
+			width: 75%;
+		}
+	}
+
 	@media (max-width: 1150px) {
-        .question-submit-button {
+        .question-submit-button,
+		.summary-button {
           min-width: 15vw;
         }
+	}
+
+	@media (max-width: 992px) {
+		#frequent-mistakes-container {
+			width: 95%;
+			min-height: 100%;
+		}
 	}
 
 	@media (max-width: 767px) {
@@ -285,10 +385,15 @@
 			padding: 15px;
 		}
 
-		.question-submit-button {
+		.question-submit-button,
+		.summary-button {
           min-width: 25vw;
         }
 	}
+
+		@media (max-width: 576px) {
+			
+		}
 
 	@media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)  {
 		.stop-button {
@@ -302,14 +407,15 @@
 		}
 
 		.material-symbols-rounded {
-			font-size: 4.5rem;
+			font-size: 3rem;
 		}
 
 		.summary-button {
 			font-size: 1.5rem;
 		}
 
-		.question-submit-button {
+		.question-submit-button,
+		.summary-button {
 			font-size: 1.5rem;
 		}
 
@@ -361,7 +467,7 @@
                 </a>
           </div>
 
-                    <!-- Desktop Navigation -->
+          <!-- Mobile Navigation -->
           <div class="main-nav-mobile-btn simplified">
               <a href="praktika.html" class="main-nav-back-btn">
                     <span class="main-nav-back-icon">←</span>
@@ -394,11 +500,11 @@
 		</div>
 
 		<div class="middle-and-upper-lines-holder">
-			<div class="upper-line">
-				<p class="previous-equation"></p>
-			</div>
 			<div id='middle-line' class="middle-line" style="position: relative;">
 				<div id="fireworks-div" class="image-containerfireworks-div"></div>
+				<div class="upper-line">
+					<p class="previous-equation"></p>
+				</div>
 				<div class="" id="invisibleRow" style="display: none; height: 0;"></div>
 				<div class="" id="middle-line-inner" class="">
 					<div id='content-container' class="equation-and-answer">
@@ -430,24 +536,23 @@
 						</div>
 
 							<div id="remainder-field" class="remainder-field">
-								<input type="text" id="remainder" name="remainder" class="form-control text-center remainder-input"
-									placeholder="liek." autocomplete="off">
+								<textarea type="text" id="remainder" name="remainder" class="form-control text-center remainder-input"
+									placeholder="liek." autocomplete="off"></textarea>
 							</div>
 
 
 					</div>
 							<label class="equation_2 text-nowrap" for="answer-field" style="display: none;"></label>
 					</div>
-				</div>
+					<div id="restart-reset-button-row" class="" style="display: none;">
+						<div class="submit-button-div">
+							<div id="reset-mistake-buttons" class="">
+								<div class="">
+									<div class="summary-div">
+										<button class="summary-button">Klaidos</button>
+									</div>
 
-				<div id="restart-reset-button-row" class="" style="display: none;">
-					<div class="submit-button-div">
-						<div id="reset-mistake-buttons" class="">
-							<div class="">
-								<div class="summary-div">
-									<button class="btn btn-primary summary-button">Klaidos</button>
 								</div>
-
 							</div>
 						</div>
 					</div>
@@ -524,19 +629,42 @@ document.querySelectorAll('.control').forEach(control => {
 		mistakesButtonElement.addEventListener("click", () => {
 			localStorage.setItem("elapsedTime", timerDisplay.textContent);
 		})
-		mistakesButtonElement.addEventListener("click", redirectToSummary);
+		mistakesButtonElement.addEventListener("click", displaylatestMistakes);
+
+		function displaylatestMistakes() {
+			document.getElementById('middle-line-inner').style.height = "100%";
+			document.querySelector(".equation").style.display = "flex";
+			document.querySelector(".equation").innerHTML = `
+				<div id="frequent-mistakes-container" style="flex-direction: column; justify-content: space-between;">
+                    <div id="mistakes-summary-math">
+                    <div class="summary-table-frequent-mistakes-outer-div">
+                        <div id="summary-table-outer-div" class="">
+                            <div class="table-container" id="table-container-math">
+                                <div id="summary-table-frequent-mistakes"></div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+			`
+			generateSummaryTable('current', null, "summary-table-frequent-mistakes", null);
+			document.querySelector("#restart-reset-button-row").style.display = "none";
+			if (
+				document.querySelector("#summary-table-frequent-mistakes") &&
+				document.querySelector("#summary-table-frequent-mistakes").innerHTML === "Klaidų nėra!"
+			) {
+				document.querySelector(".table-container").style.justifyContent = "center";
+			} else {
+				document.querySelector(".table-container").style.justifyContent = "start";
+			}
+
+		}
 
 		const resetMistakeButtonsElement = document.querySelector('#restart-reset-button-row');
 		const stopButtonElement = document.querySelector('.stop-button');
 		stopButtonElement.addEventListener("click", stopEquations)
 
 		const linkElement = document.querySelector("#questionsStyleSheet");
-
-		mistakesButtonElement.addEventListener("click", () => {
-			localStorage.setItem("elapsedTime", timerDisplay.textContent);
-		})
-		mistakesButtonElement.addEventListener("click", redirectToSummary);
-
 
 		let equationElement = document.querySelector(".equation");
 		let equation2Element = document.querySelector(".equation_2");
@@ -605,10 +733,10 @@ document.querySelectorAll('.control').forEach(control => {
     displayEquation();
     
     if (!controller.questionsStopped) {
-			answerInputElement.style.display = "flex";
-			questionsSubmitButtonRowElement.style.display = "flex";
+		answerInputElement.style.display = "flex";
+		questionsSubmitButtonRowElement.style.display = "flex";
     } else {
-			resetMistakeButtonsElement.style.display = "flex";
+		resetMistakeButtonsElement.style.display = "flex";
         document.querySelector('.answer-field-div').style.display = "none";
 		const stopButtonSpanElement = document.querySelector('#stop-button-span');
 		stopButtonSpanElement.innerHTML = "refresh";
@@ -866,9 +994,30 @@ const el = document.getElementById('middle-line-inner');
 const parent = el.parentElement;
 
 function adjustMiddleLineHeight() {
+  if(controller.questionsStopped) {
+	return
+  }
+
   el.style.height = 'auto';
+  el.style.maxHeight = 'none';
+
   el.style.height = el.scrollHeight <= parent.clientHeight ? 'auto' : '100%';
+  el.style.maxHeight = '100%';
 }
+
+function handleRemainderCompensatoryMargin() {
+	const remainderField = document.querySelector("#remainder-field");
+	const answerFieldDiv = document.querySelector(".answer-field-div");
+
+	if (getComputedStyle(remainderField).display !== "none") {
+		answerFieldDiv.classList.add("comp-margin");
+	} else {
+		answerFieldDiv.classList.remove("comp-margin");
+	}
+}
+
+
+
 
 window.addEventListener('resize', adjustMiddleLineHeight);
 adjustMiddleLineHeight();
@@ -880,6 +1029,71 @@ window.addEventListener("beforeunload", () => {
 	}
 	localStorage.setItem("controller", JSON.stringify(controller));
 });
+
+
+function stopEquations () {
+    const stopButtonSpanElement = document.querySelector('#stop-button-span');
+    if (stopButtonSpanElement.innerHTML === "close") {
+      showCustomConfirm("Ar tikrai nori sustabdyti užduotį?", stopEquationsCloseActions);
+      
+      function stopEquationsCloseActions () {
+      var answerSeparator1 = document.getElementById('answer-separator-1');
+      var answerSeparator2 = document.getElementById('answer-separator-2');
+      var contentContainerElement = document.getElementById('content-container');
+
+	  document.querySelector(".upper-line").style.display = "none";
+
+      contentContainerElement.style.width = '100%';
+      contentContainerElement.style.marginRight = '0';
+			contentContainerElement.style.marginLeft = '0';
+      contentContainerElement.style.paddingLeft = 0 + 'px';
+			contentContainerElement.style.paddingRight = 0 + 'px';
+
+      answerSeparator1.style.display = 'none';
+      answerSeparator2.style.display = 'none';
+      arithmeticSymbol.innerHTML = '';
+      
+      setFontSize();
+
+      if (controller.taskId !== 0) {
+        if (controller.taskCompleted === true) {
+          sendSetTaskResultsToDatabase();
+        controller.taskId = 0;
+        controller.taskCompleted = false;
+        } else {
+          controller.equation = '';
+          if (controller.language === 'LT') {
+            taskSavingMessageDiv.innerHTML = 'Užduotis nebaigta iki galo. Rezultatai neišsaugoti.'
+          } else if (controller.language === 'EN') {
+            taskSavingMessageDiv.innerHTML = 'Task was not completed. Results were not saved.'
+          }
+        }
+      } else {
+        controller.equation = finalMessageText();
+      }
+
+      controller.equation2 = '';
+      controller.result = ['', '', '', '', ''];
+      controller.combinations = [];
+      controller.randomSelection = []; 
+      controller.questionsStopped = true;
+
+      document.querySelector('#invisibleRow').style.display = "none";
+      document.querySelector('.answer-field-div').style.display = "none";
+      questionsSubmitButtonRowElement.style.display = "none";
+      resetMistakeButtonsElement.style.display = "flex";
+      localStorage.setItem('controller', JSON.stringify(controller))
+      clearInterval(timerInterval);
+      displayEquation()
+      stopButtonSpanElement.innerHTML = "refresh";
+    }
+  } else if (stopButtonSpanElement.innerHTML === "refresh") {
+	document.querySelector(".upper-line").style.display = "flex";
+	document.getElementById('middle-line-inner').style.height = "auto";
+    stopButtonSpanElement.innerHTML = "close";
+    restartEquations();
+  }
+}
 
 
 function detectMobileKeyboard() {

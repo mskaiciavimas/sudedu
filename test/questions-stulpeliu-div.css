@@ -3,6 +3,16 @@
   --input-size-full: 3.5rem;
 }
 
+.stulpeliu-symbol-div {
+  font-family: 'SFPro', sans-serif;
+}
+
+.equation,
+.equation_2,
+textarea {
+  font-family: 'SFMono', sans-serif;
+}
+
 .upper-line {
   display: none !important;
 }
@@ -46,6 +56,7 @@
   width: 100%;
   display: flex;
   justify-content: center;
+  height: auto !important;
 }
 
 #arithmetic-symbol {
@@ -138,6 +149,12 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+}
+
+.answer-field-div,
+#stulp-div-ans-and-first {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .answer-input {
@@ -243,46 +260,9 @@
   width: 250px;
 }
 
-.summary-button {
-  font-size: 1.2rem;
-  width: 11.5vw;
-  margin: 10px 0 10px 0;
-  background-color: #40c9a9;
-  border-color: #40c9a9;
-  color: black;
-  font-weight: bold;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-}
 
-.summary-button:focus,
-.summary-button:active,
-.summary-button:hover {
-  background-color: #32ac93;
-  border-color: #32ac93;
-  color: black;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4) !important;
-}
 
-.restart-button {
-  font-size: 1.2rem;
-  width: auto;
-  margin: 10px 0 10px 0;
-  background-color: #40c9a9;
-  border-color: #40c9a9;
-  color: black;
-  font-weight: bold;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-  z-index: 3;
-}
 
-.restart-button:focus,
-.restart-button:active,
-.restart-button:hover {
-  background-color: #32ac93;
-  border-color: #32ac93;
-  color: black;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4) !important;
-}
 
 .reset-button-div {
   display: flex;
@@ -303,36 +283,21 @@
   .upper-line {
     width: 56.7vw;
   }
-
-  .summary-button {
-    width: 15vw;
-  }
 }
 
 @media (max-width: 1200px) {
-  .summary-button {
-    width: 18vw;
-  }
+
 }
 
 @media (max-width: 1000px) {
   .upper-line {
     width: 67.5vw;
   }
-
-  .summary-button {
-    width: 24vw;
-  }
 }
 
 @media (max-width: 767px) {
   .upper-line {
     width: 65vw;
-  }
-
-  .summary-button {
-    width: 24vw;
-    font-size: 1rem;
   }
 
   #fireworks-div {
@@ -348,11 +313,7 @@
   }
 
   .upper-line {
-    width: 85.5vw;
-  }
-
-  .summary-button {
-    width: 28vw;
+    width: 100%;
   }
 
   .reset-button {

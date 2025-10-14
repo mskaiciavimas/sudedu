@@ -1,63 +1,6 @@
-html {
-  background-image: linear-gradient(to top, #ffbf9c, #ffbf92, #ffbf89, #ffbf7e, #ffc074);
-  min-height: 100dvh;
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-body {
-  background: transparent;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  font-family: 'Andika', sans-serif;
-}
-
-.container {
-  min-height: 95dvh;
-  padding-top: 1%;
-  padding-bottom: 1%;
-}
-
-.btn:disabled {
-  background-color: #40c9a9;
-  border-color: #40c9a9;
-  color: black;
-  filter: grayscale(25%);
-}
-
 #task-saving-message {
   font-size: 1.35rem;
   text-align: center;
-}
-
-.upper-line {
-  max-width: none;
-  height: 96px;
-  width: 64vw;
-  border-radius: 10px 10px 0 0;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-}
-
-.previous-equation {
-  margin-bottom: 0px;
-  font-size: 3rem;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.middle-line {
-  max-width: none;
-  min-height: 32vh;
-  width: 74vw;
-  background-color: #FAF1E6;
-  padding-top: 45px;
-  padding-bottom: 25px;
-  border-radius: 20px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 #invisibleRow {
@@ -66,13 +9,12 @@ body {
 
 .equation,
 .equation_2 {
-  font-size: 4rem;
-  padding-bottom: 5px;
+  font-size: 3rem;
 }
 
 .equation_2 {
-  padding-left: 1.5vw;
-  padding-right: 1.5vw;
+  padding-left: 1.25vw;
+  padding-right: 1.25vw;
 }
 
 .answer-field-div {
@@ -81,24 +23,14 @@ body {
   padding-right: 1vw;
 }
 
-.answer-input {
-  height: 5rem;
-  font-size: 4rem;
+textarea {
+  height: 4rem;
+  font-size: 3rem;
   padding-top: 0px !important;
 }
 
-#answer-field {
-  width: 22vw;
-}
-
-#answer {
-  background-color: #ffeccc;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-}
-
-#answer:focus,
-#answer:active {
-  outline: 3px solid #40c9a9;
+textarea {
+  width: 8ch;
 }
 
 #remainder-field {
@@ -110,73 +42,6 @@ body {
   top: -65%;
   right: 0;
   width: 250px;
-}
-
-.question-submit-button {
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  width: 11.5vw;
-  margin: 10px 0 10px 0;
-  background-color: #40c9a9;
-  border-color: #40c9a9;
-  color: black;
-  font-weight: bold;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-}
-
-.question-submit-button:focus,
-.question-submit-button:active,
-.question-submit-button:hover {
-  background-color: #32ac93;
-  border-color: #32ac93;
-  color: black;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4) !important;
-}
-
-.summary-button {
-  font-size: 1.2rem;
-  width: 11.5vw;
-  margin: 10px 0 10px 0;
-  background-color: #40c9a9;
-  border-color: #40c9a9;
-  color: black;
-  font-weight: bold;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-}
-
-.summary-button:focus,
-.summary-button:active,
-.summary-button:hover {
-  background-color: #32ac93;
-  border-color: #32ac93;
-  color: black;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4) !important;
-}
-
-.restart-button {
-  font-size: 1.2rem;
-  width: auto;
-  margin: 10px 0 10px 0;
-  background-color: #40c9a9;
-  border-color: #40c9a9;
-  color: black;
-  font-weight: bold;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-  z-index: 3;
-}
-
-.restart-button:focus,
-.restart-button:active,
-.restart-button:hover {
-  background-color: #32ac93;
-  border-color: #32ac93;
-  color: black;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4) !important;
-}
-
-.stop-reset-button-div {
-  padding-top: 10px;
 }
 
 .reset-button-div {
@@ -191,73 +56,11 @@ body {
   z-index: 3;
 }
 
-.reset-button {
-  width: 5rem;
-  height: 5rem;
-  border-radius: 0.25rem;
-  background-color: #40c9a9;
-  border-color: #40c9a9;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 3;
-}
-
-.stop-button {
-  width: 5rem;
-  height: 5rem;
-  border-radius: 0.25rem;
-  background-color: #40c9a9;
-  border-color: #40c9a9;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 3;
-}
-
-.material-symbols-rounded {
-  font-variation-settings:
-    'FILL' 0,
-    'wght' 500,
-    'GRAD' 0,
-    'opsz' 48;
-  font-size: 3.5rem;
-  color: black;
-}
-
-.reset-button:hover,
-.reset-button:active,
-.reset-button:focus {
-  background-color: #32ac93;
-  border-color: #32ac93;
-  color: black;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4) !important;
-}
-
-.stop-button:hover,
-.stop-button:active,
-.stop-button:focus {
-  background-color: #32ac93;
-  border-color: #32ac93;
-  color: black;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4) !important;
+.previous-equation {
+  font-size: 2rem;
 }
 
 @media (max-width: 1400px) {
-  .middle-line {
-    width: 86vw;
-  }
-
-  .upper-line {
-    width: 72vw;
-  }
-
-  #answer-field {
-    width: 24vw;
-  }
-
   .question-submit-button {
     width: 18vw;
   }
@@ -268,18 +71,6 @@ body {
 }
 
 @media (max-width: 1200px) {
-	.upper-line {
-		width: 80vw;
-	}
-
-  .middle-line {
-		width: 95vw;
-	}
-
-  #answer-field {
-    width: 29vw;
-  }
-
   .question-submit-button {
     width: 20vw;
   }
@@ -290,32 +81,19 @@ body {
 }
 
 @media (max-width: 1000px) {
-  .upper-line {
-    height: 72px;
-    width: 84vw;
-  }
-  
 	.previous-equation {
-		font-size: 2.5rem;
+		font-size: 2rem;
 	}
-
-  .middle-line {
-    width: 95vw;
-  }
 
   .equation,
   .equation_2 {
-		font-size: 3rem;
+		font-size: 2.5rem;
 	}
 
-  .answer-input {
-		height: 3.5rem;
-		font-size: 3rem;
+  textarea {
+		height: 3rem;
+		font-size: 2.5rem;
 	}
-
-  #answer-field {
-    width:29vw;
-  }
 
   .question-submit-button {
     width: 22vw;
@@ -327,35 +105,28 @@ body {
 }
 
 @media (max-width: 767px) {  
-  .upper-line {
-    width: 88vw;
-  }
-
-  .middle-line {
-    width: 98vw;
-  }
-
   .equation_2 {
-    padding-left: 2vw;
-    padding-right: 2vw;
+    padding-left: 1vw;
+    padding-right: 1vw;
   }
+
+  .answer-field-div {
+    padding-left: 1vw;
+    padding-right: 1vw;
+}
 
   .equation,
   .equation_2 {
-    font-size: 2.5rem;
-  }
-
-  .answer-input {
-    height: 3.5rem;
-    font-size: 2.5rem;
-  }
-
-  .previous-equation {
     font-size: 2rem;
   }
 
-  #answer-field {
-    width: 30vw;
+  textarea {
+    height: 2.5rem;
+    font-size: 2rem;
+  }
+
+  .previous-equation {
+    font-size: 1.5rem;
   }
 
   #answer {
@@ -380,14 +151,9 @@ body {
 }
 
 @media (max-width: 575px) {
-
   #fireworks-div {
     width: 200px;
     top: -65%;
-  }
-
-  .middle-line {
-    width: 99vw;
   }
 
   .equation,
@@ -396,17 +162,22 @@ body {
   }
 
   .equation_2 {
-    padding-left: 3vw;
-    padding-right: 0vw;
+    padding-left: 0;
+    padding-right: 0;
   }
 
-  .answer-input {
-    height: 2.5rem;
+  .answer-field-div {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  textarea {
+    height: 2rem;
     font-size: 1.5rem;
   }
 
   .previous-equation {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
   }
 
   .reset-button-div {
@@ -417,18 +188,6 @@ body {
   .stop-button-div {
     display: flex;
     justify-content: flex-start;
-  }
-
-  .middle-line {
-    width: 95vw;
-  }
-
-  .upper-line {
-    width: 85.5vw;
-  }
-
-  #answer-field {
-    width: 29vw;
   }
 
   .question-submit-button {
@@ -450,25 +209,14 @@ body {
     width: 4.25rem;
   }
 
-  .material-symbols-rounded {
-    font-size: 3rem;
-  }
-
-  .answer-field-div {
-    padding-left: 3vw;
-    padding-right: 1vw;
+  td {
+    font-size: 0.75rem !important;
   }
 }
 
 @supports (-webkit-touch-callout: none) {
-
   /* CSS specific to iOS devices */
   .answer-input {
     height: auto;
-  }
-
-  body {
-    height: 80%;
-    align-items: flex-center;
   }
 }

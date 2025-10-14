@@ -57,6 +57,10 @@ if (document.querySelector("#stop-button-span")) {
 
     function formatFinalMessage () {
 
+      if (document.querySelector(".upper-line")) {
+        document.querySelector(".upper-line").style.display = "none";
+      }
+
       if (controller.taskCompleted && controller.tempTracking) {
         sendTaskInfoToDatabase();
         controller.tempTracking = false
@@ -435,6 +439,7 @@ function formatFinalMessageForTextcomprehension() {
     document.querySelector('#stop-button-span').innerHTML = "refresh";
     document.getElementById("fields-row").style.display = "none";
     document.getElementById("final-message-row").style.display = "flex";
+    document.querySelector(".help-and-check-button-holder").style.display = "none"
     controller.questionsStopped = true;
     localStorage.setItem('controller', JSON.stringify(controller))
 }
@@ -765,7 +770,6 @@ async function sendSetTaskResultsToDatabase() {
       for (var i = 0; i < subAnswerNumber*2; i++) {
         tempOffset = 0;
         if (counter === 1) {
-          console.log(i, "here1")
           if (startsWithZero) {
             splitNumber1Str = subtractedValueStr.slice(0, daliklisDigits);
             splitNumber2Str = subtractedValueStr.slice(daliklisDigits);
@@ -809,7 +813,6 @@ async function sendSetTaskResultsToDatabase() {
           }
 
           } else if (subtractedValueLength < number1.toString().length) {
-            console.log("trigger")
             if (!halfpush) {
               offset = offset + 1 * (Number(number1).toString().length - (subtractedValueLength)); 
             } else {
@@ -822,7 +825,6 @@ async function sendSetTaskResultsToDatabase() {
           }
           counter--;
         } else {
-          console.log(i, "here2")
           if (startsWithZero) {
             subtract = [0, false];
           } else if (Number(number1) > number2) {
@@ -866,9 +868,6 @@ async function sendSetTaskResultsToDatabase() {
             }
             counter++;
         }
-
-        console.log(i, splitNumber1Str, splitNumber2Str, `partialSub: ${partialSub}`, `subtract: ${subtract}`, )
-
 
         if (controller.modeChoice8 === '' || controller.modeChoice8 === 'C79') {
         if (i === 0) {
@@ -1023,15 +1022,18 @@ async function sendSetTaskResultsToDatabase() {
     }
 
     if (controller.result[0] === 'Incorrect') {
-      upperLineElement.setAttribute("style", "background-color: rgba(213, 126, 126, 0.6)")
+      upperLineElement.style.backgroundColor = 'rgba(213, 126, 126, 0.8)';
     } else if (controller.result[0] === 'Correct') {
-      upperLineElement.setAttribute("style", "background-color: rgba(64, 201, 169, 0.6)")
+      upperLineElement.style.backgroundColor = 'rgba(64, 201, 169, 0.8)';
     } else {
-      upperLineElement.setAttribute("style", "background-color: rgba(255, 255, 255, 0.6)")
-    };
+      upperLineElement.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+    }
+
     previousEquationElement.innerHTML = controller.result[4];
     updateScore();
     clearAnswerField();
+
+    handleRemainderCompensatoryMargin();
   }
 
 
@@ -1554,7 +1556,6 @@ async function sendSetTaskResultsToDatabase() {
     disableFireworks();
     equationElement.style.fontSize = '';
     equationElement.style.paddingTop = '0rem';
-    equationElement.style.paddingBottom = '6px';
     document.querySelector('#invisibleRow').style.display = "block";
     controller.currentMistakes = [];
     generateCombinations();
@@ -1652,62 +1653,6 @@ async function sendSetTaskResultsToDatabase() {
     return message
   }
 
-  function stopEquations () {
-    const stopButtonSpanElement = document.querySelector('#stop-button-span');
-    if (stopButtonSpanElement.innerHTML === "close") {
-      var answerSeparator1 = document.getElementById('answer-separator-1');
-      var answerSeparator2 = document.getElementById('answer-separator-2');
-      var contentContainerElement = document.getElementById('content-container');
-
-      contentContainerElement.style.width = '100%';
-      contentContainerElement.style.marginRight = '0';
-			contentContainerElement.style.marginLeft = '0';
-      contentContainerElement.style.paddingLeft = 0 + 'px';
-			contentContainerElement.style.paddingRight = 0 + 'px';
-
-      answerSeparator1.style.display = 'none';
-      answerSeparator2.style.display = 'none';
-      arithmeticSymbol.innerHTML = '';
-      
-      setFontSize();
-
-      if (controller.taskId !== 0) {
-        if (controller.taskCompleted === true) {
-          sendSetTaskResultsToDatabase();
-        controller.taskId = 0;
-        controller.taskCompleted = false;
-        } else {
-          controller.equation = '';
-          if (controller.language === 'LT') {
-            taskSavingMessageDiv.innerHTML = 'Užduotis nebaigta iki galo. Rezultatai neišsaugoti.'
-          } else if (controller.language === 'EN') {
-            taskSavingMessageDiv.innerHTML = 'Task was not completed. Results were not saved.'
-          }
-        }
-      } else {
-        controller.equation = finalMessageText();
-      }
-
-      controller.equation2 = '';
-      controller.result = ['', '', '', '', ''];
-      controller.combinations = [];
-      controller.randomSelection = []; 
-      controller.questionsStopped = true;
-
-      document.querySelector('#invisibleRow').style.display = "none";
-      document.querySelector('.answer-field-div').style.display = "none";
-      questionsSubmitButtonRowElement.style.display = "none";
-      resetMistakeButtonsElement.style.display = "flex";
-      localStorage.setItem('controller', JSON.stringify(controller))
-      clearInterval(timerInterval);
-      displayEquation()
-      stopButtonSpanElement.innerHTML = "refresh";
-  } else if (stopButtonSpanElement.innerHTML === "refresh") {
-    stopButtonSpanElement.innerHTML = "close";
-    restartEquations();
-  }
-}
-
 function redirectToIntermediate() {
   window.location.href = "./pasirinkimai";
 }
@@ -1736,11 +1681,11 @@ function redirectToIntermediate() {
  // Function to calculate bar color based on the number of mistakes
 function getBarColor(value) {
   if (value < 3) {
-      return "rgba(64, 201, 169, 0.6)";
+      return "rgba(64, 201, 169, 1)";
   } else if (value <= 6) {
       return "#E7B10A";
   } else {
-      return "rgba(213, 126, 126, 0.6)";
+      return "rgba(213, 126, 126, 1)";
   }
 }
 
@@ -1914,15 +1859,23 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
       let summaryTableElement;
       if (customDivForSummaryTable) {
         summaryTableElement = document.getElementById(customDivForSummaryTable);
+        console.log(summaryTableElement)
       } else {
         summaryTableElement = document.getElementById("summary-table");
       }
       summaryTableElement.innerHTML = "";
       summaryTableElement.appendChild(summaryTable);
   } else {
-    // No mistakes case
-    document.getElementById("summary-table").innerHTML = controller.language === 'LT' 
-      ? 'Nėra klaidų!' 
+    // Display the summary table
+    let summaryTableElement;
+    if (customDivForSummaryTable) {
+      summaryTableElement = document.getElementById(customDivForSummaryTable);
+      console.log(summaryTableElement)
+    } else {
+      summaryTableElement = document.getElementById("summary-table");
+    }
+    summaryTableElement.innerHTML = controller.language === 'LT' 
+      ? 'Klaidų nėra!' 
       : 'No mistakes!';
   }
 
@@ -2295,10 +2248,12 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
     });
   }
 } else {
-    if (customDivForGrammarSummaryTable !== "none") {
+    const grammarSummaryContainer = document.getElementById(customDivForGrammarSummaryTable) || 
+                    document.getElementById('summary-table-grammar');
+    if (grammarSummaryContainer) {
     // No mistakes case
-    document.getElementById('summary-table-grammar').innerHTML = controller.language === 'LT' 
-      ? 'Nėra klaidų!' 
+    grammarSummaryContainer.innerHTML = controller.language === 'LT' 
+      ? 'Klaidų nėra!' 
       : 'No mistakes!';
     }
   }

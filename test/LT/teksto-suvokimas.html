@@ -1479,7 +1479,7 @@ window.onload = function () {
         clearInputFields()
         displayQuestion();
 
-        if (!controller.questionsStopped) {
+    if (!controller.questionsStopped) {
         if (controller.modeChoice4 === "C39") {
           countDown();
         } else if (controller.modeChoice4 === "C40") {
@@ -1555,6 +1555,7 @@ window.onload = function () {
             localStorage.setItem('controller', JSON.stringify(controller));
             document.querySelector(".tracker-timer-holder").style.paddingLeft = "15px";
             initiateTheProgram() 
+            document.querySelector(".help-and-check-button-holder").style.display = "none"
           }
 				} else if (stopButtonSpanElement.innerHTML === "refresh") {
           controller.questionsStopped = false;
@@ -1591,6 +1592,7 @@ window.onload = function () {
 
           document.getElementById("fields-row").style.display = "flex";
           document.getElementById("final-message-row").style.display = "none";
+          document.querySelector(".help-and-check-button-holder").style.display = "flex"
 
           controller.tempTracking = true;
           localStorage.setItem('controller', JSON.stringify(controller));
