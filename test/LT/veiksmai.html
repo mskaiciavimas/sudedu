@@ -634,6 +634,7 @@ document.querySelectorAll('.control').forEach(control => {
 		function displaylatestMistakes() {
 			document.getElementById('middle-line-inner').style.height = "100%";
 			document.querySelector(".equation").style.display = "flex";
+			document.querySelector("#equation-and-symbol").style.height = "100%";
 			document.querySelector(".equation").innerHTML = `
 				<div id="frequent-mistakes-container" style="flex-direction: column; justify-content: space-between;">
                     <div id="mistakes-summary-math">
@@ -995,7 +996,7 @@ const parent = el.parentElement;
 
 function adjustMiddleLineHeight() {
   if(controller.questionsStopped) {
-	return
+	el.style.height = 'auto';
   }
 
   el.style.height = 'auto';
@@ -1090,6 +1091,7 @@ function stopEquations () {
   } else if (stopButtonSpanElement.innerHTML === "refresh") {
 	document.querySelector(".upper-line").style.display = "flex";
 	document.getElementById('middle-line-inner').style.height = "auto";
+	document.querySelector("#equation-and-symbol").style.height = "auto";
     stopButtonSpanElement.innerHTML = "close";
     restartEquations();
   }

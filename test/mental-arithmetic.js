@@ -1032,7 +1032,7 @@ async function sendSetTaskResultsToDatabase() {
     previousEquationElement.innerHTML = controller.result[4];
     updateScore();
     clearAnswerField();
-
+    adjustMiddleLineHeight();
     handleRemainderCompensatoryMargin();
   }
 
