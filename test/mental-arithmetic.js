@@ -872,7 +872,7 @@ async function sendSetTaskResultsToDatabase() {
             '</div>' +
           '</div>';
           var dalinys = document.getElementById('dalinys');
-          dalinys.innerHTML += '<div style="position: absolute; left: calc((-1.5 * 1.5rem) + ' + (offset)*47 + 'px); top: 40% !important" class="stulpeliu-symbol-div">-</div>';
+          dalinys.innerHTML += '<div class="stulpeliu-symbol-div">-</div>';
         } else {
           if (counter !== 0) {
             divisionStulp2InnerElement.innerHTML +=
@@ -887,8 +887,8 @@ async function sendSetTaskResultsToDatabase() {
             divisionStulp2InnerElement.innerHTML += 
             '<div class="d-flex justify-content-center align-items-center">' +
               '<div class="stulpeliu-input-outer-holder" style="position: relative;">' +
-                '<div style="position: absolute; left: calc((-1.5 * 1.05rem) + ' + (offset * 25) + 'px);" class="stulpeliu-symbol-div">-</div>' +
                 '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px;">' +
+                    '<div class="stulpeliu-symbol-div">-</div>' +
                   '<input type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off" style="width:' + ((totalNumberDigits + 1 - offset - tempOffset) + 'ch') + ';">' +
                 '</div>' +
               '</div>' +

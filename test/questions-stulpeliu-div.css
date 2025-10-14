@@ -75,10 +75,18 @@
 .stulpeliu-symbol-div {
   position: absolute;
   font-size: var(--font-size-full);
-  bottom: -50%;
+  left: -1.5rem;
+  bottom: -53%;
+}
+
+#dalinys .stulpeliu-symbol-div {
+  position: absolute;
+  left: -2.5rem;
+  bottom: -40%;
 }
 
 .stulpeliu-field {
+  position: relative;
   display: flex;
   justify-content: end;
 }
@@ -231,28 +239,6 @@
   width: 250px;
 }
 
-.question-submit-button {
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  width: 11.5vw;
-  margin: 10px 0 10px 0;
-  background-color: #40c9a9;
-  border-color: #40c9a9;
-  color: black;
-  font-weight: bold;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-}
-
-.question-submit-button:focus,
-.question-submit-button:active,
-.question-submit-button:hover {
-  background-color: #32ac93;
-  border-color: #32ac93;
-  color: black;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4) !important;
-}
-
 .summary-button {
   font-size: 1.2rem;
   width: 11.5vw;
@@ -300,66 +286,6 @@
   z-index: 3;
 }
 
-.stop-button-div {
-  display: flex;
-  justify-content: flex-start;
-  z-index: 3;
-}
-
-.reset-button {
-  width: 5rem;
-  height: 5rem;
-  border-radius: 0.25rem;
-  background-color: #40c9a9;
-  border-color: #40c9a9;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 3;
-}
-
-.stop-button {
-  width: 5rem;
-  height: 5rem;
-  border-radius: 0.25rem;
-  background-color: #40c9a9;
-  border-color: #40c9a9;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 3;
-}
-
-.material-symbols-rounded {
-  font-variation-settings:
-    'FILL' 0,
-    'wght' 500,
-    'GRAD' 0,
-    'opsz' 48;
-  font-size: 3.5rem;
-  color: black;
-}
-
-.reset-button:hover,
-.reset-button:active,
-.reset-button:focus {
-  background-color: #32ac93;
-  border-color: #32ac93;
-  color: black;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4) !important;
-}
-
-.stop-button:hover,
-.stop-button:active,
-.stop-button:focus {
-  background-color: #32ac93;
-  border-color: #32ac93;
-  color: black;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4) !important;
-}
-
 .stulpeliu-input-outer-holder {
   display: flex;
   justify-content: end;
@@ -374,20 +300,12 @@
     width: 56.7vw;
   }
 
-  .question-submit-button {
-    width: 15vw;
-  }
-
   .summary-button {
     width: 15vw;
   }
 }
 
 @media (max-width: 1200px) {
-  .question-submit-button {
-    width: 18vw;
-  }
-
   .summary-button {
     width: 18vw;
   }
@@ -398,10 +316,6 @@
     width: 67.5vw;
   }
 
-  .question-submit-button {
-    width: 24vw;
-  }
-
   .summary-button {
     width: 24vw;
   }
@@ -410,11 +324,6 @@
 @media (max-width: 767px) {
   .upper-line {
     width: 65vw;
-  }
-
-  .question-submit-button {
-    width: 24vw;
-    font-size: 1rem;
   }
 
   .summary-button {
@@ -434,22 +343,8 @@
     top: 0;
   }
 
-  .reset-button-div {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .stop-button-div {
-    display: flex;
-    justify-content: flex-start;
-  }
-
   .upper-line {
     width: 85.5vw;
-  }
-
-  .question-submit-button {
-    width: 28vw;
   }
 
   .summary-button {
@@ -459,15 +354,6 @@
   .reset-button {
     height: 4.25rem;
     width: 4.25rem;
-  }
-
-  .stop-button {
-    height: 4.25rem;
-    width: 4.25rem;
-  }
-
-  .material-symbols-rounded {
-    font-size: 3rem;
   }
   
   #dalinys,
@@ -481,6 +367,10 @@
   input {
 		padding: 0 10px 0 10px;
 	}
+
+  #dalinys .stulpeliu-symbol-div {
+    left: -1.5rem;
+  }
 }
 
 @supports (-webkit-touch-callout: none) {

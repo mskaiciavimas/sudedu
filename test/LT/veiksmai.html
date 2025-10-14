@@ -115,7 +115,7 @@
 			overflow-y: auto;
 		}
 
-		.stop-reset-button-div {
+		.stop-reset-button-outer-div {
 			padding-top: 15px;
 			flex-shrink: 0;
 			display: flex;
@@ -186,6 +186,76 @@
 			min-height: 0;
 		}
 
+
+		.question-submit-button,
+        #stopButton {
+            position: relative;
+            background: linear-gradient(135deg, #3288AC, #286D8A);
+            border: none;
+            /* border: 1px solid #286D8A; */
+            color: #F5F5F7;
+            display: flex;
+            align-items: center;
+            padding: 12px 18px 12px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            letter-spacing: 0.01em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 0;
+            justify-content: center;
+            min-width: 10vw;
+        }
+
+        #stopButton {
+          width: 6vw;
+          min-width: 75px;
+          height: 42.5px;
+          border-radius: 100px;
+          font-size: 2rem;
+        }
+
+		.question-submit-button::before,
+        #stopButton::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+            border-radius: 20px;
+            pointer-events: none;
+            transition: background 0.3s ease;
+        }
+
+		.question-submit-button::after,
+        #stopButton::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+		.question-submit-button:hover::before
+        #stopButton:hover::before {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+		.material-symbols-rounded {
+			font-size: 2rem;
+			font-weight: 300;
+		}
+
+	@media (max-width: 1150px) {
+        .question-submit-button {
+          min-width: 15vw;
+        }
+	}
+
 	@media (max-width: 767px) {
 		.container {
 			width: 100%;
@@ -197,6 +267,10 @@
 			border-radius: 0;
 			padding: 15px;
 		}
+
+		.question-submit-button {
+          min-width: 25vw;
+        }
 	}
 
 	@media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)  {
@@ -228,6 +302,11 @@
 
 		#task-saving-message {
 			font-size: 1.75rem
+		}
+
+		.question-submit-button {
+			font-size: 1.25rem;
+			min-width: 25vw;
 		}
 	}
 	
@@ -359,7 +438,7 @@
 			</div>
 		</div>
 
-		<div class="stop-reset-button-div">
+		<div class="stop-reset-button-outer-div">
 
 
 
@@ -367,7 +446,7 @@
       <div class="stop-reset-button-div">
         <div class="">
           <div class="stop-button-div">
-            <button id="stopButtonTextComp" class="stop-button"><span id="stop-button-span" class="material-symbols-rounded">close</span></button>
+            <button id="stopButton" class="stop-button"><span id="stop-button-span" class="material-symbols-rounded">close</span></button>
           </div>
         </div>
       </div>
@@ -377,7 +456,7 @@
 				<div id="submit-button-row" class="row" style="display: none;">
 					<div class="submit-button-div">
 						<div class="d-flex justify-content-start align-items-center">
-							<button class="btn btn-primary question-submit-button">Tikrinti</button>
+							<button class="question-submit-button">Tikrinti</button>
 						</div>
 					</div>
 				</div>
