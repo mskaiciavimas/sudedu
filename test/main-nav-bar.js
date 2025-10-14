@@ -2,7 +2,7 @@ let userDataString = localStorage.getItem('userData');
 
 document.addEventListener('DOMContentLoaded', function() {
     
-    const mainNavbar = document.getElementById('mainNavbar');
+    const navbar = document.getElementById('mainNavbar');
     const mainNavMobileBtn = document.getElementById('mainNavMobileBtn');
     const mainNavMobileMenu = document.getElementById('mainNavMobileMenu');
     const mainNavLinks = document.querySelectorAll('.main-nav-link');
@@ -88,26 +88,3 @@ function clearUserData() {
     localStorage.removeItem('userData');
     window.location.reload();
 }
-
-function hideNavbar() {
-    navbar.classList.add('keyboard-open');
-    navbarToggle.classList.add('show');
-}
-
-function showNavbar() {
-    navbar.classList.remove('keyboard-open');
-    navbarToggle.classList.remove('show');
-    isManuallyHidden = false;
-}
-
-window.visualViewport?.addEventListener('resize', () => {
-    const currentHeight = window.visualViewport.height;
-    const heightDiff = initialHeight - currentHeight;
-    
-    // If viewport shrunk significantly (keyboard opened)
-    if (heightDiff > 150) {
-        hideNavbar();
-    } else if (!isManuallyHidden) {
-        showNavbar();
-    }
-});
