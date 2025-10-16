@@ -39,8 +39,7 @@ let answerTrackerElement = document.querySelector('#answer-tracker');
 let mistakeTrackerElement = document.querySelector('#mistake-tracker');
 let stulpeliuDivElement = document.querySelector('#stulpeliu-div');
 let divisionStulp2InnerElement = document.querySelector('#division-stulp-2-inner');
-let divisionStulp3Element = document.querySelector('#division-stulp-3');
-let divisionStulp4Element = document.querySelector('#division-stulp-4')
+let divisionStulp3InnerElement = document.querySelector('#division-stulp-3-inner');
 let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
 let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invisible-div');
 let taskSavingMessageDiv = document.querySelector("#task-saving-message");
@@ -70,12 +69,6 @@ if (document.querySelector("#stop-button-span")) {
       if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.answeredQuestionTracker >= 10) {
         triggerFireworks();
       }
-
-      setFontSize();
-      var contentContainerElement = document.getElementById('content-container');
-      contentContainerElement.style.width = '100%';
-      contentContainerElement.style.marginRight = '0';
-			contentContainerElement.style.marginLeft = '0';
 
       if (controller.taskId !== 0) {
         controller.equation = '';
@@ -353,7 +346,18 @@ function recordGrammarFinalMistakes() {
     }
   }
 
+function styleGrammarPage () {
+  document.querySelector("#field-for-final-message").style.height = "auto";
+  const linkElement = document.querySelector("#questionsStyleSheet");
+  if (controller.questionsStopped) {
+    linkElement.setAttribute("href", "../questions-stopped.css");
+  } else {
+    linkElement.removeAttribute("href");
+  }
+}
+
 function formatFinalMessageForGrammar() {
+  styleGrammarPage();
   localStorage.setItem("elapsedTime", timerDisplay.textContent)
   recordGrammarFinalMistakes();
 
@@ -366,8 +370,7 @@ function formatFinalMessageForGrammar() {
   document.getElementById('next-question').style.display = "none";
   document.getElementById('check-answers').style.visibility = "hidden";
   document.getElementById('show-answers').style.visibility = "hidden";
-  document.getElementById('help-button').style.visibility = "hidden";
-  document.getElementById('warning').style.visibility = "hidden";
+  document.querySelector('.help-toggle-holder').style.visibility = "hidden";
   clearInterval(timerInterval);
   document.querySelector('#stop-button-span').innerHTML = "refresh";
   document.getElementById("field-for-sentences").innerHTML = "";
@@ -388,7 +391,7 @@ function formatFinalMessageForGrammar() {
       }
     }
   } else {
-    document.getElementById("field-for-final-message").innerHTML = `<div style="min-height: 200px; display: flex; justify-content: center; align-items: center;">${finalMessageText()}</div>`;
+    document.getElementById("field-for-final-message").innerHTML = `<div class="field-for-final-message-inner">${finalMessageText()}</div>`;
   }
   controller.questionsStopped = true;
   localStorage.setItem('controller', JSON.stringify(controller))
@@ -636,13 +639,6 @@ async function sendSetTaskResultsToDatabase() {
       questionsSubmitButtonRowElement.style.display = "none";
       resetMistakeButtonsElement.style.display = "flex";
       contentContainerElement.style.visibility = 'visible';
-
-      //added newly
-      contentContainerElement.style.width = '100%';
-      contentContainerElement.style.marginRight = '0';
-			contentContainerElement.style.marginLeft = '0';
-      contentContainerElement.style.paddingLeft = 0 + 'px';
-			contentContainerElement.style.paddingRight = 0 + 'px';
     }
 
     if (controller.modeChoice7 === "C48") {
@@ -691,9 +687,7 @@ async function sendSetTaskResultsToDatabase() {
       divisionStulp2InnerElement .innerHTML = '';
 
       if (controller.language !== 'LT') {
-        answerFieldDivInvisibleDiv.innerHTML = '';
-        divisionStulp3Element .innerHTML = '';
-        divisionStulp4Element .innerHTML = '';
+        divisionStulp3InnerElement .innerHTML = '';
       }
 
     var answerSeparator1 = document.getElementById('answer-separator-1');
@@ -732,7 +726,18 @@ async function sendSetTaskResultsToDatabase() {
             if (i === 0) {
               stulpeliuDivElement.innerHTML += '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-right: 0; margin-bottom: 10px;"><textarea type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></textarea></div>';
             } else {
-            stulpeliuDivElement.innerHTML += '<div style="position: relative;"><div class="stulpeliu-symbol" style="position: absolute; left: calc((-0.65 * 3rem) + ' + (i*fontSizeFullREM*-0.9) + 'px); top: ' + -100 + '%;">+</div><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-right: calc(' + fontSizeFullREM*0.45 + 'rem * (' + (i) + ')) !important; margin-bottom: 10px;"><textarea type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></textarea></div></div>';
+              stulpeliuDivElement.innerHTML +=
+                '<div style="position: relative;">' +
+                  '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" ' +
+                    'style="margin-right: calc(' + (i * 3) + 'ch - ' + (0.5 * i) + 'px) !important; margin-bottom: 10px;">' +
+                    '<div class="stulp-text-area-holder" style="position: relative;">' +
+                      '<div class="stulpeliu-symbol" ' +
+                      'style="position: absolute">+</div>' +
+                        '<textarea type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" ' +
+                          'class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></textarea>' +
+                      '</div' +
+                  '</div>' +
+                '</div>';
             }
         }
     }
@@ -925,45 +930,96 @@ async function sendSetTaskResultsToDatabase() {
           }
     }
   } else if (controller.modeChoice8 === "C78") {
-
-    answerFieldDivInvisibleDiv.innerHTML += '<div class="invisibleDiv" style="visibility: hidden; display: block;"></div>';
-
     if (i === 0) {
-      divisionStulp3Element.innerHTML += '<div class="d-flex justify-content-center align-items-center"><div class="invisibleDiv" style="visibility: hidden; display: block;"></div><div style="position: relative;"><div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub stulpeliu-field-underline" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.45 + 'rem * (' + (offset+tempOffset) + ')) !important;"> <div style="position: absolute; transform: translatex(-150%); top: -14%" class="stulpeliu-symbol-div">-</div><textarea type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></textarea></div></div></div>';
+      divisionStulp3InnerElement.innerHTML += `
+        <div class="d-flex justify-content-center align-items-center">
+          <div style="position: relative;" class="stulpeliu-field-outer-holder">
+            <div 
+              id="stulpeliu-field-${i}" 
+              class="stulpeliu-field stulpeliu-field-sub stulpeliu-field-underline" 
+              style="margin-bottom: 10px;"
+            >
+              <div class="stulpeliu-symbol-div">-</div>
+              <textarea 
+                type="text" 
+                id="stulpeliu-${i}" 
+                name="stulpeliu-${i}" 
+                class="form-control text-center stulpeliu-input" 
+                placeholder="" 
+                autocomplete="off"
+                style="width: calc(${totalNumberDigits + 1 - offset - tempOffset}ch);"
+              ></textarea>
+            </div>
+          </div>
+        </div>`;
+
     } else {
       if (counter !== 0) {
-        divisionStulp4Element.innerHTML += `
-        <div class="d-flex justify-content-center align-items-center">
-          <div class="invisibleDiv" style="visibility: hidden; display: block;"></div>
-          <div style="position: relative;">
-            <div id="stulpeliu-field-${i}" class="stulpeliu-field stulpeliu-field-sub stulpeliu-field-underline" style="margin-bottom: 10px; margin-left: calc(${fontSizeFullREM * 0.9}rem * (${offset + tempOffset})) !important;">
-              <div style="position: absolute; transform: translatex(-150%); top: -14%" class="stulpeliu-symbol-div">-</div>
-              <textarea type="text" id="stulpeliu-${i}" name="stulpeliu-${i}" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></textarea>
+        divisionStulp3InnerElement.innerHTML += `
+          <div class="d-flex justify-content-center align-items-center">
+            <div style="position: relative;" class="stulpeliu-field-outer-holder">
+              <div 
+                id="stulpeliu-field-${i}" 
+                class="stulpeliu-field stulpeliu-field-sub stulpeliu-field-underline" 
+                style="margin-bottom: 10px;"
+              >
+                <div class="stulpeliu-symbol-div"
+                >-</div>
+                <textarea 
+                  type="text" 
+                  id="stulpeliu-${i}" 
+                  name="stulpeliu-${i}" 
+                  class="form-control text-center stulpeliu-input" 
+                  placeholder="" 
+                  autocomplete="off"
+                  style="width: calc(${totalNumberDigits + 1 - offset - tempOffset}ch);"
+                ></textarea>
+              </div>
             </div>
           </div>
-        </div>
-      `
+        `;
       } else if (i+1 !== subAnswerNumber*2) {
-        divisionStulp4Element.innerHTML += `
-        <div class="d-flex justify-content-center align-items-center">
-          <div class="invisibleDiv" style="visibility: hidden; display: block;"></div>
-          <div style="position: relative;">
-            <div id="stulpeliu-field-${i}" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(${fontSizeFullREM * 0.9}rem * (${offset + tempOffset})) !important;">
-              <textarea type="text" id="stulpeliu-${i}" name="stulpeliu-${i}" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></textarea>
+        divisionStulp3InnerElement.innerHTML += `
+          <div class="d-flex justify-content-center align-items-center">
+            <div style="position: relative;" class="stulpeliu-field-outer-holder">
+              <div 
+                id="stulpeliu-field-${i}" 
+                class="stulpeliu-field stulpeliu-field-sub" 
+                style="margin-bottom: 10px;"
+              >
+                <textarea 
+                  type="text" 
+                  id="stulpeliu-${i}" 
+                  name="stulpeliu-${i}" 
+                  class="form-control text-center stulpeliu-input" 
+                  placeholder="" 
+                  autocomplete="off"
+                  style="width: calc(${totalNumberDigits + 1 - offset - tempOffset}ch);"
+                ></textarea>
+              </div>
             </div>
           </div>
-        </div>
-      `;
+        `;
+
       
       } else {
-        divisionStulp4Element.innerHTML += '<div class="d-flex justify-content-center align-items-center">' +
-        '<div id="liek" class="invisibleDiv" style="visibility: hidden; display: block;"></div>' +
-        '<div style="position: relative;">' +
-        '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px; margin-left: calc(' + fontSizeFullREM*0.45 + 'rem * (' + (offset+tempOffset) + ')) !important;">' +
-        '<textarea type="text" id="stulpeliu-' + i + '" name="stulpeliu-' + i + '" class="form-control text-center stulpeliu-input" placeholder="" autocomplete="off"></textarea>' +
-        '</div>' +
-        '</div>' +
-        '</div>';
+        divisionStulp3InnerElement.innerHTML +=
+          '<div class="d-flex justify-content-center align-items-center">' +
+            '<div style="position: relative;" class="stulpeliu-field-outer-holder">' +
+              '<div id="stulpeliu-field-' + i + '" class="stulpeliu-field stulpeliu-field-sub" style="margin-bottom: 10px;">' +
+                '<textarea ' +
+                  'type="text" ' +
+                  'id="stulpeliu-' + i + '" ' +
+                  'name="stulpeliu-' + i + '" ' +
+                  'class="form-control text-center stulpeliu-input" ' +
+                  'placeholder="" ' +
+                  'autocomplete="off" ' +
+                  'style="width: calc(' + (totalNumberDigits + 1 - offset - tempOffset) + 'ch);"' +
+                '></textarea>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+
       }
 }
   }
@@ -989,15 +1045,6 @@ async function sendSetTaskResultsToDatabase() {
     } else {
       answerSeparator1.style.display = 'none';
       answerSeparator2.style.display = 'none';
-    }
-
-    
-    if (controller.modeChoice7 === "C48") {
-      setTimeout(function() {
-        if (!controller.questionsStopped) {
-          setMargins();
-        }
-      }, 100);
     }
 
       // Select all elements with the class 'stulpeliu-input'
@@ -1033,7 +1080,12 @@ async function sendSetTaskResultsToDatabase() {
     updateScore();
     clearAnswerField();
     adjustMiddleLineHeight();
-    handleRemainderCompensatoryMargin();
+    stylePage();
+    setTimeout(function() {
+      if (!controller.questionsStopped) {
+        setMargins();
+      }
+    }, 100);
   }
 
 
@@ -1138,17 +1190,6 @@ async function sendSetTaskResultsToDatabase() {
         isCorrect = false;
       } 
       answerFieldColor(answerInputElement, isCorrect);
-
-      if (controller.modeChoice8 === 'C78' && controller.withRemainder === true) {
-        var expectedRemainderAnswer = controller.randomSelection[0] % controller.randomSelection[1];
-        let answerRemainderWesternInputElement = document.querySelector('#answer-remainder');
-        userRemainderInput = answerRemainderWesternInputElement.value.trim();
-  
-        if (Number(userRemainderInput) !== expectedRemainderAnswer) {
-          isCorrect = false;
-        } 
-        answerFieldColor(answerRemainderWesternInputElement, isCorrect);
-      }
         
         var subAnswerNumber = 0;
         subAnswerNumber = parseInt((Math.floor(controller.randomSelection[0]/controller.randomSelection[1])).toString().length);
@@ -1545,10 +1586,13 @@ async function sendSetTaskResultsToDatabase() {
       formEquation();
       displayEquation();
       answerInputElement.setAttribute("style", "background-color: rgba(255, 255, 255, 0.6)")
-      //answerRemainderWesternInputElement.setAttribute("style", "background-color: rgba(255, 255, 255, 0.6)") recently removed
     } else {
       updateScore();
-      setMargins();
+      setTimeout(function() {
+        if (!controller.questionsStopped) {
+          setMargins();
+        }
+      }, 100);
     }
   }
 
@@ -1565,10 +1609,6 @@ async function sendSetTaskResultsToDatabase() {
     answerInputElement.value = '';
     answerRemainderInputElement.value = '';
     answerInputElement.setAttribute("style", "background-color: rgba(255, 255, 255, 0.6)");
-    if (controller.modeChoice8 === 'C78') {
-      answerRemainderWesternInputElement.value = '';
-      answerRemainderWesternInputElement.setAttribute("style", "background-color: rgba(255, 255, 255, 0.6)");
-    }
     controller.result = ['', '', '', '', ''];
     controller.equation = '';
     controller.equation2 = '';
@@ -1594,27 +1634,6 @@ async function sendSetTaskResultsToDatabase() {
     }
     formEquation();
     displayEquation();
-  }
-
-  var smallScreen = window.matchMedia('(max-width: 768px)');
-  var mediumScreen = window.matchMedia('(min-width: 769px) and (max-width: 1024px)');
-  var largeScreen = window.matchMedia('(min-width: 1025px)');
-  
-  // Function to set font size based on screen size
-  function setFontSize() {
-      var smallScreen = window.matchMedia('(max-width: 649px)');
-      var mediumScreen = window.matchMedia('(min-width: 650px) and (max-width: 1199px)');
-      var largeScreen = window.matchMedia('(min-width: 1200px)');
-      if (smallScreen.matches) {
-          // Small screen
-          equationElement.style.fontSize = '2rem';
-      } else if (mediumScreen.matches) {
-          // Medium screen
-          equationElement.style.fontSize = '3rem';
-      } else if (largeScreen.matches) {
-          // Large screen
-          equationElement.style.fontSize = '4rem';
-      }
   }
 
   function finalMessageText () {
@@ -1653,19 +1672,15 @@ async function sendSetTaskResultsToDatabase() {
     return message
   }
 
-function redirectToIntermediate() {
-  window.location.href = "./pasirinkimai";
-}
-
   function redirectToQuestions() {
     if (controller.mode === "lang") {
     if (controller.modeChoice1 === "C50") {
-      window.location.href = "./rasyba";
+      window.location.href = "./rasyba.html";
     } else if (controller.modeChoice1 === "C49") {
-      window.location.href = "./teksto-suvokimas";
+      window.location.href = "./teksto-suvokimas.html";
     } 
   } else if (controller.mode === "math") {
-      window.location.href = "./veiksmai";
+      window.location.href = "./veiksmai.html";
   }
   }
 
@@ -1868,15 +1883,18 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
   } else {
     // Display the summary table
     let summaryTableElement;
+    
     if (customDivForSummaryTable) {
       summaryTableElement = document.getElementById(customDivForSummaryTable);
       console.log(summaryTableElement)
     } else {
       summaryTableElement = document.getElementById("summary-table");
     }
-    summaryTableElement.innerHTML = controller.language === 'LT' 
-      ? 'Klaidų nėra!' 
-      : 'No mistakes!';
+    if (summaryTableElement) {
+      summaryTableElement.innerHTML = controller.language === 'LT' 
+        ? 'Klaidų nėra!' 
+        : 'No mistakes!';
+    }
   }
 
 

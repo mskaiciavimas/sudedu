@@ -3,36 +3,6 @@
   --input-size-full: 3.5rem;
 }
 
-html {
-  min-height: 100dvh;
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-body {
-  background-image: linear-gradient(to top, #ffbf9c, #ffbf92, #ffbf89, #ffbf7e, #ffc074);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  font-family: 'Andika', sans-serif;
-}
-
-.container {
-  min-height: 95dvh;
-  padding-top: 1%;
-  padding-bottom: 1%;
-}
-
-.btn:disabled {
-  background-color: #40c9a9;
-  border-color: #40c9a9;
-  color: black;
-  filter: grayscale(25%);
-}
-
 #task-saving-message {
   font-size: 1.35rem;
   text-align: center;
@@ -47,12 +17,6 @@ body {
   font-size: 4rem;
 }
 
-#content-container {
-  padding-right: 0;
-  padding-left: 0;
-  visibility: hidden;
-}
-
 #body-row {
   padding-left: 0 !important;
   padding-right: 0 !important;
@@ -62,6 +26,29 @@ body {
 
 .pulse {
   animation: pulse 400ms infinite alternate;
+}
+
+#content-container {
+  align-items: end;
+  width: auto ;
+  margin: 0 auto;
+  justify-content: center;
+  align-items: end;
+}
+
+.stulpeliu-field {
+  display: flex;
+  justify-content: end;
+}
+
+.equation,
+.equation_2,
+textarea {
+  font-family: 'SFMono', sans-serif !important;
+}
+
+textarea {
+  padding-right: 11px;
 }
 
 @keyframes pulse {
@@ -96,6 +83,8 @@ body {
 }
 
 .stulpeliu-symbol {
+  top: -100%;
+  left: -2rem;
   font-size: var(--font-size-full);
   position: absolute;
   transform: translateY(30%);
@@ -126,11 +115,7 @@ body {
   padding-top: 0px !important;
 }
 
-
-
 #answer {
-  background-color: #ffeccc;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
   text-align: start !important;
   direction: rtl !important;
   unicode-bidi: bidi-override;
@@ -145,10 +130,7 @@ body {
   display: none;
 }
 
-
 .stulpeliu-input {
-  background-color: #ffeccc;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4) !important;
   text-align: start !important;
   direction: rtl !important;
   unicode-bidi: bidi-override;
@@ -159,7 +141,6 @@ body {
 
 .error {
   animation: shake 0.2s ease-in-out 0s 2 !important;
-  box-shadow: 0 0 0.5em red;
 }
 
 @keyframes shake {
@@ -173,13 +154,6 @@ body {
   display: block !important;
 }
 
-.stulpeliu-input:focus,
-.stulpeliu-input:active {
-  outline: 3px solid #40c9a9;
-  background-color: #ffeccc;
-}
-
-
 #fireworks-div {
   position: absolute;
   top: 0;
@@ -188,10 +162,6 @@ body {
 }
 
 @media (max-width: 1400px) {
-  .upper-line {
-    width: 56.7vw;
-  }
-
   .question-submit-button {
     width: 15vw;
   }
@@ -204,26 +174,12 @@ body {
 }
 
 @media (max-width: 1000px) {
-  .upper-line {
-    width: 67.5vw;
-  }
 
-  .question-submit-button {
-    width: 24vw;
-  }
 }
 
 @media (max-width: 767px) {
   .previous-equation {
     font-size: 3rem;
-  }
-
-  .upper-line {
-    width: 65vw;
-  }
-
-  .question-submit-button {
-    width: 24vw;
   }
 
   #fireworks-div {
@@ -233,7 +189,6 @@ body {
 }
 
 @media (max-width: 575px) {
-
   #fireworks-div {
     width: 200px;
     top: 0;
@@ -248,24 +203,6 @@ body {
     justify-content: flex-end;
   }
 
-  .upper-line {
-    width: 100%;
-  }
-
-  #answer-field {
-    width: 28vw;
-  }
-
-  .question-submit-button {
-    width: 28vw;
-    font-size: 1rem;
-  }
-
-  .reset-button {
-    height: 4.25rem;
-    width: 4.25rem;
-  }
-
   .answer-field-div {
     padding-left: 5vw;
     padding-right: 5vw;
@@ -273,14 +210,8 @@ body {
 }
 
 @supports (-webkit-touch-callout: none) {
-
   /* CSS specific to iOS devices */
   .answer-input {
     height: auto;
-  }
-
-  body {
-    height: 80%;
-    align-items: flex-center;
   }
 }

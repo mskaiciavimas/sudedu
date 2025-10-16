@@ -555,4 +555,160 @@ function getSelectedRasybaConditions() {
       toggleGaluniuDiv(this.checked); // Toggle the div visibility when the checkbox changes
     });
   });
-  
+
+
+const timerInputChoiceElement = document.querySelector('#timer-input');
+let timerChoiceLabel = document.querySelector('.timer-choice-label');
+
+function changeQuestionNumberLabel () {
+	if (document.getElementById('answer-number-label')) {
+	if (document.getElementById('mode_choice').value === "kalba") {
+	if (document.getElementById('mode_choice_8').value === "tekstas") {
+		if (document.getElementById('mode_choice_4').value === "C40") {
+				document.getElementById("question-number-input").value = 5;
+				document.getElementById('answer-number-label').innerHTML = 'tekstus';
+			}
+	} else if (document.getElementById('mode_choice_8').value === "rasyba") {
+		if (document.getElementById('mode_choice_4').value === "C40") {
+				document.getElementById("question-number-input").value = 20;
+				document.getElementById('answer-number-label').innerHTML = 'sakinių';
+			}
+	} 
+	} else {
+		document.getElementById("question-number-input").value = 20;
+		document.getElementById('answer-number-label').innerHTML = 'veiksmų';
+	}
+	}
+}
+
+function updateModeChoice4() {
+	let modeChoice4ElementSelection = modeChoice4Element.value;
+	if (modeChoice4ElementSelection === "C39") {
+		timerInputDiv.style.display = 'flex';
+		questionNumberInputDiv.style.display = 'none';
+	} else if (modeChoice4ElementSelection === "C40") {
+		timerInputDiv.style.display = 'none';
+		questionNumberInputDiv.style.display = 'flex';
+	}
+	changeQuestionNumberLabel();
+
+	setLabelEndingForDuration();
+    setLabelEndingForQuestionNumber();
+}
+
+document.querySelector("#mode_choice_4").addEventListener('change', updateModeChoice4);
+
+
+function updateModeChoice4Options () {
+	document.getElementById('mode_choice_4').innerHTML = '';
+	if (document.getElementById('mode_choice').value === "kalba") {
+		if (document.getElementById('mode_choice_8').value === "tekstas") {
+			document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
+			document.getElementById('mode_choice_4').innerHTML += '<option value="C40">NUSTATYTI TEKSTŲ KIEKĮ</option>';
+
+		} else if (document.getElementById('mode_choice_8').value === "rasyba") {
+			document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
+			document.getElementById('mode_choice_4').innerHTML += '<option value="C40">NUSTATYTI SAKINIŲ KIEKĮ</option>';
+		}
+	} else {
+		document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
+		document.getElementById('mode_choice_4').innerHTML += '<option value="C40">NUSTATYTI VEIKSMŲ KIEKĮ</option>'; 
+	}
+	updateModeChoice4();
+}
+
+
+document.getElementById('mode_choice').addEventListener('change', updateModeChoice4Options);
+document.getElementById('mode_choice_8').addEventListener('change', updateModeChoice4Options);
+
+
+timerInputChoiceElement.addEventListener("input", function(event) {
+	setLabelEndingForDuration();
+})
+
+function setLabelEndingForDuration () {
+	if (timerChoiceLabel) {
+	if (parseInt(timerInputChoiceElement.value) === 1 || parseInt(timerInputChoiceElement.value.slice(-1)[0]) === 1 && parseInt(timerInputChoiceElement.value) !== 11) {
+		timerChoiceLabel.innerHTML = 'minutę';
+	} else if ((parseInt(timerInputChoiceElement.value) > 1 && parseInt(timerInputChoiceElement.value) < 10) || (parseInt(timerInputChoiceElement.value) > 20 && parseInt(timerInputChoiceElement.value.slice(-1)[0]) !== 0)) {
+		timerChoiceLabel.innerHTML = 'minutes';
+	} else if (parseInt(timerInputChoiceElement.value) >= 10 ) {
+		timerChoiceLabel.innerHTML = 'minučių';
+	}
+}
+}
+
+const questionNumberInputChoiceElement = document.querySelector('#question-number-input');
+let answerNumberLabelTeacher = document.querySelector('.answer-number-label');
+
+questionNumberInputChoiceElement.addEventListener("input", function(event) {
+	setLabelEndingForQuestionNumber();
+})
+
+function setLabelEndingForQuestionNumber () {
+	if (answerNumberLabelTeacher) {
+	if (document.getElementById('mode_choice').value === "kalba") {
+	if (document.getElementById('mode_choice_8').value === "tekstas") {
+		if (parseInt(questionNumberInputChoiceElement.value) === 1 || parseInt(questionNumberInputChoiceElement.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputChoiceElement.value) !== 11) {
+			answerNumberLabelTeacher.innerHTML = 'tekstą';
+		} else if ((parseInt(questionNumberInputChoiceElement.value) > 1 && parseInt(questionNumberInputChoiceElement.value) < 10) || (parseInt(questionNumberInputChoiceElement.value) > 20 && parseInt(questionNumberInputChoiceElement.value.slice(-1)[0]) !== 0))  {
+			answerNumberLabelTeacher.innerHTML = 'tekstus';
+		} else if (parseInt(questionNumberInputChoiceElement.value) >= 10) {
+			answerNumberLabelTeacher.innerHTML = 'tekstų';
+		}
+
+	} else if (document.getElementById('mode_choice_8').value === "rasyba") {
+		if (parseInt(questionNumberInputChoiceElement.value) === 1 || parseInt(questionNumberInputChoiceElement.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputChoiceElement.value) !== 11) {
+			answerNumberLabelTeacher.innerHTML = 'sakinį';
+		} else if ((parseInt(questionNumberInputChoiceElement.value) > 1 && parseInt(questionNumberInputChoiceElement.value) < 10) || (parseInt(questionNumberInputChoiceElement.value) > 20 && parseInt(questionNumberInputChoiceElement.value.slice(-1)[0]) !== 0))  {
+			answerNumberLabelTeacher.innerHTML = 'sakinius';
+		} else if (parseInt(questionNumberInputChoiceElement.value) >= 10) {
+			answerNumberLabelTeacher.innerHTML = 'sakinių';
+		}
+	}
+	} else if (parseInt(questionNumberInputChoiceElement.value) === 1 || parseInt(questionNumberInputChoiceElement.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputChoiceElement.value) !== 11) {
+		answerNumberLabelTeacher.innerHTML = 'veiksmą';
+	} else if ((parseInt(questionNumberInputChoiceElement.value) > 1 && parseInt(questionNumberInputChoiceElement.value) < 10) || (parseInt(questionNumberInputChoiceElement.value) > 20 && parseInt(questionNumberInputChoiceElement.value.slice(-1)[0]) !== 0))  {
+		answerNumberLabelTeacher.innerHTML = 'veiksmus';
+	} else if (parseInt(questionNumberInputChoiceElement.value) >= 10) {
+		answerNumberLabelTeacher.innerHTML = 'veiksmų';
+	}
+}
+}
+function incrementValue(inputId, min, max) {
+    const input = document.getElementById(inputId);
+    let value = parseInt(input.value) || min;
+    if (value < max) {
+        input.value = value + 1;
+    }
+    setLabelEndingForDuration();
+    setLabelEndingForQuestionNumber();
+}
+
+function decrementValue(inputId, min, max) {
+    const input = document.getElementById(inputId);
+    let value = parseInt(input.value) || min;
+    if (value > min) {
+        input.value = value - 1;
+    }
+    setLabelEndingForDuration();
+    setLabelEndingForQuestionNumber();
+}
+
+// Validate input on change
+document.querySelectorAll('input[type="number"]').forEach(input => {
+    input.addEventListener('change', function() {
+        const min = parseInt(this.min);
+        const max = parseInt(this.max);
+        let value = parseInt(this.value);
+        
+        if (isNaN(value) || value < min) {
+            this.value = min;
+        } else if (value > max) {
+            this.value = max;
+        }
+
+        setLabelEndingForDuration();
+        setLabelEndingForQuestionNumber();
+    });
+});

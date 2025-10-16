@@ -142,12 +142,10 @@
 			width: 100%;
 		}
 
-		/*
 		#equation-and-symbol,
 		#equation {
-			height: 100%;
+			max-height: 100%;
 		}
-		*/
 
 		#mistakes-summary-math,
 		.summary-table-frequent-mistakes-outer-div {
@@ -171,8 +169,8 @@
 		}
 
 		#frequent-mistakes-container {
-			min-width: 300px;
-  			min-height: 80px;
+			min-width: 400px;
+  			min-height: 90px;
 		}
 
 
@@ -207,11 +205,7 @@
 		}
 
 		#content-container {
-			height: 100%;
-			width: 100%;
 			display: flex;
-			justify-content: center;
-			align-items: center;
 		}
 
 		textarea,
@@ -315,7 +309,7 @@
             pointer-events: none;
         }
 
-		.question-submit-button:hover::before
+		.question-submit-button:hover::before,
         #stopButton:hover::before,
 		.summary-button:hover::before {
             background: rgba(255, 255, 255, 0.15);
@@ -346,6 +340,9 @@
 		width: 60%;
 	}
 
+	.stulpeliu-field {
+		position: relative;
+	}
 	
 	@media (max-width: 1400px) {
 		#frequent-mistakes-container {
@@ -369,15 +366,16 @@
 	@media (max-width: 992px) {
 		#frequent-mistakes-container {
 			width: 95%;
-			min-height: 100%;
+			min-width: 300px;
+			min-height: 80px;
 		}
 	}
 
 	@media (max-width: 767px) {
 		.container {
 			width: 100%;
-			max-height: calc(100% - 72px);
-			min-height: calc(100% - 72px);
+			max-height: calc(100% - 80px);
+			min-height: calc(100% - 80px);
 			margin: 0;
 			background: transparent;
 			border: none;
@@ -392,7 +390,9 @@
 	}
 
 		@media (max-width: 576px) {
-			
+			.table-container {
+				height: 90%;
+			}
 		}
 
 	@media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)  {
@@ -407,7 +407,12 @@
 		}
 
 		.material-symbols-rounded {
-			font-size: 3rem;
+			font-size: 3.15rem;
+		}
+
+		#stopButton {
+			min-width: 100px;
+			height: 54.5px;
 		}
 
 		.summary-button {
@@ -416,7 +421,7 @@
 
 		.question-submit-button,
 		.summary-button {
-			font-size: 1.5rem;
+			font-size: 1.65rem;
 		}
 
 		h3 {
@@ -430,6 +435,21 @@
 		#next-question-btn {
 			font-size: 1.25rem;
 			min-width: 25vw;
+		}
+		
+		.container {
+    		padding: 35px;
+			max-height: calc(100% - 100px);
+			min-height: calc(100% - 100px);
+			width: 100%;
+			margin: 0;
+			background: transparent;
+			border: none;
+			box-shadow: none;
+		}
+
+		#mistake-tracker, #answer-tracker, #timer {
+			font-size: 1.75rem;
 		}
 	}
 	
@@ -458,7 +478,7 @@
 
           <!-- Desktop Navigation -->
           <div class="main-nav-links">
-              <a href="praktika.html" class="main-nav-back-btn">
+              <a href="index.html" class="main-nav-back-btn">
                     <span class="main-nav-back-icon">←</span>
                     <div class="main-nav-back-text">
                         <span class="main-nav-back-label">Grįžti į</span>
@@ -469,7 +489,7 @@
 
           <!-- Mobile Navigation -->
           <div class="main-nav-mobile-btn simplified">
-              <a href="praktika.html" class="main-nav-back-btn">
+              <a href="index.html" class="main-nav-back-btn">
                     <span class="main-nav-back-icon">←</span>
                     <div class="main-nav-back-text">
                         <span class="main-nav-back-label">Grįžti į</span>
@@ -543,6 +563,12 @@
 
 					</div>
 							<label class="equation_2 text-nowrap" for="answer-field" style="display: none;"></label>
+
+							<div id="division-stulp-3">
+								<div id="division-stulp-3-outer">
+								<div id="division-stulp-3-inner"></div>
+								</div>
+							</div>
 					</div>
 					<div id="restart-reset-button-row" class="" style="display: none;">
 						<div class="submit-button-div">
@@ -598,33 +624,6 @@
 
 	<script>
 
-let helpTimeout;
-
-function updateHelpTextForControl(controlId) {
-    // Update the help text for the focused control
-}
-
-function setDefaultHelpText() {
-    // Set the default help text
-}
-
-document.querySelectorAll('.control').forEach(control => {
-    control.addEventListener('focusin', function() {
-        // Clear any pending timeout to reset help text
-        clearTimeout(helpTimeout);
-
-        // Update the help text for this control
-        updateHelpTextForControl(this.id);
-    });
-
-    control.addEventListener('focusout', function() {
-        // Set a delay before resetting to the default help text
-        helpTimeout = setTimeout(setDefaultHelpText, 100); // adjust delay as needed
-    });
-});
-
-		const answerFieldDivElement = document.querySelector('.answer-field-div')
-
 		const mistakesButtonElement = document.querySelector('.summary-button');
 		mistakesButtonElement.addEventListener("click", () => {
 			localStorage.setItem("elapsedTime", timerDisplay.textContent);
@@ -632,8 +631,8 @@ document.querySelectorAll('.control').forEach(control => {
 		mistakesButtonElement.addEventListener("click", displaylatestMistakes);
 
 		function displaylatestMistakes() {
-			document.getElementById('middle-line-inner').style.height = "100%";
 			document.querySelector(".equation").style.display = "flex";
+			document.querySelector(".equation").style.height = "100%";
 			document.querySelector("#equation-and-symbol").style.height = "100%";
 			document.querySelector(".equation").innerHTML = `
 				<div id="frequent-mistakes-container" style="flex-direction: column; justify-content: space-between;">
@@ -654,11 +653,13 @@ document.querySelectorAll('.control').forEach(control => {
 				document.querySelector("#summary-table-frequent-mistakes") &&
 				document.querySelector("#summary-table-frequent-mistakes").innerHTML === "Klaidų nėra!"
 			) {
+				document.getElementById('middle-line-inner').style.height = "auto";
 				document.querySelector(".table-container").style.justifyContent = "center";
 			} else {
+				document.getElementById('middle-line-inner').style.height = "100%";
 				document.querySelector(".table-container").style.justifyContent = "start";
 			}
-
+			
 		}
 
 		const resetMistakeButtonsElement = document.querySelector('#restart-reset-button-row');
@@ -667,47 +668,51 @@ document.querySelectorAll('.control').forEach(control => {
 
 		const linkElement = document.querySelector("#questionsStyleSheet");
 
-		let equationElement = document.querySelector(".equation");
-		let equation2Element = document.querySelector(".equation_2");
+		const equationElement = document.querySelector(".equation");
+		const equation2Element = document.querySelector(".equation_2");
+
+		const answerFieldDivElement = document.querySelector(".answer-field-div");
 
 		function stylePage () {
-		if (controller.modeChoice7 === "C48" && controller.randomSelection[2] !== 'D') {
+			if (controller.questionsStopped) {
+				linkElement.setAttribute("href", "../questions-stopped.css");
+			} else if (controller.modeChoice7 === "C48" && controller.randomSelection[2] !== 'D') {
 				linkElement.setAttribute("href", "../questions-stulpeliu.css");
-
-		} else if (controller.modeChoice7 === "C48" && controller.randomSelection[2] === 'D') {
+			} else if (controller.modeChoice7 === "C48" && controller.randomSelection[2] === 'D' && controller.modeChoice8 === "C78") {
+				linkElement.setAttribute("href", "../questions-stulpeliu-div-us.css");
+			} else if (controller.modeChoice7 === "C48" && controller.randomSelection[2] === 'D' && controller.modeChoice8 === "C79") {
 				linkElement.setAttribute("href", "../questions-stulpeliu-div.css");
-
-		} else if (controller.modeChoice7 === "C48") {
-			linkElement.setAttribute("href", "../questions-stulpeliu.css");
-		} else if (controller.withRemainder) {
-						linkElement.setAttribute("href", "../questions-remainder.css");
-				} else {
-				if (controller.modeChoice2 === "C15" ||
-						controller.modeChoice2 === "C36"
-					)	{
-						linkElement.setAttribute("href", "../questions-extra-small.css");
-				} else if (controller.modeChoice2 === "C13" || 
-						controller.modeChoice2 === "C14" || 
-						controller.modeChoice2 === "C34" || 
-						controller.modeChoice2 === "C35" || 
-						controller.modeChoice2 === "C28" || 
-						controller.modeChoice2 === "C77" ||
-						controller.modeChoice2 === "C29" ||
-						controller.modeChoice2 === "C20" ||
-						controller.modeChoice2 === "C21" ||
-					  	controller.modeChoice2 === "C23" ||
-						controller.modeChoice2 === "C24" ||
-						controller.modeChoice2 === "C25" ||
-						controller.modeChoice2 === "C26" ||
-						controller.modeChoice2 === "C27" ||
-						controller.modeChoice2 === "C16"
-					) {
-						linkElement.setAttribute("href", "../questions-smaller.css");
-				} else {
-					linkElement.setAttribute("href", "../questions-bigger.css");
-				}
+			} else if (controller.modeChoice7 === "C48") {
+				linkElement.setAttribute("href", "../questions-stulpeliu.css");
+			} else if (controller.withRemainder) {
+							linkElement.setAttribute("href", "../questions-remainder.css");
+					} else {
+					if (controller.modeChoice2 === "C15" ||
+							controller.modeChoice2 === "C36"
+						)	{
+							linkElement.setAttribute("href", "../questions-extra-small.css");
+					} else if (controller.modeChoice2 === "C13" || 
+							controller.modeChoice2 === "C14" || 
+							controller.modeChoice2 === "C34" || 
+							controller.modeChoice2 === "C35" || 
+							controller.modeChoice2 === "C28" || 
+							controller.modeChoice2 === "C77" ||
+							controller.modeChoice2 === "C29" ||
+							controller.modeChoice2 === "C20" ||
+							controller.modeChoice2 === "C21" ||
+							controller.modeChoice2 === "C23" ||
+							controller.modeChoice2 === "C24" ||
+							controller.modeChoice2 === "C25" ||
+							controller.modeChoice2 === "C26" ||
+							controller.modeChoice2 === "C27" ||
+							controller.modeChoice2 === "C16"
+						) {
+							linkElement.setAttribute("href", "../questions-smaller.css");
+					} else {
+						linkElement.setAttribute("href", "../questions-bigger.css");
+					}
+			}
 		}
-	}
 
 		window.onload = function () {
 			if (localStorage.getItem('controller') === null) {
@@ -743,7 +748,6 @@ document.querySelectorAll('.control').forEach(control => {
 		stopButtonSpanElement.innerHTML = "refresh";
         timerDisplay.textContent = localStorage.getItem("elapsedTime");
     }
-    stylePage();
 };
 
 let answerInputElement = document.querySelector('#answer');
@@ -816,14 +820,18 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 	// Function to set the margin of element2
 	function setMargins() {
 
+		if (controller.questionsStopped || controller.modeChoice7 !== "C48") {
+			return
+		}
+
 		const fontSIzeFull = 3;
 		const oneRem = 16;
 		const inputPadding = 20;
 		var digitNumber = controller.randomSelection[1].toString();
 
-
 		var element1 = document.getElementById('equation');
 		var element2 = document.getElementById('answer-field');
+		const element2Textarea = element2.querySelector("textarea");
 		var element3 = document.querySelector('#stulpeliu-0');
 		var element1Rect = element1.getBoundingClientRect();
 		var computedStyle = window.getComputedStyle(element1);
@@ -845,93 +853,57 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 		var newMargin = 0
 		var answerDigits = 0;
 
-		
-		function positionContentContainer () {
-			contentContainerElement.style.width = 'auto';
-			var middleLineWidth = document.getElementById('middle-line').offsetWidth;
-			var contentContainerElementWidth = contentContainerElement.offsetWidth;
-			var contentContainerMargins = (middleLineWidth - contentContainerElementWidth) / 2;
-			const element2ComputedStyles = window.getComputedStyle(element2);
-			const element2marginRight =  parseInt(element2ComputedStyles.getPropertyValue("margin-right"), 10) / 2;
-			contentContainerElement.style.marginRight = contentContainerMargins - element2marginRight + 'px';
-			contentContainerElement.style.marginLeft = contentContainerMargins + element2marginRight + 'px';
-		}
-
-		contentContainerElement.style.width = '100%';
-		contentContainerElement.style.marginRight = 0 + 'px';
-		contentContainerElement.style.marginLeft = 0 + 'px';
-
 	if (controller.randomSelection[2] === 'M') {
+		const daugiklisLength = document.querySelector(".daugiklis").innerHTML.length;
+		const antrasDaugiklisLength = document.querySelector("#antras-daugiklis").innerHTML.length;
+		const newWidth = daugiklisLength + 2;
 		for (var i = 0; i < stulpeliuInput.length; i++) {
 			var stulpeliuInputElement = stulpeliuInput[i];
-			newWidth = equationElementWidth + oneRem*1.75 + 2;
-			stulpeliuInputElement.style.width = newWidth + "px";
-			newMargin = oneRem*1.75;
-			stulpeliuInputElement.style.marginRight = newMargin + 'px';
-
-			if (i === 0) {
-				var firstElement = document.getElementById(`stulpeliu-field-${i}`);
-				var firstElement1Rect = firstElement.getBoundingClientRect();
-				firstElementRight = firstElement1Rect.right + newMargin;
-				firstElmenetMarginRight = newMargin;
-				answerSeparator1.style.marginRight = newMargin + 'px';
-				answerSeparator1.style.width = newWidth + 'px';
-			} else if (i === stulpeliuInput.length-1) {
-				var lastElement = document.getElementById(`stulpeliu-field-${i}`);
-				var lastElement1Rect = firstElement.getBoundingClientRect();
-				lastElementLeft = lastElement1Rect.left;
-			}
+			stulpeliuInputElement.style.width = `${newWidth}ch`;
 		}
 
-		if (element3) {
-			antrasDaugiklisLength = (document.getElementById("antras-daugiklis").textContent).toString().length;
-			var adjuster = 0;
-
-			if (antrasDaugiklisLength > 3) {
-				adjuster = antrasDaugiklisLength - 3
-			}
-
-			element2.style.width = firstElementRight + 28*adjuster - lastElementLeft + 'px';
-			var answerFieldWidth = element2.offsetWidth;
-			element2.style.marginRight = firstElmenetMarginRight + (answerFieldWidth - newWidth) + 'px';
-			answerSeparator2.style.width = firstElementRight + 28*adjuster - lastElementLeft + 'px';
-			answerSeparator2.style.marginRight = firstElmenetMarginRight + (answerFieldWidth - newWidth) + 'px';
-			
-		} else {
-
-			var daugikliai = document.getElementsByClassName('daugiklis');
-			var didDaugiklisWidth = 0;
-			var didDaugiklis;
-
-			for (var i = 0; i < daugikliai.length; i++) {
-					didDaugiklisWidth = Math.max(didDaugiklisWidth, daugikliai[i].offsetWidth);
-			}
-
-			var answerDigits = (controller.randomSelection[0] * controller.randomSelection[1]).toString().length;
-			didDaugiklis = Math.max(controller.randomSelection[0], controller.randomSelection[1]);
-
-			daugiklisDigits = didDaugiklis.toString().length;
-			element2.style.width = didDaugiklisWidth + oneRem*1.75 + oneRem*1.75*(answerDigits - daugiklisDigits) + 'px';
-			element2.style.marginRight = oneRem*1.75*(answerDigits - daugiklisDigits) + 3 + 'px';
-			answerSeparator2.style.width = didDaugiklisWidth + oneRem*1.75 + oneRem*1.75*(answerDigits - daugiklisDigits) + 'px';
-			answerSeparator2.style.marginRight = oneRem*1.75*(answerDigits - daugiklisDigits) + 3 + 'px';
+		if (stulpeliuInput[0]) {
+			answerSeparator1.style.width = `${stulpeliuInput[0].offsetWidth}px`
 		}
+
+		element2Textarea.style.width = `${newWidth+1+antrasDaugiklisLength-2}ch`;
+		answerSeparator2.style.width = `${element2Textarea.offsetWidth}px`;
 		
-		if (!controller.questionsStopped) {
-			positionContentContainer();
+	} else if (controller.randomSelection[2] === 'D') {
+		const answerInput = document.querySelector("#answer")
+		const dalinys = document.querySelector("#dalinys")
+		const daliklis = document.querySelector("#daliklis")
+
+		if (controller.modeChoice8 === "C78") {
+			const daliklisValue = daliklis.innerHTML
+			const daliklisDigits = daliklisValue.length;
+			const dalinysLength = dalinys.innerHTML.length;
+			if (dalinysLength > daliklisDigits) {
+				const dalinysStart = dalinys.innerHTML.slice(0, daliklisDigits);
+				if (Number(dalinysStart) >= Number(daliklisValue)) {
+					answerInput.style.width = `${dalinysLength+1}ch`;
+				} else {
+					answerInput.style.width = `${dalinysLength}ch`;
+				}
+			} else {
+				return
+			}
+
+		} else {
+			answerInput.style.width = `${(Math.ceil(controller.randomSelection[0]/controller.randomSelection[1])).toString().length + 1.25}ch`;
+			daliklis.style.width = `${(Math.ceil(controller.randomSelection[0]/controller.randomSelection[1])).toString().length + 1.25}ch`;
 		}
 
-	} else if (controller.randomSelection[2] === 'D') {
-		let answerInput = document.querySelector("#answer")
-		let daliklis = document.querySelector("#daliklis")
-		answerInput.style.width = `${(Math.ceil(controller.randomSelection[0]/controller.randomSelection[1])).toString().length + 1.25}ch`;
-		daliklis.style.width = `${(Math.ceil(controller.randomSelection[0]/controller.randomSelection[1])).toString().length + 1.25}ch`;
 		if (controller.withRemainder) {
-			const elements = document.querySelectorAll('.stulpeliu-input');
+			const elements = document.querySelectorAll('.stulpeliu-field');
 			const lastElement = elements[elements.length - 1];
-			lastElement.placeholder = controller.language === 'LT' 
-				? 'liek.' 
-				: 'R';
+
+			if (!lastElement.querySelector(".remainder-label")) {
+				const remainderElement = document.createElement("div");
+				remainderElement.className = "remainder-label";
+				remainderElement.innerHTML = "liek.";
+				lastElement.appendChild(remainderElement);
+			}
 		}
 		} else {
 
@@ -944,89 +916,53 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 			}
 
 			var answerSize = 0;
-			var marginSize = 0;
 			if (controller.randomSelection[2] === 'A') {
 				answerSize = didDemAtTurWidth + oneRem*1.75 * 2;
-				marginSize = oneRem*1.75 + 3;
-				positionContentContainer();
 			} else if (controller.randomSelection[2] === 'S') {
 				answerSize = didDemAtTurWidth + oneRem*1.75;
-				marginSize = 3;
 			}
 
-			element2.style.width = answerSize + 'px'
-			element2.style.marginRight = marginSize + 'px';
-			answerSeparator2.style.width = answerSize + 'px'
-			answerSeparator2.style.marginRight = marginSize + 'px';
+			element2Textarea.style.width = answerSize + 'px';
+			answerSeparator2.style.width = `${element2Textarea.offsetWidth}px`;
 
 		}
 
 		if (controller.withRemainder && controller.randomSelection[2] === 'D') {
-    var liekElement = document.getElementById("liek");
-    if (liekElement) {
-		liekElement.style.visibility = "visible";
-	}
-  }
+			var liekElement = document.getElementById("liek");
+			if (liekElement) {
+				liekElement.style.visibility = "visible";
+			}
+  		}
 
   		adjustMiddleLineHeight();
 		contentContainerElement.style.visibility = 'visible';
 	}
 
-// Run the function when the page is loaded
-window.addEventListener('load', function() {
-	if (controller.questionsStopped) {
-		setFontSize();
-	}
-	if (controller.modeChoice7 === "C48") {
-		if (!controller.questionsStopped) {
-    setTimeout(function() {
-        setMargins();
-    }, 500);
-	}
-}
-});
 
 
-// Run the function every time the page is resized
-window.addEventListener('resize', function() {
-	if (controller.questionsStopped) {
-	setFontSize();
-	}
-	if (controller.modeChoice7 === "C48") {
-		if (!controller.questionsStopped) {
-        //setMargins();
-	}
-}
-});
-
-const el = document.getElementById('middle-line-inner');
-const parent = el.parentElement;
 
 function adjustMiddleLineHeight() {
+	const el = document.getElementById('middle-line-inner');
+	const parent = el.parentElement;
+
   if(controller.questionsStopped) {
 	el.style.height = 'auto';
+
+	if (document.querySelector("#summary-table-frequent-mistakes")) {
+		if (document.querySelector("#summary-table-frequent-mistakes").innerHTML === "Klaidų nėra!") {
+			el.style.height = 'auto';
+		} else {
+			el.style.height = '100%';
+		}
+	} 
+  } else {
+	el.style.height = 'auto';
+	el.style.maxHeight = 'none';
+
+	el.style.height = el.scrollHeight <= parent.clientHeight ? 'auto' : '100%';
+	el.style.maxHeight = '100%';
   }
-
-  el.style.height = 'auto';
-  el.style.maxHeight = 'none';
-
-  el.style.height = el.scrollHeight <= parent.clientHeight ? 'auto' : '100%';
-  el.style.maxHeight = '100%';
 }
-
-function handleRemainderCompensatoryMargin() {
-	const remainderField = document.querySelector("#remainder-field");
-	const answerFieldDiv = document.querySelector(".answer-field-div");
-
-	if (getComputedStyle(remainderField).display !== "none") {
-		answerFieldDiv.classList.add("comp-margin");
-	} else {
-		answerFieldDiv.classList.remove("comp-margin");
-	}
-}
-
-
-
 
 window.addEventListener('resize', adjustMiddleLineHeight);
 adjustMiddleLineHeight();
@@ -1048,21 +984,12 @@ function stopEquations () {
       function stopEquationsCloseActions () {
       var answerSeparator1 = document.getElementById('answer-separator-1');
       var answerSeparator2 = document.getElementById('answer-separator-2');
-      var contentContainerElement = document.getElementById('content-container');
 
 	  document.querySelector(".upper-line").style.display = "none";
-
-      contentContainerElement.style.width = '100%';
-      contentContainerElement.style.marginRight = '0';
-			contentContainerElement.style.marginLeft = '0';
-      contentContainerElement.style.paddingLeft = 0 + 'px';
-			contentContainerElement.style.paddingRight = 0 + 'px';
 
       answerSeparator1.style.display = 'none';
       answerSeparator2.style.display = 'none';
       arithmeticSymbol.innerHTML = '';
-      
-      setFontSize();
 
       if (controller.taskId !== 0) {
         if (controller.taskCompleted === true) {
@@ -1100,6 +1027,7 @@ function stopEquations () {
 	document.querySelector(".upper-line").style.display = "flex";
 	document.getElementById('middle-line-inner').style.height = "auto";
 	document.querySelector("#equation-and-symbol").style.height = "auto";
+	document.querySelector(".equation").style.height = "auto";
     stopButtonSpanElement.innerHTML = "close";
     restartEquations();
   }

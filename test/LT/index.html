@@ -13,15 +13,9 @@
 	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
 	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-		integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-	<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Josefin+Sans&display=swap"
-		rel="stylesheet">
-	<link rel="stylesheet"
-	href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-	<link rel="stylesheet" type="text/css" href="../index.css">
-	<link rel="stylesheet" type="text/css" href="../user-nav-menu.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" type="text/css" href="../index.css">
+    <link rel="stylesheet" href="../main-nav-bar.css">
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-96Q83PW8XY"></script>
@@ -34,6 +28,90 @@
 </script>	
 
 <style>
+	* {
+		-webkit-user-select: none;
+		-webkit-tap-highlight-color: transparent;
+		user-select: none;
+	}
+
+	html {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background-image: linear-gradient(to top, #ffbf9c, #ffbf92, #ffbf89, #ffbf7e, #ffc074);
+		width: 100vw;
+		height: 100svh;
+		overflow: hidden;
+		user-select: none;         /* Standard */
+		-webkit-user-select: none; /* Chrome, Safari, Edge */
+		-moz-user-select: none;    /* Firefox */
+		-ms-user-select: none;     /* IE/older Edge */
+	}
+
+	body {
+		margin: 0;
+		font-family: 'SFpro', sans-serif;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+	}
+
+	.container {
+		position: relative;
+		height: calc(100% - 80px - 16px - 16px);
+		max-height: calc(100% - 80px - 16px - 16px);
+		min-height: calc(100% - 80px - 16px - 16px);
+		width: calc(100% - 16px - 16px);
+		display: flex;
+		background: rgba(255, 255, 255, 0.08);
+		margin: 16px;
+		border-radius: 20px;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+	}
+
+.container-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box; /* include padding in height calculations */
+  padding: 25px;
+  overflow: hidden; /* clip any overflow inside container */
+}
+
+.main-logo-holder,
+.practice-label-div,
+.submit-button-div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto; /* take only the space they need */
+}
+
+.middle-div {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;   /* take remaining space */
+  min-height: 0;    /* allow shrinking */
+  min-width: 0;     /* allow horizontal shrink if needed */
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+}
+
+.new-task-outer-div {
+	overflow-y: auto;
+}
+
+	.practice-label {
+		font-size: 2rem;
+		font-weight: 600;
+	}
+
 	.lm-animated-bg {
 		position: absolute;
 		width: 100vw;
@@ -49,6 +127,62 @@
 		z-index: -1;
 		opacity: 1;
 	}
+
+.submit-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  /*border: #286D8A 1px solid;*/
+  background: linear-gradient(135deg, #3288AC, #286D8A);
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #F5F5F7;
+  overflow: hidden;
+  min-width: 0;
+  padding: 14px 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  font-size: 1.15rem;
+  width: 150px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase;
+  /*box-shadow: 
+        0 1px 2px rgba(0, 0, 0, 0.2),
+        0 4px 12px rgba(50, 136, 172, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);*/
+}
+
+.submit-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+  border-radius: 20px;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+.submit-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.submit-button:hover::before {
+  background: rgba(255, 255, 255, 0.15);
+}
+
 
 	/* POPUP STYLES START */
 .class-popup-modal {
@@ -151,13 +285,131 @@ body.popup-active {
     transform: none;
 }
 
+.submit-button-div {
+  margin-top: 20px;
+}
+
+@media (max-width: 767px) {
+	.container {
+		width: 100%;
+		max-height: calc(100% - 80px);
+		min-height: calc(100% - 80px);
+		margin: 0;
+		background: transparent;
+		border: none;
+		border-radius: 0;
+		padding: 0;
+	}
+
+	.container-inner {
+		padding: 15px;
+	}
+}
+
 /* POPUP STYLES END */
 </style>
 </head>
 
 <body>
-	<div class="container" id="template-container"
-		style="display: flex; flex-direction: column; justify-content: space-between;" hidden>
+	    <div id="customConfirmModal" class="modal">
+    <div class="modal-content">
+        <p id="customModalText"></p>
+        <div class="modal-buttons">
+        <button id="customConfirmYes" class="btn btn-confirm">Taip</button>
+        <button id="customConfirmNo" class="btn btn-cancel">Ne</button>
+        </div>
+    </div>
+    </div>
+
+    <div id="object-popup" class="object-popup-overlay" style="display:none;">
+    <div class="object-popup-panel">
+        <button class="object-popup-close">&times;</button>
+        <div class="title-subtitle-inline-button-wrapper">
+        <div class="object-popup-title-subtitle-wrapper">
+        <div class="object-popup-title" id="object-popup-title"></div>
+        <div class="object-popup-subtitle" id="object-popup-subtitle"></div>
+        </div>
+        </div>
+        <div class="object-popup-content" id="object-popup-content">
+        <!-- Dynamic content goes here -->
+        </div>
+    </div>
+    </div>
+
+     <nav class="main-navbar" id="mainNavbar">
+        <div class="main-nav-container">
+            <!-- Logo -->
+            <a href="#" class="main-nav-logo">
+                <div class="main-nav-logo-icon">
+                 <img id="sudedu-main-nav-bar-logo" src="../images/sudedu_logo.png" alt="sudEdu">
+                </div>
+            </a>
+
+            <!-- Desktop Navigation -->
+            <div class="main-nav-links">
+                <a href="index.html" class="main-nav-link main-nav-link-active">Praktika</a>
+                <a href="uzduotys.html" class="main-nav-link">Užduotys</a>
+                <a href="klase.html" class="main-nav-link">Klasė</a>
+                <a href="augintiniai.html" class="main-nav-link">Augintiniai</a>
+                <a href="apie.html" class="main-nav-link">Apie Sudedu</a>
+                
+                <div class="main-nav-language-dropdown" id="languageDropdown">
+                    <button class="main-nav-language-btn" id="languageBtn">
+                        <span id="currentLanguage">LT</span>
+                        <span class="main-nav-language-arrow"></span>
+                    </button>
+                    <div class="main-nav-language-menu">
+                        <button class="main-nav-language-option selected" data-lang="LT">LT</button>
+                        <button class="main-nav-language-option" data-lang="EN">EN</button>
+                    </div>
+                </div>
+                
+                
+                <div class="main-nav-connect-wrapper">
+                    <div class="main-nav-connect-glow"></div>
+                    <button class="main-nav-connect-btn">
+                        <span class="main-nav-connect-text">Atsijungti</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Button -->
+            <button class="main-nav-mobile-btn" id="mainNavMobileBtn">
+                <span class="main-nav-hamburger"></span>
+                <span class="main-nav-hamburger"></span>
+                <span class="main-nav-hamburger"></span>
+            </button>
+
+            <!-- Mobile Menu -->
+            <div class="main-nav-mobile-menu" id="mainNavMobileMenu">
+                <a href="index.html" class="main-nav-mobile-link active">Praktika</a>
+                <a href="uzduotys.html" class="main-nav-mobile-link">Užduotys</a>
+                <a href="klase.html" class="main-nav-mobile-link">Klasė</a>
+                <a href="augintiniai.html" class="main-nav-mobile-link">Augintiniai</a>
+                <a href="apie.html" class="main-nav-mobile-link">Apie Sudedu</a>
+                
+                <div class="main-nav-mobile-language">
+                    <button class="language-option language-option-LT selected" onclick="setLanguage('LT')">LT</button>
+                    <span class="language-separator">/</span>
+                    <button class="language-option language-option-EN" onclick="setLanguage('EN')">EN</button>
+                </div>
+                
+                <button class="main-nav-mobile-connect">
+                    <span class="main-nav-connect-text">Atsijungti</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+
+	<div class="container" id="template-container" hidden>
+
+		<div class="kid-5"> 
+			<img src="../images/sudedu_kid_1.png" style="width: 100%; height: 100%;" class="img-fluid"> 
+		</div>
+		<div class="kid-6"> 
+			<img src="../images/sudedu_kid_2.png" style="width: 100%; height: 100%;" class="img-fluid"> 
+		</div>
 
 		
 		<!-- POPUP ELEMENTS START -->
@@ -177,306 +429,264 @@ body.popup-active {
 		</div>
 		<!-- POPUP ELEMENTS END -->
 
-		<div id="language-about-row" class="row d-flex align-items-start">
-			<div class="col-6" id="language-switcher" onmousedown="return false;" onselectstart="return false;" style="-webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;">
-				<span class="language-option language-option-EN" onclick="setLanguage('EN')">EN</span>
-				<span class="language-option language-option-LT selected" onclick="setLanguage('LT')">LT</span>
-			</div>
-			<div class="col-6 d-flex justify-content-end align-items-center" id="user-login-div">
-				<a id="user-login-anchor" href="prisijungimas" class="log-in">Prisijungti</a>
-
-				<div id="loggedin-user-menu">
-	<div class="profile">
-		<div class="user">
-			<h3 id="loggedin-user-nickname"></h3>
-			<p id="loggedin-user-id"></p>
-		</div>
-
-			<div class="img-box"><span id="user-initial"></span></div>
-
-	</div>
-	<div class="menu">
-		<ul>
-			<li><a href="uzduotys"><i class="ph-bold ph-user"></i>Užduotys</a></li>
-			<li><a href="/LT" onclick="clearUserData()"><i class="ph-bold ph-envelope-simple"></i>Atsijungti</a></li>
-		</ul>
-	</div>
-				</div>
-			</div>
-		</div>
-		<div class="row d-flex align-items-center justify-content-center text-center">
-			<div class="col-12 d-flex justify-content-center align-items-center text-center">
+		<div class="container-inner">
+			<div class="main-logo-holder">
 				<img id="sudedu-main-page-logo" src="../images/sudedu_logo.png" alt="sudEdu">
 			</div>
-			<label class="mode-choice-label" for="mode_choice">PRAKTIKUOTIS</label>
-			<div class="col-12 d-flex justify-content-center align-items-center middle-div">
-				<div class="row position-relative" id="middle-div-row">
-		<div class="position-absolute image-container kid-5"
-			style="width: 300px; height: 300px;"> <img src="../images/sudedu_kid_1.png"
-				style="width: 100%; height: 100%;" class="img-fluid"> </div>
-		<div class="position-absolute image-container kid-6"
-			style="width: 300px; height: 300px;"> <img src="../images/sudedu_kid_2.png"
-				style="width: 250px; height: auto;" class="img-fluid"> </div>
-					<div class="d-flex flex-column align-items-center">
-						
-						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
-							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice"
-								id="mode_choice">
-								<option value="matematika">MATEMATIKĄ</option>
-								<option value="kalba">LIETUVIŲ KALBĄ</option>
-							</select>
-						</div>
-						
-						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
-							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_1"
-								id="mode_choice_1">
-								<option value="C1">SUD&#x116;T&#x12E;</option>
-								<option value="C2">ATIMT&#x12E;</option>
-								<option value="C3">SUD&#x116;T&#x12E; IR ATIMT&#x12E;</option>
-								<option value="C4">DAUGYB&#x104;</option>
-								<option value="C5">DALYB&#x104;</option>
-								<option value="C6">DAUGYB&#x104; IR DALYB&#x104;</option>
-								<option value="C7">ĮVAIRIUS VEIKSMUS</option>
-							</select>
-						</div>
-						
-						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_2_div">
-							<div class="col-12 d-flex justify-content-center align-items-center mode_choice_2_div text-center"
-								id="mode_choice_2_div">
-								<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_2"
-									id="mode_choice_2">
-									<option value="C8">VIENAŽENKLIŲ SKAIČIŲ IKI 10</option>
-									<option value="C9">VIENAŽENKLIŲ SKAIČIŲ IKI 20 (LENTELINĖ SUDĖTIS)</option>
-									<option value="C10">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 20</option>
-									<option value="C11">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 100</option>
-									<option value="C12">DVIŽENKLIŲ SKAIČIŲ IKI 100</option>
-									<option value="C13">SKAIČIŲ IKI 1 000</option>
-									<option value="C14">SKAIČIŲ IKI 10 000</option>
-									<option value="C15">SKAIČIŲ IKI 1 000 000</option>
-								</select>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-12 d-flex justify-content-center align-items-center number_choice_div text-center">
-								<label class="number-choice-label-nuo" for="selected_number" id="number_label"
-									style="display: none;">NUO</label>
-								<select class="btn btn-secondary dropdown-toggle dropdown text-center" name="selected_number"
-									id="selected_number" style="display: none;">
-									<option value="1">1</option>
-									<option value="2">2</option>
-									<option value="3">3</option>
-									<option value="4">4</option>
-									<option value="5">5</option>
-									<option value="6">6</option>
-									<option value="7">7</option>
-									<option value="8">8</option>
-									<option value="9">9</option>
-									<option value="10">10</option>
-								</select>
-								<label class="number-choice-label-iki" for="selected_number_2" id="number_label_2"
-									style="display: none;">IKI</label>
-								<select class="btn btn-secondary dropdown-toggle dropdown text-center" name="selected_number_2"
-									id="selected_number_2" style="display: none;">
-									<option value="1">1</option>
-									<option value="2">2</option>
-									<option value="3">3</option>
-									<option value="4">4</option>
-									<option value="5">5</option>
-									<option value="6">6</option>
-									<option value="7">7</option>
-									<option value="8">8</option>
-									<option value="9">9</option>
-									<option value="10">10</option>
-								</select>
-							</div>
-						</div>
-						<div class="row d-flex justify-content-center align-items-center text-center remainder-div">
-						<label id="remainder-option" style="display: none;">
-							<input id="remainder-input" type="checkbox" name="myCheckbox"> DALYBA SU LIEKANA
-						</label>
-						</div>
+			<div class="middle-div">
+				<div class="practice-label-div">
+					<div class="practice-label">PRAKTIKUOTIS</div>
+				</div>
+				<div class="new-task-outer-div" id="middle-div-row">
+		                <div id="new-task-options-container">
+                            <div class="ode_choice_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice" id="mode_choice">
+                                    <option value="matematika">MATEMATIKĄ</option>
+                                    <option value="kalba">LIETUVIŲ KALBĄ</option>
+                                </select>
+                            </div>
 
-						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_3_div">
-							<div
-								class="col-12 d-flex justify-content-center align-items-center text-center mode_choice_3_div"
-								id="mode_choice_3_div">
-								<select class="btn btn-secondary dropdown-toggle dropdown text-center" name="mode_choice_3"
-									id="mode_choice_3">
-									<option value="C37">NEPERŽENGIANT DEŠIMTIES</option>
-								</select>
-							</div>
-						</div>
-						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
-							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_5"
-								id="mode_choice_5">
-								<option value="C41">SKAITINĖ LYGYBĖ</option>
-								<option value="C42">SKAITINĖ LYGYBĖ SU NEŽINOMUOJU</option>
-							</select>
-						</div>
-						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
-							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_6"
-								id="mode_choice_6" style="display: none;">
-								<option value="C43">NEŽINOMAS DĖMUO</option>
-							</select>
-						</div>
-						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_div">
-							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_7"
-								id="mode_choice_7" style="display: block;">
-								<option value="C47">EILUTE</option>
-								<option value="C48">STULPELIU / KAMPU</option>
-							</select>
-						</div>
-						
-						<div class="row d-flex justify-content-center align-items-center text-center class_choice_div">
-							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="class_choice"
-								id="class_choice" style="display: none;">
-								<option value="C75">1-2 KLASĖ</option>
-								<option value="C76">3-4 KLASĖ</option>
-							</select>
-						</div>
-						
-						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_8_div">
-							<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_8"
-								id="mode_choice_8" style="display: none;">
-								<option value="tekstas">TEKSTO SUPRATIMĄ</option>
-								<option value="rasyba">RAŠYBĄ</option>
-							</select>
-						</div>
-						
-						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_9_div">
-							<div class="col-12 d-flex justify-content-center align-items-center mode_choice_9_div text-center"
-								id="mode_choice_9_div">
-								<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_9"
-									id="mode_choice_9" style="display: none;">
-									<option value="C51">TURINIO KOMPONAVIMĄ</option>
-									<option value="C52">STRUKTŪROS IŠDĖSTYMĄ</option>
-								</select>
-							</div>
-						</div>
-						
-						<div class="row d-flex justify-content-center align-items-center text-center mode_choice_10_div">
-							<div class="col-12 d-flex justify-content-center align-items-center mode_choice_10_div text-center"
-								id="mode_choice_10_div">
-								<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_10"
-									id="mode_choice_10" style="display: none;">
-									<option value="C58">LENGVAS</option>
-									<option value="C80">LENGVAS SU DISTRAKTORIUMI</option>
-									<option value="C59">VIDUTINIS</option>
-									<option value="C81">VIDUTINIS SU DISTRAKTORIUMI</option>
-									<option value="C60">SUNKUS</option>
-									<option value="C82">SUNKUS SU DISTRAKTORIUMI</option>
-								</select>
-							</div>
-						</div>
+                            <div class="mode_choice_1_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_1" id="mode_choice_1">
+                                    <option value="C1">SUDĖTĮ</option>
+                                    <option value="C2">ATIMTĮ</option>
+                                    <option value="C3">SUDĖTĮ IR ATIMTĮ</option>
+                                    <option value="C4">DAUGYBĄ</option>
+                                    <option value="C5">DALYBĄ</option>
+                                    <option value="C6">DAUGYBĄ IR DALYBĄ</option>
+                                    <option value="C7">ĮVAIRIUS VEIKSMUS</option>
+                                </select>
+                            </div>
 
-						<div class="row d-flex justify-content-center align-items-center text-center rasyba-options-row">
-							<div class="col-12 justify-content-start align-items-center mode_choice_11_div text-center"
-								id="mode_choice_11_div" style="display: none;">
-								<label class="rasyba-options-label">
-									<input type="checkbox" class="r" name="r" value='GALŪNĖS' checked><span class="rasyba-options-label-text" id="rasyba-options-label-text-galune">ŽODŽIO PABAIGA:</span>
-								</label>
-								<br>
-									<div id="galuniu-div">
-									<label class="rasyba-options-label" style="display: none;">
-										<input type="checkbox" class="rasyba-options options-for-first-second-classes-input" id="first-second-class-endings" name="rasyba-option" value='{"C61": []}' checked><span class="rasyba-options-label-text">DAIKTAVARDIS</span>
-										<br>
-									</label>
-									<label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
-										<input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C62": []}'><span class="rasyba-options-label-text">DAIKTAVARDŽIAI</span>
-										<br>
-									</label>
-									<label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
-										<input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C63": [], "C64": []}'><span class="rasyba-options-label-text"></span>BŪDVARDŽIAI IR PRIEVEIKSMIAI</span>
-										<br>
-									</label>
-									<label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
-										<input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C65": []}'><span class="rasyba-options-label-text"></span>VEIKSMAŽODŽIAI</span>
-										<br>
-									</label>
-									<div class="col-12 d-flex justify-content-start align-items-center mode_choice_12_div text-center"
-									id="mode_choice_12_div">
-									<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_12"
-										id="mode_choice_12">
-										<option value="C73">LENGVESNĖS KOMBINACIJOS</option>
-										<option value="C74">SUNKESNĖS KOMBINACIJOS</option>
-									</select>
-								</div>
-								</div>
-									<label class="rasyba-options-label">
-										<input id="C66" type="checkbox" class="rasyba-options" name="rasyba-option" value='{"C66": []}' checked><span class="rasyba-options-label-text"></span>ĮSIDĖMĖTINA RAŠYBA</span>
-										<br>
-									</label>
-									<label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
-										<input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C71": []}'><span class="rasyba-options-label-text"></span>PRIEBALSIŲ SUPANAŠĖJIMAS</span>
-										<br>
-									</label>
-									<label class="rasyba-options-label options-for-first-second-classes" style="display: block;">
-										<input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C67": []}' checked><span class="rasyba-options-label-text"></span>PANAŠIAI SKAMBANČIOS PRIEBALSĖS</span>
-										<br>
-									</label>
-									<label class="rasyba-options-label" style="display: block;">
-										<input type="checkbox" class="rasyba-options" name="rasyba-option" value='{"C68": []}' checked><span class="rasyba-options-label-text"></span>BALSĖS IR DVIBALSĖS</span>
-										<br>
-									</label>
-									<label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
-										<input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C72": []}'><span class="rasyba-options-label-text"></span>MIŠRIEJI DVIGARSIAI</span>
-										<br>
-									</label>
-									<label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
-										<input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C69": []}'><span class="rasyba-options-label-text"></span>PRIEŠDĖLIAI</span>
-										<br>
-									</label>
-									<label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
-										<input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C70": []}'><span class="rasyba-options-label-text"></span>PRIESAGOS</span>
-										<br>
-									</label>
-							
-							</div>
+                            <div class="mode_choice_2_div">
+                                <div class="col-12 d-flex justify-content-center align-items-center mode_choice_2_div text-center" id="mode_choice_2_div">
+                                    <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_2" id="mode_choice_2">
+                                        <option value="C8">VIENAŽENKLIŲ SKAIČIŲ IKI 10</option>
+                                        <option value="C9">VIENAŽENKLIŲ SKAIČIŲ IKI 20 (LENTELINĖ SUDĖTIS)</option>
+                                        <option value="C10">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 20</option>
+                                        <option value="C11">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 100</option>
+                                        <option value="C12">DVIŽENKLIŲ SKAIČIŲ IKI 100</option>
+                                        <option value="C13">SKAIČIŲ IKI 1 000</option>
+                                        <option value="C14">SKAIČIŲ IKI 10 000</option>
+                                        <option value="C15">SKAIČIŲ IKI 1 000 000</option>
+                                    </select>
+                                </div>
+                            </div>
 
-							<div class="row d-flex justify-content-center align-items-center text-center mode_choice_13_div">
-								<div class="row">
-								</div>
-								<div class="col-12 d-flex justify-content-center align-items-center mode_choice_13_div text-center"
-									id="mode_choice_13_div">
-									<select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_13"
-										id="mode_choice_13" style="display: none;">
-										<option value="3">RETESNI ATVEJAI</option>
-										<option value="1">DAŽNESNI ATVEJAI</option>
-									</select>
-								</div>
-							</div>
+                            <div class="selected_numbers_div">
+                                <div class="selected_numbers_inner_div">
+                                    <label class="number-choice-label-nuo" for="selected_number" id="number_label" style="display: none;">NUO</label>
+                                    <select class="btn btn-secondary dropdown-toggle dropdown text-center" name="selected_number" id="selected_number" style="display: none;">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+                                    </select>
+                                    <label class="number-choice-label-iki" for="selected_number_2" id="number_label_2" style="display: none;">IKI</label>
+                                    <select class="btn btn-secondary dropdown-toggle dropdown text-center" name="selected_number_2" id="selected_number_2" style="display: none;">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+                                    </select>
+                                </div>
+                            </div>
 
-						</div>
+                            <div class="remainder-div">
+                                <label id="remainder-option" style="display: none;">
+                                    <input id="remainder-input" type="checkbox" name="myCheckbox"> DALYBA SU LIEKANA
+                                </label>
+                            </div>
 
-	
-						<div class="row">
-						</div>
-						<div class="row">
-							<div class="col-12 d-flex justify-content-center align-items-center submit-button">
-								<button class="btn btn-primary submit-button highlight-btn">Pirmyn!</button>
-							</div>
-						</div>
-					</div>
+                            <div class="mode_choice_3_div">
+                                <div class="col-12 d-flex justify-content-center align-items-center text-center mode_choice_3_div" id="mode_choice_3_div">
+                                    <select class="btn btn-secondary dropdown-toggle dropdown text-center" name="mode_choice_3" id="mode_choice_3">
+                                        <option value="C37">NEPERŽENGIANT DEŠIMTIES</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mode_choice_5_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_5" id="mode_choice_5">
+                                    <option value="C41">SKAITINĖ LYGYBĖ</option>
+                                    <option value="C42">SKAITINĖ LYGYBĖ SU NEŽINOMUOJU</option>
+                                </select>
+                            </div>
+
+                            <div class="mode_choice_6_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_6" id="mode_choice_6" style="display: none;">
+                                    <option value="C43">NEŽINOMAS DĖMUO</option>
+                                </select>
+                            </div>
+
+                            <div class="mode_choice_7_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_7" id="mode_choice_7" style="display: block;">
+                                    <option value="C47">EILUTE</option>
+                                    <option value="C48">STULPELIU / KAMPU</option>
+                                </select>
+                            </div>
+
+                            <div class="class_choice_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="class_choice" id="class_choice" style="display: none;">
+                                    <option value="C75">1-2 KLASĖ</option>
+                                    <option value="C76">3-4 KLASĖ</option>
+                                </select>
+                            </div>
+
+                            <div class="mode_choice_8_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_8" id="mode_choice_8" style="display: none;">
+                                    <option value="tekstas">TEKSTO SUPRATIMĄ</option>
+                                    <option value="rasyba">RAŠYBĄ</option>
+                                </select>
+                            </div>
+
+                            <div class="mode_choice_9_div">
+                                <div class="col-12 d-flex justify-content-center align-items-center mode_choice_9_div text-center" id="mode_choice_9_div">
+                                    <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_9" id="mode_choice_9" style="display: none;">
+                                        <option value="C51">TURINIO KOMPONAVIMĄ</option>
+                                        <option value="C52">STRUKTŪROS IŠDĖSTYMĄ</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mode_choice_10_div">
+                                <div class="col-12 d-flex justify-content-center align-items-center mode_choice_10_div text-center" id="mode_choice_10_div">
+                                    <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_10" id="mode_choice_10" style="display: none;">
+                                        <option value="C58">LENGVAS</option>
+                                        <option value="C80">LENGVAS SU DISTRAKTORIUMI</option>
+                                        <option value="C59">VIDUTINIS</option>
+                                        <option value="C81">VIDUTINIS SU DISTRAKTORIUMI</option>
+                                        <option value="C60">SUNKUS</option>
+                                        <option value="C82">SUNKUS SU DISTRAKTORIUMI</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="rasyba-options-row">
+                                <div class="mode_choice_11_div" id="mode_choice_11_div" style="display: none;">
+                                    <label class="rasyba-options-label">
+                                        <input type="checkbox" class="r" name="r" value='GALŪNĖS' checked><span class="rasyba-options-label-text" id="rasyba-options-label-text-galune">ŽODŽIO PABAIGA:</span>
+                                    </label>
+                                    <br>
+                                    <div id="galuniu-div">
+                                        <label class="rasyba-options-label" style="display: none;">
+                                            <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" id="first-second-class-endings" name="rasyba-option" value='{"C61": []}' checked><span class="rasyba-options-label-text">DAIKTAVARDIS</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C62": []}'><span class="rasyba-options-label-text">DAIKTAVARDŽIAI</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C63": [], "C64": []}'><span class="rasyba-options-label-text">BŪDVARDŽIAI IR PRIEVEIKSMIAI</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C65": []}'><span class="rasyba-options-label-text">VEIKSMAŽODŽIAI</span>
+                                            <br>
+                                        </label>
+                                        <div class="mode_choice_12_div" id="mode_choice_12_div">
+                                            <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_12" id="mode_choice_12">
+                                                <option value="C73">LENGVESNĖS KOMBINACIJOS</option>
+                                                <option value="C74">SUNKESNĖS KOMBINACIJOS</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <label class="rasyba-options-label">
+                                        <input id="C66" type="checkbox" class="rasyba-options" name="rasyba-option" value='{"C66": []}' checked><span class="rasyba-options-label-text">ĮSIDĖMĖTINA RAŠYBA</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C71": []}'><span class="rasyba-options-label-text">PRIEBALSIŲ SUPANAŠĖJIMAS</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-first-second-classes" style="display: block;">
+                                        <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C67": []}'checked><span class="rasyba-options-label-text">PANAŠIAI SKAMBANČIOS PRIEBALSĖS</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label" style="display: block;">
+                                        <input type="checkbox" class="rasyba-options" name="rasyba-option" value='{"C68": []}' checked><span class="rasyba-options-label-text">BALSĖS IR DVIBALSĖS</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C72": []}'><span class="rasyba-options-label-text">MIŠRIEJI DVIGARSIAI</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C69": []}'><span class="rasyba-options-label-text">PRIEŠDĖLIAI</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C70": []}'><span class="rasyba-options-label-text">PRIESAGOS</span>
+                                        <br>
+                                    </label>
+                                </div>
+
+                                <div class="mode_choice_13_div">
+                                    <div class="row"></div>
+                                    <div class="col-12 d-flex justify-content-center align-items-center mode_choice_13_div text-center" id="mode_choice_13_div">
+                                        <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_13" id="mode_choice_13" style="display: none;">
+                                            <option value="3">RETESNI ATVEJAI</option>
+                                            <option value="1">DAŽNESNI ATVEJAI</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modeChoice4_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="modeChoice4" id="mode_choice_4" style="display: block;">
+                                    <option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>
+                                    <option value="C40">NUSTATYTI VEIKSMŲ KIEKĮ</option>
+                                </select>
+                            </div>
+
+                            <div class="timer-question-number-div">
+                                <div class="timer-input-div" id="timer-input-div">
+                                    <div class="input-group">
+                                    <div class="input-wrapper">
+                                        <button class="control-btn" onclick="decrementValue('timer-input', 1, 60)">−</button>
+                                        <input type="number" class="timer-input" id="timer-input" min="1" max="60" step="1" value="5">
+                                        <button class="control-btn" onclick="incrementValue('timer-input', 1, 60)">+</button>
+                                    </div>
+                                    <h3 class="timer-choice-label">minutes</h3>
+                                </div>
+                                </div>
+                                <div class="question-number-input-div" id="question-number-input-div" style="display: none;">
+                                    <div class="input-group">
+                                    <div class="input-wrapper">
+                                        <button class="control-btn" onclick="decrementValue('question-number-input', 1, 200)">−</button>
+                                        <input type="number" class="question-number-input" id="question-number-input" min="1" max="200" step="1" value="20">
+                                        <button class="control-btn" onclick="incrementValue('question-number-input', 1, 200)">+</button>
+                                    </div>
+                                    <h3 class="answer-number-label">veiksmus</h3>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
 				</div>
 			</div>
+			<div class="submit-button-div">
+				<button class="submit-button">Pradėti</button>
+			</div>
 		</div>
-		<div class="row d-flex stop-reset-button-div">
-				<div class="col-6 d-flex justify-content-start align-items-center" style="display: inline-block; visibility: hidden;">
-					<button class="btn btn-primary summary-button-lt"><span class="material-symbols-rounded">analytics</span></button>
-				</div>
 
-		<div class="col-12 d-flex justify-content-center align-items-center about-button-div">
-			<a href="./apie" class="about-button">APIE sudEdu</a>
-		</div>
-	</div>
 
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-		integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-		crossorigin="anonymous"></script>
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="../mental-arithmetic.js"></script>
 	<script src="../mental-arithmetic-combinations.js"></script>
-	<script src="../user-nav-menu.js"></script>
+    <script src="../main-nav-bar.js"></script>
 	<script src="matematika_options.js"></script>
 
 	<script>
@@ -566,26 +776,26 @@ body.popup-active {
 				} else {
 					controller.questionFrequency = 1;
 				}
+
+				controller.modeChoice4 = modeChoice4Element.value
 			}
 		}
 			localStorage.setItem('controller', JSON.stringify(controller))
-			redirectToIntermediate();
-	
+			if (controller.modeChoice4 === "C39") {
+				startQuestionsTimer()
+			} else if (controller.modeChoice4 = "C40") {
+				startQuestionsNumber()
+			}
 		}
 
 		let submitButtonElement = document.querySelector('.submit-button');
 		submitButtonElement.addEventListener("click", submitSelection);
-		let summaryButtonElement = document.querySelector('.summary-button-lt');
-		summaryButtonElement.addEventListener("click", redirectToSummary);
 
 		window.onload = function () {
 			document.querySelector('#template-container').removeAttribute('hidden');
 		};
 
 		window.onload = function () {
-			if (localStorage.getItem('controller') !== null) {
-				summaryButtonElement.style.visibility = "visible";
-			};
 			document.querySelector('#template-container').removeAttribute('hidden');
 		};
 
@@ -697,6 +907,81 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 //POPUP SCRIPT END
+
+const timerInputElement = document.querySelector('#timer-input');
+const questionNumberInputElement = document.querySelector('#question-number-input');
+
+function startQuestionsTimer () {
+	controller = JSON.parse(localStorage.getItem('controller'));
+	if (controller.taskId !== 0) {
+	controller.timerLimit = parseInt(controller.setTaskDuration);
+	} else {
+		controller.timerLimit = parseInt(timerInputElement.value);
+	}
+	if (!controller.timerLimit) {
+	controller.timerLimit = 5;
+	}
+
+	if (localStorage.getItem("remainingTime")) {
+	localStorage.removeItem("remainingTime");
+	}
+
+	if (localStorage.getItem("elapsedTime")) {
+	localStorage.removeItem("elapsedTime");
+	}
+
+	if (localStorage.getItem("startTime")) {
+	localStorage.removeItem("startTime");
+	}
+	controller.result = ['', '', '', '', '']
+	controller.currentMistakes = [];
+	controller.mistakesTracker = 0;
+	controller.answeredQuestionTracker = 0;
+	controller.equation = '';
+	controller.equation2 = '';
+	controller.randomSelection = [];
+	controller.questionsStopped = false;
+	if (controller.mode === "math") {
+		generateCombinations();
+	}
+	controller.tempTracking = true;
+	
+	localStorage.setItem('controller', JSON.stringify(controller));
+	redirectToQuestions();
+};
+
+function startQuestionsNumber () {
+
+	controller = JSON.parse(localStorage.getItem('controller'));
+	if (controller.taskId !== 0) { 
+	controller.questionNumber = parseInt(controller.setTaskDuration);
+	} else {
+			controller.questionNumber = parseInt(questionNumberInputElement.value);
+	}
+	if (!controller.questionNumber) {
+	controller.questionNumber = 20;
+	}
+	if (localStorage.getItem("startTime")) {
+	localStorage.removeItem("startTime");
+	}
+	controller.result = ['', '', '', '', '']
+		controller.currentMistakes = [];
+		controller.mistakesTracker = 0;
+		controller.answeredQuestionTracker = 0;
+		controller.equation = '';
+	controller.randomSelection = [];
+	controller.questionsStopped = false;
+	if (controller.mode === "math") {
+			generateCombinations();
+	}
+	controller.tempTracking = true;
+	if (controller.combinations.length > controller.questionNumber) {
+	controller.combinations = controller.combinations.sort(() => 0.5 - Math.random()).slice(0, controller.questionNumber);
+	}
+
+	localStorage.setItem('controller', JSON.stringify(controller));
+	redirectToQuestions();
+}
 	</script>
 </body>
 

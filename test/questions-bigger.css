@@ -5,13 +5,6 @@
   white-space: nowrap;
 }
 
-.btn:disabled {
-  background-color: #40c9a9;
-  border-color: #40c9a9;
-  color: black;
-  filter: grayscale(25%);
-}
-
 #task-saving-message {
   font-size: 1.35rem;
   text-align: center;
@@ -19,6 +12,13 @@
 
 #invisibleRow {
   display: block !important;
+}
+
+#content-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .equation,
@@ -51,7 +51,6 @@ textarea {
   display: none;
 }
 
-
 #fireworks-div {
   position: absolute;
   top: -65%;
@@ -75,54 +74,15 @@ textarea {
   z-index: 3;
 }
 
-.upper-line {
-  width: 56.7vw;
-}
-
 @media (max-width: 1400px) {
-  .middle-line {
-    width: 63vw;
-  }
 
-  .upper-line {
-    width: 56.7vw;
-  }
-
-  .question-submit-button {
-    width: 15vw;
-  }
-
-  .summary-button {
-    width: 15vw;
-  }
 }
 
 @media (max-width: 1200px) {
-  .question-submit-button {
-    width: 18vw;
-  }
 
-  .summary-button {
-    width: 18vw;
-  }
 }
 
 @media (max-width: 1000px) {
-  .middle-line {
-    width: 75vw;
-  }
-
-  .upper-line {
-    width: 67.5vw;
-  }
-
-  .question-submit-button {
-    width: 24vw;
-  }
-
-  .summary-button {
-    width: 24vw;
-  }
 }
 
 @media (max-width: 767px) {
@@ -145,24 +105,6 @@ textarea {
     padding-right: 2vw;
   }
 
-  .middle-line {
-    width: 80vw;
-  }
-
-  .upper-line {
-    width: 65vw;
-  }
-
-  .question-submit-button {
-    width: 24vw;
-    font-size: 1rem;
-  }
-
-  .summary-button {
-    width: 24vw;
-    font-size: 1rem;
-  }
-
   #fireworks-div {
     top: -45%;
     width: 200px;
@@ -170,7 +112,6 @@ textarea {
 }
 
 @media (max-width: 575px) {
-
   #fireworks-div {
     width: 200px;
     top: -65%;
@@ -205,32 +146,6 @@ textarea {
     justify-content: flex-start;
   }
 
-  .middle-line {
-    width: 95vw;
-  }
-
-  .upper-line {
-    width: 100%;
-  }
-
-  .question-submit-button {
-    width: 28vw;
-  }
-
-  .summary-button {
-    width: 28vw;
-  }
-
-  .reset-button {
-    height: 4.25rem;
-    width: 4.25rem;
-  }
-
-  .stop-button {
-    height: 4.25rem;
-    width: 4.25rem;
-  }
-
   .answer-field-div {
     padding-left: 5%;
     padding-right: 0;
@@ -242,10 +157,5 @@ textarea {
   /* CSS specific to iOS devices */
   .answer-input {
     height: auto;
-  }
-
-  body {
-    height: 80%;
-    align-items: flex-center;
   }
 }

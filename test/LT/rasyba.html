@@ -5,10 +5,12 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>sudedu - rašyba</title>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-	<link href="https://cdn.jsdelivr.net/npm/dragula@3.7.3/dist/dragula.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-	
+	<link rel="stylesheet" href="../main-nav-bar.css">
+    <link rel="stylesheet" type="text/css" href="../index.css">
+	<link id="questionsStyleSheet" rel="stylesheet" type="text/css" href="">
+	<link rel="stylesheet" type="text/css" href="../summary.css">
+
 	<!-- Google tag (gtag.js) -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-96Q83PW8XY"></script>
 	<script>
@@ -20,86 +22,141 @@
 	</script>	
 		
 	<style>
-	html {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		background-image: linear-gradient(to top, #ffbf9c, #ffbf92, #ffbf89, #ffbf7e, #ffc074);
-  		min-height: 100dvh;
-	}
+        * {
+          -webkit-user-select: none;
+          -webkit-tap-highlight-color: transparent;
+          user-select: none;
+          box-sizing: border-box;
+          -webkit-user-drag: none;
+          user-drag: none;
+        }
 
-	body {
-		font-family: 'Andika', sans-serif;
-		overscroll-behavior: none;
-		user-select: none;
-		-webkit-user-select: none;
-		-ms-user-select: none;
-		justify-content: center;
-		align-items: center;
-		display: flex;
-  		background: transparent;
-		width: 100vw;
-		margin: 0;
-	}
+      	html {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: linear-gradient(to top, #ffbf9c, #ffbf92, #ffbf89, #ffbf7e, #ffc074);
+            width: 100vw;
+            height: 100svh;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'SFpro', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .main-nav-mobile-btn {
+            width: auto;
+            height: auto;
+        }
+
+        .container {
+            flex: 1;
+            max-height: calc(100% - 80px - 16px - 16px);
+			height: calc(100% - 80px - 16px - 16px);
+            min-height: calc(100% - 80px - 16px - 16px);
+            width: calc(100% - (2 * 16px));
+            display: flex;
+            justify-content: start;
+            background: rgba(255, 255, 255, 0.08);
+            margin: 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+            flex-direction: column;
+            padding: 20px;
+        }
+
+		.container.keyboard-open {
+			max-height: 100%;
+			min-height: 100%;
+		}
 
 	:root {
 		--font-size: 26px; /* Set the base font size */
 	}
 
-	.container {
+	.field {
+		padding: 10px 20px;
+		counter-reset: div-counter;
+	}
+
+	#field-for-text {
+		width: 100%;
+		max-height: 100%;
+		overflow-y: auto;
+		background: rgba(255, 255, 255, 0.4);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		backdrop-filter: blur(10px);
+		border-radius: 25px;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		align-items: center;
-		width: 90%;
-  		min-height: 95dvh;
-		max-width: 95% !important;
 	}
 
-	.field {
-		color: gray;
-		background-color: #FAF1E6;
-		box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-		border-radius: 10px;
-
-		max-width: 90vw;
+	.field-for-text-outer-holder {
+		flex: 1;
+		overflow: hidden;
+		background: rgba(255, 255, 255, 0.15);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 25px;
 		padding: 15px;
-		padding-left: 30px;
-		padding-right: 30px;
-		counter-reset: div-counter;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	.sakiniai {
 		padding-top: 5px;
 		padding-bottom: 5px;
 		font-size: var(--font-size);
-		color: black;
+		color: #212529;
 		counter-increment: div-counter;
 		position: relative;
 		margin-bottom: 10px;
+		line-height: 1.5;
 	}
 
 	.sakiniai::before {
 		content: counter(div-counter) ". "; /* Display the number */
 	}
 
-	.question-input {
-		padding: 0;
-		border: none;
-		border-bottom: 2px solid black;
+	textarea {
+		resize: none;          /* disable manual resize */
+		overflow-x: auto;      /* allow horizontal scroll */
+		overflow-y: hidden;    /* hide vertical scroll */
+		white-space: nowrap;   /* prevent wrapping to next line */
+		line-height: var(--input-size-full);
+		padding: 0;  
+		scrollbar-width: none;    /* Firefox */    
+		outline: none;
+		border: none;             
+		border-bottom: 2px solid #212529;
+		color: #212529; 
+		min-width: 0.5ch;
 		background: transparent;
-		outline: none;        
-		font-size: var(--font-size);       
-  		color: black; 
-		width: 23ch;
-		min-width: 0.5ch; 
+		font-size: var(--font-size);  
+		height: calc(var(--font-size) * 1.211538462);
+		margin-bottom: calc(var(--font-size) / -4);
 		text-align: center;
-		max-width: 70px;  
+		font-family: 'SFpro', sans-serif;
 	}
 
+
 	input:disabled {
-  user-select: none; /* Prevent text selection */
-  pointer-events: none; /* Ensure the input is not interactable */
+		user-select: none; /* Prevent text selection */
+		pointer-events: none; /* Ensure the input is not interactable */
 	}	
 
 	.question-word-span.middle {
@@ -136,26 +193,107 @@
 		align-items: center;
 	}
 
-	.btn-primary {
-          font-size: 1rem;
-          align-items: center;
-          justify-content: center;
-          width: 11.5vw;
-          margin: 10px 0 10px 0;
-          background-color: #40c9a9;
-          border-color: #40c9a9;
-          color: black;
-          font-weight: bold;
-          box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-        }
+	.button-outer-holder {
+		display: flex;
+		justify-content: space-between;
+		padding-top: 15px;
+	}
 
-	.btn-primary:focus,
-	.btn-primary:active,
-	.btn-primary:hover,
-	.btn-primary:disabled {
-		background-color: #32ac93;
-		border-color: #32ac93;
-		color: black;
+	.check-next-question-row {
+		display: flex;
+		gap: 10px;
+	}
+
+	.check-help-show-answers-button-holder {
+		display: flex;
+		gap: 10px;
+	}
+
+	#stopButton,
+	#check-answers,
+	#next-question,
+	#show-answers,
+	.summary-button {
+		position: relative;
+		background: linear-gradient(135deg, #3288AC, #286D8A);
+		border: none;
+		/* border: 1px solid #286D8A; */
+		color: #F5F5F7;
+		display: flex;
+		align-items: center;
+		padding: 12px 18px 12px 18px;
+		border-radius: 20px;
+		cursor: pointer;
+		font-size: 1rem;
+		letter-spacing: 0.01em;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		margin: 0;
+		justify-content: center;
+		min-width: 10vw;
+	}
+
+	.summary-button {
+		margin-top: 15px;
+	}
+
+	#stopButton::before,
+	#check-answers::before,
+	#next-question::before,
+	#show-answers::before,
+	.summary-button::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+		border-radius: 20px;
+		pointer-events: none;
+		transition: background 0.3s ease;
+	}
+
+	#stopButton {
+		width: 6vw;
+		min-width: 75px;
+		height: 42.5px;
+		border-radius: 100px;
+		font-size: 2rem;
+	}
+
+	#stopButton::after,
+	#check-answers::after,
+	#next-question::after,
+	#show-answers::after,
+	.summary-button::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: 20px;
+		padding: 1px;
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+		-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+		-webkit-mask-composite: xor;
+		mask-composite: exclude;
+		pointer-events: none;
+	}
+
+	#stopButton:hover::before,
+	#check-answers:hover::before,
+	#next-question:hover::before,
+	#show-answers:hover::before,
+	.summary-button:hover::before {
+		background: rgba(255, 255, 255, 0.15);
+	}
+
+	#stopButton:focus,
+	#check-answers:focus,
+	#next-question:focus,
+	#show-answers:focus,
+	.summary-button:focus,
+	#stopButton:active,
+	#check-answers:active,
+	#next-question:active,
+	#show-answers:active,
+	.summary-button:active {
+		outline: none;
 	}
 
 	#next-question {
@@ -168,13 +306,6 @@
 		font-size: calc(var(--font-size)*0.8);
 	}
 
-	#warning {
-		font-size: 18px;
-		padding-top: 20px;
-	}
-
-	
-
 .reset-button-div {
   display: flex;
   justify-content: flex-end;
@@ -186,12 +317,6 @@
   justify-content: flex-start;
   z-index: 3;
 }
-
-
-
-
-
-
 
 .reset-button:hover,
 .reset-button:active,
@@ -209,12 +334,117 @@
   color: black;
 }
 
+#restart-reset-button-row {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
 .col-2 {
 	padding: 0;
 }
 
+.tracker-timer-holder {
+	padding: 0 15px;
+	margin-bottom: 15px;
+}
+
 .trackers-row {
-	padding-bottom: 10px;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.trackers-holder,
+.timer-holder {
+	display: flex;
+	flex: 1;
+	white-space: nowrap;
+	align-items: center;
+}
+
+.timer-holder {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: end;
+	gap: 5px;
+}
+
+#mistake-tracker,
+#answer-tracker,
+#timer {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+#answer-tracker {
+    margin-bottom: 5px;
+}
+
+.help-toggle-holder {
+	display: flex;
+	align-items: center;
+}
+
+.switch {
+	display: flex;
+}
+
+#help-toggle {
+	height: 0 !important;
+	width: 0 !important;
+	visibility: hidden;
+	margin: 0 !important;
+}
+
+#help-toggle + span {
+	cursor: pointer;
+	width: 96px;
+	height: 30px;
+	background: grey;
+	display: inline-block;
+	border-radius: 30px;
+	position: relative;
+	vertical-align: middle;
+	transition: 0.3s;
+}
+
+#help-toggle + span:after {
+	content: '';
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	width: 24px;
+	height: 24px;
+	background: #F5F5F7;
+	border-radius: 50%;
+	transition: 0.3s;
+}
+
+#help-toggle:checked + span:after {
+	left: calc(100% - 5px);
+	transform: translateX(-100%);
+}
+
+.switch-text {
+	color: #F5F5F7;
+	padding-right: 7px;
+}
+
+#help-toggle:checked + span {
+	background: linear-gradient(135deg, #3288AC, #286D8A);
+	width: 60px;
+}
+
+#help-toggle:checked + .switch-slider .switch-text {
+	display: none;
+}
+
+#help-toggle + .switch-slider {
+	display: flex !important;
+	justify-content: end;
+	align-items: center;
 }
 
 #field-for-final-message {
@@ -227,10 +457,6 @@
     justify-content: center;
 }
 
-.summary-button {
-	min-width: 120px;
-}
-
 #fireworks-div {
   position: absolute;
   bottom: -50%;
@@ -238,8 +464,24 @@
   width: 250px;
 }
 
+.grammar-view-selector {
+	position: relative;
+	border: none;
+	border-radius: 4px;
+	background-color: transparent;
+	text-align: center;
+	font-weight: bold;
+	z-index: 10;
+	pointer-events: auto;
+	font-size: 1.25rem;
+}
+
+.material-symbols-rounded {
+    font-size: 2rem;
+    font-weight: 300;
+}
+
 @media (max-width: 767px) {
-	#help-button,
 	#next-question,
 	#show-answers {
 		width: 20vw;
@@ -250,11 +492,16 @@
 	}
 
 	.container {
-		height: 90%;
 		width: 100%;
-		margin-left: 0;
-		margin-right: 0;
+		max-height: calc(100% - 80px);
+		min-height: calc(100% - 80px);
+		margin: 0;
+		background: transparent;
+		border: none;
+		border-radius: 0;
+		padding: 15px;
 	}
+
 	:root {
         --font-size: 22px; /* Smaller font size for tablets */
     }
@@ -270,7 +517,6 @@
 }
 
 @media (max-width: 575px) {
-	#help-button,
 	#check-answers,
 	#show-answers,
 	#next-question {
@@ -297,12 +543,38 @@
     	width: 150px;
 		bottom: 60%;
   	}
+
+	.field-for-text-outer-holder {
+		padding: 0;
+		border: none;
+	}
+
+	#field-for-text {
+		height: 100%;
+		background: transparent;
+    	border: none;
+	}
+
+	.grammar-view-selector {
+		font-size: 1rem;
+	}
 }
 
 	@media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)  {
 		:root {
         	--font-size: 32px; /* Smaller font size for tablets */
     	}
+
+		.container {
+          width: 100%;
+          max-height: calc(100% - 100px);
+          min-height: calc(100% - 100px);
+          margin: 0;
+          background: transparent;
+          border: none;
+          border-radius: 0;
+          padding: 30px;
+      }
 		
 		.stop-button {
 			height: 6rem;
@@ -315,7 +587,15 @@
 		}
 
 		.material-symbols-rounded {
-			font-size: 4.5rem;
+			font-size: 2.75rem;
+		}
+
+		#stopButton {
+		  width: 10vw;
+          min-width: 90px;
+          height: 51.5px;
+          border-radius: 100px;
+          font-size: 2rem;
 		}
 
 		.summary-button {
@@ -330,8 +610,13 @@
 			font-size: 2rem;
 		}
 
+		#mistake-tracker,
+		#answer-tracker,
+		#timer {
+          font-size: 1.5rem;
+        }
+
 		#check-answers,
-		#help-button,
 		#next-question {
 			font-size: 1.5rem;
 			width: 25vw;
@@ -340,92 +625,177 @@
 		#task-saving-message {
 			font-size: 1.75rem
 		}
+
+		table * {
+			font-size: 1.5rem;
+		}
+
+		.grammar-view-selector {
+			font-size: 1.5rem;
+		}
+
+		th,
+		td {
+			background-color: rgba(255, 255, 255, 0.2);
+		}
+
+		#help-toggle + span {
+			width: 132px;
+			height: 36px;
+		}
+
+		#help-toggle + span:after {
+			content: '';
+			position: absolute;
+			top: 4px;
+			left: 4px;
+			width: 28px;
+			height: 28px;
+			background: #F5F5F7;
+			border-radius: 50%;
+			transition: 0.3s;
+		}
+
+		#help-toggle:checked + span:after {
+			left: calc(100% - 5px);
+			transform: translateX(-100%);
+		}
+
+		.switch-text {
+			color: #F5F5F7;
+			padding-right: 10px;
+			font-size: 1.45rem;
+		}
+
+		#help-toggle:checked + span {
+			background: linear-gradient(135deg, #3288AC, #286D8A);
+			width: 70px;
+		}
+
 	}
 	</style>
 </head>
 
 <body>
-	<div class="container" style="display: flex; flex-direction: column; justify-content: space-between;">
-		<div class="row justify-content-center align-items-center trackers-row">
-			<div class="col-6 d-flex justify-content-start align-items-left">
-				<div class="trackers">
+	<div id="customConfirmModal" class="modal">
+		<div class="modal-content">
+			<p id="customModalText"></p>
+			<div class="modal-buttons">
+			<button id="customConfirmYes" class="btn-confirm">Taip</button>
+			<button id="customConfirmNo" class="btn-cancel">Ne</button>
+			</div>
+		</div>
+	</div>
+
+	<nav class="main-navbar" id="mainNavbar">
+		<div class="main-nav-container">
+			<!-- Logo -->
+			<a href="#" class="main-nav-logo">
+				<div class="main-nav-logo-icon">
+					<img id="sudedu-main-nav-bar-logo" src="../images/sudedu_logo.png" alt="sudEdu">
+				</div>
+			</a>
+
+			<!-- Desktop Navigation -->
+			<div class="main-nav-links">
+				<a href="index.html" class="main-nav-back-btn">
+						<span class="main-nav-back-icon">←</span>
+						<div class="main-nav-back-text">
+							<span class="main-nav-back-label">Grįžti į</span>
+							<span class="main-nav-back-title">Padžią</span>
+						</div>
+					</a>
+			</div>
+
+						<!-- Desktop Navigation -->
+			<div class="main-nav-mobile-btn">
+				<a href="index.html" class="main-nav-back-btn">
+						<span class="main-nav-back-icon">←</span>
+						<div class="main-nav-back-text">
+							<span class="main-nav-back-label">Grįžti į</span>
+							<span class="main-nav-back-title">Padžią</span>
+						</div>
+					</a>
+			</div>
+		</div>
+	</nav>
+
+		<div class="container" style="display: flex; flex-direction: column; justify-content: space-between;">
+				<div class="tracker-timer-holder">
+		<div class="trackers-row">
+			<div class="trackers-holder">
+			<div class="trackers">
 					<div>
 						<h3 id="answer-tracker"></h3>
 					</div>
 					<div>
 						<h3 id="mistake-tracker">Teisingai: 0/0</h3>
 					</div>
-				</div>
+			</div>
 		</div>
-		<div class="col-6 d-flex justify-content-end align-items-left">
-			<h3>
-				<div id="timer"></div>
-			</h3>
+		<div class="timer-holder">
+			<div id="timer"></div>
+
+			<div class="help-toggle-holder">
+				<label class="switch"><input type="checkbox" id="help-toggle" class="help-toggle" checked>
+					<span class="switch-slider">
+						<span class="switch-text switch-text-object">
+							Pagalba
+						</span>
+					</span>
+				</label>
+			</div>
 		</div>
 		</div>
-		<div class="row justify-content-center align-items-center">
-			<div class="col-12 justify-content-center align-items-center">
-				<div id="field-for-text" style="position: relative;" class="field">
-				<div id="fireworks-div" class="image-container fireworks-div"></div>
-				<div id="field-for-sentences"></div>
-				<div id="field-for-final-message"></div>
-				<div id="task-saving-message"></div>
-				<div id="restart-reset-button-row" class="row justify-content-center align-items-center" style="display: none;">
-					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
-						<div id="reset-mistake-buttons" class="col-12 d-flex justify-content-center align-items-center">
-							<div class="col-12 d-flex position-relative justify-content-center align-items-center">
-								<div class="d-flex justify-content-end align-items-center summary-div">
-									<button class="btn btn-primary summary-button">Klaidos</button>
-								</div>
+		</div>
+		
 	
+		<div class="field-for-text-outer-holder">
+			<div id="field-for-text" style="position: relative;" class="field">
+			<div id="fireworks-div" class="image-container fireworks-div"></div>
+			<div id="field-for-sentences"></div>
+			<div id="field-for-final-message"></div>
+			<div id="task-saving-message"></div>
+			<div id="restart-reset-button-row" class="row justify-content-center align-items-center" style="display: none;">
+				<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
+					<div id="reset-mistake-buttons" class="col-12 d-flex justify-content-center align-items-center">
+						<div class="col-12 d-flex position-relative justify-content-center align-items-center">
+							<div class="d-flex justify-content-end align-items-center summary-div">
+								<button class="summary-button">Klaidos</button>
 							</div>
+
 						</div>
 					</div>
 				</div>
 			</div>
-			</div>
-		</div>
-		<div class="row justify-content-center align-items-center">
-      <div class="row justify-content-center align-items-center">
-        <div class="col-12 d-flex justify-content-end align-items-center">
-        <div id="warning" style="visibility: hidden;">įrašyk visas raides</div>
-      </div>
-      </div>
-		<div class="row justify-content-center align-items-center check-next-question-row">
-			<div class="col-6 d-flex justify-content-start align-items-left">
-				<button id="help-button" class="btn btn-primary">Pagalba</button>
-			</div>
-			<div class="col-6 d-flex justify-content-end align-items-center">
-				<button id="check-answers" class="btn btn-primary">Tikrinti</button>
-				<button id="next-question" class="btn btn-primary">Toliau</button>
-			</div>
-		</div>
-		<div class="row justify-content-center align-items-center">
-			<div class="col-12 d-flex justify-content-end align-items-center">
-        <button id="show-answers" class="btn btn-primary" style="visibility: hidden;">Atsakymai</button>
 		</div>
 		</div>
 
-		<div class="row justify-content-center align-items-center">
-			<div class="row d-flex d-flex align-items-end justify-content-center stop-reset-button-div">
-				<div class="col-2">
-					<div class="stop-button-div">
-						<button id="stopButton" class="btn btn-primary stop-button"><span id="stop-button-span"
-								class="material-symbols-rounded">close</span></button>
-					</div>
-				</div>
-				<div class="col-8"></div>
-				<div class="col-2">
-					<div class="reset-button-div">
-						<button class="btn btn-primary reset-button"><span class="material-symbols-rounded">roofing</span></button>
-					</div>
+		<div class="button-outer-holder">
+
+			<div class="stop-reset-button-div">
+				<div class="stop-button-div">
+					<button id="stopButton" class="stop-button"><span id="stop-button-span"
+							class="material-symbols-rounded">close</span></button>
 				</div>
 			</div>
-		</div>
+
+			<div class="check-help-show-answers-button-holder">
+			<div class="row justify-content-center align-items-center">
+				<div class="col-12 d-flex justify-content-end align-items-center">
+			<button id="show-answers" class="" style="visibility: hidden;">Atsakymai</button>
+			</div>
+			</div>
+			<div class="check-next-question-row">
+			<div class="check-button-holder">
+				<button id="check-answers" class="">Tikrinti</button>
+				<button id="next-question" class="">Toliau</button>
+			</div>
+			</div>
+			</div>
 	</div>
 	</div>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/dragula@3.7.3/dist/dragula.min.js"></script>
+  	<script src="../main-nav-bar.js"></script>
 	<script src="../parameter_dictionary.js"></script>
 	<script src="../mental-arithmetic.js"></script>
 
@@ -438,6 +808,8 @@ window.onload = function () {
       controller = JSON.parse(localStorage.getItem('controller')) 
       if (controller.modeChoice1 !== "C50") {
 			window.location.href = "./";
+		} else {
+			styleGrammarPage();
 		}
     }
   }
@@ -473,6 +845,7 @@ window.onload = function () {
     	let currentAnswerAttempts = 0;
 		const maximumQuestionFrequencyPerWord = controller.questionFrequency;
 		let allowAdjacentEndlessWords;
+		let allModified = false;
 		if (controller.modeChoice5 === "C73") {
 			allowAdjacentEndlessWords = false;
 		} else if (controller.modeChoice5 === "C74") {
@@ -952,7 +1325,7 @@ window.onload = function () {
 
 												// Join the results into a single string separated by commas
 												const valuesToShowString = valuesToShow.join(', ');
-												formattedWord = [`${beforePunctuation}<span class="question-word-span end" style="display: inline; white-space: nowrap;">${wordInfo["gal-c"][0][0][0]}<input type="text" autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input end" maxlength="6"> <span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
+												formattedWord = [`${beforePunctuation}<span class="question-word-span end" style="display: inline; white-space: nowrap;">${wordInfo["gal-c"][0][0][0]}<textarea autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input end" maxlength="6"></textarea> <span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
 												atsakymai[`id-${questionId}`] = {};
 												atsakymai[`id-${questionId}`]["klausimas"] = [wordInfo["gal-c"][0][0][0], '']
 												atsakymai[`id-${questionId}`]["atsakymas"] = [wordInfo["gal-c"][0][1]];
@@ -994,9 +1367,9 @@ window.onload = function () {
 														}
 														const valuesToShowString = valuesToShow.join('/');
 														if (wordsToBeUsed[word] === "fsc-vow") {
-															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<input type="text" autocapitalize="none" autocomplete="off" maxlength="6" id="id-${questionId}" class="question-input middle">${randomElement[2][0]}<span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
+															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<textarea autocapitalize="none" autocomplete="off" maxlength="6" id="id-${questionId}" class="question-input middle"></textarea>${randomElement[2][0]}<span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
 														} else if (wordsToBeUsed[word] === "fsc-con" ) {
-															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<input type="text" autocapitalize="none" autocomplete="off" maxlength="6" id="id-${questionId}" class="question-input middle">${randomElement[2][0]}<span class="pagalba-span-perm">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];															
+															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<textarea autocapitalize="none" autocomplete="off" maxlength="6" id="id-${questionId}" class="question-input middle"></textarea>${randomElement[2][0]}<span class="pagalba-span-perm">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];															
 														}
 														atsakymai[`id-${questionId}`] = {};
 														atsakymai[`id-${questionId}`]["klausimas"] = [randomElement[0][0], randomElement[2][0]]
@@ -1010,7 +1383,7 @@ window.onload = function () {
 												if (combinations && combinations.length > 0) {
 														let randomIndex = Math.floor(Math.random() * combinations.length);
 														let randomElement = combinations[randomIndex];
-														formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<input type="text" autocapitalize="none" autocomplete="off" maxlength="6" id="id-${questionId}" class="question-input middle"><span class="pagalba-div"></span>${randomElement[2][0]}${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
+														formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<textarea autocapitalize="none" autocomplete="off" maxlength="6" id="id-${questionId}" class="question-input middle"></textarea><span class="pagalba-div"></span>${randomElement[2][0]}${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
 														atsakymai[`id-${questionId}`] = {};
 														atsakymai[`id-${questionId}`]["klausimas"] = [randomElement[0][0], randomElement[2][0]]
 														atsakymai[`id-${questionId}`]["atsakymas"] = [randomElement[1]];
@@ -1080,8 +1453,9 @@ window.onload = function () {
 			answerTrackerElement.innerHTML = `Atlikta: ${totalSentencesCompleted}/${controller.questionNumber}`;
 		}
 
-
 		function displaySentences() {
+			styleGrammarPage();
+			document.getElementById('help-toggle').checked = true;
 			allAnswersCorrect = false;
 			currentAnswerAttempts = 0;
 			document.getElementById('check-answers').disabled = false;
@@ -1153,21 +1527,31 @@ window.onload = function () {
 			document.querySelectorAll('.question-input').forEach(input => {
 				// Add event listener to remove 'wrong-answer' class on focus
 				input.addEventListener('focus', () => {
+					if (input.classList.contains('wrong-answer')) {
+						input.value = ''; // clear the input
+						resizeInput(input); // keep width consistent
+					}
 					input.classList.remove('wrong-answer');
 				});
-					});
+			});
 
 			setupDynamicListeners();
 
 		}
 
 		function toggleHelpButton() {
-			const helpButton = document.getElementById("help-button");
+			const helpToggle = document.getElementById("help-toggle");
+			if (helpToggle.checked) {
+				helpToggle.checked = false;
+			} else {
+				helpToggle.checked = true;
+			}
+	
 			const pagalbaSpans = document.querySelectorAll(".pagalba-span");
 
 			let isAnySpanNonEmpty = Array.from(pagalbaSpans).some(span => span.innerHTML.trim() !== "");
 
-			helpButton.style.visibility = isAnySpanNonEmpty ? "visible" : "hidden";
+			helpToggle.style.disabled = isAnySpanNonEmpty ? "visible" : "hidden";
 		}
 
 
@@ -1195,35 +1579,35 @@ window.onload = function () {
 		initiateTheProgram();
 
 		function resizeInput(inputElement) {
-    // Create a temporary span element to measure the width of the input text
-    const span = document.createElement('span');
-    const style = window.getComputedStyle(inputElement);
+			// Create a temporary span element to measure the width of the input text
+			const span = document.createElement('span');
+			const style = window.getComputedStyle(inputElement);
 
-    // Set the span to match the input's styling (same font, padding, etc.)
-    span.style.font = style.font;
-    span.style.padding = style.padding;
-    span.style.margin = style.margin;
-    span.style.whiteSpace = 'nowrap'; // Make sure the text does not wrap
+			// Set the span to match the input's styling (same font, padding, etc.)
+			span.style.font = style.font;
+			span.style.padding = style.padding;
+			span.style.margin = style.margin;
+			span.style.whiteSpace = 'nowrap'; // Make sure the text does not wrap
 
-    // Set the span's text to the input's current value
-    span.textContent = inputElement.value || inputElement.placeholder;
+			// Set the span's text to the input's current value
+			span.textContent = inputElement.value || inputElement.placeholder;
 
-    // Append the span to the document (it will be invisible)
-    document.body.appendChild(span);
+			// Append the span to the document (it will be invisible)
+			document.body.appendChild(span);
 
-    // Get the width of the span and update the input width
-    const width = span.getBoundingClientRect().width;
+			// Get the width of the span and update the input width
+			const width = span.getBoundingClientRect().width;
 
-    // Remove the temporary span from the document
-    document.body.removeChild(span);
+			// Remove the temporary span from the document
+			document.body.removeChild(span);
 
-		
-    if (inputElement.value === '') {
-      inputElement.style.width = `1.5ch`; // Dynamic width based on placeholder
-    } else {
-      inputElement.style.width = `${width+0.25}px`;
-    }
-  }
+				
+			if (inputElement.value === '') {
+				inputElement.style.width = `1.5ch`; // Dynamic width based on placeholder
+			} else {
+				inputElement.style.width = `${width}px`;
+			}
+	}
 
 // Function to set up listeners for all inputs
 function setupDynamicListeners() {
@@ -1234,13 +1618,11 @@ function setupDynamicListeners() {
         input.addEventListener('input', () => {
             // Recheck inputs with 'wrong-answer' class
             const wrongInputs = document.querySelectorAll('.wrong-answer');
-            const modified = [...wrongInputs].some(wrongInput => wrongInput.value.trim() !== "");
-            
-            // Re-enable the button if any wrong answer has been modified
-            checkAnswersButton.disabled = modified;
-						if (!modified) {
-						warning.style.visibility = "hidden";
-						}
+			if (wrongInputs && wrongInputs.length > 0) {
+            	allModified = false;
+			} else {
+				allModified = true;
+			}
         });
     });
 }
@@ -1262,87 +1644,92 @@ function recordGrammarMistakes (inputId, userInput) {
 function checkAnswers() {
     const inputs = document.querySelectorAll('.question-input');
     const NumberOfQuestionsInRound = inputs.length;
-    const warning = document.getElementById('warning');
     const nextQuestionButton = document.getElementById('next-question');
     const checkAnswersButton = document.getElementById('check-answers');
-    warning.style.visibility = "hidden";
     let answersCorrect = true;
     let allFilled = true; // Check if all fields are filled
-
-    checkAnswersButton.disabled = true; // Disable the button initially
 
     inputs.forEach(input => {
         let inputValue = input.value.trim().toLowerCase();
         if (inputValue === "") {
             allFilled = false; // Mark as not all filled
-            warning.innerHTML = "įrašyk visas raides"
-            warning.style.visibility = "visible";
             return;
         }
     });
 
-    if (allFilled) {
-        inputs.forEach(input => {
-            const inputId = input.id;
-            let inputValue = input.value.trim();
+	if (!allFilled) {
+		messageToTheUser("Įrašyk visas raides!");
+		return
+	}
 
-            // Strip input value of spaces before comparing with the dictionary
-            inputValue = inputValue.replace(/\s+/g, '');
+	if (!allModified) {
+		messageToTheUser("Pataisyk visas klaidas!")
+		return
+	}
 
-            // Compare the stripped value with the corresponding value from atsakymai
-			if (atsakymai[inputId] && atsakymai[inputId]["atsakymas"] && atsakymai[inputId]["atsakymas"].some(answerArray => {
-				return answerArray.some(answer => inputValue === answer.replace(/\s+/g, ''));
-			})) {
-				input.classList.add('correct-answer');
-				input.classList.remove('wrong-answer');
-				input.disabled = true;
-				if (firstTimeChecking) {
-					totalCorrectAnswers++;
-				}
-			} else {
-				input.classList.add('wrong-answer');
-				input.classList.remove('correct-answer');
-				answersCorrect = false;
-				controller.mistakesTracker+=1;
-				recordGrammarMistakes(input.id, inputValue);
+	inputs.forEach(input => {
+		const inputId = input.id;
+		let inputValue = input.value.trim();
+
+		// Strip input value of spaces before comparing with the dictionary
+		inputValue = inputValue.replace(/\s+/g, '');
+
+		// Compare the stripped value with the corresponding value from atsakymai
+		if (atsakymai[inputId] && atsakymai[inputId]["atsakymas"] && atsakymai[inputId]["atsakymas"].some(answerArray => {
+			return answerArray.some(answer => inputValue === answer.replace(/\s+/g, ''));
+		})) {
+			input.classList.add('correct-answer');
+			input.classList.remove('wrong-answer');
+			input.disabled = true;
+			if (firstTimeChecking) {
+				totalCorrectAnswers++;
 			}
+		} else {
+			input.classList.add('wrong-answer');
+			input.classList.remove('correct-answer');
+			answersCorrect = false;
+			controller.mistakesTracker+=1;
+			recordGrammarMistakes(input.id, inputValue);
+		}
 
 
-            // Show "Next Question" button only if all answers are correct
-            nextQuestionButton.style.display = answersCorrect ? "flex" : "none";
-            checkAnswersButton.style.display = answersCorrect ? "none" : "flex";
-        });
+		// Show "Next Question" button only if all answers are correct
+		nextQuestionButton.style.display = answersCorrect ? "flex" : "none";
+		checkAnswersButton.style.display = answersCorrect ? "none" : "flex";
+	});
 
-        if (firstTimeChecking) {
-            controller.answeredQuestionTracker += NumberOfQuestionsInRound;
-			localStorage.setItem('controller', JSON.stringify(controller));
-            document.getElementById('mistake-tracker').innerHTML = `Teisingai: ${totalCorrectAnswers}/${controller.answeredQuestionTracker}`;
-			localStorage.setItem('controller', JSON.stringify(controller));
-        }
+	if (firstTimeChecking) {
+		controller.answeredQuestionTracker += NumberOfQuestionsInRound;
+		localStorage.setItem('controller', JSON.stringify(controller));
+		document.getElementById('mistake-tracker').innerHTML = `Teisingai: ${totalCorrectAnswers}/${controller.answeredQuestionTracker}`;
+		localStorage.setItem('controller', JSON.stringify(controller));
+	}
 
-        if (answersCorrect) {
-            allAnswersCorrect = true;
-			if (controller.modeChoice4 === "C40") {
-				answerTrackerElement.innerHTML = `Atlikta: ${totalSentencesCompleted}/${controller.questionNumber}`;
-			}
+	if (answersCorrect) {
+		allAnswersCorrect = true;
+		if (controller.modeChoice4 === "C40") {
+			answerTrackerElement.innerHTML = `Atlikta: ${totalSentencesCompleted}/${controller.questionNumber}`;
+		}
 
-			controller.correctAnswerTracker = totalCorrectAnswers
+		controller.correctAnswerTracker = totalCorrectAnswers
 
-			controller.randomSelection = [];
-			localStorage.setItem("controller", JSON.stringify(controller));
+		controller.randomSelection = [];
+		localStorage.setItem("controller", JSON.stringify(controller));
 
-        } else {
-            currentAnswerAttempts += 1;
-            warning.innerHTML = "pataisyk visas klaidas";
-            warning.style.visibility = "visible";
-        }
+	} else {
+		currentAnswerAttempts += 1;
+		allModified = false;
+	}
 
-        firstTimeChecking = false;
+	firstTimeChecking = false;
 
-        if (currentAnswerAttempts >= 3) {
-            document.getElementById('show-answers').style.visibility = "visible";
-        }
-    }
+	if (currentAnswerAttempts >= 3) {
+		if (!answersCorrect) {
+			document.getElementById('show-answers').style.visibility = "visible";
+		} else {
+			document.getElementById('show-answers').style.visibility = "hidden";
+		}
+	}
 }
 
 function showAnswers() {
@@ -1359,6 +1746,8 @@ function showAnswers() {
       resizeInput(input);
     }
   });
+
+  allModified = true;
   checkAnswers();
 }
 
@@ -1400,26 +1789,29 @@ function helpToggle() {
 			}
 
 			function stopQuestions() {
-				document.getElementById('warning').style.visibility = "hidden";
 				if (stopButtonSpanElement.innerHTML === "close") {
+					showCustomConfirm("Ar tikrai nori sustabdyti užduotį?", stopQuestionsCloseActions);
 
-					controller.questionsStopped = true;
-					clearInterval(timerInterval);
-					stopButtonSpanElement.innerHTML = "refresh";
-					document.getElementById('check-answers').disabled = true;
-					document.getElementById('check-answers').style.display = "inline-block";
-					document.getElementById('help-button').disabled = true;
-					document.getElementById('next-question').style.display = "none";
-					document.getElementById('show-answers').style.visibility = "hidden";
+					function stopQuestionsCloseActions () {
+						controller.questionsStopped = true;
+						clearInterval(timerInterval);
+						stopButtonSpanElement.innerHTML = "refresh";
+						document.getElementById('check-answers').disabled = true;
+						document.getElementById('check-answers').style.display = "inline-block";
+						document.getElementById('help-toggle').disabled = true;
+						document.getElementById('next-question').style.display = "none";
+						document.getElementById('show-answers').style.visibility = "hidden";
+						document.querySelector('.help-toggle-holder').style.visibility = "hidden";
 
-					document.querySelectorAll('.question-input').forEach(input => {
-						input.disabled = true;
-					});
+						document.querySelectorAll('.question-input').forEach(input => {
+							input.disabled = true;
+						});
 
-					resetMistakeButtonsElement.style.display = "flex";
-					localStorage.setItem("elapsedTime", timerDisplay.textContent);
-					localStorage.setItem('controller', JSON.stringify(controller))
-					formatFinalMessageForGrammar();
+						resetMistakeButtonsElement.style.display = "flex";
+						localStorage.setItem("elapsedTime", timerDisplay.textContent);
+						localStorage.setItem('controller', JSON.stringify(controller))
+						formatFinalMessageForGrammar();
+					}
 				} else if (stopButtonSpanElement.innerHTML === "refresh") {
 					stopButtonSpanElement.innerHTML = "close";
 					controller.questionsStopped = false;
@@ -1430,15 +1822,17 @@ function helpToggle() {
 					localStorage.removeItem("remainingTime");
 					};
 					document.getElementById('check-answers').disabled = false;
-					document.getElementById('help-button').disabled = false;
+					document.getElementById('help-toggle').disabled = false;
 
 					document.getElementById('check-answers').style.display = "inline-block";
 					document.getElementById('check-answers').style.visibility = "visible";
-					document.getElementById('help-button').style.visibility = "visible";
+					document.querySelector('.help-toggle-holder').style.visibility = "visible";
 
 					document.querySelectorAll('.question-input').forEach(input => {
 						input.disabled = false;
 					});
+
+					window.mistakeRecords = {};
 
 					document.getElementById('mistake-tracker').innerHTML = `Teisingai: 0/0`;
 					totalSentencesCompleted = 0;
@@ -1462,7 +1856,7 @@ function helpToggle() {
 			}
 
 			function focusFirstInput() {
-				const inputs = document.querySelectorAll('input[type="text"].question-input');
+				const inputs = document.querySelectorAll('.question-input');
 				if (inputs.length > 0) {
 					inputs[0].focus();
 				}
@@ -1477,7 +1871,7 @@ function enableEnterNavigation() {
 function handleEnterKey(event) {
     if (event.key === 'Enter') {
         event.preventDefault(); // Prevent default behavior like form submission
-        const inputs = Array.from(document.querySelectorAll('input[type="text"].question-input'));
+        const inputs = Array.from(document.querySelectorAll('.question-input'));
         const currentIndex = inputs.indexOf(document.activeElement);
 
         if (currentIndex !== -1 && currentIndex < inputs.length - 1) {
@@ -1509,13 +1903,10 @@ nextQuestionButton = document.getElementById('next-question')
 document.getElementById('check-answers').addEventListener('click', checkAnswers);
 document.getElementById('next-question').addEventListener('click', nextQuestion);
 document.getElementById('show-answers').addEventListener('click', showAnswers);
-document.getElementById('help-button').addEventListener('click', helpToggle);
+document.getElementById('help-toggle').addEventListener('change', helpToggle);
 
 const stopButtonElement = document.querySelector('.stop-button');
 stopButtonElement.addEventListener("click", stopQuestions)
-
-const resetButtonElement = document.querySelector('.reset-button');
-resetButtonElement.addEventListener("click", redirectToIndex);
 
 if (controller.questionsStopped) {
 	if (localStorage.getItem("elapsedTime") !== null) {
@@ -1536,19 +1927,262 @@ window.addEventListener("beforeunload", () => {
 });
 
 const mistakesButtonElement = document.querySelector('.summary-button');
-	mistakesButtonElement.addEventListener("click", () => {
-		localStorage.setItem("elapsedTime", timerDisplay.textContent);
-	})
-	mistakesButtonElement.addEventListener("click", redirectToSummary);
+mistakesButtonElement.addEventListener("click", () => {
+	localStorage.setItem("elapsedTime", timerDisplay.textContent);
+})
+mistakesButtonElement.addEventListener("click", displaylatestMistakes);
 
-	mistakesButtonElement.addEventListener("click", () => {
-		localStorage.setItem("elapsedTime", timerDisplay.textContent);
-	})
-	mistakesButtonElement.addEventListener("click", redirectToSummary);
+
+function displaylatestMistakes() {
+	document.querySelector("#restart-reset-button-row").style.display = "none"
+	document.querySelector("#field-for-final-message").style.display = "flex";
+	document.querySelector("#field-for-final-message").style.height = "100%";
+	document.querySelector("#field-for-final-message").innerHTML = `
+		<div id="frequent-mistakes-container" style="flex-direction: column; justify-content: space-between;">
+			<div id="mistakes-summary-math">
+			<div class="summary-table-frequent-mistakes-outer-div">
+				<div id="summary-table-outer-div" class="">
+					<div class="table-container" id="table-container-math">
+						<div id="summary-table-frequent-mistakes"></div>
+					</div>
+				</div>
+				</div>
+			</div>
+		</div>
+	`
+	
+	generateSummaryTable('current', null, null, "summary-table-frequent-mistakes");
+
+	if (
+		document.querySelector("#summary-table-frequent-mistakes") &&
+		document.querySelector("#summary-table-frequent-mistakes").innerHTML === "Klaidų nėra!"
+	) {
+		document.getElementById('field-for-final-message').style.height = "auto";
+		document.querySelector(".table-container").style.justifyContent = "center";
+	} else {
+		document.getElementById('field-for-final-message').style.height = "100%";
+		document.querySelector(".table-container").style.justifyContent = "start";
+	}
+
+	document.querySelector("#restart-reset-button-row").style.display = "none";
+}
+
+
+function detectMobileKeyboard() {
+  // Check if device is mobile
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                   ('ontouchstart' in window) ||
+                   (navigator.maxTouchPoints > 0);
+  
+  if (!isMobile) {
+    return; // Don't set up listeners on desktop
+  }
+  
+  let isKeyboardOpen = false;
+  let lastHeight = window.innerHeight;
+  let lastVisualHeight = window.visualViewport?.height || window.innerHeight;
+  let resizeTimeout = null;
+  
+  // Threshold: 150px works well for most devices
+  // Mobile keyboards are typically 250-350px tall
+  const THRESHOLD = 150;
+  
+  function handleVisualViewportResize() {
+    clearTimeout(resizeTimeout);
+    
+    resizeTimeout = setTimeout(() => {
+      const currentHeight = window.visualViewport.height;
+      const heightDiff = lastVisualHeight - currentHeight;
+      
+      // Keyboard likely opened
+      if (heightDiff > THRESHOLD && !isKeyboardOpen) {
+        isKeyboardOpen = true;
+        if (typeof onShow === 'function') {
+          onShow({
+            keyboardHeight: heightDiff,
+            viewportHeight: currentHeight,
+            method: 'visualViewport'
+          });
+        }
+      }
+      // Keyboard likely closed
+      else if (heightDiff < -THRESHOLD && isKeyboardOpen) {
+        isKeyboardOpen = false;
+        if (typeof onHide === 'function') {
+          onHide({
+            viewportHeight: currentHeight,
+            method: 'visualViewport'
+          });
+        }
+      }
+      
+      lastVisualHeight = currentHeight;
+    }, 100);
+  }
+  
+  function handleWindowResize() {
+    clearTimeout(resizeTimeout);
+    
+    resizeTimeout = setTimeout(() => {
+      const currentHeight = window.innerHeight;
+      const heightDiff = lastHeight - currentHeight;
+      
+      // Only trigger if Visual Viewport API is not available
+      if (!window.visualViewport) {
+        if (heightDiff > THRESHOLD && !isKeyboardOpen) {
+          isKeyboardOpen = true;
+          if (typeof onShow === 'function') {
+            onShow({
+              keyboardHeight: heightDiff,
+              viewportHeight: currentHeight,
+              method: 'windowResize'
+            });
+          }
+        }
+        else if (heightDiff < -THRESHOLD && isKeyboardOpen) {
+          isKeyboardOpen = false;
+          if (typeof onHide === 'function') {
+            onHide({
+              viewportHeight: currentHeight,
+              method: 'windowResize'
+            });
+          }
+        }
+      }
+      
+      lastHeight = currentHeight;
+    }, 100);
+  }
+  
+  function detectKeyboardByViewport() {
+    if (window.visualViewport) {
+      const heightDiff = window.innerHeight - window.visualViewport.height;
+      return heightDiff > THRESHOLD;
+    }
+    return false;
+  }
+  
+  function handleFocusIn(e) {
+    const target = e.target;
+    const isInput = target.tagName === 'INPUT' || 
+                    target.tagName === 'TEXTAREA' || 
+                    target.isContentEditable;
+    
+    if (isInput) {
+      // Give keyboard time to appear
+      setTimeout(() => {
+        if (!isKeyboardOpen && detectKeyboardByViewport()) {
+          isKeyboardOpen = true;
+          if (typeof onShow === 'function') {
+            onShow({
+              method: 'focusIn',
+              element: target
+            });
+          }
+        }
+      }, 300);
+    }
+  }
+  
+  function handleFocusOut(e) {
+    const target = e.target;
+    const isInput = target.tagName === 'INPUT' || 
+                    target.tagName === 'TEXTAREA' || 
+                    target.isContentEditable;
+    
+    if (isInput) {
+      // Give keyboard time to disappear
+      setTimeout(() => {
+        // Check if another input was focused
+        const activeEl = document.activeElement;
+        const stillFocused = activeEl.tagName === 'INPUT' || 
+                           activeEl.tagName === 'TEXTAREA' || 
+                           activeEl.isContentEditable;
+        
+        if (!stillFocused && isKeyboardOpen && !detectKeyboardByViewport()) {
+          isKeyboardOpen = false;
+          if (typeof onHide === 'function') {
+            onHide({
+              method: 'focusOut',
+              element: target
+            });
+          }
+        }
+      }, 300);
+    }
+  }
+  
+  function handleOrientationChange() {
+    // Reset height references on orientation change
+    setTimeout(() => {
+      lastHeight = window.innerHeight;
+      lastVisualHeight = window.visualViewport?.height || window.innerHeight;
+      isKeyboardOpen = false;
+    }, 500);
+  }
+  
+  // Set up listeners
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', handleVisualViewportResize);
+  }
+  
+  window.addEventListener('resize', handleWindowResize);
+  document.addEventListener('focusin', handleFocusIn);
+  document.addEventListener('focusout', handleFocusOut);
+  
+  if (window.screen?.orientation) {
+    window.screen.orientation.addEventListener('change', handleOrientationChange);
+  }
+  
+  // Return cleanup function
+  return function cleanup() {
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', handleVisualViewportResize);
+    }
+    window.removeEventListener('resize', handleWindowResize);
+    document.removeEventListener('focusin', handleFocusIn);
+    document.removeEventListener('focusout', handleFocusOut);
+    if (window.screen?.orientation) {
+      window.screen.orientation.removeEventListener('change', handleOrientationChange);
+    }
+    clearTimeout(resizeTimeout);
+  };
+}
+
+// Usage:
+// 1. Define your callback functions globally or in accessible scope:
+function onShow(info) {
+	const navbar = document.querySelector('#mainNavbar');
+	const container = document.querySelector('.container');
+	container.classList.add('keyboard-open');
+	navbar.classList.add('keyboard-open');
+}
+
+function onHide(info) {
+  	const navbar = document.querySelector('#mainNavbar');
+	const container = document.querySelector('.container');
+	container.classList.remove('keyboard-open');
+    navbar.classList.remove('keyboard-open');
+}
+
+// 2. Initialize the detector (only runs on mobile devices):
+const cleanup = detectMobileKeyboard();
+
+// 3. Optional: cleanup when needed
+// if (cleanup) cleanup();
+
+
+
+
+
+
+
+
 
 	}).catch(error => {
 		console.error('Error in fetching multiple JSON files:', error);
 	});
+
 	</script>
 </body>
 
