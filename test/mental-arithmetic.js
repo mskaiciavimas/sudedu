@@ -1091,6 +1091,7 @@ async function sendSetTaskResultsToDatabase() {
 
 
   function checkAnswer () {
+    document.getElementById('hidden-input').focus();
     var isCorrect = true;
     userInput = answerInputElement.value.trim();
     userAnswer = Number(userInput);

@@ -590,6 +590,7 @@ function updateModeChoice4() {
 		timerInputDiv.style.display = 'none';
 		questionNumberInputDiv.style.display = 'flex';
 	}
+    
 	changeQuestionNumberLabel();
 
 	setLabelEndingForDuration();

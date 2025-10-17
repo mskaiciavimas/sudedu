@@ -343,7 +343,12 @@
 	.stulpeliu-field {
 		position: relative;
 	}
-	
+
+	#hidden-input {
+		position: absolute; 
+		left: -9999px;
+	}
+		
 	@media (max-width: 1400px) {
 		#frequent-mistakes-container {
 			width: 60%;
@@ -524,6 +529,7 @@
 
 		<div class="middle-and-upper-lines-holder">
 			<div id='middle-line' class="middle-line" style="position: relative;">
+				<textarea id="hidden-input"></textarea>
 				<div id="fireworks-div" class="image-containerfireworks-div"></div>
 				<div class="upper-line">
 					<p class="previous-equation"></p>
@@ -537,11 +543,10 @@
 							<div id="task-saving-message"></div>
 						</div>
 						<div id="answer-separator-1" style="display: none;"></div>
-							<div id="stulpeliu-div" class="">
-								
-							</div>
-
-						<div id="answer-separator-2"></div>
+						<div id="stulpeliu-div-outer">
+							<div id="stulpeliu-div-inner">	
+								<div id="stulpeliu-div" class=""></div>
+									<div id="answer-separator-2"></div>
 
 						<div class="answer-field-div">
 							<div id="stulp-div-ans-and-first" class="">
@@ -572,7 +577,8 @@
 								<div id="division-stulp-3-inner"></div>
 								</div>
 							</div>
-							
+							</div>
+						</div>
 					</div>
 					<div id="restart-reset-button-row" class="" style="display: none;">
 						<div class="submit-button-div">
