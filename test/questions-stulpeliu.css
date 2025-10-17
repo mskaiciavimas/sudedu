@@ -24,8 +24,8 @@
   padding-right: 0 !important;
 }
 
-.pulse {
-  animation: pulse 400ms infinite alternate;
+#middle-line-inner {
+  padding: 10px;
 }
 
 #content-container {
@@ -34,6 +34,7 @@
   margin: 0 auto;
   justify-content: center;
   align-items: end;
+  height: 100%;
 }
 
 .stulpeliu-field {
@@ -51,14 +52,37 @@ textarea {
   padding-right: 11px;
 }
 
+.pulse {
+  position: relative;
+  border-radius: 25px;
+  overflow: hidden;
+}
+
+.pulse::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 25px;
+  background: rgba(182, 200, 103, 0);
+  animation: pulse 600ms ease-in-out forwards;
+  z-index: -1;
+}
+
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 5px rgba(182, 200, 103, 0), 0 0 0 5px rgba(182, 200, 103, 0) inset;
+    background: rgba(182, 200, 103, 0);
+  }
+  50% {
+    background: rgba(182, 200, 103, 0.6);
   }
   100% {
-    box-shadow: 0 0 0 5px rgba(182, 200, 103, 1), 0 0 0 5px rgba(182, 200, 103, 1) inset;
+    background: rgba(182, 200, 103, 0);
   }
 }
+
 
 #equation-and-symbol {
   position: relative;
@@ -75,6 +99,20 @@ textarea {
 
 .equation-and-answer {
   flex-direction: column;
+}
+
+#stulpeliu-div-outer {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+#stulpeliu-div-inner,
+#stulpeliu-div {
+    flex-shrink: 1;   /* allow shrinking */
+    min-height: 0;    /* allow flex child to shrink below content height */
 }
 
 #stulpeliu-div {
@@ -119,11 +157,6 @@ textarea {
   text-align: start !important;
   direction: rtl !important;
   unicode-bidi: bidi-override;
-}
-
-#answer:focus,
-#answer:active {
-  outline: 3px solid #40c9a9;
 }
 
 #remainder-field {
@@ -201,11 +234,6 @@ textarea {
   .reset-button-div {
     display: flex;
     justify-content: flex-end;
-  }
-
-  .answer-field-div {
-    padding-left: 5vw;
-    padding-right: 5vw;
   }
 }
 

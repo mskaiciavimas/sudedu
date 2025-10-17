@@ -534,34 +534,35 @@
 							<div id="task-saving-message"></div>
 						</div>
 						<div id="answer-separator-1" style="display: none;"></div>
-							<div id="stulpeliu-div" class="">
-								
-							</div>
+						<div id="stulpeliu-div-outer">
+							<div id="stulpeliu-div-inner">
+							<div id="stulpeliu-div" class=""></div>
 
-						<div id="answer-separator-2"></div>
+							<div id="answer-separator-2"></div>
 
-						<div class="answer-field-div">
-							<div id="stulp-div-ans-and-first" class="">
-							<div id="division-stulp-2">
-								<div id="division-stulp-2-outer">
-								<div id="division-stulp-2-inner"></div>
+							<div class="answer-field-div">
+								<div id="stulp-div-ans-and-first" class="">
+								<div id="division-stulp-2">
+									<div id="division-stulp-2-outer">
+									<div id="division-stulp-2-inner"></div>
+									</div>
+								</div>
+								<div id="answer-field-outer">
+								<div id="answer-field" class="answer-field">
+									<textarea type="text" id="answer" name="answer" class="form-control text-center answer-input"
+										placeholder="" autofocus autocomplete="off" style="display: none;"></textarea>
+								</div>
 								</div>
 							</div>
-							<div id="answer-field-outer">
-							<div id="answer-field" class="answer-field">
-								<textarea type="text" id="answer" name="answer" class="form-control text-center answer-input"
-									placeholder="" autofocus autocomplete="off" style="display: none;"></textarea>
-							</div>
+
+								<div id="remainder-field" class="remainder-field">
+									<textarea type="text" id="remainder" name="remainder" class="form-control text-center remainder-input"
+										placeholder="liek." autocomplete="off"></textarea>
+								</div>
+
+
 							</div>
 						</div>
-
-							<div id="remainder-field" class="remainder-field">
-								<textarea type="text" id="remainder" name="remainder" class="form-control text-center remainder-input"
-									placeholder="liek." autocomplete="off"></textarea>
-							</div>
-
-
-					</div>
 							<label class="equation_2 text-nowrap" for="answer-field" style="display: none;"></label>
 
 							<div id="division-stulp-3">
@@ -569,6 +570,7 @@
 								<div id="division-stulp-3-inner"></div>
 								</div>
 							</div>
+						</div>
 					</div>
 					<div id="restart-reset-button-row" class="" style="display: none;">
 						<div class="submit-button-div">
@@ -714,41 +716,41 @@
 			}
 		}
 
-		window.onload = function () {
-			if (localStorage.getItem('controller') === null) {
-        window.location.href = "./";
-    } else {
+	window.onload = function () {
+		if (localStorage.getItem('controller') === null) {
+        	window.location.href = "./";
+		} else {
 			controller = JSON.parse(localStorage.getItem('controller')) 
 			if (controller.mode !== "math" || controller.language !== "LT") {
-			window.location.href = "./";
+				window.location.href = "./";
 			}
+			}
+
+			document.querySelector('#template-container').removeAttribute('hidden');
+			controller = JSON.parse(localStorage.getItem('controller'));
+			
+			if (!controller.questionsStopped) {
+				if (controller.modeChoice4 === "C39") {
+					countDown();
+				} else if (controller.modeChoice4 === "C40") {
+					startTimer();
+				}
+			}
+			
+			formEquation();
+			displayEquation();
+			
+			if (!controller.questionsStopped) {
+				answerInputElement.style.display = "flex";
+				questionsSubmitButtonRowElement.style.display = "flex";
+			} else {
+				resetMistakeButtonsElement.style.display = "flex";
+				document.querySelector('.answer-field-div').style.display = "none";
+				const stopButtonSpanElement = document.querySelector('#stop-button-span');
+				stopButtonSpanElement.innerHTML = "refresh";
+				timerDisplay.textContent = localStorage.getItem("elapsedTime");
 		}
-    
-    document.querySelector('#template-container').removeAttribute('hidden');
-    controller = JSON.parse(localStorage.getItem('controller'));
-    
-		if (!controller.questionsStopped) {
-    if (controller.modeChoice4 === "C39") {
-        countDown();
-    } else if (controller.modeChoice4 === "C40") {
-        startTimer();
-    }
-		}
-    
-    formEquation();
-    displayEquation();
-    
-    if (!controller.questionsStopped) {
-		answerInputElement.style.display = "flex";
-		questionsSubmitButtonRowElement.style.display = "flex";
-    } else {
-		resetMistakeButtonsElement.style.display = "flex";
-        document.querySelector('.answer-field-div').style.display = "none";
-		const stopButtonSpanElement = document.querySelector('#stop-button-span');
-		stopButtonSpanElement.innerHTML = "refresh";
-        timerDisplay.textContent = localStorage.getItem("elapsedTime");
-    }
-};
+	};
 
 let answerInputElement = document.querySelector('#answer');
 		answerInputElement.setAttribute("inputmode", "numeric");
@@ -891,7 +893,7 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 
 		} else {
 			answerInput.style.width = `${(Math.ceil(controller.randomSelection[0]/controller.randomSelection[1])).toString().length + 1.25}ch`;
-			daliklis.style.width = `${(Math.ceil(controller.randomSelection[0]/controller.randomSelection[1])).toString().length + 1.25}ch`;
+			daliklis.style.width = `${(Math.ceil(controller.randomSelection[0]/controller.randomSelection[1])).toString().length + 1}ch`;
 		}
 
 		if (controller.withRemainder) {

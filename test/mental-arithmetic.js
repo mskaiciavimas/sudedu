@@ -1114,21 +1114,24 @@ async function sendSetTaskResultsToDatabase() {
       element.classList.remove('error'); 
     };
 
-      function answerFieldColor(element, corectness) {
-        if (corectness === false) {
-          element.style.backgroundColor = 'rgba(213, 126, 126, 0.6)';
-          clearTimeout(timeoutReference);
+    function answerFieldColor(element, correctness) {
+      // Remove wrong-answer-field if it's correct or neutral
+      if (correctness === true) {
+        element.style.backgroundColor = 'rgba(64, 201, 169, 0.6)';
+        element.classList.remove('wrong-answer-field');
+      } else if (correctness === false) {
+        element.style.backgroundColor = 'rgba(213, 126, 126, 0.6)';
+        element.classList.add('wrong-answer-field');
+        clearTimeout(timeoutReference);
+        removeError(element);
+        var timeoutReference = setTimeout(function() {
           removeError(element);
-          element.classList.add('error');
-          var timeoutReference = setTimeout(function() {
-            removeError(element);
-          }, 500);
-        } else if (corectness === true) {
-          element.style.backgroundColor = 'rgba(64, 201, 169, 0.6)';
-        } else {
-          element.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
-        }
+        }, 500);
+      } else {
+        element.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
+        element.classList.remove('wrong-answer-field');
       }
+    }
 
       function flipNumber(number) {
         var output = number.split('').reverse().join('');
@@ -1588,7 +1591,24 @@ async function sendSetTaskResultsToDatabase() {
       answerInputElement.setAttribute("style", "background-color: rgba(255, 255, 255, 0.6)")
     } else {
       updateScore();
+    }
+
+    if (controller.modeChoice7 === "C48") {
       setTimeout(function() {
+        const el = document.querySelector('.wrong-answer-field');
+        if (el) {
+          el.focus({ preventScroll: true });
+          el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+        } else {
+          const inputs = document.querySelectorAll('textarea');
+          for (const input of inputs) {
+            if (input.value.trim() === '') {
+              input.focus();
+              return;
+            }
+          }  
+        }
+
         if (!controller.questionsStopped) {
           setMargins();
         }
