@@ -86,12 +86,20 @@ textarea {
 
 #equation-and-symbol {
   position: relative;
+  max-height: 500px;
+  padding-left: 2rem;
+  transition: max-height 0.3s ease;
+}
+
+#equation-and-symbol.collapsed {
+  max-height: 0;
+  overflow-y: hidden;
 }
 
 #arithmetic-symbol {
   font-size: 3rem;
   position: absolute;
-  left: -15%;
+  left: 0.5rem;
   top: 45%;
   transform: translateY(-50%);
   /* Adjust other styles as needed */
@@ -118,6 +126,7 @@ textarea {
 #stulpeliu-div {
   position: relative;
   flex-direction: column;
+  padding-left: 2.5rem;
 }
 
 .stulpeliu-symbol {
