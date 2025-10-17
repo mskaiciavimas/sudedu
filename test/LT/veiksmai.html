@@ -831,21 +831,24 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 	const outer = document.getElementById('stulpeliu-div-outer');
 
 	if (answerTextarea && equationsAndSymbolContainer && outer) {
-		const checkOverflow = el => el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight;
+	const checkOverflow = el => el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight;
 
-		answerTextarea.addEventListener('focus', () => {
-			if (controller.modeChoice7 === "C48" && controller.randomSelection[2] === 'M') {
-				if (checkOverflow(outer)) {
-				equationsAndSymbolContainer.classList.add('collapsed');
-				}
+	answerTextarea.addEventListener('focus', () => {
+		if (controller.modeChoice7 === "C48" && controller.randomSelection[2] === 'M') {
+		// small delay to let mobile keyboard open
+		setTimeout(() => {
+			if (checkOverflow(outer)) {
+			equationsAndSymbolContainer.classList.add('collapsed');
 			}
-		});
+		}, 150); // 150ms delay
+		}
+	});
 
-		answerTextarea.addEventListener('blur', () => {
-			if (controller.modeChoice7 === "C48" && controller.randomSelection[2] === 'M') {
-				equationsAndSymbolContainer.classList.remove('collapsed');
-			}
-		});
+	answerTextarea.addEventListener('blur', () => {
+		if (controller.modeChoice7 === "C48" && controller.randomSelection[2] === 'M') {
+		equationsAndSymbolContainer.classList.remove('collapsed');
+		}
+	});
 	}
 
 	// Function to set the margin of element2
@@ -1260,6 +1263,9 @@ function onHide(info) {
 	const container = document.querySelector('.container');
 	container.classList.remove('keyboard-open');
     navbar.classList.remove('keyboard-open');
+	if (controller.modeChoice7 === "C48" && controller.randomSelection[2] === 'M') {
+		equationsAndSymbolContainer.classList.remove('collapsed');
+	}
 }
 
 // 2. Initialize the detector (only runs on mobile devices):
