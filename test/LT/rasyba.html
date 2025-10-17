@@ -102,7 +102,7 @@
 		border-radius: 25px;
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
+		justify-content: start;
 	}
 
 	.field-for-text-outer-holder {
@@ -359,7 +359,7 @@
 	display: flex;
 	flex: 1;
 	white-space: nowrap;
-	align-items: center;
+	align-items: start;
 }
 
 .timer-holder {
@@ -550,7 +550,6 @@
 	}
 
 	#field-for-text {
-		height: 100%;
 		background: transparent;
     	border: none;
 	}
@@ -752,6 +751,7 @@
 	
 		<div class="field-for-text-outer-holder">
 			<div id="field-for-text" style="position: relative;" class="field">
+			<textarea id="hidden-input" hidden></textarea>
 			<div id="fireworks-div" class="image-container fireworks-div"></div>
 			<div id="field-for-sentences"></div>
 			<div id="field-for-final-message"></div>
@@ -1649,6 +1649,8 @@ function checkAnswers() {
     let answersCorrect = true;
     let allFilled = true; // Check if all fields are filled
 
+	focusFirstInput();
+
     inputs.forEach(input => {
         let inputValue = input.value.trim().toLowerCase();
         if (inputValue === "") {
@@ -1762,6 +1764,7 @@ function helpToggle() {
             element.style.display = 'none'; // Set display to none if it's not none
         }
     });
+	focusFirstInput();
 }
 
 
@@ -1857,9 +1860,13 @@ function helpToggle() {
 
 			function focusFirstInput() {
 				const inputs = document.querySelectorAll('.question-input');
-				if (inputs.length > 0) {
-					inputs[0].focus();
+				for (const input of inputs) {
+					if (input.value.trim() === '') {
+						input.focus();
+						return;
+					}
 				}
+				document.getElementById('hidden-input').focus();
 			}
 
 function enableEnterNavigation() {
