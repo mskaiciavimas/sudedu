@@ -4278,7 +4278,6 @@
         }
     }
 
-
     function completeTask() {
         const parsedCurrentTaskInstructions = JSON.parse(currentTaskInstructions);
 
@@ -4301,7 +4300,7 @@
                 controller.modeChoice6 = parsedCurrentTaskInstructions[6];
                 controller.modeChoice7 = parsedCurrentTaskInstructions[7];
                 controller.modeChoice8 = "C79";
-                controller.taskId = currentTaskId;
+                controller.task = ["setTask", currentTaskId];
                 controller.taskCompleted = false;
                 controller.setTaskDuration = parsedCurrentTaskInstructions[10];
 
@@ -4315,7 +4314,7 @@
 				controller.modeChoice5 = parsedCurrentTaskInstructions[6];
 				controller.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[7];
 	            controller.questionFrequency = parsedCurrentTaskInstructions[8];
-                controller.taskId = currentTaskId;
+                controller.task = ["setTask", currentTaskId];;
                 controller.taskCompleted = false;
                 controller.setTaskDuration = parsedCurrentTaskInstructions[9];
             }

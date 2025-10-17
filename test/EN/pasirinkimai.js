@@ -35,7 +35,7 @@ function startQuestions () {
 
 function startQuestionsTimer () {
     controller = JSON.parse(localStorage.getItem('controller'));
-    if (controller.taskId !== 0) {
+    if (controller.task) {
         controller.timerLimit = parseInt(controller.setTaskDuration);
       } else {
     controller.timerLimit = parseInt(timerInputElement.value);
@@ -62,7 +62,7 @@ redirectToQuestions();
 
 function startQuestionsNumber () {
     controller = JSON.parse(localStorage.getItem('controller'));
-    if (controller.taskId !== 0) { 
+    if (controller.task) { 
         controller.questionNumber = parseInt(controller.setTaskDuration);
       } else {
         controller.questionNumber = parseInt(questionNumberInputElement.value);

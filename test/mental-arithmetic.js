@@ -13,7 +13,7 @@ let controller = {
   modeChoice6: '',
   modeChoice7: '',
   modeChoice8: '',
-  taskId: 0,
+  task: null,
   setTaskDuration: '',
   taskCompleted: false,
   modeChoiceLtDifficulty: '',
@@ -70,7 +70,7 @@ if (document.querySelector("#stop-button-span")) {
         triggerFireworks();
       }
 
-      if (controller.taskId !== 0) {
+      if (controller.task) {
         controller.equation = '';
         if (controller.taskCompleted === true) {
           sendSetTaskResultsToDatabase();
@@ -379,7 +379,7 @@ function formatFinalMessageForGrammar() {
     triggerFireworks();
   }
 
-  if (controller.taskId !== 0) {
+  if (controller.task) {
     if (controller.taskCompleted === true) {
       sendSetTaskResultsToDatabase();
     } else {
@@ -421,7 +421,7 @@ function formatFinalMessageForTextcomprehension() {
       triggerFireworks();
     }
 
-    if (controller.taskId !== 0) {
+    if (controller.task) {
       if (controller.taskCompleted === true) {
         sendSetTaskResultsToDatabase();
       } else {
@@ -465,20 +465,22 @@ async function sendSetTaskResultsToDatabase() {
       return;
   }
 
+  if (!controller.task || controller.task.length !== 2) {
+    if (controller.language === 'LT') {
+      taskSavingMessageDiv.innerHTML = "Įvyko klaida. Rezultatai neišsaugoti. Bandykite vėl vėliau."
+    } else if (controller.language === 'EN') {
+      taskSavingMessageDiv.innerHTML = "An error has occurred. Results were not saved. Please try again later."
+    }
+    controller.task = null;
+    controller.taskCompleted = false;
+    localStorage.setItem('controller', JSON.stringify(controller))
+    return
+  }
+
   let elapsedTime = 0;
   if (localStorage.getItem("elapsedTime")) {
     elapsedTime = localStorage.getItem("elapsedTime")
   }
-
-  resultsData = [ [controller.answeredQuestionTracker, controller.mistakesTracker],
-                  controller.currentMistakes, elapsedTime
-                ]
-  resultsDataString = JSON.stringify(resultsData);
-
-  const taskResults = {
-      taskId: controller.taskId,
-      results: resultsDataString
-  };
 
   const apiBase = 'http://localhost:5000/';
 
@@ -498,56 +500,131 @@ async function sendSetTaskResultsToDatabase() {
     taskSavingMessageDiv.innerHTML = "Saving results. Please do not leave this page."
   }
 
-  try {
-      const response = await fetch(apiBase + 'results', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `${userData.token}`
-          },
-          body: JSON.stringify(taskResults)
+  if (controller.task[0] === "setTask") {
+    resultsData = [ [controller.answeredQuestionTracker, controller.mistakesTracker],
+                    controller.currentMistakes, elapsedTime
+                  ]
+    resultsDataString = JSON.stringify(resultsData);
+
+    const taskResults = {
+        taskId: controller.task[1],
+        results: resultsDataString
+    };
+
+    try {
+        const response = await fetch(apiBase + 'results', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `${userData.token}`
+            },
+            body: JSON.stringify(taskResults)
+        });
+
+        if (!response.ok) {
+            const errorData  = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+        } else {
+          controller.task = null;
+          controller.taskCompleted = false;
+          localStorage.setItem('controller', JSON.stringify(controller))
+          if (controller.language === 'LT') {
+            taskSavingMessageDiv.innerHTML = "Rezultatai sėkmingai išsaugoti."
+          } else if (controller.language === 'EN') {
+            taskSavingMessageDiv.innerHTML = "Results were saved successfully."
+          }
+        }
+
+    } catch (error) {
+        console.log('Error saving task results:', error);
+        if (error.message === "Unauthorized") {
+          redirectingToAuthentication = true;
+            clearUserDataCookie();
+            localStorage.setItem('controller', JSON.stringify(controller))
+            window.location.href = "prisijungimas";
+        } else {
+          if (controller.language === 'LT') {
+            taskSavingMessageDiv.innerHTML = "Įvyko klaida. Rezultatai neišsaugoti. Bandykite vėl vėliau."
+          } else if (controller.language === 'EN') {
+            taskSavingMessageDiv.innerHTML = "An error has occurred. Results were not saved. Please try again later."
+          }
+          controller.task = null;
+          controller.taskCompleted = false;
+          localStorage.setItem('controller', JSON.stringify(controller))
+      }
+    }
+  } else if (controller.task[0] === "weekChl") {
+
+  const answered = controller.answeredQuestionTracker || 0;
+  const mistakes = controller.mistakesTracker || 1; // avoid dividing by 0
+
+  const resultsData = Math.floor(answered / mistakes);
+
+    const taskResults = {
+        taskId: controller.task[1],
+        results: resultsData
+    };
+
+    try {
+      const response = await fetch(apiBase + 'class/updateWeekChlScore', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `${userData.token}`
+        },
+        body: JSON.stringify({
+          studentId: userData.userId,
+          weekChlId: controller.task[1],
+          weekChlScore: resultsData
+        })
       });
 
       if (!response.ok) {
-          const errorData  = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
-      } else {
-        controller.taskId = 0;
-        controller.taskCompleted = false;
-        localStorage.setItem('controller', JSON.stringify(controller))
-        if (controller.language === 'LT') {
-          taskSavingMessageDiv.innerHTML = "Rezultatai sėkmingai išsaugoti."
-        } else if (controller.language === 'EN') {
-          taskSavingMessageDiv.innerHTML = "Results were saved successfully."
-        }
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
       }
 
-  } catch (error) {
-      console.log('Error saving task results:', error);
+      // success case
+      controller.task = null;
+      controller.taskCompleted = false;
+      localStorage.setItem('controller', JSON.stringify(controller));
+
+      if (controller.language === 'LT') {
+        taskSavingMessageDiv.innerHTML = "Savaitės iššūkio taškai sėkmingai išsaugoti.";
+      } else if (controller.language === 'EN') {
+        taskSavingMessageDiv.innerHTML = "Weekly challenge score saved successfully.";
+      }
+
+    } catch (error) {
+      console.error('Error saving week challenge score:', error);
+
       if (error.message === "Unauthorized") {
         redirectingToAuthentication = true;
-          clearUserDataCookie();
-          localStorage.setItem('controller', JSON.stringify(controller))
-          window.location.href = "prisijungimas";
+        clearUserDataCookie();
+        localStorage.setItem('controller', JSON.stringify(controller));
+        window.location.href = "prisijungimas";
       } else {
         if (controller.language === 'LT') {
-          taskSavingMessageDiv.innerHTML = "Įvyko klaida. Rezultatai neišsaugoti. Bandykite vėl vėliau."
+          taskSavingMessageDiv.innerHTML = "Įvyko klaida. Savaitės iššūkio taškai neišsaugoti. Bandykite dar kartą vėliau.";
         } else if (controller.language === 'EN') {
-          taskSavingMessageDiv.innerHTML = "An error has occurred. Results were not saved. Please try again later."
+          taskSavingMessageDiv.innerHTML = "An error occurred. Weekly challenge score not saved. Please try again later.";
         }
-        controller.taskId = 0;
+
+        controller.task = null;
         controller.taskCompleted = false;
-        localStorage.setItem('controller', JSON.stringify(controller))
+        localStorage.setItem('controller', JSON.stringify(controller));
+      }
     }
-  }
-  if (document.querySelector("#stopButton")) {
-    document.querySelector("#stopButton").disabled = false;
-  }
-  if (document.querySelector(".summary-button")) {
-    document.querySelector(".summary-button").disabled = false;
-  }
-  if (document.querySelector("#stop-button-span")) {
-    document.querySelector("#stop-button-span").disabled = false;
+    }
+
+    if (document.querySelector("#stopButton")) {
+      document.querySelector("#stopButton").disabled = false;
+    }
+    if (document.querySelector(".summary-button")) {
+      document.querySelector(".summary-button").disabled = false;
+    }
+    if (document.querySelector("#stop-button-span")) {
+      document.querySelector("#stop-button-span").disabled = false;
   }
 }
 
@@ -2416,6 +2493,87 @@ function setLanguage(lang) {
 
 		window.location.href = `/${lang}`;
 }
+}
+
+function startQuestions () {
+  controller = JSON.parse(localStorage.getItem('controller'));
+  if (controller.modeChoice4 === "C39") {
+      startQuestionsTimer()
+    } else if (controller.modeChoice4 = "C40") {
+      startQuestionsNumber()
+    }
+};
+
+function startQuestionsTimer () {
+	controller = JSON.parse(localStorage.getItem('controller'));
+	if (controller.task) {
+	controller.timerLimit = parseInt(controller.setTaskDuration);
+	} else {
+		controller.timerLimit = parseInt(timerInputElement.value);
+	}
+	if (!controller.timerLimit) {
+	controller.timerLimit = 5;
+	}
+
+	if (localStorage.getItem("remainingTime")) {
+	localStorage.removeItem("remainingTime");
+	}
+
+	if (localStorage.getItem("elapsedTime")) {
+	localStorage.removeItem("elapsedTime");
+	}
+
+	if (localStorage.getItem("startTime")) {
+	localStorage.removeItem("startTime");
+	}
+	controller.result = ['', '', '', '', '']
+	controller.currentMistakes = [];
+	controller.mistakesTracker = 0;
+	controller.answeredQuestionTracker = 0;
+	controller.equation = '';
+	controller.equation2 = '';
+	controller.randomSelection = [];
+	controller.questionsStopped = false;
+	if (controller.mode === "math") {
+		generateCombinations();
+	}
+	controller.tempTracking = true;
+	
+	localStorage.setItem('controller', JSON.stringify(controller));
+	redirectToQuestions();
+};
+
+function startQuestionsNumber () {
+
+	controller = JSON.parse(localStorage.getItem('controller'));
+	if (controller.task) { 
+	  controller.questionNumber = parseInt(controller.setTaskDuration);
+	} else {
+			controller.questionNumber = parseInt(questionNumberInputElement.value);
+	}
+	if (!controller.questionNumber) {
+	controller.questionNumber = 20;
+	}
+	if (localStorage.getItem("startTime")) {
+	localStorage.removeItem("startTime");
+	}
+	controller.result = ['', '', '', '', '']
+		controller.currentMistakes = [];
+		controller.mistakesTracker = 0;
+		controller.answeredQuestionTracker = 0;
+		controller.equation = '';
+	controller.randomSelection = [];
+	controller.questionsStopped = false;
+	if (controller.mode === "math") {
+			generateCombinations();
+	}
+	controller.tempTracking = true;
+	if (controller.combinations.length > controller.questionNumber) {
+	controller.combinations = controller.combinations.sort(() => 0.5 - Math.random()).slice(0, controller.questionNumber);
+	}
+
+	localStorage.setItem('controller', JSON.stringify(controller));
+	redirectToQuestions();
 }
 
 //TASK INFO COLLECTION START

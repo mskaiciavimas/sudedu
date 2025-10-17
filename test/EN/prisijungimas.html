@@ -202,7 +202,7 @@
 
 	controller = JSON.parse(localStorage.getItem('controller'));
 
-	if (controller.taskId !== 0 && controller.taskCompleted === true) {
+	if (controller.task && controller.taskCompleted === true) {
 		errorField.innerHTML = "Prisijunkite, kad rezultatai būtų išsaugoti."
 	}
 
@@ -293,7 +293,7 @@
 
 				localStorage.setItem('userData', JSON.stringify(userData));
 				
-				if (controller.taskId !== 0 && controller.taskCompleted === true) {
+				if (controller.task && controller.taskCompleted === true) {
 						if (controller.mode === "math") {
 						window.location.href = `veiksmai`;
 						} else if (controller.mode === "lang") {

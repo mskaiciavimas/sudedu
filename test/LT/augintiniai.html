@@ -9525,6 +9525,20 @@ function calculateHappinesIndexForPet (petId) {
     }
 }
 
+window.onload = function () {
+    if (typeof controller === 'undefined' || controller === null) {
+        const savedController = localStorage.getItem('controller');
+        if (savedController) {
+            controller = JSON.parse(savedController);
+        }
+    }
+    if (controller) {
+        controller.task = null;
+        controller.taskCompleted = false;
+        localStorage.setItem('controller', JSON.stringify(controller));
+    }
+};
+
     </script>
 </body>
 </html>

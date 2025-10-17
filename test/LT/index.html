@@ -729,7 +729,7 @@ body.popup-active {
 				controller.modeChoice7 = modeChoice7Selection;
 				controller.modeChoice8 = 'C79';
 				controller.result = ['', '', '', '', '']
-				controller.taskId = 0;
+				controller.task = null;
 
 			} else if (controller.mode === "lang") {
 				const modeChoice8Value = document.querySelector('#mode_choice_8').value;
@@ -792,10 +792,17 @@ body.popup-active {
 		submitButtonElement.addEventListener("click", submitSelection);
 
 		window.onload = function () {
-			document.querySelector('#template-container').removeAttribute('hidden');
-		};
-
-		window.onload = function () {
+            if (typeof controller === 'undefined' || controller === null) {
+                const savedController = localStorage.getItem('controller');
+                if (savedController) {
+                    controller = JSON.parse(savedController);
+                }
+            }
+            if (controller) {
+                controller.task = null;
+                controller.taskCompleted = false;
+                localStorage.setItem('controller', JSON.stringify(controller));
+            }
 			document.querySelector('#template-container').removeAttribute('hidden');
 		};
 
@@ -911,77 +918,7 @@ document.addEventListener('DOMContentLoaded', function() {
 const timerInputElement = document.querySelector('#timer-input');
 const questionNumberInputElement = document.querySelector('#question-number-input');
 
-function startQuestionsTimer () {
-	controller = JSON.parse(localStorage.getItem('controller'));
-	if (controller.taskId !== 0) {
-	controller.timerLimit = parseInt(controller.setTaskDuration);
-	} else {
-		controller.timerLimit = parseInt(timerInputElement.value);
-	}
-	if (!controller.timerLimit) {
-	controller.timerLimit = 5;
-	}
 
-	if (localStorage.getItem("remainingTime")) {
-	localStorage.removeItem("remainingTime");
-	}
-
-	if (localStorage.getItem("elapsedTime")) {
-	localStorage.removeItem("elapsedTime");
-	}
-
-	if (localStorage.getItem("startTime")) {
-	localStorage.removeItem("startTime");
-	}
-	controller.result = ['', '', '', '', '']
-	controller.currentMistakes = [];
-	controller.mistakesTracker = 0;
-	controller.answeredQuestionTracker = 0;
-	controller.equation = '';
-	controller.equation2 = '';
-	controller.randomSelection = [];
-	controller.questionsStopped = false;
-	if (controller.mode === "math") {
-		generateCombinations();
-	}
-	controller.tempTracking = true;
-	
-	localStorage.setItem('controller', JSON.stringify(controller));
-	redirectToQuestions();
-};
-
-function startQuestionsNumber () {
-
-	controller = JSON.parse(localStorage.getItem('controller'));
-	if (controller.taskId !== 0) { 
-	controller.questionNumber = parseInt(controller.setTaskDuration);
-	} else {
-			controller.questionNumber = parseInt(questionNumberInputElement.value);
-	}
-	if (!controller.questionNumber) {
-	controller.questionNumber = 20;
-	}
-	if (localStorage.getItem("startTime")) {
-	localStorage.removeItem("startTime");
-	}
-	controller.result = ['', '', '', '', '']
-		controller.currentMistakes = [];
-		controller.mistakesTracker = 0;
-		controller.answeredQuestionTracker = 0;
-		controller.equation = '';
-	controller.randomSelection = [];
-	controller.questionsStopped = false;
-	if (controller.mode === "math") {
-			generateCombinations();
-	}
-	controller.tempTracking = true;
-	if (controller.combinations.length > controller.questionNumber) {
-	controller.combinations = controller.combinations.sort(() => 0.5 - Math.random()).slice(0, controller.questionNumber);
-	}
-
-	localStorage.setItem('controller', JSON.stringify(controller));
-	redirectToQuestions();
-}
 	</script>
 </body>
 

@@ -1610,7 +1610,7 @@ window.onload = function () {
 
     window.addEventListener("beforeunload", () => {
         if (!redirectingToAuthentication) {
-          controller.taskId = 0;
+          controller.task = null;
           controller.taskCompleted = false;
         }
         localStorage.setItem("controller", JSON.stringify(controller));

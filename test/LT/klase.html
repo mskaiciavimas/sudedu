@@ -485,7 +485,6 @@
           align-items: center;
         }
 
-
         #change-teacher-toggle-button,
         #add-teacher,
         #change-teacher,
@@ -1839,7 +1838,7 @@
                                         <div id="class-challenge-user-points"></div>
                                         </div>
                                     </div>
-                                    <button class="complete-task-btn">Atlikti</button>
+                                    <button class="complete-task-btn" id="complete-task-btn">Atlikti</button>
                                 </div>
                             </div>
                         
@@ -1924,6 +1923,7 @@
     <script src="../mental-arithmetic.js"></script>
     <script src="../main-nav-bar.js"></script>
     <script src="../parameter_dictionary.js"></script>
+    <script src="../mental-arithmetic-combinations.js"></script>
     <script type="module">
         const weekChallengeWinnings = {
             "firstPlace": 10,
@@ -1981,6 +1981,10 @@
         const changeTeacherButton = document.getElementById('change-teacher');
 
         const pupilsListTitle = document.querySelector(".pupils-list-title")
+
+        const completeTaskButton = document.getElementById("complete-task-btn");
+        completeTaskButton.addEventListener("click", completeWeekChlTask);
+
 
         addTeacherButton.addEventListener('click', async () => {
             const teacherId = addTeacherInput.value;
@@ -3295,11 +3299,11 @@ function renderPodiumRewards() {
   }
 }
 
-
+let weekChallengeInfo;
 
 async function renderClassWeekChallenge () {
-    const weekChallenge = await getChallengeByTaskId(classDataCache.weekChlId)
-    const formattedWeekChallengeDescription = formatWeekChallengeDescription(weekChallenge)
+    weekChallengeInfo  = await getChallengeByTaskId(classDataCache.weekChlId)
+    const formattedWeekChallengeDescription = formatWeekChallengeDescription(weekChallengeInfo)
     
     const timeLeftDiv = document.getElementById("class-challenge-time")
     const today = new Date();
@@ -3619,7 +3623,6 @@ function pointsLabelDeterminator (points) {
     return pointsLabel
 }
 
-
 async function initClassPage() {
   await fetchClassData();  
   console.log(classDataCache)
@@ -3628,8 +3631,6 @@ async function initClassPage() {
 
 
 initClassPage();
-
-
 
 function positionWeekChallengeItems() {
   const container = document.querySelector('.class-challenge-leaders-div');
@@ -3669,6 +3670,67 @@ function positionWeekChallengeItems() {
 // Run on load and resize
 window.addEventListener('resize', positionWeekChallengeItems);
 window.addEventListener('load', positionWeekChallengeItems);
+
+
+function completeWeekChlTask() {
+    const parsedCurrentTaskInstructions = JSON.parse(weekChallengeInfo);
+
+    if (localStorage.getItem('controller') !== null) {
+        controller = JSON.parse(localStorage.getItem('controller'))
+    }
+
+    var checkbox = document.getElementById("remainder-input");
+
+    controller.language = "LT";
+    if (parsedCurrentTaskInstructions[0] === "math") {
+        controller.mode = 'math';
+        controller.modeChoice1 = parsedCurrentTaskInstructions[1];
+        controller.modeChoice2 = parsedCurrentTaskInstructions[2];
+        controller.selectedNumbers = parsedCurrentTaskInstructions[8];
+        controller.withRemainder = parsedCurrentTaskInstructions[9];
+        controller.modeChoice3 = parsedCurrentTaskInstructions[3];
+        controller.modeChoice4 = parsedCurrentTaskInstructions[4];
+        controller.modeChoice5 = parsedCurrentTaskInstructions[5];
+        controller.modeChoice6 = parsedCurrentTaskInstructions[6];
+        controller.modeChoice7 = parsedCurrentTaskInstructions[7];
+        controller.modeChoice8 = "C79";
+        controller.task = ["weekChl", classDataCache.weekChlId];
+        controller.taskCompleted = false;
+        controller.setTaskDuration = parsedCurrentTaskInstructions[10];
+
+    } else if (parsedCurrentTaskInstructions[0] === "lang") {
+        controller.mode = 'lang';
+        controller.classChoice = parsedCurrentTaskInstructions[1];
+        controller.modeChoice1 = parsedCurrentTaskInstructions[2];
+        controller.modeChoice2 = parsedCurrentTaskInstructions[3];
+        controller.modeChoice3 = parsedCurrentTaskInstructions[4];
+        controller.modeChoice4 = parsedCurrentTaskInstructions[5];
+        controller.modeChoice5 = parsedCurrentTaskInstructions[6];
+        controller.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[7];
+        controller.questionFrequency = parsedCurrentTaskInstructions[8];
+        controller.task = ["weekChl", classDataCache.weekChlId];;
+        controller.taskCompleted = false;
+        controller.setTaskDuration = parsedCurrentTaskInstructions[9];
+    }
+
+    localStorage.setItem('controller', JSON.stringify(controller))
+
+    startQuestions();
+}
+
+window.onload = function () {
+    if (typeof controller === 'undefined' || controller === null) {
+        const savedController = localStorage.getItem('controller');
+        if (savedController) {
+            controller = JSON.parse(savedController);
+        }
+    }
+    if (controller) {
+        controller.task = null;
+        controller.taskCompleted = false;
+        localStorage.setItem('controller', JSON.stringify(controller));
+    }
+};
 
     </script>
 </body>
