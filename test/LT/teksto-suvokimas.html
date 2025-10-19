@@ -1702,11 +1702,8 @@ function initializeSortableJS() {
         currentDraggedItem = evt.item;
         isOverValidContainer = true;
         
-        // Reset item background color to neutral immediately on non-touch devices
-        if (!touchDevice) {
-          evt.item.style.backgroundColor = '';
-        }
-        
+        evt.item.style.backgroundColor = '';
+
         // Close sidebar when drag starts
         if (sidebarWrapper.classList.contains('open')) {
           closeSidebar();
