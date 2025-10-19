@@ -138,9 +138,11 @@
 }
 
 .middle-div.wrapped {
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden; /* Prevent horizontal scroll */
     padding: 20px 0;
     gap: 15px;
+    -webkit-overflow-scrolling: touch;
 }
 
 .middle-div.wrapped .practice-outer-div,
@@ -160,7 +162,10 @@
 }
 
 .middle-div.wrapped .practice-outer-div {
-    max-height: 90%;
+    max-width: 100%;
+    flex: none;
+    width: 100%;
+    min-height: 0; /* Add this - important for nested scrolling */
 }
 
 .personal-chl-inner {
