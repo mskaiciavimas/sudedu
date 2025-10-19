@@ -1684,7 +1684,7 @@ function initializeSortableJS() {
       ghostClass: 'drag-ghost',
       chosenClass: 'drag-chosen',
       dragClass: 'drag-dragging',
-      forceFallback: !isTouchDevice(), 
+      forceFallback: true, 
       fallbackOnBody: true,
       scroll: true,
       scrollSensitivity: 60,
@@ -1726,6 +1726,12 @@ function initializeSortableJS() {
         }, 10);
       }
     };
+
+    // Add delay for touch devices (regardless of screen size)
+    if (touchDevice) {
+      config.delay = 300;
+      config.delayOnTouchOnly = true;
+    }
 
     const sortable = new Sortable(el, config);
     sortableInstances.push(sortable);
@@ -1774,9 +1780,6 @@ function trackDropZone(e) {
 
 function initializeOptionsFieldSortable() {
   const optionsField = document.getElementById('options-field');
-  const mobileDelay = 300; // hold delay in ms
-  let holdTimeout = null;
-  let dragInitiated = false;
 
   // Destroy previous mobile Sortable if it exists
   if (mobileOptionsSortable) {
@@ -1787,57 +1790,24 @@ function initializeOptionsFieldSortable() {
   mobileOptionsSortable = Sortable.create(optionsField, {
     group: 'shared',
     animation: 150,
-    ghostClass: 'sortable-ghost',
+    ghostClass: 'drag-ghost',
+    chosenClass: 'drag-chosen',
+    dragClass: 'drag-dragging',
+    forceFallback: true,         // JS-based drag for consistent behavior
     fallbackOnBody: true,
-    forceFallback: !isTouchDevice(),
-    delay: mobileDelay,
-    delayOnTouchOnly: true, // only apply delay on touch devices
-
-    onChoose: function(evt) {
-      const item = evt.item;
-      dragInitiated = false;
-      item.classList.remove('hold-indicator');
-
-      holdTimeout = setTimeout(() => {
-        dragInitiated = true;
-        item.classList.add('hold-indicator'); // optional visual cue
-      }, mobileDelay);
-
-      const cancelHold = (e) => {
-        clearTimeout(holdTimeout);
-        item.classList.remove('hold-indicator');
-        dragInitiated = false;
-
-        if (['contextmenu','touchend','mouseup'].includes(e.type)) e.preventDefault();
-
-        document.removeEventListener('touchend', cancelHold);
-        document.removeEventListener('mouseup', cancelHold);
-        document.removeEventListener('contextmenu', cancelHold);
-      };
-
-      document.addEventListener('touchend', cancelHold);
-      document.addEventListener('mouseup', cancelHold);
-      document.addEventListener('contextmenu', cancelHold);
-    },
+    delay: 300,                  // hold delay for touch devices
+    delayOnTouchOnly: true,      // only apply delay on touch devices
 
     onStart: function(evt) {
-      // Close sidebar regardless of whether drag will be canceled
+      // Close sidebar when dragging starts
       if (sidebarWrapper.classList.contains('open')) {
         closeSidebar();
       }
-      
-      if (!dragInitiated) {
-        evt.item.parentNode.insertBefore(evt.item, evt.item); // cancel drag
-        return;
-      }
-      
-      evt.item.classList.remove('hold-indicator');
-      clearTimeout(holdTimeout);
     },
 
     onEnd: function(evt) {
-      evt.item.classList.remove('hold-indicator');
-      clearTimeout(holdTimeout);
+      // cleanup classes
+      evt.item.classList.remove('drag-chosen', 'drag-dragging', 'drag-ghost');
     }
   });
 }
@@ -1868,7 +1838,7 @@ function updateSortables() {
         ghostClass: 'drag-ghost',
         chosenClass: 'drag-chosen',
         dragClass: 'drag-dragging',
-        forceFallback: !isTouchDevice(),
+        forceFallback: true,
         fallbackOnBody: true,
         onStart: function(evt) {
           // Close sidebar when dragging options-field
