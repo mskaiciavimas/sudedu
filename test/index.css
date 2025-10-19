@@ -180,6 +180,23 @@ background-clip: content-box;
 background: rgba(255, 255, 255, 0.4);
 }
 
+/* Hide scrollbar for Firefox */
+.hide-scrollbar {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+}
+
+/* Hide scrollbar for Chrome, Safari, Edge */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Ensure container can still scroll */
+.hide-scrollbar {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 /* Firefox (limited support) */
 * {
 scrollbar-width: thin;                         
@@ -242,7 +259,10 @@ h1 {
 #mode_choice_12 {
   margin-top: 5px;
   margin-bottom: 5px;
-  width: 90%;
+  max-width: 90%;
+      background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
   font-size: 1rem;
 }
 
@@ -344,10 +364,12 @@ input[type="radio"] {
 
 .mode_choice_11_div {
   width: 100%;
-  background-color: #FAF1E6;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: black;
   font-size: 1.3rem;
-  border-radius: 0.25rem;
+  border-radius: 20px;
   text-align: start !important;
 }
 
@@ -545,10 +567,6 @@ button:disabled {
 
 #mode_choice_11_div {
     box-sizing: border-box;
-}
-
-#mode_choice_12 {
-    width: auto;
 }
 
 .remainder-div {

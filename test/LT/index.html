@@ -212,7 +212,13 @@
     padding: 15px 3px 15px 15px;
     position: relative;
     height: 100%;
-    -webkit-overflow-scrolling: touch;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overflow-y: auto !important;
+}
+
+#new-task-options-container-inner * {
+    touch-action: auto;
 }
 
 #mode_choice {
