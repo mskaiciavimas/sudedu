@@ -1795,11 +1795,23 @@ function initializeDragDrop() {
 
 // MutationObserver to watch for dynamically added items
 function observeContainer(container) {
+  // First, make any existing items draggable
+  const existingItems = container.querySelectorAll('.item');
+  existingItems.forEach(item => {
+    if (!item.dataset.draggableInitialized) {
+      makeDraggable(item);
+      item.dataset.draggableInitialized = 'true';
+    }
+  });
+  
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => {
         if (node.nodeType === 1 && node.classList.contains('item')) {
-          makeDraggable(node);
+          if (!node.dataset.draggableInitialized) {
+            makeDraggable(node);
+            node.dataset.draggableInitialized = 'true';
+          }
         }
       });
     });
@@ -1818,6 +1830,11 @@ function observeContainer(container) {
 }
 
 function makeDraggable(element) {
+  // Skip if already initialized
+  if (element.dataset.draggableInitialized === 'true') {
+    return;
+  }
+  
   // Remove any existing listeners first to prevent duplicates
   element.removeEventListener('mousedown', handleDragStart);
   element.removeEventListener('touchstart', handleTouchStart);
@@ -1832,6 +1849,9 @@ function makeDraggable(element) {
   if (!element.classList.contains('item')) {
     element.classList.add('item');
   }
+  
+  // Mark as initialized
+  element.dataset.draggableInitialized = 'true';
 }
 
 function handleTouchStart(e) {
@@ -1844,25 +1864,40 @@ function handleTouchStart(e) {
   // Visual feedback
   element.classList.add('hold-indicator');
   
+  // Prevent any scrolling during hold
+  let holdStarted = false;
+  
   // 300ms hold delay for touch devices
   touchHoldTimer = setTimeout(() => {
+    holdStarted = true;
+    e.preventDefault(); // Prevent scrolling once hold is confirmed
     startDrag(element, touch.clientX, touch.clientY);
     
     // Add touch move and end listeners
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
     document.addEventListener('touchend', handleTouchEnd);
+    document.addEventListener('touchcancel', handleTouchEnd);
   }, 300);
   
   // Cancel if touch moves too much during hold
-  const cancelHold = (e) => {
-    const touch = e.touches[0];
+  const cancelHold = (cancelEvent) => {
+    if (!cancelEvent.touches || cancelEvent.touches.length === 0) {
+      clearTimeout(touchHoldTimer);
+      element.classList.remove('hold-indicator');
+      document.removeEventListener('touchmove', cancelHold);
+      return;
+    }
+    
+    const touch = cancelEvent.touches[0];
     const moveThreshold = 10;
     
     if (Math.abs(touch.clientX - startX) > moveThreshold || 
         Math.abs(touch.clientY - startY) > moveThreshold) {
-      clearTimeout(touchHoldTimer);
-      element.classList.remove('hold-indicator');
-      document.removeEventListener('touchmove', cancelHold);
+      if (!holdStarted) {
+        clearTimeout(touchHoldTimer);
+        element.classList.remove('hold-indicator');
+        document.removeEventListener('touchmove', cancelHold);
+      }
     }
   };
   
@@ -1870,7 +1905,7 @@ function handleTouchStart(e) {
   
   setTimeout(() => {
     document.removeEventListener('touchmove', cancelHold);
-  }, 300);
+  }, 320);
 }
 
 function handleTouchMove(e) {
@@ -1885,6 +1920,7 @@ function handleTouchEnd(e) {
   clearTimeout(touchHoldTimer);
   document.removeEventListener('touchmove', handleTouchMove);
   document.removeEventListener('touchend', handleTouchEnd);
+  document.removeEventListener('touchcancel', handleTouchEnd);
   
   if (isDragging) {
     endDrag();
@@ -1926,6 +1962,10 @@ function startDrag(element, clientX, clientY) {
   isDragging = true;
   isOverValidContainer = true;
   
+  // Prevent body scrolling during drag
+  document.body.style.overflow = 'hidden';
+  document.body.style.touchAction = 'none';
+  
   // Close sidebar when drag starts
   if (typeof sidebarWrapper !== 'undefined' && sidebarWrapper.classList.contains('open')) {
     if (typeof closeSidebar === 'function') {
@@ -1948,6 +1988,7 @@ function startDrag(element, clientX, clientY) {
   draggedClone.style.pointerEvents = 'none';
   draggedClone.style.opacity = '0.9';
   draggedClone.style.cursor = 'grabbing';
+  draggedClone.style.touchAction = 'none';
   document.body.appendChild(draggedClone);
   
   // Make original semi-transparent
@@ -2022,6 +2063,10 @@ function checkDropTarget(element, clientX, clientY) {
 
 function endDrag() {
   if (!currentDraggedItem) return;
+  
+  // Re-enable body scrolling
+  document.body.style.overflow = '';
+  document.body.style.touchAction = '';
   
   // Remove clone
   if (draggedClone && draggedClone.parentNode) {
@@ -2116,12 +2161,41 @@ function updateSortables() {
   updateDragDropInstances();
 }
 
+// Function to manually reinitialize all items (useful after dynamic content loads)
+function reinitializeAllItems() {
+  const allContainers = [
+    'title-field',
+    'answers-field',
+    'answers-field-start',
+    'answers-field-middle',
+    'answers-field-end',
+    'options-field'
+  ];
+  
+  allContainers.forEach(containerId => {
+    const container = document.getElementById(containerId);
+    if (container) {
+      const items = container.querySelectorAll('.item');
+      items.forEach(item => {
+        // Reset initialization flag
+        delete item.dataset.draggableInitialized;
+        makeDraggable(item);
+      });
+    }
+  });
+}
+
 // Initialize on load
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', updateDragDropInstances);
 } else {
   updateDragDropInstances();
 }
+
+// Also try initializing after a short delay to catch any dynamically loaded content
+setTimeout(() => {
+  reinitializeAllItems();
+}, 500);
 
 window.addEventListener('resize', updateDragDropInstances);
 
