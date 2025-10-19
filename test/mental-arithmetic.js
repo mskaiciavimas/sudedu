@@ -42,7 +42,6 @@ let divisionStulp2InnerElement = document.querySelector('#division-stulp-2-inner
 let divisionStulp3InnerElement = document.querySelector('#division-stulp-3-inner');
 let arithmeticSymbol = document.querySelector('#arithmetic-symbol');
 let answerFieldDivInvisibleDiv = document.querySelector('#answer-field-div-invisible-div');
-let taskSavingMessageDiv = document.querySelector("#task-saving-message");
 
 if (document.querySelector("#stopButton")) {
   document.querySelector("#stopButton").disabled = false;
@@ -71,19 +70,18 @@ if (document.querySelector("#stop-button-span")) {
       }
 
       if (controller.task) {
-        controller.equation = '';
         if (controller.taskCompleted === true) {
           sendSetTaskResultsToDatabase();
         } else {
           if (controller.language === 'LT') {
-            taskSavingMessageDiv.innerHTML = 'Užduotis nebaigta iki galo. Rezultatai neišsaugoti.';
+            messageToTheUser('Užduotis nebaigta iki galo. Rezultatai neišsaugoti.');
           } else if (controller.language === 'EN') {
-            taskSavingMessageDiv.innerHTML = 'Task was not completed. Results were not saved.';
+            messageToTheUser('Task was not completed. Results were not saved.');
           }
         }
-      } else {
-        controller.equation = finalMessageText();
       }
+
+      controller.equation = finalMessageText();
       
       controller.equation2 = '';
       controller.result = ['', '', '', '', ''];
@@ -95,7 +93,6 @@ if (document.querySelector("#stop-button-span")) {
     }
 
 	function formEquation () {
-    taskSavingMessageDiv.innerHTML = ''
     let remainingTime = parseInt(localStorage.getItem('remainingTime'));
     if (controller.modeChoice4 === "C39") {
       if (controller.combinations.length === 0 && remainingTime > 0 && !controller.questionsStopped) {
@@ -383,16 +380,16 @@ function formatFinalMessageForGrammar() {
     if (controller.taskCompleted === true) {
       sendSetTaskResultsToDatabase();
     } else {
-      document.getElementById("field-for-final-message").innerHTML = ''
       if (controller.language === 'LT') {
-        taskSavingMessageDiv.innerHTML = 'Užduotis nebaigta iki galo. Rezultatai neišsaugoti.'
+        messageToTheUser('Užduotis nebaigta iki galo. Rezultatai neišsaugoti.')
       } else if (controller.language === 'EN') {
-        taskSavingMessageDiv.innerHTML = 'Task was not completed. Results were not saved.'
+        messageToTheUser('Task was not completed. Results were not saved.')
       }
     }
-  } else {
-    document.getElementById("field-for-final-message").innerHTML = `<div class="field-for-final-message-inner">${finalMessageText()}</div>`;
   }
+
+  document.getElementById("field-for-final-message").innerHTML = `<div class="field-for-final-message-inner">${finalMessageText()}</div>`;
+  
   controller.questionsStopped = true;
   localStorage.setItem('controller', JSON.stringify(controller))
 }
@@ -425,16 +422,16 @@ function formatFinalMessageForTextcomprehension() {
       if (controller.taskCompleted === true) {
         sendSetTaskResultsToDatabase();
       } else {
-        document.getElementById("final-message-div").innerHTML = '';
         if (controller.language === 'LT') {
-          taskSavingMessageDiv.innerHTML = 'Užduotis nebaigta iki galo. Rezultatai neišsaugoti.'
+          messageToTheUser('Užduotis nebaigta iki galo. Rezultatai neišsaugoti.')
         } else if (controller.language === 'EN') {
-          taskSavingMessageDiv.innerHTML = 'Task was not completed. Results were not saved.'
+          messageToTheUser('Task was not completed. Results were not saved.')
         }
       }
-    } else {
-      document.getElementById("final-message-div").innerHTML = finalMessageText();
     }
+
+    document.getElementById("final-message-div").innerHTML = finalMessageText();
+    
     document.getElementById('check-answer-btn').disabled = true;
     document.getElementById('help-btn').disabled = true;
     document.getElementById('next-question-btn').disabled = true;
@@ -450,6 +447,17 @@ function formatFinalMessageForTextcomprehension() {
 let redirectingToAuthentication = false;
 
 async function sendSetTaskResultsToDatabase() {
+  let closer;
+  let showMessageTimeout;
+  showMessageTimeout = setTimeout(() => {
+    let closerText; 
+    if (controller.language === 'LT') {
+      closerText= "Rezultatai saugomi. Neuždarykite šio lango."
+    } else if (controller.language === 'EN') {
+      closerText = "Saving results. Please do not leave this page."
+    }
+    closer = messageToTheUser(closerText, false);
+  }, 500);
 
   function clearUserDataCookie() {
     localStorage.removeItem('userData');
@@ -466,10 +474,15 @@ async function sendSetTaskResultsToDatabase() {
   }
 
   if (!controller.task || controller.task.length !== 2) {
+    clearTimeout(showMessageTimeout);
+    if (closer) {
+      setTimeout(() => closer(), 0);
+    }
+
     if (controller.language === 'LT') {
-      taskSavingMessageDiv.innerHTML = "Įvyko klaida. Rezultatai neišsaugoti. Bandykite vėl vėliau."
+      messageToTheUser("Įvyko klaida. Rezultatai neišsaugoti. Bandykite vėl vėliau.")
     } else if (controller.language === 'EN') {
-      taskSavingMessageDiv.innerHTML = "An error has occurred. Results were not saved. Please try again later."
+      messageToTheUser("An error has occurred. Results were not saved. Please try again later.")
     }
     controller.task = null;
     controller.taskCompleted = false;
@@ -482,22 +495,18 @@ async function sendSetTaskResultsToDatabase() {
     elapsedTime = localStorage.getItem("elapsedTime")
   }
 
-  const apiBase = 'http://localhost:5000/';
 
   if (document.querySelector("#stopButton")) {
     document.querySelector("#stopButton").disabled = true;
+  }
+  if (document.querySelector("#stopButtonTextComp")) {
+    document.querySelector("#stopButtonTextComp").disabled = true;
   }
   if (document.querySelector(".summary-button")) {
     document.querySelector(".summary-button").disabled = true;
   }
   if (document.querySelector("#stop-button-span")) {
     document.querySelector("#stop-button-span").disabled = true;
-  }
-
-  if (controller.language === 'LT') {
-    taskSavingMessageDiv.innerHTML = "Rezultatai saugomi. Neuždarykite šio lango."
-  } else if (controller.language === 'EN') {
-    taskSavingMessageDiv.innerHTML = "Saving results. Please do not leave this page."
   }
 
   if (controller.task[0] === "setTask") {
@@ -512,14 +521,17 @@ async function sendSetTaskResultsToDatabase() {
     };
 
     try {
-        const response = await fetch(apiBase + 'results', {
+        const response = await apiFetch(apiBase + 'results', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `${userData.token}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(taskResults)
         });
+
+        if (!response) {
+          return;
+        }
 
         if (!response.ok) {
             const errorData  = await response.json().catch(() => ({}));
@@ -528,10 +540,14 @@ async function sendSetTaskResultsToDatabase() {
           controller.task = null;
           controller.taskCompleted = false;
           localStorage.setItem('controller', JSON.stringify(controller))
+          clearTimeout(showMessageTimeout);
+          if (closer) {
+            setTimeout(() => closer(), 0);
+          }
           if (controller.language === 'LT') {
-            taskSavingMessageDiv.innerHTML = "Rezultatai sėkmingai išsaugoti."
+            messageToTheUser("Rezultatai sėkmingai išsaugoti.", false)
           } else if (controller.language === 'EN') {
-            taskSavingMessageDiv.innerHTML = "Results were saved successfully."
+            messageToTheUser("Results were saved successfully.", false)
           }
         }
 
@@ -541,12 +557,16 @@ async function sendSetTaskResultsToDatabase() {
           redirectingToAuthentication = true;
             clearUserDataCookie();
             localStorage.setItem('controller', JSON.stringify(controller))
-            window.location.href = "prisijungimas";
+            //window.location.href = "prisijungimas";
         } else {
+          clearTimeout(showMessageTimeout);
+          if (closer) {
+            setTimeout(() => closer(), 0);
+          }
           if (controller.language === 'LT') {
-            taskSavingMessageDiv.innerHTML = "Įvyko klaida. Rezultatai neišsaugoti. Bandykite vėl vėliau."
+            messageToTheUser("Įvyko klaida. Rezultatai neišsaugoti. Bandykite vėl vėliau.")
           } else if (controller.language === 'EN') {
-            taskSavingMessageDiv.innerHTML = "An error has occurred. Results were not saved. Please try again later."
+            messageToTheUser("An error has occurred. Results were not saved. Please try again later.")
           }
           controller.task = null;
           controller.taskCompleted = false;
@@ -560,17 +580,11 @@ async function sendSetTaskResultsToDatabase() {
 
   const resultsData = Math.floor(answered / mistakes);
 
-    const taskResults = {
-        taskId: controller.task[1],
-        results: resultsData
-    };
-
     try {
-      const response = await fetch(apiBase + 'class/updateWeekChlScore', {
+      const response = await apiFetch(apiBase + 'class/updateWeekChlScore', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `${userData.token}`
         },
         body: JSON.stringify({
           studentId: userData.userId,
@@ -578,6 +592,10 @@ async function sendSetTaskResultsToDatabase() {
           weekChlScore: resultsData
         })
       });
+
+      if (!response) {
+        return;
+      }
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -589,10 +607,15 @@ async function sendSetTaskResultsToDatabase() {
       controller.taskCompleted = false;
       localStorage.setItem('controller', JSON.stringify(controller));
 
+      clearTimeout(showMessageTimeout);
+      if (closer) {
+        setTimeout(() => closer(), 0); // close after 0.5s
+      }
+
       if (controller.language === 'LT') {
-        taskSavingMessageDiv.innerHTML = "Savaitės iššūkio taškai sėkmingai išsaugoti.";
+        messageToTheUser("Savaitės iššūkio taškai sėkmingai išsaugoti.", false);
       } else if (controller.language === 'EN') {
-        taskSavingMessageDiv.innerHTML = "Weekly challenge score saved successfully.";
+        messageToTheUser("Weekly challenge score saved successfully.", false);
       }
 
     } catch (error) {
@@ -604,10 +627,14 @@ async function sendSetTaskResultsToDatabase() {
         localStorage.setItem('controller', JSON.stringify(controller));
         window.location.href = "prisijungimas";
       } else {
+        clearTimeout(showMessageTimeout);
+        if (closer) {
+          setTimeout(() => closer(), 0); // close after 0.5s
+        }
         if (controller.language === 'LT') {
-          taskSavingMessageDiv.innerHTML = "Įvyko klaida. Savaitės iššūkio taškai neišsaugoti. Bandykite dar kartą vėliau.";
+          messageToTheUser("Įvyko klaida. Savaitės iššūkio taškai neišsaugoti. Bandykite vėliau.");
         } else if (controller.language === 'EN') {
-          taskSavingMessageDiv.innerHTML = "An error occurred. Weekly challenge score not saved. Please try again later.";
+          messageToTheUser("An error occurred. Weekly challenge score not saved. Please try again later.");
         }
 
         controller.task = null;
@@ -619,6 +646,9 @@ async function sendSetTaskResultsToDatabase() {
 
     if (document.querySelector("#stopButton")) {
       document.querySelector("#stopButton").disabled = false;
+    }
+    if (document.querySelector("#stopButtonTextComp")) {
+      document.querySelector("#stopButtonTextComp").disabled = false;
     }
     if (document.querySelector(".summary-button")) {
       document.querySelector(".summary-button").disabled = false;
@@ -678,8 +708,6 @@ async function sendSetTaskResultsToDatabase() {
 				linkElement.setAttribute("href", "../questions-stulpeliu-div-us.css");
 		}  else if (controller.modeChoice7 === "C48") {
 			linkElement.setAttribute("href", "../questions-stulpeliu.css");
-      var answerSeparator2 = document.getElementById('answer-separator-2');
-      answerSeparator2.style.display = 'block';
     } else if (controller.withRemainder) {
 			linkElement.setAttribute("href", "../questions-remainder.css");
 		} else if (
@@ -766,9 +794,6 @@ async function sendSetTaskResultsToDatabase() {
       if (controller.language !== 'LT') {
         divisionStulp3InnerElement .innerHTML = '';
       }
-
-    var answerSeparator1 = document.getElementById('answer-separator-1');
-    var answerSeparator2 = document.getElementById('answer-separator-2');
 
     arithmeticSymbol.style.display = 'block';
     if (controller.questionsStopped) {
@@ -1106,23 +1131,6 @@ async function sendSetTaskResultsToDatabase() {
     }
 }
 }
-    if (controller.randomSelection[2] !== 'D') {
-    answerSeparator2.style.display = 'block'
-    var element3 = document.querySelector('#stulpeliu-' + (subAnswerNumber - 1));
-    if (element3) {
-      answerSeparator1.style.display = 'block';
-    } else {
-      answerSeparator1.style.display = 'none';
-    }
-
-    if (controller.questionsStopped) {  
-      answerSeparator1.style.display = 'none';
-      answerSeparator2.style.display = 'none';
-    }
-    } else {
-      answerSeparator1.style.display = 'none';
-      answerSeparator2.style.display = 'none';
-    }
 
       // Select all elements with the class 'stulpeliu-input'
       const inputElements = document.querySelectorAll('.stulpeliu-input');
@@ -1972,7 +1980,6 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
       let summaryTableElement;
       if (customDivForSummaryTable) {
         summaryTableElement = document.getElementById(customDivForSummaryTable);
-        console.log(summaryTableElement)
       } else {
         summaryTableElement = document.getElementById("summary-table");
       }
@@ -1984,7 +1991,6 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
     
     if (customDivForSummaryTable) {
       summaryTableElement = document.getElementById(customDivForSummaryTable);
-      console.log(summaryTableElement)
     } else {
       summaryTableElement = document.getElementById("summary-table");
     }
@@ -2574,6 +2580,211 @@ function startQuestionsNumber () {
 
 	localStorage.setItem('controller', JSON.stringify(controller));
 	redirectToQuestions();
+}
+
+function getOptionTextFromValues(values) {
+    function determineQuestionNumberTimeLabelEnding(type, string) {
+        if (type === "NUSTATYTI LAIKO TRUKMĘ") {
+            durationTypeTag = ''
+            if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                durationTypeTag = 'MINUTĘ';
+            } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                durationTypeTag = 'MINUTES';
+            } else if (parseInt(string) >= 10 ) {
+                durationTypeTag = 'MINUČIŲ';
+            }
+            return ("PRAKTIKUOTIS " + string + " " + durationTypeTag)  
+        } else {
+            if (values[0] === "math") {
+            durationTypeTag = ''
+            if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                durationTypeTag = 'VEIKSMĄ';
+            } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                durationTypeTag = 'VEIKSMUS';
+            } else if (parseInt(string) >= 10 ) {
+                durationTypeTag = 'VEIKSMŲ';
+            }
+            return ("ATLIKTI " + string + " " + durationTypeTag)  
+        } else if (values[0] === "lang") {
+            if (values[2] === "C49") {
+                if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                    durationTypeTag = 'TEKSTĄ';
+                } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                    durationTypeTag = 'TEKSTUS';
+                } else if (parseInt(string) >= 10 ) {
+                    durationTypeTag = 'TEKSTŲ';
+                }
+                return ("SUDĖLIOTI " + string + " " + durationTypeTag)  
+            } else if (values[2] === "C50") {
+                if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                    durationTypeTag = 'SAKINYS';
+                } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                    durationTypeTag = 'SAKINIAI';
+                } else if (parseInt(string) >= 10 ) {
+                    durationTypeTag = 'SAKINIŲ';
+                }
+                return (string + " " + durationTypeTag)  
+            }
+
+        }
+    }
+    }
+
+    let result = [];
+    let final_results = [];
+    let durationTypeTag = "";
+    if (values[0] === "math") {
+
+    result.push(parameterDictionary[values[1]]["decodedParameterText"])
+    result.push(parameterDictionary[values[2]]["decodedParameterText"])
+    result.push(values[3] ? "PERŽENGIANT DEŠIMTĮ" : "NEPERŽENGIANT DEŠIMTIES")
+    result.push(parameterDictionary[values[4]]["decodedParameterText"])
+    result.push(parameterDictionary[values[5]]["decodedParameterText"])
+    if (values[5] === "C42") {
+        if (values[1] === "C1") {
+            result.push("NEŽINOMAS DĖMUO")
+        } else if (values[1] === "C2") {
+            if (values[6] === "C43") {
+                result.push("NEŽINOMAS TURINYS")
+            } else if (values[6] === "C44") {
+                result.push("NEŽINOMAS ATĖMINYS")
+            } 
+        } else if (values[1] === "C3") {
+            result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS")
+        } else if (values[1] === "C4") {
+            result.push("NEŽINOMAS DAUGINAMASIS")
+        } else if (values[1] === "C5") {
+            if (values[6] === "C45") {
+                result.push("NEŽINOMAS DALINYS")
+            } else if (values[6] === "C46") {
+                result.push("NEŽINOMAS DALIKLIS")
+            }
+        } else if (values[1] === "C6") {
+            result.push("NEŽINOMAS DAUGINAMASIS / DALINYS / DALIKLIS")
+        } else if (values[1] === "C7") {
+            result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS / DAUGINAMASIS / DALINYS / DALIKLIS")
+        }
+    } else {
+        result.push(parameterDictionary[values[6]]["decodedParameterText"])
+    }
+
+    result.push(parameterDictionary[values[7]]["decodedParameterText"])
+    result.push(values[8])
+    result.push(values[9] ? "DALYBA SU LIEKANA" : "DALYBA BE LIEKANOS")
+    result.push(values[10])
+
+    final_results.push(result[0])
+
+    if (result[0] === "SUDĖTIS" || result[0] === "ATIMTIS" || result[0] === "SUDĖTIS IR ATIMTIS") {
+        final_results.push(result[1])
+        final_results.push(result[2])
+        final_results.push(result[4])
+        if (result[4] === "SKAITINĖ LYGYBĖ") {
+            final_results.push(result[6])  
+        } else if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+            final_results.push(result[5])  
+        }
+        final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))
+    } else if (result[0] === "DAUGYBA") {
+        final_results.push(result[1])
+        if (result[1] === "DAUGYBOS LENTELĖ") {
+        final_results.push(`NUO ${result[7][0]} IKI ${result[7][1]}`)
+        }
+        final_results.push(result[4])
+        if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+            final_results.push(result[5])    
+        }
+        final_results.push(result[6])
+        final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))    
+    } else if (result[0] === "DALYBA" || result[0] === "DAUGYBA IR DALYBA") {
+        final_results.push(result[1])
+        if (result[1] === "DAUGYBOS LENTELĖ") {
+        final_results.push(`NUO ${result[7][0]} IKI ${result[7][1]}`)
+        }
+        final_results.push(result[8])
+        final_results.push(result[4])
+        if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+            final_results.push(result[5])    
+        }
+        final_results.push(result[6])
+        final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))    
+    } else if (result[0] === "ĮVAIRŪS VEIKSMAI") {
+        final_results.push(result[1])
+        final_results.push(result[4])
+        if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+            final_results.push(result[5])    
+        }
+        final_results.push(result[6]) 
+        final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))       
+    }
+
+} else if (values[0] === "lang") {
+    result.push(parameterDictionary[values[1]]["decodedParameterText"])
+    result.push(parameterDictionary[values[2]]["decodedParameterText"])
+    
+    if (values[3] === "1") {
+        result.push("1 SAKINYS EKRANE")
+    } else if (values[3] === "2") {
+        result.push("2 SAKINIAI EKRANE")
+    } else if (values[3] === "3") {
+        result.push("3 SAKINIAI EKRANE")
+    } else if (values[3] === "4") {
+        result.push("4 SAKINIAI EKRANE")
+    } else if (values[3] === "5") {
+        result.push("5 SAKINIAI EKRANE")
+    } else {
+        result.push(values[3])
+    }      
+
+    let outerLiItem = document.createElement('li');
+    outerLiItem.textContent = "RAŠYBOS NUSTATYMAI:"; // Add a label for the outer <li>
+
+    let grammarParamsList = document.createElement('ul');
+    grammarParamsList.classList.add('grammar-params-list');
+
+    Object.keys(values[4]).forEach(key => {
+        let listItem = document.createElement('li');
+        listItem.innerHTML = parameterDictionary[key]["decodedParameterText"]; // Use innerHTML instead of textContent
+        grammarParamsList.appendChild(listItem);
+    });
+
+    outerLiItem.appendChild(grammarParamsList);
+
+
+    // Store as an HTML string
+    result.push(outerLiItem.outerHTML);
+
+    result.push(parameterDictionary[values[5]]["decodedParameterText"])
+    result.push(parameterDictionary[values[6]]["decodedParameterText"])
+    result.push(values[9])
+    if (values[8] === 1) {
+        result.push("DAŽNESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
+    } else {
+        result.push("RETESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
+    }
+    result.push(parameterDictionary[values[7]]["decodedParameterText"])
+
+    final_results.push(result[0])
+    final_results.push(result[1])
+    if (result[1] === "TEKSTO SUPRATIMAS") {
+        final_results.push(parameterDictionary[result[2]]["decodedParameterText"])
+        final_results.push(result[8])
+        final_results.push(determineQuestionNumberTimeLabelEnding(result[4], result[6])) 
+    } else if (result[1] === "RAŠYBA") {
+        final_results.push(result[2])
+        final_results.push(result[3])
+        if (result[0] === "3-4 KLASĖ") {
+            if ("C62" in values[4] || "C63" in values[4] || "C64" in values[4] || "C65" in values[4]) {
+                    final_results.push(result[5])
+                } 
+            } else {
+                final_results.push(result[7])
+            }
+        final_results.push(determineQuestionNumberTimeLabelEnding(result[4], result[6])) 
+    }
+}
+
+    return final_results;
 }
 
 //TASK INFO COLLECTION START

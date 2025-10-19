@@ -6,6 +6,7 @@
     <title>Page Template</title>
     <link rel="stylesheet" type="text/css" href="../index.css">
     <link rel="stylesheet" href="../main-nav-bar.css">
+    <script src="../refresh-token.js"></script>
     <style>
         @font-face {
             font-family: "SFpro";
@@ -97,6 +98,10 @@
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        #contentContainer[hidden] {
+            display: none !important;
         }
 
         /* Side Navigation */
@@ -1708,7 +1713,7 @@
                 </div>
             </a>
 
-            <div class="main-nav-links">
+            <div class="main-nav-links invisible">
                 <a href="index.html" class="main-nav-link">Praktika</a>
                 <a href="uzduotys.html" class="main-nav-link">Užduotys</a>
                 <a href="klase.html" class="main-nav-link main-nav-link-active">Klasė</a>
@@ -1728,8 +1733,12 @@
                 
                 <div class="main-nav-connect-wrapper">
                     <div class="main-nav-connect-glow"></div>
-                    <button class="main-nav-connect-btn">
+                    <button class="main-nav-log-out-btn">
                         <span class="main-nav-connect-text">Atsijungti</span>
+                    </button>
+
+                    <button class="main-nav-log-in-btn">
+                        <span class="main-nav-connect-text">Prisijungti</span>
                     </button>
                 </div>
             </div>
@@ -1753,15 +1762,18 @@
                     <button class="language-option language-option-EN" onclick="setLanguage('EN')">EN</button>
                 </div>
                 
-                <button class="main-nav-mobile-connect">
+                <button class="main-nav-mobile-log-out-btn">
                     <span class="main-nav-connect-text">Atsijungti</span>
+                </button>
+                <button class="main-nav-mobile-log-in-btn">
+                    <span class="main-nav-connect-text">Prisijungti</span>
                 </button>
             </div>
         </div>
     </nav>
 
     <!-- Main Content Container -->
-    <div id="contentContainer">
+    <div id="contentContainer" hidden>
         <!-- Side Navigation -->
         <nav class="side-navigation">
             <div class="nav-items">
@@ -1937,7 +1949,7 @@
         if (userDataString) {
             userData = JSON.parse(userDataString);
         } else {
-            window.location.href = '/LT';
+            window.location.href = './';
         }
 
         let classDataCache = null;
@@ -1997,14 +2009,17 @@
             document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = true);
             
             try {
-                const response = await fetch(apiBase + 'students', {
+                const response = await apiFetch(apiBase + 'students', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': userData.token
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ teacherId })
                 });
+
+                if (!response) {
+                    return;
+                }
 
                 // Safely parse response (fallback if JSON fails)
                 const responseData = await response.json().catch(() => ({}))
@@ -2062,14 +2077,17 @@
             changeTeacherButton.innerHTML = "Keičiama..."
             document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = true);   
             try {
-                const response = await fetch(apiBase + 'students', {
+                const response = await apiFetch(apiBase + 'students', {
                     method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': userData.token
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ teacherId })
                 });
+
+                if (!response) {
+                    return;
+                }
 
                 // Safely parse response (fallback if JSON fails)
                 const responseData = await response.json().catch(() => ({}))
@@ -2207,9 +2225,6 @@
                 contentPanel.forEach(panel => panel.classList.remove("mobile"));
             }
         }
-
-        // Run on page load
-        handleResponsiveLayout();
 
         // Recalculate on resize
         window.addEventListener("resize", handleResponsiveLayout);
@@ -2492,7 +2507,6 @@ function updateAvatarDisplay() {
                 await updateUserAvatar(newAvatarCode)
             }
 
-            console.log(userData)
             localStorage.setItem('userData', JSON.stringify(userData));
             userDataString = localStorage.getItem('userData');
             saveClassDataCache();
@@ -2503,14 +2517,17 @@ function updateAvatarDisplay() {
         async function updateUserAvatar(newAvatarCode) {
             const newAvatarSvg = renderAvatarFromCode(newAvatarCode);
             try {
-                const response = await fetch(apiBase + 'class/updateAvatar', {
+                const response = await apiFetch(apiBase + 'class/updateAvatar', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': userData.token // if authentication is needed
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ userId: userData.userId, newAvatarCode })
                 });
+
+                if (!response) {
+                    return;
+                }
 
                 if (!response.ok) {
                     throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -2545,14 +2562,17 @@ function updateAvatarDisplay() {
 
         async function updateUserNickname(newNickname) {
             try {
-                const response = await fetch(apiBase + 'class/updateNickname', {
+                const response = await apiFetch(apiBase + 'class/updateNickname', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': userData.token // if you require auth
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ userId: userData.userId, newNickname })
                 });
+
+                if (!response) {
+                    return;
+                }
 
                 if (!response.ok) {
                     throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -2797,14 +2817,17 @@ async function fetchClassData() {
   }
 
   try {
-    const response = await fetch(apiBase + 'class/studentInfo', {
+    const response = await apiFetch(apiBase + 'class/studentInfo', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': userData.token
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ studentId: userData.userId })
     });
+
+    if (!response) {
+        return;
+    }
 
     const raw = await response.json();
 
@@ -2882,14 +2905,17 @@ async function updateClassStats() {
   if (!classDataCache) return;
 
   try {
-    const response = await fetch(apiBase + 'class/updateStudentStats', {
+    const response = await apiFetch(apiBase + 'class/updateStudentStats', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': userData.token
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ studentId: userData.userId })
     });
+
+    if (!response) {
+        return;
+    }
 
     const raw = await response.json();
 
@@ -3004,221 +3030,19 @@ if (storedCacheExpiry) {
     }
 
 
-            function getOptionTextFromValues(values) {
-            function determineQuestionNumberTimeLabelEnding(type, string) {
-                if (type === "NUSTATYTI LAIKO TRUKMĘ") {
-                    durationTypeTag = ''
-                    if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
-                        durationTypeTag = 'MINUTĘ';
-                    } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
-                        durationTypeTag = 'MINUTES';
-                    } else if (parseInt(string) >= 10 ) {
-                        durationTypeTag = 'MINUČIŲ';
-                    }
-                    return ("PRAKTIKUOTIS " + string + " " + durationTypeTag)  
-                } else {
-                    if (values[0] === "math") {
-                    durationTypeTag = ''
-                    if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
-                        durationTypeTag = 'VEIKSMĄ';
-                    } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
-                        durationTypeTag = 'VEIKSMUS';
-                    } else if (parseInt(string) >= 10 ) {
-                        durationTypeTag = 'VEIKSMŲ';
-                    }
-                    return ("ATLIKTI " + string + " " + durationTypeTag)  
-                } else if (values[0] === "lang") {
-                    if (values[2] === "C49") {
-                        if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
-                            durationTypeTag = 'TEKSTĄ';
-                        } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
-                            durationTypeTag = 'TEKSTUS';
-                        } else if (parseInt(string) >= 10 ) {
-                            durationTypeTag = 'TEKSTŲ';
-                        }
-                        return ("SUDĖLIOTI " + string + " " + durationTypeTag)  
-                    } else if (values[2] === "C50") {
-                        if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
-                            durationTypeTag = 'SAKINYS';
-                        } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
-                            durationTypeTag = 'SAKINIAI';
-                        } else if (parseInt(string) >= 10 ) {
-                            durationTypeTag = 'SAKINIŲ';
-                        }
-                        return (string + " " + durationTypeTag)  
-                    }
-
-                }
-            }
-            }
- 
-            let result = [];
-            let final_results = [];
-            let durationTypeTag = "";
-            if (values[0] === "math") {
-
-            result.push(parameterDictionary[values[1]]["decodedParameterText"])
-            result.push(parameterDictionary[values[2]]["decodedParameterText"])
-            result.push(values[3] ? "PERŽENGIANT DEŠIMTĮ" : "NEPERŽENGIANT DEŠIMTIES")
-            result.push(parameterDictionary[values[4]]["decodedParameterText"])
-            result.push(parameterDictionary[values[5]]["decodedParameterText"])
-            if (values[5] === "C42") {
-                if (values[1] === "C1") {
-                    result.push("NEŽINOMAS DĖMUO")
-                } else if (values[1] === "C2") {
-                    if (values[6] === "C43") {
-                        result.push("NEŽINOMAS TURINYS")
-                    } else if (values[6] === "C44") {
-                        result.push("NEŽINOMAS ATĖMINYS")
-                    } 
-                } else if (values[1] === "C3") {
-                    result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS")
-                } else if (values[1] === "C4") {
-                    result.push("NEŽINOMAS DAUGINAMASIS")
-                } else if (values[1] === "C5") {
-                    if (values[6] === "C45") {
-                        result.push("NEŽINOMAS DALINYS")
-                    } else if (values[6] === "C46") {
-                        result.push("NEŽINOMAS DALIKLIS")
-                    }
-                } else if (values[1] === "C6") {
-                    result.push("NEŽINOMAS DAUGINAMASIS / DALINYS / DALIKLIS")
-                } else if (values[1] === "C7") {
-                    result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS / DAUGINAMASIS / DALINYS / DALIKLIS")
-                }
-            } else {
-                result.push(parameterDictionary[values[6]]["decodedParameterText"])
-            }
-
-            result.push(parameterDictionary[values[7]]["decodedParameterText"])
-            result.push(values[8])
-            result.push(values[9] ? "DALYBA SU LIEKANA" : "DALYBA BE LIEKANOS")
-            result.push(values[10])
-
-            final_results.push(result[0])
-
-            if (result[0] === "SUDĖTIS" || result[0] === "ATIMTIS" || result[0] === "SUDĖTIS IR ATIMTIS") {
-                final_results.push(result[1])
-                final_results.push(result[2])
-                final_results.push(result[4])
-                if (result[4] === "SKAITINĖ LYGYBĖ") {
-                    final_results.push(result[6])  
-                } else if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
-                    final_results.push(result[5])  
-                }
-                final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))
-            } else if (result[0] === "DAUGYBA") {
-                final_results.push(result[1])
-                if (result[1] === "DAUGYBOS LENTELĖ") {
-                final_results.push(`NUO ${result[7][0]} IKI ${result[7][1]}`)
-                }
-                final_results.push(result[4])
-                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
-                    final_results.push(result[5])    
-                }
-                final_results.push(result[6])
-                final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))    
-            } else if (result[0] === "DALYBA" || result[0] === "DAUGYBA IR DALYBA") {
-                final_results.push(result[1])
-                if (result[1] === "DAUGYBOS LENTELĖ") {
-                final_results.push(`NUO ${result[7][0]} IKI ${result[7][1]}`)
-                }
-                final_results.push(result[8])
-                final_results.push(result[4])
-                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
-                    final_results.push(result[5])    
-                }
-                final_results.push(result[6])
-                final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))    
-            } else if (result[0] === "ĮVAIRŪS VEIKSMAI") {
-                final_results.push(result[1])
-                final_results.push(result[4])
-                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
-                    final_results.push(result[5])    
-                }
-                final_results.push(result[6]) 
-                final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))       
-            }
-
-        } else if (values[0] === "lang") {
-            result.push(parameterDictionary[values[1]]["decodedParameterText"])
-            result.push(parameterDictionary[values[2]]["decodedParameterText"])
-            
-            if (values[3] === "1") {
-                result.push("1 SAKINYS EKRANE")
-            } else if (values[3] === "2") {
-                result.push("2 SAKINIAI EKRANE")
-            } else if (values[3] === "3") {
-                result.push("3 SAKINIAI EKRANE")
-            } else if (values[3] === "4") {
-                result.push("4 SAKINIAI EKRANE")
-            } else if (values[3] === "5") {
-                result.push("5 SAKINIAI EKRANE")
-            } else {
-                result.push(values[3])
-            }      
-
-            let outerLiItem = document.createElement('li');
-            outerLiItem.textContent = "RAŠYBOS NUSTATYMAI:"; // Add a label for the outer <li>
-
-            let grammarParamsList = document.createElement('ul');
-            grammarParamsList.classList.add('grammar-params-list');
-
-            Object.keys(values[4]).forEach(key => {
-                let listItem = document.createElement('li');
-                listItem.innerHTML = parameterDictionary[key]["decodedParameterText"]; // Use innerHTML instead of textContent
-                grammarParamsList.appendChild(listItem);
-            });
-
-            outerLiItem.appendChild(grammarParamsList);
-
-
-            // Store as an HTML string
-            result.push(outerLiItem.outerHTML);
-
-            result.push(parameterDictionary[values[5]]["decodedParameterText"])
-            result.push(parameterDictionary[values[6]]["decodedParameterText"])
-            result.push(values[9])
-            if (values[8] === 1) {
-                result.push("DAŽNESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
-            } else {
-                result.push("RETESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
-            }
-            result.push(parameterDictionary[values[7]]["decodedParameterText"])
-
-            final_results.push(result[0])
-            final_results.push(result[1])
-            if (result[1] === "TEKSTO SUPRATIMAS") {
-                final_results.push(parameterDictionary[result[2]]["decodedParameterText"])
-                final_results.push(result[8])
-                final_results.push(determineQuestionNumberTimeLabelEnding(result[4], result[6])) 
-            } else if (result[1] === "RAŠYBA") {
-                final_results.push(result[2])
-                final_results.push(result[3])
-                if (result[0] === "3-4 KLASĖ") {
-                    if ("C62" in values[4] || "C63" in values[4] || "C64" in values[4] || "C65" in values[4]) {
-                            final_results.push(result[5])
-                        } 
-                    } else {
-                        final_results.push(result[7])
-                    }
-                final_results.push(determineQuestionNumberTimeLabelEnding(result[4], result[6])) 
-            }
-        }
-
-            return final_results;
-        }
-
         async function getChallengeByTaskId(taskId) {
             try {
-                const response = await fetch(apiBase + 'class/getChallenge', {
+                const response = await apiFetch(apiBase + 'class/getChallenge', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': userData.token // include if backend expects auth
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ taskId })
                 });
+
+                if (!response) {
+                    return;
+                }
 
                 if (!response.ok) {
                 throw new Error(`Server error ${response.status}: ${response.statusText}`);
@@ -3719,16 +3543,27 @@ function completeWeekChlTask() {
 }
 
 window.onload = function () {
-    if (typeof controller === 'undefined' || controller === null) {
-        const savedController = localStorage.getItem('controller');
-        if (savedController) {
-            controller = JSON.parse(savedController);
-        }
+    const savedController = localStorage.getItem('controller');
+    if (savedController) {
+        controller = JSON.parse(savedController);
     }
+
     if (controller) {
         controller.task = null;
         controller.taskCompleted = false;
         localStorage.setItem('controller', JSON.stringify(controller));
+    }
+
+    handleResponsiveLayout();
+    document.querySelector('#contentContainer').removeAttribute('hidden');
+
+    const referrerPage = document.referrer.split('/').pop();
+
+    const triggerPages = ['veiksmai.html', 'teksto-suvokimas.html', 'rasyba.html'];
+    
+    if (triggerPages.includes(referrerPage)) {
+        const btn = document.querySelector('.nav-item[data-target="issukis"]');
+        if (btn) btn.click();
     }
 };
 

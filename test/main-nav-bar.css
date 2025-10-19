@@ -40,7 +40,7 @@
 .main-nav-logo-icon {
     position: relative;
     margin-right: 0.5rem;
-    height: 50px;
+    height: 55px;
 }
 
 /* Navigation Links */
@@ -48,6 +48,10 @@
     display: flex;
     align-items: center;
     gap: 0.25rem;
+}
+
+.main-nav-links.invisible {
+    opacity: 0;
 }
 
 .main-nav-link {
@@ -92,7 +96,8 @@
     margin-left: 1rem;
 }
 
-.main-nav-connect-btn {
+.main-nav-log-out-btn,
+.main-nav-log-in-btn {
     position: relative;
     z-index: 1;
     padding: 0.5rem 1rem;
@@ -113,8 +118,10 @@
     overflow: hidden;
 }
 
-.main-nav-connect-btn:before,
-.main-nav-mobile-connect:before {
+.main-nav-log-out-btn:before,
+.main-nav-log-in-btn:before,
+.main-nav-mobile-log-out-btn:before,
+.main-nav-mobile-log-in-btn:before {
   content: '';
   position: absolute;
   inset: 0;
@@ -124,8 +131,10 @@
   transition: background 0.3s ease;
 }
 
-.main-nav-connect-btn:after,
-.main-nav-mobile-connect:after {
+.main-nav-log-out-btn:after,
+.main-nav-log-in-btn:after,
+.main-nav-mobile-log-out-btn:after,
+.main-nav-mobile-log-in-btn:after {
   content: '';
   position: absolute;
   inset: 0;
@@ -138,7 +147,10 @@
   pointer-events: none;
 }
 
-.main-nav-connect-btn:hover::before {
+.main-nav-log-out-btn:hover::before,
+.main-nav-log-in-btn:hover::before,
+.main-nav-mobile-log-out-btn:hover::before,
+.main-nav-mobile-log-in-btn:hover::before {
   background: rgba(255, 255, 255, 0.15);
 }
 
@@ -339,6 +351,7 @@
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .main-nav-mobile-link {
@@ -362,7 +375,8 @@
     border-left-color: #32ac93;
 }
 
-.main-nav-mobile-connect {
+.main-nav-mobile-log-out-btn,
+.main-nav-mobile-log-in-btn {
     position: relative;
     margin: 1rem 1.5rem 0;
     padding: 0.75rem 1rem;
@@ -393,6 +407,11 @@
     transition: all 0.2s ease;
     padding: 8px 12px;
     border-radius: 8px;
+}
+
+#desktopBackBtn,
+#mobileBackBtn {
+    cursor: pointer;
 }
 
 .main-nav-back-btn:hover {
@@ -511,7 +530,8 @@
         font-size: 1.5rem;
     }
 
-    .main-nav-mobile-connect {
+    .main-nav-mobile-log-out-btn,
+    .main-nav-mobile-log-in-btn {
         font-size: 1.5rem;
         margin-top: 32px;
     }

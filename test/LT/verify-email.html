@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>El. pašto patvirtinimas - sudEdu</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+	<link rel="stylesheet" type="text/css" href="../index.css">
+	<script src="../refresh-token.js"></script>
+
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-96Q83PW8XY"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+		gtag('config', 'G-96Q83PW8XY');
+	</script>
+
+	<style>
+		* {
+			-webkit-user-select: none;
+			-webkit-tap-highlight-color: transparent;
+			user-select: none;
+			box-sizing: border-box;
+		}
+
+		html {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			background-image: linear-gradient(to top, #ffbf9c, #ffbf92, #ffbf89, #ffbf7e, #ffc074);
+			width: 100vw;
+			height: 100svh;
+			overflow: hidden;
+		}
+
+		body {
+			margin: 0;
+			font-family: 'SFpro', sans-serif;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+		}
+
+		.container {
+			position: relative;
+			width: calc(100% - 32px);
+			max-height: calc(100% - 32px);
+			max-width: 480px;
+			background: rgba(255, 255, 255, 0.08);
+			backdrop-filter: blur(20px);
+			border-radius: 25px;
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+			padding: 40px;
+			animation: fadeIn 0.5s ease-out;
+			overflow-y: auto;
+			text-align: center;
+		}
+
+		@keyframes fadeIn {
+			from {
+				opacity: 0;
+				transform: translateY(-20px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.logo-container {
+			text-align: center;
+			margin-bottom: 15px;
+		}
+
+		.logo-container img {
+			width: 300px;
+			height: auto;
+		}
+
+		h2 {
+			font-size: 2rem;
+			font-weight: 700;
+			color: #2c3e50;
+			text-align: center;
+			margin: 0 0 24px 0;
+		}
+
+		.spinner-container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			padding: 20px 0;
+		}
+
+		.spinner {
+			width: 56px;
+			height: 56px;
+			border: 5px solid rgba(64, 201, 169, 0.2);
+			border-top-color: #40c9a9;
+			border-radius: 50%;
+			animation: spin 0.8s linear infinite;
+		}
+
+		@keyframes spin {
+			to { transform: rotate(360deg); }
+		}
+
+		.spinner-text {
+			margin-top: 16px;
+			color: #2c3e50;
+			font-size: 1rem;
+		}
+
+		.status-message {
+			padding: 16px 20px;
+			border-radius: 12px;
+			font-size: 1.05rem;
+			line-height: 1.6;
+			margin: 20px 0;
+			background: rgba(255, 255, 255, 0.5);
+			color: #2c3e50;
+			border: 1px solid rgba(255, 255, 255, 0.3);
+		}
+
+		.status-message.success {
+			background: rgba(46, 204, 113, 0.15);
+			color: #27ae60;
+			border-color: rgba(46, 204, 113, 0.3);
+		}
+
+		.status-message.error {
+			background: rgba(231, 76, 60, 0.15);
+			color: #c0392b;
+			border-color: rgba(231, 76, 60, 0.3);
+		}
+
+		.status-message.warning {
+			background: rgba(243, 156, 18, 0.15);
+			color: #d68910;
+			border-color: rgba(243, 156, 18, 0.3);
+		}
+
+		.form-group {
+			margin-bottom: 16px;
+		}
+
+		input[type="email"] {
+			width: 100%;
+			padding: 14px 16px;
+			font-size: 1rem;
+			font-family: 'SFpro', sans-serif;
+			background: rgba(255, 255, 255, 0.9);
+			border: 1px solid rgba(255, 255, 255, 0.3);
+			border-radius: 25px;
+			transition: all 0.3s ease;
+			color: #2c3e50;
+		}
+
+		input[type="email"]:focus {
+			outline: none;
+			background: rgba(255, 255, 255, 1);
+			border-color: #40c9a9;
+			box-shadow: 0 0 0 3px rgba(64, 201, 169, 0.1);
+		}
+
+		input::placeholder {
+			color: #95a5a6;
+		}
+
+		.btn {
+			width: 100%;
+			padding: 14px 24px;
+			font-size: 1.1rem;
+			font-weight: 600;
+			font-family: 'SFpro', sans-serif;
+			border: none;
+			border-radius: 25px;
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			position: relative;
+			overflow: hidden;
+		}
+
+		.btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+            border-radius: 20px;
+            pointer-events: none;
+            transition: background 0.3s ease;
+        }
+
+		.btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+		.btn-primary {
+			background: linear-gradient(135deg, #40c9a9, #32ac93);
+			color: white;
+		}
+
+		.btn-primary:not(:disabled):hover::before {
+		background: rgba(255, 255, 255, 0.15);
+		}
+
+		.btn-primary:disabled {
+			opacity: 0.6;
+			cursor: not-allowed;
+			transform: none;
+		}
+
+		.btn-spinner {
+			width: 16px;
+			height: 16px;
+			border: 2px solid rgba(255, 255, 255, 0.3);
+			border-top-color: white;
+			border-radius: 50%;
+			animation: spin 0.6s linear infinite;
+		}
+
+		.resend-section {
+			animation: slideIn 0.3s ease-out;
+		}
+
+		@keyframes slideIn {
+			from {
+				opacity: 0;
+				transform: translateY(10px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.icon-container {
+			width: 80px;
+			height: 80px;
+			margin: 0 auto 20px;
+			background: linear-gradient(135deg, #40c9a9, #32ac93);
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			animation: scaleIn 0.5s ease-out;
+		}
+
+		.icon-container.success {
+			background: linear-gradient(135deg, #46d39a, #2ecc71);
+		}
+
+		.icon-container.error {
+			background: linear-gradient(135deg, #ff6b6b, #e74c3c);
+		}
+
+		.icon-container.warning {
+			background: linear-gradient(135deg, #ffa41b, #f39c12);
+		}
+
+		@keyframes scaleIn {
+			from {
+				transform: scale(0);
+				opacity: 0;
+			}
+			to {
+				transform: scale(1);
+				opacity: 1;
+			}
+		}
+
+		.icon-container .material-symbols-rounded {
+			font-size: 48px;
+			color: white;
+		}
+
+		@media (max-width: 767px) {
+			.container {
+				padding: 32px 24px;
+			}
+
+			h2 {
+				font-size: 1.75rem;
+			}
+
+			.logo-container img {
+				width: 250px;
+			}
+
+			.icon-container {
+				width: 70px;
+				height: 70px;
+			}
+
+			.icon-container .material-symbols-rounded {
+				font-size: 40px;
+			}
+		}
+
+		@media (max-width: 575px) {
+			.container {
+				padding: 20px 20px;
+			}
+
+			h2 {
+				font-size: 1.5rem;
+			}
+
+			.logo-container img {
+				width: 200px;
+			}
+
+			.icon-container {
+				width: 60px;
+				height: 60px;
+			}
+
+			.icon-container .material-symbols-rounded {
+				font-size: 36px;
+			}
+		}
+
+		@media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait) {
+			h2 {
+				font-size: 2.5rem;
+			}
+
+			.logo-container img {
+				width: 400px;
+			}
+
+			input {
+				font-size: 1.5rem;
+				padding: 18px 20px;
+			}
+
+			.btn {
+				font-size: 1.5rem;
+				padding: 18px 28px;
+			}
+
+			.status-message {
+				font-size: 1.4rem;
+			}
+
+			.spinner {
+				width: 72px;
+				height: 72px;
+			}
+
+			.spinner-text {
+				font-size: 1.3rem;
+			}
+
+			.icon-container {
+				width: 100px;
+				height: 100px;
+			}
+
+			.icon-container .material-symbols-rounded {
+				font-size: 60px;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="logo-container">
+			<img src="../images/sudedu_logo.png" alt="sudEdu">
+		</div>
+
+		<h2>El. pašto patvirtinimas</h2>
+
+		<!-- Loading State -->
+		<div id="loadingSpinner" class="spinner-container">
+			<div class="spinner"></div>
+			<p class="spinner-text">Palaukite, vyksta patvirtinimas...</p>
+		</div>
+
+		<!-- Status Message -->
+		<div id="messageContainer" class="status-message" style="display:none;">
+			<p id="message" style="margin:0;"></p>
+		</div>
+
+		<!-- Resend Section -->
+		<div id="resendSection" class="resend-section" style="display:none;">
+			<p style="margin-bottom: 16px; color: #2c3e50;">Patvirtinimo nuoroda nebegalioja.</p>
+			<div class="form-group">
+				<input type="email" id="emailInput" placeholder="Įveskite el. paštą" />
+			</div>
+			<button class="btn btn-primary" id="resendBtn" onclick="resendVerification()">
+				<span id="resendBtnText">Siųsti naują nuorodą</span>
+				<div id="resendBtnSpinner" class="btn-spinner" style="display:none;"></div>
+			</button>
+		</div>
+
+		<!-- Home Button -->
+		<button class="btn btn-primary" id="goHomeBtn" style="display:none; margin-top: 20px;" onclick="window.location.href='./prisijungimas.html'">
+			Eiti į prisijungimą
+		</button>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="../mental-arithmetic.js"></script>
+	<script src="../mental-arithmetic-combinations.js"></script>
+
+	<script>
+		const MESSAGES = {
+			'VERIFY_001': 'El. paštas sėkmingai patvirtintas! Galite prisijungti.',
+			'VERIFY_002': 'El. paštas jau buvo patvirtintas.',
+			'VERIFY_003': 'Vartotojas nerastas.',
+			'VERIFY_004': 'Patvirtinimo nuoroda nebegalioja.',
+			'ERR_001': 'Serverio klaida. Bandykite vėliau.',
+			'ERR_002': 'Trūksta duomenų.'
+		};
+
+		function getMsg(code) {
+			return MESSAGES[code] || 'Nežinoma klaida';
+		}
+
+		const params = new URLSearchParams(window.location.search);
+		const token = params.get('token');
+		const loadingSpinner = document.getElementById('loadingSpinner');
+		const messageContainer = document.getElementById('messageContainer');
+		const message = document.getElementById('message');
+		const btn = document.getElementById('goHomeBtn');
+		const resendSection = document.getElementById('resendSection');
+
+		function showStatus(msg, type = 'info', icon = 'info') {
+			loadingSpinner.style.display = 'none';
+			
+			// Show message
+			messageContainer.style.display = 'block';
+			messageContainer.className = 'status-message ' + type;
+			message.textContent = msg;
+		}
+
+		async function verifyEmail() {
+			if (!token) {
+				showStatus(getMsg('ERR_002'), 'error', 'error');
+				btn.style.display = 'block';
+				return;
+			}
+
+			try {
+				const res = await fetch(apiBase + 'auth/verify-email?token=' + encodeURIComponent(token));
+				const data = await res.json();
+
+				if (data.code === 'VERIFY_001') {
+					showStatus(getMsg(data.code), 'success', 'check_circle');
+					btn.style.display = 'block';
+				} else if (data.code === 'VERIFY_002') {
+					showStatus(getMsg(data.code), 'success', 'verified');
+					btn.style.display = 'block';
+				} else if (data.code === 'VERIFY_004') {
+					showStatus(getMsg(data.code), 'warning', 'schedule');
+					resendSection.style.display = 'block';
+					btn.style.display = 'block';
+				} else if (data.code === 'VERIFY_003') {
+					showStatus(getMsg(data.code), 'error', 'person_off');
+					btn.style.display = 'block';
+				} else {
+					showStatus(getMsg(data.code), 'error', 'error');
+					btn.style.display = 'block';
+				}
+			} catch (err) {
+				showStatus(getMsg('ERR_001'), 'error', 'error');
+				btn.style.display = 'block';
+			}
+		}
+
+		async function resendVerification() {
+			const emailVal = document.getElementById('emailInput').value.trim();
+			const resendBtn = document.getElementById('resendBtn');
+			const resendBtnText = document.getElementById('resendBtnText');
+			const resendBtnSpinner = document.getElementById('resendBtnSpinner');
+			
+			if (!emailVal || !emailVal.includes('@')) {
+				message.textContent = 'Įveskite galiojantį el. paštą';
+				messageContainer.className = 'status-message error';
+				return;
+			}
+
+			resendBtn.disabled = true;
+			resendBtnText.textContent = 'Siunčiama...';
+			resendBtnSpinner.style.display = 'block';
+			message.textContent = 'Siunčiama patvirtinimo nuoroda...';
+			messageContainer.className = 'status-message';
+
+			try {
+				const response = await fetch(apiBase + 'auth/resend-verification', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ username: emailVal })
+				});
+				const data = await response.json();
+				
+				message.textContent = getMsg(data.code);
+				messageContainer.className = 'status-message success';
+				resendSection.style.display = 'none';
+			} catch (err) {
+				message.textContent = 'Nepavyko išsiųsti patvirtinimo laiško.';
+				messageContainer.className = 'status-message error';
+				resendBtn.disabled = false;
+				resendBtnText.textContent = 'Siųsti naują nuorodą';
+				resendBtnSpinner.style.display = 'none';
+			}
+		}
+
+		// Handle Enter key
+		document.addEventListener('keydown', function(event) {
+			if (event.key === 'Enter' && resendSection.style.display !== 'none') {
+				resendVerification();
+			}
+		});
+
+		// Auto-verify on page load
+		verifyEmail();
+	</script>
+</body>
+</html>

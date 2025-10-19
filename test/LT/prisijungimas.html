@@ -1,358 +1,912 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 	<title>sudedu - prisijungimas</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
 	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-		integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-	<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Josefin+Sans&display=swap"
-		rel="stylesheet">
-		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 	<link rel="stylesheet" type="text/css" href="../index.css">
+	<link rel="stylesheet" href="../main-nav-bar.css">
+	<script src="../refresh-token.js"></script>
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-96Q83PW8XY"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-96Q83PW8XY"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+		gtag('config', 'G-96Q83PW8XY');
+	</script>
 
-  gtag('config', 'G-96Q83PW8XY');
-</script>	
-	
-<style>
-	.container {
-		padding-bottom: 25px;
-		padding-left: 0;
-		padding-right: 0;
-	}
+	<style>
+		* {
+			-webkit-user-select: none;
+			-webkit-tap-highlight-color: transparent;
+			user-select: none;
+			box-sizing: border-box;
+		}
 
-	.gap-after-row {
-		padding-bottom: 10px;
-	}
+		html {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			background-image: linear-gradient(to top, #ffbf9c, #ffbf92, #ffbf89, #ffbf7e, #ffc074);
+			width: 100vw;
+			height: 100svh;
+			overflow: hidden;
+		}
 
+		body {
+			margin: 0;
+			font-family: 'SFpro', sans-serif;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+		}
 
-	#error {
-		margin-bottom: 0;
-	}
+		.container {
+			position: relative;
+			width: calc(100% - 32px);
+			max-height: calc(100% - 80px - 32px);
+			min-height: calc(100% - 80px - 32px);
+			background: rgba(255, 255, 255, 0.08);
+			backdrop-filter: blur(20px);
+			border-radius: 20px;
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+			padding: 40px;
+			overflow-y: auto;
+			margin: 16px;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+		}
 
-	input {
-		min-width: 300px;
-		padding: 5px;
-	}
+		.inner-container {
+			position: relative;
+			max-height: 100%;
+			width: 400px;
+			overflow-y: auto;
+		}
 
-	#is-teacher {
-		min-width: 0;
-	}
+		@keyframes fadeIn {
+			from {
+				opacity: 0;
+				transform: translateY(-20px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
 
-	.btn:disabled {
-            background-color: #40c9a9;
-            border-color: #40c9a9;
-            color: black;
-            filter: grayscale(25%);
-    }
-	
-	#error {
-		max-width: 300px;
-		min-height: 48px;
+		.logo-container {
+			text-align: center;
+			margin-bottom: 15px;
+		}
 
-	}
+		.logo-container img {
+			width: 300px;
+			height: auto;
+		}
 
-	hr {
-		margin: 32px 0 32px 0;
-	}
-
-	@media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)  {
 		h2 {
-			font-size: 2.5rem;
+			font-size: 2rem;
+			font-weight: 700;
+			color: #2c3e50;
+			text-align: center;
+			margin: 0 0 24px 0;
 		}
 
-		input {
-			font-size: 1.5rem;
-			min-width: 500px;
+		.form-group {
+			margin-bottom: 16px;
 		}
 
-		.bi-eye {
-			width: 26px !important;
-			height: 26px !important;
+		.input-wrapper {
+			position: relative;
+			width: 100%;
+			border-radius: 15px;
+			border: none;
+			background: transparent;
 		}
 
-		#authBtn,
-		#registerBtn {
-			font-size: 1.5rem;
+		input[type="text"],
+		input[type="email"],
+		input[type="password"] {
+			width: 100%;
+			padding: 14px 16px;
+			font-size: 1rem;
+			font-family: 'SFpro', sans-serif;
+			background: rgba(255, 255, 255, 0.85);
+			border: 1px solid rgba(255, 255, 255, 0.3);
+			border-radius: 15px;
+			transition: all 0.3s ease;
+			color: #2c3e50;
 		}
 
-		#sign-ip-text {
-			font-size: 1.75rem;
+		input[type="text"]:focus,
+		input[type="email"]:focus,
+		input[type="password"]:focus {
+			outline: none;
+			background: rgba(255, 255, 255, 1);
+			border-color: rgba(255, 255, 255, 1);
 		}
 
-		.reset-button {
-			height: 6rem;
-			width: 6rem;
+		input::placeholder {
+			color: #95a5a6;
 		}
 
-		.material-symbols-rounded {
-			font-size: 4.5rem;
+		.password-toggle {
+			position: absolute;
+			right: 12px;
+			top: 50%;
+			transform: translateY(-50%);
+			background: none;
+			border: none;
+			cursor: pointer;
+			padding: 8px;
+			color: #7f8c8d;
+			transition: color 0.2s;
 		}
-	}
 
-</style>
+		.password-toggle:hover {
+			color: #40c9a9;
+		}
 
+		.password-toggle svg {
+			width: 20px;
+			height: 20px;
+			display: block;
+		}
+
+		.checkbox-wrapper {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			margin-bottom: 16px;
+		}
+
+		input[type="checkbox"] {
+			width: 20px;
+			height: 20px;
+			cursor: pointer;
+		}
+
+		.checkbox-wrapper label {
+			font-size: 0.95rem;
+			color: #2c3e50;
+			cursor: pointer;
+			user-select: none;
+		}
+
+		select {
+			width: 100%;
+			padding: 14px 16px;
+			font-size: 1rem;
+			font-family: 'SFpro', sans-serif;
+			background: rgba(255, 255, 255, 0.9);
+			border: 1px solid rgba(255, 255, 255, 0.3);
+			border-radius: 15px;
+			color: #2c3e50;
+			cursor: pointer;
+			transition: all 0.3s ease;
+		}
+
+		select:focus {
+			outline: none;
+			background: rgba(255, 255, 255, 1);
+			border-color: #40c9a9;
+			box-shadow: 0 0 0 3px rgba(64, 201, 169, 0.1);
+		}
+
+		.btn {
+			width: 100%;
+			padding: 14px 24px;
+			font-size: 1.1rem;
+			font-weight: 600;
+			font-family: 'SFpro', sans-serif;
+			border: none;
+			border-radius: 25px;
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			position: relative;
+			overflow: hidden;
+		}
+
+		.btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+            border-radius: 20px;
+            pointer-events: none;
+            transition: background 0.3s ease;
+        }
+
+		.btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+		.btn-primary {
+			background: linear-gradient(135deg, #40c9a9, #32ac93);
+			color: white;
+		}
+
+		.btn-primary:hover::before {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+		.btn-primary:disabled {
+			opacity: 0.6;
+			cursor: not-allowed;
+			transform: none;
+		}
+
+		.btn-secondary {
+			background: rgba(255, 255, 255, 0.9);
+			color: #2c3e50;
+			border: 1px solid rgba(255, 255, 255, 0.3);
+		}
+
+		.btn-secondary:hover {
+			background: rgba(255, 255, 255, 1);
+		}
+
+		.btn-link {
+			background: none;
+			color: #40c9a9;
+			text-decoration: none;
+			padding: 8px 0;
+			font-weight: 500;
+			border: none;
+			cursor: pointer;
+			font-size: 0.95rem;
+			transition: color 0.2s;
+			width: auto;
+		}
+
+		.btn-link:hover {
+			color: #32ac93;
+			text-decoration: underline;
+		}
+
+		.divider {
+			display: flex;
+			align-items: center;
+			text-align: center;
+			margin: 24px 0;
+			color: #7f8c8d;
+			font-size: 0.9rem;
+		}
+
+		.divider::before,
+		.divider::after {
+			content: '';
+			flex: 1;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+		}
+
+		.divider span {
+			padding: 0 16px;
+		}
+
+		#error {
+			padding: 12px 16px;
+			border-radius: 10px;
+			font-size: 0.95rem;
+			line-height: 1.5;
+			margin-bottom: 16px;
+			background: rgba(231, 76, 60, 0.1);
+			color: #c0392b;
+			border: 1px solid rgba(231, 76, 60, 0.2);
+			min-height: 0;
+			display: none;
+		}
+
+		#error:empty {
+			display: none;
+		}
+
+		#error:not(:empty) {
+			display: block;
+		}
+
+		.success-message {
+			background: rgba(46, 204, 113, 0.1) !important;
+			color: #27ae60 !important;
+			border-color: rgba(46, 204, 113, 0.2) !important;
+		}
+
+		#forgot-password-outer-div {
+			display: flex;
+			flex-direction: column;
+			text-align: center;
+			justify-content: center;
+		}
+
+		.forgot-pass-section {
+			background: rgba(255, 255, 255, 0.5);
+			padding: 16px;
+			border-radius: 12px;
+			margin-top: 12px;
+			animation: slideDown 0.3s ease-out;
+		}
+
+		@keyframes slideDown {
+			from {
+				opacity: 0;
+				max-height: 0;
+				padding-top: 0;
+				padding-bottom: 0;
+			}
+			to {
+				opacity: 1;
+				max-height: 200px;
+				padding-top: 16px;
+				padding-bottom: 16px;
+			}
+		}
+
+		/* Add this new animation */
+		@keyframes slideUp {
+			from {
+				opacity: 1;
+				max-height: 200px;
+				padding-top: 16px;
+				padding-bottom: 16px;
+			}
+			to {
+				opacity: 0;
+				max-height: 0;
+				padding-top: 0;
+				padding-bottom: 0;
+			}
+		}
+
+		@media (max-width: 767px) {
+			.container {
+				padding: 32px 24px;
+			}
+
+			h2 {
+				font-size: 1.75rem;
+			}
+
+			.logo-container img {
+				width: 250px;
+			}
+
+			.inner-container {
+				width: 300px;
+			}
+		}
+
+		@media (max-width: 575px) {
+			.container {
+				padding: 20px 20px;
+			}
+
+			h2 {
+				font-size: 1.5rem;
+			}
+
+			.divider {
+				margin: 15px 0 25px 0;
+			}
+
+			.logo-container img {
+				width: 200px;
+			}
+
+			.inner-container {
+				width: 100%;
+				max-width: 300px;
+			}
+		}
+
+		@media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait) {
+			h2 {
+				font-size: 2.5rem;
+			}
+
+			input,
+			select {
+				font-size: 1.5rem;
+				padding: 18px 20px;
+			}
+
+			.password-toggle svg {
+				width: 26px;
+				height: 26px;
+			}
+
+			.btn {
+				font-size: 1.5rem;
+				padding: 18px 28px;
+			}
+
+			.btn-link {
+				font-size: 1.25rem;
+			}
+		}
+	</style>
 </head>
 
 <body>
-	<div class="container d-flex align-items-center justify-content-between flex-column" id="template-container">
-		<div class="invisible-spaceholder" style="height: 1px; width: 100%;"></div>
-		<div>
-		<div class="row">
-		<div class="col-12">
-			<h2 id="log-in-text">Prisijungimas</h2>
-		</div>
-		</div>
+	<nav class="main-navbar" id="mainNavbar">
+      <div class="main-nav-container">
+          <!-- Logo -->
+          <a href="#" class="main-nav-logo">
+              <div class="main-nav-logo-icon">
+                <img id="sudedu-main-nav-bar-logo" src="../images/sudedu_logo.png" alt="sudEdu">
+              </div>
+          </a>
 
-		<div class="col-12 gap-after-row">
-			<p id="error"></p>
-		</div>
-		<div class="col-12 gap-after-row">
-		<input id="emailInput" placeholder="elektroninis paštas" />
-		</div>
-		<div class="col-12 gap-after-row">
-			<div style="position: relative;">
-		<input id="passwordInput" placeholder="slaptažodis" type="password" />
-		<button type="button" onclick="togglePasswordVisibility()" 
-		style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); border: none; background-color: transparent;">
-		  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
-			<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
-			<path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
-		  </svg>
-		</button>
-		</div>
-		</div>
-		<div class="col-12 gap-after-row">
-			<input id="nickname" placeholder="vardas" />
-		</div>
-		<div class="col-12 gap-after-row"id="is-teacher-div">
-				<input type="checkbox" id="is-teacher"/>
-				Aš esu mokytoja(as)
-		</div>
-		<div class="col-12 gap-after-row">
-		<button class="btn btn-primary item-to-be-disabled-while-talking-to-server" id="authBtn" onclick="authenticate()">
-			Prisijungti
-		</button>
-		</div>
-		<hr />
-			<div class="col-12">
-			<p id="sign-ip-text">Neturi paskyros?</p>
+			<div class="main-nav-links invisible">
+				<a class="main-nav-back-btn" id="desktopBackBtn">
+					<span class="main-nav-back-icon">←</span>
+					<div class="main-nav-back-text">
+						<span class="main-nav-back-label">Grįžti</span>
+						<span class="main-nav-back-title">Atgal</span>
+					</div>
+				</a>
 			</div>
-			<div class="col-12">
-			<button class="btn btn-primary item-to-be-disabled-while-talking-to-server" onclick="toggleIsRegister()" id="registerBtn">Sukurti paskyrą</button>
+
+			<!-- Mobile Navigation -->
+			<div class="main-nav-mobile-btn simplified">
+				<a class="main-nav-back-btn" id="mobileBackBtn">
+					<span class="main-nav-back-icon">←</span>
+					<div class="main-nav-back-text">
+						<span class="main-nav-back-label">Grįžti</span>
+						<span class="main-nav-back-title">Atgal</span>
+					</div>
+				</a>
+			</div>
+      </div>
+  	</nav>
+
+	<div class="container">
+	<div class="inner-container" id="template-container">
+		<h2 id="log-in-text">Prisijungimas</h2>
+
+		<div id="error"></div>
+
+		<form onsubmit="event.preventDefault(); authenticate();">
+			<div class="form-group">
+				<input type="email" id="emailInput" placeholder="Elektroninis paštas" />
+			</div>
+
+			<div class="form-group">
+				<div class="input-wrapper">
+					<input type="password" id="passwordInput" placeholder="Slaptažodis" />
+					<button type="button" class="password-toggle" onclick="togglePasswordVisibility()">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+							<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
+							<path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+						</svg>
+					</button>
+				</div>
+			</div>
+
+			<div class="form-group" id="nickname-group" style="display: none;">
+				<input type="text" id="nickname" placeholder="Vardas" />
+			</div>
+
+			<div class="checkbox-wrapper" id="is-teacher-div" style="display: none;">
+				<input type="checkbox" id="is-teacher" onchange="changeInIsTeacherOption(this)"/>
+				<label for="is-teacher">Aš esu mokytoja(as)</label>
+			</div>
+
+			<div class="form-group" id="class-select-group" style="display: none;">
+				<select id="class-select">
+					<option value="-1">Pasirink klasę</option>
+					<option value="0">Priešmokyklinė</option>
+					<option value="1">1 klasė</option>
+					<option value="2">2 klasė</option>
+					<option value="3">3 klasė</option>
+					<option value="4">4 klasė</option>
+					<option value="5">Aukštesnė</option>
+				</select>
+			</div>
+
+			<div class="form-group">
+				<button type="submit" class="btn btn-primary" id="authBtn">
+					Prisijungti
+				</button>
+			</div>
+		</form>
+
+		<div id="forgot-password-outer-div">
+			<button class="btn-link" id="forgotPassBtn" onclick="showForgotPassword()">
+				Pamiršau slaptažodį
+			</button>
 		</div>
+
+		<div id="forgotPassDiv" style="display:none;">
+			<div class="forgot-pass-section">
+				<div class="form-group">
+					<input type="email" id="forgotPassEmail" placeholder="Įveskite savo el. paštą" />
+				</div>
+				<button class="btn btn-primary" id="requestPasswordResetBtn" onclick="requestPasswordReset()">
+					Siųsti nuorodą
+				</button>
+			</div>
+		</div>
+
+		<div class="divider">
+			<span>arba</span>
+		</div>
+
+		<button class="btn btn-secondary" onclick="toggleIsRegister()" id="registerBtn">
+			Sukurti paskyrą
+		</button>
 	</div>
-	
-	<div class="col-12 d-flex justify-content-end align-items-center">
-		<div class="reset-button-div">
-				<button class="btn btn-primary reset-button" onclick="redirectToIndex()"><span class="material-symbols-rounded">roofing</span></button>
-		</div>
 	</div>
 
-	</div>
-
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-		integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-		crossorigin="anonymous"></script>
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="../mental-arithmetic.js"></script>
 	<script src="../mental-arithmetic-combinations.js"></script>
-	
+	<script src="../main-nav-bar.js"></script>
+
 	<script>
-	function redirectToIndex() {
-		localStorage.setItem('controller', JSON.stringify(controller))
-		window.location.href = "./";
-	}
+		const MESSAGES = {
+			'REG_001': 'Paskyra sukurta! Patikrinkite el. paštą, kad ją patvirtintumėte.',
+			'REG_002': 'Patvirtinimo el. laiškas išsiųstas dar kartą. Patikrinkite savo el. paštą.',
+			'REG_003': 'Elektroninis paštas jau užimtas',
+			'LOGIN_001': '',
+			'LOGIN_002': 'Paskyra sukurta! Patikrinkite el. paštą, kad ją patvirtintumėte.',
+			'LOGIN_003': 'El. paštas nėra patvirtintas.',
+			'LOGIN_004': 'Vartotojas nerastas',
+			'LOGIN_005': 'Neteisingas slaptažodis',
+			'VERIFY_001': 'El. paštas sėkmingai patvirtintas! Galite prisijungti.',
+			'VERIFY_002': 'El. paštas jau patvirtintas.',
+			'VERIFY_003': 'Vartotojas nerastas',
+			'VERIFY_004': 'Patvirtinimo nuoroda nebegalioja.',
+			'RESET_001': 'Slaptažodžio atkūrimo nuoroda išsiųsta el. paštu (galioja 15 minučių).',
+			'RESET_002': 'Vartotojas su tokiu el. paštu nerastas',
+			'RESET_003': '✅ Slaptažodis sėkmingai pakeistas! Galite prisijungti.',
+			'RESET_004': 'Atkūrimo nuoroda nebegalioja arba neteisinga.',
+			'RESET_005': 'Nuoroda galioja.',
+			'ERR_001': 'Serverio klaida. Bandykite vėliau.',
+			'ERR_002': 'Trūksta duomenų'
+		};
 
-	let userData = localStorage.getItem('userData');
-	if (userData) {
-		window.location.href = `./`;
-	}
-
-	document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
-
-	const apiBase = 'http://localhost:5000/'
-
-    const registerBtn = document.getElementById('registerBtn')
-	const logInTitle = document.getElementById('log-in-text')
-	const authBtn = document.getElementById('authBtn')
-	const signUpText = document.getElementById('sign-ip-text')
-	const email = document.getElementById('emailInput')
-    const password = document.getElementById('passwordInput')
-	const errorField = document.getElementById('error')
-	const nickname = document.getElementById('nickname')
-	const isTeacherDiv = document.getElementById('is-teacher-div')
-	const isTeacher = document.getElementById('is-teacher')
-	let isRegistration = false
-	let isLoading = false
-    let isAuthenticating = false
-
-	nickname.style.display = 'none';
-	isTeacherDiv.style.display = 'none';
-
-	controller = JSON.parse(localStorage.getItem('controller'));
-
-	if (controller.task && controller.taskCompleted === true) {
-		errorField.innerHTML = "Prisijunkite, kad rezultatai būtų išsaugoti."
-	}
-
-	async function toggleIsRegister() {
-        isRegistration = !isRegistration
-        registerBtn.innerText = isRegistration ? 'Prisijungti' : 'Sukurti paskyrą';
-        logInTitle.innerHTML = isRegistration ? 'Registracija' : 'Prisijungimas';
-        signUpText.innerText = isRegistration ? 'Jau turi paskyrą?' : 'Neturi paskyros?';
-        authBtn.innerHTML = isRegistration ? 'Prisiregistruoti' : 'Prisijungti';
-		nickname.style.display = isRegistration ? 'block' : 'none';
-		isTeacherDiv.style.display = isRegistration ? 'block' : 'none';
-    }
-
-	async function authenticate() {
-		// access email and pass values
-		const emailVal = email.value.trim();
-		const passVal = password.value.trim();
-		const nicknameVal = nickname.value.trim();
-		const isTeacherVal = isTeacher.checked
-
-		// guard clauses... if authenticating, return
-		if (!emailVal) {
-			errorField.innerHTML = 'Įveskite elektroninį paštą';
-			return
-		} else if (!passVal) {
-			errorField.innerHTML = 'Įveskite slaptažodį';
-			return
-		} else if ((passVal.length < 6 || passVal.length > 15) && isRegistration) {
-			errorField.innerHTML = 'Slaptažodis turi būti nuo 6 iki 15 simbolių';
-			return
-		} else if (!emailVal.includes('@')) {
-			errorField.innerHTML = 'Neteisingas elektroninio pašto formatas';
-			return
-		} else if (!nicknameVal && isRegistration) {
-			errorField.innerHTML = 'Įveskite vardą';
-			return
-		} else if (nicknameVal.length > 15) {
-			errorField.innerHTML = 'Vardas gali būti tik iki 15 simbolių';
-			return
+		function getMsg(code) {
+			return MESSAGES[code] || 'Nežinoma klaida';
 		}
-	
-		if (
-			isLoading ||
-			isAuthenticating
-		) { return }
 
-		// reset error and set isAuthenticating to true
-		errorField.innerHTML = ''
-		isAuthenticating = true
-		authBtn.innerText = 'Tikrinama...'
-		document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = true);
+		function redirectToIndex() {
+			if (typeof controller !== 'undefined') {
+				localStorage.setItem('controller', JSON.stringify(controller));
+			}
+			window.location.href = "./";
+		}
 
-		try {
-			let data
-			if (isRegistration) {
-				// register an account
-				const response = await fetch(apiBase + 'auth/register', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ username: emailVal, password: passVal, nickname: nicknameVal, isTeacher: isTeacherVal })
-				})
-				data = await response.json()
+		if (userData && userData.emailVerified) {
+			window.location.href = './';
+		}
+
+		const registerBtn = document.getElementById('registerBtn');
+		const logInTitle = document.getElementById('log-in-text');
+		const authBtn = document.getElementById('authBtn');
+		const email = document.getElementById('emailInput');
+		const password = document.getElementById('passwordInput');
+		const errorField = document.getElementById('error');
+		const nickname = document.getElementById('nickname');
+		const nicknameGroup = document.getElementById('nickname-group');
+		const isTeacherDiv = document.getElementById('is-teacher-div');
+		const isTeacher = document.getElementById('is-teacher');
+		const classSelectDropdown = document.getElementById('class-select');
+		const classSelectGroup = document.getElementById('class-select-group');
+		const forgotPasswordOuterDiv = document.getElementById('forgot-password-outer-div');
+
+		let isRegistration = false;
+		let isLoading = false;
+		let isAuthenticating = false;
+
+		if (!controller) {
+			let controller = JSON.parse(localStorage.getItem('controller')) || {};
+		}
+
+		if (controller?.task && controller.taskCompleted === true) {
+			errorField.innerHTML = "Prisijunkite, kad rezultatai būtų išsaugoti.";
+			errorField.style.display = 'block';
+		}
+
+		function toggleIsRegister() {
+			isRegistration = !isRegistration;
+			registerBtn.innerText = isRegistration ? 'Prisijungti' : 'Sukurti paskyrą';
+			logInTitle.innerHTML = isRegistration ? 'Registracija' : 'Prisijungimas';
+			authBtn.innerHTML = isRegistration ? 'Prisiregistruoti' : 'Prisijungti';
+			nicknameGroup.style.display = isRegistration ? 'block' : 'none';
+			isTeacherDiv.style.display = isRegistration ? 'flex' : 'none';
+			classSelectGroup.style.display = (isRegistration && !isTeacher.checked) ? 'block' : 'none';
+			forgotPasswordOuterDiv.style.display = isRegistration ? 'none' : 'flex';
+			
+			forgotPassDiv.style.display = 'none';
+			forgotPassDiv.style.animation = ''; // Reset animation for next time
+			document.getElementById('forgotPassBtn').style.display = 'block';
+			document.getElementById('forgotPassEmail').value = '';
+		}
+
+		function changeInIsTeacherOption(checkbox) {
+			if (checkbox.checked) {
+				classSelectGroup.style.display = "none";
 			} else {
-				// login an account
-				const response = await fetch(apiBase + 'auth/login', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ username: emailVal, password: passVal })
-				})
-				data = await response.json()
+				classSelectGroup.style.display = "block";
+			}
+		}
+
+		async function authenticate() {
+			const emailVal = email.value.trim();
+			const passVal = password.value.trim();
+			const nicknameVal = nickname.value.trim();
+			const isTeacherVal = isTeacher.checked;
+			const classValue = Number(classSelectDropdown.value);
+
+			if (!emailVal) { 
+				showError('Įveskite elektroninį paštą'); 
+				return; 
+			}
+			if (!passVal) { 
+				showError('Įveskite slaptažodį'); 
+				return; 
+			}
+			if ((passVal.length < 6 || passVal.length > 15) && isRegistration) {
+				showError('Slaptažodis turi būti nuo 6 iki 15 simbolių'); 
+				return;
+			}
+			if (!emailVal.includes('@')) { 
+				showError('Neteisingas elektroninio pašto formatas'); 
+				return; 
+			}
+			if (!nicknameVal && isRegistration) { 
+				showError('Įveskite vardą'); 
+				return; 
+			}
+			if (nicknameVal.length > 15 && isRegistration) { 
+				showError('Vardas gali būti tik iki 15 simbolių'); 
+				return; 
+			}
+			if (isRegistration && !isTeacherVal && classValue === -1) {
+				showError('Pasirink savo klasę'); 
+				return;
 			}
 
-			if (isRegistration && data.message == 'registration successful') {
-				errorField.innerHTML = 'Paskyra sėkmingai sukurta';
-				email.value = '';
-    	 		password.value = '';
-				nickname.value = '';
-				isTeacher.checked = false;
-				toggleIsRegister();
-			} else if (data.token) {
-				const userData = {
-					token: data.token,
-					userId: data.userId,
-					nickname: data.nickname,
-					accType: data.accType,
-					teacher: data.teacher
-				};
+			if (isLoading || isAuthenticating) return;
 
-				localStorage.setItem('userData', JSON.stringify(userData));
+			errorField.innerHTML = '';
+			errorField.style.display = 'none';
+			isAuthenticating = true;
+			authBtn.innerText = 'Tikrinama...';
+			authBtn.disabled = true;
 
-					if (controller.task && controller.taskCompleted === true) {
-						if (controller.mode === "math") {
-						window.location.href = `veiksmai`;
-						} else if (controller.mode === "lang") {
-							if (controller.modeChoice1 === "C49") {
-								window.location.href = `teksto-suvokimas`;
-							} else if (controller.modeChoice1 === "C50") {
-								window.location.href = `rasyba`;
-							}
+			try {
+				let data;
+				
+				if (isRegistration) {
+					const response = await fetch(apiBase + 'auth/register', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ 
+							username: emailVal, 
+							password: passVal, 
+							nickname: nicknameVal, 
+							isTeacher: isTeacherVal,
+							class: isTeacherVal ? null : classValue
+						})
+					});
+					data = await response.json();
+				} else {
+					const response = await fetch(apiBase + 'auth/login', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ username: emailVal, password: passVal })
+					});
+					data = await response.json();
+				}
+
+				if (isRegistration) {
+					if (data.code === 'REG_001' || data.code === 'REG_002') {
+						email.value = ''; 
+						password.value = ''; 
+						nickname.value = ''; 
+						isTeacher.checked = false;
+						classSelectDropdown.value = '-1';
+						
+						toggleIsRegister();
+						
+						showSuccess(getMsg(data.code));
+						return;
+					} else if (data.code === 'REG_003') {
+						showError(getMsg(data.code));
+						return;
+					}
+				}
+
+				if (data.token) {
+					if (!data.emailVerified) {
+						if (data.isNewAccount) {
+							showError(`
+								${getMsg('LOGIN_002')}
+								<br/>
+								<button class="btn-link" onclick="resendVerification('${emailVal}')" style="margin-top: 8px;">
+									Siųsti patvirtinimo el. laišką dar kartą
+								</button>
+							`);
+						} else {
+							window.tempUserData = data;
+							
+							showError(`
+								${getMsg('LOGIN_003')}
+								<br/>
+								<button class="btn-link" onclick="resendVerification('${emailVal}')" style="margin-top: 8px;">
+									Siųsti patvirtinimo el. laišką dar kartą
+								</button>
+								<br/>
+								<button class="btn-link" onclick="continueAnywayFromTemp()" style="margin-top: 4px;">
+									Tęsti be patvirtinimo
+								</button>
+							`);
 						}
 					} else {
-						window.location.href = `./`;
+						const userData = {
+							token: data.token,
+							userId: data.userId,
+							nickname: data.nickname,
+							accType: data.accType,
+							teacher: data.teacher || '',
+							avatarCode: data.avatarCode || 'w63060003',
+							emailVerified: data.emailVerified,
+							petOnWalk: data.petOnWalk || '',
+							petStats: data.petStats || '[]',
+							knowledgeLvl: data.knowledgeLvl !== undefined ? data.knowledgeLvl : -1 // ← ADD THIS
+						};
+						
+						localStorage.setItem('userData', JSON.stringify(userData));
+						localStorage.setItem('refreshToken', data.refreshToken);
+						
+						window.location.href = './';
 					}
-			} else {
-				if (data.message == 'User not found') {
-					errorField.innerHTML = 'Vartotojas nerastas';
-				} else if (data.message == 'Invalid password') {
-					errorField.innerHTML = 'Neteisingas slaptažodis';
-				} else if (data.message = 'Username is already taken') {
-					errorField.innerHTML = 'Elektroninis paštas jau užimtas';
-				} else if (data.message = 'Database is not available') {
-					errorField.innerHTML = 'Duomenų bazė nepasiekamia. Bandykite vėliau';	
-				} else if (data.message = 'Unexpected error') {
-					errorField.innerHTML = 'Kažkas nepavyko, bandykite vėliau';
-				} else throw Error('Kažkas nepavyko')
+				} else {
+					handleLoginError(data, emailVal);
+				}
+
+			} catch (err) {
+				showError('Nepavyko pasiekti duomenų. Bandykite vėl vėliau.');
+				console.log('Error fetching auth:', err);
+			} finally {
+				isAuthenticating = false;
+				authBtn.innerText = isRegistration ? 'Prisiregistruoti' : 'Prisijungti';
+				authBtn.disabled = false;
 			}
-		} catch (err) {
-			errorField.innerHTML = 'Nepavyko pasiekti duomenų. Bandykite vėl vėliau.';
-			console.log('Error fetching tasks:', err);
-		} finally {
-			isAuthenticating = false
-			if (isAuthenticating) {
-				authBtn.innerText = 'Prisiregistruoti'
-			} else {
-				authBtn.innerText = 'Prisijungti'
-			}
-			document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
 		}
-}
 
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Enter') {
-        // Check current mode and trigger the appropriate action
-        if (typeof isRegistration !== 'undefined' && isRegistration) {
-            // In registration mode
-            document.getElementById('registerBtn').click();
-        } else {
-            // In login mode
-            document.getElementById('authBtn').click();
-        }
-    }
-});
+		function showError(message) {
+			errorField.innerHTML = message;
+			errorField.className = '';
+			errorField.style.display = 'block';
+		}
 
-function togglePasswordVisibility() {
-  const input = document.getElementById('passwordInput');
-  input.type = input.type === 'password' ? 'text' : 'password';
-}
+		function showSuccess(message) {
+			errorField.innerHTML = message;
+			errorField.className = 'success-message';
+			errorField.style.display = 'block';
+		}
 
+		function continueAnywayFromTemp() {
+		if (window.tempUserData) {
+			const data = window.tempUserData;
+			
+			const userData = {
+			token: data.token,
+			userId: data.userId,
+			nickname: data.nickname,
+			accType: data.accType,
+			teacher: data.teacher || '',
+			avatarCode: data.avatarCode || 'w63060003',
+			emailVerified: data.emailVerified,
+			petOnWalk: data.petOnWalk || '',
+			petStats: data.petStats || '[]',
+			knowledgeLvl: data.knowledgeLvl !== undefined ? data.knowledgeLvl : -1 // ← ADD THIS
+			};
+			
+			localStorage.setItem('userData', JSON.stringify(userData));
+			localStorage.setItem('refreshToken', data.refreshToken);
+			
+			delete window.tempUserData;
+			window.location.href = './';
+		}
+		}
+		
+		function handleLoginError(data, emailVal) {
+			const msg = getMsg(data.code);
+			showError(msg || 'Nepavyko prisijungti.');
+		}
+
+		function togglePasswordVisibility() {
+			const input = document.getElementById('passwordInput');
+			input.type = input.type === 'password' ? 'text' : 'password';
+		}
+
+		function showForgotPassword() {
+			document.getElementById('forgotPassDiv').style.display = 'block';
+			document.getElementById('forgotPassBtn').style.display = 'none';
+			document.getElementById('requestPasswordResetBtn').disabled = false;
+		}
+
+		async function requestPasswordReset() {
+			const emailVal = document.getElementById('forgotPassEmail').value.trim();
+			if (!emailVal || !emailVal.includes('@')) {
+				showError('Įveskite galiojantį el. paštą');
+				return;
+			}
+
+			document.getElementById('requestPasswordResetBtn').disabled = true;
+
+			try {
+				const response = await fetch(apiBase + 'auth/forgot-password', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ username: emailVal })
+				});
+
+				const data = await response.json();
+				
+				// Add slideUp animation class
+				const forgotPassDiv = document.getElementById('forgotPassDiv');
+				forgotPassDiv.style.animation = 'slideUp 0.3s ease-out forwards';
+				
+				// Wait for animation to complete, then hide and reset
+				setTimeout(() => {
+					forgotPassDiv.style.display = 'none';
+					forgotPassDiv.style.animation = ''; // Reset animation for next time
+					document.getElementById('forgotPassBtn').style.display = 'block';
+					document.getElementById('forgotPassEmail').value = '';
+				}, 300);
+				
+				// Show success message
+				showSuccess(getMsg(data.code));
+			} catch (err) {
+				showError('Nepavyko pasiekti serverio.');
+			}
+		}
+
+		async function resendVerification(emailVal) {
+			try {
+				const response = await fetch(apiBase + 'auth/resend-verification', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ username: emailVal })
+				});
+				const data = await response.json();
+				showSuccess(getMsg(data.code));
+			} catch (err) {
+				showError('Nepavyko išsiųsti patvirtinimo laiško.');
+			}
+		}
+
+		document.addEventListener('keydown', function (event) {
+			if (event.key === 'Enter') {
+				authenticate();
+			}
+		});
 	</script>
 </body>
-
 </html>

@@ -1450,14 +1450,17 @@
                 // Prepare the list of tasks to delete (assuming tasksToTemove is already populated)
                 const studentsToDelete = studentsToRemove;  // Ensure this array holds task IDs to be deleted
 
-                const response = await fetch(apiBase + 'students', {
+                const response = await apiFetch(apiBase + 'students', {
                     method: 'DELETE',  // Change to DELETE method
                     headers: {
-                        'Authorization': userData.token,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ studentIds: studentsToDelete })  // Send the list as JSON in the body
                 });
+
+                if (!response) {
+                    return;
+                }
 
                 if (!response.ok) {
                     const errorData  = await response.json().catch(() => ({}));
@@ -1499,14 +1502,17 @@
             addTeacherButton.innerHTML = "Adding...";
             document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = true);
             try {
-                const response = await fetch(apiBase + 'students', {
+                const response = await apiFetch(apiBase + 'students', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': userData.token
+                        'Content-Type': 'application/json'                    
                     },
                     body: JSON.stringify({ teacherId })
                 });
+
+                if (!response) {
+                    return;
+                }
 
                 // Safely parse response (fallback if JSON fails)
                 const responseData = await response.json().catch(() => ({}))
@@ -1555,14 +1561,17 @@
             changeTeacherButton.innerHTML = "Changing..." 
             document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = true);  
             try {
-                const response = await fetch(apiBase + 'students', {
+                const response = await apiFetch(apiBase + 'students', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': userData.token
                     },
                     body: JSON.stringify({ teacherId })
                 });
+
+                if (!response) {
+                    return;
+                }
 
                 // Safely parse response (fallback if JSON fails)
                 const responseData = await response.json().catch(() => ({}))
@@ -2239,10 +2248,13 @@
             deleteTaskButton.disabled = true
             deleteStudentButton.disabled = true
             try {
-                const response = await fetch(apiBase + 'students', {
+                const response = await apiFetch(apiBase + 'students', {
                     method: 'GET',
-                    headers: { 'Authorization': userData.token }
                 });
+
+                if (!response) {
+                    return;
+                }
 
                 if (!response.ok) {
                     const errorData  = await response.json().catch(() => ({}));
@@ -2275,10 +2287,13 @@
             let success = false;
             studentMessage.innerHTML = 'Tasks are being retrieved from the database. This might take a few minutes.'
             try {
-                const response = await fetch(apiBase + 'tasks', {
+                const response = await apiFetch(apiBase + 'tasks', {
                     method: 'GET',
-                    headers: { 'Authorization': userData.token }
                 });
+
+                if (!response) {
+                    return;
+                }
 
                 if (!response.ok) {
                     const errorData  = await response.json().catch(() => ({}));
@@ -2404,10 +2419,13 @@
 
     async function deleteAllTasks() {
         try {
-                const response = await fetch(apiBase + 'tasks', {
+                const response = await apiFetch(apiBase + 'tasks', {
                     method: 'GET',
-                    headers: { 'Authorization': userData.token }
                 });
+
+                if (!response) {
+                    return;
+                }
 
                 if (!response.ok) {
                     const errorData  = await response.json().catch(() => ({}));
@@ -2440,14 +2458,17 @@
             confirmDeleteTaskButton.innerHTML = "Deleting..."
             confirmDeleteTaskButton.disabled = true
             disableTeacherControlPannel()
-            const response = await fetch(apiBase + 'tasks', {
+            const response = await apiFetch(apiBase + 'tasks', {
                 method: 'DELETE',  // Change to DELETE method
                 headers: {
-                    'Authorization': userData.token,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ tasks: tasksToDelete })  // Send the list as JSON in the body
             });
+
+            if (!response) {
+                return;
+            }
 
             if (!response.ok) {
                 const errorData  = await response.json().catch(() => ({}));
@@ -2569,14 +2590,17 @@
         disableNewTaskContainer();
         disableTeacherControlPannel();
         try {
-        const response = await fetch(apiBase + 'tasks', {
+        const response = await apiFetch(apiBase + 'tasks', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': userData.token
             },
             body: JSON.stringify(taskData)
         });
+
+        if (!response) {
+            return;
+        }
 
         // First parse the response as JSON
         const responseData = await response.json().catch(() => ({}));
@@ -2691,11 +2715,12 @@
         }
 
         // 2. Get target user info
-        const userResponse = await fetch(`${apiBase}auth/?username=${encodeURIComponent(username)}`, {
-            headers: {
-                'Authorization': userData.token
-            }
+        const userResponse = await apiFetch(`${apiBase}auth/?username=${encodeURIComponent(username)}`, {
         });
+
+        if (!userResponse) {
+            return;
+        }
         
         const userInfo = await userResponse.json();
         
@@ -2710,12 +2735,13 @@
         }
 
         // 4. Delete user and all associations
-        const deleteResponse = await fetch(`${apiBase}auth/${userInfo.id}`, {
+        const deleteResponse = await apiFetch(`${apiBase}auth/${userInfo.id}`, {
             method: 'DELETE',
-            headers: {
-                'Authorization': userData.token
-            }
         });
+
+        if (!deleteResponse) {
+            return;
+        }
 
         if (!deleteResponse.ok) {
             throw new Error(deleteResponse.status === 403 
@@ -2771,13 +2797,16 @@ async function deleteInactiveUsers() {
         }
 
         // Make API request
-        const response = await fetch(`${apiBase}admin/inactive?inactivePeriod=${encodeURIComponent(inactivePeriod)}`, {
+        const response = await apiFetch(`${apiBase}admin/inactive?inactivePeriod=${encodeURIComponent(inactivePeriod)}`, {
             method: 'DELETE',
             headers: {
-                'Authorization': userData.token,
                 'Content-Type': 'application/json'
             }
         });
+
+        if (!response) {
+            return;
+        }
 
         const responseData = await response.json().catch(() => ({}));
         

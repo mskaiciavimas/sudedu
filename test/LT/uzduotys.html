@@ -22,7 +22,8 @@
     gtag('js', new Date());
 
     gtag('config', 'G-96Q83PW8XY');
-    </script>	
+    </script>
+    <script src="../refresh-token.js"></script>
 
     <style>
         * {
@@ -379,8 +380,9 @@
             width: 100%;
             box-sizing: border-box;
             text-align: center;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 255, 255, 1);
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 20px;
             font-size: 1.3rem;
             padding: 7px;
@@ -1399,8 +1401,9 @@
         .input-wrapper {
             display: flex;
             align-items: center;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 255, 255, 1);
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 20px;
             overflow: hidden;
         }
@@ -1925,6 +1928,16 @@
 </head>
 
 <body>
+    <div id="customConfirmModal" class="modal">
+    <div class="modal-content">
+        <p id="customModalText"></p>
+        <div class="modal-buttons">
+        <button id="customConfirmYes" class="btn btn-confirm">Taip</button>
+        <button id="customConfirmNo" class="btn btn-cancel">Ne</button>
+        </div>
+    </div>
+    </div>
+
    <nav class="main-navbar" id="mainNavbar">
         <div class="main-nav-container">
             <!-- Logo -->
@@ -1935,7 +1948,7 @@
             </a>
 
             <!-- Desktop Navigation -->
-            <div class="main-nav-links">
+            <div class="main-nav-links invisible">
                 <a href="index.html" class="main-nav-link">Praktika</a>
                 <a href="uzduotys.html" class="main-nav-link main-nav-link-active">Užduotys</a>
                 <a href="klase.html" class="main-nav-link">Klasė</a>
@@ -1956,8 +1969,12 @@
                 
                 <div class="main-nav-connect-wrapper">
                     <div class="main-nav-connect-glow"></div>
-                    <button class="main-nav-connect-btn">
+                    <button class="main-nav-log-out-btn">
                         <span class="main-nav-connect-text">Atsijungti</span>
+                    </button>
+
+                    <button class="main-nav-log-in-btn">
+                        <span class="main-nav-connect-text">Prisijungti</span>
                     </button>
                 </div>
             </div>
@@ -1983,8 +2000,11 @@
                     <button class="language-option language-option-EN" onclick="setLanguage('EN')">EN</button>
                 </div>
                 
-                <button class="main-nav-mobile-connect">
+                <button class="main-nav-mobile-log-out-btn">
                     <span class="main-nav-connect-text">Atsijungti</span>
+                </button>
+                <button class="main-nav-mobile-log-in-btn">
+                    <span class="main-nav-connect-text">Prisijungti</span>
                 </button>
             </div>
         </div>
@@ -2566,19 +2586,15 @@
 	<script src="../mental-arithmetic.js"></script>
 	<script src="../mental-arithmetic-combinations.js"></script>
     <script src="matematika_options.js"></script>
-    <script src="pasirinkimai.js"></script>
     <script src="../parameter_dictionary.js"></script>
     <script src="../main-nav-bar.js"></script>
 
 	<script>
         const redCircleColorCode = '#D57E7E';
         const greenCircleColorCode = '#40c9a9';
-        let userData;
 
-        if (userDataString) {
-            userData = JSON.parse(userDataString);
-        } else {
-            window.location.href = '/LT';
+        if (!userData) {
+            window.location.href = './';
         }
 
         let studentList;
@@ -2945,14 +2961,17 @@
                 // Prepare the list of tasks to delete (assuming tasksToTemove is already populated)
                 const studentsToDelete = studentsToRemove;  // Ensure this array holds task IDs to be deleted
 
-                const response = await fetch(apiBase + 'students', {
+                const response = await apiFetch(apiBase + 'students', {
                     method: 'DELETE',  // Change to DELETE method
                     headers: {
-                        'Authorization': userData.token,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ studentIds: studentsToDelete })  // Send the list as JSON in the body
                 });
+
+                if (!response) {
+                    return;
+                }
 
                 if (!response.ok) {
                     const errorData  = await response.json().catch(() => ({}));
@@ -3197,17 +3216,20 @@
             console.log(student)
             if (newValue !== student[2]) {
                 try {
-                    const response = await fetch(apiBase + `students/knowledge-level`, {
+                    const response = await apiFetch(apiBase + `students/knowledge-level`, {
                         method: "PATCH",
                         headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": userData.token
+                            "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
                             studentId: Number(student[0]),
                             knowledgeLvl: Number(newValue)
                         })
                     });
+
+                    if (!response) {
+                        return;
+                    }
 
                     if (!response.ok) {
                         throw new Error("Nepavyko atnaujinti lygio");
@@ -3861,11 +3883,6 @@
             }
         }
 
-
-
-
-        const apiBase = 'http://localhost:5000/'
-
         async function fetchDataForTeachers() {
             let success = false;
             let showMessageTimeout;
@@ -3881,10 +3898,13 @@
             deleteStudentButton.disabled = true
 
             try {
-                const response = await fetch(apiBase + 'students', {
-                    method: 'GET',
-                    headers: { 'Authorization': userData.token }
+                const response = await apiFetch(apiBase + 'students', {
+                    method: 'GET'
                 });
+
+                if (!response) {
+                    return;
+                }
 
                 if (!response.ok) {
                     const errorData  = await response.json().catch(() => ({}));
@@ -3931,10 +3951,13 @@
             }, 500);
 
             try {
-                const response = await fetch(apiBase + 'tasks', {
-                    method: 'GET',
-                    headers: { 'Authorization': userData.token }
+                const response = await apiFetch(apiBase + 'tasks', {
+                    method: 'GET'
                 });
+
+                if (!response) {
+                    return;
+                }
 
                 if (!response.ok) {
                     const errorData  = await response.json().catch(() => ({}));
@@ -4042,10 +4065,13 @@
 
     async function deleteAllTasks() {
         try {
-                const response = await fetch(apiBase + 'tasks', {
-                    method: 'GET',
-                    headers: { 'Authorization': userData.token }
+                const response = await apiFetch(apiBase + 'tasks', {
+                    method: 'GET'
                 });
+
+                if (!response) {
+                    return;
+                }
 
                 if (!response.ok) {
                     const errorData  = await response.json().catch(() => ({}));
@@ -4075,14 +4101,17 @@
             const tasksToDelete = tasksToRemove;  // Ensure this array holds task IDs to be deleted
 
             disableTeacherControlPannel()
-            const response = await fetch(apiBase + 'tasks', {
+            const response = await apiFetch(apiBase + 'tasks', {
                 method: 'DELETE',  // Change to DELETE method
                 headers: {
-                    'Authorization': userData.token,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ tasks: tasksToDelete })  // Send the list as JSON in the body
             });
+
+            if (!response) {
+                return;
+            }
 
             if (!response.ok) {
                 const errorData  = await response.json().catch(() => ({}));
@@ -4241,14 +4270,17 @@
         disableTeacherControlPannel();
         disableConfirmationButtons();
         try {
-        const response = await fetch(apiBase + 'tasks', {
+        const response = await apiFetch(apiBase + 'tasks', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': userData.token
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(taskData)
         });
+
+        if (!response) {
+            return;
+        }
 
         // First parse the response as JSON
         const responseData = await response.json().catch(() => ({}));
@@ -4353,11 +4385,13 @@
         }
 
         // 2. Get target user info
-        const userResponse = await fetch(`${apiBase}auth/?username=${encodeURIComponent(username)}`, {
-            headers: {
-                'Authorization': userData.token
-            }
+        const userResponse = await apiFetch(`${apiBase}auth/?username=${encodeURIComponent(username)}`, {
+
         });
+
+        if (!userResponse) {
+            return;
+        }
         
         const userInfo = await userResponse.json();
         
@@ -4372,12 +4406,13 @@
         }
 
         // 4. Delete user and all associations
-        const deleteResponse = await fetch(`${apiBase}auth/${userInfo.id}`, {
+        const deleteResponse = await apiFetch(`${apiBase}auth/${userInfo.id}`, {
             method: 'DELETE',
-            headers: {
-                'Authorization': userData.token
-            }
         });
+
+        if (!deleteResponse) {
+            return;
+        }
 
         if (!deleteResponse.ok) {
             throw new Error(deleteResponse.status === 403 
@@ -4413,13 +4448,16 @@ async function deleteInactiveUsers() {
         }
 
         // Make API request
-        const response = await fetch(`${apiBase}admin/inactive?inactivePeriod=${encodeURIComponent(inactivePeriod)}`, {
+        const response = await apiFetch(`${apiBase}admin/inactive?inactivePeriod=${encodeURIComponent(inactivePeriod)}`, {
             method: 'DELETE',
             headers: {
-                'Authorization': userData.token,
                 'Content-Type': 'application/json'
             }
         });
+
+        if (!response) {
+            return;
+        }
 
         const responseData = await response.json().catch(() => ({}));
         
@@ -4931,6 +4969,20 @@ function updateButtonLayout() {
 
 window.addEventListener('load', updateButtonLayout);
 window.addEventListener('resize', updateButtonLayout);
+
+window.onload = function () {
+    const savedController = localStorage.getItem('controller');
+    if (savedController) {
+        controller = JSON.parse(savedController);
+    }
+
+    if (controller) {
+        controller.task = null;
+        controller.taskCompleted = false;
+        localStorage.setItem('controller', JSON.stringify(controller));
+    }
+};
+
 	</script>
 </body>
 

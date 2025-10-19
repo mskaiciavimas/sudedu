@@ -26,6 +26,7 @@
 
   gtag('config', 'G-96Q83PW8XY');
 </script>
+<script src="../refresh-token.js"></script>
 <style>
 	 * {
           -webkit-user-select: none;
@@ -80,6 +81,7 @@
 			flex-direction: column;
 			padding: 20px;
 			transition: min-height 0.3s ease, max-height 0.3s ease;
+			box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
 		}
 
 		.container.keyboard-open {
@@ -433,10 +435,6 @@
 			font-size: 2rem;
 		}
 
-		#task-saving-message {
-			font-size: 1.75rem
-		}
-
 		#next-question-btn {
 			font-size: 1.25rem;
 			min-width: 25vw;
@@ -481,27 +479,26 @@
               </div>
           </a>
 
-          <!-- Desktop Navigation -->
-          <div class="main-nav-links">
-              <a href="index.html" class="main-nav-back-btn">
-                    <span class="main-nav-back-icon">←</span>
-                    <div class="main-nav-back-text">
-                        <span class="main-nav-back-label">Grįžti į</span>
-                        <span class="main-nav-back-title">Padžią</span>
-                    </div>
-                </a>
-          </div>
+			<div class="main-nav-links invisible">
+				<a class="main-nav-back-btn" id="desktopBackBtn">
+					<span class="main-nav-back-icon">←</span>
+					<div class="main-nav-back-text">
+						<span class="main-nav-back-label">Grįžti</span>
+						<span class="main-nav-back-title">Atgal</span>
+					</div>
+				</a>
+			</div>
 
-          <!-- Mobile Navigation -->
-          <div class="main-nav-mobile-btn simplified">
-              <a href="index.html" class="main-nav-back-btn">
-                    <span class="main-nav-back-icon">←</span>
-                    <div class="main-nav-back-text">
-                        <span class="main-nav-back-label">Grįžti į</span>
-                        <span class="main-nav-back-title">Padžią</span>
-                    </div>
-                </a>
-          </div>
+			<!-- Mobile Navigation -->
+			<div class="main-nav-mobile-btn simplified">
+				<a class="main-nav-back-btn" id="mobileBackBtn">
+					<span class="main-nav-back-icon">←</span>
+					<div class="main-nav-back-text">
+						<span class="main-nav-back-label">Grįžti</span>
+						<span class="main-nav-back-title">Atgal</span>
+					</div>
+				</a>
+			</div>
       </div>
   </nav>
 
@@ -537,14 +534,10 @@
 						<div id="equation-and-symbol">
 							<div id="arithmetic-symbol"></div>
 							<label id="equation" class="equation text-nowrap" for="answer-field"></label>
-							<div id="task-saving-message"></div>
 						</div>
-						<div id="answer-separator-1" style="display: none;"></div>
 						<div id="stulpeliu-div-outer">
 							<div id="stulpeliu-div-inner">
 							<div id="stulpeliu-div" class=""></div>
-
-							<div id="answer-separator-2"></div>
 
 							<div class="answer-field-div">
 								<div id="stulp-div-ans-and-first" class="">
@@ -723,14 +716,14 @@
 			}
 		}
 
-	window.onload = function () {
-		if (localStorage.getItem('controller') === null) {
-        	window.location.href = "./";
-		} else {
-			controller = JSON.parse(localStorage.getItem('controller')) 
-			if (controller.mode !== "math" || controller.language !== "LT") {
+		window.onload = function () {
+			if (!localStorage.getItem('controller')) {
 				window.location.href = "./";
-			}
+			} else {
+				controller = JSON.parse(localStorage.getItem('controller')) 
+				if (controller.mode !== "math" || controller.language !== "LT") {
+					window.location.href = "./";
+				}
 			}
 
 			document.querySelector('#template-container').removeAttribute('hidden');
@@ -872,8 +865,6 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 		var paddingRight = parseFloat(computedStyle.paddingRight);
 		var viewportWidth = window.innerWidth;
 		var rightMargin = viewportWidth - (element1Rect.right + paddingRight);
-		var answerSeparator1 = document.getElementById('answer-separator-1');
-		var answerSeparator2 = document.getElementById('answer-separator-2');
 		var computedStyle3;
 		var leftMargin3;
 		var equationElement = document.getElementById('equation');
@@ -896,12 +887,7 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 			stulpeliuInputElement.style.width = `${newWidth}ch`;
 		}
 
-		if (stulpeliuInput[0]) {
-			answerSeparator1.style.width = `${stulpeliuInput[0].offsetWidth}px`
-		}
-
 		element2Textarea.style.width = `${newWidth+1+antrasDaugiklisLength-2}ch`;
-		answerSeparator2.style.width = `${element2Textarea.offsetWidth}px`;
 		
 	} else if (controller.randomSelection[2] === 'D') {
 		const answerInput = document.querySelector("#answer")
@@ -957,8 +943,6 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 			}
 
 			element2Textarea.style.width = answerSize + 'px';
-			answerSeparator2.style.width = `${element2Textarea.offsetWidth}px`;
-
 		}
 
 		if (controller.withRemainder && controller.randomSelection[2] === 'D') {
@@ -1016,13 +1000,7 @@ function stopEquations () {
       showCustomConfirm("Ar tikrai nori sustabdyti užduotį?", stopEquationsCloseActions);
       
       function stopEquationsCloseActions () {
-      var answerSeparator1 = document.getElementById('answer-separator-1');
-      var answerSeparator2 = document.getElementById('answer-separator-2');
-
 	  document.querySelector(".upper-line").style.display = "none";
-
-      answerSeparator1.style.display = 'none';
-      answerSeparator2.style.display = 'none';
       arithmeticSymbol.innerHTML = '';
 
       if (controller.task) {
@@ -1031,14 +1009,14 @@ function stopEquations () {
         } else {
           controller.equation = '';
           if (controller.language === 'LT') {
-            taskSavingMessageDiv.innerHTML = 'Užduotis nebaigta iki galo. Rezultatai neišsaugoti.'
+            messageToTheUser('Užduotis nebaigta iki galo. Rezultatai neišsaugoti.')
           } else if (controller.language === 'EN') {
-            taskSavingMessageDiv.innerHTML = 'Task was not completed. Results were not saved.'
+            messageToTheUser('Task was not completed. Results were not saved.')
           }
         }
-      } else {
-        controller.equation = finalMessageText();
       }
+        
+	  controller.equation = finalMessageText();
 
       controller.equation2 = '';
       controller.result = ['', '', '', '', ''];

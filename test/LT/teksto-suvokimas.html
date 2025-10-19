@@ -18,6 +18,7 @@
 
       gtag('config', 'G-96Q83PW8XY');
     </script>	
+    <script src="../refresh-token.js"></script>
     
     <style>
 
@@ -265,11 +266,6 @@
           gap: 10px;
         }
 
-        #task-saving-message {
-          font-size: 1.35rem;
-          text-align: center;
-        }
-
         #check-answer-btn {
           margin-bottom: 0;
         }
@@ -420,7 +416,8 @@
         }
 
         .drag-chosen {
-          background-color: #faf1e6;
+          background-color: #faf1e6 !important;
+          background: rgba(255, 255, 255, 0.2);
           border: 2px dashed #40c9a9;
         }
 
@@ -714,10 +711,6 @@
     .item {
       font-size: 1.4rem;
     }
-
-    #task-saving-message {
-			font-size: 1.75rem
-		}
 	}
 
     </style>
@@ -745,25 +738,25 @@
           </a>
 
           <!-- Desktop Navigation -->
-          <div class="main-nav-links">
-              <a href="index.html" class="main-nav-back-btn">
-                    <span class="main-nav-back-icon">←</span>
-                    <div class="main-nav-back-text">
-                        <span class="main-nav-back-label">Grįžti į</span>
-                        <span class="main-nav-back-title">Padžią</span>
-                    </div>
-                </a>
+          <div class="main-nav-links invisible">
+            <a class="main-nav-back-btn" id="desktopBackBtn">
+              <span class="main-nav-back-icon">←</span>
+              <div class="main-nav-back-text">
+                <span class="main-nav-back-label">Grįžti</span>
+                <span class="main-nav-back-title">Atgal</span>
+              </div>
+            </a>
           </div>
 
-                    <!-- Desktop Navigation -->
-          <div class="main-nav-mobile-btn">
-              <a href="index.html" class="main-nav-back-btn">
-                    <span class="main-nav-back-icon">←</span>
-                    <div class="main-nav-back-text">
-                        <span class="main-nav-back-label">Grįžti į</span>
-                        <span class="main-nav-back-title">Padžią</span>
-                    </div>
-                </a>
+          <!-- Mobile Navigation -->
+          <div class="main-nav-mobile-btn simplified">
+            <a class="main-nav-back-btn" id="mobileBackBtn">
+              <span class="main-nav-back-icon">←</span>
+              <div class="main-nav-back-text">
+                <span class="main-nav-back-label">Grįžti</span>
+                <span class="main-nav-back-title">Atgal</span>
+              </div>
+            </a>
           </div>
       </div>
   </nav>
@@ -855,7 +848,6 @@
     <div id="final-message-row" style="display: none; position: relative;">
           <div id="fireworks-div" class="image-container fireworks-div"></div>
           <div id="final-message-div"></div>
-          <div id="task-saving-message"></div>
     </div>
 
     <div class="button-row">
@@ -900,11 +892,11 @@
   <script>
 let sortableInstances = [];
 window.onload = function () {
-    if (localStorage.getItem('controller') === null) {
+    if (!localStorage.getItem('controller')) {
         window.location.href = "./";
     } else {
       controller = JSON.parse(localStorage.getItem('controller')) 
-      if (controller.mode !== "lang") {
+      if (controller.mode !== "lang" || controller.modeChoice1 !== "C49") {
 			window.location.href = "./";
 		}
     }
@@ -1664,6 +1656,9 @@ window.addEventListener('resize', () => {
 let mobileOptionsSortable = null;
 
 
+let isOverValidContainer = false;
+let currentDraggedItem = null;
+
 function initializeSortableJS() {
   // Destroy previous instances
   sortableInstances.forEach(instance => instance.destroy());
@@ -1701,16 +1696,49 @@ function initializeSortableJS() {
       scroll: true,
       scrollSensitivity: 60,
       scrollSpeed: 10,
+      removeCloneOnHide: true,
+      emptyInsertThreshold: 20,
       onStart: function(evt) {
-        // Close sidebar when drag starts on desktop
+        currentDraggedItem = evt.item;
+        isOverValidContainer = true;
+        
+        // Reset item background color to neutral immediately on non-touch devices
+        if (!touchDevice) {
+          evt.item.style.backgroundColor = '';
+        }
+        
+        // Close sidebar when drag starts
         if (sidebarWrapper.classList.contains('open')) {
           closeSidebar();
         }
+      },
+      onMove: function(evt) {
+        isOverValidContainer = true;
+        return true;
+      },
+      onEnd: function(evt) {
+        // Clean up any ghost clones that might be stuck
+        const ghosts = document.querySelectorAll('.sortable-ghost, .drag-ghost, .drag-chosen');
+        ghosts.forEach(ghost => {
+          if (ghost !== evt.item && ghost.classList.contains('sortable-ghost')) {
+            ghost.remove();
+          }
+        });
+        
+        // Small delay to let Sortable finish its operations
+        setTimeout(() => {
+          if (!isOverValidContainer && currentDraggedItem) {
+            const optionsField = document.getElementById('options-field');
+            optionsField.appendChild(currentDraggedItem);
+          }
+          currentDraggedItem = null;
+          isOverValidContainer = false;
+        }, 10);
       }
     };
 
-    // Add delay for mobile touch devices
-    if (isMobile && touchDevice) {
+    // Add delay for touch devices (regardless of screen size)
+    if (touchDevice) {
       config.delay = 300;
       config.delayOnTouchOnly = true;
     }
@@ -1718,6 +1746,100 @@ function initializeSortableJS() {
     const sortable = new Sortable(el, config);
     sortableInstances.push(sortable);
   });
+
+  // Add global mouse/touch tracking
+  document.removeEventListener('mousemove', trackDropZone);
+  document.removeEventListener('touchmove', trackDropZone);
+  document.addEventListener('mousemove', trackDropZone, { passive: true });
+  document.addEventListener('touchmove', trackDropZone, { passive: true });
+}
+
+function trackDropZone(e) {
+  if (!currentDraggedItem) return;
+  
+  const point = e.touches ? e.touches[0] : e;
+  
+  // Hide the dragged element temporarily to get element underneath
+  if (currentDraggedItem) {
+    currentDraggedItem.style.visibility = 'hidden';
+  }
+  
+  const elementUnderCursor = document.elementFromPoint(point.clientX, point.clientY);
+  
+  // Restore visibility
+  if (currentDraggedItem) {
+    currentDraggedItem.style.visibility = 'visible';
+  }
+  
+  if (!elementUnderCursor) {
+    isOverValidContainer = false;
+    return;
+  }
+  
+  const validContainers = [
+    'title-field',
+    'answers-field',
+    'answers-field-start',
+    'answers-field-middle',
+    'answers-field-end',
+    'options-field'
+  ];
+  
+  // Check if cursor is over a valid container or its children
+  let el = elementUnderCursor;
+  isOverValidContainer = false;
+  
+  while (el && el !== document.body) {
+    if (validContainers.includes(el.id)) {
+      isOverValidContainer = true;
+      break;
+    }
+    el = el.parentElement;
+  }
+}
+
+function trackDropZone(e) {
+  if (!currentDraggedItem) return;
+  
+  const point = e.touches ? e.touches[0] : e;
+  
+  // Hide the dragged element temporarily to get element underneath
+  if (currentDraggedItem) {
+    currentDraggedItem.style.visibility = 'hidden';
+  }
+  
+  const elementUnderCursor = document.elementFromPoint(point.clientX, point.clientY);
+  
+  // Restore visibility
+  if (currentDraggedItem) {
+    currentDraggedItem.style.visibility = 'visible';
+  }
+  
+  if (!elementUnderCursor) {
+    isOverValidContainer = false;
+    return;
+  }
+  
+  const validContainers = [
+    'title-field',
+    'answers-field',
+    'answers-field-start',
+    'answers-field-middle',
+    'answers-field-end',
+    'options-field'
+  ];
+  
+  // Check if cursor is over a valid container or its children
+  let el = elementUnderCursor;
+  isOverValidContainer = false;
+  
+  while (el && el !== document.body) {
+    if (validContainers.includes(el.id)) {
+      isOverValidContainer = true;
+      break;
+    }
+    el = el.parentElement;
+  }
 }
 
 

@@ -6,6 +6,7 @@
     <title>Interactive Pixel Art Room</title>
     <link rel="stylesheet" type="text/css" href="../index.css">
     <link rel="stylesheet" href="../main-nav-bar.css">
+    <script src="../refresh-token.js"></script>
     <style>
 
       @font-face {
@@ -685,6 +686,10 @@
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        #gameContainer[hidden] {
+            display: none !important;
         }
 
         .game-navigation {
@@ -2991,7 +2996,7 @@
             </a>
 
             <!-- Desktop Navigation -->
-            <div class="main-nav-links">
+            <div class="main-nav-links invisible">
                 <a href="index.html" class="main-nav-link">Praktika</a>
                 <a href="uzduotys.html" class="main-nav-link">Užduotys</a>
                 <a href="klase.html" class="main-nav-link">Klasė</a>
@@ -3012,8 +3017,12 @@
                 
                 <div class="main-nav-connect-wrapper">
                     <div class="main-nav-connect-glow"></div>
-                    <button class="main-nav-connect-btn">
+                    <button class="main-nav-log-out-btn">
                         <span class="main-nav-connect-text">Atsijungti</span>
+                    </button>
+
+                    <button class="main-nav-log-in-btn">
+                        <span class="main-nav-connect-text">Prisijungti</span>
                     </button>
                 </div>
             </div>
@@ -3039,14 +3048,17 @@
                     <button class="language-option language-option-EN" onclick="setLanguage('EN')">EN</button>
                 </div>
                 
-                <button class="main-nav-mobile-connect">
+                <button class="main-nav-mobile-log-out-btn">
                     <span class="main-nav-connect-text">Atsijungti</span>
+                </button>
+                <button class="main-nav-mobile-log-in-btn">
+                    <span class="main-nav-connect-text">Prisijungti</span>
                 </button>
             </div>
         </div>
     </nav>
 
-    <div id="gameContainer" class="">
+    <div id="gameContainer" class="" hidden>
 
     <nav class="game-navigation">
         <div class="nav-items">
@@ -3358,13 +3370,8 @@
     <script src="../mental-arithmetic.js"></script>
     <script src="../main-nav-bar.js"></script>
     <script>
-        const apiBase = 'http://localhost:5000/';
-        let userData;
-
-        if (userDataString) {
-            userData = JSON.parse(userDataString);
-        } else {
-            window.location.href = '/LT';
+        if (!userData) {
+            window.location.href = './';
         }
 
         let unitSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
@@ -3814,14 +3821,17 @@ async function fetchGameData() {
         child.style.opacity = "0.5";         // optional visual cue
     });
     try {
-        const response = await fetch(apiBase + 'petGame/gameData', {
+        const response = await apiFetch(apiBase + 'petGame/gameData', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': userData.token
             },
             body: JSON.stringify({ studentId: userData.userId })  // stringify the whole object, not the id itself
         });
+
+        if (!response) {
+            return;
+        }
 
         if (!response.ok) {
             throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -5306,14 +5316,17 @@ async function sendObjectAssetsUpdateToDatabase() {
     );
 
     try {
-        const response = await fetch(apiBase + 'petGame/objectAssets', {
+        const response = await apiFetch(apiBase + 'petGame/objectAssets', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': userData.token
             },
             body: JSON.stringify({ studentId: userData.userId, objectAssets: objectAssetsString })
         });
+
+        if (!response) {
+            return;
+        }
 
         if (response.ok && response.status === 204) {
             // Success - add tick animation
@@ -5343,14 +5356,17 @@ async function sendPetAssetsUpdateToDatabase() {
     let petAssetsString = JSON.stringify(convertUserPetAssetsDictToCompactList(userPetAssets));
 
     try {
-        const response = await fetch(apiBase + 'petGame/petAssets', {
+        const response = await apiFetch(apiBase + 'petGame/petAssets', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': userData.token
             },
             body: JSON.stringify({ studentId: userData.userId, petAssets: petAssetsString })
         });
+
+        if (!response) {
+            return;
+        }
 
         if (response.ok && response.status === 204) {
             // Success - add tick animation
@@ -5377,14 +5393,17 @@ async function sendMoneyUpdateToDatabase() {
     const originalMoney = userMoney;
     
     try {
-        const response = await fetch(apiBase + 'petGame/money', {
+        const response = await apiFetch(apiBase + 'petGame/money', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': userData.token
             },
             body: JSON.stringify({ studentId: userData.userId, money: userMoney })
         });
+
+        if (!response) {
+            return;
+        }
 
         if (response.ok && response.status === 204) {
             // Success - update UI and add tick animation
@@ -5425,14 +5444,17 @@ async function sendPetStatsUpdateToDatabase(petId) {
     ];
 
     try {
-        const response = await fetch(apiBase + 'petGame/petStats', {
+        const response = await apiFetch(apiBase + 'petGame/petStats', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': userData.token
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({ studentId: userData.userId, petStats: petsArray })
         });
+
+        if (!response) {
+            return;
+        }
 
         if (response.ok) {
             document.querySelector('.some-pet-element')?.classList.add('tick-svg');
@@ -5895,9 +5917,6 @@ function navigationResponsiveLayout() {
         gameContentPanel.forEach(panel => panel.classList.remove("mobile"));
     }
 }
-
-// Run once on page load
-navigationResponsiveLayout();
 
 // Recalculate on resize
 window.addEventListener("resize", () => {
@@ -7484,17 +7503,20 @@ function deletePetConfirmed(petId) {
 
 async function deletePetStatsInDatabase(petId) {
     try {
-        const response = await fetch(apiBase + 'petGame/deletePetStats', {
+        const response = await apiFetch(apiBase + 'petGame/deletePetStats', {
             method: 'POST', // or 'DELETE' if backend is updated
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': userData.token
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 studentId: userData.userId,
                 petId: petId
             })
         });
+
+        if (!response) {
+            return;
+        }
 
         if (!response.ok) {
             throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -7690,7 +7712,7 @@ function createPetButtons() {
 
 async function sendPetOnWalkUpdateToServer() {
     try {
-        const response = await fetch(apiBase + 'petGame/petOnWalk', {
+        const response = await apiFetch(apiBase + 'petGame/petOnWalk', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -7698,6 +7720,10 @@ async function sendPetOnWalkUpdateToServer() {
             },
             body: JSON.stringify({ studentId: userData.userId, petOnWalk: petOnWalk })
         });
+
+        if (!response) {
+            return;
+        }
 
         if (response.ok) {
             document.querySelector('.some-pet-element')?.classList.add('tick-svg');
@@ -9404,7 +9430,7 @@ async function payTax(taxType) {
 
 async function sendTaxUpdate(taxesArray) {
 
-    const response = await fetch(apiBase + 'petGame/taxes', {
+    const response = await apiFetch(apiBase + 'petGame/taxes', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -9412,6 +9438,10 @@ async function sendTaxUpdate(taxesArray) {
         },
         body: JSON.stringify({studentId: userData.userId, taxes: taxesArray})
     });
+
+    if (!response) {
+        return;
+    }
 
     if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -9526,17 +9556,18 @@ function calculateHappinesIndexForPet (petId) {
 }
 
 window.onload = function () {
-    if (typeof controller === 'undefined' || controller === null) {
-        const savedController = localStorage.getItem('controller');
-        if (savedController) {
-            controller = JSON.parse(savedController);
-        }
+    const savedController = localStorage.getItem('controller');
+    if (savedController) {
+        controller = JSON.parse(savedController);
     }
+
     if (controller) {
         controller.task = null;
         controller.taskCompleted = false;
         localStorage.setItem('controller', JSON.stringify(controller));
     }
+    navigationResponsiveLayout();
+    document.querySelector('#gameContainer').removeAttribute('hidden');
 };
 
     </script>

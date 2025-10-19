@@ -26,12 +26,14 @@
 
   gtag('config', 'G-96Q83PW8XY');
 </script>	
+<script src="../refresh-token.js"></script>
 
 <style>
 	* {
 		-webkit-user-select: none;
 		-webkit-tap-highlight-color: transparent;
 		user-select: none;
+        box-sizing: border-box;
 	}
 
 	html {
@@ -83,33 +85,137 @@
   overflow: hidden; /* clip any overflow inside container */
 }
 
-.main-logo-holder,
 .practice-label-div,
 .submit-button-div {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 auto; /* take only the space they need */
+   max-width: 500px;
+   width: 100%;
+}
+
+.free-practice-div {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.submit-button-div {
+  padding: 16px 0 0 0;
+}
+
+.submit-button-div {
+    border-top: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.practice-outer-div {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 25px;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.personal-chl {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: end;
+}
+
+.practice-outer-div,
+.personal-chl {
+    flex: 1 1 400px;
+    max-width: 50%;
+}
+
+.middle-div.wrapped {
+    overflow: auto;
+}
+
+.middle-div.wrapped .practice-outer-div,
+.middle-div.wrapped .personal-chl {
+    max-width: 100%;
+    flex: none;
+    width: 100%;
+}
+
+.middle-div.wrapped .practice-outer-div,
+.middle-div.wrapped .personal-chl {
+    height: auto;
+}
+
+.middle-div.wrapped .practice-outer-div.overflowing {
+    height: 100%;
+}
+
+.middle-div.wrapped .practice-outer-div {
+    max-height: 90%;
+}
+
+.personal-chl-inner {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .middle-div {
+  height: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex: 1 1 auto;   /* take remaining space */
   min-height: 0;    /* allow shrinking */
   min-width: 0;     /* allow horizontal shrink if needed */
-  overflow: hidden;
-  align-items: center;
+  align-items: start;
   justify-content: center;
+  gap: 25px;
+  flex-wrap: wrap;
 }
 
 .new-task-outer-div {
-	overflow-y: auto;
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    overflow: hidden;
+    width: 100%;
+}
+
+#new-task-options-container {
+    max-height: 100%;
+    justify-content: start;
+    overflow: hidden;
+}
+
+#new-task-options-container-inner {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    padding: 15px 3px 15px 15px;
+}
+
+#mode_choice {
+    margin-top: 0;
 }
 
 	.practice-label {
-		font-size: 2rem;
-		font-weight: 600;
+        font-size: 2rem;
+        font-weight: 800;
+        opacity: 0.9;
+        margin-bottom: 16px;
 	}
 
 	.lm-animated-bg {
@@ -143,13 +249,14 @@
   color: #F5F5F7;
   overflow: hidden;
   min-width: 0;
-  padding: 14px 12px;
+  padding: 12px 10px;
   font-weight: 600;
   letter-spacing: 0.01em;
   font-size: 1.15rem;
   width: 150px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-transform: uppercase;
+  letter-spacing: 0.05rem;
   /*box-shadow: 
         0 1px 2px rgba(0, 0, 0, 0.2),
         0 4px 12px rgba(50, 136, 172, 0.2),
@@ -285,9 +392,198 @@ body.popup-active {
     transform: none;
 }
 
-.submit-button-div {
-  margin: 20px 0 15px 0;
+.personal-chl-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border-radius: 25px;
+    height: 100%;
+    overflow-y: auto;
+    max-width: 500px;
+    align-items: center;
+    justify-content: start;
 }
+
+.chl-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 25px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.chl-card:hover::before {
+    opacity: 1;
+}
+
+.chl-card.expanded {
+    background: rgba(255, 255, 255, 0.4);
+    padding: 20px;
+}
+
+.chl-card.expanded::before {
+    opacity: 1;
+}
+
+.chl-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.chl-card-header-left {
+    flex: 1;
+}
+
+.chl-type-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.chl-type-math {
+    background: linear-gradient(135deg, #40c9a9, #32ac93);
+    color: white;
+}
+
+.chl-type-text-comp {
+    background: linear-gradient(135deg, #40c9a9, #32ac93);
+    color: white;
+}
+
+.chl-type-grammar {
+    background: linear-gradient(135deg, #40c9a9, #32ac93);
+    color: white;
+}
+
+.chl-info-text {
+    font-size: 0.95rem;
+    color: rgba(0, 0, 0, 0.8);
+    line-height: 1.6;
+    font-weight: 500;
+}
+
+.chl-expand-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.chl-expand-icon svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s ease;
+}
+
+.chl-card.expanded .chl-expand-icon svg {
+    transform: rotate(180deg);
+}
+
+.chl-card-details {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chl-label-div {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    align-items: center;
+}
+
+.chl-card.expanded .chl-card-details {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 15px;
+}
+
+.chl-details-info {
+    background: rgba(50, 136, 172, 0.08);
+    border-left: 4px solid #3288AC;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.chl-details-info-item {
+    font-size: 0.9rem;
+    color: rgba(0, 0, 0, 0.7);
+    line-height: 1.8;
+    margin-bottom: 6px;
+}
+
+.chl-details-info-item:last-child {
+    margin-bottom: 0;
+}
+
+.chl-details-info-item strong {
+    color: rgba(0, 0, 0, 0.9);
+    font-weight: 700;
+}
+
+.chl-action-button {
+    width: 100px;
+    padding: 12px 10px;
+    border: none;
+    background: linear-gradient(135deg, #3288AC, #286D8A);
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+}
+
+.chl-action-button-holder {
+    display: flex;
+    justify-content: end;
+}
+
+.chl-action-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+  border-radius: 20px;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+.chl-action-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.chl-action-button:hover::before {
+  background: rgba(255, 255, 255, 0.15);
+}
+
 
 @media (max-width: 767px) {
 	.container {
@@ -304,6 +600,55 @@ body.popup-active {
 	.container-inner {
 		padding: 15px;
 	}
+
+    .practice-outer-div {
+        width: 70%;
+        min-width: 0;
+    }
+
+    .chl-card {
+        padding: 15px;
+    }
+
+    .chl-info-text {
+        font-size: 0.85rem;
+    }
+
+    .chl-details-info-item {
+        font-size: 0.85rem;
+    }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    #new-task-options-container-inner {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 575px) {
+	.container {
+		padding: 0;
+	}
+
+    .practice-outer-div {
+        width: 100%;
+        padding: 15px;
+        max-height: 90%;
+    }
+
+    .practice-label {
+        font-size: 1.75rem;
+    }
+
+    #new-task-options-container-inner {
+        overflow-y: auto;
+        scrollbar-gutter: stable;
+        padding: 15px 0;
+    }
+
+    .personal-chl-inner {
+        padding: 15px;
+    }
 }
 
 /* POPUP STYLES END */
@@ -311,7 +656,7 @@ body.popup-active {
 </head>
 
 <body>
-	    <div id="customConfirmModal" class="modal">
+	<div id="customConfirmModal" class="modal">
     <div class="modal-content">
         <p id="customModalText"></p>
         <div class="modal-buttons">
@@ -346,7 +691,7 @@ body.popup-active {
             </a>
 
             <!-- Desktop Navigation -->
-            <div class="main-nav-links">
+            <div class="main-nav-links invisible">
                 <a href="index.html" class="main-nav-link main-nav-link-active">Praktika</a>
                 <a href="uzduotys.html" class="main-nav-link">Užduotys</a>
                 <a href="klase.html" class="main-nav-link">Klasė</a>
@@ -367,8 +712,12 @@ body.popup-active {
                 
                 <div class="main-nav-connect-wrapper">
                     <div class="main-nav-connect-glow"></div>
-                    <button class="main-nav-connect-btn">
+                    <button class="main-nav-log-out-btn">
                         <span class="main-nav-connect-text">Atsijungti</span>
+                    </button>
+
+                    <button class="main-nav-log-in-btn">
+                        <span class="main-nav-connect-text">Prisijungti</span>
                     </button>
                 </div>
             </div>
@@ -394,24 +743,18 @@ body.popup-active {
                     <button class="language-option language-option-EN" onclick="setLanguage('EN')">EN</button>
                 </div>
                 
-                <button class="main-nav-mobile-connect">
+                <button class="main-nav-mobile-log-out-btn">
                     <span class="main-nav-connect-text">Atsijungti</span>
+                </button>
+                <button class="main-nav-mobile-log-in-btn">
+                    <span class="main-nav-connect-text">Prisijungti</span>
                 </button>
             </div>
         </div>
     </nav>
 
 
-	<div class="container" id="template-container" hidden>
-
-		<div class="kid-5"> 
-			<img src="../images/sudedu_kid_1.png" style="width: 100%; height: 100%;" class="img-fluid"> 
-		</div>
-		<div class="kid-6"> 
-			<img src="../images/sudedu_kid_2.png" style="width: 100%; height: 100%;" class="img-fluid"> 
-		</div>
-
-		
+	<div class="container" id="template-container" hidden>		
 		<!-- POPUP ELEMENTS START -->
 		<div class="class-popup-modal" id="classPopup">
 			<div class="class-popup-content">
@@ -430,15 +773,14 @@ body.popup-active {
 		<!-- POPUP ELEMENTS END -->
 
 		<div class="container-inner">
-			<div class="main-logo-holder">
-				<img id="sudedu-main-page-logo" src="../images/sudedu_logo.png" alt="sudEdu">
-			</div>
 			<div class="middle-div">
-				<div class="practice-label-div">
+                <div class="practice-outer-div">
+				<div class="practice-label-div free-practice-div">
 					<div class="practice-label">PRAKTIKUOTIS</div>
 				</div>
 				<div class="new-task-outer-div" id="middle-div-row">
 		                <div id="new-task-options-container">
+                            <div id="new-task-options-container-inner">
                             <div class="ode_choice_div">
                                 <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice" id="mode_choice">
                                     <option value="matematika">MATEMATIKĄ</option>
@@ -675,21 +1017,35 @@ body.popup-active {
                                 </div>
                             </div>
                         </div>
+                    </div>
 				</div>
-			</div>
-			<div class="submit-button-div">
+            <div class="submit-button-div">
 				<button class="submit-button">Pradėti</button>
+			</div>
+            </div>
+            <div class="personal-chl">
+                <div class="personal-chl-inner">
+                <div class="practice-label-div chl-label-div">
+					<div class="practice-label">IŠŠŪKIAI</div>
+				</div>
+                <div class="personal-chl-list-container" id="personalChlContainer"></div>
+            </div>
+            </div>
 			</div>
 		</div>
 
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../parameter_dictionary.js"></script>
 	<script src="../mental-arithmetic.js"></script>
 	<script src="../mental-arithmetic-combinations.js"></script>
     <script src="../main-nav-bar.js"></script>
 	<script src="matematika_options.js"></script>
 
 	<script>
+        let userClass;
+
+
 		function submitSelection() {
 			let modeChoiceSelection = document.querySelector('#mode_choice').value;
 			if (localStorage.getItem('controller') !== null) {
@@ -792,11 +1148,9 @@ body.popup-active {
 		submitButtonElement.addEventListener("click", submitSelection);
 
 		window.onload = function () {
-            if (typeof controller === 'undefined' || controller === null) {
-                const savedController = localStorage.getItem('controller');
-                if (savedController) {
-                    controller = JSON.parse(savedController);
-                }
+            const savedController = localStorage.getItem('controller');
+            if (savedController) {
+                controller = JSON.parse(savedController);
             }
             if (controller) {
                 controller.task = null;
@@ -845,7 +1199,7 @@ function setClassLocalStorage(classValue) {
 
 // Function to get value from localStorage and check expiration
 function getClassLocalStorage() {
-    const itemStr = localStorage.getItem("userClassV2");
+    const itemStr = localStorage.getItem("userClassNotLoggedIn");
     
     // If the item doesn't exist, return null
     if (!itemStr) {
@@ -884,7 +1238,7 @@ function showClassPopup() {
             this.classList.add('selected');
             
             // Store the selected class
-            selectedClass = this.getAttribute('data-class');
+            selectedClass = Number(this.getAttribute('data-class'));
             
             // Enable the Next button
             nextButton.disabled = false;
@@ -896,28 +1250,320 @@ function showClassPopup() {
         if (selectedClass) {
             // Set localStorage with selected class and expiration
             setClassLocalStorage(selectedClass);
+
+            userClass = selectedClass;
+
+            if (userData) {
+                updateUserClass (userClass);
+                userData.knowledgeLvl = userClass;
+                localStorage.setItem('userData', JSON.stringify(userData));
+            }
             
             // Close popup
             popup.classList.remove('active');
             document.body.classList.remove('popup-active');
         }
     });
+
+    displayPersonalChl();
 }
 
-// Check if class exists in localStorage when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    const userClass = getClassLocalStorage();
-    if (!userClass) {
-        // Show popup if no valid class is stored
-        showClassPopup();
+async function updateUserClass (userClassSelection) {
+    try {
+        const response = await apiFetch(apiBase + `students/knowledge-level`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                studentId: userData.userId,
+                knowledgeLvl: Number(userClassSelection)
+            })
+        });
+
+        if (!response) {
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error("Nepavyko atnaujinti lygio");
+        }
+
+        const data = await response.json();
+    } catch (error) {
+        console.error("Error updating knowledge level:", error);
     }
-});
+}
 
 //POPUP SCRIPT END
 
 const timerInputElement = document.querySelector('#timer-input');
 const questionNumberInputElement = document.querySelector('#question-number-input');
 
+const personalChlDict = {
+    0: {
+        "math": [
+            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
+        ],
+        "text-comp": [
+            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
+        ],
+        "grammar": [
+            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
+        ]
+    },
+    1: {
+        "math": [
+            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
+        ],
+        "text-comp": [
+            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
+        ],
+        "grammar": [
+            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
+        ]
+    },
+    2: {
+        "math": [
+            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
+        ],
+        "text-comp": [
+            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
+        ],
+        "grammar": [
+            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
+        ]
+    },
+    3: {
+        "math": [
+            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
+        ],
+        "text-comp": [
+            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
+        ],
+        "grammar": [
+            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
+        ]
+    },
+    4: {
+        "math": [
+            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
+        ],
+        "text-comp": [
+            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
+        ],
+        "grammar": [
+            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
+        ]
+    },
+}
+
+const typeLabels = {
+    "math": "Matematika",
+    "text-comp": "Teksto supratimas",
+    "grammar": "Rašyba"
+};
+
+function displayPersonalChl() {
+    const container = document.getElementById('personalChlContainer');
+    const userClass = 0; // Replace with actual user class
+    
+    if (!personalChlDict[userClass]) {
+        container.innerHTML = '<p style="text-align: center; color: rgba(0,0,0,0.5);">Nėra prieinamų iššūkių</p>';
+        return;
+    }
+
+    const classData = personalChlDict[userClass];
+    const challenges = Object.keys(classData).map(key => {
+        const items = classData[key];
+        const randomItem = items[Math.floor(Math.random() * items.length)];
+        const randomItemInfo = getOptionTextFromValues(JSON.parse(randomItem));
+
+        return {
+            type: key,
+            chl: randomItem,
+            chlInfo: randomItemInfo
+        };
+    });
+
+    container.innerHTML = '';
+
+    challenges.forEach(challenge => {
+        const card = document.createElement('div');
+        card.className = 'chl-card';
+        card.dataset.challenge = challenge.chl;
+        card.dataset.type = challenge.type;
+
+        // Card header
+        const header = document.createElement('div');
+        header.className = 'chl-card-header';
+
+        const headerLeft = document.createElement('div');
+        headerLeft.className = 'chl-card-header-left';
+
+        const badge = document.createElement('div');
+        badge.className = `chl-type-badge chl-type-${challenge.type}`;
+        badge.textContent = typeLabels[challenge.type] || challenge.type;
+
+        const info = document.createElement('div');
+        info.className = 'chl-info-text';
+        info.textContent = challenge.chlInfo.join(' • ');
+
+        headerLeft.appendChild(badge);
+
+        const expandIcon = document.createElement('div');
+        expandIcon.className = 'chl-expand-icon';
+        expandIcon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+
+        header.appendChild(headerLeft);
+        header.appendChild(expandIcon);
+
+        // Card details (hidden by default)
+        const details = document.createElement('div');
+        details.className = 'chl-card-details';
+
+        const button = document.createElement('button');
+        button.className = 'chl-action-button';
+        button.textContent = 'Atlikti';
+        button.onclick = (e) => {
+            e.stopPropagation();
+            completePersonalChlTask(challenge.chl)
+        };
+
+        const buttonHolder = document.createElement('div');
+        buttonHolder.className = 'chl-action-button-holder';
+
+        buttonHolder.appendChild(button);
+
+        details.appendChild(headerLeft.appendChild(info));
+        details.appendChild(buttonHolder);
+
+        card.appendChild(header);
+        card.appendChild(details);
+
+        card.addEventListener('click', () => toggleCard(card));
+
+        container.appendChild(card);
+    });
+}
+
+function toggleCard(clickedCard) {
+    const allCards = document.querySelectorAll('.chl-card');
+    const container = document.querySelector('.middle-div'); // scrollable container
+
+    // Collapse other cards
+    allCards.forEach(card => {
+        if (card !== clickedCard && card.classList.contains('expanded')) {
+            card.classList.remove('expanded');
+        }
+    });
+
+    const isExpanding = !clickedCard.classList.contains('expanded');
+    clickedCard.classList.toggle('expanded');
+
+    if (isExpanding && container) {
+        setTimeout(() => {
+            // Get card's position relative to the container
+            const cardRect = clickedCard.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+
+            const cardBottomRelative = cardRect.bottom - containerRect.top;
+            const containerHeight = container.clientHeight;
+
+            // If card bottom is below visible area, scroll
+            if (cardBottomRelative > containerHeight) {
+                const scrollAmount = container.scrollTop + (cardBottomRelative - containerHeight + 20); // 20px padding
+                container.scrollTo({
+                    top: scrollAmount,
+                    behavior: 'smooth'
+                });
+            }
+        }, 400);
+    }
+}
+
+
+function completePersonalChlTask(challengeInfo) {
+    const parsedCurrentTaskInstructions = JSON.parse(challengeInfo);
+
+    if (localStorage.getItem('controller') !== null) {
+        controller = JSON.parse(localStorage.getItem('controller'))
+    }
+
+    var checkbox = document.getElementById("remainder-input");
+
+    controller.language = "LT";
+    if (parsedCurrentTaskInstructions[0] === "math") {
+        controller.mode = 'math';
+        controller.modeChoice1 = parsedCurrentTaskInstructions[1];
+        controller.modeChoice2 = parsedCurrentTaskInstructions[2];
+        controller.selectedNumbers = parsedCurrentTaskInstructions[8];
+        controller.withRemainder = parsedCurrentTaskInstructions[9];
+        controller.modeChoice3 = parsedCurrentTaskInstructions[3];
+        controller.modeChoice4 = parsedCurrentTaskInstructions[4];
+        controller.modeChoice5 = parsedCurrentTaskInstructions[5];
+        controller.modeChoice6 = parsedCurrentTaskInstructions[6];
+        controller.modeChoice7 = parsedCurrentTaskInstructions[7];
+        controller.modeChoice8 = "C79";
+        controller.taskCompleted = false;
+        controller.setTaskDuration = parsedCurrentTaskInstructions[10];
+
+    } else if (parsedCurrentTaskInstructions[0] === "lang") {
+        controller.mode = 'lang';
+        controller.classChoice = parsedCurrentTaskInstructions[1];
+        controller.modeChoice1 = parsedCurrentTaskInstructions[2];
+        controller.modeChoice2 = parsedCurrentTaskInstructions[3];
+        controller.modeChoice3 = parsedCurrentTaskInstructions[4];
+        controller.modeChoice4 = parsedCurrentTaskInstructions[5];
+        controller.modeChoice5 = parsedCurrentTaskInstructions[6];
+        controller.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[7];
+        controller.questionFrequency = parsedCurrentTaskInstructions[8];
+        controller.taskCompleted = false;
+        controller.setTaskDuration = parsedCurrentTaskInstructions[9];
+    }
+
+    localStorage.setItem('controller', JSON.stringify(controller))
+
+    startQuestions();
+}
+displayPersonalChl();
+
+function checkWrap() {
+  const container = document.querySelector('.middle-div');
+  const practiceHolderDiv = document.querySelector(".practice-outer-div");
+  const personalChlHolderDiv = document.querySelector(".personal-chl");
+  if (!container || !practiceHolderDiv || !personalChlHolderDiv) return;
+
+  // Temporarily remove class to get clean measurement
+  container.classList.remove('wrapped');
+
+  const wrapped = personalChlHolderDiv.offsetTop > practiceHolderDiv.offsetTop;
+
+  container.classList.toggle('wrapped', wrapped);
+  
+}
+
+function updateOverflowClass() {
+  const container = document.getElementById('new-task-options-container-inner');
+  const practiceDiv = document.querySelector('.practice-outer-div');
+  if (!container || !practiceDiv) return;
+
+  // Compare scrollHeight to offsetHeight (visible height)
+  const isOverflowing = container.scrollHeight > container.offsetHeight;
+  practiceDiv.classList.toggle('overflowing', isOverflowing);
+}
+
+// Run on load, resize, and DOM changes
+window.addEventListener('load', updateOverflowClass);
+window.addEventListener('resize', updateOverflowClass);
+
+// Optional: detect dynamic content changes
+const observer = new MutationObserver(updateOverflowClass);
+observer.observe(document.getElementById('new-task-options-container-inner'), { childList: true, subtree: true });
+
+
+window.addEventListener('resize', checkWrap);
+window.addEventListener('load', checkWrap);
 
 	</script>
 </body>

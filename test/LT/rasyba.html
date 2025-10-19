@@ -20,6 +20,7 @@
 
 	gtag('config', 'G-96Q83PW8XY');
 	</script>	
+	<script src="../refresh-token.js"></script>
 		
 	<style>
         * {
@@ -177,20 +178,6 @@
 
 	.row {
 		width: 100%;
-	}
-
-	#task-saving-message:empty {
-		min-height: 0;
-	}
-
-	#task-saving-message {
-		font-size: 1.35rem;
-		text-align: center;
-		min-height: 200px;
-		color: black;
-		display: flex;
-		justify-content: center;
-		align-items: center;
 	}
 
 	.button-outer-holder {
@@ -626,10 +613,6 @@
 			width: 25vw;
 		}
 
-		#task-saving-message {
-			font-size: 1.75rem
-		}
-
 		table * {
 			font-size: 1.5rem;
 		}
@@ -701,25 +684,25 @@
 			</a>
 
 			<!-- Desktop Navigation -->
-			<div class="main-nav-links">
-				<a href="index.html" class="main-nav-back-btn">
-						<span class="main-nav-back-icon">←</span>
-						<div class="main-nav-back-text">
-							<span class="main-nav-back-label">Grįžti į</span>
-							<span class="main-nav-back-title">Padžią</span>
-						</div>
-					</a>
+			<div class="main-nav-links invisible">
+				<a class="main-nav-back-btn" id="desktopBackBtn">
+					<span class="main-nav-back-icon">←</span>
+					<div class="main-nav-back-text">
+						<span class="main-nav-back-label">Grįžti</span>
+						<span class="main-nav-back-title">Atgal</span>
+					</div>
+				</a>
 			</div>
 
-						<!-- Desktop Navigation -->
-			<div class="main-nav-mobile-btn">
-				<a href="index.html" class="main-nav-back-btn">
-						<span class="main-nav-back-icon">←</span>
-						<div class="main-nav-back-text">
-							<span class="main-nav-back-label">Grįžti į</span>
-							<span class="main-nav-back-title">Padžią</span>
-						</div>
-					</a>
+			<!-- Mobile Navigation -->
+			<div class="main-nav-mobile-btn simplified">
+				<a class="main-nav-back-btn" id="mobileBackBtn">
+					<span class="main-nav-back-icon">←</span>
+					<div class="main-nav-back-text">
+						<span class="main-nav-back-label">Grįžti</span>
+						<span class="main-nav-back-title">Atgal</span>
+					</div>
+				</a>
 			</div>
 		</div>
 	</nav>
@@ -756,11 +739,10 @@
 	
 		<div class="field-for-text-outer-holder">
 			<div id="field-for-text" style="position: relative;" class="field">
-			<textarea id="hidden-input"></textarea>
+			<textarea id="hidden-input" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false"></textarea>
 			<div id="fireworks-div" class="image-container fireworks-div"></div>
 			<div id="field-for-sentences"></div>
 			<div id="field-for-final-message"></div>
-			<div id="task-saving-message"></div>
 			<div id="restart-reset-button-row" class="row justify-content-center align-items-center" style="display: none;">
 				<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
 					<div id="reset-mistake-buttons" class="col-12 d-flex justify-content-center align-items-center">
@@ -807,15 +789,15 @@
 	<script>
 
 window.onload = function () {
-    if (localStorage.getItem('controller') === null) {
+    if (!localStorage.getItem('controller')) {
         window.location.href = "./";
     } else {
       controller = JSON.parse(localStorage.getItem('controller')) 
-      if (controller.modeChoice1 !== "C50") {
-			window.location.href = "./";
-		} else {
-			styleGrammarPage();
-		}
+      if (controller.mode !== "lang" || controller.modeChoice1 !== "C50") {
+		window.location.href = "./";
+	} else {
+		styleGrammarPage();
+	}
     }
   }
 
@@ -1330,7 +1312,7 @@ window.onload = function () {
 
 												// Join the results into a single string separated by commas
 												const valuesToShowString = valuesToShow.join(', ');
-												formattedWord = [`${beforePunctuation}<span class="question-word-span end" style="display: inline; white-space: nowrap;">${wordInfo["gal-c"][0][0][0]}<textarea autocapitalize="none" autocomplete="off" id="id-${questionId}" class="question-input end" maxlength="6"></textarea> <span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
+												formattedWord = [`${beforePunctuation}<span class="question-word-span end" style="display: inline; white-space: nowrap;">${wordInfo["gal-c"][0][0][0]}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" id="id-${questionId}" class="question-input end" maxlength="6"></textarea> <span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
 												atsakymai[`id-${questionId}`] = {};
 												atsakymai[`id-${questionId}`]["klausimas"] = [wordInfo["gal-c"][0][0][0], '']
 												atsakymai[`id-${questionId}`]["atsakymas"] = [wordInfo["gal-c"][0][1]];
@@ -1372,9 +1354,9 @@ window.onload = function () {
 														}
 														const valuesToShowString = valuesToShow.join('/');
 														if (wordsToBeUsed[word] === "fsc-vow") {
-															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<textarea autocapitalize="none" autocomplete="off" maxlength="6" id="id-${questionId}" class="question-input middle"></textarea>${randomElement[2][0]}<span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
+															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="6" id="id-${questionId}" class="question-input middle"></textarea>${randomElement[2][0]}<span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
 														} else if (wordsToBeUsed[word] === "fsc-con" ) {
-															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<textarea autocapitalize="none" autocomplete="off" maxlength="6" id="id-${questionId}" class="question-input middle"></textarea>${randomElement[2][0]}<span class="pagalba-span-perm">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];															
+															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="6" id="id-${questionId}" class="question-input middle"></textarea>${randomElement[2][0]}<span class="pagalba-span-perm">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];															
 														}
 														atsakymai[`id-${questionId}`] = {};
 														atsakymai[`id-${questionId}`]["klausimas"] = [randomElement[0][0], randomElement[2][0]]
@@ -1388,7 +1370,7 @@ window.onload = function () {
 												if (combinations && combinations.length > 0) {
 														let randomIndex = Math.floor(Math.random() * combinations.length);
 														let randomElement = combinations[randomIndex];
-														formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<textarea autocapitalize="none" autocomplete="off" maxlength="6" id="id-${questionId}" class="question-input middle"></textarea><span class="pagalba-div"></span>${randomElement[2][0]}${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
+														formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="6" id="id-${questionId}" class="question-input middle"></textarea><span class="pagalba-div"></span>${randomElement[2][0]}${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
 														atsakymai[`id-${questionId}`] = {};
 														atsakymai[`id-${questionId}`]["klausimas"] = [randomElement[0][0], randomElement[2][0]]
 														atsakymai[`id-${questionId}`]["atsakymas"] = [randomElement[1]];
@@ -1466,7 +1448,6 @@ window.onload = function () {
 			document.getElementById('check-answers').disabled = false;
 			document.getElementById('show-answers').style.visibility = "hidden";
 			document.getElementById('field-for-final-message').innerHTML = '';
-			taskSavingMessageDiv.innerHTML = ''
 
 			if (controller.modeChoice4 === "C39") {
 				if (questionsToDisplay > sakiniai.length) {
@@ -2182,13 +2163,6 @@ const cleanup = detectMobileKeyboard();
 
 // 3. Optional: cleanup when needed
 // if (cleanup) cleanup();
-
-
-
-
-
-
-
 
 
 	}).catch(error => {

@@ -1,4 +1,8 @@
 let userDataString = localStorage.getItem('userData');
+let userData = null
+if (userDataString) {
+    userData = JSON.parse(userDataString)
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -53,12 +57,54 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Connect buttons
-    document.querySelectorAll('.main-nav-connect-btn, .main-nav-mobile-connect').forEach(btn => {
+    document.querySelectorAll('.main-nav-log-out-btn, .main-nav-mobile-log-out-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            clearUserData();
+            showCustomConfirm(`Ar tikrai norite atsijungti?`, logout)
         });
     });
+
+    document.querySelectorAll('.main-nav-log-in-btn, .main-nav-mobile-log-in-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            window.location.href = 'prisijungimas.html';
+        });
+    });
+
+    [document.getElementById('mobileBackBtn'), document.getElementById('desktopBackBtn')]
+    .forEach(btn => {
+        if (btn) {
+        btn.addEventListener('click', e => {
+            e.preventDefault(); // prevent default link behavior
+            backToPreviousPage();
+        });
+        }
+    });
 });
+
+if (userData) {
+    document.querySelector(".main-nav-log-in-btn")?.style.setProperty('display', 'none');
+    document.querySelector(".main-nav-mobile-log-in-btn")?.style.setProperty('display', 'none');
+    if (userData.accType === "teacher") {
+        const augintiniaiLink = document.querySelector('.main-nav-link[href="augintiniai.html"]');
+        augintiniaiLink?.style.setProperty('display', 'none');
+    }
+} else {
+    document.querySelector(".main-nav-log-out-btn")?.style.setProperty('display', 'none');
+    document.querySelector(".main-nav-mobile-log-out-btn")?.style.setProperty('display', 'none');
+
+    document.querySelectorAll('.main-nav-link').forEach(navLink => {
+        if (navLink.getAttribute('href') !== 'apie.html' && navLink.getAttribute('href') !== 'index.html') {
+            navLink.style.display = 'none';
+        }
+    });
+
+    document.querySelectorAll('.main-nav-mobile-link').forEach(navLink => {
+        if (navLink.getAttribute('href') !== 'apie.html' && navLink.getAttribute('href') !== 'index.html') {
+            navLink.style.display = 'none';
+        }
+    });
+}
+
+document.querySelector('.main-nav-links.invisible').classList.remove('invisible');
 
 function setLanguage(lang) {
     // Update desktop dropdown
@@ -84,7 +130,11 @@ function setLanguage(lang) {
     // Add your language switching logic here
 }
 
-function clearUserData() {
-    localStorage.removeItem('userData');
-    window.location.reload();
+function backToPreviousPage() {
+    const previousPage = document.referrer.split('/').pop() || 'index.html';
+    if (['index.html', 'uzduotys.html', 'klase.html'].includes(previousPage)) {
+        window.location.href = previousPage;
+    } else {
+        window.location.href = 'index.html';
+    }
 }
