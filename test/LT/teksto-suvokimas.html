@@ -1654,8 +1654,6 @@ window.addEventListener('resize', () => {
 });
 
 let mobileOptionsSortable = null;
-
-
 let isOverValidContainer = false;
 let currentDraggedItem = null;
 
@@ -1691,7 +1689,7 @@ function initializeSortableJS() {
       ghostClass: 'drag-ghost',
       chosenClass: 'drag-chosen',
       dragClass: 'drag-dragging',
-      forceFallback: !isTouchDevice(), 
+      forceFallback: true, 
       fallbackOnBody: true,
       scroll: true,
       scrollSensitivity: 60,
@@ -1734,6 +1732,12 @@ function initializeSortableJS() {
       }
     };
 
+    // Add delay for touch devices (regardless of screen size)
+    if (touchDevice) {
+      config.delay = 300;
+      config.delayOnTouchOnly = true;
+    }
+
     const sortable = new Sortable(el, config);
     sortableInstances.push(sortable);
   });
@@ -1743,50 +1747,6 @@ function initializeSortableJS() {
   document.removeEventListener('touchmove', trackDropZone);
   document.addEventListener('mousemove', trackDropZone, { passive: true });
   document.addEventListener('touchmove', trackDropZone, { passive: true });
-}
-
-function trackDropZone(e) {
-  if (!currentDraggedItem) return;
-  
-  const point = e.touches ? e.touches[0] : e;
-  
-  // Hide the dragged element temporarily to get element underneath
-  if (currentDraggedItem) {
-    currentDraggedItem.style.visibility = 'hidden';
-  }
-  
-  const elementUnderCursor = document.elementFromPoint(point.clientX, point.clientY);
-  
-  // Restore visibility
-  if (currentDraggedItem) {
-    currentDraggedItem.style.visibility = 'visible';
-  }
-  
-  if (!elementUnderCursor) {
-    isOverValidContainer = false;
-    return;
-  }
-  
-  const validContainers = [
-    'title-field',
-    'answers-field',
-    'answers-field-start',
-    'answers-field-middle',
-    'answers-field-end',
-    'options-field'
-  ];
-  
-  // Check if cursor is over a valid container or its children
-  let el = elementUnderCursor;
-  isOverValidContainer = false;
-  
-  while (el && el !== document.body) {
-    if (validContainers.includes(el.id)) {
-      isOverValidContainer = true;
-      break;
-    }
-    el = el.parentElement;
-  }
 }
 
 function trackDropZone(e) {
@@ -1852,6 +1812,8 @@ function initializeOptionsFieldSortable() {
     ghostClass: 'sortable-ghost',
     fallbackOnBody: true,
     forceFallback: false,
+    delay: mobileDelay,
+    delayOnTouchOnly: true, // only apply delay on touch devices
 
     onChoose: function(evt) {
       const item = evt.item;
@@ -1928,7 +1890,7 @@ function updateSortables() {
         ghostClass: 'drag-ghost',
         chosenClass: 'drag-chosen',
         dragClass: 'drag-dragging',
-        forceFallback: !isTouchDevice(),
+        forceFallback: true,
         fallbackOnBody: true,
         onStart: function(evt) {
           // Close sidebar when dragging options-field
