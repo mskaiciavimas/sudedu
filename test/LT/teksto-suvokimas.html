@@ -1962,6 +1962,9 @@ function startDrag(element, clientX, clientY) {
   isDragging = true;
   isOverValidContainer = true;
   
+  // Reset background color when drag starts
+  element.style.backgroundColor = '';
+  
   // Prevent body scrolling during drag
   document.body.style.overflow = 'hidden';
   document.body.style.touchAction = 'none';
