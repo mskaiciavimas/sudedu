@@ -713,6 +713,96 @@
     }
 	}
 
+  /* Draggable base styles */
+.draggable-item {
+  cursor: move;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.draggable-item:active {
+  cursor: grabbing;
+}
+
+/* Dragging states */
+.draggable-source--is-dragging {
+  opacity: 0.3;
+  cursor: grabbing;
+}
+
+.draggable-mirror {
+  opacity: 0.9;
+  cursor: grabbing;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.draggable--over {
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+/* Container receiving drag */
+.draggable-container--over {
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Placeholder for where item will drop */
+.draggable-source--placed {
+  opacity: 0.5;
+}
+
+/* Touch device feedback */
+@media (hover: none) and (pointer: coarse) {
+  .draggable-item {
+    cursor: default;
+  }
+  
+  .draggable-item:active {
+    cursor: default;
+  }
+  
+  /* Visual feedback during hold delay */
+  .draggable-item.hold-indicator {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+}
+
+/* Swap animation */
+.draggable-item {
+  transition: transform 150ms ease-in-out;
+}
+
+/* Prevent text selection during drag */
+.draggable-container--is-dragging {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Empty container hint */
+.draggable-container:empty::before {
+  content: 'Drop items here';
+  display: block;
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  font-style: italic;
+}
+
+/* Ensure proper stacking */
+.draggable-mirror,
+.draggable-source--is-dragging {
+  position: relative;
+  z-index: 10000;
+}
+
     </style>
 </head>
 <body>
@@ -888,9 +978,10 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script src="../parameter_dictionary.js"></script>
   <script src="../mental-arithmetic.js"></script>
-  
+  <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.12/lib/draggable.bundle.js"></script>
+
   <script>
-let sortableInstances = [];
+
 window.onload = function () {
     if (!localStorage.getItem('controller')) {
         window.location.href = "./";
@@ -1652,19 +1743,25 @@ window.addEventListener('resize', () => {
         closeSidebar();
     }
 });
+// Simple vanilla JS drag and drop implementation
+// No external dependencies needed!
 
-let mobileOptionsSortable = null;
+let sortableInstances = [];
 let isOverValidContainer = false;
 let currentDraggedItem = null;
+let draggedClone = null;
+let touchHoldTimer = null;
+let isDragging = false;
+let startX = 0;
+let startY = 0;
+let currentX = 0;
+let currentY = 0;
+let offsetX = 0;
+let offsetY = 0;
 
-function isTouchDevice() {
-  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-}
-
-function initializeSortableJS() {
-  // Destroy previous instances
-  sortableInstances.forEach(instance => instance.destroy());
-  sortableInstances = [];
+function initializeDragDrop() {
+  // Clean up previous instances
+  cleanupDragDrop();
 
   const containers = [
     'title-field',
@@ -1674,78 +1771,181 @@ function initializeSortableJS() {
     'answers-field-end'
   ];
 
-  const touchDevice = isTouchDevice();
-
-  containers.forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    const config = {
-      group: 'shared',
-      animation: 150,
-      swapThreshold: 0.65,
-      ghostClass: 'drag-ghost',
-      chosenClass: 'drag-chosen',
-      dragClass: 'drag-dragging',
-      forceFallback: !touchDevice, // JS fallback only on desktop
-      fallbackOnBody: false,       // not needed for native drag
-      scroll: true,
-      scrollSensitivity: 60,
-      scrollSpeed: 10,
-      removeCloneOnHide: true,
-      emptyInsertThreshold: 20,
-      delay: 300,
-      delayOnTouchOnly: true,
-      onStart(evt) {
-        currentDraggedItem = evt.item;
-        isOverValidContainer = true;
-
-        // Close sidebar when drag starts
-        if (sidebarWrapper.classList.contains('open')) closeSidebar();
-      },
-      onMove() {
-        isOverValidContainer = true;
-        return true;
-      },
-      onEnd(evt) {
-        // Clean up any ghost clones
-        const ghosts = document.querySelectorAll('.sortable-ghost, .drag-ghost, .drag-chosen');
-        ghosts.forEach(ghost => {
-          if (ghost !== evt.item) ghost.remove();
-        });
-
-        setTimeout(() => {
-          if (!isOverValidContainer && currentDraggedItem) {
-            const optionsField = document.getElementById('options-field');
-            optionsField.appendChild(currentDraggedItem);
-          }
-          currentDraggedItem = null;
-          isOverValidContainer = false;
-        }, 10);
-      }
-    };
-
-    const sortable = new Sortable(el, config);
-    sortableInstances.push(sortable);
-  });
-
-  // Track mouse/touch for drop zone
-  document.removeEventListener('mousemove', trackDropZone);
-  document.removeEventListener('touchmove', trackDropZone);
-  document.addEventListener('mousemove', trackDropZone, { passive: true });
-  document.addEventListener('touchmove', trackDropZone, { passive: true });
-}
-
-function trackDropZone(e) {
-  if (!currentDraggedItem) return;
-
-  const point = e.touches ? e.touches[0] : e;
-  const elementUnderCursor = document.elementFromPoint(point.clientX, point.clientY);
-  if (!elementUnderCursor) {
-    isOverValidContainer = false;
-    return;
+  // On desktop, also include options-field
+  if (window.innerWidth > 768) {
+    containers.push('options-field');
   }
 
+  containers.forEach(containerId => {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    makeContainerDroppable(container);
+    
+    const items = container.querySelectorAll('.item');
+    items.forEach(item => {
+      makeDraggable(item);
+    });
+  });
+}
+
+function makeDraggable(element) {
+  // Remove any existing listeners first to prevent duplicates
+  element.removeEventListener('mousedown', handleDragStart);
+  element.removeEventListener('touchstart', handleTouchStart);
+  
+  // Always add mouse events for desktop/laptop
+  element.addEventListener('mousedown', handleDragStart);
+  
+  // Also add touch events for touch-capable devices
+  element.addEventListener('touchstart', handleTouchStart, { passive: false });
+  
+  element.style.cursor = 'grab';
+  if (!element.classList.contains('item')) {
+    element.classList.add('item');
+  }
+}
+
+function handleTouchStart(e) {
+  const element = e.currentTarget;
+  const touch = e.touches[0];
+  
+  startX = touch.clientX;
+  startY = touch.clientY;
+  
+  // Visual feedback
+  element.classList.add('hold-indicator');
+  
+  // 300ms hold delay for touch devices
+  touchHoldTimer = setTimeout(() => {
+    startDrag(element, touch.clientX, touch.clientY);
+    
+    // Add touch move and end listeners
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
+  }, 300);
+  
+  // Cancel if touch moves too much during hold
+  const cancelHold = (e) => {
+    const touch = e.touches[0];
+    const moveThreshold = 10;
+    
+    if (Math.abs(touch.clientX - startX) > moveThreshold || 
+        Math.abs(touch.clientY - startY) > moveThreshold) {
+      clearTimeout(touchHoldTimer);
+      element.classList.remove('hold-indicator');
+      document.removeEventListener('touchmove', cancelHold);
+    }
+  };
+  
+  document.addEventListener('touchmove', cancelHold, { passive: true });
+  
+  setTimeout(() => {
+    document.removeEventListener('touchmove', cancelHold);
+  }, 300);
+}
+
+function handleTouchMove(e) {
+  if (!isDragging) return;
+  
+  e.preventDefault();
+  const touch = e.touches[0];
+  updateDragPosition(touch.clientX, touch.clientY);
+}
+
+function handleTouchEnd(e) {
+  clearTimeout(touchHoldTimer);
+  document.removeEventListener('touchmove', handleTouchMove);
+  document.removeEventListener('touchend', handleTouchEnd);
+  
+  if (isDragging) {
+    endDrag();
+  }
+  
+  if (currentDraggedItem) {
+    currentDraggedItem.classList.remove('hold-indicator');
+  }
+}
+
+function handleDragStart(e) {
+  if (e.button !== 0) return; // Only left mouse button
+  
+  e.preventDefault();
+  const element = e.currentTarget;
+  
+  startDrag(element, e.clientX, e.clientY);
+  
+  document.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('mouseup', handleMouseUp);
+}
+
+function handleMouseMove(e) {
+  if (!isDragging) return;
+  updateDragPosition(e.clientX, e.clientY);
+}
+
+function handleMouseUp(e) {
+  document.removeEventListener('mousemove', handleMouseMove);
+  document.removeEventListener('mouseup', handleMouseUp);
+  
+  if (isDragging) {
+    endDrag();
+  }
+}
+
+function startDrag(element, clientX, clientY) {
+  currentDraggedItem = element;
+  isDragging = true;
+  isOverValidContainer = true;
+  
+  // Close sidebar when drag starts
+  if (typeof sidebarWrapper !== 'undefined' && sidebarWrapper.classList.contains('open')) {
+    if (typeof closeSidebar === 'function') {
+      closeSidebar();
+    }
+  }
+  
+  // Get element position
+  const rect = element.getBoundingClientRect();
+  offsetX = clientX - rect.left;
+  offsetY = clientY - rect.top;
+  
+  // Create clone for dragging
+  draggedClone = element.cloneNode(true);
+  draggedClone.classList.add('dragging-clone');
+  draggedClone.style.position = 'fixed';
+  draggedClone.style.width = rect.width + 'px';
+  draggedClone.style.height = rect.height + 'px';
+  draggedClone.style.zIndex = '9999';
+  draggedClone.style.pointerEvents = 'none';
+  draggedClone.style.opacity = '0.9';
+  draggedClone.style.cursor = 'grabbing';
+  document.body.appendChild(draggedClone);
+  
+  // Make original semi-transparent
+  element.style.opacity = '0.3';
+  
+  updateDragPosition(clientX, clientY);
+}
+
+function updateDragPosition(clientX, clientY) {
+  if (!draggedClone) return;
+  
+  currentX = clientX - offsetX;
+  currentY = clientY - offsetY;
+  
+  draggedClone.style.left = currentX + 'px';
+  draggedClone.style.top = currentY + 'px';
+  
+  // Check what's under the cursor
+  draggedClone.style.pointerEvents = 'none';
+  const elementBelow = document.elementFromPoint(clientX, clientY);
+  draggedClone.style.pointerEvents = 'none';
+  
+  checkDropTarget(elementBelow, clientX, clientY);
+}
+
+function checkDropTarget(element, clientX, clientY) {
   const validContainers = [
     'title-field',
     'answers-field',
@@ -1754,86 +1954,141 @@ function trackDropZone(e) {
     'answers-field-end',
     'options-field'
   ];
-
-  let el = elementUnderCursor;
+  
   isOverValidContainer = false;
-
-  while (el && el !== document.body) {
-    if (validContainers.includes(el.id)) {
+  
+  // Traverse up to find valid container
+  let current = element;
+  while (current && current !== document.body) {
+    if (validContainers.includes(current.id)) {
       isOverValidContainer = true;
+      
+      // Find insertion point
+      const container = current;
+      const items = Array.from(container.children).filter(child => 
+        child.classList.contains('item') && child !== currentDraggedItem
+      );
+      
+      let insertBefore = null;
+      for (let item of items) {
+        const rect = item.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        
+        if (clientY < midY) {
+          insertBefore = item;
+          break;
+        }
+      }
+      
+      if (insertBefore) {
+        container.insertBefore(currentDraggedItem, insertBefore);
+      } else {
+        container.appendChild(currentDraggedItem);
+      }
+      
       break;
     }
-    el = el.parentElement;
+    current = current.parentElement;
   }
 }
 
-function initializeOptionsFieldSortable() {
+function endDrag() {
+  if (!currentDraggedItem) return;
+  
+  // Remove clone
+  if (draggedClone && draggedClone.parentNode) {
+    draggedClone.remove();
+  }
+  draggedClone = null;
+  
+  // Restore original opacity
+  currentDraggedItem.style.opacity = '';
+  currentDraggedItem.classList.remove('hold-indicator');
+  
+  // If not over valid container, return to options-field
+  if (!isOverValidContainer) {
+    const optionsField = document.getElementById('options-field');
+    if (optionsField) {
+      optionsField.appendChild(currentDraggedItem);
+    }
+  }
+  
+  isDragging = false;
+  currentDraggedItem = null;
+  isOverValidContainer = false;
+}
+
+function makeContainerDroppable(container) {
+  container.classList.add('drop-container');
+}
+
+function cleanupDragDrop() {
+  document.removeEventListener('mousemove', handleMouseMove);
+  document.removeEventListener('mouseup', handleMouseUp);
+  document.removeEventListener('touchmove', handleTouchMove);
+  document.removeEventListener('touchend', handleTouchEnd);
+  clearTimeout(touchHoldTimer);
+  
+  if (draggedClone && draggedClone.parentNode) {
+    draggedClone.remove();
+  }
+  
+  isDragging = false;
+  currentDraggedItem = null;
+  draggedClone = null;
+}
+
+function initializeOptionsFieldDragDrop() {
   const optionsField = document.getElementById('options-field');
   if (!optionsField) return;
-
-  // Destroy previous instance
-  if (mobileOptionsSortable) {
-    mobileOptionsSortable.destroy();
-    mobileOptionsSortable = null;
-  }
-
-  const touchDevice = isTouchDevice();
-
-  mobileOptionsSortable = Sortable.create(optionsField, {
-    group: 'shared',
-    animation: 150,
-    ghostClass: 'drag-ghost',
-    chosenClass: 'drag-chosen',
-    dragClass: 'drag-dragging',
-    forceFallback: !touchDevice, // JS fallback only on desktop
-    fallbackOnBody: false,
-    delay: 300,
-    delayOnTouchOnly: true,
-
-    onStart(evt) {
-      if (sidebarWrapper.classList.contains('open')) closeSidebar();
-    },
-
-    onEnd(evt) {
-      evt.item.classList.remove('drag-chosen', 'drag-dragging', 'drag-ghost');
-    }
+  
+  makeContainerDroppable(optionsField);
+  
+  const items = optionsField.querySelectorAll('.item');
+  items.forEach(item => {
+    makeDraggable(item);
   });
 }
 
-function updateSortables() {
-  initializeSortableJS();
+function isTouchDevice() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+}
 
+function updateDragDropInstances() {
+  initializeDragDrop();
+  
   const touchDevice = isTouchDevice();
-  const optionsField = document.getElementById('options-field');
-  if (!optionsField) return;
-
+  
   if (window.innerWidth <= 768 && touchDevice) {
-    initializeOptionsFieldSortable();
+    initializeOptionsFieldDragDrop();
   } else {
-    if (mobileOptionsSortable) {
-      mobileOptionsSortable.destroy();
-      mobileOptionsSortable = null;
+    const optionsField = document.getElementById('options-field');
+    if (optionsField) {
+      makeContainerDroppable(optionsField);
+      const items = optionsField.querySelectorAll('.item');
+      items.forEach(item => {
+        makeDraggable(item);
+      });
     }
-
-    const sortable = new Sortable(optionsField, {
-      group: 'shared',
-      animation: 150,
-      ghostClass: 'drag-ghost',
-      chosenClass: 'drag-chosen',
-      dragClass: 'drag-dragging',
-      forceFallback: true,
-      fallbackOnBody: true,
-      onStart(evt) {
-        if (sidebarWrapper.classList.contains('open')) closeSidebar();
-      }
-    });
-    sortableInstances.push(sortable);
   }
 }
 
-window.addEventListener('resize', updateSortables);
-updateSortables(); // initialize on load
+// Alias for backward compatibility
+function updateSortables() {
+  updateDragDropInstances();
+}
 
+// Initialize on load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', updateDragDropInstances);
+} else {
+  updateDragDropInstances();
+}
+
+window.addEventListener('resize', updateDragDropInstances);
+
+// Clean up on page unload
+window.addEventListener('beforeunload', cleanupDragDrop);
 
   </script>
 
