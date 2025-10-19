@@ -138,11 +138,9 @@
 }
 
 .middle-div.wrapped {
-    overflow-y: auto;
-    overflow-x: hidden; /* Prevent horizontal scroll */
+    overflow: auto;
     padding: 20px 0;
     gap: 15px;
-    -webkit-overflow-scrolling: touch;
 }
 
 .middle-div.wrapped .practice-outer-div,
@@ -162,10 +160,7 @@
 }
 
 .middle-div.wrapped .practice-outer-div {
-    max-width: 100%;
-    flex: none;
-    width: 100%;
-    min-height: 0; /* Add this - important for nested scrolling */
+    max-height: 90%;
 }
 
 .personal-chl-inner {
@@ -213,12 +208,12 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    overflow-x: hidden;
     scrollbar-gutter: stable;
     padding: 15px 3px 15px 15px;
     position: relative;
     height: 100%;
     -webkit-overflow-scrolling: touch;
-    max-height: 100%;
 }
 
 #mode_choice {
@@ -665,7 +660,7 @@ body.popup-active {
     #new-task-options-container-inner {
         overflow-y: auto;
         scrollbar-gutter: stable;
-        padding: 0;
+        padding: 1px;
     }
 
     .personal-chl-inner {
