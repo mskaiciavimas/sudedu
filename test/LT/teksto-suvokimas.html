@@ -1684,7 +1684,7 @@ function initializeSortableJS() {
       ghostClass: 'drag-ghost',
       chosenClass: 'drag-chosen',
       dragClass: 'drag-dragging',
-      forceFallback: true, 
+      forceFallback: !isTouchDevice(), 
       fallbackOnBody: true,
       scroll: true,
       scrollSensitivity: 60,
@@ -1795,7 +1795,7 @@ function initializeOptionsFieldSortable() {
     animation: 150,
     ghostClass: 'sortable-ghost',
     fallbackOnBody: true,
-    forceFallback: false,
+    forceFallback: !isTouchDevice(),
     delay: mobileDelay,
     delayOnTouchOnly: true, // only apply delay on touch devices
 
@@ -1874,7 +1874,7 @@ function updateSortables() {
         ghostClass: 'drag-ghost',
         chosenClass: 'drag-chosen',
         dragClass: 'drag-dragging',
-        forceFallback: true,
+        forceFallback: !isTouchDevice(),
         fallbackOnBody: true,
         onStart: function(evt) {
           // Close sidebar when dragging options-field
