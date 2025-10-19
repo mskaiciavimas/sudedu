@@ -1573,11 +1573,6 @@
                 font-size: 1.25rem;
             }
 
-            #group_name {
-                font-size: 1.1rem;
-            }
-
-
       .sidebar {
         padding: 16px;
         height: 100%;
@@ -1697,6 +1692,23 @@
                     html,
             body {
                 width: 100vw;
+            }
+
+            #group_name,
+            #mode_choice,
+            #mode_choice_1,
+            #mode_choice_2,
+            #mode_choice_3,
+            #mode_choice_4,
+            #mode_choice_5,
+            #mode_choice_6,
+            #mode_choice_7,
+            #mode_choice_8,
+            #mode_choice_9,
+            #mode_choice_10,
+            #mode_choice_13,
+            #class_choice {
+                font-size: 1.1rem;
             }
 
             .initial-button-div {
@@ -2298,23 +2310,47 @@
                             <div class="timer-question-number-div">
                                 <div class="timer-input-div" id="timer-input-div">
                                     <div class="input-group">
-                                    <div class="input-wrapper">
-                                        <button class="control-btn" onclick="decrementValue('timer-input', 1, 60)">−</button>
-                                        <input type="number" class="timer-input" id="timer-input" min="1" max="60" step="1" value="5">
-                                        <button class="control-btn" onclick="incrementValue('timer-input', 1, 60)">+</button>
+                                        <div class="input-wrapper">
+                                            <button class="control-btn" 
+                                                    onmousedown="startHold('timer-input', 1, 60, false)"
+                                                    onmouseup="stopHold()"
+                                                    onmouseleave="stopHold()"
+                                                    ontouchstart="event.preventDefault(); startHold('timer-input', 1, 60, false)"
+                                                    ontouchend="stopHold()"
+                                                    ontouchcancel="stopHold()">−</button>
+                                            <input type="number" class="timer-input" id="timer-input" min="1" max="60" step="1" value="5" readonly>
+                                            <button class="control-btn" 
+                                                    onmousedown="startHold('timer-input', 1, 60, true)"
+                                                    onmouseup="stopHold()"
+                                                    onmouseleave="stopHold()"
+                                                    ontouchstart="event.preventDefault(); startHold('timer-input', 1, 60, true)"
+                                                    ontouchend="stopHold()"
+                                                    ontouchcancel="stopHold()">+</button>
+                                        </div>
+                                        <h3 class="timer-choice-label">minutes</h3>
                                     </div>
-                                    <h3 class="timer-choice-label">minutes</h3>
-                                </div>
                                 </div>
                                 <div class="question-number-input-div" id="question-number-input-div" style="display: none;">
                                     <div class="input-group">
-                                    <div class="input-wrapper">
-                                        <button class="control-btn" onclick="decrementValue('question-number-input', 1, 200)">−</button>
-                                        <input type="number" class="question-number-input" id="question-number-input" min="1" max="200" step="1" value="20">
-                                        <button class="control-btn" onclick="incrementValue('question-number-input', 1, 200)">+</button>
+                                        <div class="input-wrapper">
+                                            <button class="control-btn" 
+                                                    onmousedown="startHold('question-number-input', 1, 200, false)"
+                                                    onmouseup="stopHold()"
+                                                    onmouseleave="stopHold()"
+                                                    ontouchstart="event.preventDefault(); startHold('question-number-input', 1, 200, false)"
+                                                    ontouchend="stopHold()"
+                                                    ontouchcancel="stopHold()">−</button>
+                                            <input type="number" class="question-number-input" id="question-number-input" min="1" max="200" step="1" value="20" readonly>
+                                            <button class="control-btn" 
+                                                    onmousedown="startHold('question-number-input', 1, 200, true)"
+                                                    onmouseup="stopHold()"
+                                                    onmouseleave="stopHold()"
+                                                    ontouchstart="event.preventDefault(); startHold('question-number-input', 1, 200, true)"
+                                                    ontouchend="stopHold()"
+                                                    ontouchcancel="stopHold()">+</button>
+                                        </div>
+                                        <h3 class="answer-number-label">veiksmus</h3>
                                     </div>
-                                    <h3 class="answer-number-label">veiksmus</h3>
-                                </div>
                                 </div>
                             </div>
                         </div>

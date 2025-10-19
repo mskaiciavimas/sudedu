@@ -676,6 +676,12 @@ function setLabelEndingForQuestionNumber () {
 	}
 }
 }
+let holdInterval = null;
+let holdTimeout = null;
+let holdSpeed = 200; // Initial speed in ms
+const minSpeed = 50; // Fastest speed in ms
+const speedIncrease = 0.9; // Multiplier to speed up (lower = faster)
+
 function incrementValue(inputId, min, max) {
     const input = document.getElementById(inputId);
     let value = parseInt(input.value) || min;
@@ -694,6 +700,47 @@ function decrementValue(inputId, min, max) {
     }
     setLabelEndingForDuration();
     setLabelEndingForQuestionNumber();
+}
+
+function startHold(inputId, min, max, isIncrement) {
+    // First immediate action
+    if (isIncrement) {
+        incrementValue(inputId, min, max);
+    } else {
+        decrementValue(inputId, min, max);
+    }
+    
+    holdSpeed = 200; // Reset speed
+    
+    // Wait a bit before starting the interval
+    holdTimeout = setTimeout(() => {
+        const repeat = () => {
+            if (isIncrement) {
+                incrementValue(inputId, min, max);
+            } else {
+                decrementValue(inputId, min, max);
+            }
+            
+            // Speed up gradually
+            if (holdSpeed > minSpeed) {
+                holdSpeed = Math.max(minSpeed, holdSpeed * speedIncrease);
+            }
+            
+            // Clear and restart with new speed
+            clearInterval(holdInterval);
+            holdInterval = setInterval(repeat, holdSpeed);
+        };
+        
+        holdInterval = setInterval(repeat, holdSpeed);
+    }, 300); // Initial delay before repeating
+}
+
+function stopHold() {
+    clearTimeout(holdTimeout);
+    clearInterval(holdInterval);
+    holdInterval = null;
+    holdTimeout = null;
+    holdSpeed = 200;
 }
 
 // Validate input on change

@@ -85,6 +85,16 @@
   overflow: hidden; /* clip any overflow inside container */
 }
 
+.container-inner.wrapped {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box; /* include padding in height calculations */
+  padding: 0px 25px;
+  overflow: hidden; /* clip any overflow inside container */
+}
+
 .practice-label-div,
 .submit-button-div {
   display: flex;
@@ -93,17 +103,8 @@
    max-width: 500px;
    width: 100%;
 }
-
-.free-practice-div {
-    border-bottom: 2px solid rgba(255, 255, 255, 0.4);
-}
-
 .submit-button-div {
   padding: 16px 0 0 0;
-}
-
-.submit-button-div {
-    border-top: 2px solid rgba(255, 255, 255, 0.4);
 }
 
 .practice-outer-div {
@@ -138,6 +139,7 @@
 
 .middle-div.wrapped {
     overflow: auto;
+    padding: 20px 0;
 }
 
 .middle-div.wrapped .practice-outer-div,
@@ -622,6 +624,14 @@ body.popup-active {
     .chl-details-info-item {
         font-size: 0.85rem;
     }
+
+    .container-inner.wrapped {
+        padding: 0;
+    }
+
+    .middle-div.wrapped {
+        padding: 20px;
+    }
 }
 
 @media (hover: none) and (pointer: coarse) {
@@ -648,11 +658,19 @@ body.popup-active {
     #new-task-options-container-inner {
         overflow-y: auto;
         scrollbar-gutter: stable;
-        padding: 15px 0;
+        padding: 0;
     }
 
     .personal-chl-inner {
         padding: 15px;
+    }
+
+    .container-inner.wrapped {
+        padding: 0;
+    }
+
+    .middle-div.wrapped {
+        padding: 10px;
     }
 }
 
@@ -1000,26 +1018,50 @@ body.popup-active {
                             </div>
 
                             <div class="timer-question-number-div">
-                                <div class="timer-input-div" id="timer-input-div">
-                                    <div class="input-group">
+                            <div class="timer-input-div" id="timer-input-div">
+                                <div class="input-group">
                                     <div class="input-wrapper">
-                                        <button class="control-btn" onclick="decrementValue('timer-input', 1, 60)">−</button>
-                                        <input type="number" class="timer-input" id="timer-input" min="1" max="60" step="1" value="5">
-                                        <button class="control-btn" onclick="incrementValue('timer-input', 1, 60)">+</button>
+                                        <button class="control-btn" 
+                                                onmousedown="startHold('timer-input', 1, 60, false)"
+                                                onmouseup="stopHold()"
+                                                onmouseleave="stopHold()"
+                                                ontouchstart="event.preventDefault(); startHold('timer-input', 1, 60, false)"
+                                                ontouchend="stopHold()"
+                                                ontouchcancel="stopHold()">−</button>
+                                        <input type="number" class="timer-input" id="timer-input" min="1" max="60" step="1" value="5" readonly>
+                                        <button class="control-btn" 
+                                                onmousedown="startHold('timer-input', 1, 60, true)"
+                                                onmouseup="stopHold()"
+                                                onmouseleave="stopHold()"
+                                                ontouchstart="event.preventDefault(); startHold('timer-input', 1, 60, true)"
+                                                ontouchend="stopHold()"
+                                                ontouchcancel="stopHold()">+</button>
                                     </div>
                                     <h3 class="timer-choice-label">minutes</h3>
                                 </div>
-                                </div>
-                                <div class="question-number-input-div" id="question-number-input-div" style="display: none;">
-                                    <div class="input-group">
+                            </div>
+                            <div class="question-number-input-div" id="question-number-input-div" style="display: none;">
+                                <div class="input-group">
                                     <div class="input-wrapper">
-                                        <button class="control-btn" onclick="decrementValue('question-number-input', 1, 200)">−</button>
-                                        <input type="number" class="question-number-input" id="question-number-input" min="1" max="200" step="1" value="20">
-                                        <button class="control-btn" onclick="incrementValue('question-number-input', 1, 200)">+</button>
+                                        <button class="control-btn" 
+                                                onmousedown="startHold('question-number-input', 1, 200, false)"
+                                                onmouseup="stopHold()"
+                                                onmouseleave="stopHold()"
+                                                ontouchstart="event.preventDefault(); startHold('question-number-input', 1, 200, false)"
+                                                ontouchend="stopHold()"
+                                                ontouchcancel="stopHold()">−</button>
+                                        <input type="number" class="question-number-input" id="question-number-input" min="1" max="200" step="1" value="20" readonly>
+                                        <button class="control-btn" 
+                                                onmousedown="startHold('question-number-input', 1, 200, true)"
+                                                onmouseup="stopHold()"
+                                                onmouseleave="stopHold()"
+                                                ontouchstart="event.preventDefault(); startHold('question-number-input', 1, 200, true)"
+                                                ontouchend="stopHold()"
+                                                ontouchcancel="stopHold()">+</button>
                                     </div>
                                     <h3 class="answer-number-label">veiksmus</h3>
                                 </div>
-                                </div>
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -1534,18 +1576,19 @@ function completePersonalChlTask(challengeInfo) {
 displayPersonalChl();
 
 function checkWrap() {
-  const container = document.querySelector('.middle-div');
+  const middleDivEl = document.querySelector('.middle-div');
+  const containerInnerEl = document.querySelector('.container-inner');
   const practiceHolderDiv = document.querySelector(".practice-outer-div");
   const personalChlHolderDiv = document.querySelector(".personal-chl");
-  if (!container || !practiceHolderDiv || !personalChlHolderDiv) return;
+  if (!middleDivEl || !containerInnerEl || !practiceHolderDiv || !personalChlHolderDiv) return;
 
   // Temporarily remove class to get clean measurement
-  container.classList.remove('wrapped');
+  middleDivEl.classList.remove('wrapped');
 
   const wrapped = personalChlHolderDiv.offsetTop > practiceHolderDiv.offsetTop;
 
-  container.classList.toggle('wrapped', wrapped);
-  
+  middleDivEl.classList.toggle('wrapped', wrapped);
+  containerInnerEl.classList.toggle('wrapped', wrapped);
 }
 
 function updateOverflowClass() {
