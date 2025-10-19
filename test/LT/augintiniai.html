@@ -83,6 +83,7 @@
             -webkit-user-select: none;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            box-sizing: border-box;
         }
 
         :root {
@@ -2382,11 +2383,12 @@
     }
 
     #pet-room-container {
-        height: calc(100% - 81px);
+        height: auto;
+        justify-content: start;
     }
 
     .game-content-panel.mobile {
-        padding: 20px 15px !important;
+        padding: 15px 15px !important;
     }
 
     .shop-header {
@@ -3092,7 +3094,7 @@
     </nav>
 
     <div id="game-content" class="">
-        <div id="content-outer-container">
+        <div id="content-outer-container" class="hide-scrollbar">
             <div id="pet-room-container" class="game-content-panel active">
 
             <div id="game-panel">

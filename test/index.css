@@ -180,6 +180,23 @@ background-clip: content-box;
 background: rgba(255, 255, 255, 0.4);
 }
 
+/* Hide scrollbar for Firefox */
+.hide-scrollbar {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+}
+
+/* Hide scrollbar for Chrome, Safari, Edge */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Ensure container can still scroll */
+.hide-scrollbar {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 /* Firefox (limited support) */
 * {
 scrollbar-width: thin;                         
