@@ -1782,11 +1782,39 @@ function initializeDragDrop() {
 
     makeContainerDroppable(container);
     
+    // Make existing items draggable
     const items = container.querySelectorAll('.item');
     items.forEach(item => {
       makeDraggable(item);
     });
+    
+    // Watch for new items being added
+    observeContainer(container);
   });
+}
+
+// MutationObserver to watch for dynamically added items
+function observeContainer(container) {
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (node.nodeType === 1 && node.classList.contains('item')) {
+          makeDraggable(node);
+        }
+      });
+    });
+  });
+  
+  observer.observe(container, {
+    childList: true,
+    subtree: false
+  });
+  
+  // Store observer for cleanup
+  if (!window.dragDropObservers) {
+    window.dragDropObservers = [];
+  }
+  window.dragDropObservers.push(observer);
 }
 
 function makeDraggable(element) {
@@ -2033,6 +2061,12 @@ function cleanupDragDrop() {
     draggedClone.remove();
   }
   
+  // Disconnect all observers
+  if (window.dragDropObservers) {
+    window.dragDropObservers.forEach(observer => observer.disconnect());
+    window.dragDropObservers = [];
+  }
+  
   isDragging = false;
   currentDraggedItem = null;
   draggedClone = null;
@@ -2048,6 +2082,9 @@ function initializeOptionsFieldDragDrop() {
   items.forEach(item => {
     makeDraggable(item);
   });
+  
+  // Watch for new items
+  observeContainer(optionsField);
 }
 
 function isTouchDevice() {
@@ -2069,6 +2106,7 @@ function updateDragDropInstances() {
       items.forEach(item => {
         makeDraggable(item);
       });
+      observeContainer(optionsField);
     }
   }
 }
