@@ -150,7 +150,6 @@
     width: 100%;
 }
 
-.middle-div.wrapped .practice-outer-div,
 .middle-div.wrapped .personal-chl {
     height: auto;
 }
@@ -214,10 +213,7 @@
     position: relative;
     height: 100%;
     -webkit-overflow-scrolling: touch;
-    overflow-y: scroll !important;
     -webkit-overflow-scrolling: touch !important;
-    min-height: 100px !important;
-    max-height: 200px !important;
 }
 
 #mode_choice {
@@ -1588,14 +1584,59 @@ function checkWrap() {
   const personalChlHolderDiv = document.querySelector(".personal-chl");
   if (!middleDivEl || !containerInnerEl || !practiceHolderDiv || !personalChlHolderDiv) return;
 
-  // Temporarily remove class to get clean measurement
   middleDivEl.classList.remove('wrapped');
-
   const wrapped = personalChlHolderDiv.offsetTop > practiceHolderDiv.offsetTop;
-
+  
   middleDivEl.classList.toggle('wrapped', wrapped);
   containerInnerEl.classList.toggle('wrapped', wrapped);
+  
+  // Call setProperHeight after wrapping changes
+  if (wrapped) {
+    setTimeout(setProperHeight, 50);
+  } else {
+    document.querySelector('.practice-outer-div').style.height = "100%";
+  }
 }
+
+function setProperHeight() {
+  const middleDiv = document.querySelector('.middle-div');
+  const outer = document.querySelector('.practice-outer-div');
+  
+  if (!middleDiv || !outer) return;
+
+  // Only run if wrapped
+  if (!middleDiv.classList.contains('wrapped')) return;
+
+  // Reset height to auto first
+  outer.style.height = 'auto';
+
+  // Force reflow
+  outer.offsetHeight;
+
+  // Use requestAnimationFrame for accurate measurement
+  requestAnimationFrame(() => {
+    const container = document.getElementById('new-task-options-container-inner');
+    if (!container) return;
+
+    const fullHeight = container.scrollHeight;
+    const practiceLabel = outer.querySelector('.practice-label-div');
+    const submitButton = outer.querySelector('.submit-button-div');
+    
+    // Calculate total needed height
+    const labelHeight = practiceLabel ? practiceLabel.offsetHeight : 0;
+    const buttonHeight = submitButton ? submitButton.offsetHeight : 0;
+    const padding = 40; // padding from .practice-outer-div
+    
+    const totalHeight = fullHeight + labelHeight + buttonHeight + padding;
+    
+    outer.style.height = totalHeight + 20 + 'px';
+    
+    // Update overflow class after height is set
+    setTimeout(updateOverflowClass, 50);
+  });
+}
+
+window.addEventListener('resize', checkWrap);
 
 function updateOverflowClass() {
   const container = document.getElementById('new-task-options-container-inner');
@@ -1618,6 +1659,7 @@ observer.observe(document.getElementById('new-task-options-container-inner'), { 
 
 window.addEventListener('resize', checkWrap);
 window.addEventListener('load', checkWrap);
+
 
 	</script>
 </body>
