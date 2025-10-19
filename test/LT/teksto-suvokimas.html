@@ -1691,7 +1691,7 @@ function initializeSortableJS() {
       ghostClass: 'drag-ghost',
       chosenClass: 'drag-chosen',
       dragClass: 'drag-dragging',
-      forceFallback: true, 
+      forceFallback: !isTouchDevice(), 
       fallbackOnBody: true,
       scroll: true,
       scrollSensitivity: 60,
@@ -1936,7 +1936,7 @@ function updateSortables() {
         ghostClass: 'drag-ghost',
         chosenClass: 'drag-chosen',
         dragClass: 'drag-dragging',
-        forceFallback: true,
+        forceFallback: !isTouchDevice(),
         fallbackOnBody: true,
         onStart: function(evt) {
           // Close sidebar when dragging options-field
