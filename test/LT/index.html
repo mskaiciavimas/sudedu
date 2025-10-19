@@ -29,13 +29,12 @@
 <script src="../refresh-token.js"></script>
 
 <style>
-    * {
-        -webkit-user-select: none;
-        -webkit-tap-highlight-color: transparent;
-        user-select: none;
+	* {
+		-webkit-user-select: none;
+		-webkit-tap-highlight-color: transparent;
+		user-select: none;
         box-sizing: border-box;
-        -webkit-touch-callout: none;
-    }
+	}
 
 	html {
 		display: flex;
@@ -196,7 +195,6 @@
     justify-content: center;
     overflow: hidden;
     width: 100%;
-    touch-action: pan-y;
 }
 
 #new-task-options-container {
@@ -204,7 +202,6 @@
     justify-content: start;
     overflow: hidden;
     position: relative;
-    touch-action: pan-y;
 }
 
 #new-task-options-container-inner {
@@ -215,20 +212,7 @@
     padding: 15px 3px 15px 15px;
     position: relative;
     height: 100%;
-
-    overscroll-behavior: contain;
-    z-index: 1;
-
-    touch-action: pan-y !important;
-    -webkit-overflow-scrolling: touch !important;
-}
-
-#new-task-options-container-inner * {
-    pointer-events: auto;
-}
-
-.middle-div {
-    touch-action: auto !important;
+    -webkit-overflow-scrolling: touch;
 }
 
 #mode_choice {
@@ -652,17 +636,8 @@ body.popup-active {
 }
 
 @media (hover: none) and (pointer: coarse) {
-#new-task-options-container-inner {
+    #new-task-options-container-inner {
         padding: 15px;
-        min-height: 80%;
-        
-        -webkit-overflow-scrolling: touch;
-        scroll-behavior: smooth;
-    }
-    
-    /* Ensure parent doesn't interfere */
-    .practice-outer-div {
-        overflow: visible; /* Changed from initial */
     }
 }
 
@@ -1638,24 +1613,6 @@ observer.observe(document.getElementById('new-task-options-container-inner'), { 
 
 window.addEventListener('resize', checkWrap);
 window.addEventListener('load', checkWrap);
-
-// Add after your existing scripts
-document.addEventListener('DOMContentLoaded', function() {
-    const scrollContainer = document.getElementById('new-task-options-container-inner');
-    
-    if (scrollContainer) {
-        // Prevent parent scroll interference
-        scrollContainer.addEventListener('touchstart', function(e) {
-            // Allow the scroll container to handle touch
-            e.stopPropagation();
-        }, { passive: true });
-        
-        scrollContainer.addEventListener('touchmove', function(e) {
-            // Allow scrolling
-            e.stopPropagation();
-        }, { passive: true });
-    }
-});
 
 	</script>
 </body>
