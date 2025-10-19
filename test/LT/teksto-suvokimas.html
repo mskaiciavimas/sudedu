@@ -1657,6 +1657,10 @@ let mobileOptionsSortable = null;
 let isOverValidContainer = false;
 let currentDraggedItem = null;
 
+function isTouchDevice() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+}
+
 function initializeSortableJS() {
   // Destroy previous instances
   sortableInstances.forEach(instance => instance.destroy());
@@ -1671,7 +1675,6 @@ function initializeSortableJS() {
   ];
 
   const touchDevice = isTouchDevice();
-  const isMobile = window.innerWidth <= 768;
 
   containers.forEach(id => {
     const el = document.getElementById(id);
@@ -1684,38 +1687,33 @@ function initializeSortableJS() {
       ghostClass: 'drag-ghost',
       chosenClass: 'drag-chosen',
       dragClass: 'drag-dragging',
-      forceFallback: true, 
-      fallbackOnBody: true,
+      forceFallback: !touchDevice, // JS fallback only on desktop
+      fallbackOnBody: false,       // not needed for native drag
       scroll: true,
       scrollSensitivity: 60,
       scrollSpeed: 10,
       removeCloneOnHide: true,
       emptyInsertThreshold: 20,
-      onStart: function(evt) {
+      delay: 300,
+      delayOnTouchOnly: true,
+      onStart(evt) {
         currentDraggedItem = evt.item;
         isOverValidContainer = true;
-        
-        evt.item.style.backgroundColor = '';
 
         // Close sidebar when drag starts
-        if (sidebarWrapper.classList.contains('open')) {
-          closeSidebar();
-        }
+        if (sidebarWrapper.classList.contains('open')) closeSidebar();
       },
-      onMove: function(evt) {
+      onMove() {
         isOverValidContainer = true;
         return true;
       },
-      onEnd: function(evt) {
-        // Clean up any ghost clones that might be stuck
+      onEnd(evt) {
+        // Clean up any ghost clones
         const ghosts = document.querySelectorAll('.sortable-ghost, .drag-ghost, .drag-chosen');
         ghosts.forEach(ghost => {
-          if (ghost !== evt.item && ghost.classList.contains('sortable-ghost')) {
-            ghost.remove();
-          }
+          if (ghost !== evt.item) ghost.remove();
         });
-        
-        // Small delay to let Sortable finish its operations
+
         setTimeout(() => {
           if (!isOverValidContainer && currentDraggedItem) {
             const optionsField = document.getElementById('options-field');
@@ -1727,17 +1725,11 @@ function initializeSortableJS() {
       }
     };
 
-    // Add delay for touch devices (regardless of screen size)
-    if (touchDevice) {
-      config.delay = 300;
-      config.delayOnTouchOnly = true;
-    }
-
     const sortable = new Sortable(el, config);
     sortableInstances.push(sortable);
   });
 
-  // Add global mouse/touch tracking
+  // Track mouse/touch for drop zone
   document.removeEventListener('mousemove', trackDropZone);
   document.removeEventListener('touchmove', trackDropZone);
   document.addEventListener('mousemove', trackDropZone, { passive: true });
@@ -1746,15 +1738,14 @@ function initializeSortableJS() {
 
 function trackDropZone(e) {
   if (!currentDraggedItem) return;
-  
+
   const point = e.touches ? e.touches[0] : e;
   const elementUnderCursor = document.elementFromPoint(point.clientX, point.clientY);
-  
   if (!elementUnderCursor) {
     isOverValidContainer = false;
     return;
   }
-  
+
   const validContainers = [
     'title-field',
     'answers-field',
@@ -1763,11 +1754,10 @@ function trackDropZone(e) {
     'answers-field-end',
     'options-field'
   ];
-  
-  // Check if cursor is over a valid container or its children
+
   let el = elementUnderCursor;
   isOverValidContainer = false;
-  
+
   while (el && el !== document.body) {
     if (validContainers.includes(el.id)) {
       isOverValidContainer = true;
@@ -1777,15 +1767,17 @@ function trackDropZone(e) {
   }
 }
 
-
 function initializeOptionsFieldSortable() {
   const optionsField = document.getElementById('options-field');
+  if (!optionsField) return;
 
-  // Destroy previous mobile Sortable if it exists
+  // Destroy previous instance
   if (mobileOptionsSortable) {
     mobileOptionsSortable.destroy();
     mobileOptionsSortable = null;
   }
+
+  const touchDevice = isTouchDevice();
 
   mobileOptionsSortable = Sortable.create(optionsField, {
     group: 'shared',
@@ -1793,66 +1785,55 @@ function initializeOptionsFieldSortable() {
     ghostClass: 'drag-ghost',
     chosenClass: 'drag-chosen',
     dragClass: 'drag-dragging',
-    forceFallback: true,         // JS-based drag for consistent behavior
-    fallbackOnBody: true,
-    delay: 300,                  // hold delay for touch devices
-    delayOnTouchOnly: true,      // only apply delay on touch devices
+    forceFallback: !touchDevice, // JS fallback only on desktop
+    fallbackOnBody: false,
+    delay: 300,
+    delayOnTouchOnly: true,
 
-    onStart: function(evt) {
-      // Close sidebar when dragging starts
-      if (sidebarWrapper.classList.contains('open')) {
-        closeSidebar();
-      }
+    onStart(evt) {
+      if (sidebarWrapper.classList.contains('open')) closeSidebar();
     },
 
-    onEnd: function(evt) {
-      // cleanup classes
+    onEnd(evt) {
       evt.item.classList.remove('drag-chosen', 'drag-dragging', 'drag-ghost');
     }
   });
 }
 
-function isTouchDevice() {
-  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-}
-
 function updateSortables() {
-  initializeSortableJS(); // initializes everything except options-field on mobile
+  initializeSortableJS();
 
   const touchDevice = isTouchDevice();
+  const optionsField = document.getElementById('options-field');
+  if (!optionsField) return;
 
   if (window.innerWidth <= 768 && touchDevice) {
-    initializeOptionsFieldSortable(); // mobile touch behavior with hold delay
+    initializeOptionsFieldSortable();
   } else {
-    // Always allow normal drag (even on small screens if using mouse)
-    const optionsField = document.getElementById('options-field');
     if (mobileOptionsSortable) {
       mobileOptionsSortable.destroy();
       mobileOptionsSortable = null;
     }
 
-    if (optionsField) {
-      const sortable = new Sortable(optionsField, {
-        group: 'shared',
-        animation: 150,
-        ghostClass: 'drag-ghost',
-        chosenClass: 'drag-chosen',
-        dragClass: 'drag-dragging',
-        forceFallback: true,
-        fallbackOnBody: true,
-        onStart: function(evt) {
-          // Close sidebar when dragging options-field
-          if (sidebarWrapper.classList.contains('open')) {
-            closeSidebar();
-          }
-        }
-      });
-      sortableInstances.push(sortable);
-    }
+    const sortable = new Sortable(optionsField, {
+      group: 'shared',
+      animation: 150,
+      ghostClass: 'drag-ghost',
+      chosenClass: 'drag-chosen',
+      dragClass: 'drag-dragging',
+      forceFallback: true,
+      fallbackOnBody: true,
+      onStart(evt) {
+        if (sidebarWrapper.classList.contains('open')) closeSidebar();
+      }
+    });
+    sortableInstances.push(sortable);
   }
 }
 
 window.addEventListener('resize', updateSortables);
+updateSortables(); // initialize on load
+
 
   </script>
 
