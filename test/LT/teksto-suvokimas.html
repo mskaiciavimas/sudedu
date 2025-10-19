@@ -1753,18 +1753,7 @@ function trackDropZone(e) {
   if (!currentDraggedItem) return;
   
   const point = e.touches ? e.touches[0] : e;
-  
-  // Hide the dragged element temporarily to get element underneath
-  if (currentDraggedItem) {
-    currentDraggedItem.style.visibility = 'hidden';
-  }
-  
   const elementUnderCursor = document.elementFromPoint(point.clientX, point.clientY);
-  
-  // Restore visibility
-  if (currentDraggedItem) {
-    currentDraggedItem.style.visibility = 'visible';
-  }
   
   if (!elementUnderCursor) {
     isOverValidContainer = false;
