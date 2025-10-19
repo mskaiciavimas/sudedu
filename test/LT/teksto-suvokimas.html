@@ -1734,12 +1734,6 @@ function initializeSortableJS() {
       }
     };
 
-    // Add delay for touch devices (regardless of screen size)
-    if (touchDevice) {
-      config.delay = 300;
-      config.delayOnTouchOnly = true;
-    }
-
     const sortable = new Sortable(el, config);
     sortableInstances.push(sortable);
   });
@@ -1858,8 +1852,6 @@ function initializeOptionsFieldSortable() {
     ghostClass: 'sortable-ghost',
     fallbackOnBody: true,
     forceFallback: false,
-    delay: mobileDelay,
-    delayOnTouchOnly: true, // only apply delay on touch devices
 
     onChoose: function(evt) {
       const item = evt.item;
