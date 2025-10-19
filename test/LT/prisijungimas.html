@@ -2,7 +2,7 @@
 <html>
 <head>
 	<title>sudedu - prisijungimas</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
 	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -67,6 +67,12 @@
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
+			transition: min-height 0.3s ease, max-height 0.3s ease;
+		}
+
+		.container.keyboard-open {
+			max-height: 100%;
+			min-height: 100%;
 		}
 
 		.inner-container {
@@ -834,7 +840,7 @@
 			window.location.href = './';
 		}
 		}
-		
+
 		function handleLoginError(data, emailVal) {
 			const msg = getMsg(data.code);
 			showError(msg || 'Nepavyko prisijungti.');
@@ -907,6 +913,213 @@
 				authenticate();
 			}
 		});
+
+
+function detectMobileKeyboard() {
+  // Check if device is mobile
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                   ('ontouchstart' in window) ||
+                   (navigator.maxTouchPoints > 0);
+  
+  if (!isMobile) {
+    return; // Don't set up listeners on desktop
+  }
+  
+  let isKeyboardOpen = false;
+  let lastHeight = window.innerHeight;
+  let lastVisualHeight = window.visualViewport?.height || window.innerHeight;
+  let resizeTimeout = null;
+  
+  // Threshold: 150px works well for most devices
+  // Mobile keyboards are typically 250-350px tall
+  const THRESHOLD = 150;
+  
+  function handleVisualViewportResize() {
+    clearTimeout(resizeTimeout);
+    
+    resizeTimeout = setTimeout(() => {
+      const currentHeight = window.visualViewport.height;
+      const heightDiff = lastVisualHeight - currentHeight;
+      
+      // Keyboard likely opened
+      if (heightDiff > THRESHOLD && !isKeyboardOpen) {
+        isKeyboardOpen = true;
+        if (typeof onShow === 'function') {
+          onShow({
+            keyboardHeight: heightDiff,
+            viewportHeight: currentHeight,
+            method: 'visualViewport'
+          });
+        }
+      }
+      // Keyboard likely closed
+      else if (heightDiff < -THRESHOLD && isKeyboardOpen) {
+        isKeyboardOpen = false;
+        if (typeof onHide === 'function') {
+          onHide({
+            viewportHeight: currentHeight,
+            method: 'visualViewport'
+          });
+        }
+      }
+      
+      lastVisualHeight = currentHeight;
+    }, 100);
+  }
+  
+  function handleWindowResize() {
+    clearTimeout(resizeTimeout);
+    
+    resizeTimeout = setTimeout(() => {
+      const currentHeight = window.innerHeight;
+      const heightDiff = lastHeight - currentHeight;
+      
+      // Only trigger if Visual Viewport API is not available
+      if (!window.visualViewport) {
+        if (heightDiff > THRESHOLD && !isKeyboardOpen) {
+          isKeyboardOpen = true;
+          if (typeof onShow === 'function') {
+            onShow({
+              keyboardHeight: heightDiff,
+              viewportHeight: currentHeight,
+              method: 'windowResize'
+            });
+          }
+        }
+        else if (heightDiff < -THRESHOLD && isKeyboardOpen) {
+          isKeyboardOpen = false;
+          if (typeof onHide === 'function') {
+            onHide({
+              viewportHeight: currentHeight,
+              method: 'windowResize'
+            });
+          }
+        }
+      }
+      
+      lastHeight = currentHeight;
+    }, 100);
+  }
+  
+  function detectKeyboardByViewport() {
+    if (window.visualViewport) {
+      const heightDiff = window.innerHeight - window.visualViewport.height;
+      return heightDiff > THRESHOLD;
+    }
+    return false;
+  }
+  
+  function handleFocusIn(e) {
+    const target = e.target;
+    const isInput = target.tagName === 'INPUT' || 
+                    target.tagName === 'TEXTAREA' || 
+                    target.isContentEditable;
+    
+    if (isInput) {
+      // Give keyboard time to appear
+      setTimeout(() => {
+        if (!isKeyboardOpen && detectKeyboardByViewport()) {
+          isKeyboardOpen = true;
+          if (typeof onShow === 'function') {
+            onShow({
+              method: 'focusIn',
+              element: target
+            });
+          }
+        }
+      }, 300);
+    }
+  }
+  
+  function handleFocusOut(e) {
+    const target = e.target;
+    const isInput = target.tagName === 'INPUT' || 
+                    target.tagName === 'TEXTAREA' || 
+                    target.isContentEditable;
+    
+    if (isInput) {
+      // Give keyboard time to disappear
+      setTimeout(() => {
+        // Check if another input was focused
+        const activeEl = document.activeElement;
+        const stillFocused = activeEl.tagName === 'INPUT' || 
+                           activeEl.tagName === 'TEXTAREA' || 
+                           activeEl.isContentEditable;
+        
+        if (!stillFocused && isKeyboardOpen && !detectKeyboardByViewport()) {
+          isKeyboardOpen = false;
+          if (typeof onHide === 'function') {
+            onHide({
+              method: 'focusOut',
+              element: target
+            });
+          }
+        }
+      }, 300);
+    }
+  }
+  
+  function handleOrientationChange() {
+    // Reset height references on orientation change
+    setTimeout(() => {
+      lastHeight = window.innerHeight;
+      lastVisualHeight = window.visualViewport?.height || window.innerHeight;
+      isKeyboardOpen = false;
+    }, 500);
+  }
+  
+  // Set up listeners
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', handleVisualViewportResize);
+  }
+  
+  window.addEventListener('resize', handleWindowResize);
+  document.addEventListener('focusin', handleFocusIn);
+  document.addEventListener('focusout', handleFocusOut);
+  
+  if (window.screen?.orientation) {
+    window.screen.orientation.addEventListener('change', handleOrientationChange);
+  }
+  
+  // Return cleanup function
+  return function cleanup() {
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', handleVisualViewportResize);
+    }
+    window.removeEventListener('resize', handleWindowResize);
+    document.removeEventListener('focusin', handleFocusIn);
+    document.removeEventListener('focusout', handleFocusOut);
+    if (window.screen?.orientation) {
+      window.screen.orientation.removeEventListener('change', handleOrientationChange);
+    }
+    clearTimeout(resizeTimeout);
+  };
+}
+
+// Usage:
+// 1. Define your callback functions globally or in accessible scope:
+function onShow(info) {
+	const navbar = document.querySelector('#mainNavbar');
+	const container = document.querySelector('.container');
+	container.classList.add('keyboard-open');
+	navbar.classList.add('keyboard-open');
+}
+
+function onHide(info) {
+  	const navbar = document.querySelector('#mainNavbar');
+	const container = document.querySelector('.container');
+	container.classList.remove('keyboard-open');
+    navbar.classList.remove('keyboard-open');
+	if (controller.modeChoice7 === "C48" && controller.randomSelection[2] === 'M') {
+		equationsAndSymbolContainer.classList.remove('collapsed');
+	}
+}
+
+// 2. Initialize the detector (only runs on mobile devices):
+const cleanup = detectMobileKeyboard();
+
+// 3. Optional: cleanup when needed
+// if (cleanup) cleanup();
 	</script>
 </body>
 </html>
