@@ -3624,17 +3624,19 @@
             taskDescriptionList.classList.add("task-description-list")
             formattedTaskDescription.forEach(item => {
                 if (item) {  // Ensure empty values are not added
-                    let listItem = document.createElement('li');
-                    
-                    // Check if item contains an HTML tag, then use innerHTML
-                    if (item.includes("<")) {
-                        listItem.innerHTML = item; // Render HTML properly
-                    } else {
-                        listItem.textContent = item; // Use textContent for plain text
+                    if (!item.includes("KLASĖ")) {
+                        let listItem = document.createElement('li');
+                        
+                        // Check if item contains an HTML tag, then use innerHTML
+                        if (item.includes("<")) {
+                            listItem.innerHTML = item; // Render HTML properly
+                        } else {
+                            listItem.textContent = item; // Use textContent for plain text
+                        }
+                        
+                        listItem.classList.add("task-description-list-item");
+                        taskDescriptionList.appendChild(listItem);
                     }
-                    
-                    listItem.classList.add("task-description-list-item");
-                    taskDescriptionList.appendChild(listItem);
                 }
             });
             let description = document.createElement('div');
