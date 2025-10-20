@@ -75,6 +75,10 @@
 		box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
 	}
 
+    .hidden {
+        display: none;
+    }
+
 .container-inner {
   display: flex;
   flex-direction: column;
@@ -137,7 +141,7 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
     padding: 20px;
     border-radius: 25px;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
 }
 
@@ -655,6 +659,53 @@ body.popup-active {
   background: rgba(255, 255, 255, 0.15);
 }
 
+@media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait) {
+    .container {
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        box-shadow: none;
+    }
+
+    .container-inner {
+        padding: 0 !important;
+    }
+
+    .middle-div {
+        padding: 0 !important;
+    }
+
+    .practice-label {
+        font-size: 2.5rem;
+    }
+
+    #group_name, #mode_choice, #mode_choice_1, #mode_choice_2, #mode_choice_3, #mode_choice_4, #mode_choice_5, #mode_choice_6, #mode_choice_7, #mode_choice_8, #mode_choice_9, #mode_choice_10, #mode_choice_13, #class_choice {
+        font-size: 1.5rem;
+    }
+
+    .submit-button {
+        font-size: 1.4rem;
+        padding: 16px 18px;
+    }
+
+    #personalChlContainer {
+        padding: 15px 0;
+    }
+
+    .chl-type-badge {
+        font-size: 1.1rem;
+    }
+
+    .chl-card-preview,
+    .chl-info-text {
+        font-size: 1.25rem;
+    }
+
+    .chl-action-button {
+        font-size: 1.25rem;
+        padding: 14px 14px
+    }
+}
 
 @media (max-width: 767px) {
 	.container {
@@ -681,14 +732,6 @@ body.popup-active {
         padding: 15px;
     }
 
-    .chl-info-text {
-        font-size: 0.85rem;
-    }
-
-    .chl-details-info-item {
-        font-size: 0.85rem;
-    }
-
     .container-inner.wrapped {
         padding: 0;
     }
@@ -707,6 +750,7 @@ body.popup-active {
         padding: 15px;
     }
 }
+
 
 @media (max-width: 575px) {
 	.container {
@@ -1276,6 +1320,7 @@ body.popup-active {
                 controller.taskCompleted = false;
                 localStorage.setItem('controller', JSON.stringify(controller));
             }
+            
 			document.querySelector('#template-container').removeAttribute('hidden');
 		};
 
@@ -1313,7 +1358,7 @@ function setClassLocalStorage(classValue) {
         expiration: expiration.getTime()
     };
     
-    localStorage.setItem("userClassV2", JSON.stringify(item));
+    localStorage.setItem("userClassNotLoggedIn", JSON.stringify(item));
 }
 
 // Function to get value from localStorage and check expiration
@@ -1331,7 +1376,7 @@ function getClassLocalStorage() {
     // Compare the expiration time with the current time
     if (now.getTime() > item.expiration) {
         // If the item is expired, delete it and return null
-        localStorage.removeItem("userClassV2");
+        localStorage.removeItem("userClassNotLoggedIn");
         return null;
     }
     
@@ -1697,6 +1742,7 @@ function completePersonalChlTask(challengeInfo) {
         controller.modeChoice6 = parsedCurrentTaskInstructions[6];
         controller.modeChoice7 = parsedCurrentTaskInstructions[7];
         controller.modeChoice8 = "C79";
+        controller.task = ["personalChl", null];
         controller.taskCompleted = false;
         controller.setTaskDuration = parsedCurrentTaskInstructions[10];
 
@@ -1710,6 +1756,7 @@ function completePersonalChlTask(challengeInfo) {
         controller.modeChoice5 = parsedCurrentTaskInstructions[6];
         controller.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[7];
         controller.questionFrequency = parsedCurrentTaskInstructions[8];
+        controller.task = ["personalChl", null];
         controller.taskCompleted = false;
         controller.setTaskDuration = parsedCurrentTaskInstructions[9];
     }

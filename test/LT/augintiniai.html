@@ -766,6 +766,7 @@
 
 #toggle-edit-save-btn,
 #cancel-edit-btn,
+#end-preview-button,
 .pet-stats-selection-button.active,
 .pet-btn.active,
 .department-btn.active,
@@ -791,6 +792,7 @@
 
 #toggle-edit-save-btn::before,
 #cancel-edit-btn::before,
+#end-preview-button::before,
 .pet-stats-selection-button.active::before,
 .pet-btn.active::before,
 .department-btn.active::before,
@@ -816,6 +818,7 @@
 
 #toggle-edit-save-btn::after,
 #cancel-edit-btn::after,
+#end-preview-button::after,
 .pet-stats-selection-button.active::after,
 .pet-btn.active::after,
 .department-btn.active::after,
@@ -844,6 +847,7 @@
 
 #toggle-edit-save-btn:hover::before,
 #cancel-edit-btn:hover::before,
+#end-preview-button:hover::before,
 .pet-stats-selection-button.active:hover::before,
 .pet-btn.active:hover::before,
 .use-btn:hover::before,
@@ -1035,7 +1039,8 @@
         }
 
         #toggle-edit-save-btn,
-        #cancel-edit-btn {
+        #cancel-edit-btn,
+        #end-preview-button {
             align-items: center;
             gap: 0.5rem;
             border-radius: 20px;
@@ -1055,7 +1060,8 @@
             /*border: 1px solid #286D8A;*/
         }
 
-        #cancel-edit-btn {
+        #cancel-edit-btn,
+        #end-preview-button {
             background: linear-gradient(135deg, #ff8073, #e74c3c);
             border: none;
             /*border: 1px solid #e74c3c;*/
@@ -1398,6 +1404,8 @@
         .item-preview {
             background-size: contain; /* or cover, depending on behavior */
             background-position: center;
+            max-height: 100%;
+            max-width: 100%;
         }
 
         .item-preview.pet {
@@ -2742,7 +2750,8 @@
 
     .pet-stats-selection-button,
     #toggle-edit-save-btn, 
-    #cancel-edit-btn {
+    #cancel-edit-btn,
+    #end-preview-button {
         font-size: 1.5rem;
     }
 
@@ -3153,6 +3162,7 @@
             <div id="button-container">
                 <button id="toggle-edit-save-btn" class="edit">Perstatyti</button>
                 <button id="cancel-edit-btn" class="cancel hidden">Atšaukti</button>
+                <button id="end-preview-button" class="cancel hidden">Baigti peržiūrą</button>
             </div>
             </div>
             </div>
@@ -3636,6 +3646,18 @@ function renderRoomObjects() {
             div.style.top = `calc((${y + 1} * var(--unit-size)) - ${div.offsetHeight}px)`;
         }
     });
+
+    if (furniturePreviewDict["furniture-preview"].assetIndex) {
+        if (furniturePreviewDict["furniture-preview"].position.length !== 0) {
+            const [x, y] = furniturePreviewDict["furniture-preview"].position;
+            const div = document.createElement("div");
+            roomObjectsContainer.appendChild(div);
+            div.className = `room-object furniture-preview ${gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex]["css-class"]}`;
+            div.id = 'furniture-preview';
+            div.style.left = `calc(${x} * var(--unit-size))`;
+            div.style.top = `calc((${y + 1} * var(--unit-size)) - ${div.offsetHeight}px)`;
+        }
+    }
     
     disableObjectDragging();
 }
@@ -3969,7 +3991,10 @@ function removeAllDeleteIcons() {
 }
 
 function showDeleteIcon(element) {
-    // Remove any existing delete icons first
+    if (furniturePreviewDict["furniture-preview"].assetIndex) {
+        return
+    }
+
     removeAllDeleteIcons();
     
     const deleteIcon = document.createElement('div');
@@ -4089,7 +4114,7 @@ function enableObjectDragging() {
                 // Increase threshold to prevent accidental dragging on clicks
                 if ((deltaX > 10 || deltaY > 10) && !dragStarted) {
                     hasMoved = true;
-                    const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]["assetIndex"]]["placingIndex"]
+                    const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
                     if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 9)) {
                         messageToTheUser("Šį daiktą galėsi pajudinti tik nuėmęs nuo jo kitus!");
                         cancelDrag(); // stop listening so it won’t repeat
@@ -5574,14 +5599,23 @@ function generatePlacementMap(draggedObjectId) {
         return null;
     }
 
+    const combinedAssets = { ...userObjectAssets };
+
+    // Only add furniture-preview if assetIndex is not null
+    if (furniturePreviewDict["furniture-preview"].assetIndex !== null) {
+        combinedAssets["furniture-preview"] = furniturePreviewDict["furniture-preview"];
+    }
+
     // Get the dragged object's asset data
-    const draggedAsset = userObjectAssets[draggedObjectId];
+    const draggedAsset = combinedAssets[draggedObjectId];
+    
     if (!draggedAsset) {
-        console.error("Dragged object not found in userObjectAssets");
+        console.error("Dragged object not found in combinedAssets");
         return null;
     }
 
     const draggedAssetData = gameAssetIndex[draggedAsset.assetIndex];
+
     if (!draggedAssetData) {
         console.error("Asset data not found for dragged object");
         return null;
@@ -5597,7 +5631,7 @@ function generatePlacementMap(draggedObjectId) {
     const objectWidth = Math.ceil(draggedElement.offsetWidth / unitSize);
     const objectHeight = Math.ceil(draggedElement.offsetHeight / unitSize);
 
-    const draggedAssetPlacingRules = gameAssetIndex[userObjectAssets[draggedElement.id]["assetIndex"]]["canBePlacedOn"];
+    const draggedAssetPlacingRules = gameAssetIndex[combinedAssets[draggedElement.id]?.assetIndex]?.canBePlacedOn;
 
     // Create placement validity map
     const placementMap = [];
@@ -5661,11 +5695,11 @@ function generatePlacementMap(draggedObjectId) {
                 }
 
                 if (!(draggedAssetData["placingIndex"] === 5 || draggedAssetData["placingIndex"] === 9)) {
-
                     const objectsAtTile = getObjectsAtTile(x, y, draggedObjectId);
 
                     for (const existingObj of objectsAtTile) {
-                        const existingAsset = userObjectAssets[existingObj.id];
+                        const existingAsset = combinedAssets[existingObj.id];
+
                         const existingAssetData = gameAssetIndex[existingAsset.assetIndex];
                         const existingPlacingIndex = existingAssetData["placingIndex"] || 0;
 
@@ -5698,7 +5732,7 @@ function generatePlacementMap(draggedObjectId) {
                             } else {
                                 // Then check if any objects on that tile allow placement
                                 for (const obj of bottomObjects) {
-                                    const objData = gameAssetIndex[userObjectAssets[obj.id].assetIndex];
+                                    const objData = gameAssetIndex[combinedAssets[obj.id].assetIndex];
                                     const objPlacingIndex = objData.placingIndex || 0;
                                     if (draggedAssetPlacingRules.includes(objPlacingIndex)) {
                                         bottomTileValid = true;
@@ -5711,11 +5745,10 @@ function generatePlacementMap(draggedObjectId) {
                         }
                         }
                     } else {
-
                         const objectsAtTile = getObjectsAtTile(x, y, draggedObjectId);
 
                         for (const existingObj of objectsAtTile) {
-                            const existingAsset = userObjectAssets[existingObj.id];
+                            const existingAsset = combinedAssets[existingObj.id];
                             const existingAssetData = gameAssetIndex[existingAsset.assetIndex];
                             const existingPlacingIndex = existingAssetData["placingIndex"] || 0;
 
@@ -5734,6 +5767,7 @@ function generatePlacementMap(draggedObjectId) {
         }
 
         if (sectionAllowed) {
+            
             for (let y = row; y <= bottomOfSection; y++) {
                 for (let x = col; x <= rightEndofSection; x++) {
                     placementMap[y][x] = { canPlace: true };
@@ -5743,6 +5777,7 @@ function generatePlacementMap(draggedObjectId) {
     }
 
 }
+
 return placementMap;
 }
 
@@ -5751,7 +5786,14 @@ function getObjectsAtTile(tileCol, tileRow, excludeObjectId = null) {
     const objectsAtTile = [];
     const unitSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
 
-    Object.entries(userObjectAssets).forEach(([objectId, asset]) => {
+    const combinedAssets = { ...userObjectAssets };
+
+    // Only add furniture-preview if assetIndex is not null
+    if (furniturePreviewDict["furniture-preview"].assetIndex !== null) {
+        combinedAssets["furniture-preview"] = furniturePreviewDict["furniture-preview"];
+    }
+
+    Object.entries(combinedAssets).forEach(([objectId, asset]) => {
         if (objectId === excludeObjectId) return;
 
         const element = document.getElementById(objectId);
@@ -5772,6 +5814,7 @@ function getObjectsAtTile(tileCol, tileRow, excludeObjectId = null) {
 
         if (tileCol >= objLeftCol && tileCol <= objRightCol &&
             tileRow >= objTopRow && tileRow <= objBottomRow) {
+
             objectsAtTile.push(element);
         }
     });
@@ -5845,6 +5888,8 @@ navButtons.forEach((button) => {
         button.classList.add('active');
         const targetPanel = document.getElementById(targetId);
         targetPanel.classList.add('active');
+
+        endPreview()
 
         if (button.id !== "pet-room-button") {
             selectedConsumable = [];
@@ -6483,6 +6528,103 @@ function renderShopCategoriesDropdown() {
     });
 }
 
+function renderTemporaryRoomObject(assetId) {
+    const roomObjectsContainer = document.querySelector("#roomObjectsContainer");
+    const item = gameAssetIndex[assetId];
+
+    const div = document.createElement("div");
+    div.className = `room-object furniture-preview ${item["css-class"]}`;
+    div.id = "furniture-preview";
+    roomObjectsContainer.appendChild(div);
+
+    div.style.left = `0px`;
+    div.style.top = `0px`;
+
+    return div.id;
+}
+
+let furniturePreviewDict = {
+    "furniture-preview" : {
+        assetIndex: null,
+        position: []
+    }
+}
+
+document.querySelector("#end-preview-button").addEventListener("click", () => {
+    endPreview();
+    updateStatsBeforeRerunningInitGameAndRenderPets();
+    initGame();
+});;
+
+function endPreview() {
+    if (!furniturePreviewDict["furniture-preview"].assetIndex) {
+        return
+    }
+    
+    document.querySelector("#end-preview-button").classList.add("hidden");
+    document.querySelector("#toggle-edit-save-btn").classList.remove("hidden");
+
+    // Clean up the preview object
+    furniturePreviewDict["furniture-preview"].assetIndex = null;
+    furniturePreviewDict["furniture-preview"].position = [];
+
+    // Remove the preview div if it exists
+    const previewDiv = document.getElementById('furniture-preview');
+    
+    if (previewDiv) {
+        previewDiv.remove();
+    }
+
+    // If in edit mode, exit it first
+    if (editing) {
+        cancelEditBtn.click();
+    }
+}
+
+function previewFurniture (key) {
+    
+    let tempDivId = renderTemporaryRoomObject(key);
+
+    document.querySelectorAll('.game-content-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('pet-room-container').classList.add('active');
+
+    const navButtons = document.querySelectorAll('.nav-item');
+    navButtons.forEach(btn => btn.classList.remove('active'));
+    navButtons[0].classList.add('active')
+    
+    furniturePreviewDict["furniture-preview"].assetIndex = key;
+    furniturePreviewDict["furniture-preview"].position = getObjectCoordinates(tempDivId);
+
+    updateStatsBeforeRerunningInitGameAndRenderPets();
+    
+    initGame();
+    const placementMap = generatePlacementMap(tempDivId);
+
+    const validPosition = findValidPosition(placementMap, tempDivId);
+
+    if (validPosition) {
+        furniturePreviewDict["furniture-preview"].position = validPosition;
+        updateStatsBeforeRerunningInitGameAndRenderPets();
+        adjustUnitSizeForSmallScreens(roomLayout);
+        renderRoomGrid();
+        setPetAndObjectContainersToGridDimentions();
+        renderRoomObjects();
+        toggleRoomDarknessBasedOnElectricityTax();
+        toggleEditSaveBtn.click();
+
+        document.querySelector("#end-preview-button").classList.remove("hidden")
+        document.querySelector("#toggle-edit-save-btn").classList.add("hidden")
+        document.querySelector("#cancel-edit-btn").classList.add("hidden")
+
+        
+    } else {
+        furniturePreviewDict["furniture-preview"].position = [];
+        furniturePreviewDict["furniture-preview"].assetIndex = null;
+        document.getElementById(tempDivId).remove();
+        messageToTheUser("Nepakanka vietos!")
+    }
+}
+
 function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', tabType = 'supplies') {
     const shopContainer = document.getElementById('shop-items');
     if (!shopContainer) return;
@@ -6582,7 +6724,16 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
         if (showUnpurchasedOnly && ownedIndexes.has(assetIndex) && item.oneOfKind) continue;
 
         const itemDiv = document.createElement('div');
-        itemDiv.className = `shop-item ${item.category.join(' ')}`;
+        const itemClasses = item.category.join(' ');
+        itemDiv.className = `shop-item ${itemClasses}`;
+
+        let previewButton = null;
+        if (item['css-class'].includes("previewable")) {
+            previewButton = document.createElement('button');
+            previewButton.className = 'furniture-preview-button';
+            previewButton.innerHTML = "Peržiūra";
+            previewButton.onclick = () => previewFurniture(key);
+        }
 
         const previewDiv = document.createElement('div');
         previewDiv.className = `item-preview ${item['css-class']}`;
@@ -6690,6 +6841,9 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
                 handlePurchase(item, assetIndex, quantity, selectedCategory, btn);
             });
 
+            if (previewButton && !(ownedIndexes.has(assetIndex) && item.oneOfKind)) {
+                itemDiv.appendChild(previewButton);
+            }
             itemDiv.appendChild(previewHolder);
             itemDiv.appendChild(infoDiv);
             itemDiv.appendChild(btn);
@@ -6697,6 +6851,9 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
             const requiresDiv = document.createElement('div');
             requiresDiv.className = 'item-requires';
             requiresDiv.textContent = 'Reikalinga: ' + unmetRequirements.join(', ');
+            if (previewButton && !(ownedIndexes.has(assetIndex) && item.oneOfKind)) {
+                itemDiv.appendChild(previewButton);
+            }
             itemDiv.appendChild(previewHolder);
             itemDiv.appendChild(infoDiv);
             itemDiv.appendChild(requiresDiv);
@@ -6851,7 +7008,6 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
                 navButtons[0].classList.add('active')
                 
                 userObjectAssets[tempDivId].position = getObjectCoordinates(tempDivId);
-                console.log(userObjectAssets[tempDivId].position);
 
                 updateStatsBeforeRerunningInitGameAndRenderPets();
                 initGame();
@@ -9452,7 +9608,7 @@ async function sendTaxUpdate(taxesArray) {
 
 function bonusFromDailySupplyItems() {
     const container = document.getElementById("roomObjectsContainer");
-    const roomObjects = container.querySelectorAll(".room-object");
+    const roomObjects = container.querySelectorAll(".room-object:not(.furniture-preview)");
     const roomObjectsArray = Array.from(roomObjects);
 
     let continiousStatsBonus = {};

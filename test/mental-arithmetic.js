@@ -346,6 +346,7 @@ function recordGrammarFinalMistakes() {
 function styleGrammarPage () {
   document.querySelector("#field-for-final-message").style.height = "auto";
   const linkElement = document.querySelector("#questionsStyleSheet");
+  console.log("here")
   if (controller.questionsStopped) {
     linkElement.setAttribute("href", "../questions-stopped.css");
   } else {
@@ -354,7 +355,6 @@ function styleGrammarPage () {
 }
 
 function formatFinalMessageForGrammar() {
-  styleGrammarPage();
   localStorage.setItem("elapsedTime", timerDisplay.textContent)
   recordGrammarFinalMistakes();
 
@@ -391,6 +391,7 @@ function formatFinalMessageForGrammar() {
   document.getElementById("field-for-final-message").innerHTML = `<div class="field-for-final-message-inner">${finalMessageText()}</div>`;
   
   controller.questionsStopped = true;
+  styleGrammarPage();
   localStorage.setItem('controller', JSON.stringify(controller))
 }
 
@@ -642,7 +643,87 @@ async function sendSetTaskResultsToDatabase() {
         localStorage.setItem('controller', JSON.stringify(controller));
       }
     }
+    } 
+
+    if (document.querySelector("#stopButton")) {
+      document.querySelector("#stopButton").disabled = false;
     }
+    if (document.querySelector("#stopButtonTextComp")) {
+      document.querySelector("#stopButtonTextComp").disabled = false;
+    }
+    if (document.querySelector(".summary-button")) {
+      document.querySelector(".summary-button").disabled = false;
+    }
+    if (document.querySelector("#stop-button-span")) {
+      document.querySelector("#stop-button-span").disabled = false;
+
+  } else if (controller.task[0] === "personalChl") {
+
+    /*
+    try {
+      const response = await apiFetch(apiBase + 'class/updateWeekChlScore', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          studentId: userData.userId,
+          weekChlId: controller.task[1],
+          weekChlScore: resultsData
+        })
+      });
+
+      if (!response) {
+        return;
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+      }
+
+      // success case
+      controller.task = null;
+      controller.taskCompleted = false;
+      localStorage.setItem('controller', JSON.stringify(controller));
+
+      clearTimeout(showMessageTimeout);
+      if (closer) {
+        setTimeout(() => closer(), 0); // close after 0.5s
+      }
+
+      if (controller.language === 'LT') {
+        messageToTheUser("Savaitės iššūkio taškai sėkmingai išsaugoti.", false);
+      } else if (controller.language === 'EN') {
+        messageToTheUser("Weekly challenge score saved successfully.", false);
+      }
+
+    } catch (error) {
+      console.error('Error saving week challenge score:', error);
+
+      if (error.message === "Unauthorized") {
+        redirectingToAuthentication = true;
+        clearUserDataCookie();
+        localStorage.setItem('controller', JSON.stringify(controller));
+        window.location.href = "prisijungimas";
+      } else {
+        clearTimeout(showMessageTimeout);
+        if (closer) {
+          setTimeout(() => closer(), 0); // close after 0.5s
+        }
+        if (controller.language === 'LT') {
+          messageToTheUser("Įvyko klaida. Savaitės iššūkio taškai neišsaugoti. Bandykite vėliau.");
+        } else if (controller.language === 'EN') {
+          messageToTheUser("An error occurred. Weekly challenge score not saved. Please try again later.");
+        }
+          */
+
+        controller.task = null;
+        controller.taskCompleted = false;
+        localStorage.setItem('controller', JSON.stringify(controller));
+      ///}
+    ///}
+    } 
 
     if (document.querySelector("#stopButton")) {
       document.querySelector("#stopButton").disabled = false;
