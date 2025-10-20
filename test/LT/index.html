@@ -1381,10 +1381,10 @@ function showClassPopup() {
             // Close popup
             popup.classList.remove('active');
             document.body.classList.remove('popup-active');
+
+            displayPersonalChl();
         }
     });
-
-    displayPersonalChl();
 }
 
 async function updateUserClass (userClassSelection) {
@@ -1485,7 +1485,7 @@ const typeLabels = {
 
 function displayPersonalChl() {
     const container = document.getElementById('personalChlContainer');
-    const userClass = userData.knowledgeLvl || 2;
+    const userClass = userData?.knowledgeLvl || getClassLocalStorage() || 2;
 
     if (!personalChlDict[userClass]) {
         container.innerHTML = '<p style="text-align: center; color: rgba(0,0,0,0.5);">Nėra prieinamų iššūkių</p>';
@@ -1718,7 +1718,6 @@ function completePersonalChlTask(challengeInfo) {
 
     startQuestions();
 }
-displayPersonalChl();
 
 function checkWrap() {
   const middleDivEl = document.querySelector('.middle-div');
@@ -1802,6 +1801,20 @@ observer.observe(document.getElementById('new-task-options-container-inner'), { 
 
 window.addEventListener('resize', checkWrap);
 window.addEventListener('load', checkWrap);
+
+function handleKnowledgeLvlStatus () {
+    const knowledgeLvlStatus = getClassLocalStorage();
+
+    if ((userData && userData.knowledgeLvl) || knowledgeLvlStatus) {
+        displayPersonalChl();
+    } else {
+        showClassPopup();
+    }
+}
+
+handleKnowledgeLvlStatus();
+
+// LOCAL STORAGE LIMIT START
 
 const LOCALSTORAGE_LIMIT = 5 * 1024 * 1024;
 
