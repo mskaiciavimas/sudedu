@@ -535,6 +535,7 @@ window.onload = function () {
     let filteredTextLibrary = [];
     let currentTextId;
     let answeredTexts = [];
+    let firstTimeChecking = true;
     window.mistakesSummary = {};
 
     function generateFilteredTextLibrary() {
@@ -858,7 +859,12 @@ document.addEventListener('touchmove', function (event) {
       }
 
       if (allFieldsCorrect) {
-        controller.answeredQuestionTracker++;
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++;
+        }
+
+        firstTimeChecking = true;
+
         localStorage.setItem('controller', JSON.stringify(controller));
         if (controller.modeChoice4 === "C40") {
         questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
@@ -1223,6 +1229,8 @@ document.addEventListener('touchmove', function (event) {
           helpTracker = 0;
           controller.mistakesTracker = 0;
 					controller.answeredQuestionTracker = 0;
+          controller.correctAnswersTracker = 0;
+          firstTimeChecking = true;
           answeredTexts = [];
           mistakesSummary = {};
 

@@ -28,6 +28,7 @@ let controller = {
   equation2: '',
   result: ['', '', '', '', ''],
 	answeredQuestionTracker: 0,
+  correctAnswersTracker: 0,
   questionsStopped: false,
   tempTracking: true
 }
@@ -1079,10 +1080,15 @@ async function sendSetTaskResultsToDatabase() {
       }
     
       if (isCorrect) {
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++
+        }
+        firstTimeChecking = true;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${flipNumber(userInput)}`];
         controller.combinations.splice(indexToRemove, 1);
         controller.answeredQuestionTracker++;
       } else {
+        firstTimeChecking = false;
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${flipNumber(userInput)}`];
         controller.mistakesTracker++;
         recordMistakes(); 
@@ -1247,10 +1253,15 @@ async function sendSetTaskResultsToDatabase() {
       }
 
       if (isCorrect) {
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++
+        }
+        firstTimeChecking = true;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], ":", `${controller.randomSelection[0]} ${divisionSymbol} ${controller.randomSelection[1]} = ${userInput}`];
         controller.combinations.splice(indexToRemove, 1);
         controller.answeredQuestionTracker++;
       } else {
+        firstTimeChecking = false;
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], ":", `${controller.randomSelection[0]} ${divisionSymbol} ${controller.randomSelection[1]} = ${userInput}`];
         controller.mistakesTracker++;
         recordMistakes(); 
@@ -1260,8 +1271,13 @@ async function sendSetTaskResultsToDatabase() {
       if (flipNumber(userInput) === controller.randomSelection[0] + controller.randomSelection[1]) {
         controller.combinations.splice(indexToRemove, 1);
         controller.answeredQuestionTracker++;
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++
+        }
+        firstTimeChecking = true;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
       } else {
+        firstTimeChecking = false;
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
         isCorrect = false;
         controller.mistakesTracker++;
@@ -1272,8 +1288,13 @@ async function sendSetTaskResultsToDatabase() {
       if (flipNumber(userInput) === controller.randomSelection[0] - controller.randomSelection[1]) {
         controller.combinations.splice(indexToRemove, 1);
         controller.answeredQuestionTracker++;
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++
+        }
+        firstTimeChecking = true;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
       } else {
+        firstTimeChecking = false;
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
         isCorrect = false;
         controller.mistakesTracker++;
@@ -1289,8 +1310,13 @@ async function sendSetTaskResultsToDatabase() {
       if (userAnswer === controller.randomSelection[0] + controller.randomSelection[1]) {
         controller.combinations.splice(indexToRemove, 1);
         controller.answeredQuestionTracker++;
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++
+        }
+        firstTimeChecking = true;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
       } else {
+        firstTimeChecking = false;
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
         isCorrect = false;
         controller.mistakesTracker++;
@@ -1300,8 +1326,13 @@ async function sendSetTaskResultsToDatabase() {
       if (userAnswer === controller.randomSelection[0] - controller.randomSelection[1]) {
         controller.combinations.splice(indexToRemove, 1);
         controller.answeredQuestionTracker++;
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++
+        }
+        firstTimeChecking = true;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
       } else {
+        firstTimeChecking = false;
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
         isCorrect = false;
         controller.mistakesTracker++;
@@ -1311,8 +1342,13 @@ async function sendSetTaskResultsToDatabase() {
         if (userAnswer === controller.randomSelection[0] * controller.randomSelection[1]) {
           controller.combinations.splice(indexToRemove, 1);
           controller.answeredQuestionTracker++;
+          if (firstTimeChecking) {
+            controller.correctAnswersTracker++
+          }
+          firstTimeChecking = true;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${userAnswer}`];
         } else {
+          firstTimeChecking = false;
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${userAnswer}`];
           isCorrect = false;
           controller.mistakesTracker++;
@@ -1341,6 +1377,10 @@ async function sendSetTaskResultsToDatabase() {
         if (isCorrect) {
           controller.combinations.splice(indexToRemove, 1);
           controller.answeredQuestionTracker++;
+          if (firstTimeChecking) {
+            controller.correctAnswersTracker++
+          }
+          firstTimeChecking = true;
           if (controller.withRemainder) {
             controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} ${divisionSymbol} ${controller.randomSelection[1]} = ${userAnswer} (${remainderText} ${userAnswerRemainder})`];
           } else {
@@ -1352,6 +1392,7 @@ async function sendSetTaskResultsToDatabase() {
           } else {
             controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} ${divisionSymbol} ${controller.randomSelection[1]} = ${userAnswer}`];
           }
+          firstTimeChecking = false;
           isCorrect = false;
           controller.mistakesTracker++;
           recordMistakes(); 
@@ -1362,9 +1403,14 @@ async function sendSetTaskResultsToDatabase() {
         if (controller.randomSelection[3] === "first") {
           if (userAnswer === controller.randomSelection[0]) {
             controller.answeredQuestionTracker++;
+            if (firstTimeChecking) {
+              controller.correctAnswersTracker++
+            }
+            firstTimeChecking = true;
             controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+ first", `${userAnswer} + ${controller.randomSelection[1]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
             controller.combinations.splice(indexToRemove, 1);
           } else {
+            firstTimeChecking = false;
             controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+ first", `${userAnswer} + ${controller.randomSelection[1]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`];
             isCorrect = false;
             controller.mistakesTracker++;
@@ -1372,10 +1418,15 @@ async function sendSetTaskResultsToDatabase() {
           }
         } else if (controller.randomSelection[3] === "second") {
           if (userAnswer === controller.randomSelection[1]) {
+            if (firstTimeChecking) {
+              controller.correctAnswersTracker++
+            }
+            firstTimeChecking = true;
             controller.answeredQuestionTracker++;
             controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+ second", `${controller.randomSelection[0]} + ${userAnswer} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
             controller.combinations.splice(indexToRemove, 1);
           } else {
+            firstTimeChecking = false;
             controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+ second", `${controller.randomSelection[0]} + ${userAnswer} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
             isCorrect = false;
             controller.mistakesTracker++;
@@ -1386,9 +1437,14 @@ async function sendSetTaskResultsToDatabase() {
       if (controller.randomSelection[3] === "first") {
         if (userAnswer === controller.randomSelection[0]) {
           controller.answeredQuestionTracker++;
+          if (firstTimeChecking) {
+            controller.correctAnswersTracker++
+          }
+          firstTimeChecking = true;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "- first", `${userAnswer} - ${controller.randomSelection[1]} = ${controller.randomSelection[0] - controller.randomSelection[1]}`]; 
           controller.combinations.splice(indexToRemove, 1);
         } else {
+          firstTimeChecking = false;
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "- first", `${userAnswer} - ${controller.randomSelection[1]} = ${controller.randomSelection[0] - controller.randomSelection[1]}`]; 
           isCorrect = false;
           controller.mistakesTracker++;
@@ -1397,12 +1453,17 @@ async function sendSetTaskResultsToDatabase() {
       } else if (controller.randomSelection[3] === "second") {
         if (userAnswer === controller.randomSelection[1]) {
           controller.answeredQuestionTracker++;
+          if (firstTimeChecking) {
+            controller.correctAnswersTracker++
+          }
+          firstTimeChecking = true;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "- second", `${controller.randomSelection[0]} - ${userAnswer} = ${controller.randomSelection[0] - controller.randomSelection[1]}`]; 
           controller.combinations.splice(indexToRemove, 1);
         } else {
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "- second", `${controller.randomSelection[0]} - ${userAnswer} = ${controller.randomSelection[0] - controller.randomSelection[1]}`];  
           isCorrect = false;
           controller.mistakesTracker++;
+          firstTimeChecking = false;
           recordMistakes(); 
         }
       }
@@ -1410,20 +1471,30 @@ async function sendSetTaskResultsToDatabase() {
       if (controller.randomSelection[3] === "first") {
         if (userAnswer === controller.randomSelection[0]) {
           controller.answeredQuestionTracker++;
+          if (firstTimeChecking) {
+            controller.correctAnswersTracker++
+          }
+          firstTimeChecking = true;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7 first", `${userAnswer} \u00D7 ${controller.randomSelection[1]} = ${controller.randomSelection[0] * controller.randomSelection[1]}`]; 
           controller.combinations.splice(indexToRemove, 1);
         } else {
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7 first", `${userAnswer} \u00D7 ${controller.randomSelection[1]} = ${controller.randomSelection[0] * controller.randomSelection[1]}`]; 
           isCorrect = false;
+          firstTimeChecking = false;
           controller.mistakesTracker++;
           recordMistakes(); 
         }
       } else if (controller.randomSelection[3] === "second") {
         if (userAnswer === controller.randomSelection[1]) {
           controller.answeredQuestionTracker++;
+          if (firstTimeChecking) {
+            controller.correctAnswersTracker++
+          }
+          firstTimeChecking = true;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7 first", `${controller.randomSelection[0]} \u00D7 ${userAnswer} = ${controller.randomSelection[0] * controller.randomSelection[1]}`]; 
           controller.combinations.splice(indexToRemove, 1);
         } else {
+          firstTimeChecking = false;
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7 first", `${controller.randomSelection[0]} \u00D7 ${userAnswer} = ${controller.randomSelection[0] * controller.randomSelection[1]}`];  
           isCorrect = false;
           controller.mistakesTracker++;
@@ -1442,9 +1513,14 @@ async function sendSetTaskResultsToDatabase() {
     if (controller.randomSelection[3] === "first") {
       if (userAnswer === controller.randomSelection[0]) {
         controller.answeredQuestionTracker++;
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++
+        }
+        firstTimeChecking = true;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${userAnswer} ${divisionSymbol} ${controller.randomSelection[1]} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
         controller.combinations.splice(indexToRemove, 1);
       } else {
+        firstTimeChecking = false;
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${userAnswer} ${divisionSymbol} ${controller.randomSelection[1]} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
         isCorrect = false;
         controller.mistakesTracker++;
@@ -1453,9 +1529,14 @@ async function sendSetTaskResultsToDatabase() {
     } else if (controller.randomSelection[3] === "second") {
       if (userAnswer === parseInt(controller.randomSelection[1])) {
         controller.answeredQuestionTracker++;
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++
+        }
+        firstTimeChecking = true;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${controller.randomSelection[0]} ${divisionSymbol} ${userAnswer} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
         controller.combinations.splice(indexToRemove, 1);
       } else {
+        firstTimeChecking = false;
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${controller.randomSelection[0]} ${divisionSymbol} ${userAnswer} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
         isCorrect = false; 
         controller.mistakesTracker++;
@@ -1491,6 +1572,9 @@ async function sendSetTaskResultsToDatabase() {
 
 
     if (isCorrect || controller.modeChoice7 !== "C48") {
+      if (isCorrect) {
+        firstTimeChecking = true;
+      }
       formEquation();
       displayEquation();
       answerInputElement.setAttribute("style", "background-color: #ffeccc")
@@ -2391,12 +2475,6 @@ async function sendTaskInfoToDatabase() {
         }
     }
 
-    // Prepare results
-    const resultsData = [
-        [controller.answeredQuestionTracker || 0, controller.mistakesTracker || 0],
-        controller.currentMistakes || []
-    ];
-
     // Task info template
     let taskInfo = {
         "userClass": -1,
@@ -2489,30 +2567,12 @@ async function sendTaskInfoToDatabase() {
         taskInfo["mult-table-selection"] = controller.selectedNumbers || [];
     }
 
-    // Calculate correctness
-    let correctAnswers = 0;
-    let totalAnswers = 0;
-
     if (controller.mode === "lang") {
         if (controller.modeChoice1 === "C49") {
-            let totalTexts = 0;
-            let textsWithoutError = 0;
-            resultsData[1].forEach(([outerKey, value]) => {
-                totalTexts++;
-                if (value === 0) textsWithoutError++;
-            });
-            correctAnswers = textsWithoutError;
-            totalAnswers = totalTexts;
-        } else if (controller.modeChoice1 === "C50") {
-            correctAnswers = resultsData[0][0] - resultsData[0][1];
-            totalAnswers = resultsData[0][0];
-        }
         taskInfo["C47"] = false;
         taskInfo["C48"] = false;
         taskInfo["remainder"] = false;
     } else if (controller.mode === "math") {
-        correctAnswers = resultsData[0][0] - resultsData[0][1];
-        totalAnswers = resultsData[0][0];
         taskInfo["C49"] = false;
         taskInfo["C50"] = false;
         taskInfo["C51"] = false;
@@ -2527,8 +2587,8 @@ async function sendTaskInfoToDatabase() {
         taskInfo["C82"] = false;
     }
 
-    taskInfo["correct-ans"] = correctAnswers;
-    taskInfo["total-ans"] = totalAnswers;
+    taskInfo["correct-ans"] = controller.correctAnswersTracker;
+    taskInfo["total-ans"] = controller.answeredQuestionTracker;
 
     // Send to server
     //https://sudedu-server.onrender.com/record

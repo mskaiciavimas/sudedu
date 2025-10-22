@@ -1329,7 +1329,7 @@ function checkAnswers() {
 				input.classList.remove('wrong-answer');
 				input.disabled = true;
 				if (firstTimeChecking) {
-					totalCorrectAnswers++;
+					controller.correctAnswersTracker++;
 				}
 			} else {
 				input.classList.add('wrong-answer');
@@ -1348,7 +1348,7 @@ function checkAnswers() {
         if (firstTimeChecking) {
             controller.answeredQuestionTracker += NumberOfQuestionsInRound;
 			localStorage.setItem('controller', JSON.stringify(controller));
-            document.getElementById('mistake-tracker').innerHTML = `Teisingai: ${totalCorrectAnswers}/${controller.answeredQuestionTracker}`;
+            document.getElementById('mistake-tracker').innerHTML = `Teisingai: ${controller.correctAnswersTracker}/${controller.answeredQuestionTracker}`;
 			localStorage.setItem('controller', JSON.stringify(controller));
         }
 
@@ -1357,8 +1357,6 @@ function checkAnswers() {
 			if (controller.modeChoice4 === "C40") {
 				answerTrackerElement.innerHTML = `Atlikta: ${totalSentencesCompleted}/${controller.questionNumber}`;
 			}
-
-			controller.correctAnswerTracker = totalCorrectAnswers
 
 			controller.randomSelection = [];
 			localStorage.setItem("controller", JSON.stringify(controller));
@@ -1483,6 +1481,7 @@ function helpToggle() {
 					controller.currentMistakes = [];
 					controller.mistakesTracker = 0;
 					controller.answeredQuestionTracker = 0;
+					controller.correctAnswersTracker = 0;
 					totalCorrectAnswers = 0;
 					atsakymai = {};
 					questionId = 1;
