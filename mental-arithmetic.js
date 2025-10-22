@@ -2568,7 +2568,6 @@ async function sendTaskInfoToDatabase() {
     }
 
     if (controller.mode === "lang") {
-        if (controller.modeChoice1 === "C49") {
         taskInfo["C47"] = false;
         taskInfo["C48"] = false;
         taskInfo["remainder"] = false;
@@ -2602,6 +2601,6 @@ async function sendTaskInfoToDatabase() {
         console.error("Error saving task results:", error);
     }
   }
-}
+
 //TASK INFO COLLECTION END
 
