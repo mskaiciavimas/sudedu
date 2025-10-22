@@ -2601,7 +2601,7 @@ async function sendTaskInfoToDatabase() {
     } catch (error) {
         console.error("Error saving task results:", error);
     }
+  }
 }
-
 //TASK INFO COLLECTION END
 
