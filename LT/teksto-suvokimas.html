@@ -859,10 +859,11 @@ document.addEventListener('touchmove', function (event) {
       }
 
       if (allFieldsCorrect) {
+        controller.answeredQuestionTracker++
+        
         if (firstTimeChecking) {
           controller.correctAnswersTracker++;
         }
-
         firstTimeChecking = true;
 
         localStorage.setItem('controller', JSON.stringify(controller));
