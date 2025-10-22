@@ -879,6 +879,7 @@ document.addEventListener('touchmove', function (event) {
         controller.randomSelection = [];
         localStorage.setItem("controller", JSON.stringify(controller));
       } else {
+        firstTimeChecking = false;
         const dots = document.querySelectorAll('#dots .dot');
         const targetColor = 'rgb(255, 191, 146)'; // Example target color (white in RGB)
         let foundMatch = false;
