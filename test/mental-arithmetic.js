@@ -28,8 +28,42 @@ let controller = {
   equation2: '',
   result: ['', '', '', '', ''],
 	answeredQuestionTracker: 0,
+  correctAnswersTracker: 0,
   questionsStopped: false,
   tempTracking: true
+}
+
+function resetControllerTaskSettings () {
+  controller.mode = '',
+  controller.currentMistakes = [],
+  controller.mistakesTracker = 0,
+  controller.classChoice = '',
+  controller.modeChoice = '',
+  controller.modeChoice2 = '',
+  controller.modeChoice3 = [],
+  controller.modeChoice4 = '',
+  controller.modeChoice5 = '',
+  controller.modeChoice6 = '',
+  controller.modeChoice7 = '',
+  controller.modeChoice8 = '',
+  controller.setTaskDuration = '',
+  controller.taskCompleted = false,
+  controller.modeChoiceLtDifficulty = '',
+  controller.questionFrequency = 0,
+  controller.timerLimit = 0,
+  controller.questionNumber = 0,
+  controller.selectedNumbers = [],
+  controller.withRemainder = false,
+  controller.randomSelection = [],
+  controller.combinations = [],
+  controller.equation = '',
+  controller.equation2 = '',
+  controller.result = ['', '', '', '', ''],
+  controller.answeredQuestionTracker = 0,
+  controller.correctAnswersTracker = 0,
+  controller.questionsStopped = false,
+  controller.tempTracking = true
+  localStorage.setItem('controller', JSON.stringify(controller))
 }
 
 const fireworksDiv = document.querySelector('#fireworks-div');
@@ -346,7 +380,6 @@ function recordGrammarFinalMistakes() {
 function styleGrammarPage () {
   document.querySelector("#field-for-final-message").style.height = "auto";
   const linkElement = document.querySelector("#questionsStyleSheet");
-  console.log("here")
   if (controller.questionsStopped) {
     linkElement.setAttribute("href", "../questions-stopped.css");
   } else {
@@ -816,6 +849,12 @@ async function sendSetTaskResultsToDatabase() {
 		} else {
       linkElement.setAttribute("href", "../questions-bigger.css");
     }
+
+    if (controller.modeChoice5 === "C42") {
+      dynamicStyleSheet.setAttribute("href", "../questions-unknown-number-style-supplement.css");
+    } else {
+      dynamicStyleSheet.setAttribute("href", "");
+    }
   }   
 		
 
@@ -1256,7 +1295,7 @@ async function sendSetTaskResultsToDatabase() {
 
 
 
-  function checkAnswer () {
+function checkAnswer () {
     document.getElementById('hidden-input').focus();
     var isCorrect = true;
     userInput = answerInputElement.value.trim();
@@ -1342,10 +1381,15 @@ async function sendSetTaskResultsToDatabase() {
       }
     
       if (isCorrect) {
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++
+        }
+        firstTimeChecking = true;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${flipNumber(userInput)}`];
         controller.combinations.splice(indexToRemove, 1);
         controller.answeredQuestionTracker++;
       } else {
+        firstTimeChecking = false;
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${flipNumber(userInput)}`];
         controller.mistakesTracker++;
         recordMistakes(); 
@@ -1509,10 +1553,15 @@ async function sendSetTaskResultsToDatabase() {
       }
 
       if (isCorrect) {
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++
+        }
+        firstTimeChecking = true;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], ":", `${controller.randomSelection[0]} ${divisionSymbol} ${controller.randomSelection[1]} = ${userInput}`];
         controller.combinations.splice(indexToRemove, 1);
         controller.answeredQuestionTracker++;
       } else {
+        firstTimeChecking = false;
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], ":", `${controller.randomSelection[0]} ${divisionSymbol} ${controller.randomSelection[1]} = ${userInput}`];
         controller.mistakesTracker++;
         recordMistakes(); 
@@ -1522,8 +1571,13 @@ async function sendSetTaskResultsToDatabase() {
       if (flipNumber(userInput) === controller.randomSelection[0] + controller.randomSelection[1]) {
         controller.combinations.splice(indexToRemove, 1);
         controller.answeredQuestionTracker++;
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++
+        }
+        firstTimeChecking = true;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
       } else {
+        firstTimeChecking = false;
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
         isCorrect = false;
         controller.mistakesTracker++;
@@ -1534,8 +1588,13 @@ async function sendSetTaskResultsToDatabase() {
       if (flipNumber(userInput) === controller.randomSelection[0] - controller.randomSelection[1]) {
         controller.combinations.splice(indexToRemove, 1);
         controller.answeredQuestionTracker++;
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++
+        }
+        firstTimeChecking = true;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
       } else {
+        firstTimeChecking = false;
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
         isCorrect = false;
         controller.mistakesTracker++;
@@ -1551,8 +1610,13 @@ async function sendSetTaskResultsToDatabase() {
       if (userAnswer === controller.randomSelection[0] + controller.randomSelection[1]) {
         controller.combinations.splice(indexToRemove, 1);
         controller.answeredQuestionTracker++;
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++
+        }
+        firstTimeChecking = true;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
       } else {
+        firstTimeChecking = false;
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+", `${controller.randomSelection[0]} + ${controller.randomSelection[1]} = ${userAnswer}`];
         isCorrect = false;
         controller.mistakesTracker++;
@@ -1562,8 +1626,13 @@ async function sendSetTaskResultsToDatabase() {
       if (userAnswer === controller.randomSelection[0] - controller.randomSelection[1]) {
         controller.combinations.splice(indexToRemove, 1);
         controller.answeredQuestionTracker++;
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++
+        }
+        firstTimeChecking = true;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
       } else {
+        firstTimeChecking = false;
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "-", `${controller.randomSelection[0]} - ${controller.randomSelection[1]} = ${userAnswer}`];
         isCorrect = false;
         controller.mistakesTracker++;
@@ -1573,8 +1642,13 @@ async function sendSetTaskResultsToDatabase() {
         if (userAnswer === controller.randomSelection[0] * controller.randomSelection[1]) {
           controller.combinations.splice(indexToRemove, 1);
           controller.answeredQuestionTracker++;
+          if (firstTimeChecking) {
+            controller.correctAnswersTracker++
+          }
+          firstTimeChecking = true;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${userAnswer}`];
         } else {
+          firstTimeChecking = false;
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7", `${controller.randomSelection[0]} \u00D7 ${controller.randomSelection[1]} = ${userAnswer}`];
           isCorrect = false;
           controller.mistakesTracker++;
@@ -1603,6 +1677,10 @@ async function sendSetTaskResultsToDatabase() {
         if (isCorrect) {
           controller.combinations.splice(indexToRemove, 1);
           controller.answeredQuestionTracker++;
+          if (firstTimeChecking) {
+            controller.correctAnswersTracker++
+          }
+          firstTimeChecking = true;
           if (controller.withRemainder) {
             controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} ${divisionSymbol} ${controller.randomSelection[1]} = ${userAnswer} (${remainderText} ${userAnswerRemainder})`];
           } else {
@@ -1614,6 +1692,7 @@ async function sendSetTaskResultsToDatabase() {
           } else {
             controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789", `${controller.randomSelection[0]} ${divisionSymbol} ${controller.randomSelection[1]} = ${userAnswer}`];
           }
+          firstTimeChecking = false;
           isCorrect = false;
           controller.mistakesTracker++;
           recordMistakes(); 
@@ -1624,9 +1703,14 @@ async function sendSetTaskResultsToDatabase() {
         if (controller.randomSelection[3] === "first") {
           if (userAnswer === controller.randomSelection[0]) {
             controller.answeredQuestionTracker++;
+            if (firstTimeChecking) {
+              controller.correctAnswersTracker++
+            }
+            firstTimeChecking = true;
             controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+ first", `${userAnswer} + ${controller.randomSelection[1]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
             controller.combinations.splice(indexToRemove, 1);
           } else {
+            firstTimeChecking = false;
             controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+ first", `${userAnswer} + ${controller.randomSelection[1]} = ${controller.randomSelection[0] + controller.randomSelection[1]}`];
             isCorrect = false;
             controller.mistakesTracker++;
@@ -1634,10 +1718,15 @@ async function sendSetTaskResultsToDatabase() {
           }
         } else if (controller.randomSelection[3] === "second") {
           if (userAnswer === controller.randomSelection[1]) {
+            if (firstTimeChecking) {
+              controller.correctAnswersTracker++
+            }
+            firstTimeChecking = true;
             controller.answeredQuestionTracker++;
             controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "+ second", `${controller.randomSelection[0]} + ${userAnswer} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
             controller.combinations.splice(indexToRemove, 1);
           } else {
+            firstTimeChecking = false;
             controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "+ second", `${controller.randomSelection[0]} + ${userAnswer} = ${controller.randomSelection[0] + controller.randomSelection[1]}`]; 
             isCorrect = false;
             controller.mistakesTracker++;
@@ -1648,9 +1737,14 @@ async function sendSetTaskResultsToDatabase() {
       if (controller.randomSelection[3] === "first") {
         if (userAnswer === controller.randomSelection[0]) {
           controller.answeredQuestionTracker++;
+          if (firstTimeChecking) {
+            controller.correctAnswersTracker++
+          }
+          firstTimeChecking = true;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "- first", `${userAnswer} - ${controller.randomSelection[1]} = ${controller.randomSelection[0] - controller.randomSelection[1]}`]; 
           controller.combinations.splice(indexToRemove, 1);
         } else {
+          firstTimeChecking = false;
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "- first", `${userAnswer} - ${controller.randomSelection[1]} = ${controller.randomSelection[0] - controller.randomSelection[1]}`]; 
           isCorrect = false;
           controller.mistakesTracker++;
@@ -1659,12 +1753,17 @@ async function sendSetTaskResultsToDatabase() {
       } else if (controller.randomSelection[3] === "second") {
         if (userAnswer === controller.randomSelection[1]) {
           controller.answeredQuestionTracker++;
+          if (firstTimeChecking) {
+            controller.correctAnswersTracker++
+          }
+          firstTimeChecking = true;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "- second", `${controller.randomSelection[0]} - ${userAnswer} = ${controller.randomSelection[0] - controller.randomSelection[1]}`]; 
           controller.combinations.splice(indexToRemove, 1);
         } else {
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "- second", `${controller.randomSelection[0]} - ${userAnswer} = ${controller.randomSelection[0] - controller.randomSelection[1]}`];  
           isCorrect = false;
           controller.mistakesTracker++;
+          firstTimeChecking = false;
           recordMistakes(); 
         }
       }
@@ -1672,20 +1771,30 @@ async function sendSetTaskResultsToDatabase() {
       if (controller.randomSelection[3] === "first") {
         if (userAnswer === controller.randomSelection[0]) {
           controller.answeredQuestionTracker++;
+          if (firstTimeChecking) {
+            controller.correctAnswersTracker++
+          }
+          firstTimeChecking = true;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7 first", `${userAnswer} \u00D7 ${controller.randomSelection[1]} = ${controller.randomSelection[0] * controller.randomSelection[1]}`]; 
           controller.combinations.splice(indexToRemove, 1);
         } else {
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7 first", `${userAnswer} \u00D7 ${controller.randomSelection[1]} = ${controller.randomSelection[0] * controller.randomSelection[1]}`]; 
           isCorrect = false;
+          firstTimeChecking = false;
           controller.mistakesTracker++;
           recordMistakes(); 
         }
       } else if (controller.randomSelection[3] === "second") {
         if (userAnswer === controller.randomSelection[1]) {
           controller.answeredQuestionTracker++;
+          if (firstTimeChecking) {
+            controller.correctAnswersTracker++
+          }
+          firstTimeChecking = true;
           controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\u00D7 first", `${controller.randomSelection[0]} \u00D7 ${userAnswer} = ${controller.randomSelection[0] * controller.randomSelection[1]}`]; 
           controller.combinations.splice(indexToRemove, 1);
         } else {
+          firstTimeChecking = false;
           controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\u00D7 first", `${controller.randomSelection[0]} \u00D7 ${userAnswer} = ${controller.randomSelection[0] * controller.randomSelection[1]}`];  
           isCorrect = false;
           controller.mistakesTracker++;
@@ -1704,9 +1813,14 @@ async function sendSetTaskResultsToDatabase() {
     if (controller.randomSelection[3] === "first") {
       if (userAnswer === controller.randomSelection[0]) {
         controller.answeredQuestionTracker++;
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++
+        }
+        firstTimeChecking = true;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${userAnswer} ${divisionSymbol} ${controller.randomSelection[1]} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
         controller.combinations.splice(indexToRemove, 1);
       } else {
+        firstTimeChecking = false;
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${userAnswer} ${divisionSymbol} ${controller.randomSelection[1]} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
         isCorrect = false;
         controller.mistakesTracker++;
@@ -1715,9 +1829,14 @@ async function sendSetTaskResultsToDatabase() {
     } else if (controller.randomSelection[3] === "second") {
       if (userAnswer === parseInt(controller.randomSelection[1])) {
         controller.answeredQuestionTracker++;
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++
+        }
+        firstTimeChecking = true;
         controller.result = ["Correct", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${controller.randomSelection[0]} ${divisionSymbol} ${userAnswer} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
         controller.combinations.splice(indexToRemove, 1);
       } else {
+        firstTimeChecking = false;
         controller.result = ["Incorrect", controller.randomSelection[0], controller.randomSelection[1], "\uA789 first", `${controller.randomSelection[0]} ${divisionSymbol} ${userAnswer} = ${controller.randomSelection[0] / controller.randomSelection[1]}`]; 
         isCorrect = false; 
         controller.mistakesTracker++;
@@ -1753,6 +1872,9 @@ async function sendSetTaskResultsToDatabase() {
 
 
     if (isCorrect || controller.modeChoice7 !== "C48") {
+      if (isCorrect) {
+        firstTimeChecking = true;
+      }
       formEquation();
       displayEquation();
       answerInputElement.setAttribute("style", "background-color: rgba(255, 255, 255, 0.6)")
@@ -1801,6 +1923,8 @@ async function sendSetTaskResultsToDatabase() {
     controller.equation2 = '';
     controller.mistakesTracker = 0;
     controller.answeredQuestionTracker = 0;
+    controller.correctAnswersTracker = 0;
+    firstTimeChecking = true;
     controller.randomSelection = [];
     controller.questionsStopped = false;
     controller.tempTracking = true;
@@ -2617,6 +2741,7 @@ function startQuestionsTimer () {
 	controller.currentMistakes = [];
 	controller.mistakesTracker = 0;
 	controller.answeredQuestionTracker = 0;
+  controller.correctAnswersTracker = 0;
 	controller.equation = '';
 	controller.equation2 = '';
 	controller.randomSelection = [];
@@ -2645,10 +2770,11 @@ function startQuestionsNumber () {
 	localStorage.removeItem("startTime");
 	}
 	controller.result = ['', '', '', '', '']
-		controller.currentMistakes = [];
-		controller.mistakesTracker = 0;
-		controller.answeredQuestionTracker = 0;
-		controller.equation = '';
+  controller.currentMistakes = [];
+  controller.mistakesTracker = 0;
+  controller.answeredQuestionTracker = 0;
+  controller.correctAnswersTracker = 0;
+  controller.equation = '';
 	controller.randomSelection = [];
 	controller.questionsStopped = false;
 	if (controller.mode === "math") {
@@ -2873,6 +2999,8 @@ function getOptionTextFromValues(values) {
 async function sendTaskInfoToDatabase() {
     // Restore controller
 
+    return 
+
     if (!controller) {
         const storedController = localStorage.getItem("controller");
         if (storedController) {
@@ -3096,8 +3224,73 @@ function messageToTheUser(message, errorMessage = true) {
     return closePopup;
 }
 
-
 //CUSTOM CONFIRM MODAL
+
+
+//OBJECT POP UP START
+
+const objectPopup = document.getElementById("object-popup");
+const objectPopupContent = document.getElementById("object-popup-content");
+const objectPopupTitle = document.getElementById("object-popup-title");
+const objectPopupSubtitle = document.getElementById("object-popup-subtitle");
+const objectPopupClose = objectPopup.querySelector(".object-popup-close");
+
+const infoMessages = {
+  "coin-amount-custom-timer": {
+    "content": "Pasirinkę šią užduotį, uždirbsite nurodytą kiekį „sudedu“ pinigų už kiekvieną iš pirmo karto teisingai atsakytą klausimą.",
+    "title": "Uždarbis",
+    "subtitle": ""
+  },
+  "coin-amount-custom-question-number": {
+    "content": "Pasirinkę šią užduotį, galite uždirbti iki nurodyto kiekio „sudedu“ pinigų, priklausomai nuo iš pirmo karto teisingai atsakytų klausimų skaičiaus.",
+    "title": "Uždarbis",
+    "subtitle": ""
+  }
+}
+
+let popupOpenTime = 0;
+// Open popup with dynamic content
+function openObjectPopup(content, title='', subtitle = '') {
+    popupOpenTime = Date.now();
+    // Clear existing content
+    objectPopupContent.innerHTML = '';
+    objectPopupTitle.innerHTML = '';
+    objectPopupSubtitle.innerHTML = '';
+
+    if (typeof content === 'string') {
+        // If it's an HTML string, insert it
+        objectPopupContent.innerHTML = content;
+    } else if (content instanceof HTMLElement) {
+        // If it's a DOM element, append it directly
+        objectPopupContent.appendChild(content);
+    }
+
+    objectPopupTitle.innerHTML = title;
+    objectPopupSubtitle.innerHTML = subtitle;
+
+    // Show the popup
+    objectPopup.style.display = 'flex';
+}
+
+function closeObjectPopup () {
+    objectPopup.style.display = 'none';
+}
+
+// Close button
+objectPopupClose.addEventListener("click", () => {
+  objectPopup.style.display = "none";
+});
+
+// Modified close listener
+objectPopup.addEventListener("click", (e) => {
+    if (e.target === objectPopup && Date.now() - popupOpenTime > 300) {
+        objectPopup.style.display = "none";
+    }
+});
+
+//OBJECT POP UP END
+
+
 function showCustomConfirm(text, onConfirm, item=null) {
       const modal = document.getElementById('customConfirmModal');
       const modalText = document.getElementById('customModalText');
@@ -3129,3 +3322,344 @@ function showCustomConfirm(text, onConfirm, item=null) {
           modal.style.display = 'none';
       };
   }
+
+
+// POINTS CALCULATION START
+
+const pointWeights = {
+    "userClass": {"values": [0, 1, 2, 3, 4, 5], "label": "ziniu lygis"},
+    "base": {"values": [0.76, 0.76, 0.76, 0.76, 0.76, 0.76], "label": "base"},
+    "C1": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "sudetis"},
+    "C2": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "atimtis"},
+    "C3": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "sudetis ir atimtis"},
+    "C4": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "daugyba"},
+    "C5": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "dalyba"},
+    "C6": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "daugyba ir dalyba"},
+    "C7": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "ivairius"},
+    "C8": {"values": [0.4, 0.4, 0.15, 0.0, 0.0, 0.0], "label": "vienazenkliu iki 10"},
+    "C9": {"values": [0.6, 0.5, 0.35, 0.0, 0.0, 0.0], "label": "vienazenkliu iki 20"},
+    "C10": {"values": [2.0, 1.25, 0.5, 0.0, 0.0, 0.0], "label": "dvizenkliu ir vienazenkliu iki 20"},
+    "C11": {"values": [2.0, 1.5, 0.5, 0.0, 0.0, 0.0], "label": "dvizenkliu ir vienazenkliu iki 100"},
+    "C12": {"values": [2.0, 2.0, 1.0, 0.5, 0.25, 0.25], "label": "dvizenkliu iki 100"},
+    "C13": {"values": [2.0, 2.0, 2.0, 1.5, 1.25, 1.25], "label": "skaiciu iki 1000"},
+    "C14": {"values": [2.0, 2.0, 2.0, 1.75, 1.5, 1.5], "label": "skaiciu iki 10000"},
+    "C15": {"values": [2.0, 2.0, 2.0, 2.0, 2.0, 2.0], "label": "skaiciu iki 1000000"},
+    "C16": {"values": [2.0, 2.0, 2.0, 1.5, 1.25, 1.15], "label": "turinyje gretimi nuliai"},
+    "C17": {"values": [2.0, 2.0, 1.0, 0.0, 0.0, 0.0], "label": "lenteline sudetis ir atimitis iki 20"},
+    "C18": {"values": [1.0, 0.75, 0.5, 0.35, 0.35, 0.35], "label": "daugybos lentle"},
+    "DL1": {"values": [1.0, 1.0, 0.15, 0.0, 0.0, 0.0], "label": "daugybos range[1] === 1"},
+    "DL2": {"values": [2.0, 2.0, 0.5, 0, 0, 0], "label": "daugybos range[1] === 2"},
+    "DL10": {"values": [1.25, 1.0, 0.15, 0, 0, 0], "label": "daugybos range[0] === 10 AND daugybos range[1] ===10"},
+    "DLALL": {"values": [2.0, 2.0, 1.0, 1.0, 1.0, 1.0], "label": "daugybos range else"},
+    "C19": {"values": [2.0, 2.0, 2.0, 1.0, 0.5, 0.5], "label": "dvizenklio is vienazenklio"},
+    "C20": {"values": [2.0, 2.0, 2.0, 1.5, 0.75, 0.75], "label": "trizenklio is vienazenklio"},
+    "C21": {"values": [2.0, 2.0, 2.0, 1.75, 0.95, 0.95], "label": "keturzenklio is vienazenklio"},
+    "C22": {"values": [2.0, 2.0, 2.0, 1.75, 1.0, 1.0], "label": "daugiazenklio is vienzenklio"},
+    "C23": {"values": [3.0, 3.0, 3.0, 3.0, 3.0, 3.0], "label": "dvizenklio is dvizenklio"},
+    "C24": {"values": [3.0, 3.0, 3.0, 3.0, 3.0, 3.0], "label": "trizenklio is dvizenklio"},
+    "C25": {"values": [3.0, 3.0, 3.0, 3.0, 3.0, 3.0], "label": "keturzenklio is dvizenklio"},
+    "C26": {"values": [3.0, 3.0, 3.0, 3.0, 3.0, 3.0], "label": "daugiazenklio is dvizenklio"},
+    "remainder": {"values": [2.0, 2.0, 2.0, 1.25, 1.15, 1], "label": "su liekana"},
+    "C27": {"values": [3.0, 3.0, 3.0, 3.0, 3.0, 3.0], "label": "daugiazenkliu"},
+    "C28": {"values": [2.0, 2.0, 2.0, 1.0, 0.5, 0.5], "label": "is pilnu lengvesni"},
+    "C29": {"values": [2.0, 2.0, 2.0, 1.0, 0.75, 0.75], "label": "is pilnu sunkesni"},
+    "C30": {"values": [2.0, 2.0, 1.5, 1.25, 1.25, 1.25], "label": "daugiazenklio is vienazenklio (dalmenyje 0)"},
+    "C31": {"values": [1.65, 1.0, 0, 0, 0, 0], "label": "ivairus iki 10"},
+    "C32": {"values": [2.0, 1.2, 0, 0, 0, 0], "label": "ivairus iki 20"},
+    "C33": {"values": [2.0, 2.0, 0.5, 0, 0, 0], "label": "ivairus iki 100"},
+    "C34": {"values": [2.0, 2.0, 1.0, 0.75, 0.5, 0.5], "label": "ivairus iki 1000"},
+    "C35": {"values": [2.0, 2.0, 2.0, 1.0, 1.0, 1.0], "label": "ivairus iki 10000"},
+    "C36": {"values": [2.0, 2.0, 2.0, 1.0, 1.0, 1.0], "label": "ivairus iki 1000000"},
+    "C37": {"values": [2.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "neperzengiant"},
+    "C38": {"values": [2.0, 1.5, 1.5, 1.5, 1.5, 1.0], "label": "perzengiant"},
+    "C41": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "skaitine"},
+    "C42": {"values": [2.0, 2.0, 2.0, 2.0, 2.0, 2.0], "label": "su nezinomuoju"},
+    "C49": {"values": [5.0, 5.0, 5.0, 5.0, 5.0, 5.0], "label": "teksto supratimas"},
+    "C50": {"values": [0.75, 0.75, 0.75, 0.75, 0.75, 0.75], "label": "rasyba"},
+    "C51": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "turinio komponavimas"},
+    "C52": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "strukturos isdestumas"},
+    "C75": {"values": [2.0, 1.0, 1.0, 0.0, 0.0, 0.0], "label": "lietuviu klases 1-2"},
+    "C76": {"values": [2.0, 2.0, 2.0, 1.0, 1.0, 1.0], "label": "lietuviu klases 3-4"},
+    "C77": {"values": [2.0, 2.0, 1.0, 1.0, 1.0, 1.0], "label": "is pilnu simtu"},
+    "C58": {"values": [2.0, 1.25, 1.15, 1.15, 0.95, 0.95], "label": "teksto supratimas lengvas"},
+    "C59": {"values": [2.0, 1.75, 1.75, 1.5, 1.5, 1.25], "label": "teksto supratimas vidutinis"},
+    "C60": {"values": [2.0, 2.0, 2.0, 1.75, 1.75, 1.5], "label": "teksto supratimas sunkus"},
+    "C80": {"values": [2.0, 1.35, 1.35, 1.15, 1.15, 1.0], "label": "teksto supratimas lengvas su distraktorium"},
+    "C81": {"values": [2.0, 2.0, 2.0, 1.85, 1.85, 1.65], "label": "teksto supratimas vidutinis su distraktorium"},
+    "C82": {"values": [2.0, 2.0, 2.0, 2.0, 2.0, 1.85], "label": "teksto supratimas sunkus su distraktorium"},
+}
+
+const personalChlCoinBonusModifier = 1.1;
+
+function calculateTasksPerCorrectAnswerPoints (type) {
+
+    const userClass = userData?.knowledgeLvl;
+
+    if (!userClass) {
+      return
+    }
+
+    let taskInfoTemp = {
+        "userClass": userClass,
+        "lang": false,
+        "math": false,
+        "C1": false,
+        "C2": false,
+        "C3": false,
+        "C4": false,
+        "C5": false,
+        "C6": false,
+        "C7": false,
+        "C8": false,
+        "C9": false,
+        "C10": false,
+        "C11": false,
+        "C12": false,
+        "C13": false,
+        "C14": false,
+        "C15": false,
+        "C16": false,
+        "C17": false,
+        "C18": false,
+        "C19": false,
+        "C20": false,
+        "C21": false,
+        "C22": false,
+        "C23": false,
+        "C24": false,
+        "C25": false,
+        "C26": false,
+        "C27": false,
+        "C28": false,
+        "C29": false,
+        "C30": false,
+        "C31": false,
+        "C32": false,
+        "C33": false,
+        "C34": false,
+        "C35": false,
+        "C36": false,
+        "C37": false,
+        "C38": false,
+        "C41": false,
+        "C42": false,
+        "C47": false,
+        "C48": false,
+        "C49": false,
+        "C50": false,
+        "C51": false,
+        "C52": false,
+        "C58": false,
+        "C59": false,
+        "C60": false,
+        "C75": false,
+        "C76": false,
+        "C77": false,
+        "C80": false,
+        "C81": false,
+        "C82": false,
+        "remainder": false,
+        "mult-table-selection": [],
+        "correct-ans": 0,
+        "total-ans": 0
+    };
+
+    let total = pointWeights.base?.values[taskInfoTemp.userClass] ?? 1;
+
+    const skipTasks = ['C47', 'C48', 'userClass'];
+
+    if (type === "controller") {
+      // Mark C-flags from controller values
+      for (let key in controller) {
+          const val = controller[key];
+          if (taskInfoTemp.hasOwnProperty(val)) {
+              taskInfoTemp[val] = true;
+          }
+      }
+
+      if (controller.withRemainder) {
+          taskInfoTemp.remainder = true;
+      }
+
+      if (controller.modeChoice2 === "C18") {
+          taskInfoTemp["mult-table-selection"] = controller.selectedNumbers || [];
+      }
+
+      if (controller.mode === "lang") {
+          taskInfoTemp["C47"] = false;
+          taskInfoTemp["C48"] = false;
+          taskInfoTemp["remainder"] = false;
+      } else if (controller.mode === "math") {
+          taskInfoTemp["C49"] = false;
+          taskInfoTemp["C50"] = false;
+          taskInfoTemp["C51"] = false;
+          taskInfoTemp["C52"] = false;
+          taskInfoTemp["C58"] = false;
+          taskInfoTemp["C59"] = false;
+          taskInfoTemp["C60"] = false;
+          taskInfoTemp["C75"] = false;
+          taskInfoTemp["C76"] = false;
+          taskInfoTemp["C80"] = false;
+          taskInfoTemp["C81"] = false;
+          taskInfoTemp["C82"] = false;
+      }
+
+    // Helper to get task weight
+    const getTaskWeight = (task) => {
+        const taskWeightArray = pointWeights[task]?.values;
+        return taskWeightArray ? taskWeightArray[taskInfoTemp.userClass] : 1;
+    };
+
+    // Special handling for C18
+    const getC18Weight = (multSelection) => {
+        if (!Array.isArray(multSelection) || multSelection.length < 2) return 1;
+        const nums = multSelection.map(x => parseInt(x, 10));
+        if (nums.some(isNaN)) return 1;
+        const [first, second] = nums;
+        if (second === 1) return pointWeights.DL1?.values[taskInfoTemp.userClass] ?? 1;
+        if (second === 2) return pointWeights.DL2?.values[taskInfoTemp.userClass] ?? 1;
+        if (first === 10 && second === 10) return pointWeights.DL10?.values[taskInfoTemp.userClass] ?? 1;
+        return pointWeights.DLALL?.values[taskInfoTemp.userClass] ?? 1;
+    };
+
+    Object.keys(taskInfoTemp).forEach(task => {
+        if (!taskInfoTemp[task] || skipTasks.includes(task)) return;
+
+        let weight = getTaskWeight(task);
+
+        if (task === 'C18') {
+            weight *= getC18Weight(taskInfoTemp['mult-table-selection']);
+        }
+
+        total *= weight;
+    });
+
+  } else {
+    const parsedCurrentTaskInstructions = JSON.parse(type);
+
+    let tempController = {}
+    if (parsedCurrentTaskInstructions[0] === "math") {
+        tempController.mode = 'math';
+        tempController.modeChoice1 = parsedCurrentTaskInstructions[1];
+        tempController.modeChoice2 = parsedCurrentTaskInstructions[2];
+        tempController.selectedNumbers = parsedCurrentTaskInstructions[8];
+        tempController.withRemainder = parsedCurrentTaskInstructions[9];
+        tempController.modeChoice3 = parsedCurrentTaskInstructions[3];
+        tempController.modeChoice4 = parsedCurrentTaskInstructions[4];
+        tempController.modeChoice5 = parsedCurrentTaskInstructions[5];
+        tempController.modeChoice6 = parsedCurrentTaskInstructions[6];
+        tempController.modeChoice7 = parsedCurrentTaskInstructions[7];
+        tempController.modeChoice8 = "";
+        tempController.setTaskDuration = parsedCurrentTaskInstructions[10];
+
+    } else if (parsedCurrentTaskInstructions[0] === "lang") {
+        tempController.mode = 'lang';
+        tempController.classChoice = parsedCurrentTaskInstructions[1];
+        tempController.modeChoice1 = parsedCurrentTaskInstructions[2];
+        tempController.modeChoice2 = parsedCurrentTaskInstructions[3];
+        tempController.modeChoice3 = parsedCurrentTaskInstructions[4];
+        tempController.modeChoice4 = parsedCurrentTaskInstructions[5];
+        tempController.modeChoice5 = parsedCurrentTaskInstructions[6];
+        tempController.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[7];
+        tempController.questionFrequency = parsedCurrentTaskInstructions[8];
+        tempController.setTaskDuration = parsedCurrentTaskInstructions[9];
+    }
+
+      // Mark C-flags from controller values
+      for (let key in tempController) {
+          const val = tempController[key];
+          if (taskInfoTemp.hasOwnProperty(val)) {
+              taskInfoTemp[val] = true;
+          }
+      }
+
+      if (tempController.withRemainder) {
+          taskInfoTemp.remainder = true;
+      }
+
+      if (tempController.modeChoice2 === "C18") {
+          taskInfoTemp["mult-table-selection"] = tempController.selectedNumbers || [];
+      }
+
+      if (tempController.mode === "lang") {
+          taskInfoTemp["C47"] = false;
+          taskInfoTemp["C48"] = false;
+          taskInfoTemp["remainder"] = false;
+      } else if (tempController.mode === "math") {
+          taskInfoTemp["C49"] = false;
+          taskInfoTemp["C50"] = false;
+          taskInfoTemp["C51"] = false;
+          taskInfoTemp["C52"] = false;
+          taskInfoTemp["C58"] = false;
+          taskInfoTemp["C59"] = false;
+          taskInfoTemp["C60"] = false;
+          taskInfoTemp["C75"] = false;
+          taskInfoTemp["C76"] = false;
+          taskInfoTemp["C80"] = false;
+          taskInfoTemp["C81"] = false;
+          taskInfoTemp["C82"] = false;
+      }
+
+    // Helper to get task weight
+    const getTaskWeight = (task) => {
+        const taskWeightArray = pointWeights[task]?.values;
+        return taskWeightArray ? taskWeightArray[taskInfoTemp.userClass] : 1;
+    };
+
+    // Special handling for C18
+    const getC18Weight = (multSelection) => {
+        if (!Array.isArray(multSelection) || multSelection.length < 2) return 1;
+        const nums = multSelection.map(x => parseInt(x, 10));
+        if (nums.some(isNaN)) return 1;
+        const [first, second] = nums;
+        if (second === 1) return pointWeights.DL1?.values[taskInfoTemp.userClass] ?? 1;
+        if (second === 2) return pointWeights.DL2?.values[taskInfoTemp.userClass] ?? 1;
+        if (first === 10 && second === 10) return pointWeights.DL10?.values[taskInfoTemp.userClass] ?? 1;
+        return pointWeights.DLALL?.values[taskInfoTemp.userClass] ?? 1;
+    };
+
+    Object.keys(taskInfoTemp).forEach(task => {
+        if (!taskInfoTemp[task] || skipTasks.includes(task)) return;
+              console.log(taskInfoTemp[task])
+        let weight = getTaskWeight(task);
+
+        if (task === 'C18') {
+            weight *= getC18Weight(taskInfoTemp['mult-table-selection']);
+        }
+
+        total *= weight;
+    });
+}
+
+  total = Number(total.toFixed(2));
+  return total;
+}
+
+
+function displayCustomTaskPotentialEarnings () {
+  if (controller.modeChoice4 === "C39") {
+    document.querySelector(".custom-earnings-iki-holder").innerHTML = '';
+    const el = document.querySelector(".custom-coin-amount .coin-amount");
+    if (el) el.innerHTML = calculateTasksPerCorrectAnswerPoints("controller");
+    document.querySelector(".custom-coin-amount").onclick = function() {
+      openObjectPopup(
+        infoMessages['coin-amount-custom-timer'].content,
+        infoMessages['coin-amount-custom-timer'].title,
+        infoMessages['coin-amount-custom-timer'].subtitle
+      );
+    };
+  } else if (controller.modeChoice4 === "C40") {
+    const el = document.querySelector(".custom-coin-amount .coin-amount");
+    document.querySelector(".custom-coin-amount").onclick = function() {
+      openObjectPopup(
+        infoMessages['coin-amount-custom-question-number'].content,
+        infoMessages['coin-amount-custom-question-number'].title,
+        infoMessages['coin-amount-custom-question-number'].subtitle
+      );
+    };
+    document.querySelector(".custom-earnings-iki-holder").innerHTML = 'IKI';
+    if (el) el.innerHTML = Number((calculateTasksPerCorrectAnswerPoints("controller") * parseInt(questionNumberInputElement.value)).toFixed(2));
+  }
+}
+
+// POINTS CALCULATION END

@@ -817,6 +817,21 @@
     </div>
     </div>
 
+    <div id="object-popup" class="object-popup-overlay" style="display:none;">
+    <div class="object-popup-panel">
+        <button class="object-popup-close">&times;</button>
+        <div class="title-subtitle-inline-button-wrapper">
+        <div class="object-popup-title-subtitle-wrapper">
+        <div class="object-popup-title" id="object-popup-title"></div>
+        <div class="object-popup-subtitle" id="object-popup-subtitle"></div>
+        </div>
+        </div>
+        <div class="object-popup-content" id="object-popup-content">
+        <!-- Dynamic content goes here -->
+        </div>
+    </div>
+    </div>
+
 
     <nav class="main-navbar" id="mainNavbar">
       <div class="main-nav-container">
@@ -1032,6 +1047,7 @@ window.onload = function () {
     let filteredTextLibrary = [];
     let currentTextId;
     let answeredTexts = [];
+    let firstTimeChecking = true;
     window.mistakesSummary = {};
 
     function generateFilteredTextLibrary() {
@@ -1290,6 +1306,13 @@ window.onload = function () {
 
       if (allFieldsCorrect) {
         controller.answeredQuestionTracker++;
+
+        if (firstTimeChecking) {
+          controller.correctAnswersTracker++;
+        }
+
+        firstTimeChecking = true;
+      
         localStorage.setItem('controller', JSON.stringify(controller));
         if (controller.modeChoice4 === "C40") {
         questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
@@ -1305,6 +1328,9 @@ window.onload = function () {
       } else {
         trackHelpButtonCounter();
         controller.mistakesTracker++;
+
+        firstTimeChecking = false;
+
         recordTextComprehensionMistake()
         localStorage.setItem('controller', JSON.stringify(controller));
         mistakesTracker.innerHTML = `Klaidos: ${controller.mistakesTracker}`;
@@ -1662,6 +1688,9 @@ window.onload = function () {
           helpTracker = 0;
           controller.mistakesTracker = 0;
 					controller.answeredQuestionTracker = 0;
+          controller.correctAnswersTracker = 0;
+          firstTimeChecking = true;
+
           answeredTexts = [];
           mistakesSummary = {};
 

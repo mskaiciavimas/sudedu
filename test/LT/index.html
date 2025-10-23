@@ -128,6 +128,7 @@
 
 .submit-button-div {
   padding: 16px 0 0 0;
+  gap: 5px
 }
 
 .practice-outer-div {
@@ -266,6 +267,18 @@
 		z-index: -1;
 		opacity: 1;
 	}
+
+
+.submit-button-outer {
+    display: flex;
+    flex: 1 1 auto;
+}   
+
+.earnings-estimation-outer {
+    display: flex;
+    justify-content: end;
+    flex: 1 1 auto;
+}
 
 .submit-button {
   position: relative;
@@ -435,7 +448,7 @@ body.popup-active {
     max-width: 500px;
     align-items: center;
     justify-content: start;
-    padding: 20px;
+    padding: 15px;
 }
 
 .chl-card {
@@ -486,6 +499,8 @@ body.popup-active {
 
 .chl-card-header-left {
     flex: 1;
+    display: flex;
+    gap: 5px;
 }
 
 .chl-card-preview {
@@ -515,6 +530,7 @@ body.popup-active {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    align-self: center;
 }
 
 .chl-type-math {
@@ -737,7 +753,7 @@ body.popup-active {
     }
 
     .middle-div.wrapped {
-        padding: 20px;
+        padding: 15px;
     }
 }
 
@@ -1128,13 +1144,13 @@ body.popup-active {
 
                             <div class="modeChoice4_div">
                                 <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="modeChoice4" id="mode_choice_4" style="display: block;">
-                                    <option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>
                                     <option value="C40">NUSTATYTI VEIKSMŲ KIEKĮ</option>
+                                    <option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>
                                 </select>
                             </div>
 
                             <div class="timer-question-number-div">
-                            <div class="timer-input-div" id="timer-input-div">
+                            <div class="timer-input-div" id="timer-input-div" style="display: none;">
                                 <div class="input-group">
                                     <div class="input-wrapper">
                                         <button class="control-btn" 
@@ -1156,7 +1172,7 @@ body.popup-active {
                                     <h3 class="timer-choice-label">minutes</h3>
                                 </div>
                             </div>
-                            <div class="question-number-input-div" id="question-number-input-div" style="display: none;">
+                            <div class="question-number-input-div" id="question-number-input-div">
                                 <div class="input-group">
                                     <div class="input-wrapper">
                                         <button class="control-btn" 
@@ -1175,7 +1191,7 @@ body.popup-active {
                                                 ontouchend="stopHold()"
                                                 ontouchcancel="stopHold()">+</button>
                                     </div>
-                                    <h3 class="answer-number-label">veiksmus</h3>
+                                    <h3 class="answer-number-label">veiksmų</h3>
                                 </div>
                             </div>
                             </div>
@@ -1183,7 +1199,35 @@ body.popup-active {
                     </div>
 				</div>
             <div class="submit-button-div">
-				<button class="submit-button">Pradėti</button>
+                <div class="earnings-estimation-outer">
+                <button class="earnings-estimation-display info-button custom-coin-amount"
+                    onclick="openObjectPopup(infoMessages['coin-amount-custom'].content, infoMessages['coin-amount-custom'].title, infoMessages['coin-amount-custom'].subtitle)">
+                    <div class="potetnital-earnings-amount-and-info-holder">
+                        <span class="potetnital-earnings-coin-icon-and-amount-holder">
+                        <span class="earnings-iki-holder custom-earnings-iki-holder">
+                        </span>
+                        <span class="coin-icon">
+                                <img src="../images/icons/icon-sudedu-coin.png">
+                        </span>
+                        <span class="coin-amount"></span>
+                        </span>
+                        <div 
+                            class="info-icon"
+                            >
+                        <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 256 256" xml:space="preserve">
+                        <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
+                            <path d="M 49.083 71.489 l 5.776 -21.96 l 4.186 -15.247 c 3.497 -16.18 -32.704 -2.439 -38.002 1.695 l 0.425 4.853 c 4.824 -3.395 23.091 -7.744 19.449 4.275 l -1.634 6.135 l 0 0 l -8.329 31.071 c -3.497 16.18 32.704 2.439 38.002 -1.695 l -0.425 -4.853 C 63.708 79.159 45.441 83.508 49.083 71.489 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: currentColor; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                            <circle cx="53.871" cy="11.201" r="11.201" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: currentColor; fill-rule: nonzero; opacity: 1;" transform="  matrix(1 0 0 1 0 0) "/>
+                        </g>
+                        </svg>
+                        </div>
+                    </div>
+                </button>
+            </div>
+
+                <div class="submit-button-outer">
+				    <button class="submit-button">Pradėti</button>
+                </div>
 			</div>
             </div>
             <div class="personal-chl">
@@ -1208,8 +1252,8 @@ body.popup-active {
 	<script>
         let userClass;
 
-
 		function submitSelection() {
+            resetControllerTaskSettings();
 			let modeChoiceSelection = document.querySelector('#mode_choice').value;
 			if (localStorage.getItem('controller') !== null) {
 				controller = JSON.parse(localStorage.getItem('controller'))
@@ -1320,6 +1364,20 @@ body.popup-active {
                 controller.taskCompleted = false;
                 localStorage.setItem('controller', JSON.stringify(controller));
             }
+
+            if (!userData || userData.accType === "teacher") {
+                document.querySelectorAll('.earnings-estimation-outer').forEach(el => {
+                    el.style.display = 'none';
+                });
+                document.querySelector(".submit-button-outer").style.justifyContent = "center";
+            } else {
+                updateControllerCustomTaskChoices();
+                displayCustomTaskPotentialEarnings();
+            }
+
+            if (userData?.accType === "teacher") {
+                document.querySelector(".personal-chl").style.display = "none";
+            }
             
 			document.querySelector('#template-container').removeAttribute('hidden');
 		};
@@ -1411,7 +1469,7 @@ function showClassPopup() {
     
     // Add event listener to Next button
     nextButton.addEventListener('click', function() {
-        if (selectedClass) {
+        if (selectedClass !== null && selectedClass !== undefined) {
             // Set localStorage with selected class and expiration
             setClassLocalStorage(selectedClass);
 
@@ -1596,6 +1654,86 @@ function displayPersonalChl() {
         badge.textContent = typeLabels[challenge.type] || challenge.type;
 
         headerLeft.appendChild(badge);
+
+        if (userData && userData.knowledgeLvl) {
+            const potentialEarningsDisplay = document.createElement('div');
+
+            let numberOfQuestions;
+            let answeringMode;
+            let earningsDiplay = "";
+
+            const parsedCurrentTaskInstructions = JSON.parse(challenge.chl)
+            if (parsedCurrentTaskInstructions[0] === "math") {
+                numberOfQuestions = parsedCurrentTaskInstructions[10]
+                answeringMode = parsedCurrentTaskInstructions[4]
+            } else if (parsedCurrentTaskInstructions[0] === "lang") {
+                numberOfQuestions = parsedCurrentTaskInstructions[9]
+                answeringMode = parsedCurrentTaskInstructions[5]
+            }
+
+            if (answeringMode === "C39") {
+                earningsDiplay = `
+                    <div class="earnings-estimation-outer">
+                        <button class="earnings-estimation-display info-button"
+                            onclick="openObjectPopup(infoMessages['coin-amount-custom-timer'].content, infoMessages['coin-amount-custom-timer'].title, infoMessages['coin-amount-custom-timer'].subtitle)">
+                            <div class="potetnital-earnings-amount-and-info-holder">
+                                <span class="potetnital-earnings-coin-icon-and-amount-holder">
+                                <span class="earnings-iki-holder">
+                                </span>
+                                <span class="coin-icon">
+                                        <img src="../images/icons/icon-sudedu-coin.png">
+                                </span>
+                                <span class="coin-amount">${Number((calculateTasksPerCorrectAnswerPoints(challenge.chl)*personalChlCoinBonusModifier).toFixed(2))}</span>
+                                </span>
+                                <div 
+                                    class="info-icon"
+                                    >
+                                <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 256 256" xml:space="preserve">
+                                <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
+                                    <path d="M 49.083 71.489 l 5.776 -21.96 l 4.186 -15.247 c 3.497 -16.18 -32.704 -2.439 -38.002 1.695 l 0.425 4.853 c 4.824 -3.395 23.091 -7.744 19.449 4.275 l -1.634 6.135 l 0 0 l -8.329 31.071 c -3.497 16.18 32.704 2.439 38.002 -1.695 l -0.425 -4.853 C 63.708 79.159 45.441 83.508 49.083 71.489 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: currentColor; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                                    <circle cx="53.871" cy="11.201" r="11.201" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: currentColor; fill-rule: nonzero; opacity: 1;" transform="  matrix(1 0 0 1 0 0) "/>
+                                </g>
+                                </svg>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                    `
+            } else if (answeringMode === "C40") {
+                earningsDiplay = `
+                    <div class="earnings-estimation-outer">
+                        <button class="earnings-estimation-display info-button"
+                            onclick="openObjectPopup(infoMessages['coin-amount-custom-question-number'].content, infoMessages['coin-amount-custom-question-number'].title, infoMessages['coin-amount-custom-question-number'].subtitle)">
+                            <div class="potetnital-earnings-amount-and-info-holder">
+                                <span class="potetnital-earnings-coin-icon-and-amount-holder">
+                                <span class="earnings-iki-holder">
+                                    IKI
+                                </span>
+                                <span class="coin-icon">
+                                        <img src="../images/icons/icon-sudedu-coin.png">
+                                </span>
+                                <span class="coin-amount">${Number((calculateTasksPerCorrectAnswerPoints(challenge.chl) * numberOfQuestions * personalChlCoinBonusModifier).toFixed(2))}</span>
+                                </span>
+                                <div 
+                                    class="info-icon"
+                                    >
+                                <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 256 256" xml:space="preserve">
+                                <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
+                                    <path d="M 49.083 71.489 l 5.776 -21.96 l 4.186 -15.247 c 3.497 -16.18 -32.704 -2.439 -38.002 1.695 l 0.425 4.853 c 4.824 -3.395 23.091 -7.744 19.449 4.275 l -1.634 6.135 l 0 0 l -8.329 31.071 c -3.497 16.18 32.704 2.439 38.002 -1.695 l -0.425 -4.853 C 63.708 79.159 45.441 83.508 49.083 71.489 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: currentColor; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                                    <circle cx="53.871" cy="11.201" r="11.201" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: currentColor; fill-rule: nonzero; opacity: 1;" transform="  matrix(1 0 0 1 0 0) "/>
+                                </g>
+                                </svg>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                    `
+            }
+
+            potentialEarningsDisplay.innerHTML = earningsDiplay
+            
+            headerLeft.appendChild(potentialEarningsDisplay);
+        }
 
         const expandIcon = document.createElement('div');
         expandIcon.className = 'chl-expand-icon';
@@ -1851,8 +1989,8 @@ window.addEventListener('load', checkWrap);
 
 function handleKnowledgeLvlStatus () {
     const knowledgeLvlStatus = getClassLocalStorage();
-
-    if ((userData && userData.knowledgeLvl) || knowledgeLvlStatus) {
+    console.log()
+    if ((userData && userData.knowledgeLvl) || (knowledgeLvlStatus !== null && knowledgeLvlStatus !== undefined)) {
         displayPersonalChl();
     } else {
         showClassPopup();

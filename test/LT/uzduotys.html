@@ -801,6 +801,8 @@
         .complete-task-holder {
             display: flex;
             justify-content: end;
+            margin-top: 10px;
+            gap: 5px;
         }
 
         #complete-task-button {
@@ -816,7 +818,6 @@
             border: none;
             /*border: 1px solid #286D8A;*/
             color: #F5F5F7;
-            margin-top: 10px;
             letter-spacing: 0.01em;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             /*box-shadow: 
@@ -1950,6 +1951,21 @@
     </div>
     </div>
 
+    <div id="object-popup" class="object-popup-overlay" style="display:none;">
+    <div class="object-popup-panel">
+        <button class="object-popup-close">&times;</button>
+        <div class="title-subtitle-inline-button-wrapper">
+        <div class="object-popup-title-subtitle-wrapper">
+        <div class="object-popup-title" id="object-popup-title"></div>
+        <div class="object-popup-subtitle" id="object-popup-subtitle"></div>
+        </div>
+        </div>
+        <div class="object-popup-content" id="object-popup-content">
+        <!-- Dynamic content goes here -->
+        </div>
+    </div>
+    </div>
+
    <nav class="main-navbar" id="mainNavbar">
         <div class="main-nav-container">
             <!-- Logo -->
@@ -2302,13 +2318,13 @@
 
                             <div class="modeChoice4_div">
                                 <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="modeChoice4" id="mode_choice_4" style="display: block;">
-                                    <option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>
                                     <option value="C40">NUSTATYTI VEIKSMŲ KIEKĮ</option>
+                                    <option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>
                                 </select>
                             </div>
 
                             <div class="timer-question-number-div">
-                                <div class="timer-input-div" id="timer-input-div">
+                                <div class="timer-input-div" id="timer-input-div" style="display: none;">
                                     <div class="input-group">
                                         <div class="input-wrapper">
                                             <button class="control-btn" 
@@ -2330,7 +2346,7 @@
                                         <h3 class="timer-choice-label">minutes</h3>
                                     </div>
                                 </div>
-                                <div class="question-number-input-div" id="question-number-input-div" style="display: none;">
+                                <div class="question-number-input-div" id="question-number-input-div">
                                     <div class="input-group">
                                         <div class="input-wrapper">
                                             <button class="control-btn" 
@@ -2349,7 +2365,7 @@
                                                     ontouchend="stopHold()"
                                                     ontouchcancel="stopHold()">+</button>
                                         </div>
-                                        <h3 class="answer-number-label">veiksmus</h3>
+                                        <h3 class="answer-number-label">veiksmų</h3>
                                     </div>
                                 </div>
                             </div>
@@ -2545,8 +2561,9 @@
                             <div id="task-description-for-student"></div>
                         </div>
                     </div>
-                    <div class="complete-task-holder">
-                        <button id="complete-task-button" class="" onclick="completeTask()" style="display: none;">Atlikti užduotį</button>
+                    <div class="complete-task-holder" style="display: none;">
+                        <div class="coin-display-holder"></div>
+                        <button id="complete-task-button" class="" onclick="completeTask()">Atlikti užduotį</button>
                     </div>
 
                     <div id="frequent-mistakes-container" style="flex-direction: column; justify-content: space-between;" hidden>
@@ -2696,6 +2713,7 @@
         const expandStudentInfoButton = document.getElementById('expand-student-info-button')
 
         const completeTaskButton = document.getElementById('complete-task-button');
+        const completeTaskButtonHolder = document.querySelector('.complete-task-holder');
 
         const frequentMistakeContainerElement = document.getElementById("frequent-mistakes-container");
 
@@ -3093,7 +3111,7 @@
             studentScoreDurationForStudent.innerHTML = "";
             document.querySelector("#frequent-mistakes-container").style.display = "none";
             document.querySelector('.task-info-holder-student').style.display = "none";
-            completeTaskButton.style.display = "none";
+            completeTaskButtonHolder.style.display = "none";
         }
 
         let studentStatisticsCompletedTasks = document.querySelector("#student-statistics-completed-tasks");
@@ -3556,9 +3574,83 @@
             }
 
             if (task.status) {
-                completeTaskButton.style.display = "none"
+                completeTaskButtonHolder.style.display = "none";
             } else {
-                completeTaskButton.style.display = "block"
+                completeTaskButtonHolder.style.display = "flex";
+
+                let numberOfQuestions;
+                let answeringMode;
+                let earningsDiplay = "";
+
+                const parsedCurrentTaskInstructions = JSON.parse(currentTaskInstructions);
+                if (parsedCurrentTaskInstructions[0] === "math") {
+                    numberOfQuestions = parsedCurrentTaskInstructions[10]
+                    answeringMode = parsedCurrentTaskInstructions[4]
+                } else if (parsedCurrentTaskInstructions[0] === "lang") {
+                    numberOfQuestions = parsedCurrentTaskInstructions[9]
+                    answeringMode = parsedCurrentTaskInstructions[5]
+                }
+
+                if (answeringMode === "C39") {
+                    earningsDiplay = `
+                        <div class="earnings-estimation-outer">
+                            <button class="earnings-estimation-display info-button"
+                                onclick="openObjectPopup(infoMessages['coin-amount-custom-timer'].content, infoMessages['coin-amount-custom-timer'].title, infoMessages['coin-amount-custom-timer'].subtitle)">
+                                <div class="potetnital-earnings-amount-and-info-holder">
+                                    <span class="potetnital-earnings-coin-icon-and-amount-holder">
+                                    <span class="earnings-iki-holder">
+                                    </span>
+                                    <span class="coin-icon">
+                                            <img src="../images/icons/icon-sudedu-coin.png">
+                                    </span>
+                                    <span class="coin-amount">${Number((calculateTasksPerCorrectAnswerPoints(currentTaskInstructions)).toFixed(2))}</span>
+                                    </span>
+                                    <div 
+                                        class="info-icon"
+                                        >
+                                    <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 256 256" xml:space="preserve">
+                                    <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
+                                        <path d="M 49.083 71.489 l 5.776 -21.96 l 4.186 -15.247 c 3.497 -16.18 -32.704 -2.439 -38.002 1.695 l 0.425 4.853 c 4.824 -3.395 23.091 -7.744 19.449 4.275 l -1.634 6.135 l 0 0 l -8.329 31.071 c -3.497 16.18 32.704 2.439 38.002 -1.695 l -0.425 -4.853 C 63.708 79.159 45.441 83.508 49.083 71.489 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: currentColor; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                                        <circle cx="53.871" cy="11.201" r="11.201" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: currentColor; fill-rule: nonzero; opacity: 1;" transform="  matrix(1 0 0 1 0 0) "/>
+                                    </g>
+                                    </svg>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                        `
+                } else if (answeringMode === "C40") {
+                    earningsDiplay = `
+                        <div class="earnings-estimation-outer">
+                            <button class="earnings-estimation-display info-button"
+                                onclick="openObjectPopup(infoMessages['coin-amount-custom-question-number'].content, infoMessages['coin-amount-custom-question-number'].title, infoMessages['coin-amount-custom-question-number'].subtitle)">
+                                <div class="potetnital-earnings-amount-and-info-holder">
+                                    <span class="potetnital-earnings-coin-icon-and-amount-holder">
+                                    <span class="earnings-iki-holder">
+                                        IKI
+                                    </span>
+                                    <span class="coin-icon">
+                                            <img src="../images/icons/icon-sudedu-coin.png">
+                                    </span>
+                                    <span class="coin-amount">${Number((calculateTasksPerCorrectAnswerPoints(currentTaskInstructions) * numberOfQuestions).toFixed(2))}</span>
+                                    </span>
+                                    <div 
+                                        class="info-icon"
+                                        >
+                                    <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 256 256" xml:space="preserve">
+                                    <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
+                                        <path d="M 49.083 71.489 l 5.776 -21.96 l 4.186 -15.247 c 3.497 -16.18 -32.704 -2.439 -38.002 1.695 l 0.425 4.853 c 4.824 -3.395 23.091 -7.744 19.449 4.275 l -1.634 6.135 l 0 0 l -8.329 31.071 c -3.497 16.18 32.704 2.439 38.002 -1.695 l -0.425 -4.853 C 63.708 79.159 45.441 83.508 49.083 71.489 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: currentColor; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                                        <circle cx="53.871" cy="11.201" r="11.201" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: currentColor; fill-rule: nonzero; opacity: 1;" transform="  matrix(1 0 0 1 0 0) "/>
+                                    </g>
+                                    </svg>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                        `
+                }
+
+                document.querySelector(".coin-display-holder").innerHTML = earningsDiplay
             }
 
             if (task.result !== '') {

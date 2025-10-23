@@ -407,6 +407,85 @@ input[type="radio"] {
   font-size: 1.2rem !important;
 }
 
+.earnings-estimation-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 2px 10px 2px 4px;
+    border-radius: 15px;
+}
+
+.potetnital-earnings-amount-and-info-holder {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 5px 0 0;
+}
+
+.potetnital-earnings-coin-icon-and-amount-holder {
+  display: flex;
+  align-items: center;
+}
+
+.earnings-iki-holder {
+  font-weight: 600;
+  font-size: 1rem;
+  padding-right: 3px;
+}
+
+.coin-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.coin-icon img {
+    width: 30px;
+    height: 30px;
+}
+
+.coin-amount {
+    font-weight: 600;
+    color: #92400e;
+    font-size: 1rem;
+}
+
+.info-icon {
+    position: absolute;
+    top: 0;
+    right: -0.4rem;
+    width: 0.65rem;
+    height: 0.65rem;
+    color: grey;
+    font-weight: bold;
+    font-size: 1rem;
+    line-height: 1rem;
+    background-color: transparent;
+    border-radius: 1rem;
+    border: none;
+    opacity: 0.3;
+}
+
+.info-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+/* Hover ir Focus efektai */
+.info-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.info-button:hover .info-icon {
+  opacity: 1;
+}
+
 /*nauja */
 
 .empty-placeholder-between-options {
@@ -839,6 +918,64 @@ button:disabled {
       justify-content: space-around;
   }
 
+  .object-popup-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.object-popup-panel {
+  background: #F5F5F7;
+  border-radius: 20px;
+  padding: 25px 20px 20px 20px;
+  width: 500px;
+  max-width: 90%;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  position: relative;
+  animation: object-popup-fadeInUp 0.25s ease-out;
+}
+
+.object-popup-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+  padding-top: 0;
+}
+
+.object-popup-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.object-popup-subtitle {
+    font-size: 1rem;
+    margin: 5px 0;
+}
+
+.object-popup-content {
+  margin-top: 10px;
+}
+
+.object-popup-title-subtitle-wrapper {
+    flex: 1;
+}
+
+@keyframes object-popup-fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
   .btn-confirm {
   font-size: 1rem;
   background: linear-gradient(135deg, #ff8073, #e74c3c);
@@ -1050,6 +1187,11 @@ button:disabled {
   .rasyba-options-label {
 		font-size: 1.1rem !important;
 	}
+
+  .object-popup-panel {
+      max-width: 85vw;
+      width: 85vw;
+  }
 }
 
 @media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)  {
@@ -1137,4 +1279,20 @@ button:disabled {
     padding: 10px 18px;
     font-size: 1.5rem;
 }
+
+ .object-popup-title {
+        font-size: 2rem;
+    }
+
+  .object-popup-subtitle {
+      font-size: 1.25rem;
+  }
+
+  .object-popup-panel {
+      width: 600px;
+  }
+
+  .object-popup-close {
+    font-size: 2rem;
+  }
 }

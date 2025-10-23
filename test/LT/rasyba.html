@@ -96,7 +96,6 @@
 	#field-for-text {
 		width: 100%;
 		max-height: 100%;
-		overflow-y: auto;
 		background: rgba(255, 255, 255, 0.4);
 		border: 1px solid rgba(255, 255, 255, 0.2);
 		backdrop-filter: blur(10px);
@@ -106,16 +105,45 @@
 		justify-content: start;
 	}
 
+	#field-for-text-outer {
+		flex: 1 1 auto;
+		width: 100%;
+		max-height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+		overflow-y: auto;
+	}
+
 	.field-for-text-outer-holder {
 		flex: 1;
+		height: 100%;
+		flex-direction: column;
 		overflow: hidden;
 		background: rgba(255, 255, 255, 0.15);
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 25px;
 		padding: 15px;
 		display: flex;
-		justify-content: center;
-		align-items: center;
+		justify-content: start;
+		align-items: start;
+		position: relative;
+	}
+
+	#increase-no-of-sentences,
+	#decrease-no-of-sentences {
+		background: transparent;
+		border: none;
+		font-size: 2rem;
+		color: rgba(255, 255, 255, 0.4);
+		cursor: pointer;
+		padding: 0;
+		font-weight: 800;
+	}
+
+	#decrease-no-of-sentences {
+		margin-right: 2.5px;
 	}
 
 	.sakiniai {
@@ -446,9 +474,11 @@
 
 #fireworks-div {
   position: absolute;
-  bottom: -50%;
-  right: 0;
+  top: 5%;
+  right: 5%;
+  max-height: 300px;
   width: 250px;
+  z-index: 1000;
 }
 
 .grammar-view-selector {
@@ -548,6 +578,15 @@
 
 	.grammar-view-selector {
 		font-size: 1rem;
+	}
+
+	#sentence-number-selector {
+		margin: 5px 0 0 20px;
+	}
+
+	#increase-no-of-sentences,
+	#decrease-no-of-sentences {
+		font-size: 1.5rem;
 	}
 }
 
@@ -674,6 +713,21 @@
 		</div>
 	</div>
 
+	<div id="object-popup" class="object-popup-overlay" style="display:none;">
+    <div class="object-popup-panel">
+        <button class="object-popup-close">&times;</button>
+        <div class="title-subtitle-inline-button-wrapper">
+        <div class="object-popup-title-subtitle-wrapper">
+        <div class="object-popup-title" id="object-popup-title"></div>
+        <div class="object-popup-subtitle" id="object-popup-subtitle"></div>
+        </div>
+        </div>
+        <div class="object-popup-content" id="object-popup-content">
+        <!-- Dynamic content goes here -->
+        </div>
+    </div>
+    </div>
+
 	<nav class="main-navbar" id="mainNavbar">
 		<div class="main-nav-container">
 			<!-- Logo -->
@@ -716,7 +770,7 @@
 						<h3 id="answer-tracker"></h3>
 					</div>
 					<div>
-						<h3 id="mistake-tracker">Teisingai: 0/0</h3>
+						<h3 id="mistake-tracker"></h3>
 					</div>
 			</div>
 		</div>
@@ -736,21 +790,29 @@
 		</div>
 		</div>
 		
-	
 		<div class="field-for-text-outer-holder">
-			<div id="field-for-text" style="position: relative;" class="field">
-			<textarea id="hidden-input" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false"></textarea>
 			<div id="fireworks-div" class="image-container fireworks-div"></div>
-			<div id="field-for-sentences"></div>
-			<div id="field-for-final-message"></div>
-			<div id="restart-reset-button-row" class="row justify-content-center align-items-center" style="display: none;">
-				<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
-					<div id="reset-mistake-buttons" class="col-12 d-flex justify-content-center align-items-center">
-						<div class="col-12 d-flex position-relative justify-content-center align-items-center">
-							<div class="d-flex justify-content-end align-items-center summary-div">
-								<button class="summary-button">Klaidos</button>
-							</div>
+			<div id="sentence-number-selector-holder">
+				<div id="sentence-number-selector">
+					<button id="decrease-no-of-sentences">−</button>
+					<button id="increase-no-of-sentences">+</button>
+				</div>
+			</div>
 
+			<div id="field-for-text-outer">
+			<div id="field-for-text" style="position: relative;" class="field">
+				<textarea id="hidden-input" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false"></textarea>
+				<div id="field-for-sentences"></div>
+				<div id="field-for-final-message"></div>
+				<div id="restart-reset-button-row" class="row justify-content-center align-items-center" style="display: none;">
+					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
+						<div id="reset-mistake-buttons" class="col-12 d-flex justify-content-center align-items-center">
+							<div class="col-12 d-flex position-relative justify-content-center align-items-center">
+								<div class="d-flex justify-content-end align-items-center summary-div">
+									<button class="summary-button">Klaidos</button>
+								</div>
+
+							</div>
 						</div>
 					</div>
 				</div>
@@ -821,14 +883,12 @@ window.onload = function () {
 		return null; // Return null or empty object in case of error
 	}))).then(([sentenceLibrary]) => {
 
+		let questionsToDisplay = 1;
 		let sakiniai = [];
 		window.atsakymai = {};
 		let questionId = 1;
 		window.mistakeRecords = {};
-		let questionsToDisplay = Number(controller.modeChoice2);
-		let totalSentencesCompleted = 0;
 		let firstTimeChecking = true;
-		let totalCorrectAnswers = 0;
     	let currentAnswerAttempts = 0;
 		const maximumQuestionFrequencyPerWord = controller.questionFrequency;
 		let allowAdjacentEndlessWords;
@@ -916,8 +976,6 @@ window.onload = function () {
 				"įsi-r": ["1kl", "2kl", "3kl", "4kl"]
 			}
 
-			// Function to get allowed matching categories
-
 			function getAllowedMatchingCategories(category, rules) {
 					// Check if category is an array or a single string
 					if (Array.isArray(category)) {
@@ -991,7 +1049,7 @@ window.onload = function () {
 				shuffleArray(tempfilteredSentenceLibrary);
 			}
 
-			let noOfQuestionsGeneratedPerRound = questionsToDisplay * Object.keys(conditions).length;
+			let noOfQuestionsGeneratedPerRound = 5 * Object.keys(conditions).length;
 
 			function assembleAndFormatSentences() {
 				sakiniai = [];
@@ -1437,8 +1495,28 @@ window.onload = function () {
 		const resetMistakeButtonsElement = document.querySelector('#restart-reset-button-row');
 
 		if (controller.modeChoice4 === "C40") {
-			answerTrackerElement.innerHTML = `Atlikta: ${totalSentencesCompleted}/${controller.questionNumber}`;
+			answerTrackerElement.innerHTML =`Atlikta: ${controller.randomSelection[2] || 0}/${controller.questionNumber}`;
 		}
+
+		// Function to get allowed matching categories
+
+		document.getElementById('increase-no-of-sentences').addEventListener('click', () => {
+		if (questionsToDisplay < 5) {
+			questionsToDisplay++;
+			displaySentences();
+			document.getElementById('help-toggle').checked = false;
+			helpToggle();
+		}
+		});
+
+		document.getElementById('decrease-no-of-sentences').addEventListener('click', () => {
+		if (questionsToDisplay > 1) {
+			questionsToDisplay--;
+			displaySentences();
+			document.getElementById('help-toggle').checked = false;
+			helpToggle();
+		}
+		});
 
 		function displaySentences() {
 			styleGrammarPage();
@@ -1449,26 +1527,29 @@ window.onload = function () {
 			document.getElementById('show-answers').style.visibility = "hidden";
 			document.getElementById('field-for-final-message').innerHTML = '';
 
-			if (controller.modeChoice4 === "C39") {
-				if (questionsToDisplay > sakiniai.length) {
-					assembleAndFormatSentences();
-				}
-			} else if (controller.modeChoice4 === "C40") {
-				if ((controller.questionNumber - totalSentencesCompleted) < questionsToDisplay) {
-					questionsToDisplay = controller.questionNumber - totalSentencesCompleted
-				}
-				totalSentencesCompleted = totalSentencesCompleted + questionsToDisplay
-				if (questionsToDisplay > sakiniai.length) {
-					assembleAndFormatSentences();
+			if (controller.randomSelection.length === 0 || ((controller.randomSelection.length !== 0 && 5 > controller.randomSelection[0].length) && 5 > sakiniai.length)) {
+				controller.randomSelection[0] = [];
+				controller.randomSelection[1] = {};
+				localStorage.setItem("controller", JSON.stringify(controller));
+				assembleAndFormatSentences();
+			}
+
+			if (controller.modeChoice4 === "C40") {
+				if ((controller.questionNumber - controller.randomSelection[2]) < questionsToDisplay) {
+					questionsToDisplay = controller.questionNumber - controller.randomSelection[2];
 				}
 			}
 
 			let subSakiniai = [];
+			if (controller.randomSelection.length === 0 || controller.randomSelection[0].length < 5) {
 
-			if (controller.randomSelection.length === 0) {
+				if (controller.randomSelection[0]) {
+					subSakiniai.push(...controller.randomSelection[0]);
+				}
+
 				// Select random unique indices
 				const selectedIndices = new Set();
-				while (selectedIndices.size < questionsToDisplay) {
+				while (selectedIndices.size <= (5 - subSakiniai.length)) {
 					const randomIndex = Math.floor(Math.random() * sakiniai.length);
 					selectedIndices.add(randomIndex);
 				}
@@ -1485,7 +1566,8 @@ window.onload = function () {
 				const remainingSakiniai = sakiniai.filter((_, index) => !selectedIndices.has(index));
 				sakiniai = remainingSakiniai;
 
-				controller.randomSelection = [subSakiniai, atsakymai]
+				controller.randomSelection[0] = subSakiniai;
+				controller.randomSelection[1] = atsakymai;
 				localStorage.setItem("controller", JSON.stringify(controller));
 			} else {
 				subSakiniai = controller.randomSelection[0];
@@ -1493,7 +1575,7 @@ window.onload = function () {
 			}
 
 			// Set the inner HTML of the text container
-			document.getElementById("field-for-sentences").innerHTML = subSakiniai.join('');
+			document.getElementById("field-for-sentences").innerHTML = subSakiniai.slice(0, questionsToDisplay).join('');
 
 			// Restrict input to Lithuanian letters and spaces for the question inputs
 			document.querySelectorAll('.question-input').forEach(input => {
@@ -1544,7 +1626,6 @@ window.onload = function () {
 		function initiateTheProgram() {
 			if (!controller.questionsStopped) {
 				filterSentenceLibrary();
-				assembleAndFormatSentences();
 				displaySentences();
 				toggleHelpButton();
 				helpToggle();
@@ -1559,7 +1640,7 @@ window.onload = function () {
 			} else {
 				formatFinalMessageForGrammar();
 			}
-	}
+		}
 
 
 		initiateTheProgram();
@@ -1670,13 +1751,14 @@ function checkAnswers() {
 			input.classList.remove('wrong-answer');
 			input.disabled = true;
 			if (firstTimeChecking) {
-				totalCorrectAnswers++;
+				controller.correctAnswersTracker++;
 			}
 		} else {
 			input.classList.add('wrong-answer');
 			input.classList.remove('correct-answer');
 			answersCorrect = false;
-			controller.mistakesTracker+=1;
+			controller.mistakesTracker++;
+			localStorage.setItem("controller", JSON.stringify(controller));
 			recordGrammarMistakes(input.id, inputValue);
 		}
 
@@ -1688,20 +1770,25 @@ function checkAnswers() {
 
 	if (firstTimeChecking) {
 		controller.answeredQuestionTracker += NumberOfQuestionsInRound;
-		localStorage.setItem('controller', JSON.stringify(controller));
-		document.getElementById('mistake-tracker').innerHTML = `Teisingai: ${totalCorrectAnswers}/${controller.answeredQuestionTracker}`;
+		document.getElementById('mistake-tracker').innerHTML = `Teisingai: ${controller.correctAnswersTracker}/${controller.answeredQuestionTracker}`;
 		localStorage.setItem('controller', JSON.stringify(controller));
 	}
 
 	if (answersCorrect) {
 		allAnswersCorrect = true;
-		if (controller.modeChoice4 === "C40") {
-			answerTrackerElement.innerHTML = `Atlikta: ${totalSentencesCompleted}/${controller.questionNumber}`;
+
+		controller.randomSelection[0].splice(0, questionsToDisplay);
+
+		if (controller.randomSelection[2] === undefined || controller.randomSelection[2] === null) {
+			controller.randomSelection[2] = 0;
 		}
 
-		controller.correctAnswerTracker = totalCorrectAnswers
+		controller.randomSelection[2] = controller.randomSelection[2] + questionsToDisplay;
 
-		controller.randomSelection = [];
+		if (controller.modeChoice4 === "C40") {
+			answerTrackerElement.innerHTML = `Atlikta: ${controller.randomSelection[2]}/${controller.questionNumber}`;
+		}
+
 		localStorage.setItem("controller", JSON.stringify(controller));
 
 	} else {
@@ -1756,7 +1843,7 @@ function helpToggle() {
 
 			function nextQuestion() {
 				if (controller.modeChoice4 === "C40") {
-					if (totalSentencesCompleted === controller.questionNumber) {
+					if (controller.randomSelection[2] === controller.questionNumber) {
 						localStorage.setItem("elapsedTime", timerDisplay.textContent);
 						controller.taskCompleted = true;
 						formatFinalMessageForGrammar();
@@ -1824,17 +1911,16 @@ function helpToggle() {
 					window.mistakeRecords = {};
 
 					document.getElementById('mistake-tracker').innerHTML = `Teisingai: 0/0`;
-					totalSentencesCompleted = 0;
-					questionsToDisplay = Number(controller.modeChoice2);
+					controller.randomSelection[2] = 0;
 					if (controller.modeChoice4 === "C40") {
-						answerTrackerElement.innerHTML = `Atlikta: ${totalSentencesCompleted}/${controller.questionNumber}`;
+						answerTrackerElement.innerHTML = `Atlikta: ${controller.randomSelection[2]}/${controller.questionNumber}`;
 					}
 					firstTimeChecking = true;
 					controller.randomSelection = [];
 					controller.currentMistakes = [];
 					controller.mistakesTracker = 0;
 					controller.answeredQuestionTracker = 0;
-					totalCorrectAnswers = 0;
+					controller.correctAnswersTracker = 0;
 					atsakymai = {};
 					questionId = 1;
 					controller.tempTracking = true;
@@ -1908,6 +1994,9 @@ if (controller.questionsStopped) {
 		timerDisplay.textContent = "00:00:00";
 	}
 }
+
+document.getElementById('mistake-tracker').innerHTML = `Teisingai: ${controller.correctAnswersTracker}/${controller.answeredQuestionTracker}`;
+
 
 window.addEventListener("beforeunload", () => {
 	if (!redirectingToAuthentication) {

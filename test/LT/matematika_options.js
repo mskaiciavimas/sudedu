@@ -604,16 +604,16 @@ function updateModeChoice4Options () {
 	document.getElementById('mode_choice_4').innerHTML = '';
 	if (document.getElementById('mode_choice').value === "kalba") {
 		if (document.getElementById('mode_choice_8').value === "tekstas") {
-			document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
 			document.getElementById('mode_choice_4').innerHTML += '<option value="C40">NUSTATYTI TEKSTŲ KIEKĮ</option>';
+            document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
 
 		} else if (document.getElementById('mode_choice_8').value === "rasyba") {
-			document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
 			document.getElementById('mode_choice_4').innerHTML += '<option value="C40">NUSTATYTI SAKINIŲ KIEKĮ</option>';
+            document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
 		}
 	} else {
-		document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
 		document.getElementById('mode_choice_4').innerHTML += '<option value="C40">NUSTATYTI VEIKSMŲ KIEKĮ</option>'; 
+    	document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
 	}
 	updateModeChoice4();
 }
@@ -760,3 +760,109 @@ document.querySelectorAll('input[type="number"]').forEach(input => {
         setLabelEndingForQuestionNumber();
     });
 });
+
+document.addEventListener("change", function(event) {
+  if (event.target.matches("input[type='checkbox'], select")) {
+    updateControllerCustomTaskChoices();
+  }
+});
+
+document.addEventListener("click", function (event) {
+  if (event.target.classList.contains("control-btn")) {
+    updateControllerCustomTaskChoices();
+  }
+});
+
+function updateControllerCustomTaskChoices () {
+    let modeChoiceSelection = document.querySelector('#mode_choice').value;
+    if (!controller && localStorage.getItem('controller') !== null) {
+        controller = JSON.parse(localStorage.getItem('controller'))
+    }
+
+    if (modeChoiceSelection === "matematika") {
+        controller.mode = 'math';
+    } else if (modeChoiceSelection === "kalba") {
+        controller.mode = 'lang';
+    }
+
+    controller.language = "LT";
+
+    if (controller.mode === "math") {
+        modeChoice1Selection = modeChoice1Element.value;
+        modeChoice2Selection = modeChoice2Element.value;
+        selectedNumbers = [selectedNumberElement.value, selectedNumber2Element.value].sort();
+        modeChoice3Selection = modeChoice3Element.value;
+        modeChoice5Selection = modeChoice5Element.value;
+        modeChoice6Selection = modeChoice6Element.value;
+        modeChoice7Selection = modeChoice7Element.value;
+
+        var checkbox = document.getElementById("remainder-input");
+
+        controller.modeChoice1 = modeChoice1Selection;
+        controller.modeChoice2 = modeChoice2Selection;
+        controller.selectedNumbers = selectedNumbers;
+        controller.withRemainder = checkbox.checked;
+        if (modeChoice3Selection === "C37") {
+            controller.modeChoice3 = true;
+        } else if (modeChoice3Selection === "C38") {
+            controller.modeChoice3 = false;
+        }
+        controller.modeChoice5 = modeChoice5Selection;
+        controller.modeChoice6 = modeChoice6Selection;
+        controller.modeChoice7 = modeChoice7Selection;
+        controller.modeChoice8 = 'C79';
+        controller.result = ['', '', '', '', '']
+        controller.task = null;
+
+    } else if (controller.mode === "lang") {
+        const modeChoice8Value = document.querySelector('#mode_choice_8').value;
+        const rasybaOptions = document.querySelectorAll('[name="rasyba-option"]');
+        let anyChecked = false;
+        rasybaOptions.forEach(option => {
+        if (option.checked) {
+            anyChecked = true;
+        }
+        });
+    if ((modeChoice8Value === "rasyba" && anyChecked) || modeChoice8Value !== "rasyba") {
+        modeChoice8Selection = modeChoice8Element.value;
+        modeChoice9Selection = modeChoice9Element.value;
+        modeChoice12Selection = modeChoice12Element.value;
+        modeChoice13Selection = modeChoice13Element.value;
+        classChoiceSelection = classChoiceElement.value;
+
+        controller.classChoice = classChoiceSelection;
+        if (modeChoice8Selection === "tekstas") {
+            controller.modeChoice1 = "C49";
+        } else if (modeChoice8Selection === "rasyba") {
+            controller.modeChoice1 = "C50";
+        }
+
+        if (modeChoice9Selection === "C53") {
+            controller.modeChoice2 = "1";
+        } else if (modeChoice9Selection === "C54") {
+            controller.modeChoice2 = "2";
+        } else if (modeChoice9Selection === "C55") {
+            controller.modeChoice2 = "3";
+        } else if (modeChoice9Selection === "C56") {
+            controller.modeChoice2 = "4";
+        } else if (modeChoice9Selection === "C57") {
+            controller.modeChoice2 = "5";
+        } else {
+            controller.modeChoice2 = modeChoice9Selection;
+        }
+        controller.modeChoice3 = getSelectedRasybaConditions();
+        controller.modeChoice5 = modeChoice12Selection;
+        controller.result = ['', '', '', '', ''];
+        controller.modeChoiceLtDifficulty = document.getElementById('mode_choice_10').value;
+        if (controller.classChoice === "C75") {
+            controller.questionFrequency = Number(modeChoice13Selection);
+        } else {
+            controller.questionFrequency = 1;
+        }
+    }
+}
+
+controller.modeChoice4 = modeChoice4Element.value
+
+displayCustomTaskPotentialEarnings();
+}

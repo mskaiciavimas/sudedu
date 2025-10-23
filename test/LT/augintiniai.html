@@ -2250,54 +2250,6 @@
     color: #F5F5F7;
 }
 
-.object-popup-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.object-popup-panel {
-  background: #F5F5F7;
-  border-radius: 20px;
-  padding: 25px 20px 20px 20px;
-  width: 500px;
-  max-width: 90%;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-  position: relative;
-  animation: object-popup-fadeInUp 0.25s ease-out;
-}
-
-.object-popup-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  color: #666;
-  padding-top: 0;
-}
-
-.object-popup-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-}
-
-.object-popup-subtitle {
-    font-size: 1rem;
-    margin: 5px 0;
-}
-
-.object-popup-content {
-  margin-top: 10px;
-}
-
 .title-subtitle-inline-button-wrapper {
     display: flex;
     flex-direction: row;
@@ -2322,10 +2274,6 @@
     padding: 10px 16px;
 }
 
-.object-popup-title-subtitle-wrapper {
-    flex: 1;
-}
-
 #pet-asset-buttons,
 #shop-buttons {
   display: flex;
@@ -2340,12 +2288,6 @@
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 10px;
-}
-
-
-@keyframes object-popup-fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 #pet-buttons-outer {
@@ -2431,11 +2373,6 @@
 }
 
 @media (max-width: 578px) {
-    .object-popup-panel {
-        max-width: 85vw;
-        width: 85vw;
-    }
-
     .pet-section-pet-button-container,
     .pet-delete-btn {
         width: 85px;
@@ -2878,18 +2815,6 @@
         font-size: 1.5rem;
     }
 
-    .object-popup-title {
-        font-size: 2rem;
-    }
-
-    .object-popup-subtitle {
-        font-size: 1.25rem;
-    }
-
-    .object-popup-panel {
-        width: 600px;
-    }
-
     .food-item-preview-holder {
         width: 120px;
         height: 65px;
@@ -2920,10 +2845,6 @@
     .fill-water-bowl-btn,
     .treat-use-btn {
         font-size: 1.25rem;
-    }
-
-    .object-popup-close {
-        font-size: 2rem;
     }
 }
 
@@ -7981,52 +7902,6 @@ function increasePetStatsInDisplay(petId, stat) {
         targetStatsButton.click();
     }
 }
-
-const objectPopup = document.getElementById("object-popup");
-const objectPopupContent = document.getElementById("object-popup-content");
-const objectPopupTitle = document.getElementById("object-popup-title");
-const objectPopupSubtitle = document.getElementById("object-popup-subtitle");
-const objectPopupClose = objectPopup.querySelector(".object-popup-close");
-
-let popupOpenTime = 0;
-// Open popup with dynamic content
-function openObjectPopup(content, title='', subtitle = '') {
-    popupOpenTime = Date.now();
-    // Clear existing content
-    objectPopupContent.innerHTML = '';
-    objectPopupTitle.innerHTML = '';
-    objectPopupSubtitle.innerHTML = '';
-
-    if (typeof content === 'string') {
-        // If it's an HTML string, insert it
-        objectPopupContent.innerHTML = content;
-    } else if (content instanceof HTMLElement) {
-        // If it's a DOM element, append it directly
-        objectPopupContent.appendChild(content);
-    }
-
-    objectPopupTitle.innerHTML = title;
-    objectPopupSubtitle.innerHTML = subtitle;
-
-    // Show the popup
-    objectPopup.style.display = 'flex';
-}
-
-function closeObjectPopup () {
-    objectPopup.style.display = 'none';
-}
-
-// Close button
-objectPopupClose.addEventListener("click", () => {
-  objectPopup.style.display = "none";
-});
-
-// Modified close listener
-objectPopup.addEventListener("click", (e) => {
-    if (e.target === objectPopup && Date.now() - popupOpenTime > 300) {
-        objectPopup.style.display = "none";
-    }
-});
 
 
 function displayWaterBowlFillingOptions(obj) {

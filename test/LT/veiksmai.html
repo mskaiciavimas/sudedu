@@ -14,6 +14,7 @@
 	<link rel="stylesheet" href="../main-nav-bar.css">
     <link rel="stylesheet" type="text/css" href="../index.css">
 	<link id="questionsStyleSheet" rel="stylesheet" type="text/css" href="../questions-bigger.css">
+	<link id="dynamicStyleSheet" rel="stylesheet" type="text/css" href="">
 	<link rel="stylesheet" type="text/css" href="../summary.css">
 </head>
 
@@ -459,7 +460,7 @@
 </style>	
 
 <body>
-	    <div id="customConfirmModal" class="modal">
+	<div id="customConfirmModal" class="modal">
     <div class="modal-content">
         <p id="customModalText"></p>
         <div class="modal-buttons">
@@ -469,6 +470,20 @@
     </div>
     </div>
 
+	<div id="object-popup" class="object-popup-overlay" style="display:none;">
+    <div class="object-popup-panel">
+        <button class="object-popup-close">&times;</button>
+        <div class="title-subtitle-inline-button-wrapper">
+        <div class="object-popup-title-subtitle-wrapper">
+        <div class="object-popup-title" id="object-popup-title"></div>
+        <div class="object-popup-subtitle" id="object-popup-subtitle"></div>
+        </div>
+        </div>
+        <div class="object-popup-content" id="object-popup-content">
+        <!-- Dynamic content goes here -->
+        </div>
+    </div>
+    </div>
 
     <nav class="main-navbar" id="mainNavbar">
       <div class="main-nav-container">
@@ -625,6 +640,7 @@
 	<script src="../mental-arithmetic-combinations.js"></script>
 
 	<script>
+		let firstTimeChecking = true;
 
 		const mistakesButtonElement = document.querySelector('.summary-button');
 		mistakesButtonElement.addEventListener("click", () => {
@@ -669,6 +685,7 @@
 		stopButtonElement.addEventListener("click", stopEquations)
 
 		const linkElement = document.querySelector("#questionsStyleSheet");
+		const dynamicStyleSheet = document.querySelector("#dynamicStyleSheet");
 
 		const equationElement = document.querySelector(".equation");
 		const equation2Element = document.querySelector(".equation_2");
@@ -713,6 +730,12 @@
 					} else {
 						linkElement.setAttribute("href", "../questions-bigger.css");
 					}
+			}
+
+			if (controller.modeChoice5 === "C42") {
+				dynamicStyleSheet.setAttribute("href", "../questions-unknown-number-style-supplement.css");
+			} else {
+				dynamicStyleSheet.setAttribute("href", "");
 			}
 		}
 
@@ -847,116 +870,161 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 	// Function to set the margin of element2
 	function setMargins() {
 
-		if (controller.questionsStopped || controller.modeChoice7 !== "C48") {
+		if (controller.questionsStopped) {
 			return
 		}
 
-		const fontSIzeFull = 3;
-		const oneRem = 16;
-		const inputPadding = 20;
-		var digitNumber = controller.randomSelection[1].toString();
+		if (controller.modeChoice7 === "C48") {
 
-		var element1 = document.getElementById('equation');
-		var element2 = document.getElementById('answer-field');
-		const element2Textarea = element2.querySelector("textarea");
-		var element3 = document.querySelector('#stulpeliu-0');
-		var element1Rect = element1.getBoundingClientRect();
-		var computedStyle = window.getComputedStyle(element1);
-		var paddingRight = parseFloat(computedStyle.paddingRight);
-		var viewportWidth = window.innerWidth;
-		var rightMargin = viewportWidth - (element1Rect.right + paddingRight);
-		var computedStyle3;
-		var leftMargin3;
-		var equationElement = document.getElementById('equation');
-		var equationElementWidth = equationElement.offsetWidth;
-		var stulpeliuInput = document.getElementsByClassName('stulpeliu-input');
-		var newWidth = 0;
-		var firstElementRight = 0;
-		var lastElementLeft = 0;
-		var firstElmenetMarginRight = 0;
-		var contentContainerElement = document.getElementById('content-container');
-		var newMargin = 0
-		var answerDigits = 0;
+			const fontSIzeFull = 3;
+			const oneRem = 16;
+			const inputPadding = 20;
+			var digitNumber = controller.randomSelection[1].toString();
 
-	if (controller.randomSelection[2] === 'M') {
-		const daugiklisLength = document.querySelector(".daugiklis").innerHTML.length;
-		const antrasDaugiklisLength = document.querySelector("#antras-daugiklis").innerHTML.length;
-		const newWidth = daugiklisLength + 2;
-		for (var i = 0; i < stulpeliuInput.length; i++) {
-			var stulpeliuInputElement = stulpeliuInput[i];
-			stulpeliuInputElement.style.width = `${newWidth}ch`;
-		}
+			var element1 = document.getElementById('equation');
+			var element2 = document.getElementById('answer-field');
+			const element2Textarea = element2.querySelector("textarea");
+			var element3 = document.querySelector('#stulpeliu-0');
+			var element1Rect = element1.getBoundingClientRect();
+			var computedStyle = window.getComputedStyle(element1);
+			var paddingRight = parseFloat(computedStyle.paddingRight);
+			var viewportWidth = window.innerWidth;
+			var rightMargin = viewportWidth - (element1Rect.right + paddingRight);
+			var computedStyle3;
+			var leftMargin3;
+			var equationElement = document.getElementById('equation');
+			var equationElementWidth = equationElement.offsetWidth;
+			var stulpeliuInput = document.getElementsByClassName('stulpeliu-input');
+			var newWidth = 0;
+			var firstElementRight = 0;
+			var lastElementLeft = 0;
+			var firstElmenetMarginRight = 0;
+			var contentContainerElement = document.getElementById('content-container');
+			var newMargin = 0
+			var answerDigits = 0;
 
-		element2Textarea.style.width = `${newWidth+1+antrasDaugiklisLength-2}ch`;
-		
-	} else if (controller.randomSelection[2] === 'D') {
-		const answerInput = document.querySelector("#answer")
-		const dalinys = document.querySelector("#dalinys")
-		const daliklis = document.querySelector("#daliklis")
+		if (controller.randomSelection[2] === 'M') {
+			const daugiklisLength = document.querySelector(".daugiklis").innerHTML.length;
+			const antrasDaugiklisLength = document.querySelector("#antras-daugiklis").innerHTML.length;
+			const newWidth = daugiklisLength + 2;
+			for (var i = 0; i < stulpeliuInput.length; i++) {
+				var stulpeliuInputElement = stulpeliuInput[i];
+				stulpeliuInputElement.style.width = `${newWidth}ch`;
+			}
 
-		if (controller.modeChoice8 === "C78") {
-			const daliklisValue = daliklis.innerHTML
-			const daliklisDigits = daliklisValue.length;
-			const dalinysLength = dalinys.innerHTML.length;
-			if (dalinysLength > daliklisDigits) {
-				const dalinysStart = dalinys.innerHTML.slice(0, daliklisDigits);
-				if (Number(dalinysStart) >= Number(daliklisValue)) {
-					answerInput.style.width = `${dalinysLength+1}ch`;
+			element2Textarea.style.width = `${newWidth+1+antrasDaugiklisLength-2}ch`;
+			
+		} else if (controller.randomSelection[2] === 'D') {
+			const answerInput = document.querySelector("#answer")
+			const dalinys = document.querySelector("#dalinys")
+			const daliklis = document.querySelector("#daliklis")
+
+			if (controller.modeChoice8 === "C78") {
+				const daliklisValue = daliklis.innerHTML
+				const daliklisDigits = daliklisValue.length;
+				const dalinysLength = dalinys.innerHTML.length;
+				if (dalinysLength > daliklisDigits) {
+					const dalinysStart = dalinys.innerHTML.slice(0, daliklisDigits);
+					if (Number(dalinysStart) >= Number(daliklisValue)) {
+						answerInput.style.width = `${dalinysLength+1}ch`;
+					} else {
+						answerInput.style.width = `${dalinysLength}ch`;
+					}
 				} else {
-					answerInput.style.width = `${dalinysLength}ch`;
+					return
 				}
+
 			} else {
-				return
+				answerInput.style.width = `${(Math.ceil(controller.randomSelection[0]/controller.randomSelection[1])).toString().length + 1.25}ch`;
+				daliklis.style.width = `${(Math.ceil(controller.randomSelection[0]/controller.randomSelection[1])).toString().length + 1}ch`;
+			}
+
+			if (controller.withRemainder) {
+				const elements = document.querySelectorAll('.stulpeliu-field');
+				const lastElement = elements[elements.length - 1];
+
+				if (!lastElement.querySelector(".remainder-label")) {
+					const remainderElement = document.createElement("div");
+					remainderElement.className = "remainder-label";
+					remainderElement.innerHTML = "liek.";
+					lastElement.appendChild(remainderElement);
+				}
+			}
+			} else {
+
+				var demAtTur = document.getElementsByClassName('demuo-turinys-ateminys');
+				var didDemAtTurWidth = 0;
+				var didDemAtTur;
+
+				for (var i = 0; i < demAtTur.length; i++) {
+						didDemAtTurWidth = Math.max(didDemAtTurWidth, demAtTur[i].offsetWidth);
+				}
+
+				var answerSize = 0;
+				if (controller.randomSelection[2] === 'A') {
+					answerSize = didDemAtTurWidth + oneRem*1.75 * 2;
+				} else if (controller.randomSelection[2] === 'S') {
+					answerSize = didDemAtTurWidth + oneRem*1.75;
+				}
+
+				element2Textarea.style.width = answerSize + 'px';
+			}
+
+			if (controller.withRemainder && controller.randomSelection[2] === 'D') {
+				var liekElement = document.getElementById("liek");
+				if (liekElement) {
+					liekElement.style.visibility = "visible";
+				}
 			}
 
 		} else {
-			answerInput.style.width = `${(Math.ceil(controller.randomSelection[0]/controller.randomSelection[1])).toString().length + 1.25}ch`;
-			daliklis.style.width = `${(Math.ceil(controller.randomSelection[0]/controller.randomSelection[1])).toString().length + 1}ch`;
-		}
-
-		if (controller.withRemainder) {
-			const elements = document.querySelectorAll('.stulpeliu-field');
-			const lastElement = elements[elements.length - 1];
-
-			if (!lastElement.querySelector(".remainder-label")) {
-				const remainderElement = document.createElement("div");
-				remainderElement.className = "remainder-label";
-				remainderElement.innerHTML = "liek.";
-				lastElement.appendChild(remainderElement);
+			const answerElement = document.getElementById('answer');
+			const requiredWidth = getCorrectAnswerLength() + 0.5;
+			const currentWidthInCh = parseFloat(getComputedStyle(answerElement).width) / parseFloat(getComputedStyle(answerElement).fontSize);
+			
+			if (currentWidthInCh < requiredWidth) {
+				answerElement.style.width = requiredWidth + 'ch';
 			}
 		}
-		} else {
 
-			var demAtTur = document.getElementsByClassName('demuo-turinys-ateminys');
-			var didDemAtTurWidth = 0;
-			var didDemAtTur;
-
-			for (var i = 0; i < demAtTur.length; i++) {
-					didDemAtTurWidth = Math.max(didDemAtTurWidth, demAtTur[i].offsetWidth);
-			}
-
-			var answerSize = 0;
-			if (controller.randomSelection[2] === 'A') {
-				answerSize = didDemAtTurWidth + oneRem*1.75 * 2;
-			} else if (controller.randomSelection[2] === 'S') {
-				answerSize = didDemAtTurWidth + oneRem*1.75;
-			}
-
-			element2Textarea.style.width = answerSize + 'px';
-		}
-
-		if (controller.withRemainder && controller.randomSelection[2] === 'D') {
-			var liekElement = document.getElementById("liek");
-			if (liekElement) {
-				liekElement.style.visibility = "visible";
-			}
-  		}
 
   		adjustMiddleLineHeight();
-		contentContainerElement.style.visibility = 'visible';
+		if (contentContainerElement) {
+			contentContainerElement.style.visibility = 'visible';
+		}
 	}
 
+function getCorrectAnswerLength() {
+  const num1 = controller.randomSelection[0];
+  const num2 = controller.randomSelection[1];
+  const operation = controller.randomSelection[2];
+  const position = controller.randomSelection[3];
+  
+  function flipNumber(number) {
+    return Number(number.toString().split('').reverse().join(''));
+  }
 
+  let answer;
+  
+  if (controller.modeChoice7 === "C48") {
+    if (operation === 'M') answer = flipNumber(num1 * num2);
+    else if (operation === 'D') answer = Math.floor(num1 / num2);
+    else if (operation === 'A') answer = flipNumber(num1 + num2);
+    else if (operation === 'S') answer = flipNumber(num1 - num2);
+  }
+  else if (controller.modeChoice5 === "C41") {
+    if (operation === 'A') answer = num1 + num2;
+    else if (operation === 'S') answer = num1 - num2;
+    else if (operation === 'M') answer = num1 * num2;
+    else if (operation === 'D') answer = Math.floor(num1 / num2);
+  }
+  else if (controller.modeChoice5 === "C42") {
+    if (position === "first") answer = num1;
+    else if (position === "second") answer = num2;
+  }
+  
+  return answer ? answer.toString().length : 0;
+}
 
 
 function adjustMiddleLineHeight() {
