@@ -131,10 +131,22 @@ function setLanguage(lang) {
 }
 
 function backToPreviousPage() {
+    // Get the previous page filename
     const previousPage = document.referrer.split('/').pop() || 'index.html';
-    if (['index.html', 'uzduotys.html', 'klase.html'].includes(previousPage)) {
-        window.location.href = previousPage;
+    const targetPages = ['index.html', 'uzduotys.html', 'klase.html'];
+
+    if (targetPages.includes(previousPage)) {
+        // Use relative path instead of absolute
+        let url = previousPage;
+
+        // Append query parameter to indicate "came from back"
+        const separator = url.includes('?') ? '&' : '?';
+        url += `${separator}fromBack=true`;
+
+        // Navigate to previous page
+        window.location.href = url;
     } else {
         window.location.href = 'index.html';
     }
 }
+

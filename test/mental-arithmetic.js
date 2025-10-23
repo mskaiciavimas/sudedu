@@ -1985,8 +1985,10 @@ function checkAnswer () {
 
   function redirectToQuestions() {
     if (controller.mode === "lang") {
-    if (controller.modeChoice1 === "C50") {
-      window.location.href = "./rasyba.html";
+    if (controller.modeChoice1 === "C83") {
+      if (controller.modeChoice2 === "C50") {
+        window.location.href = "./rasyba.html";
+      }
     } else if (controller.modeChoice1 === "C49") {
       window.location.href = "./teksto-suvokimas.html";
     } 
@@ -2651,8 +2653,10 @@ function countDown() {
         formatFinalMessage();
         displayEquation();
       } else if (controller.mode === "lang") {
-        if (controller.modeChoice1 === "C50") {
-        formatFinalMessageForGrammar();
+        if (controller.modeChoice1 === "C83") {
+          if (controller.modeChoice1 === "C50") {
+            formatFinalMessageForGrammar();
+          }
       } else if (controller.modeChoice1 === "C49") {
         formatFinalMessageForTextcomprehension();
       }
@@ -2789,210 +2793,198 @@ function startQuestionsNumber () {
 	redirectToQuestions();
 }
 
-function getOptionTextFromValues(values) {
-    function determineQuestionNumberTimeLabelEnding(type, string) {
-        if (type === "NUSTATYTI LAIKO TRUKMĘ") {
-            durationTypeTag = ''
-            if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
-                durationTypeTag = 'MINUTĘ';
-            } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
-                durationTypeTag = 'MINUTES';
-            } else if (parseInt(string) >= 10 ) {
-                durationTypeTag = 'MINUČIŲ';
+        function getOptionTextFromValues(taskInfo, taskDuration) {
+            function determineQuestionNumberTimeLabelEnding(type, string) {
+                if (type === "C39") {
+                    durationTypeTag = ''
+                    if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                        durationTypeTag = 'MINUTĘ';
+                    } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                        durationTypeTag = 'MINUTES';
+                    } else if (parseInt(string) >= 10 ) {
+                        durationTypeTag = 'MINUČIŲ';
+                    }
+                    return ("PRAKTIKUOTIS " + string + " " + durationTypeTag)  
+                } else {
+                    if (values[0] === "math") {
+                    durationTypeTag = ''
+                    if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                        durationTypeTag = 'VEIKSMĄ';
+                    } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                        durationTypeTag = 'VEIKSMUS';
+                    } else if (parseInt(string) >= 10 ) {
+                        durationTypeTag = 'VEIKSMŲ';
+                    }
+                    return ("ATLIKTI " + string + " " + durationTypeTag)  
+                } else if (values[0] === "lang") {
+                    if (values[2] === "C49") {
+                        if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                            durationTypeTag = 'TEKSTĄ';
+                        } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                            durationTypeTag = 'TEKSTUS';
+                        } else if (parseInt(string) >= 10 ) {
+                            durationTypeTag = 'TEKSTŲ';
+                        }
+                        return ("SUDĖLIOTI " + string + " " + durationTypeTag)  
+                    } else if (values[2] === "C83") {
+                        if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
+                            durationTypeTag = 'SAKINYS';
+                        } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
+                            durationTypeTag = 'SAKINIAI';
+                        } else if (parseInt(string) >= 10 ) {
+                            durationTypeTag = 'SAKINIŲ';
+                        }
+                        return (string + " " + durationTypeTag)  
+                    }
+
+                }
             }
-            return ("PRAKTIKUOTIS " + string + " " + durationTypeTag)  
-        } else {
+            }
+ 
+            values = taskInfo;
+            currentTaskDuration = taskDuration;
+            result = []
+            final_results = []
             if (values[0] === "math") {
-            durationTypeTag = ''
-            if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
-                durationTypeTag = 'VEIKSMĄ';
-            } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
-                durationTypeTag = 'VEIKSMUS';
-            } else if (parseInt(string) >= 10 ) {
-                durationTypeTag = 'VEIKSMŲ';
-            }
-            return ("ATLIKTI " + string + " " + durationTypeTag)  
-        } else if (values[0] === "lang") {
-            if (values[2] === "C49") {
-                if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
-                    durationTypeTag = 'TEKSTĄ';
-                } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
-                    durationTypeTag = 'TEKSTUS';
-                } else if (parseInt(string) >= 10 ) {
-                    durationTypeTag = 'TEKSTŲ';
+            result.push(parameterDictionary[values[1]]["decodedParameterText"])
+            result.push(parameterDictionary[values[2]]["decodedParameterText"])
+            result.push(parameterDictionary[values[3]]?.["decodedParameterText"] || "")
+            result.push(parameterDictionary[values[4]]["decodedParameterText"])
+            if (values[4] === "C42") {
+                if (values[1] === "C1") {
+                    result.push("NEŽINOMAS DĖMUO")
+                } else if (values[1] === "C2") {
+                    if (values[5] === "C43") {
+                        result.push("NEŽINOMAS TURINYS")
+                    } else if (values[5] === "C44") {
+                        result.push("NEŽINOMAS ATĖMINYS")
+                    } 
+                } else if (values[1] === "C3") {
+                    result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS")
+                } else if (values[1] === "C4") {
+                    result.push("NEŽINOMAS DAUGINAMASIS")
+                } else if (values[1] === "C5") {
+                    if (values[5] === "C45") {
+                        result.push("NEŽINOMAS DALINYS")
+                    } else if (values[5] === "C46") {
+                        result.push("NEŽINOMAS DALIKLIS")
+                    }
+                } else if (values[1] === "C6") {
+                    result.push("NEŽINOMAS DAUGINAMASIS / DALINYS / DALIKLIS")
+                } else if (values[1] === "C7") {
+                    result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS / DAUGINAMASIS / DALINYS / DALIKLIS")
                 }
-                return ("SUDĖLIOTI " + string + " " + durationTypeTag)  
-            } else if (values[2] === "C50") {
-                if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
-                    durationTypeTag = 'SAKINYS';
-                } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
-                    durationTypeTag = 'SAKINIAI';
-                } else if (parseInt(string) >= 10 ) {
-                    durationTypeTag = 'SAKINIŲ';
-                }
-                return (string + " " + durationTypeTag)  
-            }
-
-        }
-    }
-    }
-
-    let result = [];
-    let final_results = [];
-    let durationTypeTag = "";
-    if (values[0] === "math") {
-
-    result.push(parameterDictionary[values[1]]["decodedParameterText"])
-    result.push(parameterDictionary[values[2]]["decodedParameterText"])
-    result.push(values[3] ? "PERŽENGIANT DEŠIMTĮ" : "NEPERŽENGIANT DEŠIMTIES")
-    result.push(parameterDictionary[values[4]]["decodedParameterText"])
-    result.push(parameterDictionary[values[5]]["decodedParameterText"])
-    if (values[5] === "C42") {
-        if (values[1] === "C1") {
-            result.push("NEŽINOMAS DĖMUO")
-        } else if (values[1] === "C2") {
-            if (values[6] === "C43") {
-                result.push("NEŽINOMAS TURINYS")
-            } else if (values[6] === "C44") {
-                result.push("NEŽINOMAS ATĖMINYS")
-            } 
-        } else if (values[1] === "C3") {
-            result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS")
-        } else if (values[1] === "C4") {
-            result.push("NEŽINOMAS DAUGINAMASIS")
-        } else if (values[1] === "C5") {
-            if (values[6] === "C45") {
-                result.push("NEŽINOMAS DALINYS")
-            } else if (values[6] === "C46") {
-                result.push("NEŽINOMAS DALIKLIS")
-            }
-        } else if (values[1] === "C6") {
-            result.push("NEŽINOMAS DAUGINAMASIS / DALINYS / DALIKLIS")
-        } else if (values[1] === "C7") {
-            result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS / DAUGINAMASIS / DALINYS / DALIKLIS")
-        }
-    } else {
-        result.push(parameterDictionary[values[6]]["decodedParameterText"])
-    }
-
-    result.push(parameterDictionary[values[7]]["decodedParameterText"])
-    result.push(values[8])
-    result.push(values[9] ? "DALYBA SU LIEKANA" : "DALYBA BE LIEKANOS")
-    result.push(values[10])
-
-    final_results.push(result[0])
-
-    if (result[0] === "SUDĖTIS" || result[0] === "ATIMTIS" || result[0] === "SUDĖTIS IR ATIMTIS") {
-        final_results.push(result[1])
-        final_results.push(result[2])
-        final_results.push(result[4])
-        if (result[4] === "SKAITINĖ LYGYBĖ") {
-            final_results.push(result[6])  
-        } else if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
-            final_results.push(result[5])  
-        }
-        final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))
-    } else if (result[0] === "DAUGYBA") {
-        final_results.push(result[1])
-        if (result[1] === "DAUGYBOS LENTELĖ") {
-        final_results.push(`NUO ${result[7][0]} IKI ${result[7][1]}`)
-        }
-        final_results.push(result[4])
-        if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
-            final_results.push(result[5])    
-        }
-        final_results.push(result[6])
-        final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))    
-    } else if (result[0] === "DALYBA" || result[0] === "DAUGYBA IR DALYBA") {
-        final_results.push(result[1])
-        if (result[1] === "DAUGYBOS LENTELĖ") {
-        final_results.push(`NUO ${result[7][0]} IKI ${result[7][1]}`)
-        }
-        final_results.push(result[8])
-        final_results.push(result[4])
-        if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
-            final_results.push(result[5])    
-        }
-        final_results.push(result[6])
-        final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))    
-    } else if (result[0] === "ĮVAIRŪS VEIKSMAI") {
-        final_results.push(result[1])
-        final_results.push(result[4])
-        if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
-            final_results.push(result[5])    
-        }
-        final_results.push(result[6]) 
-        final_results.push(determineQuestionNumberTimeLabelEnding(result[3], result[9]))       
-    }
-
-} else if (values[0] === "lang") {
-    result.push(parameterDictionary[values[1]]["decodedParameterText"])
-    result.push(parameterDictionary[values[2]]["decodedParameterText"])
-    
-    if (values[3] === "1") {
-        result.push("1 SAKINYS EKRANE")
-    } else if (values[3] === "2") {
-        result.push("2 SAKINIAI EKRANE")
-    } else if (values[3] === "3") {
-        result.push("3 SAKINIAI EKRANE")
-    } else if (values[3] === "4") {
-        result.push("4 SAKINIAI EKRANE")
-    } else if (values[3] === "5") {
-        result.push("5 SAKINIAI EKRANE")
-    } else {
-        result.push(values[3])
-    }      
-
-    let outerLiItem = document.createElement('li');
-    outerLiItem.textContent = "RAŠYBOS NUSTATYMAI:"; // Add a label for the outer <li>
-
-    let grammarParamsList = document.createElement('ul');
-    grammarParamsList.classList.add('grammar-params-list');
-
-    Object.keys(values[4]).forEach(key => {
-        let listItem = document.createElement('li');
-        listItem.innerHTML = parameterDictionary[key]["decodedParameterText"]; // Use innerHTML instead of textContent
-        grammarParamsList.appendChild(listItem);
-    });
-
-    outerLiItem.appendChild(grammarParamsList);
-
-
-    // Store as an HTML string
-    result.push(outerLiItem.outerHTML);
-
-    result.push(parameterDictionary[values[5]]["decodedParameterText"])
-    result.push(parameterDictionary[values[6]]["decodedParameterText"])
-    result.push(values[9])
-    if (values[8] === 1) {
-        result.push("DAŽNESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
-    } else {
-        result.push("RETESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
-    }
-    result.push(parameterDictionary[values[7]]["decodedParameterText"])
-
-    final_results.push(result[0])
-    final_results.push(result[1])
-    if (result[1] === "TEKSTO SUPRATIMAS") {
-        final_results.push(parameterDictionary[result[2]]["decodedParameterText"])
-        final_results.push(result[8])
-        final_results.push(determineQuestionNumberTimeLabelEnding(result[4], result[6])) 
-    } else if (result[1] === "RAŠYBA") {
-        final_results.push(result[2])
-        final_results.push(result[3])
-        if (result[0] === "3-4 KLASĖ") {
-            if ("C62" in values[4] || "C63" in values[4] || "C64" in values[4] || "C65" in values[4]) {
-                    final_results.push(result[5])
-                } 
             } else {
-                final_results.push(result[7])
+                result.push(parameterDictionary[values[5]]["decodedParameterText"])
             }
-        final_results.push(determineQuestionNumberTimeLabelEnding(result[4], result[6])) 
-    }
-}
 
-    return final_results;
-}
+            result.push(parameterDictionary[values[6]]["decodedParameterText"])
+            result.push(values[7])
+            result.push(values[8] ? "DALYBA SU LIEKANA" : "DALYBA BE LIEKANOS")
+            result.push(values[9])
+
+            final_results.push(result[0])
+
+            if (result[0] === "SUDĖTIS" || result[0] === "ATIMTIS" || result[0] === "SUDĖTIS IR ATIMTIS") {
+                final_results.push(result[1])
+                final_results.push(result[2])
+                final_results.push(result[3])
+                if (result[4] === "SKAITINĖ LYGYBĖ") {
+                    final_results.push(result[5])  
+                } else if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+                    final_results.push(result[4])  
+                }
+                final_results.push(result[5])
+                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1]))
+            } else if (result[0] === "DAUGYBA") {
+                final_results.push(result[1])
+                if (result[1] === "DAUGYBOS LENTELĖ") {
+                final_results.push(`NUO ${result[6][0]} IKI ${result[6][1]}`)
+                }
+                final_results.push(result[3])
+                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+                    final_results.push(result[5])    
+                }
+                final_results.push(result[5])
+                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1]))    
+            } else if (result[0] === "DALYBA" || result[0] === "DAUGYBA IR DALYBA") {
+                final_results.push(result[1])
+                if (result[1] === "DAUGYBOS LENTELĖ") {
+                final_results.push(`NUO ${result[6][0]} IKI ${result[6][1]}`)
+                }
+                final_results.push(result[7])
+                final_results.push(result[3])
+                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+                    final_results.push(result[4])    
+                }
+                final_results.push(result[5])
+                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1]))    
+            } else if (result[0] === "ĮVAIRŪS VEIKSMAI") {
+                final_results.push(result[1])
+                final_results.push(result[3])
+                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+                    final_results.push(result[4])    
+                }
+                final_results.push(result[5]) 
+                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1]))       
+            }
+        } else if (values[0] === "lang") {
+            result.push(parameterDictionary[values[1]]["decodedParameterText"])
+            result.push(parameterDictionary[values[2]]["decodedParameterText"])
+            
+            result.push(parameterDictionary[values[3]]["decodedParameterText"])  
+
+            if (values[3]  === "C50") {
+                let outerLiItem = document.createElement('li');
+                outerLiItem.textContent = "RAŠYBOS NUSTATYMAI:"; // Add a label for the outer <li>
+
+                let grammarParamsList = document.createElement('ul');
+                grammarParamsList.classList.add('grammar-params-list');
+                
+                Object.keys(values[4]).forEach(key => {
+                    let listItem = document.createElement('li');
+                    listItem.innerHTML = parameterDictionary[key]["decodedParameterText"]; // Use innerHTML instead of textContent
+                    grammarParamsList.appendChild(listItem);
+                });
+
+                outerLiItem.appendChild(grammarParamsList);
+
+
+                // Store as an HTML string
+                result.push(outerLiItem.outerHTML);
+
+                result.push(parameterDictionary[values[5]]["decodedParameterText"])
+
+                if (values[6] === 1) {
+                    result.push("DAŽNESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
+                } else {
+                    result.push("RETESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
+                }
+            }
+
+            final_results.push(result[0])
+            final_results.push(result[1])
+            final_results.push(result[2])
+            if (result[1] === "TEKSTO SUPRATIMAS") {
+                final_results.push(parameterDictionary[values[4]]["decodedParameterText"])
+                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1])) 
+            } else if (result[1] === "GRAMATIKA") {
+                if (result[2] === "RAŠYBA") {
+                    final_results.push(result[3])
+                }
+
+                if (result[0] === "3-4 KLASĖ") {
+                    if ("C62" in values[4] || "C63" in values[4] || "C64" in values[4] || "C65" in values[4]) {
+                            final_results.push(result[4])
+                        } 
+                    } else {
+                        final_results.push(result[5])
+                    }
+                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1])) 
+            }
+        }
+            return final_results;
+        }
 
 //TASK INFO COLLECTION START
 
@@ -3387,12 +3379,12 @@ const pointWeights = {
     "C80": {"values": [2.0, 1.35, 1.35, 1.15, 1.15, 1.0], "label": "teksto supratimas lengvas su distraktorium"},
     "C81": {"values": [2.0, 2.0, 2.0, 1.85, 1.85, 1.65], "label": "teksto supratimas vidutinis su distraktorium"},
     "C82": {"values": [2.0, 2.0, 2.0, 2.0, 2.0, 1.85], "label": "teksto supratimas sunkus su distraktorium"},
+    "C83": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "gramatika"}
 }
 
 const personalChlCoinBonusModifier = 1.1;
 
 function calculateTasksPerCorrectAnswerPoints (type) {
-
     const userClass = userData?.knowledgeLvl;
 
     if (!userClass) {
@@ -3458,6 +3450,7 @@ function calculateTasksPerCorrectAnswerPoints (type) {
         "C80": false,
         "C81": false,
         "C82": false,
+        "C83": false,
         "remainder": false,
         "mult-table-selection": [],
         "correct-ans": 0,
@@ -3502,7 +3495,10 @@ function calculateTasksPerCorrectAnswerPoints (type) {
           taskInfoTemp["C80"] = false;
           taskInfoTemp["C81"] = false;
           taskInfoTemp["C82"] = false;
+          taskInfoTemp["C83"] = false;
       }
+
+              console.log(controller, taskInfoTemp)
 
     // Helper to get task weight
     const getTaskWeight = (task) => {
@@ -3535,35 +3531,40 @@ function calculateTasksPerCorrectAnswerPoints (type) {
     });
 
   } else {
-    const parsedCurrentTaskInstructions = JSON.parse(type);
+    const parsedCurrentTaskInstructions = type;
 
     let tempController = {}
     if (parsedCurrentTaskInstructions[0] === "math") {
         tempController.mode = 'math';
         tempController.modeChoice1 = parsedCurrentTaskInstructions[1];
         tempController.modeChoice2 = parsedCurrentTaskInstructions[2];
-        tempController.selectedNumbers = parsedCurrentTaskInstructions[8];
-        tempController.withRemainder = parsedCurrentTaskInstructions[9];
         tempController.modeChoice3 = parsedCurrentTaskInstructions[3];
-        tempController.modeChoice4 = parsedCurrentTaskInstructions[4];
-        tempController.modeChoice5 = parsedCurrentTaskInstructions[5];
-        tempController.modeChoice6 = parsedCurrentTaskInstructions[6];
-        tempController.modeChoice7 = parsedCurrentTaskInstructions[7];
-        tempController.modeChoice8 = "";
-        tempController.setTaskDuration = parsedCurrentTaskInstructions[10];
+        tempController.modeChoice5 = parsedCurrentTaskInstructions[4];
+        tempController.modeChoice6 = parsedCurrentTaskInstructions[5];
+        tempController.modeChoice7 = parsedCurrentTaskInstructions[6];
+        tempController.selectedNumbers = parsedCurrentTaskInstructions[7];
+        tempController.withRemainder = parsedCurrentTaskInstructions[8];
+        tempController.modeChoice8 = parsedCurrentTaskInstructions[9];
 
     } else if (parsedCurrentTaskInstructions[0] === "lang") {
         tempController.mode = 'lang';
-        tempController.classChoice = parsedCurrentTaskInstructions[1];
-        tempController.modeChoice1 = parsedCurrentTaskInstructions[2];
-        tempController.modeChoice2 = parsedCurrentTaskInstructions[3];
-        tempController.modeChoice3 = parsedCurrentTaskInstructions[4];
-        tempController.modeChoice4 = parsedCurrentTaskInstructions[5];
-        tempController.modeChoice5 = parsedCurrentTaskInstructions[6];
-        tempController.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[7];
-        tempController.questionFrequency = parsedCurrentTaskInstructions[8];
-        tempController.setTaskDuration = parsedCurrentTaskInstructions[9];
-    }
+        if (parsedCurrentTaskInstructions[2] === "C49") {
+            tempController.classChoice = parsedCurrentTaskInstructions[1];
+            tempController.modeChoice1 = parsedCurrentTaskInstructions[2];
+            tempController.modeChoice2 = parsedCurrentTaskInstructions[3];
+            tempController.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[4];
+
+        } else if (parsedCurrentTaskInstructions[2] === "C83") {
+            if (parsedCurrentTaskInstructions[3] === "C50") {
+                tempController.classChoice = parsedCurrentTaskInstructions[1];
+                tempController.modeChoice1 = parsedCurrentTaskInstructions[2];
+                tempController.modeChoice2 = parsedCurrentTaskInstructions[3];
+                tempController.modeChoice3 = parsedCurrentTaskInstructions[4];
+                tempController.modeChoice5 = parsedCurrentTaskInstructions[5];
+                tempController.questionFrequency = parsedCurrentTaskInstructions[6];
+            }
+        }
+      }
 
       // Mark C-flags from controller values
       for (let key in tempController) {
@@ -3620,7 +3621,6 @@ function calculateTasksPerCorrectAnswerPoints (type) {
 
     Object.keys(taskInfoTemp).forEach(task => {
         if (!taskInfoTemp[task] || skipTasks.includes(task)) return;
-              console.log(taskInfoTemp[task])
         let weight = getTaskWeight(task);
 
         if (task === 'C18') {
@@ -3638,7 +3638,7 @@ function calculateTasksPerCorrectAnswerPoints (type) {
 
 function displayCustomTaskPotentialEarnings () {
   if (controller.modeChoice4 === "C39") {
-    document.querySelector(".custom-earnings-iki-holder").innerHTML = '';
+    document.querySelector(".custom-earnings-iki-holder").innerHTML = 'x';
     const el = document.querySelector(".custom-coin-amount .coin-amount");
     if (el) el.innerHTML = calculateTasksPerCorrectAnswerPoints("controller");
     document.querySelector(".custom-coin-amount").onclick = function() {

@@ -3055,44 +3055,43 @@ if (storedCacheExpiry) {
       return settings;
     }
 
-
-        async function getChallengeByTaskId(taskId) {
-            try {
-                const response = await apiFetch(apiBase + 'class/getChallenge', {
+    async function getChallengeByTaskId(taskId) {
+        try {
+            const response = await apiFetch(apiBase + 'class/getChallenge', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ taskId })
-                });
+            });
 
-                if (!response) {
-                    return;
-                }
+            if (!response) return;
 
-                if (!response.ok) {
+            if (!response.ok) {
                 throw new Error(`Server error ${response.status}: ${response.statusText}`);
-                }
+            }
 
-                const data = await response.json();
+            const data = await response.json();
 
-                if (data.success) {
-                console.log("Challenge retrieved:", data.challenge);
-                return data.challenge;
-                } else {
+            if (data.success) {
+                console.log("Challenge retrieved:", data.challenge, "Duration:", data.duration);
+                return {
+                    challenge: data.challenge,
+                    duration: data.duration
+                };
+            } else {
                 console.warn("Challenge not found:", data.error);
                 return null;
-                }
-            } catch (error) {
-                console.error("Error fetching challenge:", error);
-                return null;
             }
+        } catch (error) {
+            console.error("Error fetching challenge:", error);
+            return null;
         }
+    }
 
 
     function formatWeekChallengeDescription(task) {
-        const parsedTaskDescription = JSON.parse(task)
-        const formattedTaskDescription = getOptionTextFromValues(parsedTaskDescription);
+        const parsedTaskDescription = JSON.parse(task.challenge);
+        const parsedTaskDuration = JSON.parse(task.duration);
+        const formattedTaskDescription = getOptionTextFromValues(parsedTaskDescription, parsedTaskDuration);
 
         const classWeekChallengeTaskDescription = document.getElementById("class-challenge-task-list")
         classWeekChallengeTaskDescription.innerHTML = "";
@@ -3523,7 +3522,9 @@ window.addEventListener('load', positionWeekChallengeItems);
 
 
 function completeWeekChlTask() {
-    const parsedCurrentTaskInstructions = JSON.parse(weekChallengeInfo);
+    console.log(weekChallengeInfo)
+    const parsedCurrentTaskInstructions = JSON.parse(weekChallengeInfo.challenge);
+    const currentTaskDuration = JSON.parse(weekChallengeInfo.duration);
 
     if (localStorage.getItem('controller') !== null) {
         controller = JSON.parse(localStorage.getItem('controller'))
@@ -3536,35 +3537,52 @@ function completeWeekChlTask() {
         controller.mode = 'math';
         controller.modeChoice1 = parsedCurrentTaskInstructions[1];
         controller.modeChoice2 = parsedCurrentTaskInstructions[2];
-        controller.selectedNumbers = parsedCurrentTaskInstructions[8];
-        controller.withRemainder = parsedCurrentTaskInstructions[9];
         controller.modeChoice3 = parsedCurrentTaskInstructions[3];
-        controller.modeChoice4 = parsedCurrentTaskInstructions[4];
-        controller.modeChoice5 = parsedCurrentTaskInstructions[5];
-        controller.modeChoice6 = parsedCurrentTaskInstructions[6];
-        controller.modeChoice7 = parsedCurrentTaskInstructions[7];
-        controller.modeChoice8 = "C79";
+        controller.modeChoice5 = parsedCurrentTaskInstructions[4];
+        controller.modeChoice6 = parsedCurrentTaskInstructions[5];
+        controller.modeChoice7 = parsedCurrentTaskInstructions[6];
+        controller.selectedNumbers = parsedCurrentTaskInstructions[7];
+        controller.withRemainder = parsedCurrentTaskInstructions[8];
+        controller.modeChoice8 = parsedCurrentTaskInstructions[9];
         controller.task = ["weekChl", classDataCache.weekChlId];
         controller.taskCompleted = false;
-        controller.setTaskDuration = parsedCurrentTaskInstructions[10];
+
+        controller.modeChoice4 = currentTaskDuration[0];
+        controller.setTaskDuration = currentTaskDuration[1];
 
     } else if (parsedCurrentTaskInstructions[0] === "lang") {
         controller.mode = 'lang';
-        controller.classChoice = parsedCurrentTaskInstructions[1];
-        controller.modeChoice1 = parsedCurrentTaskInstructions[2];
-        controller.modeChoice2 = parsedCurrentTaskInstructions[3];
-        controller.modeChoice3 = parsedCurrentTaskInstructions[4];
-        controller.modeChoice4 = parsedCurrentTaskInstructions[5];
-        controller.modeChoice5 = parsedCurrentTaskInstructions[6];
-        controller.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[7];
-        controller.questionFrequency = parsedCurrentTaskInstructions[8];
-        controller.task = ["weekChl", classDataCache.weekChlId];;
-        controller.taskCompleted = false;
-        controller.setTaskDuration = parsedCurrentTaskInstructions[9];
+        if (parsedCurrentTaskInstructions[2] === "C49") {
+            controller.classChoice = parsedCurrentTaskInstructions[1];
+            controller.modeChoice1 = parsedCurrentTaskInstructions[2];
+            controller.modeChoice2 = parsedCurrentTaskInstructions[3];
+            controller.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[4];
+
+            controller.task = ["weekChl", classDataCache.weekChlId];
+            controller.taskCompleted = false;
+            
+            controller.modeChoice4 = currentTaskDuration[0];
+            controller.setTaskDuration = currentTaskDuration[1];
+
+        } else if (parsedCurrentTaskInstructions[2] === "C83") {
+            if (parsedCurrentTaskInstructions[3] === "C50") {
+                controller.classChoice = parsedCurrentTaskInstructions[1];
+                controller.modeChoice1 = parsedCurrentTaskInstructions[2];
+                controller.modeChoice2 = parsedCurrentTaskInstructions[3];
+                controller.modeChoice3 = parsedCurrentTaskInstructions[4];
+                controller.modeChoice5 = parsedCurrentTaskInstructions[5];
+                controller.questionFrequency = parsedCurrentTaskInstructions[6];
+                
+                controller.task = ["setTask", currentTaskId];;
+                controller.taskCompleted = false;
+
+                controller.modeChoice4 = currentTaskDuration[0];
+                controller.setTaskDuration = currentTaskDuration[1];
+            }
+        }
     }
 
     localStorage.setItem('controller', JSON.stringify(controller))
-
     startQuestions();
 }
 
@@ -3587,9 +3605,12 @@ window.onload = function () {
 
     const triggerPages = ['veiksmai.html', 'teksto-suvokimas.html', 'rasyba.html'];
     
-    if (triggerPages.includes(referrerPage)) {
-        const btn = document.querySelector('.nav-item[data-target="issukis"]');
-        if (btn) btn.click();
+    const params = new URLSearchParams(window.location.search);
+    if (window.location.pathname.endsWith('klase.html') && params.get('fromBack') === 'true') {
+        const challengeButton = document.querySelector('button.nav-item[data-target="issukis"]');
+        if (challengeButton) {
+            challengeButton.click();
+        }
     }
 };
 

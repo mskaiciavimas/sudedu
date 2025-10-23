@@ -586,7 +586,7 @@
 
 	#increase-no-of-sentences,
 	#decrease-no-of-sentences {
-		font-size: 1.5rem;
+		font-size: 1.75rem;
 	}
 }
 
@@ -855,7 +855,7 @@ window.onload = function () {
         window.location.href = "./";
     } else {
       controller = JSON.parse(localStorage.getItem('controller')) 
-      if (controller.mode !== "lang" || controller.modeChoice1 !== "C50") {
+      if (controller.mode !== "lang" || controller.modeChoice2 !== "C50") {
 		window.location.href = "./";
 	} else {
 		styleGrammarPage();
@@ -1535,6 +1535,9 @@ window.onload = function () {
 			}
 
 			if (controller.modeChoice4 === "C40") {
+				if (!controller.randomSelection[2]) {
+					controller.randomSelection[2] = 0;
+				}
 				if ((controller.questionNumber - controller.randomSelection[2]) < questionsToDisplay) {
 					questionsToDisplay = controller.questionNumber - controller.randomSelection[2];
 				}

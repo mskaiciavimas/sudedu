@@ -36,7 +36,7 @@ let rasybaOptionsLabelTextGaluneElement = document.querySelector('#rasyba-option
     function handleModeChoiceChange () {
         let modeChoiceSelection = modeChoiceElement.value;
 
-        if (modeChoiceSelection === "kalba") {
+        if (modeChoiceSelection === "lang") {
             toggleVisibility(modeChoice1Element, false);
             toggleVisibility(modeChoice2Element, false);
             toggleVisibility(modeChoice3Element, false);
@@ -55,10 +55,10 @@ let rasybaOptionsLabelTextGaluneElement = document.querySelector('#rasyba-option
             toggleVisibility(modeChoice10Element, true);
 
             let changeEvent = new Event('change');
-            modeChoice8Element.value = 'tekstas';
+            modeChoice8Element.value = 'C49';
             modeChoice8Element.dispatchEvent(changeEvent);
 
-        } else if (modeChoiceSelection === "matematika") {
+        } else if (modeChoiceSelection === "math") {
             toggleVisibility(modeChoice1Element, true);
             let changeEvent = new Event('change');
             modeChoice1Element.value = "C1";
@@ -395,13 +395,9 @@ function handleModeChoice8Change() {
     }
 }
 
-if (modeChoice8Selection === "rasyba") {
+if (modeChoice8Selection === "C83") {
     toggleVisibility(modeChoice10Element, false);
-    modeChoice9Element.innerHTML += '<option value="C53">1 SAKINYS EKRANE</option>';
-    modeChoice9Element.innerHTML += '<option value="C54">2 SAKINIAI EKRANE</option>';
-    modeChoice9Element.innerHTML += '<option value="C55">3 SAKINIAI EKRANE</option>';
-    modeChoice9Element.innerHTML += '<option value="C56">4 SAKINIAI EKRANE</option>';
-    modeChoice9Element.innerHTML += '<option value="C57">5 SAKINIAI EKRANE</option>';
+    modeChoice9Element.innerHTML += '<option value="C50">RAŠYBĄ</option>';
     toggleVisibility(modeChoice11DivElement, true);
     if (classChoiceSelection === "C75") {
         toggleVisibility(modeChoice13Element, true);
@@ -412,7 +408,7 @@ if (modeChoice8Selection === "rasyba") {
         toggleVisibility(modeChoice12Element, true);
         rasybaOptionsLabelTextGaluneElement.innerHTML = "ŽODŽIO PABAIGA:";
     }
-} else if (modeChoice8Selection === "tekstas") {
+} else if (modeChoice8Selection === "C49") {
     toggleVisibility(modeChoice10Element, true);
     toggleVisibility(modeChoice11DivElement, false);
     toggleVisibility(modeChoice13Element, false);
@@ -561,22 +557,22 @@ const timerInputChoiceElement = document.querySelector('#timer-input');
 let timerChoiceLabel = document.querySelector('.timer-choice-label');
 
 function changeQuestionNumberLabel () {
-	if (document.getElementById('answer-number-label')) {
-	if (document.getElementById('mode_choice').value === "kalba") {
-	if (document.getElementById('mode_choice_8').value === "tekstas") {
+	if (document.querySelector('.answer-number-label')) {
+	if (document.getElementById('mode_choice').value === "lang") {
+	if (document.getElementById('mode_choice_8').value === "C49") {
 		if (document.getElementById('mode_choice_4').value === "C40") {
 				document.getElementById("question-number-input").value = 5;
-				document.getElementById('answer-number-label').innerHTML = 'tekstus';
+				document.querySelector('.answer-number-label').innerHTML = 'tekstus';
 			}
-	} else if (document.getElementById('mode_choice_8').value === "rasyba") {
+	} else if (document.getElementById('mode_choice_8').value === "C83") {
 		if (document.getElementById('mode_choice_4').value === "C40") {
 				document.getElementById("question-number-input").value = 20;
-				document.getElementById('answer-number-label').innerHTML = 'sakinių';
+				document.querySelector('.answer-number-label').innerHTML = 'sakinių';
 			}
 	} 
 	} else {
 		document.getElementById("question-number-input").value = 20;
-		document.getElementById('answer-number-label').innerHTML = 'veiksmų';
+		document.querySelector('.answer-number-label').innerHTML = 'veiksmų';
 	}
 	}
 }
@@ -602,12 +598,12 @@ document.querySelector("#mode_choice_4").addEventListener('change', updateModeCh
 
 function updateModeChoice4Options () {
 	document.getElementById('mode_choice_4').innerHTML = '';
-	if (document.getElementById('mode_choice').value === "kalba") {
-		if (document.getElementById('mode_choice_8').value === "tekstas") {
+	if (document.getElementById('mode_choice').value === "lang") {
+		if (document.getElementById('mode_choice_8').value === "C49") {
 			document.getElementById('mode_choice_4').innerHTML += '<option value="C40">NUSTATYTI TEKSTŲ KIEKĮ</option>';
             document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
 
-		} else if (document.getElementById('mode_choice_8').value === "rasyba") {
+		} else if (document.getElementById('mode_choice_8').value === "C83") {
 			document.getElementById('mode_choice_4').innerHTML += '<option value="C40">NUSTATYTI SAKINIŲ KIEKĮ</option>';
             document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
 		}
@@ -648,8 +644,8 @@ questionNumberInputChoiceElement.addEventListener("input", function(event) {
 
 function setLabelEndingForQuestionNumber () {
 	if (answerNumberLabelTeacher) {
-	if (document.getElementById('mode_choice').value === "kalba") {
-	if (document.getElementById('mode_choice_8').value === "tekstas") {
+	if (document.getElementById('mode_choice').value === "lang") {
+	if (document.getElementById('mode_choice_8').value === "C49") {
 		if (parseInt(questionNumberInputChoiceElement.value) === 1 || parseInt(questionNumberInputChoiceElement.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputChoiceElement.value) !== 11) {
 			answerNumberLabelTeacher.innerHTML = 'tekstą';
 		} else if ((parseInt(questionNumberInputChoiceElement.value) > 1 && parseInt(questionNumberInputChoiceElement.value) < 10) || (parseInt(questionNumberInputChoiceElement.value) > 20 && parseInt(questionNumberInputChoiceElement.value.slice(-1)[0]) !== 0))  {
@@ -658,7 +654,7 @@ function setLabelEndingForQuestionNumber () {
 			answerNumberLabelTeacher.innerHTML = 'tekstų';
 		}
 
-	} else if (document.getElementById('mode_choice_8').value === "rasyba") {
+	} else if (document.getElementById('mode_choice_8').value === "C83") {
 		if (parseInt(questionNumberInputChoiceElement.value) === 1 || parseInt(questionNumberInputChoiceElement.value.slice(-1)[0]) === 1 && parseInt(questionNumberInputChoiceElement.value) !== 11) {
 			answerNumberLabelTeacher.innerHTML = 'sakinį';
 		} else if ((parseInt(questionNumberInputChoiceElement.value) > 1 && parseInt(questionNumberInputChoiceElement.value) < 10) || (parseInt(questionNumberInputChoiceElement.value) > 20 && parseInt(questionNumberInputChoiceElement.value.slice(-1)[0]) !== 0))  {
@@ -761,17 +757,21 @@ document.querySelectorAll('input[type="number"]').forEach(input => {
     });
 });
 
-document.addEventListener("change", function(event) {
-  if (event.target.matches("input[type='checkbox'], select")) {
-    updateControllerCustomTaskChoices();
-  }
-});
 
-document.addEventListener("click", function (event) {
-  if (event.target.classList.contains("control-btn")) {
-    updateControllerCustomTaskChoices();
-  }
-});
+if (!window.location.pathname.endsWith('uzduotys.html')) {
+    document.addEventListener("change", function(event) {
+    if (event.target.matches("input[type='checkbox'], select")) {
+        updateControllerCustomTaskChoices();
+    }
+    });
+
+    document.addEventListener("click", function (event) {
+    if (event.target.classList.contains("control-btn")) {
+        updateControllerCustomTaskChoices();
+    }
+    });
+}
+
 
 function updateControllerCustomTaskChoices () {
     let modeChoiceSelection = document.querySelector('#mode_choice').value;
@@ -779,11 +779,7 @@ function updateControllerCustomTaskChoices () {
         controller = JSON.parse(localStorage.getItem('controller'))
     }
 
-    if (modeChoiceSelection === "matematika") {
-        controller.mode = 'math';
-    } else if (modeChoiceSelection === "kalba") {
-        controller.mode = 'lang';
-    }
+    controller.mode = modeChoiceSelection;
 
     controller.language = "LT";
 
@@ -823,7 +819,7 @@ function updateControllerCustomTaskChoices () {
             anyChecked = true;
         }
         });
-    if ((modeChoice8Value === "rasyba" && anyChecked) || modeChoice8Value !== "rasyba") {
+    if ((modeChoice8Value === "C83" && anyChecked) || modeChoice8Value !== "C83") {
         modeChoice8Selection = modeChoice8Element.value;
         modeChoice9Selection = modeChoice9Element.value;
         modeChoice12Selection = modeChoice12Element.value;
@@ -831,10 +827,10 @@ function updateControllerCustomTaskChoices () {
         classChoiceSelection = classChoiceElement.value;
 
         controller.classChoice = classChoiceSelection;
-        if (modeChoice8Selection === "tekstas") {
+        if (modeChoice8Selection === "C49") {
             controller.modeChoice1 = "C49";
-        } else if (modeChoice8Selection === "rasyba") {
-            controller.modeChoice1 = "C50";
+        } else if (modeChoice8Selection === "C83") {
+            controller.modeChoice1 = "C83";
         }
 
         if (modeChoice9Selection === "C53") {

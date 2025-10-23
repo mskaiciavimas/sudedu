@@ -326,5 +326,9 @@ const parameterDictionary = {
     "C82": {
         "parameter": "sunkus",
         "decodedParameterText": "SUNKUS SU DISTRAKTORIUMI"
-    }
+    },
+    "C83": {
+        "parameter": "gramatika",
+        "decodedParameterText": "GRAMATIKA"
+    },
 }
