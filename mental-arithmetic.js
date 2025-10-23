@@ -1608,6 +1608,7 @@ async function sendSetTaskResultsToDatabase() {
     controller.equation2 = '';
     controller.mistakesTracker = 0;
     controller.answeredQuestionTracker = 0;
+    controller.correctAnswersTracker = 0;
     controller.randomSelection = [];
     controller.questionsStopped = false;
     controller.tempTracking = true;
