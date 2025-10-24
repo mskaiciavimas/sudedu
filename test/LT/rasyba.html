@@ -2129,7 +2129,7 @@ function handleEnterKey(event) {
     }
 }
 
-// NEW: Add this separate handler for mobile input
+
 function handleHiddenInputChange(event) {
     const inputs = Array.from(document.querySelectorAll('.question-input'));
     const wrongInput = inputs.find(input => input.classList.contains('wrong-answer'));
@@ -2140,6 +2140,7 @@ function handleHiddenInputChange(event) {
         if (newValue) {
             // Transfer the input to wrong input
             wrongInput.value += newValue;
+			wrongInput.focus();
             wrongInput.dispatchEvent(new Event('input', { bubbles: true }));
             resizeInput(wrongInput);
             
