@@ -1896,13 +1896,13 @@ function checkAnswers() {
 
 		const wrongInput = document.querySelector(".wrong-answer")
 		const wrongInputParent = wrongInput.parentElement;
+		focusCentered(wrongInputParent);
 		wrongInputParent.classList.add('pulse-word');
 		setTimeout(function() {
 			wrongInputParent.classList.remove('pulse-word');
 		}, 800);
-		hiddenInput.value = wrongInput.id;
 		hiddenInput.focus();
-		focusCentered(wrongInputParent);
+		hiddenInput.value = wrongInput.id;
 	}
 
 	firstTimeChecking = false;
@@ -2075,6 +2075,7 @@ function handleEnterKey(event) {
         if (wrongInput && wrongInput.id === hiddenInput.value) {
             wrongInput.focus();
         }
+		return
     }
 
     // 🟡 Handle Enter key only
@@ -2094,8 +2095,8 @@ function handleEnterKey(event) {
             focusCentered(parentDiv);
             parentDiv.classList.add('pulse-word');
             setTimeout(() => parentDiv.classList.remove('pulse-word'), 800);
-			hiddenInput.value = wrongInput.id;
 			hiddenInput.focus();
+			hiddenInput.value = wrongInput.id;
         }
         return;
     }
