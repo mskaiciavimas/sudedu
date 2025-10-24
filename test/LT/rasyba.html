@@ -1913,14 +1913,24 @@ function checkAnswers() {
 
 		const wrongInput = document.querySelector(".wrong-answer")
 		const wrongInputParent = wrongInput.parentElement;
-		focusCentered(wrongInputParent);
+		
 		document.querySelectorAll('.current-focus-parent').forEach(el => {
 			el.classList.remove('current-focus-parent');
 		});
 		wrongInputParent.classList.add('current-focus-parent');
 
+		// Lock the scroll position before focusing hidden input
+		const scrollContainer = document.querySelector('#field-for-text-outer');
+		const savedScrollTop = scrollContainer.scrollTop;
+
 		hiddenInput.focus({ preventScroll: true });
 		hiddenInput.dataset.currentId = wrongInput.id;
+
+		// Force restore scroll position immediately after focus
+		scrollContainer.scrollTop = savedScrollTop;
+
+		// Now do the intentional scroll to parent
+		focusCentered(wrongInputParent);
 	}
 
 	firstTimeChecking = false;
@@ -2139,13 +2149,23 @@ function handleEnterKey(event) {
         if (hiddenInput.dataset.currentId === wrongInput.id) {
             focusCentered(wrongInput);
         } else {
-            focusCentered(parentDiv);
 			document.querySelectorAll('.current-focus-parent').forEach(el => {
 				el.classList.remove('current-focus-parent');
 			});
 			parentDiv.classList.add('current-focus-parent');
-            hiddenInput.focus({ preventScroll: true });
-            hiddenInput.dataset.currentId = wrongInput.id;
+			
+			// Lock scroll before focusing hidden input
+			const container = document.querySelector('#field-for-text-outer');
+			const savedScrollTop = container.scrollTop;
+
+			hiddenInput.focus({ preventScroll: true });
+			hiddenInput.dataset.currentId = wrongInput.id;
+
+			// Restore scroll position
+			container.scrollTop = savedScrollTop;
+			
+			// Now do the intentional scroll to parent
+            focusCentered(parentDiv);
         }
         return;
     }
@@ -2166,6 +2186,7 @@ function handleEnterKey(event) {
         if (checkAnswersButton) checkAnswersButton.click();
     }
 }
+
 
 
 function handleHiddenInputChange(event) {
@@ -2195,11 +2216,12 @@ function focusCentered(element) {
 	const container = document.querySelector('#field-for-text-outer');
 	if (!container) return;
 
-	// Focus element without native scroll jump
-	if (element.tagName.toLowerCase() === 'textarea') {
+	// Only focus if it's an actual input/textarea
+	const isFocusable = element.tagName.toLowerCase() === 'textarea' || 
+	                    element.tagName.toLowerCase() === 'input';
+	
+	if (isFocusable) {
 		element.focus({ preventScroll: true });
-	} else {
-		element.focus({ preventScroll: true }); // Added preventScroll here too
 	}
 
 	// Use requestAnimationFrame to ensure layout is updated before scrolling
