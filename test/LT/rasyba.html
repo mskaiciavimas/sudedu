@@ -1588,6 +1588,8 @@ window.onload = function () {
 				displaySentences();
 				document.getElementById('help-toggle').checked = false;
 				helpToggle();
+			} else {
+				focusFirstInput();
 			}
 		});
 
@@ -1603,6 +1605,8 @@ window.onload = function () {
 				displaySentences();
 				document.getElementById('help-toggle').checked = false;
 				helpToggle();
+			} else {
+				focusFirstInput();
 			}
 		});
 
@@ -1915,7 +1919,7 @@ function checkAnswers() {
 		});
 		wrongInputParent.classList.add('current-focus-parent');
 
-		hiddenInput.focus();
+		hiddenInput.focus({ preventScroll: true });
 		hiddenInput.dataset.currentId = wrongInput.id;
 	}
 
@@ -2061,7 +2065,7 @@ function helpToggle() {
 						return;
 					}
 				}
-				hiddenInput.focus();
+				hiddenInput.focus({ preventScroll: true });
 			}
 
 function enableEnterNavigation() {
@@ -2140,7 +2144,7 @@ function handleEnterKey(event) {
 				el.classList.remove('current-focus-parent');
 			});
 			parentDiv.classList.add('current-focus-parent');
-            hiddenInput.focus();
+            hiddenInput.focus({ preventScroll: true });
             hiddenInput.dataset.currentId = wrongInput.id;
         }
         return;
