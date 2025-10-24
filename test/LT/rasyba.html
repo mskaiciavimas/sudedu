@@ -2149,35 +2149,31 @@ function handleHiddenInputChange(event) {
 
 
 function focusCentered(element) {
-    if (!element) return;
+	if (!element) return;
 
-    // Focus only if it's a textarea
-    if (element.tagName.toLowerCase() === 'textarea') {
-        element.focus({ preventScroll: true });
-    }
+	// Focus textarea without native scroll jump
+	if (element.tagName.toLowerCase() === 'textarea') {
+		element.focus({ preventScroll: true });
+	}
 
-    // Find scrollable container
-    const container = document.querySelector("#field-for-text-outer");
-    if (container) {
-        const containerHeight = container.clientHeight;
-        const elementOffsetTop = element.offsetTop - container.offsetTop;
-        const elementHeight = element.offsetHeight;
+	const container = document.querySelector('#field-for-text-outer');
+	if (!container) return;
 
-        // Scroll so element is vertically centered
-        const scrollTop = elementOffsetTop - (containerHeight / 2) + (elementHeight / 2);
+	// Compute offset relative to the scroll container
+	let offsetTop = 0;
+	let current = element;
+	while (current && current !== container) {
+		offsetTop += current.offsetTop;
+		current = current.offsetParent;
+	}
 
-        container.scrollTo({
-            top: scrollTop,
-            behavior: 'smooth'
-        });
-    } else {
-        // Fallback: scroll the page vertically
-        const windowHeight = window.innerHeight;
-        const rect = element.getBoundingClientRect();
-        const scrollY = window.scrollY + rect.top - (windowHeight / 2) + (rect.height / 2);
+	// Center element vertically inside container
+	const scrollTop = offsetTop - (container.clientHeight / 2) + (element.offsetHeight / 2);
 
-        window.scrollTo({ top: scrollY, behavior: 'smooth' });
-    }
+	container.scrollTo({
+		top: scrollTop,
+		behavior: 'smooth'
+	});
 }
 
 
