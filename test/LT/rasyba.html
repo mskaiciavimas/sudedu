@@ -2059,6 +2059,7 @@ function enableEnterNavigation() {
 
     if (target.classList.contains('question-input')) {
 		hiddenInput.dataset.currentId = "";
+		hiddenInput.value = ''
     }
 });
 }
@@ -2071,14 +2072,23 @@ function handleEnterKey(event) {
     const checkAnswersButton = document.getElementById('check-answers');
     const nextQuestionBtn = document.getElementById('next-question');
 
-    if (letterPattern.test(event.key) && wrongInput && hiddenInput.dataset.currentId === wrongInput.id && document.activeElement !== wrongInput) {
-		console.log("trigger")
+    if (
+		letterPattern.test(event.key) &&
+		wrongInput &&
+		hiddenInput.dataset.currentId === wrongInput.id &&
+		document.activeElement !== wrongInput
+	) {
 		event.preventDefault();
-		wrongInput.focus();
-		wrongInput.value += event.key;
-		wrongInput.dispatchEvent(new Event('input', { bubbles: true }));
-		resizeInput(wrongInput)
-		return
+
+		// Delay focus to ensure mobile keyboard switches
+		setTimeout(() => {
+			wrongInput.focus();
+			wrongInput.value += event.key;
+			wrongInput.dispatchEvent(new Event('input', { bubbles: true }));
+			resizeInput(wrongInput);
+		}, 10);
+
+		return;
 	}
 
     // 🟡 Handle Enter key only
