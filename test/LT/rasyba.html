@@ -93,6 +93,12 @@
 		counter-reset: div-counter;
 	}
 
+	span:focus,
+	span:active {
+		border: none;
+		outline: none;
+	}
+
 	#field-for-text {
 		width: 100%;
 		max-height: 100%;
@@ -177,11 +183,73 @@
 		background: transparent;
 		font-size: var(--font-size);  
 		height: calc(var(--font-size) * 1.211538462);
-		margin-bottom: calc(var(--font-size) / -4);
+		margin-bottom: calc(var(--font-size) / -3.75);
 		text-align: center;
 		font-family: 'SFpro', sans-serif;
 	}
 
+	.pulse {
+	position: relative;
+	border-radius: 25px;
+	overflow: hidden;
+	}
+
+	.pulse::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	border-radius: 25px;
+	background: rgba(182, 200, 103, 0);
+	animation: pulse 600ms ease-in-out forwards;
+	z-index: -1;
+	}
+
+	@keyframes pulse {
+	0% {
+		background: rgba(182, 200, 103, 0);
+	}
+	50% {
+		background: rgba(182, 200, 103, 0.6);
+	}
+	100% {
+		background: rgba(182, 200, 103, 0);
+	}
+	}
+
+	.pulse-word {
+		position: relative;
+		border-radius: 25px;
+		overflow: hidden;
+	}
+
+	.pulse-word::before {
+		content: "";
+		position: absolute;
+		top: -5%;
+		left: -5%;
+		width: 110%;
+		height: 125%;
+		border-radius: 25px;
+		background: rgba(182, 200, 103, 0);
+		filter: blur(5px);
+		animation: pulse-word 600ms ease-in-out forwards;
+		z-index: -1
+	}
+
+	@keyframes pulse-word {
+	0% {
+		background: rgba(182, 200, 103, 0);
+	}
+	50% {
+		background: rgba(213, 126, 126, 0.5);;
+	}
+	100% {
+		background: rgba(182, 200, 103, 0);
+	}
+	}
 
 	input:disabled {
 		user-select: none; /* Prevent text selection */
@@ -194,13 +262,13 @@
 
 	.correct-answer {
 		color: #32ac93;
-		text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7);
+		text-shadow: 0.5px 0.5px 0.5px rgba(0, 0, 0, 0.7);
 		caret-color: black;
 	}
 
 	.wrong-answer {
 		color: #D57E7C;
-		text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7);
+		text-shadow: 0.5px 0.5px 0.5px rgba(0, 0, 0, 0.7);
 		caret-color: black;
 	}
 
@@ -1501,21 +1569,33 @@ window.onload = function () {
 		// Function to get allowed matching categories
 
 		document.getElementById('increase-no-of-sentences').addEventListener('click', () => {
-		if (questionsToDisplay < 5) {
-			questionsToDisplay++;
-			displaySentences();
-			document.getElementById('help-toggle').checked = false;
-			helpToggle();
-		}
+			const inputs = Array.from(document.querySelectorAll('.question-input'));
+			const anyNotEmpty = inputs.some(input => input.value.trim() !== '');
+			if (!firstTimeChecking || anyNotEmpty) {
+				messageToTheUser("Sakinių skaičių galima pakeisti tik prieš įrašant raides.")
+				return
+			}
+			if (questionsToDisplay < 5) {
+				questionsToDisplay++;
+				displaySentences();
+				document.getElementById('help-toggle').checked = false;
+				helpToggle();
+			}
 		});
 
 		document.getElementById('decrease-no-of-sentences').addEventListener('click', () => {
-		if (questionsToDisplay > 1) {
-			questionsToDisplay--;
-			displaySentences();
-			document.getElementById('help-toggle').checked = false;
-			helpToggle();
-		}
+			const inputs = Array.from(document.querySelectorAll('.question-input'));
+			const anyNotEmpty = inputs.some(input => input.value.trim() !== '');
+			if (!firstTimeChecking || anyNotEmpty) {
+				messageToTheUser("Sakinių skaičių galima pakeisti tik prieš įrašant raides.")
+				return
+			}
+			if (questionsToDisplay > 1) {
+				questionsToDisplay--;
+				displaySentences();
+				document.getElementById('help-toggle').checked = false;
+				helpToggle();
+			}
 		});
 
 		function displaySentences() {
@@ -1694,6 +1774,16 @@ function setupDynamicListeners() {
 				allModified = true;
 			}
         });
+
+		const parent = input.parentElement;
+        if (parent) {
+            parent.addEventListener('click', (e) => {
+                // Prevent double-firing if clicking on the input itself
+                if (e.target !== input) {
+                    input.focus();
+                }
+            });
+        }
     });
 }
 
@@ -1794,9 +1884,22 @@ function checkAnswers() {
 
 		localStorage.setItem("controller", JSON.stringify(controller));
 
+		var container = document.querySelector('.field-for-text-outer-holder');
+		container.classList.add('pulse')
+		setTimeout(function() {
+			container.classList.remove('pulse');
+		}, 800);
 	} else {
 		currentAnswerAttempts += 1;
 		allModified = false;
+
+		const wrongInputParent = document.querySelector(".wrong-answer").parentElement;
+		wrongInputParent.tabIndex = 0;
+		wrongInputParent.classList.add('pulse-word');
+		setTimeout(function() {
+			wrongInputParent.classList.remove('pulse-word');
+		}, 800);
+		focusCentered(wrongInputParent);
 	}
 
 	firstTimeChecking = false;
@@ -1951,28 +2054,94 @@ function enableEnterNavigation() {
 }
 
 function handleEnterKey(event) {
-    if (event.key === 'Enter') {
-        event.preventDefault(); // Prevent default behavior like form submission
-        const inputs = Array.from(document.querySelectorAll('.question-input'));
-        const currentIndex = inputs.indexOf(document.activeElement);
+    const letterPattern = /^[a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ]$/;
 
-        if (currentIndex !== -1 && currentIndex < inputs.length - 1) {
-            // Move to the next input field
-            inputs[currentIndex + 1].focus();
-				
-        } else if (currentIndex === inputs.length - 1) {
-            // Autofocus the "check-answers" button when the last input field is reached
-            const checkAnswersButton = document.getElementById('check-answers');
-            if (checkAnswersButton) {
-                checkAnswersButton.focus();
-                checkAnswersButton.click(); // Trigger the button click if focused and Enter is pressed
-					}
+    if (letterPattern.test(event.key)) {
+        const activeEl = document.activeElement;
+
+        if (activeEl && activeEl.classList.contains('question-word-span')) {
+            const textarea = activeEl.querySelector('textarea');
+            if (textarea && document.activeElement !== textarea) {
+                // Only focus the textarea, do NOT manually add the letter
+                textarea.focus();
+
+                // Move cursor to end
+                textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+            }
+        }
+    }
+
+    // 🟡 Handle Enter key only
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+
+    const inputs = Array.from(document.querySelectorAll('.question-input'));
+    const checkAnswersButton = document.getElementById('check-answers');
+    const nextQuestionBtn = document.getElementById('next-question');
+
+    if (!inputs.length) return;
+
+    // 1️⃣ Handle wrong answers
+    const wrongInput = inputs.find(input => input.classList.contains('wrong-answer'));
+    if (wrongInput) {
+        const parentDiv = wrongInput.parentElement;
+
+        if (document.activeElement === parentDiv) {
+            focusCentered(wrongInput);
         } else {
-					if (allAnswersCorrect) {
-							document.getElementById('next-question').focus();
-							document.getElementById('next-question').click();
-						} 
-				}
+            parentDiv.tabIndex = 0;
+            focusCentered(parentDiv);
+            parentDiv.classList.add('pulse-word');
+            setTimeout(() => parentDiv.classList.remove('pulse-word'), 800);
+        }
+        return;
+    }
+
+    // 2️⃣ Focus first empty input if exists
+    const emptyInput = inputs.find(input => !input.value.trim());
+    if (emptyInput) {
+        focusCentered(emptyInput);
+        return;
+    }
+
+    // 3️⃣ Check if all inputs are correct
+    const allCorrect = inputs.every(input => input.classList.contains('correct-answer'));
+
+    if (allCorrect) {
+        if (nextQuestionBtn) nextQuestionBtn.click();
+    } else {
+        if (checkAnswersButton) checkAnswersButton.click();
+    }
+}
+
+
+function focusCentered(input) {
+    if (!input) return;
+
+    // Focus without automatic scroll
+    input.focus({ preventScroll: true });
+
+    // Find scrollable container
+    const container = document.querySelector("#field-for-text-outer");
+    if (container) {
+        const containerHeight = container.clientHeight;
+        const inputOffsetTop = input.offsetTop - container.offsetTop;
+        const inputHeight = input.offsetHeight;
+
+        // Scroll so input is vertically centered
+        const scrollTop = inputOffsetTop - (containerHeight / 2) + (inputHeight / 2);
+
+        container.scrollTo({
+            top: scrollTop,
+            behavior: 'smooth'
+        });
+    } else {
+        // fallback: scroll the page vertically
+        const windowHeight = window.innerHeight;
+        const inputRect = input.getBoundingClientRect();
+        const scrollY = window.scrollY + inputRect.top - (windowHeight / 2) + (inputRect.height / 2);
+
+        window.scrollTo({ top: scrollY, behavior: 'smooth' });
     }
 }
 
