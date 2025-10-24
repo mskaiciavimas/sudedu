@@ -158,7 +158,6 @@
 .practice-outer-div,
 .personal-chl {
     flex: 1 1 400px;
-    max-width: 50%;
 }
 
 .middle-div.wrapped {
@@ -196,7 +195,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100%;
 }
 
 .middle-div {
@@ -438,242 +436,337 @@ body.popup-active {
     transform: none;
 }
 
-.personal-chl-list-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    border-radius: 25px;
-    height: 100%;
-    overflow-y: auto;
-    max-width: 500px;
-    align-items: center;
-    justify-content: start;
-    padding: 15px;
-}
+        .message-board-personal-chl-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 25px;
+            flex-wrap: wrap;
+            min-width: 0;
+            flex: 1 1 400px;
+        }
 
-.chl-card {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 25px;
-    padding: 20px;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-}
+        .container-inner.wrapped .message-board-personal-chl-container {
+            height: auto;
+            width: 100%;
+            gap: 15px;
+        }
 
-.chl-card.expanded {
-    display: flex;
-    flex-direction: column;
-}
+        .container-inner.wrapped .message-board {
+            min-height: 200px;
+        }
 
-.chl-card.expanded .chl-card-header {
-    flex: 1 1 auto;
-}
+        .message-board-container {
+            flex: 1;
+        }
 
-.chl-card.expanded .chl-card-details {
-    flex: 1 1 auto;
-    display: flex;
-}
+        .message-board-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            min-height: 0;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 20px;
+        }
 
-.chl-card:hover::before {
-    opacity: 1;
-}
+        .board-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+            padding: 0 5px;
+        }
 
-.chl-card.expanded {
-    background: rgba(255, 255, 255, 0.4);
-    padding: 20px;
-}
+        .board-title {
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: rgba(0, 0, 0, 0.7);
+        }
 
-.chl-card.expanded::before {
-    opacity: 1;
-}
+        .board-date {
+            font-size: 0.7rem;
+            color: rgba(0, 0, 0, 0.5);
+            font-weight: 600;
+        }
 
-.chl-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
+        .message-board {
+            flex: 1 1 0px;
+            min-height: 0;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 14px;
+        }
 
-.chl-card-header-left {
-    flex: 1;
-    display: flex;
-    gap: 5px;
-}
+        .board-message {
+            font-size: 0.85rem;
+            color: rgba(0, 0, 0, 0.75);
+            line-height: 1.6;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            padding: 8px;
+            margin-left: -8px;
+            margin-right: -8px;
+        }
 
-.chl-card-preview {
-    font-size: 1rem;
-    color: rgba(0, 0, 0, 0.8);
-    line-height: 1.6;
-    font-weight: 500;
-    margin-top: 12px;
-    opacity: 1;
-    max-height: 100px;
-    overflow: hidden;
-    transition: opacity 0 cubic-bezier(0.4, 0, 0.2, 1), 
-                max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
+        .board-message:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(0, 0, 0, 0.85);
+        }
 
-.chl-card.expanded .chl-card-preview {
-    opacity: 0;
-    max-height: 0;
-    margin-top: 0;
-}
+        .board-message:last-child {
+            margin-bottom: 0;
+        }
 
-.chl-type-badge {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    align-self: center;
-}
+        .message-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
 
-.chl-type-math {
-    background: linear-gradient(135deg, #40c9a9, #32ac93);
-    color: white;
-}
+        .message-meta {
+            font-size: 0.7rem;
+            color: rgba(0, 0, 0, 0.5);
+            margin-top: 4px;
+            font-style: italic;
+        }
 
-.chl-type-text-comp {
-    background: linear-gradient(135deg, #40c9a9, #32ac93);
-    color: white;
-}
+        .empty-message {
+            text-align: center;
+            color: rgba(0, 0, 0, 0.5);
+            font-size: 0.8rem;
+            padding: 20px 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-.chl-type-grammar {
-    background: linear-gradient(135deg, #40c9a9, #32ac93);
-    color: white;
-}
+        .personal-chl-content-holder {
+            width: 100%;
+            padding: 15px 0 0 0;
+        }
 
-.chl-info-text {
-    font-size: 1rem;
-    color: rgba(0, 0, 0, 0.8);
-    line-height: 1.6;
-    font-weight: 500;
-    flex: 1 1 auto;
-    overflow: auto;
-}
+        .personal-chl-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 0 1 auto;
+            padding: 20px;
+        }
 
-.chl-expand-icon {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    flex-shrink: 0;
-}
+        .practice-label {
+            font-size: 2rem;
+            font-weight: 700;
+            opacity: 0.9;
+            margin-bottom: 16px;
+            text-align: center;
+            position: relative;
+        }
 
-.chl-expand-icon svg {
-    width: 16px;
-    height: 16px;
-    transition: transform 0.3s ease;
-}
+        .practice-label::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #3288AC, #40c9a9);
+            border-radius: 2px;
+        }
 
-.chl-card.expanded .chl-expand-icon svg {
-    transform: rotate(180deg);
-}
+        .chl-pills-container {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
 
-.chl-card-details {
-    display: flex;
-    flex-direction: column;
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: 
-        opacity 0s linear, 
-        max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
+        .chl-pill {
+            flex: 1;
+            padding: 12px 8px;
+            background: transparent;
+            border: none;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: rgba(0, 0, 0, 0.65);
+            text-align: center;
+            line-height: 1.3;
+            position: relative;
+        }
 
-.chl-label-div {
-    width: 100%;
-    max-width: 500px;
-    display: flex;
-    align-items: center;
-}
+        .chl-pill:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.3);
+            color: rgba(0, 0, 0, 0.8);
+        }
 
-.chl-card.expanded .chl-card-details {
-    max-height: 500px;
-    opacity: 1;
-    margin-top: 15px;
-}
+        .chl-pill.active {
+            background: linear-gradient(135deg, #A0C58F, #32ac93);
+            color: white;
+            box-shadow: 0 2px 8px rgba(64, 201, 169, 0.3);
+        }
 
-.chl-details-info {
-    background: rgba(50, 136, 172, 0.08);
-    border-left: 4px solid #3288AC;
-    padding: 16px;
-    border-radius: 12px;
-    margin-bottom: 16px;
-}
+        .chl-content-container {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 18px;
+            padding: 20px;
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+            container-type: inline-size;
+        }
 
-.chl-details-info-item {
-    font-size: 0.9rem;
-    color: rgba(0, 0, 0, 0.7);
-    line-height: 1.8;
-    margin-bottom: 6px;
-}
+        .chl-content {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+        }
 
-.chl-details-info-item:last-child {
-    margin-bottom: 0;
-}
+        .chl-content.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
 
-.chl-details-info-item strong {
-    color: rgba(0, 0, 0, 0.9);
-    font-weight: 700;
-}
+        .chl-title-holder {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-.chl-action-button {
-    max-width: 100px;
-    min-width: 100px;
-    padding: 12px 10px;
-    border: none;
-    background: linear-gradient(135deg, #3288AC, #286D8A);
-    color: white;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 15px;
-    flex: 1 1 auto;
-}
+        .chl-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: rgba(0, 0, 0, 0.85);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            background: linear-gradient(135deg, #3288AC, #286D8A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
-.chl-action-button-holder {
-    display: flex;
-    justify-content: end;
-}
+        .chl-title .earnings-estimation-outer {
+            font-size: 1rem;
+        }
 
-.chl-action-button::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
-  border-radius: 20px;
-  pointer-events: none;
-  transition: background 0.3s ease;
-}
+        .chl-info {
+            font-size: 0.9rem;
+            color: rgba(0, 0, 0, 0.75);
+            line-height: 1.6;
+            font-weight: 500;
+            margin-bottom: 5px;
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+            display: flex;
+            align-items: center;
+        }
 
-.chl-action-button::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 20px;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
+        .chl-info::-webkit-scrollbar {
+            width: 4px;
+        }
 
-.chl-action-button:hover::before {
-  background: rgba(255, 255, 255, 0.15);
-}
+        .chl-info::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .chl-info::-webkit-scrollbar-thumb {
+            background: rgba(50, 136, 172, 0.4);
+            border-radius: 10px;
+        }
+
+        .chl-action-button {
+            position: relative;
+            width: 100px;
+            align-self: end;
+            padding: 12px;
+            border: none;
+            background: linear-gradient(135deg, #3288AC, #286D8A);
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            border-radius: 20px;
+        }
+
+        .middle-div.wrapped .chl-action-button {
+            width: 100%;
+        }
+        @container (min-width: 400px) {
+        .middle-div.wrapped .chl-action-button {
+            width: 100px;
+        }
+        }
+
+        .chl-action-button::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+            border-radius: 20px;
+            pointer-events: none;
+            transition: background 0.3s ease;
+        }
+
+        .chl-action-button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .chl-action-button:hover::before {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
 
 @media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait) {
     .container {
@@ -707,19 +800,55 @@ body.popup-active {
     #personalChlContainer {
         padding: 15px 0;
     }
-
-    .chl-type-badge {
-        font-size: 1.1rem;
+    
+    .chl-pill {
+        font-size: 1.15rem;
     }
 
-    .chl-card-preview,
-    .chl-info-text {
+    .chl-title {
+        font-size: 1.5rem;
+    }
+
+    .earnings-iki-holder,
+    .coin-amount {
+        font-size: 1.35rem;
+    }
+
+    .coin-icon img {
+        width: 36px;
+        height: 36px;
+    }
+
+    .chl-info {
+        font-size: 1.15rem;
+    }
+
+    .board-title {
         font-size: 1.25rem;
+    }
+
+    .board-date {
+        font-size: 1rem;
+    }
+
+    .submit-button {
+        font-size: 1.35rem;
+    }
+
+    .board-message {
+        font-size: 1.1rem;
     }
 
     .chl-action-button {
         font-size: 1.25rem;
-        padding: 14px 14px
+    }
+
+    .middle-div.wrapped .chl-action-button {
+        width: 120px;
+    }
+
+    .message-meta {
+        font-size: 0.9rem;
     }
 }
 
@@ -744,8 +873,47 @@ body.popup-active {
         min-width: 0;
     }
 
-    .chl-card {
-        padding: 15px;
+     .message-board-container {
+            padding: 15px;
+        }
+
+        .board-title {
+            font-size: 0.8rem;
+        }
+
+        .board-message {
+            font-size: 0.8rem;
+        }
+
+        .message-board {
+            padding: 12px;
+            min-height: 70px;
+            max-height: 110px;
+        }
+
+    .practice-label {
+        font-size: 1.5rem;
+    }
+
+    .chl-pill {
+        padding: 11px 6px;
+        font-size: 0.75rem;
+    }
+
+    .chl-content-container {
+        height: 220px;
+        padding: 18px;
+    }
+
+    .chl-content {
+        top: 18px;
+        left: 18px;
+        right: 18px;
+        bottom: 18px;
+    }
+
+    .chl-title {
+        font-size: 1.05rem;
     }
 
     .container-inner.wrapped {
@@ -793,8 +961,13 @@ body.popup-active {
         padding: 10px 0;
     }
 
-    .personal-chl-inner {
+    .personal-chl-container {
         padding: 15px;
+    }
+
+    .personal-chl-content-holder {
+        padding: 10px 0 0 0;
+        max-width: 100%;
     }
 
     .container-inner.wrapped {
@@ -1230,15 +1403,28 @@ body.popup-active {
                 </div>
 			</div>
             </div>
-            <div class="personal-chl">
-                <div class="personal-chl-inner">
-                <div class="practice-label-div chl-label-div">
-					<div class="practice-label">IŠŠŪKIAI</div>
-				</div>
-                <div class="personal-chl-list-container" id="personalChlContainer"></div>
+            <div class="message-board-personal-chl-container">
+
+            <div class="message-board-container">
+                <div class="board-header">
+                    <div class="board-title">Naujienos</div>
+                    <div class="board-date" id="currentDate"></div>
+                </div>
+                <div class="message-board hide-scrollbar" id="messageBoard">
+                    <!-- Messages will be inserted here -->
+                </div>
             </div>
+            
+            <div class="personal-chl-container">
+                <div class="practice-label">IŠŠŪKIAI</div>
+                
+                <div class="personal-chl-content-holder">
+                    <div class="chl-pills-container" id="chlPills"></div>
+                    <div class="chl-content-container" id="chlContentContainer"></div>
+                </div>
             </div>
 			</div>
+            </div>
 		</div>
 
 
@@ -1503,6 +1689,68 @@ async function updateUserClass (userClassSelection) {
 }
 
 //POPUP SCRIPT END
+      
+const messagesToUsers = [
+            {   
+                title: "Naujos Užduotys",
+                text: "Šią savaitę pridėjome naujų užduočių visoms klasėms.",
+                fullText: "Šią savaitę pridėjome naujų užduočių visoms klasėms. Ačiū už jūsų atsiliepimus! Dabar galite rasti daugiau užduočių skaitmeninėje lygybėje, teksto supratime ir rašybos pratybose. Nuolat tobuliname turinį pagal jūsų poreikius.",
+                date: "2025-01-20"
+            },
+            {
+                title: "Priminimas",
+                text: "Primename: reguliari praktika pagerina rezultatus.",
+                fullText: "Primename: reguliari praktika pagerina rezultatus. Rekomenduojame praktikuotis 15-20 minučių kasdien. Tyrimai rodo, kad nuoseklus mokymasis yra efektyvesnis nei ilgi, bet reti pratybų seansai. Sukurkite savo rutiną ir stebėkite savo pažangą!",
+                date: "2025-01-18"
+            },
+            {
+                title: "Nuaja Funkcija",
+                text: "Naujas funkcionalumas: dabar galite sekti savo pažangą per laiką.",
+                fullText: "Naujas funkcionalumas: dabar galite sekti savo pažangą per laiką. Žiūrėkite statistikos skiltį ir analizuokite, kuriose srityse jums sekasi geriausiai, o kur galite tobulėti. Grafikais vaizduojami jūsų rezultatai padės geriau suprasti savo mokymosi kelią.",
+                date: "2025-01-15"
+            }
+        ];
+
+function displayMessages () {
+    const messageBoard = document.getElementById('messageBoard');
+    const currentDateEl = document.getElementById('currentDate');
+
+    // Set current date
+    const today = new Date();
+    const dateStr = today.toLocaleDateString('lt-LT', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    currentDateEl.textContent = dateStr;
+
+    // Populate messages
+    if (messagesToUsers.length > 0) {
+        messagesToUsers.forEach(msg => {
+            const messageEl = document.createElement('div');
+            messageEl.className = 'board-message';
+            
+            const msgDate = new Date(msg.date);
+            const formattedDate = msgDate.toLocaleDateString('lt-LT', { 
+                month: 'short', 
+                day: 'numeric' 
+            });
+            
+            messageEl.innerHTML = `
+                ${msg.text}
+                <div class="message-meta">${formattedDate}</div>
+            `;
+
+
+            messageEl.addEventListener('click', () => openObjectPopup(msg.fullText, msg.title, msg.date) );
+            messageBoard.appendChild(messageEl);
+        });
+    } else {
+        messageBoard.innerHTML = '<div class="empty-message">Naujienų nėra!</div>';
+    }
+}
+
+displayMessages();
 
 const timerInputElement = document.querySelector('#timer-input');
 const questionNumberInputElement = document.querySelector('#question-number-input');
@@ -1568,7 +1816,7 @@ const personalChlDict = {
 const typeLabels = {
     "math": "Matematika",
     "text-comp": "Teksto supratimas",
-    "grammar": "Rašyba"
+    "grammar": "Gramatika"
 };
 
 function displayPersonalChl() {
@@ -1594,9 +1842,10 @@ function displayPersonalChl() {
         };
     });
 
-    container.innerHTML = '';
+    const pillsContainer = document.getElementById('chlPills');
+    const contentContainer = document.getElementById('chlContentContainer');
 
-    challenges.forEach(challenge => {
+    challenges.forEach((challenge, index) => {
         // Filter out unwanted items
         const filteredInfo = challenge.chlInfo.filter(item =>
             !item.includes('KLASĖ') &&
@@ -1620,26 +1869,40 @@ function displayPersonalChl() {
             }
         });
 
-        // Remove first item if needed
-        processedItems.shift();
+        if (processedItems.some(i => i.content === "TEKSTO SUPRATIMAS" || i.content === "GRAMATIKA")) {
+            processedItems.shift();
+        }
 
-        const card = document.createElement('div');
-        card.className = 'chl-card';
-        card.dataset.challenge = challenge.chl;
-        card.dataset.type = challenge.type;
+        const pill = document.createElement('button');
+        pill.className = `chl-pill ${index === 0 ? 'active' : ''}`;
+        pill.textContent = typeLabels[challenge.type];
+        pill.dataset.index = index;
+        pill.addEventListener('click', () => switchTab(index));
+        pillsContainer.appendChild(pill);
 
-        // Card header
-        const header = document.createElement('div');
-        header.className = 'chl-card-header';
+        const content = document.createElement('div');
+        content.className = `chl-content ${index === 0 ? 'active' : ''}`;
 
-        const headerLeft = document.createElement('div');
-        headerLeft.className = 'chl-card-header-left';
+        // Title
+        const title = document.createElement('div');
+        title.className = 'chl-title';
+        title.textContent = typeLabels[challenge.type];
 
-        const badge = document.createElement('div');
-        badge.className = `chl-type-badge chl-type-${challenge.type}`;
-        badge.textContent = typeLabels[challenge.type] || challenge.type;
+        // Info
+        console.log(processedItems)
+        const personalChlIInfo = document.createElement('div');
+        personalChlIInfo.className = 'chl-info';
+        personalChlIInfo.textContent = processedItems.map(item => item.content).join(' • ');
 
-        headerLeft.appendChild(badge);
+        // Button
+        const personalChLButton = document.createElement('button');
+        personalChLButton.className = 'chl-action-button';
+        personalChLButton.textContent = 'Atlikti';
+        personalChLButton.addEventListener('click', () => completePersonalChlTask(challenge.chl, challenge.duration));
+
+        const titleHodler = document.createElement('div');
+        titleHodler.className = 'chl-title-holder';
+        titleHodler.appendChild(title)
 
         if (userData && userData.knowledgeLvl) {
             const potentialEarningsDisplay = document.createElement('div');
@@ -1661,7 +1924,7 @@ function displayPersonalChl() {
                                 <span class="coin-icon">
                                         <img src="../images/icons/icon-sudedu-coin.png">
                                 </span>
-                                <span class="coin-amount">${Number((calculateTasksPerCorrectAnswerPoints(challenge.chl)*personalChlCoinBonusModifier).toFixed(2))}</span>
+                                <span class="coin-amount">${Number((calculateTasksPerCorrectAnswerPoints(challenge.chl, challenge)*personalChlCoinBonusModifier).toFixed(2))}</span>
                                 </span>
                                 <div 
                                     class="info-icon"
@@ -1710,134 +1973,35 @@ function displayPersonalChl() {
 
             potentialEarningsDisplay.innerHTML = earningsDiplay
             
-            headerLeft.appendChild(potentialEarningsDisplay);
+            titleHodler.appendChild(potentialEarningsDisplay);
         }
 
-        const expandIcon = document.createElement('div');
-        expandIcon.className = 'chl-expand-icon';
-        expandIcon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+        
+        // Append all elements
+        content.appendChild(titleHodler);
+        content.appendChild(personalChlIInfo);
+        content.appendChild(personalChLButton);
 
-        header.appendChild(headerLeft);
-        header.appendChild(expandIcon);
-
-        // Preview logic
-        let previewIndices;
-        if (challenge.type === 'grammar') {
-            previewIndices = [processedItems.length - 1];
-        } else {
-            previewIndices = [0, processedItems.length - 1];
-        }
-
-        const previewParts = [];
-        previewIndices.forEach(idx => {
-            if (processedItems[idx]) previewParts.push(processedItems[idx].content);
-        });
-
-        const preview = document.createElement('div');
-        preview.className = 'chl-card-preview';
-        preview.textContent = previewParts.join(' • ');
-
-        // Full text
-        const fullText = processedItems.map(item => item.content).join(' • ');
-
-        const details = document.createElement('div');
-        details.className = 'chl-card-details';
-
-        const info = document.createElement('div');
-        info.className = 'chl-info-text';
-        info.textContent = fullText;
-
-        const button = document.createElement('button');
-        button.className = 'chl-action-button';
-        button.textContent = 'Atlikti';
-        button.onclick = (e) => {
-            e.stopPropagation();
-            completePersonalChlTask(challenge.chl);
-        };
-
-        const buttonHolder = document.createElement('div');
-        buttonHolder.className = 'chl-action-button-holder';
-        buttonHolder.appendChild(button);
-
-        details.appendChild(info);
-        details.appendChild(buttonHolder);
-
-        card.appendChild(header);
-        card.appendChild(preview);
-        card.appendChild(details);
-
-        card.addEventListener('click', () => toggleCard(card));
-
-        container.appendChild(card);
+        contentContainer.appendChild(content);
     });
 }
 
-function toggleCard(clickedCard) {
-    const allCards = document.querySelectorAll('.chl-card');
-    const container = document.querySelector('.middle-div');
+function switchTab(index) {
+    const pills = document.querySelectorAll('.chl-pill');
+    const contents = document.querySelectorAll('.chl-content');
 
-    allCards.forEach(card => {
-        if (card !== clickedCard && card.classList.contains('expanded')) {
-            card.classList.remove('expanded');
-        }
+    pills.forEach((pill, i) => {
+        pill.classList.toggle('active', i === index);
     });
 
-    const isExpanding = !clickedCard.classList.contains('expanded');
-    clickedCard.classList.toggle('expanded');
-
-    if (isExpanding && container) {
-        setTimeout(() => {
-            const cardRect = clickedCard.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-
-            const cardBottomRelative = cardRect.bottom - containerRect.top;
-            const containerHeight = container.clientHeight;
-
-            if (cardBottomRelative > containerHeight) {
-                const scrollAmount = container.scrollTop + (cardBottomRelative - containerHeight + 20);
-                container.scrollTo({ top: scrollAmount, behavior: 'smooth' });
-            }
-        }, 400);
-    }
-}
-
-
-function toggleCard(clickedCard) {
-    const allCards = document.querySelectorAll('.chl-card');
-    const container = document.querySelector('.middle-div');
-
-    // Collapse other cards
-    allCards.forEach(card => {
-        if (card !== clickedCard && card.classList.contains('expanded')) {
-            card.classList.remove('expanded');
-        }
+    contents.forEach((content, i) => {
+        content.classList.toggle('active', i === index);
     });
-
-    const isExpanding = !clickedCard.classList.contains('expanded');
-    clickedCard.classList.toggle('expanded');
-
-    if (isExpanding && container) {
-        setTimeout(() => {
-            const cardRect = clickedCard.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-
-            const cardBottomRelative = cardRect.bottom - containerRect.top;
-            const containerHeight = container.clientHeight;
-
-            if (cardBottomRelative > containerHeight) {
-                const scrollAmount = container.scrollTop + (cardBottomRelative - containerHeight + 20);
-                container.scrollTo({
-                    top: scrollAmount,
-                    behavior: 'smooth'
-                });
-            }
-        }, 400);
-    }
 }
 
-
-function completePersonalChlTask(challengeInfo) {
-    const parsedCurrentTaskInstructions = JSON.parse(challengeInfo);
+function completePersonalChlTask(challengeInfo, challengeDuration) {
+    const parsedCurrentTaskInstructions = challengeInfo;
+    const currentTaskDuration = challengeDuration
 
     if (localStorage.getItem('controller') !== null) {
         controller = JSON.parse(localStorage.getItem('controller'))
@@ -1846,35 +2010,53 @@ function completePersonalChlTask(challengeInfo) {
     var checkbox = document.getElementById("remainder-input");
 
     controller.language = "LT";
-    if (parsedCurrentTaskInstructions[0] === "math") {
+        if (parsedCurrentTaskInstructions[0] === "math") {
         controller.mode = 'math';
         controller.modeChoice1 = parsedCurrentTaskInstructions[1];
         controller.modeChoice2 = parsedCurrentTaskInstructions[2];
-        controller.selectedNumbers = parsedCurrentTaskInstructions[8];
-        controller.withRemainder = parsedCurrentTaskInstructions[9];
         controller.modeChoice3 = parsedCurrentTaskInstructions[3];
-        controller.modeChoice4 = parsedCurrentTaskInstructions[4];
-        controller.modeChoice5 = parsedCurrentTaskInstructions[5];
-        controller.modeChoice6 = parsedCurrentTaskInstructions[6];
-        controller.modeChoice7 = parsedCurrentTaskInstructions[7];
-        controller.modeChoice8 = "C79";
+        controller.modeChoice5 = parsedCurrentTaskInstructions[4];
+        controller.modeChoice6 = parsedCurrentTaskInstructions[5];
+        controller.modeChoice7 = parsedCurrentTaskInstructions[6];
+        controller.selectedNumbers = parsedCurrentTaskInstructions[7];
+        controller.withRemainder = parsedCurrentTaskInstructions[8];
+        controller.modeChoice8 = parsedCurrentTaskInstructions[9];
         controller.task = ["personalChl", null];
         controller.taskCompleted = false;
-        controller.setTaskDuration = parsedCurrentTaskInstructions[10];
+
+        controller.modeChoice4 = currentTaskDuration[0];
+        controller.setTaskDuration = currentTaskDuration[1];
 
     } else if (parsedCurrentTaskInstructions[0] === "lang") {
         controller.mode = 'lang';
-        controller.classChoice = parsedCurrentTaskInstructions[1];
-        controller.modeChoice1 = parsedCurrentTaskInstructions[2];
-        controller.modeChoice2 = parsedCurrentTaskInstructions[3];
-        controller.modeChoice3 = parsedCurrentTaskInstructions[4];
-        controller.modeChoice4 = parsedCurrentTaskInstructions[5];
-        controller.modeChoice5 = parsedCurrentTaskInstructions[6];
-        controller.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[7];
-        controller.questionFrequency = parsedCurrentTaskInstructions[8];
-        controller.task = ["personalChl", null];
-        controller.taskCompleted = false;
-        controller.setTaskDuration = parsedCurrentTaskInstructions[9];
+        if (parsedCurrentTaskInstructions[2] === "C49") {
+            controller.classChoice = parsedCurrentTaskInstructions[1];
+            controller.modeChoice1 = parsedCurrentTaskInstructions[2];
+            controller.modeChoice2 = parsedCurrentTaskInstructions[3];
+            controller.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[4];
+
+            controller.task = ["personalChl", null];
+            controller.taskCompleted = false;
+            
+            controller.modeChoice4 = currentTaskDuration[0];
+            controller.setTaskDuration = currentTaskDuration[1];
+
+        } else if (parsedCurrentTaskInstructions[2] === "C83") {
+            if (parsedCurrentTaskInstructions[3] === "C50") {
+                controller.classChoice = parsedCurrentTaskInstructions[1];
+                controller.modeChoice1 = parsedCurrentTaskInstructions[2];
+                controller.modeChoice2 = parsedCurrentTaskInstructions[3];
+                controller.modeChoice3 = parsedCurrentTaskInstructions[4];
+                controller.modeChoice5 = parsedCurrentTaskInstructions[5];
+                controller.questionFrequency = parsedCurrentTaskInstructions[6];
+                
+                controller.task = ["personalChl", null];
+                controller.taskCompleted = false;
+
+                controller.modeChoice4 = currentTaskDuration[0];
+                controller.setTaskDuration = currentTaskDuration[1];
+            }
+        }
     }
 
     localStorage.setItem('controller', JSON.stringify(controller))
@@ -1886,21 +2068,30 @@ function checkWrap() {
   const middleDivEl = document.querySelector('.middle-div');
   const containerInnerEl = document.querySelector('.container-inner');
   const practiceHolderDiv = document.querySelector(".practice-outer-div");
-  const personalChlHolderDiv = document.querySelector(".personal-chl");
-  if (!middleDivEl || !containerInnerEl || !practiceHolderDiv || !personalChlHolderDiv) return;
+  const messageBoardPersonalChlHolderDiv = document.querySelector(".message-board-personal-chl-container");
 
-  middleDivEl.classList.remove('wrapped');
-  const wrapped = personalChlHolderDiv.offsetTop > practiceHolderDiv.offsetTop;
-  
-  middleDivEl.classList.toggle('wrapped', wrapped);
-  containerInnerEl.classList.toggle('wrapped', wrapped);
-  
-  // Call setProperHeight after wrapping changes
-  if (wrapped) {
-    setTimeout(setProperHeight, 50);
-  } else {
-    document.querySelector('.practice-outer-div').style.height = "100%";
-  }
+  if (!middleDivEl || !containerInnerEl || !practiceHolderDiv || !messageBoardPersonalChlHolderDiv) return;
+
+  // Defer measurement until after layout settles
+  requestAnimationFrame(() => {
+    // Remove wrapped first to re-measure cleanly
+    middleDivEl.classList.remove('wrapped');
+    containerInnerEl.classList.remove('wrapped');
+
+    // Recalculate after class removal
+    const wrapped = messageBoardPersonalChlHolderDiv.offsetTop > practiceHolderDiv.offsetTop;
+
+    // Toggle classes accordingly
+    middleDivEl.classList.toggle('wrapped', wrapped);
+    containerInnerEl.classList.toggle('wrapped', wrapped);
+
+    // Handle height adjustment
+    if (wrapped) {
+      setTimeout(setProperHeight, 50);
+    } else {
+      practiceHolderDiv.style.height = "100%";
+    }
+  });
 }
 
 function setProperHeight() {

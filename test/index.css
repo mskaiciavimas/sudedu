@@ -661,7 +661,7 @@ button:disabled {
 }
 
 #remainder-option {
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .selected_numbers_inner_div {
@@ -685,7 +685,7 @@ button:disabled {
 
 .number-choice-label-iki,
 .number-choice-label-nuo {
-    font-weight: 600;
+    font-weight: 500;
     font-size: 1.75rem;
 }
 
@@ -738,7 +738,7 @@ button:disabled {
 .timer-choice-label,
 .answer-number-label {
     font-size: 1.75rem;
-    font-weight: 600;
+    font-weight: 500;
     margin-top: 0;
     margin-bottom: 0;
     width: 130px;
@@ -947,15 +947,26 @@ button:disabled {
 }
 
 .object-popup-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  color: #666;
-  padding-top: 0;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 1.5rem;
+    color: rgba(0, 0, 0, 0.7);
+}
+
+.object-popup-close:hover {
+    background: rgba(0, 0, 0, 0.15);
+    transform: rotate(90deg);
 }
 
 .object-popup-title {
@@ -970,6 +981,7 @@ button:disabled {
 
 .object-popup-content {
   margin-top: 10px;
+  line-height: 1.7;
 }
 
 .object-popup-title-subtitle-wrapper {
@@ -1300,5 +1312,9 @@ button:disabled {
 
   .object-popup-close {
     font-size: 2rem;
+  }
+
+  .object-popup-content {
+    font-size: 1.25rem;
   }
 }
