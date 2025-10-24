@@ -869,7 +869,7 @@
 
 			<div id="field-for-text-outer">
 			<div id="field-for-text" style="position: relative;" class="field">
-				<textarea id="hidden-input" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false"></textarea>
+				<textarea id="hidden-input" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-current-id=""></textarea>
 				<div id="field-for-sentences"></div>
 				<div id="field-for-final-message"></div>
 				<div id="restart-reset-button-row" class="row justify-content-center align-items-center" style="display: none;">
@@ -1902,7 +1902,7 @@ function checkAnswers() {
 			wrongInputParent.classList.remove('pulse-word');
 		}, 800);
 		hiddenInput.focus();
-		hiddenInput.value = wrongInput.id;
+		hiddenInput.dataset.currentId = wrongInput.id;
 	}
 
 	firstTimeChecking = false;
@@ -2058,7 +2058,7 @@ function enableEnterNavigation() {
     const target = event.target;
 
     if (target.classList.contains('question-input')) {
-		hiddenInput.value = "";
+		hiddenInput.dataset.currentId = "";
     }
 });
 }
@@ -2071,12 +2071,15 @@ function handleEnterKey(event) {
     const checkAnswersButton = document.getElementById('check-answers');
     const nextQuestionBtn = document.getElementById('next-question');
 
-    if (letterPattern.test(event.key)) {
-        if (wrongInput && wrongInput.id === hiddenInput.value) {
-            wrongInput.focus();
-        }
+    if (letterPattern.test(event.key) && wrongInput && hiddenInput.dataset.currentId === wrongInput.id && document.activeElement !== wrongInput) {
+		console.log("trigger")
+		event.preventDefault();
+		wrongInput.focus();
+		wrongInput.value += event.key;
+		wrongInput.dispatchEvent(new Event('input', { bubbles: true }));
+		resizeInput(wrongInput)
 		return
-    }
+	}
 
     // 🟡 Handle Enter key only
     if (event.key !== 'Enter') return;
@@ -2089,14 +2092,14 @@ function handleEnterKey(event) {
     if (wrongInput) {
         const parentDiv = wrongInput.parentElement;
 
-        if (hiddenInput.value === wrongInput.id) {
+        if (hiddenInput.dataset.currentId === wrongInput.id) {
             focusCentered(wrongInput);
         } else {
             focusCentered(parentDiv);
             parentDiv.classList.add('pulse-word');
             setTimeout(() => parentDiv.classList.remove('pulse-word'), 800);
 			hiddenInput.focus();
-			hiddenInput.value = wrongInput.id;
+			hiddenInput.dataset.currentId = wrongInput.id;
         }
         return;
     }

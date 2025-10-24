@@ -3498,8 +3498,6 @@ function calculateTasksPerCorrectAnswerPoints (type) {
           taskInfoTemp["C83"] = false;
       }
 
-              console.log(controller, taskInfoTemp)
-
     // Helper to get task weight
     const getTaskWeight = (task) => {
         const taskWeightArray = pointWeights[task]?.values;
