@@ -2050,56 +2050,53 @@ function helpToggle() {
 				hiddenInput.focus();
 			}
 
-hiddenInput.addEventListener('input', (event) => {
-    hiddenInput.value = '';
-});
-
 function enableEnterNavigation() {
     // Ensure the event listener is added only once
     document.removeEventListener('keydown', handleEnterKey);
     document.addEventListener('keydown', handleEnterKey);
 	document.addEventListener('focusin', (event) => {
-    const target = event.target;
+		const target = event.target;
 
-    if (target.classList.contains('question-input')) {
-		hiddenInput.dataset.currentId = "";
-		hiddenInput.value = ''
-    }
-});
+		if (target.classList.contains('question-input')) {
+			hiddenInput.dataset.currentId = "";
+			hiddenInput.value = ''
+		}
+	});
+	
+	hiddenInput.addEventListener('keydown', handleEnterKey);
+	hiddenInput.addEventListener('input', handleHiddenInputChange);
 }
 
 function handleEnterKey(event) {
     const letterPattern = /^[a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ]$/;
-	const inputs = Array.from(document.querySelectorAll('.question-input'));
-	const wrongInput = inputs.find(input => input.classList.contains('wrong-answer'));
+    const inputs = Array.from(document.querySelectorAll('.question-input'));
+    const wrongInput = inputs.find(input => input.classList.contains('wrong-answer'));
 
     const checkAnswersButton = document.getElementById('check-answers');
     const nextQuestionBtn = document.getElementById('next-question');
 
+    // Handle letter keys (desktop only)
     if (letterPattern.test(event.key) && wrongInput && hiddenInput.dataset.currentId === wrongInput.id) {
         event.preventDefault();
         
-        // Focus the wrong input if it's not already focused
         if (document.activeElement !== wrongInput) {
-			hiddenInput.blur();
+            hiddenInput.blur();
             wrongInput.focus();
         }
         
-        // Add the letter to the input
         wrongInput.value += event.key;
         wrongInput.dispatchEvent(new Event('input', { bubbles: true }));
         resizeInput(wrongInput);
         return;
     }
 
-    // 🟡 Handle Enter key only
+    // Handle Enter key only
     if (event.key !== 'Enter') return;
     event.preventDefault();
 
     if (!inputs.length) return;
 
-    // 1️⃣ Handle wrong answers
-
+    // Handle wrong answers
     if (wrongInput) {
         const parentDiv = wrongInput.parentElement;
 
@@ -2109,26 +2106,46 @@ function handleEnterKey(event) {
             focusCentered(parentDiv);
             parentDiv.classList.add('pulse-word');
             setTimeout(() => parentDiv.classList.remove('pulse-word'), 800);
-			hiddenInput.focus();
-			hiddenInput.dataset.currentId = wrongInput.id;
+            hiddenInput.focus();
+            hiddenInput.dataset.currentId = wrongInput.id;
         }
         return;
     }
 
-    // 2️⃣ Focus first empty input if exists
+    // Focus first empty input if exists
     const emptyInput = inputs.find(input => !input.value.trim());
     if (emptyInput) {
         focusCentered(emptyInput);
         return;
     }
 
-    // 3️⃣ Check if all inputs are correct
+    // Check if all inputs are correct
     const allCorrect = inputs.every(input => input.classList.contains('correct-answer'));
 
     if (allCorrect) {
         if (nextQuestionBtn) nextQuestionBtn.click();
     } else {
         if (checkAnswersButton) checkAnswersButton.click();
+    }
+}
+
+// NEW: Add this separate handler for mobile input
+function handleHiddenInputChange(event) {
+    const inputs = Array.from(document.querySelectorAll('.question-input'));
+    const wrongInput = inputs.find(input => input.classList.contains('wrong-answer'));
+    
+    if (wrongInput && hiddenInput.dataset.currentId === wrongInput.id) {
+        const newValue = hiddenInput.value;
+        
+        if (newValue) {
+            // Transfer the input to wrong input
+            wrongInput.value += newValue;
+            wrongInput.dispatchEvent(new Event('input', { bubbles: true }));
+            resizeInput(wrongInput);
+            
+            // Clear hidden input
+            hiddenInput.value = '';
+        }
     }
 }
 
