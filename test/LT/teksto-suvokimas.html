@@ -1647,25 +1647,27 @@ window.onload = function () {
     const stopButtonElement = document.querySelector('.stop-button');
     let stopButtonSpanElement = document.querySelector('#stop-button-span');
 
+
+    
+    window.stopQuestionsCloseActions = function () {
+      controller.questionsStopped = true;
+      clearInterval(timerInterval);
+      stopButtonSpanElement.innerHTML = "refresh";
+      checkAnswerBtn.disabled = true;
+      helpBtn.disabled = true;
+      nextQuestionBtn.disabled = true;
+      updateSortables()
+      controller.questionsStopped = true;
+      localStorage.setItem("elapsedTime", timerDisplay.textContent);
+      localStorage.setItem('controller', JSON.stringify(controller));
+      document.querySelector(".tracker-timer-holder").style.paddingLeft = "15px";
+      initiateTheProgram() 
+      document.querySelector(".help-and-check-button-holder").style.display = "none"
+    }
+
     function stopQuestions() {
 				if (stopButtonSpanElement.innerHTML === "close") {
           showCustomConfirm("Ar tikrai nori sustabdyti užduotį?", stopQuestionsCloseActions);
-
-          function stopQuestionsCloseActions () {
-            controller.questionsStopped = true;
-            clearInterval(timerInterval);
-            stopButtonSpanElement.innerHTML = "refresh";
-            checkAnswerBtn.disabled = true;
-            helpBtn.disabled = true;
-            nextQuestionBtn.disabled = true;
-            updateSortables()
-            controller.questionsStopped = true;
-            localStorage.setItem("elapsedTime", timerDisplay.textContent);
-            localStorage.setItem('controller', JSON.stringify(controller));
-            document.querySelector(".tracker-timer-holder").style.paddingLeft = "15px";
-            initiateTheProgram() 
-            document.querySelector(".help-and-check-button-holder").style.display = "none"
-          }
 				} else if (stopButtonSpanElement.innerHTML === "refresh") {
           controller.questionsStopped = false;
 					stopButtonSpanElement.innerHTML = "close";

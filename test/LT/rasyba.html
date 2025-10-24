@@ -1950,30 +1950,30 @@ function helpToggle() {
 				}
 			}
 
+			window.stopQuestionsCloseActions = function () {
+				controller.questionsStopped = true;
+				clearInterval(timerInterval);
+				stopButtonSpanElement.innerHTML = "refresh";
+				document.getElementById('check-answers').disabled = true;
+				document.getElementById('check-answers').style.display = "inline-block";
+				document.getElementById('help-toggle').disabled = true;
+				document.getElementById('next-question').style.display = "none";
+				document.getElementById('show-answers').style.visibility = "hidden";
+				document.querySelector('.help-toggle-holder').style.visibility = "hidden";
+
+				document.querySelectorAll('.question-input').forEach(input => {
+					input.disabled = true;
+				});
+
+				resetMistakeButtonsElement.style.display = "flex";
+				localStorage.setItem("elapsedTime", timerDisplay.textContent);
+				localStorage.setItem('controller', JSON.stringify(controller))
+				formatFinalMessageForGrammar();
+			}
+
 			function stopQuestions() {
 				if (stopButtonSpanElement.innerHTML === "close") {
 					showCustomConfirm("Ar tikrai nori sustabdyti užduotį?", stopQuestionsCloseActions);
-
-					function stopQuestionsCloseActions () {
-						controller.questionsStopped = true;
-						clearInterval(timerInterval);
-						stopButtonSpanElement.innerHTML = "refresh";
-						document.getElementById('check-answers').disabled = true;
-						document.getElementById('check-answers').style.display = "inline-block";
-						document.getElementById('help-toggle').disabled = true;
-						document.getElementById('next-question').style.display = "none";
-						document.getElementById('show-answers').style.visibility = "hidden";
-						document.querySelector('.help-toggle-holder').style.visibility = "hidden";
-
-						document.querySelectorAll('.question-input').forEach(input => {
-							input.disabled = true;
-						});
-
-						resetMistakeButtonsElement.style.display = "flex";
-						localStorage.setItem("elapsedTime", timerDisplay.textContent);
-						localStorage.setItem('controller', JSON.stringify(controller))
-						formatFinalMessageForGrammar();
-					}
 				} else if (stopButtonSpanElement.innerHTML === "refresh") {
 					stopButtonSpanElement.innerHTML = "close";
 					controller.questionsStopped = false;

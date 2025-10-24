@@ -481,7 +481,8 @@ body.popup-active {
             padding: 0 5px;
         }
 
-        .board-title {
+        .board-title,
+        .personal-chl-label {
             font-size: 1.15rem;
             font-weight: 700;
             text-transform: uppercase;
@@ -507,7 +508,7 @@ body.popup-active {
         }
 
         .board-message {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: rgba(0, 0, 0, 0.75);
             line-height: 1.6;
             margin-bottom: 12px;
@@ -557,223 +558,300 @@ body.popup-active {
 
         .personal-chl-content-holder {
             width: 100%;
-            padding: 15px 0 0 0;
         }
 
         .personal-chl-container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 0 1 auto;
-            padding: 20px;
-        }
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 auto;
+    padding: 20px;
+}
 
-        .practice-label {
-            font-size: 2rem;
-            font-weight: 700;
-            opacity: 0.9;
-            margin-bottom: 16px;
-            text-align: center;
-            position: relative;
-        }
+.chl-header {
+    align-items: center;
+    margin-bottom: 16px;
+    display: flex; 
+    justify-content: flex-start; 
+    margin-bottom: 12px; 
+    font-size: 1.25rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
 
-        .practice-label::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 4px;
-            background: linear-gradient(90deg, #3288AC, #40c9a9);
-            border-radius: 2px;
-        }
+.chl-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
 
-        .chl-pills-container {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 12px;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 6px;
-            border-radius: 18px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+.chl-info-text-inner {
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
 
-        .chl-pill {
-            flex: 1;
-            padding: 12px 8px;
-            background: transparent;
-            border: none;
-            border-radius: 13px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            color: rgba(0, 0, 0, 0.65);
-            text-align: center;
-            line-height: 1.3;
-            position: relative;
-        }
+.chl-title-math {
+    color: #286D8A;
+}
 
-        .chl-pill:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.3);
-            color: rgba(0, 0, 0, 0.8);
-        }
+.chl-title-text-comp {
+    color: #32ac93;
+}
 
-        .chl-pill.active {
-            background: linear-gradient(135deg, #A0C58F, #32ac93);
-            color: white;
-            box-shadow: 0 2px 8px rgba(64, 201, 169, 0.3);
-        }
+.chl-title-grammar {
+    color: #F28C28;
+}
 
-        .chl-content-container {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 18px;
-            padding: 20px;
-            position: relative;
-            height: 200px;
-            overflow: hidden;
-            container-type: inline-size;
-        }
+.practice-label {
+    font-size: 2rem;
+    font-weight: 800;
+    opacity: 0.9;
+    position: relative;
+}
 
-        .chl-content {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            bottom: 20px;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-        }
+.practice-label::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, #3288AC, #40c9a9);
+    border-radius: 2px;
+    animation: pulse 2s infinite;
+}
 
-        .chl-content.active {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: all;
-        }
+@keyframes pulse {
+    0%, 100% { width: 60px; opacity: 1; }
+    50% { width: 80px; opacity: 0.7; }
+}
 
-        .chl-title-holder {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+.personal-chl-container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 auto;
+    padding: 20px;
+}
 
-        .chl-title {
-            font-size: 1.15rem;
-            font-weight: 800;
-            color: rgba(0, 0, 0, 0.85);
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            background: linear-gradient(135deg, #3288AC, #286D8A);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+.chl-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 12px;
+}
 
-        .chl-title .earnings-estimation-outer {
-            font-size: 1rem;
-        }
+.personal-chl-label {
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(0, 0, 0, 0.7);
+    flex-shrink: 0;
+}
 
-        .chl-info {
-            font-size: 0.9rem;
-            color: rgba(0, 0, 0, 0.75);
-            line-height: 1.6;
-            font-weight: 500;
-            margin-bottom: 5px;
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 4px;
-            display: flex;
-            align-items: center;
-        }
+.chl-indicators {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+}
 
-        .chl-info::-webkit-scrollbar {
-            width: 4px;
-        }
+.chl-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
 
-        .chl-info::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-        }
+.chl-indicator.math {
+    background: linear-gradient(135deg, #3288AC, #286D8A);
+}
 
-        .chl-info::-webkit-scrollbar-thumb {
-            background: rgba(50, 136, 172, 0.4);
-            border-radius: 10px;
-        }
+.chl-indicator.text-comp {
+    background: linear-gradient(135deg, #40c9a9, #32ac93);
+}
 
-        .chl-action-button {
-            position: relative;
-            width: 100px;
-            align-self: end;
-            padding: 12px;
-            border: none;
-            background: linear-gradient(135deg, #3288AC, #286D8A);
-            color: white;
-            font-size: 0.95rem;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            border-radius: 20px;
-        }
+.chl-indicator.grammar {
+    background: linear-gradient(135deg, #FFAC1C, #F28C28);
+}
 
-        .middle-div.wrapped .chl-action-button {
-            width: 100%;
-        }
-        @container (min-width: 400px) {
-        .middle-div.wrapped .chl-action-button {
-            width: 100px;
-        }
-        }
+.chl-indicator.active {
+    width: 24px;
+    border-radius: 4px;
+}
 
-        .chl-action-button::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
-            border-radius: 20px;
-            pointer-events: none;
-            transition: background 0.3s ease;
-        }
+.chl-nav-arrows {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
 
-        .chl-action-button::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 20px;
-            padding: 1px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            pointer-events: none;
-        }
+.chl-nav-btn {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
 
-        .chl-action-button:hover::before {
-            background: rgba(255, 255, 255, 0.15);
-        }
+.chl-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.chl-nav-btn:active {
+    transform: scale(0.95);
+}
+
+.chl-nav-btn svg {
+    width: 16px;
+    height: 16px;
+    opacity: 0.7;
+}
+
+.personal-chl-container-outer {
+    position: relative;
+    height: 170px;
+}
+
+.personal-chl-container-inner {
+    position: relative;
+    height: 100%;
+}
+
+.chl-category-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 20px;
+}
+
+.chl-category-content.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.chl-info-text {
+    flex: 1;
+    overflow-y: auto;
+    margin: 10px 0;
+}
+
+.complete-button-div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.chl-action-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  /*border: #286D8A 1px solid;*/
+  background: linear-gradient(135deg, #3288AC, #286D8A);
+  border-radius: 25px;
+  cursor: pointer;
+  color: #F5F5F7;
+  overflow: hidden;
+  min-width: 0;
+  padding: 9px 16px; 
+  font-size: 0.85rem; 
+  font-weight: 700; 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+  /*box-shadow: 
+        0 1px 2px rgba(0, 0, 0, 0.2),
+        0 4px 12px rgba(50, 136, 172, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);*/
+}
+
+.chl-action-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+  border-radius: 20px;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+.chl-action-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.chl-action-btn:hover::before {
+  background: rgba(255, 255, 255, 0.15);
+}
 
 
 @media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait) {
     .container {
+        height: calc(100% - 100px - 16px - 16px);
+        max-height: calc(100% - 100px - 16px - 16px);
+        min-height: calc(100% - 100px - 16px - 16px);
         background-color: transparent;
         border: none;
         padding: 0;
         box-shadow: none;
+    }
+
+    .personal-chl-container-outer {
+        height: 220px;
+    }
+
+    .chl-header {
+        font-size: 1.75rem;
+    }
+
+    .chl-info-text-inner {
+        font-size: 1.25rem;
+    }
+
+    .chl-action-btn {
+        font-size: 1.25rem;
     }
 
     .container-inner {
@@ -823,8 +901,9 @@ body.popup-active {
         font-size: 1.15rem;
     }
 
+    .personal-chl-label,
     .board-title {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
     }
 
     .board-date {
@@ -836,7 +915,7 @@ body.popup-active {
     }
 
     .board-message {
-        font-size: 1.1rem;
+        font-size: 1.25rem;
     }
 
     .chl-action-button {
@@ -849,6 +928,21 @@ body.popup-active {
 
     .message-meta {
         font-size: 0.9rem;
+    }
+
+    .chl-indicator {
+        height: 12px;
+        width: 12px;
+    }
+
+    .chl-indicator.active {
+        width: 28px;
+        border-radius: 25px;
+    }
+
+    .chl-nav-btn svg {
+        width: 24px;
+        height: 24px;
     }
 }
 
@@ -879,10 +973,6 @@ body.popup-active {
 
         .board-title {
             font-size: 1.15rem;
-        }
-
-        .board-message {
-            font-size: 0.95rem;
         }
 
         .message-board {
@@ -966,7 +1056,6 @@ body.popup-active {
     }
 
     .personal-chl-content-holder {
-        padding: 10px 0 0 0;
         max-width: 100%;
     }
 
@@ -976,6 +1065,10 @@ body.popup-active {
 
     .middle-div.wrapped {
         padding: 15px;
+    }
+
+    .personal-chl-container-outer {
+        height: 210px;
     }
 }
 
@@ -1416,11 +1509,30 @@ body.popup-active {
             </div>
             
             <div class="personal-chl-container">
-                <div class="practice-label">IŠŠŪKIAI</div>
-                
+                <div class="chl-header">
+                    <div class="personal-chl-label">IŠŠŪKIAI</div>
+                    <div class="chl-nav-arrows">
+                        <button class="chl-nav-btn chl-nav-prev" id="chlNavPrev">
+                            <svg fill="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                            </svg>
+                        </button>
+                        <div class="chl-indicators" id="chlIndicators">
+                        <!-- Indicators will be inserted here -->
+                        </div>
+                        <button class="chl-nav-btn chl-nav-next" id="chlNavNext">
+                            <svg fill="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
                 <div class="personal-chl-content-holder">
-                    <div class="chl-pills-container" id="chlPills"></div>
-                    <div class="chl-content-container" id="chlContentContainer"></div>
+                    <div class="personal-chl-container-outer">
+                        <div class="personal-chl-container-inner">
+                            <div id="chlDisplayArea"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 			</div>
@@ -1819,14 +1931,25 @@ const typeLabels = {
     "grammar": "Gramatika"
 };
 
+const tabHeight = 60;
+const overlap = 20;
+let tabs = [];
+
 function displayPersonalChl() {
-    const container = document.getElementById('personalChlContainer');
+    const displayArea = document.getElementById('chlDisplayArea');
+    const indicatorsContainer = document.getElementById('chlIndicators');
+    const prevBtn = document.getElementById('chlNavPrev');
+    const nextBtn = document.getElementById('chlNavNext');
     const userClass = userData?.knowledgeLvl || getClassLocalStorage() || 2;
 
     if (!personalChlDict[userClass]) {
-        container.innerHTML = '<p style="text-align: center; color: rgba(0,0,0,0.5);">Nėra prieinamų iššūkių</p>';
+        displayArea.innerHTML = '<p style="text-align: center; color: rgba(0,0,0,0.5);">Nėra prieinamų iššūkių</p>';
         return;
     }
+
+    // Clear previous content
+    displayArea.innerHTML = '';
+    indicatorsContainer.innerHTML = '';
 
     const classData = personalChlDict[userClass];
     const challenges = Object.keys(classData).map(key => {
@@ -1842,76 +1965,76 @@ function displayPersonalChl() {
         };
     });
 
-    const pillsContainer = document.getElementById('chlPills');
-    const contentContainer = document.getElementById('chlContentContainer');
+    let activeIndex = 0;
 
+    // Create indicators
     challenges.forEach((challenge, index) => {
-        // Filter out unwanted items
+        const indicator = document.createElement('div');
+        indicator.className = `chl-indicator ${challenge.type} ${index === 0 ? 'active' : ''}`;
+        indicator.addEventListener('click', () => switchToChallenge(index));
+        indicatorsContainer.appendChild(indicator);
+    });
+
+    // Create content for each challenge
+    challenges.forEach((challenge, index) => {
         const filteredInfo = challenge.chlInfo.filter(item =>
             !item.includes('KLASĖ') &&
             !item.includes('KOMBINACIJOS') &&
             !item.includes('ATVEJAI')
         );
 
-        // Process all items as regular items
         const processedItems = [];
         filteredInfo.forEach(item => {
             if (item.includes("<li>")) {
-                const splitItems = item.split("<li>")
+                const splitItems = item.split("<li>");
                 splitItems.forEach(splitItem => {
                     if (splitItem.includes("</li>")) {
-                        const splitItemProcessed = splitItem.split("</li>")[0]
-                        processedItems.push({ type: 'regular', content: splitItemProcessed })
+                        const splitItemProcessed = splitItem.split("</li>")[0];
+                        processedItems.push(splitItemProcessed);
                     }
                 });
             } else {
-                processedItems.push({ type: 'regular', content: item })
+                processedItems.push(item);
             }
         });
 
-        if (processedItems.some(i => i.content === "TEKSTO SUPRATIMAS" || i.content === "GRAMATIKA")) {
+        if (processedItems.some(i => i === "TEKSTO SUPRATIMAS" || i === "GRAMATIKA")) {
             processedItems.shift();
         }
 
-        const pill = document.createElement('button');
-        pill.className = `chl-pill ${index === 0 ? 'active' : ''}`;
-        pill.textContent = typeLabels[challenge.type];
-        pill.dataset.index = index;
-        pill.addEventListener('click', () => switchTab(index));
-        pillsContainer.appendChild(pill);
-
         const content = document.createElement('div');
-        content.className = `chl-content ${index === 0 ? 'active' : ''}`;
+        content.className = `chl-category-content chl-content-${challenge.type} ${index === 0 ? 'active' : ''}`;
+        content.dataset.type = challenge.type;
+        
+        const titleDiv = document.createElement('div');
+        titleDiv.className = `chl-title chl-title-${challenge.type}`;
+        titleDiv.textContent = typeLabels[challenge.type];
+        
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'chl-info-text hide-scrollbar';
 
-        // Title
-        const title = document.createElement('div');
-        title.className = 'chl-title';
-        title.textContent = typeLabels[challenge.type];
+        const infoDivInner = document.createElement('div');
+        infoDivInner.className = 'chl-info-text-inner';
+        infoDivInner.textContent = processedItems.join(' • ');
 
-        // Info
-        const personalChlIInfo = document.createElement('div');
-        personalChlIInfo.className = 'chl-info';
-        personalChlIInfo.textContent = processedItems.map(item => item.content).join(' • ');
+        infoDiv.appendChild(infoDivInner);
 
-        // Button
-        const personalChLButton = document.createElement('button');
-        personalChLButton.className = 'chl-action-button';
-        personalChLButton.textContent = 'Atlikti';
-        personalChLButton.addEventListener('click', () => completePersonalChlTask(challenge.chl, challenge.duration));
+        const actionBtn = document.createElement('button');
+        actionBtn.className = 'chl-action-btn';
+        actionBtn.textContent = 'Atlikti';
+        actionBtn.addEventListener('click', () => completePersonalChlTask(challenge.chl, challenge.duration));
 
-        const titleHodler = document.createElement('div');
-        titleHodler.className = 'chl-title-holder';
-        titleHodler.appendChild(title)
+        const completeButtonDiv = document.createElement('div');
+        completeButtonDiv.className = 'complete-button-div';
 
         if (userData && userData.knowledgeLvl) {
             const potentialEarningsDisplay = document.createElement('div');
-
             let answeringMode = challenge.duration[0];
             let numberOfQuestions = challenge.duration[1];
-            let earningsDiplay = "";
+            let earningsDisplay = "";
 
             if (answeringMode === "C39") {
-                earningsDiplay = `
+                earningsDisplay = `
                     <div class="earnings-estimation-outer">
                         <button class="earnings-estimation-display info-button"
                             onclick="openObjectPopup(infoMessages['coin-amount-custom-timer'].content, infoMessages['coin-amount-custom-timer'].title, infoMessages['coin-amount-custom-timer'].subtitle)">
@@ -1925,9 +2048,7 @@ function displayPersonalChl() {
                                 </span>
                                 <span class="coin-amount">${Number((calculateTasksPerCorrectAnswerPoints(challenge.chl, challenge)*personalChlCoinBonusModifier).toFixed(2))}</span>
                                 </span>
-                                <div 
-                                    class="info-icon"
-                                    >
+                                <div class="info-icon">
                                 <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 256 256" xml:space="preserve">
                                 <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
                                     <path d="M 49.083 71.489 l 5.776 -21.96 l 4.186 -15.247 c 3.497 -16.18 -32.704 -2.439 -38.002 1.695 l 0.425 4.853 c 4.824 -3.395 23.091 -7.744 19.449 4.275 l -1.634 6.135 l 0 0 l -8.329 31.071 c -3.497 16.18 32.704 2.439 38.002 -1.695 l -0.425 -4.853 C 63.708 79.159 45.441 83.508 49.083 71.489 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: currentColor; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
@@ -1938,9 +2059,9 @@ function displayPersonalChl() {
                             </div>
                         </button>
                     </div>
-                    `
+                    `;
             } else if (answeringMode === "C40") {
-                earningsDiplay = `
+                earningsDisplay = `
                     <div class="earnings-estimation-outer">
                         <button class="earnings-estimation-display info-button"
                             onclick="openObjectPopup(infoMessages['coin-amount-custom-question-number'].content, infoMessages['coin-amount-custom-question-number'].title, infoMessages['coin-amount-custom-question-number'].subtitle)">
@@ -1954,9 +2075,7 @@ function displayPersonalChl() {
                                 </span>
                                 <span class="coin-amount">${Number((calculateTasksPerCorrectAnswerPoints(challenge.chl) * numberOfQuestions * personalChlCoinBonusModifier).toFixed(2))}</span>
                                 </span>
-                                <div 
-                                    class="info-icon"
-                                    >
+                                <div class="info-icon">
                                 <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 256 256" xml:space="preserve">
                                 <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
                                     <path d="M 49.083 71.489 l 5.776 -21.96 l 4.186 -15.247 c 3.497 -16.18 -32.704 -2.439 -38.002 1.695 l 0.425 4.853 c 4.824 -3.395 23.091 -7.744 19.449 4.275 l -1.634 6.135 l 0 0 l -8.329 31.071 c -3.497 16.18 32.704 2.439 38.002 -1.695 l -0.425 -4.853 C 63.708 79.159 45.441 83.508 49.083 71.489 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: currentColor; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
@@ -1967,36 +2086,47 @@ function displayPersonalChl() {
                             </div>
                         </button>
                     </div>
-                    `
+                    `;
             }
-
-            potentialEarningsDisplay.innerHTML = earningsDiplay
-            
-            titleHodler.appendChild(potentialEarningsDisplay);
+            potentialEarningsDisplay.innerHTML = earningsDisplay;
+            completeButtonDiv.appendChild(potentialEarningsDisplay);
         }
 
+        completeButtonDiv.appendChild(actionBtn);
+        content.appendChild(titleDiv);
+        content.appendChild(infoDiv);
+        content.appendChild(completeButtonDiv);
+        displayArea.appendChild(content);
+    });
+
+    function switchToChallenge(index) {
+        activeIndex = index;
         
-        // Append all elements
-        content.appendChild(titleHodler);
-        content.appendChild(personalChlIInfo);
-        content.appendChild(personalChLButton);
+        // Update indicators
+        const indicators = indicatorsContainer.querySelectorAll('.chl-indicator');
+        indicators.forEach((ind, i) => {
+            ind.classList.toggle('active', i === index);
+        });
 
-        contentContainer.appendChild(content);
+        // Update content
+        const allContent = displayArea.querySelectorAll('.chl-category-content');
+        allContent.forEach((content, i) => {
+            content.classList.toggle('active', i === index);
+        });
+    }
+
+    // Arrow button handlers
+    prevBtn.addEventListener('click', () => {
+        activeIndex = (activeIndex - 1 + challenges.length) % challenges.length;
+        switchToChallenge(activeIndex);
+    });
+
+    nextBtn.addEventListener('click', () => {
+        activeIndex = (activeIndex + 1) % challenges.length;
+        switchToChallenge(activeIndex);
     });
 }
 
-function switchTab(index) {
-    const pills = document.querySelectorAll('.chl-pill');
-    const contents = document.querySelectorAll('.chl-content');
-
-    pills.forEach((pill, i) => {
-        pill.classList.toggle('active', i === index);
-    });
-
-    contents.forEach((content, i) => {
-        content.classList.toggle('active', i === index);
-    });
-}
 
 function completePersonalChlTask(challengeInfo, challengeDuration) {
     const parsedCurrentTaskInstructions = challengeInfo;

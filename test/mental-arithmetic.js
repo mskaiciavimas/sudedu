@@ -2620,6 +2620,12 @@ function startTimer() {
       minutes.toString().padStart(2, "0") +
       ":" +
       seconds.toString().padStart(2, "0");
+
+      if (controller && controller.modeChoice4 === "C40") {
+        if (elapsedTime > 2 * 60 * 60 * 1000) {
+          stopQuestionsCloseActions();
+        }
+      }
   }
 
   updateTimer();

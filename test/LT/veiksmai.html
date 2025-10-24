@@ -1061,54 +1061,54 @@ window.addEventListener("beforeunload", () => {
 	localStorage.setItem("controller", JSON.stringify(controller));
 });
 
+function stopQuestionsCloseActions () {
+	document.querySelector(".upper-line").style.display = "none";
+	arithmeticSymbol.innerHTML = '';
+
+	if (controller.task) {
+	if (controller.taskCompleted === true) {
+		sendSetTaskResultsToDatabase();
+	} else {
+		controller.equation = '';
+		if (controller.language === 'LT') {
+		messageToTheUser('Užduotis nebaigta iki galo. Rezultatai neišsaugoti.')
+		} else if (controller.language === 'EN') {
+		messageToTheUser('Task was not completed. Results were not saved.')
+		}
+	}
+	}
+	
+	controller.equation = finalMessageText();
+
+	controller.equation2 = '';
+	controller.result = ['', '', '', '', ''];
+	controller.combinations = [];
+	controller.randomSelection = []; 
+	controller.questionsStopped = true;
+
+	document.querySelector('#invisibleRow').style.display = "none";
+	document.querySelector('.answer-field-div').style.display = "none";
+	questionsSubmitButtonRowElement.style.display = "none";
+	resetMistakeButtonsElement.style.display = "flex";
+	localStorage.setItem('controller', JSON.stringify(controller))
+	clearInterval(timerInterval);
+	displayEquation()
+	stopButtonSpanElement.innerHTML = "refresh";
+}
+
 
 function stopEquations () {
-    const stopButtonSpanElement = document.querySelector('#stop-button-span');
-    if (stopButtonSpanElement.innerHTML === "close") {
-      showCustomConfirm("Ar tikrai nori sustabdyti užduotį?", stopEquationsCloseActions);
-      
-      function stopEquationsCloseActions () {
-	  document.querySelector(".upper-line").style.display = "none";
-      arithmeticSymbol.innerHTML = '';
-
-      if (controller.task) {
-        if (controller.taskCompleted === true) {
-          sendSetTaskResultsToDatabase();
-        } else {
-          controller.equation = '';
-          if (controller.language === 'LT') {
-            messageToTheUser('Užduotis nebaigta iki galo. Rezultatai neišsaugoti.')
-          } else if (controller.language === 'EN') {
-            messageToTheUser('Task was not completed. Results were not saved.')
-          }
-        }
-      }
-        
-	  controller.equation = finalMessageText();
-
-      controller.equation2 = '';
-      controller.result = ['', '', '', '', ''];
-      controller.combinations = [];
-      controller.randomSelection = []; 
-      controller.questionsStopped = true;
-
-      document.querySelector('#invisibleRow').style.display = "none";
-      document.querySelector('.answer-field-div').style.display = "none";
-      questionsSubmitButtonRowElement.style.display = "none";
-      resetMistakeButtonsElement.style.display = "flex";
-      localStorage.setItem('controller', JSON.stringify(controller))
-      clearInterval(timerInterval);
-      displayEquation()
-      stopButtonSpanElement.innerHTML = "refresh";
-    }
-  } else if (stopButtonSpanElement.innerHTML === "refresh") {
-	document.querySelector(".upper-line").style.display = "flex";
-	document.getElementById('middle-line-inner').style.height = "auto";
-	document.querySelector("#equation-and-symbol").style.height = "auto";
-	document.querySelector(".equation").style.height = "auto";
-    stopButtonSpanElement.innerHTML = "close";
-    restartEquations();
-  }
+	const stopButtonSpanElement = document.querySelector('#stop-button-span');
+	if (stopButtonSpanElement.innerHTML === "close") {
+		showCustomConfirm("Ar tikrai nori sustabdyti užduotį?", stopQuestionsCloseActions);
+	} else if (stopButtonSpanElement.innerHTML === "refresh") {
+		document.querySelector(".upper-line").style.display = "flex";
+		document.getElementById('middle-line-inner').style.height = "auto";
+		document.querySelector("#equation-and-symbol").style.height = "auto";
+		document.querySelector(".equation").style.height = "auto";
+		stopButtonSpanElement.innerHTML = "close";
+		restartEquations();
+	}
 }
 
 
