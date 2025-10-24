@@ -2139,8 +2139,8 @@ function handleHiddenInputChange(event) {
         
         if (newValue) {
             // Transfer the input to wrong input
-            wrongInput.value += newValue;
 			wrongInput.focus();
+            wrongInput.value += newValue;
             wrongInput.dispatchEvent(new Event('input', { bubbles: true }));
             resizeInput(wrongInput);
             
