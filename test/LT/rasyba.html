@@ -219,6 +219,37 @@
 	}
 	}
 
+	.pulse-wrong {
+	position: relative;
+	border-radius: 25px;
+	overflow: hidden;
+	}
+
+	.pulse-wrong::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	border-radius: 25px;
+	background: rgba(182, 200, 103, 0);
+	animation: pulse-wrong  600ms ease-in-out forwards;
+	z-index: -1;
+	}
+
+	@keyframes pulse-wrong {
+	0% {
+		background: rgba(182, 200, 103, 0);
+	}
+	50% {
+		background: rgba(213, 126, 126, 0.4);
+	}
+	100% {
+		background: rgba(182, 200, 103, 0);
+	}
+	}
+
 	input:disabled {
 		user-select: none; /* Prevent text selection */
 		pointer-events: none; /* Ensure the input is not interactable */
@@ -1870,6 +1901,12 @@ function checkAnswers() {
 		currentAnswerAttempts += 1;
 		allModified = false;
 
+		var container = document.querySelector('.field-for-text-outer-holder');
+		container.classList.add('pulse-wrong')
+		setTimeout(function() {
+			container.classList.remove('pulse-wrong');
+		}, 800);
+
 		const wrongInput = document.querySelector(".wrong-answer")
 		const wrongInputParent = wrongInput.parentElement;
 		focusCentered(wrongInputParent);
@@ -2168,13 +2205,42 @@ function focusCentered(element) {
 		const containerRect = container.getBoundingClientRect();
 
 		// Current scroll position plus element offset within container
-		const scrollTop = container.scrollTop + rect.top - containerRect.top - (container.clientHeight / 2) + (element.offsetHeight / 2);
+		const targetScrollTop = container.scrollTop + rect.top - containerRect.top - (container.clientHeight / 2) + (element.offsetHeight / 2);
 
-		// Smooth scroll to center
-		container.scrollTo({
-			top: scrollTop,
-			behavior: 'smooth'
-		});
+		// Try smooth scroll first (works on desktop)
+		const supportsSmooth = 'scrollBehavior' in document.documentElement.style;
+		
+		if (supportsSmooth) {
+			container.scrollTo({
+				top: targetScrollTop,
+				behavior: 'smooth'
+			});
+		} else {
+			// Fallback: manual smooth scroll for mobile
+			const startScrollTop = container.scrollTop;
+			const distance = targetScrollTop - startScrollTop;
+			const duration = 300; // milliseconds
+			let startTime = null;
+
+			function animation(currentTime) {
+				if (startTime === null) startTime = currentTime;
+				const timeElapsed = currentTime - startTime;
+				const progress = Math.min(timeElapsed / duration, 1);
+				
+				// Easing function (ease-in-out)
+				const ease = progress < 0.5
+					? 2 * progress * progress
+					: 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+				container.scrollTop = startScrollTop + distance * ease;
+
+				if (progress < 1) {
+					requestAnimationFrame(animation);
+				}
+			}
+
+			requestAnimationFrame(animation);
+		}
 	});
 }
 
