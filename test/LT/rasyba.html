@@ -2151,28 +2151,30 @@ function handleHiddenInputChange(event) {
 function focusCentered(element) {
 	if (!element) return;
 
-	// Focus textarea without native scroll jump
-	if (element.tagName.toLowerCase() === 'textarea') {
-		element.focus({ preventScroll: true });
-	}
-
 	const container = document.querySelector('#field-for-text-outer');
 	if (!container) return;
 
-	// Compute offset relative to the scroll container
-	let offsetTop = 0;
-	let current = element;
-	while (current && current !== container) {
-		offsetTop += current.offsetTop;
-		current = current.offsetParent;
+	// Focus textarea without native scroll jump
+	if (element.tagName.toLowerCase() === 'textarea') {
+		element.focus({ preventScroll: true });
+	} else {
+		element.focus();
 	}
 
-	// Center element vertically inside container
-	const scrollTop = offsetTop - (container.clientHeight / 2) + (element.offsetHeight / 2);
+	// Use requestAnimationFrame to ensure layout is updated before scrolling
+	requestAnimationFrame(() => {
+		// Compute element position relative to the container
+		const rect = element.getBoundingClientRect();
+		const containerRect = container.getBoundingClientRect();
 
-	container.scrollTo({
-		top: scrollTop,
-		behavior: 'smooth'
+		// Current scroll position plus element offset within container
+		const scrollTop = container.scrollTop + rect.top - containerRect.top - (container.clientHeight / 2) + (element.offsetHeight / 2);
+
+		// Smooth scroll to center
+		container.scrollTo({
+			top: scrollTop,
+			behavior: 'smooth'
+		});
 	});
 }
 
