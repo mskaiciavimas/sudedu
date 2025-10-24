@@ -219,38 +219,6 @@
 	}
 	}
 
-	.pulse-word {
-		position: relative;
-		border-radius: 25px;
-		overflow: hidden;
-	}
-
-	.pulse-word::before {
-		content: "";
-		position: absolute;
-		top: -5%;
-		left: -5%;
-		width: 110%;
-		height: 125%;
-		border-radius: 25px;
-		background: rgba(182, 200, 103, 0);
-		filter: blur(5px);
-		animation: pulse-word 600ms ease-in-out forwards;
-		z-index: -1
-	}
-
-	@keyframes pulse-word {
-	0% {
-		background: rgba(182, 200, 103, 0);
-	}
-	50% {
-		background: rgba(213, 126, 126, 0.5);;
-	}
-	100% {
-		background: rgba(182, 200, 103, 0);
-	}
-	}
-
 	input:disabled {
 		user-select: none; /* Prevent text selection */
 		pointer-events: none; /* Ensure the input is not interactable */
@@ -272,6 +240,14 @@
 		caret-color: black;
 	}
 
+	@keyframes blink {
+		0%, 50%, 100% { color: #D57E7C; }
+		25%, 75% { color: #FFEE00; }
+	}
+
+	.current-focus-parent .wrong-answer {
+		animation: blink 2s infinite;
+	}
 	.row {
 		width: 100%;
 	}
@@ -1897,10 +1873,11 @@ function checkAnswers() {
 		const wrongInput = document.querySelector(".wrong-answer")
 		const wrongInputParent = wrongInput.parentElement;
 		focusCentered(wrongInputParent);
-		wrongInputParent.classList.add('pulse-word');
-		setTimeout(function() {
-			wrongInputParent.classList.remove('pulse-word');
-		}, 800);
+		document.querySelectorAll('.current-focus-parent').forEach(el => {
+			el.classList.remove('current-focus-parent');
+		});
+		wrongInputParent.classList.add('current-focus-parent');
+
 		hiddenInput.focus();
 		hiddenInput.dataset.currentId = wrongInput.id;
 	}
@@ -2062,6 +2039,24 @@ function enableEnterNavigation() {
 			hiddenInput.value = ''
 		}
 	});
+
+	document.addEventListener('click', (event) => {
+		if (!event.isTrusted) return;
+		hiddenInput.dataset.currentId = "";
+		hiddenInput.value = ''
+		document.querySelectorAll('.current-focus-parent').forEach(el => {
+			el.classList.remove('current-focus-parent');
+		});
+	});
+
+	document.addEventListener('touchstart', (event) => {
+		if (!event.isTrusted) return;
+		hiddenInput.dataset.currentId = "";
+		hiddenInput.value = ''
+		document.querySelectorAll('.current-focus-parent').forEach(el => {
+			el.classList.remove('current-focus-parent');
+		});
+	});
 	
 	hiddenInput.addEventListener('keydown', handleEnterKey);
 	hiddenInput.addEventListener('input', handleHiddenInputChange);
@@ -2104,8 +2099,10 @@ function handleEnterKey(event) {
             focusCentered(wrongInput);
         } else {
             focusCentered(parentDiv);
-            parentDiv.classList.add('pulse-word');
-            setTimeout(() => parentDiv.classList.remove('pulse-word'), 800);
+			document.querySelectorAll('.current-focus-parent').forEach(el => {
+				el.classList.remove('current-focus-parent');
+			});
+			parentDiv.classList.add('current-focus-parent');
             hiddenInput.focus();
             hiddenInput.dataset.currentId = wrongInput.id;
         }
