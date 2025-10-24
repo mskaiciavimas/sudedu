@@ -2195,11 +2195,11 @@ function focusCentered(element) {
 	const container = document.querySelector('#field-for-text-outer');
 	if (!container) return;
 
-	// Focus textarea without native scroll jump
+	// Focus element without native scroll jump
 	if (element.tagName.toLowerCase() === 'textarea') {
 		element.focus({ preventScroll: true });
 	} else {
-		element.focus();
+		element.focus({ preventScroll: true }); // Added preventScroll here too
 	}
 
 	// Use requestAnimationFrame to ensure layout is updated before scrolling
