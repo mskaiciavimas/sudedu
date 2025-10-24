@@ -967,6 +967,7 @@ window.onload = function () {
 			allowAdjacentEndlessWords = true;
 		}
 		let allAnswersCorrect = false;
+		const hiddenInput = document.getElementById('hidden-input');
 
 		if(sentenceLibrary) {
 			const codedConditions = controller.modeChoice3
@@ -1893,12 +1894,14 @@ function checkAnswers() {
 		currentAnswerAttempts += 1;
 		allModified = false;
 
-		const wrongInputParent = document.querySelector(".wrong-answer").parentElement;
-		wrongInputParent.tabIndex = 0;
+		const wrongInput = document.querySelector(".wrong-answer")
+		const wrongInputParent = wrongInput.parentElement;
 		wrongInputParent.classList.add('pulse-word');
 		setTimeout(function() {
 			wrongInputParent.classList.remove('pulse-word');
 		}, 800);
+		hiddenInput.value = wrongInput.id;
+		hiddenInput.focus();
 		focusCentered(wrongInputParent);
 	}
 
@@ -2044,30 +2047,33 @@ function helpToggle() {
 						return;
 					}
 				}
-				document.getElementById('hidden-input').focus();
+				hiddenInput.focus();
 			}
 
 function enableEnterNavigation() {
     // Ensure the event listener is added only once
     document.removeEventListener('keydown', handleEnterKey);
     document.addEventListener('keydown', handleEnterKey);
+	document.addEventListener('focusin', (event) => {
+    const target = event.target;
+
+    if (target.classList.contains('question-input')) {
+		hiddenInput.value = "";
+    }
+});
 }
 
 function handleEnterKey(event) {
     const letterPattern = /^[a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ]$/;
+	const inputs = Array.from(document.querySelectorAll('.question-input'));
+	const wrongInput = inputs.find(input => input.classList.contains('wrong-answer'));
+
+    const checkAnswersButton = document.getElementById('check-answers');
+    const nextQuestionBtn = document.getElementById('next-question');
 
     if (letterPattern.test(event.key)) {
-        const activeEl = document.activeElement;
-
-        if (activeEl && activeEl.classList.contains('question-word-span')) {
-            const textarea = activeEl.querySelector('textarea');
-            if (textarea && document.activeElement !== textarea) {
-                // Only focus the textarea, do NOT manually add the letter
-                textarea.focus();
-
-                // Move cursor to end
-                textarea.setSelectionRange(textarea.value.length, textarea.value.length);
-            }
+        if (wrongInput && wrongInput.id === hiddenInput.value) {
+            wrongInput.focus();
         }
     }
 
@@ -2075,24 +2081,21 @@ function handleEnterKey(event) {
     if (event.key !== 'Enter') return;
     event.preventDefault();
 
-    const inputs = Array.from(document.querySelectorAll('.question-input'));
-    const checkAnswersButton = document.getElementById('check-answers');
-    const nextQuestionBtn = document.getElementById('next-question');
-
     if (!inputs.length) return;
 
     // 1️⃣ Handle wrong answers
-    const wrongInput = inputs.find(input => input.classList.contains('wrong-answer'));
+
     if (wrongInput) {
         const parentDiv = wrongInput.parentElement;
 
-        if (document.activeElement === parentDiv) {
+        if (hiddenInput.value === wrongInput.id) {
             focusCentered(wrongInput);
         } else {
-            parentDiv.tabIndex = 0;
             focusCentered(parentDiv);
             parentDiv.classList.add('pulse-word');
             setTimeout(() => parentDiv.classList.remove('pulse-word'), 800);
+			hiddenInput.value = wrongInput.id;
+			hiddenInput.focus();
         }
         return;
     }
@@ -2115,35 +2118,38 @@ function handleEnterKey(event) {
 }
 
 
-function focusCentered(input) {
-    if (!input) return;
+function focusCentered(element) {
+    if (!element) return;
 
-    // Focus without automatic scroll
-    input.focus({ preventScroll: true });
+    // Focus only if it's a textarea
+    if (element.tagName.toLowerCase() === 'textarea') {
+        element.focus({ preventScroll: true });
+    }
 
     // Find scrollable container
     const container = document.querySelector("#field-for-text-outer");
     if (container) {
         const containerHeight = container.clientHeight;
-        const inputOffsetTop = input.offsetTop - container.offsetTop;
-        const inputHeight = input.offsetHeight;
+        const elementOffsetTop = element.offsetTop - container.offsetTop;
+        const elementHeight = element.offsetHeight;
 
-        // Scroll so input is vertically centered
-        const scrollTop = inputOffsetTop - (containerHeight / 2) + (inputHeight / 2);
+        // Scroll so element is vertically centered
+        const scrollTop = elementOffsetTop - (containerHeight / 2) + (elementHeight / 2);
 
         container.scrollTo({
             top: scrollTop,
             behavior: 'smooth'
         });
     } else {
-        // fallback: scroll the page vertically
+        // Fallback: scroll the page vertically
         const windowHeight = window.innerHeight;
-        const inputRect = input.getBoundingClientRect();
-        const scrollY = window.scrollY + inputRect.top - (windowHeight / 2) + (inputRect.height / 2);
+        const rect = element.getBoundingClientRect();
+        const scrollY = window.scrollY + rect.top - (windowHeight / 2) + (rect.height / 2);
 
         window.scrollTo({ top: scrollY, behavior: 'smooth' });
     }
 }
+
 
 // Call the function after rendering the inputs and button
 enableEnterNavigation();
