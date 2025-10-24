@@ -2050,6 +2050,10 @@ function helpToggle() {
 				hiddenInput.focus();
 			}
 
+hiddenInput.addEventListener('input', (event) => {
+    hiddenInput.value = '';
+});
+
 function enableEnterNavigation() {
     // Ensure the event listener is added only once
     document.removeEventListener('keydown', handleEnterKey);
@@ -2072,24 +2076,20 @@ function handleEnterKey(event) {
     const checkAnswersButton = document.getElementById('check-answers');
     const nextQuestionBtn = document.getElementById('next-question');
 
-    if (
-		letterPattern.test(event.key) &&
-		wrongInput &&
-		hiddenInput.dataset.currentId === wrongInput.id &&
-		document.activeElement !== wrongInput
-	) {
-		event.preventDefault();
-
-		// Delay focus to ensure mobile keyboard switches
-		setTimeout(() => {
-			wrongInput.focus();
-			wrongInput.value += event.key;
-			wrongInput.dispatchEvent(new Event('input', { bubbles: true }));
-			resizeInput(wrongInput);
-		}, 10);
-
-		return;
-	}
+    if (letterPattern.test(event.key) && wrongInput && hiddenInput.dataset.currentId === wrongInput.id) {
+        event.preventDefault();
+        
+        // Focus the wrong input if it's not already focused
+        if (document.activeElement !== wrongInput) {
+            wrongInput.focus();
+        }
+        
+        // Add the letter to the input
+        wrongInput.value += event.key;
+        wrongInput.dispatchEvent(new Event('input', { bubbles: true }));
+        resizeInput(wrongInput);
+        return;
+    }
 
     // 🟡 Handle Enter key only
     if (event.key !== 'Enter') return;
