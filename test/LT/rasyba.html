@@ -1827,16 +1827,24 @@ function setupDynamicListeners() {
         });
 
 		const parent = input.parentElement;
-        if (parent) {
-            parent.addEventListener('click', (e) => {
-                // Prevent double-firing if clicking on the input itself
-                if (e.target !== input) {
-                    input.focus();
-                }
-            });
-        }
+		if (parent) {
+			parent.addEventListener('click', (e) => {
+				// Prevent double-firing if clicking on the input itself
+				if (e.target !== input) {
+					const container = document.querySelector('#field-for-text-outer');
+					focusWithKeyboardAdjustment(input, container);
+				}
+			});
+		}
     });
 }
+
+document.querySelectorAll('.question-input').forEach(input => {
+	input.addEventListener('click', () => {
+		const container = document.querySelector('#field-for-text-outer');
+		focusWithKeyboardAdjustment(input, container);
+	});
+});
 
 function recordGrammarMistakes (inputId, userInput) {
 	if (!mistakeRecords[inputId]) {
@@ -2268,9 +2276,44 @@ function focusCentered(element) {
 		
 		// On mobile, perform a second scroll after keyboard settles
 		if (isMobile && isTextarea) {
-			setTimeout(performScroll, 300);
+			setTimeout(performScroll, 100);
 		}
 	});
+}
+
+// Universal function to handle focus with keyboard adjustment
+function focusWithKeyboardAdjustment(element, container) {
+	if (!element || !container) return;
+
+	// Detect if mobile device
+	const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+	                ('ontouchstart' in window) ||
+	                (navigator.maxTouchPoints > 0);
+
+	// Focus the element
+	element.focus({ preventScroll: true });
+
+	// Function to center the element in viewport
+	function centerElement() {
+		const rect = element.getBoundingClientRect();
+		const containerRect = container.getBoundingClientRect();
+		const targetScrollTop = container.scrollTop + rect.top - containerRect.top - (container.clientHeight / 2) + (element.offsetHeight / 2);
+
+		container.scrollTo({
+			top: targetScrollTop,
+			behavior: 'smooth'
+		});
+	}
+
+	// Scroll immediately
+	requestAnimationFrame(centerElement);
+
+	// On mobile, re-scroll after keyboard opens
+	if (isMobile) {
+		// Multiple delays to catch different keyboard animation timings
+		setTimeout(centerElement, 300);
+		setTimeout(centerElement, 500);
+	}
 }
 
 // Call the function after rendering the inputs and button
