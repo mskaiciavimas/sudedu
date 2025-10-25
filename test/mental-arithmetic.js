@@ -3762,25 +3762,17 @@ function initScrollIndicators() {
         const observer = new MutationObserver(updateIndicators);
         observer.observe(container, { childList: true, subtree: true });
        
+        // Multiple checks to ensure reliable initialization
         setTimeout(updateIndicators, 100);
+        setTimeout(updateIndicators, 300);
+        setTimeout(updateIndicators, 500);
+        
+        // Also check when images/content loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', updateIndicators);
+        }
+        window.addEventListener('load', updateIndicators);
     });
 }
 
-window.addEventListener('load', () => {
-    initScrollIndicators();
-});
-
-// Watch for added/removed elements
-const scrollingIndicatorObserver = new MutationObserver(() => {
-    initScrollIndicators();
-});
-
-scrollingIndicatorObserver.observe(document.body, {
-    childList: true,
-    subtree: true
-});
-
-// Re-run indicators when screen size changes
-window.addEventListener('resize', () => {
-    initScrollIndicators();
-});
+initScrollIndicators();
