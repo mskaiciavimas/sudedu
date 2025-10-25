@@ -2228,8 +2228,16 @@ function focusCentered(element) {
 	// Focus behavior: textareas focus without scroll
 	if (isTextarea) {
 		element.focus({ preventScroll: true });
+	} else {
+		// If focusing a parent div, position hidden input at where the element will be after scroll
+		const rect = element.getBoundingClientRect();
+		const containerRect = container.getBoundingClientRect();
+		const targetScrollTop = container.scrollTop + rect.top - containerRect.top - (container.clientHeight / 2) + (element.offsetHeight / 2);
+		
+		// Position hidden input at the center of viewport (where element will be after scroll)
+		hiddenInput.style.top = (targetScrollTop + container.clientHeight / 2) + 'px';
+		hiddenInput.style.left = '50%';
 	}
-	// If element is a parent div/span, we don't focus it, just scroll to it
 
 	// Function to perform the scroll
 	function performScroll() {
