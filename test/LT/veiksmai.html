@@ -977,6 +977,40 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 				}
 			}
 
+			let container;
+			let answerInputs;
+
+			if (controller.randomSelection[2] === 'M') {
+				answerInputs = document.querySelectorAll('.answer-input');
+				container = document.querySelector('#stulpeliu-div-outer');
+			} else if (controller.randomSelection[2] === 'D') {
+				answerInputs = document.querySelectorAll('.stulpeliu-input');
+				container = document.querySelector('#division-stulp-2-outer');
+			} else {
+				return
+			}
+
+			if (answerInputs) {
+				answerInputs.forEach(textarea => {
+					if (controller.randomSelection[2] === 'M') {
+						container = document.querySelector('#stulpeliu-div-outer');
+					} else if (controller.randomSelection[2] === 'D') {
+						container = document.querySelector('#division-stulp-2-outer');
+					} else {
+						return
+					}
+
+					textarea.addEventListener('click', () => {
+						focusWithKeyboardAdjustment(textarea, container);
+					});
+
+					textarea.addEventListener('touchstart', (e) => {
+						e.preventDefault();
+						focusWithKeyboardAdjustment(textarea, container);
+					}, { passive: false });
+				});
+			}
+
 		} else {
 			const answerElement = document.getElementById('answer');
 			const requiredWidth = getCorrectAnswerLength() + 0.5;
@@ -1061,6 +1095,8 @@ window.addEventListener("beforeunload", () => {
 	localStorage.setItem("controller", JSON.stringify(controller));
 });
 
+const stopButtonSpanElement = document.querySelector('#stop-button-span');
+
 function stopQuestionsCloseActions () {
 	document.querySelector(".upper-line").style.display = "none";
 	arithmeticSymbol.innerHTML = '';
@@ -1098,7 +1134,6 @@ function stopQuestionsCloseActions () {
 
 
 function stopEquations () {
-	const stopButtonSpanElement = document.querySelector('#stop-button-span');
 	if (stopButtonSpanElement.innerHTML === "close") {
 		showCustomConfirm("Ar tikrai nori sustabdyti užduotį?", stopQuestionsCloseActions);
 	} else if (stopButtonSpanElement.innerHTML === "refresh") {
@@ -1108,6 +1143,42 @@ function stopEquations () {
 		document.querySelector(".equation").style.height = "auto";
 		stopButtonSpanElement.innerHTML = "close";
 		restartEquations();
+	}
+}
+
+function focusWithKeyboardAdjustment(element, container) {
+	if (!element || !container) return;
+
+	const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+		|| ('ontouchstart' in window)
+		|| (navigator.maxTouchPoints > 0);
+
+	element.focus({ preventScroll: true });
+
+	function centerElement() {
+		const elemRect = element.getBoundingClientRect();
+		const containerRect = container.getBoundingClientRect();
+
+		// Current scroll position of container
+		const scrollTop = container.scrollTop;
+
+		// Element's top relative to container
+		const elementTopRelative = elemRect.top - containerRect.top + scrollTop;
+
+		// Scroll so element is centered
+		const targetScrollTop = elementTopRelative - (container.clientHeight / 2) + (element.offsetHeight / 2);
+
+		container.scrollTo({
+			top: targetScrollTop,
+			behavior: 'smooth'
+		});
+	}
+
+	requestAnimationFrame(centerElement);
+
+	if (isMobile) {
+		setTimeout(centerElement, 300);
+		setTimeout(centerElement, 500);
 	}
 }
 
