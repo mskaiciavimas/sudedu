@@ -1839,28 +1839,25 @@ function setupDynamicListeners() {
     });
 }
 
-// Add click listeners to textareas for keyboard adjustment
+// Add mousedown listeners to textareas for keyboard adjustment
 document.querySelectorAll('.question-input').forEach(input => {
-	input.addEventListener('click', (e) => {
+	input.addEventListener('mousedown', (e) => {
 		// Only handle if keyboard is closed (element not already focused)
+		if (document.activeElement !== input) {
+			e.preventDefault(); // Prevent default focus
+			const container = document.querySelector('#field-for-text-outer');
+			focusWithKeyboardAdjustment(input, container);
+		}
+	});
+	
+	// Also handle touch events for mobile
+	input.addEventListener('touchstart', (e) => {
 		if (document.activeElement !== input) {
 			e.preventDefault();
 			const container = document.querySelector('#field-for-text-outer');
 			focusWithKeyboardAdjustment(input, container);
-		} else {
-			// Already focused, just re-center in case keyboard moved things
-			const container = document.querySelector('#field-for-text-outer');
-			requestAnimationFrame(() => {
-				const rect = input.getBoundingClientRect();
-				const containerRect = container.getBoundingClientRect();
-				const targetScrollTop = container.scrollTop + rect.top - containerRect.top - (container.clientHeight / 2) + (input.offsetHeight / 2);
-				container.scrollTo({
-					top: targetScrollTop,
-					behavior: 'smooth'
-				});
-			});
 		}
-	});
+	}, { passive: false });
 });
 
 function recordGrammarMistakes (inputId, userInput) {
