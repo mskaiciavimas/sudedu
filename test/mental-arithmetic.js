@@ -3667,3 +3667,65 @@ function displayCustomTaskPotentialEarnings () {
 }
 
 // POINTS CALCULATION END
+
+
+function initScrollIndicators() {
+    const containers = document.querySelectorAll('.scroll-indicators');
+    
+    containers.forEach(function(container) {
+        if (container.dataset.scrollInit) return;
+        container.dataset.scrollInit = 'true';
+        
+        // Find the parent container to attach arrows to
+        const parent = container.parentElement;
+        if (!parent) return;
+        
+        // Ensure parent has position context
+        const computedStyle = window.getComputedStyle(parent);
+        if (computedStyle.position === 'static') {
+            parent.style.position = 'relative';
+        }
+        
+        // Create arrows
+        const topArrow = document.createElement('div');
+        topArrow.className = 'scroll-indicator-arrow top';
+        topArrow.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>';
+        
+        const bottomArrow = document.createElement('div');
+        bottomArrow.className = 'scroll-indicator-arrow bottom';
+        bottomArrow.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>';
+        
+        // Append to parent, not to scrolling container
+        parent.appendChild(topArrow);
+        parent.appendChild(bottomArrow);
+        
+        function updateIndicators() {
+            const scrollTop = container.scrollTop;
+            const scrollHeight = container.scrollHeight;
+            const clientHeight = container.clientHeight;
+            const canScroll = scrollHeight > clientHeight;
+            
+            if (!canScroll) {
+                topArrow.classList.remove('visible');
+                bottomArrow.classList.remove('visible');
+                return;
+            }
+            
+            const isAtTop = scrollTop <= 5;
+            const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
+            
+            topArrow.classList.toggle('visible', !isAtTop);
+            bottomArrow.classList.toggle('visible', !isAtBottom);
+        }
+        
+        container.addEventListener('scroll', updateIndicators);
+        window.addEventListener('resize', updateIndicators);
+        
+        const observer = new MutationObserver(updateIndicators);
+        observer.observe(container, { childList: true, subtree: true });
+        
+        setTimeout(updateIndicators, 100);
+    });
+}
+
+initScrollIndicators();

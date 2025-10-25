@@ -207,6 +207,52 @@ scrollbar-color: rgba(255,255,255,0.4) transparent;
     pointer-events: none;
 }
 
+#new-task-options-container {
+    position: relative;
+}
+
+.scroll-indicator-arrow {
+    position: absolute;
+    right: -10px;
+    transform: translateX(-50%);
+    width: 24px !important;
+    height: 24px !important;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 10;
+    backdrop-filter: blur(4px);
+}
+
+.scroll-indicator-arrow.top {
+    top: 8px;
+}
+
+.scroll-indicator-arrow.bottom {
+    bottom: 8px;
+    animation: bounce-subtle 2s ease-in-out infinite;
+}
+
+.scroll-indicator-arrow.visible {
+    opacity: 1;
+}
+
+.scroll-indicator-arrow svg {
+    width: 14px;
+    height: 14px;
+    fill: rgba(255, 255, 255, 0.9);
+}
+
+@keyframes bounce-subtle {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(3px); }
+}
+
 .kid-5 {
   position: absolute;
   width: 300px; 

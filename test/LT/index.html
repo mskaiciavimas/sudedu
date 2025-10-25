@@ -436,6 +436,10 @@ body.popup-active {
     transform: none;
 }
 
+.message-board-outer {
+    width: 100%;
+}
+
         .message-board-personal-chl-container {
             display: flex;
             flex-direction: column;
@@ -1201,7 +1205,7 @@ body.popup-active {
 				</div>
 				<div class="new-task-outer-div" id="middle-div-row">
 		                <div id="new-task-options-container">
-                            <div id="new-task-options-container-inner">
+                            <div id="new-task-options-container-inner" class="hide-scrollbar scroll-indicators">
                             <div class="ode_choice_div">
                                 <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice" id="mode_choice">
                                     <option value="math">MATEMATIKĄ</option>
@@ -1503,8 +1507,10 @@ body.popup-active {
                     <div class="board-title">Naujienos</div>
                     <div class="board-date" id="currentDate"></div>
                 </div>
-                <div class="message-board hide-scrollbar" id="messageBoard">
-                    <!-- Messages will be inserted here -->
+                <div class="message-board-outer">
+                    <div class="message-board hide-scrollbar scroll-indicators" id="messageBoard">
+                        <!-- Messages will be inserted here -->
+                    </div>
                 </div>
             </div>
             
