@@ -3671,61 +3671,87 @@ function displayCustomTaskPotentialEarnings () {
 
 function initScrollIndicators() {
     const containers = document.querySelectorAll('.scroll-indicators');
-    
+   
     containers.forEach(function(container) {
         if (container.dataset.scrollInit) return;
         container.dataset.scrollInit = 'true';
-        
-        // Find the parent container to attach arrows to
+       
         const parent = container.parentElement;
         if (!parent) return;
-        
-        // Ensure parent has position context
+       
         const computedStyle = window.getComputedStyle(parent);
         if (computedStyle.position === 'static') {
             parent.style.position = 'relative';
         }
+       
+        // Create line indicators
+        const topIndicator = document.createElement('div');
+        topIndicator.className = 'scroll-indicator-line top';
         
-        // Create arrows
-        const topArrow = document.createElement('div');
-        topArrow.className = 'scroll-indicator-arrow top';
-        topArrow.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>';
+        const bottomIndicator = document.createElement('div');
+        bottomIndicator.className = 'scroll-indicator-line bottom';
         
-        const bottomArrow = document.createElement('div');
-        bottomArrow.className = 'scroll-indicator-arrow bottom';
-        bottomArrow.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>';
-        
-        // Append to parent, not to scrolling container
-        parent.appendChild(topArrow);
-        parent.appendChild(bottomArrow);
-        
+        // Create dots for each indicator
+        for (let i = 0; i < 3; i++) {
+            const topDot = document.createElement('div');
+            topDot.className = 'indicator-dot';
+            topDot.style.animationDelay = `${i * 0.15}s`;
+            topIndicator.appendChild(topDot);
+            
+            const bottomDot = document.createElement('div');
+            bottomDot.className = 'indicator-dot';
+            bottomDot.style.animationDelay = `${i * 0.15}s`;
+            bottomIndicator.appendChild(bottomDot);
+        }
+       
+        parent.appendChild(topIndicator);
+        parent.appendChild(bottomIndicator);
+       
         function updateIndicators() {
             const scrollTop = container.scrollTop;
             const scrollHeight = container.scrollHeight;
             const clientHeight = container.clientHeight;
             const canScroll = scrollHeight > clientHeight;
-            
+           
             if (!canScroll) {
-                topArrow.classList.remove('visible');
-                bottomArrow.classList.remove('visible');
+                topIndicator.classList.remove('visible');
+                bottomIndicator.classList.remove('visible');
                 return;
             }
-            
+           
             const isAtTop = scrollTop <= 5;
             const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
-            
-            topArrow.classList.toggle('visible', !isAtTop);
-            bottomArrow.classList.toggle('visible', !isAtBottom);
+           
+            topIndicator.classList.toggle('visible', !isAtTop);
+            bottomIndicator.classList.toggle('visible', !isAtBottom);
         }
-        
+       
         container.addEventListener('scroll', updateIndicators);
         window.addEventListener('resize', updateIndicators);
-        
+       
         const observer = new MutationObserver(updateIndicators);
         observer.observe(container, { childList: true, subtree: true });
-        
+       
         setTimeout(updateIndicators, 100);
     });
 }
+
+// Initialize once
+initScrollIndicators();
+
+// Watch for added/removed elements
+const scrollingIndicatorObserver = new MutationObserver(() => {
+    initScrollIndicators();
+});
+
+scrollingIndicatorObserver.observe(document.body, {
+    childList: true,
+    subtree: true
+});
+
+// Re-run indicators when screen size changes
+window.addEventListener('resize', () => {
+    initScrollIndicators();
+});
 
 initScrollIndicators();

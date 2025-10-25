@@ -211,46 +211,49 @@ scrollbar-color: rgba(255,255,255,0.4) transparent;
     position: relative;
 }
 
-.scroll-indicator-arrow {
+.scroll-indicator-line {
     position: absolute;
-    right: -10px;
-    transform: translateX(-50%);
-    width: 24px !important;
-    height: 24px !important;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 50%;
+    right: 12px;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    gap: 4px;
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
     z-index: 10;
-    backdrop-filter: blur(4px);
+    justify-content: end;
 }
 
-.scroll-indicator-arrow.top {
-    top: 8px;
+.scroll-indicator-line.top {
+    top: 12px;
+    flex-direction: row;
+    display: none;
 }
 
-.scroll-indicator-arrow.bottom {
-    bottom: 8px;
-    animation: bounce-subtle 2s ease-in-out infinite;
+.scroll-indicator-line.bottom {
+    bottom: 12px;
+    flex-direction: row;
 }
 
-.scroll-indicator-arrow.visible {
+.scroll-indicator-line.visible {
     opacity: 1;
 }
 
-.scroll-indicator-arrow svg {
-    width: 14px;
-    height: 14px;
-    fill: rgba(255, 255, 255, 0.9);
+.indicator-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    animation: pulse-opacity 1.5s ease-in-out infinite;
 }
 
-@keyframes bounce-subtle {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(3px); }
+.personal-chl-container .scroll-indicator-line {
+  right: -2px;
+  bottom: 5px;
+}
+
+@keyframes pulse-opacity {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
 }
 
 .kid-5 {

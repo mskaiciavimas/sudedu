@@ -182,7 +182,7 @@
 }
 
 .middle-div.wrapped .practice-outer-div {
-    max-height: 90%;
+    max-height: 92.5%;
 }
 
 .personal-chl-inner {
@@ -595,6 +595,7 @@ body.popup-active {
 .chl-info-text-inner {
     font-size: 0.9rem;
     line-height: 1.5;
+    position: relative;
 }
 
 .chl-title-math {
@@ -732,7 +733,7 @@ body.popup-active {
 
 .personal-chl-container-outer {
     position: relative;
-    height: 170px;
+    height: 180px;
 }
 
 .personal-chl-container-inner {
@@ -752,8 +753,8 @@ body.popup-active {
     display: flex;
     flex-direction: column;
     background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     padding: 20px;
     border-radius: 20px;
@@ -764,10 +765,18 @@ body.popup-active {
     pointer-events: all;
 }
 
+.chl-info-holder {
+    height: 100%;
+    min-height: 0;
+    flex: 1;
+    margin: 10px 0;
+}
+
 .chl-info-text {
+    height: 100%;
+    min-height: 0;
     flex: 1;
     overflow-y: auto;
-    margin: 10px 0;
 }
 
 .complete-button-div {
@@ -1073,6 +1082,10 @@ body.popup-active {
 
     .personal-chl-container-outer {
         height: 190px;
+    }
+    
+    .chl-category-content {
+        padding: 15px;
     }
 }
 
@@ -2017,13 +2030,18 @@ function displayPersonalChl() {
         titleDiv.textContent = typeLabels[challenge.type];
         
         const infoDiv = document.createElement('div');
-        infoDiv.className = 'chl-info-text hide-scrollbar';
+        infoDiv.className = 'chl-info-text hide-scrollbar scroll-indicators';
 
         const infoDivInner = document.createElement('div');
         infoDivInner.className = 'chl-info-text-inner';
         infoDivInner.textContent = processedItems.join(' • ');
 
         infoDiv.appendChild(infoDivInner);
+
+        const infoDivHolder = document.createElement('div');
+        infoDivHolder.className = 'chl-info-holder';
+
+        infoDivHolder.appendChild(infoDiv);
 
         const actionBtn = document.createElement('button');
         actionBtn.className = 'chl-action-btn';
@@ -2100,7 +2118,7 @@ function displayPersonalChl() {
 
         completeButtonDiv.appendChild(actionBtn);
         content.appendChild(titleDiv);
-        content.appendChild(infoDiv);
+        content.appendChild(infoDivHolder);
         content.appendChild(completeButtonDiv);
         displayArea.appendChild(content);
     });
