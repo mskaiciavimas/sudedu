@@ -1008,7 +1008,30 @@ window.onload = function () {
     }
   }
 
+  window.stopButtonElement = document.querySelector('.stop-button');
+  window.stopButtonSpanElement = document.querySelector('#stop-button-span');
+  window.checkAnswerBtn = document.getElementById('check-answer-btn');
+  window.nextQuestionBtn = document.getElementById('next-question-btn');
+  window.helpBtn = document.getElementById('help-btn');
+
   controller = JSON.parse(localStorage.getItem('controller')) 
+    window.stopQuestionsCloseActions = function () {
+    controller.questionsStopped = true;
+    clearInterval(timerInterval);
+    stopButtonSpanElement.innerHTML = "refresh";
+    checkAnswerBtn.disabled = true;
+    helpBtn.disabled = true;
+    nextQuestionBtn.disabled = true;
+    updateSortables()
+    controller.questionsStopped = true;
+    localStorage.setItem("elapsedTime", timerDisplay.textContent);
+    localStorage.setItem('controller', JSON.stringify(controller));
+    document.querySelector(".tracker-timer-holder").style.paddingLeft = "15px";
+    formatFinalMessageForTextcomprehension();
+    document.querySelector(".help-and-check-button-holder").style.display = "none"
+  }
+
+
   let jsonFiles = [];
 
 	// Define an array of URLs for the JSON files you want to fetch
@@ -1037,9 +1060,6 @@ window.onload = function () {
     const answersFieldEnd = document.getElementById('answers-field-end');
     const titleField = document.getElementById('title-field');
     const optionsField = document.getElementById('options-field');
-    const checkAnswerBtn = document.getElementById('check-answer-btn');
-    const nextQuestionBtn = document.getElementById('next-question-btn');
-    const helpBtn = document.getElementById('help-btn');
     var selectedItem;
     let questionNumberTracker = document.getElementById('question-number-tracker');
     let mistakesTracker = document.getElementById('mistakes-tracker'); 
@@ -1643,27 +1663,6 @@ window.onload = function () {
            displayQuestion();
         }
     });
-
-    const stopButtonElement = document.querySelector('.stop-button');
-    let stopButtonSpanElement = document.querySelector('#stop-button-span');
-
-
-    
-    window.stopQuestionsCloseActions = function () {
-      controller.questionsStopped = true;
-      clearInterval(timerInterval);
-      stopButtonSpanElement.innerHTML = "refresh";
-      checkAnswerBtn.disabled = true;
-      helpBtn.disabled = true;
-      nextQuestionBtn.disabled = true;
-      updateSortables()
-      controller.questionsStopped = true;
-      localStorage.setItem("elapsedTime", timerDisplay.textContent);
-      localStorage.setItem('controller', JSON.stringify(controller));
-      document.querySelector(".tracker-timer-holder").style.paddingLeft = "15px";
-      initiateTheProgram() 
-      document.querySelector(".help-and-check-button-holder").style.display = "none"
-    }
 
     function stopQuestions() {
 				if (stopButtonSpanElement.innerHTML === "close") {

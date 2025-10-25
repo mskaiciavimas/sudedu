@@ -940,6 +940,31 @@ window.onload = function () {
 
   controller = JSON.parse(localStorage.getItem('controller'))
 
+window.answerTrackerElement = document.querySelector('#answer-tracker');
+window.stopButtonSpanElement = document.querySelector('#stop-button-span');
+window.resetMistakeButtonsElement = document.querySelector('#restart-reset-button-row');
+
+window.stopQuestionsCloseActions = function () {
+	controller.questionsStopped = true;
+	clearInterval(timerInterval);
+	stopButtonSpanElement.innerHTML = "refresh";
+	document.getElementById('check-answers').disabled = true;
+	document.getElementById('check-answers').style.display = "inline-block";
+	document.getElementById('help-toggle').disabled = true;
+	document.getElementById('next-question').style.display = "none";
+	document.getElementById('show-answers').style.visibility = "hidden";
+	document.querySelector('.help-toggle-holder').style.visibility = "hidden";
+
+	document.querySelectorAll('.question-input').forEach(input => {
+		input.disabled = true;
+	});
+
+	resetMistakeButtonsElement.style.display = "flex";
+	localStorage.setItem("elapsedTime", timerDisplay.textContent);
+	localStorage.setItem('controller', JSON.stringify(controller))
+	formatFinalMessageForGrammar();
+}
+
   let jsonFiles = [];
 
 	// Define an array of URLs for the JSON files you want to fetch
@@ -1566,48 +1591,58 @@ window.onload = function () {
 			}
 		}
 
-		let answerTrackerElement = document.querySelector('#answer-tracker');
-		let stopButtonSpanElement = document.querySelector('#stop-button-span');
-		const resetMistakeButtonsElement = document.querySelector('#restart-reset-button-row');
-
 		if (controller.modeChoice4 === "C40") {
 			answerTrackerElement.innerHTML =`Atlikta: ${controller.randomSelection[2] || 0}/${controller.questionNumber}`;
 		}
 
 		// Function to get allowed matching categories
 
+		function preserveFocusDuring(fn) {
+		const previouslyFocused = document.activeElement !== document.body ? document.activeElement : null;
+		fn(); // run your main logic
+		if (previouslyFocused) {
+			previouslyFocused.focus(); // restore focus
+		} else {
+			document.activeElement.blur(); // ensure nothing is focused
+		}
+		}
+
 		document.getElementById('increase-no-of-sentences').addEventListener('click', () => {
+		preserveFocusDuring(() => {
 			const inputs = Array.from(document.querySelectorAll('.question-input'));
 			const anyNotEmpty = inputs.some(input => input.value.trim() !== '');
 			if (!firstTimeChecking || anyNotEmpty) {
-				messageToTheUser("Sakinių skaičių galima pakeisti tik prieš įrašant raides.")
-				return
+			messageToTheUser("Sakinių skaičių galima pakeisti tik prieš įrašant raides.");
+			return;
 			}
 			if (questionsToDisplay < 5) {
-				questionsToDisplay++;
-				displaySentences();
-				document.getElementById('help-toggle').checked = false;
-				helpToggle();
+			questionsToDisplay++;
+			displaySentences();
+			document.getElementById('help-toggle').checked = false;
+			helpToggle();
 			} else {
-				focusFirstInput();
+			focusFirstInput();
 			}
+		});
 		});
 
 		document.getElementById('decrease-no-of-sentences').addEventListener('click', () => {
+		preserveFocusDuring(() => {
 			const inputs = Array.from(document.querySelectorAll('.question-input'));
 			const anyNotEmpty = inputs.some(input => input.value.trim() !== '');
 			if (!firstTimeChecking || anyNotEmpty) {
-				messageToTheUser("Sakinių skaičių galima pakeisti tik prieš įrašant raides.")
-				return
+			messageToTheUser("Sakinių skaičių galima pakeisti tik prieš įrašant raides.");
+			return;
 			}
 			if (questionsToDisplay > 1) {
-				questionsToDisplay--;
-				displaySentences();
-				document.getElementById('help-toggle').checked = false;
-				helpToggle();
+			questionsToDisplay--;
+			displaySentences();
+			document.getElementById('help-toggle').checked = false;
+			helpToggle();
 			} else {
-				focusFirstInput();
+			focusFirstInput();
 			}
+		});
 		});
 
 		function displaySentences() {
@@ -1991,27 +2026,6 @@ function helpToggle() {
 				}
 			}
 
-			window.stopQuestionsCloseActions = function () {
-				controller.questionsStopped = true;
-				clearInterval(timerInterval);
-				stopButtonSpanElement.innerHTML = "refresh";
-				document.getElementById('check-answers').disabled = true;
-				document.getElementById('check-answers').style.display = "inline-block";
-				document.getElementById('help-toggle').disabled = true;
-				document.getElementById('next-question').style.display = "none";
-				document.getElementById('show-answers').style.visibility = "hidden";
-				document.querySelector('.help-toggle-holder').style.visibility = "hidden";
-
-				document.querySelectorAll('.question-input').forEach(input => {
-					input.disabled = true;
-				});
-
-				resetMistakeButtonsElement.style.display = "flex";
-				localStorage.setItem("elapsedTime", timerDisplay.textContent);
-				localStorage.setItem('controller', JSON.stringify(controller))
-				formatFinalMessageForGrammar();
-			}
-
 			function stopQuestions() {
 				if (stopButtonSpanElement.innerHTML === "close") {
 					showCustomConfirm("Ar tikrai nori sustabdyti užduotį?", stopQuestionsCloseActions);
@@ -2195,23 +2209,30 @@ function focusCentered(element) {
 	const container = document.querySelector('#field-for-text-outer');
 	if (!container) return;
 
-	// Focus textarea without native scroll jump
-	if (element.tagName.toLowerCase() === 'textarea') {
-		element.focus({ preventScroll: true });
-	} else {
-		element.focus();
-	}
+	// Detect if mobile device
+	const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+	                ('ontouchstart' in window) ||
+	                (navigator.maxTouchPoints > 0);
 
-	// Use requestAnimationFrame to ensure layout is updated before scrolling
-	requestAnimationFrame(() => {
-		// Compute element position relative to the container
+	// Determine if we're focusing a textarea or its parent
+	const isTextarea = element.tagName.toLowerCase() === 'textarea';
+	
+	// Focus behavior: textareas focus without scroll, parent divs don't get focused
+	if (isTextarea) {
+		element.focus({ preventScroll: true });
+	}
+	// If element is a parent div/span, we don't focus it, just scroll to it
+
+	// Function to perform the scroll
+	function performScroll() {
+		// Get fresh measurements
 		const rect = element.getBoundingClientRect();
 		const containerRect = container.getBoundingClientRect();
 
 		// Current scroll position plus element offset within container
 		const targetScrollTop = container.scrollTop + rect.top - containerRect.top - (container.clientHeight / 2) + (element.offsetHeight / 2);
 
-		// Try smooth scroll first (works on desktop)
+		// Always try smooth scroll first
 		const supportsSmooth = 'scrollBehavior' in document.documentElement.style;
 		
 		if (supportsSmooth) {
@@ -2220,30 +2241,18 @@ function focusCentered(element) {
 				behavior: 'smooth'
 			});
 		} else {
-			// Fallback: manual smooth scroll for mobile
-			const startScrollTop = container.scrollTop;
-			const distance = targetScrollTop - startScrollTop;
-			const duration = 300; // milliseconds
-			let startTime = null;
+			// Fallback: instant scroll if smooth not supported
+			container.scrollTop = targetScrollTop;
+		}
+	}
 
-			function animation(currentTime) {
-				if (startTime === null) startTime = currentTime;
-				const timeElapsed = currentTime - startTime;
-				const progress = Math.min(timeElapsed / duration, 1);
-				
-				// Easing function (ease-in-out)
-				const ease = progress < 0.5
-					? 2 * progress * progress
-					: 1 - Math.pow(-2 * progress + 2, 2) / 2;
-
-				container.scrollTop = startScrollTop + distance * ease;
-
-				if (progress < 1) {
-					requestAnimationFrame(animation);
-				}
-			}
-
-			requestAnimationFrame(animation);
+	// Use requestAnimationFrame to ensure layout is updated before scrolling
+	requestAnimationFrame(() => {
+		performScroll();
+		
+		// On mobile, perform a second scroll after keyboard settles (to correct position if keyboard moved viewport)
+		if (isMobile && isTextarea) {
+			setTimeout(performScroll, 300);
 		}
 	});
 }
