@@ -1812,53 +1812,99 @@ window.stopQuestionsCloseActions = function () {
 
 // Function to set up listeners for all inputs
 function setupDynamicListeners() {
-    const inputs = document.querySelectorAll('.question-input');
-    const checkAnswersButton = document.getElementById('check-answers');
+	const inputs = document.querySelectorAll('.question-input');
+	const checkAnswersButton = document.getElementById('check-answers');
 
-    inputs.forEach(input => {
-        input.addEventListener('input', () => {
-            // Recheck inputs with 'wrong-answer' class
-            const wrongInputs = document.querySelectorAll('.wrong-answer');
-			if (wrongInputs && wrongInputs.length > 0) {
-            	allModified = false;
-			} else {
-				allModified = true;
+	inputs.forEach(input => {
+		// --- Define handlers once per input ---
+		const handleInput = () => {
+			const wrongInputs = document.querySelectorAll('.wrong-answer');
+			allModified = !(wrongInputs && wrongInputs.length > 0);
+		};
+
+		const handleParentClick = (e) => {
+			if (e.target !== input) {
+				const container = document.querySelector('#field-for-text-outer');
+				focusWithKeyboardAdjustment(input, container);
 			}
-        });
+		};
 
-		const parent = input.parentElement;
-		if (parent) {
-			parent.addEventListener('click', (e) => {
-				// Prevent double-firing if clicking on the input itself
-				if (e.target !== input) {
-					const container = document.querySelector('#field-for-text-outer');
-					focusWithKeyboardAdjustment(input, container);
-				}
-			});
+		const handleMouseDown = (e) => {
+			if (document.activeElement !== input) {
+				e.preventDefault();
+				const container = document.querySelector('#field-for-text-outer');
+				focusWithKeyboardAdjustment(input, container);
+			}
+		};
+
+		const handleTouchStart = (e) => {
+			if (document.activeElement !== input) {
+				e.preventDefault();
+				const container = document.querySelector('#field-for-text-outer');
+				focusWithKeyboardAdjustment(input, container);
+			}
+		};
+
+		// --- Remove old listeners if they exist ---
+		input.removeEventListener('input', input._handleInput);
+		input.removeEventListener('mousedown', input._handleMouseDown);
+		input.removeEventListener('touchstart', input._handleTouchStart);
+		if (input.parentElement) {
+			input.parentElement.removeEventListener('click', input._handleParentClick);
 		}
-    });
+
+		// --- Attach new listeners ---
+		input.addEventListener('input', handleInput);
+		input.addEventListener('mousedown', handleMouseDown);
+		input.addEventListener('touchstart', handleTouchStart, { passive: false });
+		if (input.parentElement) {
+			input.parentElement.addEventListener('click', handleParentClick);
+		}
+
+		// --- Store handlers for future cleanup ---
+		input._handleInput = handleInput;
+		input._handleMouseDown = handleMouseDown;
+		input._handleTouchStart = handleTouchStart;
+		input._handleParentClick = handleParentClick;
+	});
 }
 
-// Add mousedown listeners to textareas for keyboard adjustment
-document.querySelectorAll('.question-input').forEach(input => {
-	input.addEventListener('mousedown', (e) => {
-		// Only handle if keyboard is closed (element not already focused)
-		if (document.activeElement !== input) {
-			e.preventDefault(); // Prevent default focus
-			const container = document.querySelector('#field-for-text-outer');
-			focusWithKeyboardAdjustment(input, container);
-		}
-	});
-	
-	// Also handle touch events for mobile
-	input.addEventListener('touchstart', (e) => {
-		if (document.activeElement !== input) {
-			e.preventDefault();
-			const container = document.querySelector('#field-for-text-outer');
-			focusWithKeyboardAdjustment(input, container);
-		}
-	}, { passive: false });
-});
+function getOffsetTopWithinContainer(el, container) {
+	let offset = 0;
+	while (el && el !== container) {
+		offset += el.offsetTop;
+		el = el.offsetParent;
+	}
+	return offset;
+}
+
+function focusWithKeyboardAdjustment(element, container) {
+	if (!element || !container) return;
+
+	const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+		|| ('ontouchstart' in window)
+		|| (navigator.maxTouchPoints > 0);
+
+	element.focus({ preventScroll: true });
+
+	function centerElement() {
+		const elementTop = getOffsetTopWithinContainer(element, container);
+		const targetScrollTop = elementTop - (container.clientHeight / 2) + (element.offsetHeight / 2);
+
+		container.scrollTo({
+			top: targetScrollTop,
+			behavior: 'smooth'
+		});
+	}
+
+	requestAnimationFrame(centerElement);
+	if (isMobile) {
+		setTimeout(centerElement, 300);
+		setTimeout(centerElement, 500);
+	}
+}
+
+
 
 function recordGrammarMistakes (inputId, userInput) {
 	if (!mistakeRecords[inputId]) {
@@ -2293,41 +2339,6 @@ function focusCentered(element) {
 			setTimeout(performScroll, 100);
 		}
 	});
-}
-
-// Universal function to handle focus with keyboard adjustment
-function focusWithKeyboardAdjustment(element, container) {
-	if (!element || !container) return;
-
-	// Detect if mobile device
-	const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-	                ('ontouchstart' in window) ||
-	                (navigator.maxTouchPoints > 0);
-
-	// Focus the element
-	element.focus({ preventScroll: true });
-
-	// Function to center the element in viewport
-	function centerElement() {
-		const rect = element.getBoundingClientRect();
-		const containerRect = container.getBoundingClientRect();
-		const targetScrollTop = container.scrollTop + rect.top - containerRect.top - (container.clientHeight / 2) + (element.offsetHeight / 2);
-
-		container.scrollTo({
-			top: targetScrollTop,
-			behavior: 'smooth'
-		});
-	}
-
-	// Scroll immediately
-	requestAnimationFrame(centerElement);
-
-	// On mobile, re-scroll after keyboard opens
-	if (isMobile) {
-		// Multiple delays to catch different keyboard animation timings
-		setTimeout(centerElement, 300);
-		setTimeout(centerElement, 500);
-	}
 }
 
 // Call the function after rendering the inputs and button
