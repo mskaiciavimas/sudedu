@@ -1958,8 +1958,10 @@ function checkAnswers() {
 		});
 		wrongInputParent.classList.add('current-focus-parent');
 
-		hiddenInput.focus({ preventScroll: true });
-		hiddenInput.dataset.currentId = wrongInput.id;
+		setTimeout(() => {
+			hiddenInput.focus({ preventScroll: true });
+			hiddenInput.dataset.currentId = wrongInput.id;
+		}, 400);
 	}
 
 	firstTimeChecking = false;
@@ -2162,8 +2164,10 @@ function handleEnterKey(event) {
 				el.classList.remove('current-focus-parent');
 			});
 			parentDiv.classList.add('current-focus-parent');
-            hiddenInput.focus({ preventScroll: true });
-            hiddenInput.dataset.currentId = wrongInput.id;
+            setTimeout(() => {
+				hiddenInput.focus({ preventScroll: true });
+				hiddenInput.dataset.currentId = wrongInput.id;
+			}, 400);
         }
         return;
     }
@@ -2221,6 +2225,12 @@ function focusCentered(element) {
 	// Determine if we're focusing a textarea or its parent
 	const isTextarea = element.tagName.toLowerCase() === 'textarea';
 	
+	// Focus behavior: textareas focus without scroll
+	if (isTextarea) {
+		element.focus({ preventScroll: true });
+	}
+	// If element is a parent div/span, we don't focus it, just scroll to it
+
 	// Function to perform the scroll
 	function performScroll() {
 		// Get fresh measurements
@@ -2248,24 +2258,12 @@ function focusCentered(element) {
 	requestAnimationFrame(() => {
 		performScroll();
 		
-		// Focus behavior AFTER scroll calculation
-		if (isTextarea) {
-			element.focus({ preventScroll: true });
-		} else {
-			// If focusing a parent div, position hidden input at center of container
-			// This prevents browser from scrolling when hidden input is focused
-			const centerTop = container.scrollTop + (container.clientHeight / 2);
-			hiddenInput.style.top = centerTop + 'px';
-			hiddenInput.style.left = '50%';
-		}
-		
-		// On mobile, perform a second scroll after keyboard settles (to correct position if keyboard moved viewport)
+		// On mobile, perform a second scroll after keyboard settles
 		if (isMobile && isTextarea) {
 			setTimeout(performScroll, 300);
 		}
 	});
 }
-
 
 // Call the function after rendering the inputs and button
 enableEnterNavigation();
