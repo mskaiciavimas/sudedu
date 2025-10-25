@@ -2221,18 +2221,6 @@ function focusCentered(element) {
 	// Determine if we're focusing a textarea or its parent
 	const isTextarea = element.tagName.toLowerCase() === 'textarea';
 	
-	// Focus behavior: textareas focus without scroll, parent divs don't get focused
-	if (isTextarea) {
-		element.focus({ preventScroll: true });
-	} else {
-		// If focusing a parent div, position hidden input at the element's location
-		const rect = element.getBoundingClientRect();
-		const containerRect = container.getBoundingClientRect();
-		hiddenInput.style.top = (rect.top - containerRect.top + container.scrollTop) + 'px';
-		hiddenInput.style.left = (rect.left - containerRect.left + container.scrollLeft) + 'px';
-	}
-	// If element is a parent div/span, we don't focus it, just scroll to it
-
 	// Function to perform the scroll
 	function performScroll() {
 		// Get fresh measurements
@@ -2256,15 +2244,27 @@ function focusCentered(element) {
 		}
 	}
 
-	// Use requestAnimationFrame to ensure layout is updated before scrolling
-	requestAnimationFrame(() => {
-		performScroll();
-		
-		// On mobile, perform a second scroll after keyboard settles (to correct position if keyboard moved viewport)
-		if (isMobile && isTextarea) {
+	// Perform scroll first, THEN focus
+	performScroll();
+	
+	// Focus after scroll starts (for mobile keyboard)
+	if (isMobile && isTextarea) {
+		setTimeout(() => {
+			element.focus({ preventScroll: true });
+			// Correct scroll position after keyboard opens
 			setTimeout(performScroll, 300);
-		}
-	});
+		}, 50);
+	} else if (isTextarea) {
+		element.focus({ preventScroll: true });
+	}
+	
+	// For parent divs, position hidden input at center of target element before focusing
+	if (!isTextarea) {
+		// Position hidden input at the center of the container view (where element will be after scroll)
+		const centerTop = container.scrollTop + (container.clientHeight / 2);
+		hiddenInput.style.top = centerTop + 'px';
+		hiddenInput.style.left = '50%';
+	}
 }
 
 

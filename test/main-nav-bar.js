@@ -150,3 +150,19 @@ function backToPreviousPage() {
     }
 }
 
+// Close mobile menu when clicking or scrolling outside
+document.addEventListener('click', function(e) {
+    const isMenuOpen = mainNavMobileMenu.classList.contains('main-nav-mobile-open');
+    if (isMenuOpen && !mainNavMobileMenu.contains(e.target) && !mainNavMobileBtn.contains(e.target)) {
+        mainNavMobileBtn.classList.remove('main-nav-mobile-active');
+        mainNavMobileMenu.classList.remove('main-nav-mobile-open');
+    }
+});
+
+document.addEventListener('scroll', function() {
+    const isMenuOpen = mainNavMobileMenu.classList.contains('main-nav-mobile-open');
+    if (isMenuOpen) {
+        mainNavMobileBtn.classList.remove('main-nav-mobile-active');
+        mainNavMobileMenu.classList.remove('main-nav-mobile-open');
+    }
+}, true);
