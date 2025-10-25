@@ -2244,27 +2244,26 @@ function focusCentered(element) {
 		}
 	}
 
-	// Perform scroll first, THEN focus
-	performScroll();
-	
-	// Focus after scroll starts (for mobile keyboard)
-	if (isMobile && isTextarea) {
-		setTimeout(() => {
+	// Use requestAnimationFrame to ensure layout is updated before scrolling
+	requestAnimationFrame(() => {
+		performScroll();
+		
+		// Focus behavior AFTER scroll calculation
+		if (isTextarea) {
 			element.focus({ preventScroll: true });
-			// Correct scroll position after keyboard opens
+		} else {
+			// If focusing a parent div, position hidden input at center of container
+			// This prevents browser from scrolling when hidden input is focused
+			const centerTop = container.scrollTop + (container.clientHeight / 2);
+			hiddenInput.style.top = centerTop + 'px';
+			hiddenInput.style.left = '50%';
+		}
+		
+		// On mobile, perform a second scroll after keyboard settles (to correct position if keyboard moved viewport)
+		if (isMobile && isTextarea) {
 			setTimeout(performScroll, 300);
-		}, 50);
-	} else if (isTextarea) {
-		element.focus({ preventScroll: true });
-	}
-	
-	// For parent divs, position hidden input at center of target element before focusing
-	if (!isTextarea) {
-		// Position hidden input at the center of the container view (where element will be after scroll)
-		const centerTop = container.scrollTop + (container.clientHeight / 2);
-		hiddenInput.style.top = centerTop + 'px';
-		hiddenInput.style.left = '50%';
-	}
+		}
+	});
 }
 
 
