@@ -215,27 +215,36 @@ scrollbar-color: rgba(255,255,255,0.4) transparent;
     position: absolute;
     right: 12px;
     display: flex;
-    gap: 4px;
+    gap: 2px;
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
     z-index: 10;
     justify-content: end;
+    flex-direction: column;
+}
+
+.dot-row {
+  display: flex;
+  justify-content: end;
+  gap: 3px;
 }
 
 .scroll-indicator-line.top {
     top: 12px;
-    flex-direction: row;
     display: none;
 }
 
 .scroll-indicator-line.bottom {
     bottom: 12px;
-    flex-direction: row;
 }
 
 .scroll-indicator-line.visible {
     opacity: 1;
+}
+
+.bottom-indicator-dot {
+  margin-right: 3px;
 }
 
 .indicator-dot {
@@ -244,6 +253,11 @@ scrollbar-color: rgba(255,255,255,0.4) transparent;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.9);
     animation: pulse-opacity 1.5s ease-in-out infinite;
+}
+
+#new-task-options-container .scroll-indicator-line {
+  right: 5px;
+  bottom: 5px;
 }
 
 .personal-chl-container .scroll-indicator-line {

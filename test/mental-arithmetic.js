@@ -3668,7 +3668,6 @@ function displayCustomTaskPotentialEarnings () {
 
 // POINTS CALCULATION END
 
-
 function initScrollIndicators() {
     const containers = document.querySelectorAll('.scroll-indicators');
    
@@ -3691,18 +3690,49 @@ function initScrollIndicators() {
         const bottomIndicator = document.createElement('div');
         bottomIndicator.className = 'scroll-indicator-line bottom';
         
-        // Create dots for each indicator
-        for (let i = 0; i < 3; i++) {
-            const topDot = document.createElement('div');
-            topDot.className = 'indicator-dot';
-            topDot.style.animationDelay = `${i * 0.15}s`;
-            topIndicator.appendChild(topDot);
-            
-            const bottomDot = document.createElement('div');
-            bottomDot.className = 'indicator-dot';
-            bottomDot.style.animationDelay = `${i * 0.15}s`;
-            bottomIndicator.appendChild(bottomDot);
-        }
+        // Create dots in triangle formation
+        const topRow = document.createElement('div');
+        topRow.className = 'dot-row';
+        const topDot1 = document.createElement('div');
+        topDot1.className = 'indicator-dot';
+        topDot1.style.animationDelay = '0s';
+        const topDot2 = document.createElement('div');
+        topDot2.className = 'indicator-dot';
+        topDot2.style.animationDelay = '0s';
+        topRow.appendChild(topDot1);
+        topRow.appendChild(topDot2);
+        
+        const topBottomRow = document.createElement('div');
+        topBottomRow.className = 'dot-row';
+        const topDot3 = document.createElement('div');
+        topDot3.className = 'indicator-dot';
+        topDot3.style.animationDelay = '0.3s';
+        topBottomRow.appendChild(topDot3);
+        
+        topIndicator.appendChild(topRow);
+        topIndicator.appendChild(topBottomRow);
+        
+        // Bottom indicator (same structure)
+        const bottomRow = document.createElement('div');
+        bottomRow.className = 'dot-row';
+        const bottomDot1 = document.createElement('div');
+        bottomDot1.className = 'indicator-dot';
+        bottomDot1.style.animationDelay = '0s';
+        const bottomDot2 = document.createElement('div');
+        bottomDot2.className = 'indicator-dot';
+        bottomDot2.style.animationDelay = '0s';
+        bottomRow.appendChild(bottomDot1);
+        bottomRow.appendChild(bottomDot2);
+        
+        const bottomBottomRow = document.createElement('div');
+        bottomBottomRow.className = 'dot-row';
+        const bottomDot3 = document.createElement('div');
+        bottomDot3.className = 'indicator-dot bottom-indicator-dot';
+        bottomDot3.style.animationDelay = '0.3s';
+        bottomBottomRow.appendChild(bottomDot3);
+        
+        bottomIndicator.appendChild(bottomRow);
+        bottomIndicator.appendChild(bottomBottomRow);
        
         parent.appendChild(topIndicator);
         parent.appendChild(bottomIndicator);
@@ -3736,8 +3766,9 @@ function initScrollIndicators() {
     });
 }
 
-// Initialize once
-initScrollIndicators();
+window.addEventListener('load', () => {
+    initScrollIndicators();
+});
 
 // Watch for added/removed elements
 const scrollingIndicatorObserver = new MutationObserver(() => {
@@ -3753,5 +3784,3 @@ scrollingIndicatorObserver.observe(document.body, {
 window.addEventListener('resize', () => {
     initScrollIndicators();
 });
-
-initScrollIndicators();
