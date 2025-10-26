@@ -4333,7 +4333,17 @@
 
             modeChoice2 = modeChoice9Selection;
 
-            modeChoice3 = getSelectedRasybaConditions();
+            const selectedOptions = getSelectedRasybaConditions();
+
+            const sortedModeChoice3 = Object.fromEntries(
+            Object.entries(selectedOptions).sort(([a], [b]) => {
+                const numA = parseInt(a.slice(1));
+                const numB = parseInt(b.slice(1));
+                return numA - numB;
+            })
+            );
+
+            modeChoice3 = sortedModeChoice3;
 
             const modeChoice12Selection = document.querySelector('#mode_choice_12').value;
             modeChoice5 = modeChoice12Selection;

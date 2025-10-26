@@ -3667,7 +3667,6 @@ function displayCustomTaskPotentialEarnings () {
 }
 
 // POINTS CALCULATION END
-
 function initScrollIndicators() {
     const containers = document.querySelectorAll('.scroll-indicators');
    
@@ -3742,6 +3741,9 @@ function initScrollIndicators() {
             const scrollHeight = container.scrollHeight;
             const clientHeight = container.clientHeight;
             const canScroll = scrollHeight > clientHeight;
+
+            console.log(container)
+        
            
             if (!canScroll) {
                 topIndicator.classList.remove('visible');
@@ -3756,16 +3758,22 @@ function initScrollIndicators() {
             bottomIndicator.classList.toggle('visible', !isAtBottom);
         }
        
-        container.addEventListener('scroll', updateIndicators);
-        window.addEventListener('resize', updateIndicators);
+        container.addEventListener('scroll', updateIndicatorsWithDelays);
+        window.addEventListener('resize', updateIndicatorsWithDelays);
+        window.addEventListener('click', updateIndicatorsWithDelays);
+        window.addEventListener('touchend', updateIndicatorsWithDelays);
        
         const observer = new MutationObserver(updateIndicators);
         observer.observe(container, { childList: true, subtree: true });
        
-        // Multiple checks to ensure reliable initialization
-        setTimeout(updateIndicators, 100);
-        setTimeout(updateIndicators, 300);
-        setTimeout(updateIndicators, 500);
+        function updateIndicatorsWithDelays () {
+          // Multiple checks to ensure reliable initialization
+          setTimeout(updateIndicators, 100);
+          setTimeout(updateIndicators, 300);
+          setTimeout(updateIndicators, 500);
+        }
+
+        updateIndicatorsWithDelays();
         
         // Also check when images/content loads
         if (document.readyState === 'loading') {
@@ -3775,4 +3783,32 @@ function initScrollIndicators() {
     });
 }
 
+// Initialize existing containers
 initScrollIndicators();
+
+// Watch for dynamically added containers
+const bodyObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        mutation.addedNodes.forEach(function(node) {
+            if (node.nodeType === 1) { // Element node
+                // Check if the added node itself has the class
+                if (node.classList && node.classList.contains('scroll-indicators')) {
+                    initScrollIndicators();
+                }
+                // Check if any descendants have the class
+                if (node.querySelectorAll) {
+                    const newContainers = node.querySelectorAll('.scroll-indicators');
+                    if (newContainers.length > 0) {
+                        initScrollIndicators();
+                    }
+                }
+            }
+        });
+    });
+});
+
+// Start observing the document body for changes
+bodyObserver.observe(document.body, {
+    childList: true,
+    subtree: true
+});

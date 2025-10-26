@@ -1178,8 +1178,8 @@
         }
 
         .carousel-btn {
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid rgba(255, 215, 0, 0.5);
+            background: transparent;
+            border: none;
             border-radius: 50%;
             width: 32px;
             height: 32px;
@@ -1190,18 +1190,13 @@
             transition: all 0.2s;
             font-size: 1rem;
             color: #bf9b30;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             font-weight: 700;
         }
 
-        .carousel-btn:hover:not(:disabled) {
-            background: rgba(255, 215, 0, 0.2);
-            transform: scale(1.1);
-        }
-
-        .carousel-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
+        .carousel-btn:focus,
+        .carousel-btn:active {
+            border: none;
+            outline: none;
         }
 
         .carousel-dots {
@@ -3243,7 +3238,6 @@ async function renderClassWeekChallenge () {
                     const prevBtn = document.createElement('button');
                     prevBtn.className = 'carousel-btn';
                     prevBtn.innerHTML = '‹';
-                    prevBtn.disabled = true;
                     prevBtn.onclick = () => navigateCarousel(placeClass, -1);
 
                     const dotsContainer = document.createElement('div');
@@ -3329,12 +3323,18 @@ async function renderClassWeekChallenge () {
 
             function navigateCarousel(placeClass, direction) {
                 const state = carouselStates[placeClass];
-                const newIndex = state.currentIndex + direction;
-                
-                if (newIndex >= 0 && newIndex < state.students.length) {
-                    goToSlide(placeClass, newIndex);
+                let newIndex = state.currentIndex + direction;
+
+                // Wrap around (loop)
+                if (newIndex < 0) {
+                    newIndex = state.students.length - 1;  // go to last
+                } else if (newIndex >= state.students.length) {
+                    newIndex = 0;  // go to first
                 }
+
+                goToSlide(placeClass, newIndex);
             }
+
 
             function goToSlide(placeClass, index) {
                 const state = carouselStates[placeClass];
@@ -3350,9 +3350,6 @@ async function renderClassWeekChallenge () {
 
                 const prevBtn = podiumPlaceDiv.querySelector('.carousel-btn:first-of-type');
                 const nextBtn = podiumPlaceDiv.querySelector('.carousel-btn:last-of-type');
-                
-                if (prevBtn) prevBtn.disabled = index === 0;
-                if (nextBtn) nextBtn.disabled = index === state.students.length - 1;
             }
         }   
 
