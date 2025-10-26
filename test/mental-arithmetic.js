@@ -3689,49 +3689,39 @@ function initScrollIndicators() {
         const bottomIndicator = document.createElement('div');
         bottomIndicator.className = 'scroll-indicator-line bottom';
         
-        // Create dots in triangle formation
-        const topRow = document.createElement('div');
-        topRow.className = 'dot-row';
-        const topDot1 = document.createElement('div');
-        topDot1.className = 'indicator-dot';
-        topDot1.style.animationDelay = '0s';
-        const topDot2 = document.createElement('div');
-        topDot2.className = 'indicator-dot';
-        topDot2.style.animationDelay = '0s';
-        topRow.appendChild(topDot1);
-        topRow.appendChild(topDot2);
+        // Create three horizontal lines for top indicator (pointing up - inverted triangle)
+        const topLine1 = document.createElement('div');
+        topLine1.className = 'indicator-line line-short';
+        topLine1.style.animationDelay = '0s';
         
-        const topBottomRow = document.createElement('div');
-        topBottomRow.className = 'dot-row';
-        const topDot3 = document.createElement('div');
-        topDot3.className = 'indicator-dot';
-        topDot3.style.animationDelay = '0.3s';
-        topBottomRow.appendChild(topDot3);
+        const topLine2 = document.createElement('div');
+        topLine2.className = 'indicator-line line-medium';
+        topLine2.style.animationDelay = '0.15s';
         
-        topIndicator.appendChild(topRow);
-        topIndicator.appendChild(topBottomRow);
+        const topLine3 = document.createElement('div');
+        topLine3.className = 'indicator-line line-long';
+        topLine3.style.animationDelay = '0.3s';
         
-        // Bottom indicator (same structure)
-        const bottomRow = document.createElement('div');
-        bottomRow.className = 'dot-row';
-        const bottomDot1 = document.createElement('div');
-        bottomDot1.className = 'indicator-dot';
-        bottomDot1.style.animationDelay = '0s';
-        const bottomDot2 = document.createElement('div');
-        bottomDot2.className = 'indicator-dot';
-        bottomDot2.style.animationDelay = '0s';
-        bottomRow.appendChild(bottomDot1);
-        bottomRow.appendChild(bottomDot2);
+        topIndicator.appendChild(topLine1);
+        topIndicator.appendChild(topLine2);
+        topIndicator.appendChild(topLine3);
         
-        const bottomBottomRow = document.createElement('div');
-        bottomBottomRow.className = 'dot-row';
-        const bottomDot3 = document.createElement('div');
-        bottomDot3.className = 'indicator-dot bottom-indicator-dot';
-        bottomDot3.style.animationDelay = '0.3s';
-        bottomBottomRow.appendChild(bottomDot3);
+        // Create three horizontal lines for bottom indicator (pointing down)
+        const bottomLine1 = document.createElement('div');
+        bottomLine1.className = 'indicator-line line-long';
+        bottomLine1.style.animationDelay = '0s';
         
-        bottomIndicator.appendChild(bottomRow);
-        bottomIndicator.appendChild(bottomBottomRow);
+        const bottomLine2 = document.createElement('div');
+        bottomLine2.className = 'indicator-line line-medium';
+        bottomLine2.style.animationDelay = '0.15s';
+        
+        const bottomLine3 = document.createElement('div');
+        bottomLine3.className = 'indicator-line line-short';
+        bottomLine3.style.animationDelay = '0.3s';
+        
+        bottomIndicator.appendChild(bottomLine1);
+        bottomIndicator.appendChild(bottomLine2);
+        bottomIndicator.appendChild(bottomLine3);
        
         parent.appendChild(topIndicator);
         parent.appendChild(bottomIndicator);
@@ -3741,9 +3731,6 @@ function initScrollIndicators() {
             const scrollHeight = container.scrollHeight;
             const clientHeight = container.clientHeight;
             const canScroll = scrollHeight > clientHeight;
-
-            console.log(container)
-        
            
             if (!canScroll) {
                 topIndicator.classList.remove('visible');
