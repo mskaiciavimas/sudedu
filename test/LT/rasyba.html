@@ -1810,6 +1810,65 @@ window.stopQuestionsCloseActions = function () {
 			}
 	}
 
+
+function alignTextarea(textarea) {
+    // Reset transform
+    textarea.style.transform = 'translateY(0)';
+    
+    // Force reflow
+    void textarea.offsetHeight;
+    
+    const parent = textarea.closest('.question-word-span');
+    if (!parent) return;
+    
+    // Find actual text content in the parent to use as reference
+    let referenceText = null;
+    for (let child of parent.childNodes) {
+        if (child.nodeType === Node.TEXT_NODE && child.textContent.trim()) {
+            referenceText = child.textContent.trim()[0];
+            break;
+        }
+    }
+    
+    // Create a simple span with same styling as parent text
+    const testSpan = document.createElement('span');
+    testSpan.textContent = referenceText || 'X';
+    testSpan.style.visibility = 'hidden';
+    testSpan.style.display = 'inline';
+    parent.appendChild(testSpan);
+    
+    // Wait for next frame to ensure accurate measurements
+    requestAnimationFrame(() => {
+        const testRect = testSpan.getBoundingClientRect();
+        const textareaRect = textarea.getBoundingClientRect();
+        
+        // Calculate offset
+        const offset = testRect.bottom - textareaRect.bottom;
+        
+        // Apply transform
+        if (Math.abs(offset) > 0.5) { // Only apply if difference is significant
+            textarea.style.transform = `translateY(${offset}px)`;
+        }
+        
+        // Clean up
+        testSpan.remove();
+    });
+}
+
+function alignAllTextareas() {
+    const textareas = document.querySelectorAll('.question-word-span textarea');
+    textareas.forEach(textarea => {
+        alignTextarea(textarea);
+    });
+}
+
+window.addEventListener('load', alignAllTextareas);
+window.addEventListener('resize', alignAllTextareas);
+if (document.fonts) {
+    document.fonts.ready.then(alignAllTextareas);
+}
+
+
 // Function to set up listeners for all inputs
 function setupDynamicListeners() {
 	const inputs = document.querySelectorAll('.question-input');
