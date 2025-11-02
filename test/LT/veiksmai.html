@@ -876,10 +876,7 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 
 		if (controller.modeChoice7 === "C48") {
 
-			const fontSIzeFull = 3;
 			const oneRem = 16;
-			const inputPadding = 20;
-			var digitNumber = controller.randomSelection[1].toString();
 
 			var element1 = document.getElementById('equation');
 			var element2 = document.getElementById('answer-field');
@@ -930,10 +927,7 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 					} else {
 						answerInput.style.width = `${dalinysLength}ch`;
 					}
-				} else {
-					return
 				}
-
 			} else {
 				answerInput.style.width = `${(Math.ceil(controller.randomSelection[0]/controller.randomSelection[1])).toString().length + 1.25}ch`;
 				daliklis.style.width = `${(Math.ceil(controller.randomSelection[0]/controller.randomSelection[1])).toString().length + 1}ch`;
@@ -950,8 +944,8 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 					lastElement.appendChild(remainderElement);
 				}
 			}
-			} else {
 
+			} else {
 				var demAtTur = document.getElementsByClassName('demuo-turinys-ateminys');
 				var didDemAtTurWidth = 0;
 				var didDemAtTur;
@@ -986,8 +980,6 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 			} else if (controller.randomSelection[2] === 'D') {
 				answerInputs = document.querySelectorAll('.stulpeliu-input');
 				container = document.querySelector('#division-stulp-2-outer');
-			} else {
-				return
 			}
 
 			if (answerInputs) {
@@ -1020,7 +1012,6 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 				answerElement.style.width = requiredWidth + 'ch';
 			}
 		}
-
 
   		adjustMiddleLineHeight();
 		if (contentContainerElement) {

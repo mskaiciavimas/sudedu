@@ -4758,43 +4758,43 @@ function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) 
 
             // Resolve z-index conflicts
             if (Object.keys(itemsZIndexes).length > 0) {
-                const zIndexGroups = {};
-                for (const [item, zIndex] of Object.entries(itemsZIndexes)) {
-                    if (!zIndexGroups[zIndex]) zIndexGroups[zIndex] = [];
-                    zIndexGroups[zIndex].push(item);
-                }
+                // Get all items sorted by their initial z-index, then by position
+                const allItems = Object.entries(itemsZIndexes).map(([item, zIndex]) => ({
+                    item,
+                    zIndex,
+                    pos: getObjectCoordinates(item)[1]
+                }));
+                
+                allItems.sort((a, b) => {
+                    if (a.zIndex !== b.zIndex) return a.zIndex - b.zIndex;
+                    return a.pos - b.pos;
+                });
 
-                for (const [zIndex, itemsInGroup] of Object.entries(zIndexGroups)) {
-                    if (itemsInGroup.length <= 1) continue;
-                    const zIndexNum = parseInt(zIndex);
-                    const itemPositions = itemsInGroup.map(item => ({ item, pos: getObjectCoordinates(item)[1] }));
-                    itemPositions.sort((a, b) => a.pos - b.pos);
-
-                    const positionGroups = [];
-                    let currentGroup = [itemPositions[0]];
-                    for (let i = 1; i < itemPositions.length; i++) {
-                        if (itemPositions[i].pos === itemPositions[i-1].pos) currentGroup.push(itemPositions[i]);
-                        else { positionGroups.push(currentGroup); currentGroup = [itemPositions[i]]; }
-                    }
-                    positionGroups.push(currentGroup);
-
-                    let totalIncreased = 0;
-                    positionGroups.forEach((group, idx) => {
-                        const bonus = idx;
-                        group.forEach(({item}) => { itemsZIndexes[item] = zIndexNum + bonus; });
-                        if (idx === positionGroups.length - 1) totalIncreased = bonus;
-                    });
-
-                    if (totalIncreased > 0) {
-                        for (const [item, origZIndex] of Object.entries(itemsZIndexes)) {
-                            if (origZIndex > zIndexNum && !itemsInGroup.includes(item)) {
-                                itemsZIndexes[item] = origZIndex + totalIncreased;
-                            }
+                // Assign new z-indexes maintaining relative differences
+                const minZ = allItems[0].zIndex;
+                let currentZ = minZ;
+                
+                for (let i = 0; i < allItems.length; i++) {
+                    const current = allItems[i];
+                    
+                    // If this item had a higher z-index than previous, maintain that difference
+                    if (i > 0) {
+                        const prev = allItems[i - 1];
+                        if (current.zIndex > prev.zIndex) {
+                            currentZ = itemsZIndexes[prev.item] + (current.zIndex - prev.zIndex);
+                        } else if (current.pos > prev.pos) {
+                            // Same original z-index but lower position - increment
+                            currentZ = itemsZIndexes[prev.item] + 1;
+                        } else {
+                            // Same z-index and position - keep same z-index
+                            currentZ = itemsZIndexes[prev.item];
                         }
                     }
+                    
+                    itemsZIndexes[current.item] = currentZ;
                 }
 
-                const minZ = Math.min(...Object.values(itemsZIndexes));
+                // Calculate deltas from minimum
                 for (const [key, value] of Object.entries(itemsZIndexes)) {
                     if (value > minZ) clusteredItemsZIndexDelta[key] = value - minZ;
                 }
@@ -6442,6 +6442,7 @@ function previewFurniture (key) {
             messageToTheUser("Nepakanka vietos!")
         }
         furniturePreviewDict["furniture-preview"].assetIndex = null;
+        predictAndSetZIndex();
     }
 }
 
@@ -6849,6 +6850,7 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
                     } else {
                         messageToTheUser("Nepakanka vietos!")
                     }
+                    predictAndSetZIndex();
                 }
             });
         }

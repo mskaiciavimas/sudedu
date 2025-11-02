@@ -2469,6 +2469,8 @@ function displayPersonalChl() {
 
 
 function completePersonalChlTask(challengeInfo, challengeDuration) {
+    resetControllerTaskSettings();
+
     const parsedCurrentTaskInstructions = challengeInfo;
     const currentTaskDuration = challengeDuration
 
@@ -2479,11 +2481,16 @@ function completePersonalChlTask(challengeInfo, challengeDuration) {
     var checkbox = document.getElementById("remainder-input");
 
     controller.language = "LT";
-        if (parsedCurrentTaskInstructions[0] === "math") {
+    
+    if (parsedCurrentTaskInstructions[0] === "math") {
         controller.mode = 'math';
         controller.modeChoice1 = parsedCurrentTaskInstructions[1];
         controller.modeChoice2 = parsedCurrentTaskInstructions[2];
-        controller.modeChoice3 = parsedCurrentTaskInstructions[3];
+        if (parsedCurrentTaskInstructions[3] === "C37") {
+            controller.modeChoice3 = true;
+        } else if (parsedCurrentTaskInstructions[3] === "C38") {
+            controller.modeChoice3 = false;
+        }
         controller.modeChoice5 = parsedCurrentTaskInstructions[4];
         controller.modeChoice6 = parsedCurrentTaskInstructions[5];
         controller.modeChoice7 = parsedCurrentTaskInstructions[6];
