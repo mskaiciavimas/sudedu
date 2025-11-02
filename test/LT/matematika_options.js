@@ -6,6 +6,7 @@ let selectedNumberElement = document.querySelector('#selected_number');
 let numberLabel2 = document.querySelector('#number_label_2');
 let selectedNumber2Element = document.querySelector('#selected_number_2');
 let remainderOptionElement = document.querySelector('#remainder-option');
+let remainderCheckBox = document.querySelector('#remainder-input');
 let modeChoice3Element = document.querySelector('#mode_choice_3');
 let modeChoice5Element = document.querySelector('#mode_choice_5');
 let modeChoice6Element = document.querySelector('#mode_choice_6');
@@ -48,6 +49,7 @@ let rasybaOptionsLabelTextGaluneElement = document.querySelector('#rasyba-option
             toggleVisibility(numberLabel2, false);
             toggleVisibility(selectedNumber2Element, false);
             toggleVisibility(remainderOptionElement, false);
+            remainderCheckBox.checked = false;
 
             toggleVisibility(classChoiceElement, true);
             toggleVisibility(modeChoice8Element, true);
@@ -135,6 +137,7 @@ let rasybaOptionsLabelTextGaluneElement = document.querySelector('#rasyba-option
         }
         else {
             toggleVisibility(remainderOptionElement, false);
+            remainderCheckBox.checked = false;
         }
         if (modeChoice1Selection === "C7") {
             toggleVisibility(modeChoice3Element, false);
