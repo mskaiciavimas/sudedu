@@ -1391,7 +1391,6 @@ window.stopQuestionsCloseActions = function () {
 									}
 									let combinedWordsThatCanBeUsed = Object.assign({}, wordsOneMustBeUsed, wordsThatCanBeUsedForQuestions);
 									while (Object.keys(wordsToBeUsed).length < questionQuota && (Object.keys(combinedWordsThatCanBeUsed).length > 0)) {
-										
 										let randomWord = Object.keys(combinedWordsThatCanBeUsed)[Math.floor(Math.random() * Object.keys(combinedWordsThatCanBeUsed).length)];
 										wordsToBeUsed[randomWord] = combinedWordsThatCanBeUsed[randomWord];
 										delete combinedWordsThatCanBeUsed[randomWord];
@@ -1683,7 +1682,7 @@ window.stopQuestionsCloseActions = function () {
 
 				// Select random unique indices
 				const selectedIndices = new Set();
-				while (selectedIndices.size <= (5 - subSakiniai.length)) {
+				while (selectedIndices.size < (5 - subSakiniai.length)) {
 					const randomIndex = Math.floor(Math.random() * sakiniai.length);
 					selectedIndices.add(randomIndex);
 				}

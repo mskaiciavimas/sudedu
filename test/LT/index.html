@@ -1925,7 +1925,7 @@ const personalChlDict = {
                 `[["lang","C75","C49","C52","C58"], ["C40","1"]]`
             ],
             "grammar": [
-                `[["lang","C75","C83","C50",{"C61":[],"C62":[],"C63":[],"C64":[],"C65":[]},"C73",3], ["C40","1"]]`
+                `[["lang","C75","C83","C50",{"C61":[]},"C73",3], ["C40","1"]]`
             ]
         },
         "second-semester": {
@@ -1942,7 +1942,7 @@ const personalChlDict = {
                 `[["lang","C75","C49","C52","C58"], ["C40","1"]]`
             ],
             "grammar": [
-                `[["lang","C75","C83","C50",{"C61":[],"C62":[],"C63":[],"C64":[],"C65":[]},"C73",3], ["C40","2"]]`
+                `[["lang","C75","C83","C50",{"C61":[]},"C73",3], ["C40","2"]]`
             ]
         }
     },
@@ -2033,7 +2033,7 @@ const personalChlDict = {
                 `[["lang","C75","C49","C52","C60"], ["C40","2"]]`
             ],
             "grammar": [
-                '["lang","C75","C50","1",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C40","C73","C58",3,"1"]'
+                `[["lang","C75","C83","C50",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C73",1], ["C40","10"]]`
             ]
         },
         "second-semester": {
@@ -2275,7 +2275,7 @@ function displayPersonalChl() {
     const indicatorsContainer = document.getElementById('chlIndicators');
     const prevBtn = document.getElementById('chlNavPrev');
     const nextBtn = document.getElementById('chlNavNext');
-    const userClass = userData?.knowledgeLvl || getClassLocalStorage() || 2;
+    const userClass = userData?.knowledgeLvl ?? getClassLocalStorage() ?? 2; // 0 (for priesmokykline) is treated as faulty unless ?? is used instead of ||
 
     if (!personalChlDict[userClass][getLithuanianSchoolSemester()]) {
         displayArea.innerHTML = '<p style="text-align: center; color: rgba(0,0,0,0.5);">Nėra prieinamų iššūkių</p>';
