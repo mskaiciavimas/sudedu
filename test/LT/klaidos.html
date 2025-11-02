@@ -1,153 +1,1091 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="lt">
 <head>
-    <title>sudedu - klaidos</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Josefin+Sans&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="../summary.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mokymosi Statistika</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-image: linear-gradient(to top, #ffbf9c, #ffbf92, #ffbf89, #ffbf7e, #ffc074);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+        }
+        
+        h1 {
+            color: #1a1a1a;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .filter-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .filter-label {
+            font-weight: 600;
+            color: #4a4a4a;
+            margin-bottom: 12px;
+            display: block;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: #333;
+        }
+        
+        .btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .btn.active {
+            background: rgba(50, 136, 172, 0.9);
+            color: white;
+        }
+        
+        .btn-subject.active {
+            background: rgba(16, 185, 129, 0.9);
+        }
+        
+        .badge {
+            display: inline-block;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 6px;
+            font-weight: 600;
+        }
+        
+        .badge-percent {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-number {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        /* Enhanced chart container with fixed header */
+        .chart-container {
+            position: relative;
+            height: 450px;
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        .chart-header {
+            position: relative;
+            flex-shrink: 0;
+            z-index: 10;
+            padding-bottom: 10px;
+        }
+        
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #1a1a1a;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .chart-body {
+            flex: 1;
+            position: relative;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            min-height: 0;
+        }
+        
+        .chart-scrollable {
+            position: relative;
+            min-width: 600px;
+            height: 100%;
+            width: max-content;
+        }
+        
+        .chart-scroll-indicator {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+            z-index: 5;
+        }
+        
+        .chart-scroll-indicator.hidden {
+            opacity: 0;
+        }
+        
+        .info-box {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 20px;
+        }
+        
+        .info-box p {
+            color: #1a1a1a;
+            font-size: 13px;
+            line-height: 1.6;
+        }
 
-</head>
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-96Q83PW8XY"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-96Q83PW8XY');
-</script>    
-
-<body>
-    <div id="object-popup" class="object-popup-overlay" style="display:none;">
-    <div class="object-popup-panel">
-        <button class="object-popup-close">&times;</button>
-        <div class="title-subtitle-inline-button-wrapper">
-        <div class="object-popup-title-subtitle-wrapper">
-        <div class="object-popup-title" id="object-popup-title"></div>
-        <div class="object-popup-subtitle" id="object-popup-subtitle"></div>
-        </div>
-        </div>
-        <div class="object-popup-content" id="object-popup-content">
-        <!-- Dynamic content goes here -->
-        </div>
-    </div>
-    </div>
-    <div class="container" id="template-container"
-        style="display: flex; flex-direction: column; justify-content: space-between;" hidden>
-        <div class="row d-flex align-items-start">
-            <div class="col-12 text-center">
-                <h1>Da&#x17E;niausios klaidos</h1>
-            </div>
-        </div>
-
-
-
-        <div id="mistakes-summary-math">
-                    <div class="d-flex align-items-center justify-content-center">
-        <button class="display-summary-button active-summary-button" onclick="displayMathSummary()" id="display-math-summary-button">MATEMATIKA</button>
-        <button class="display-summary-button" onclick="displayGrammarSummary()" id="display-grammar-summary-button">RAŠYBA</button>
-        </div>
-        <div class="row d-flex align-items-center justify-content-center text-center">
-            <div id="summary-table-outer-div" class="col-12 justify-content-center align-items-center">
-                <div class="col-12 table-container" id="table-container-math">
-                    <div id="summary-table"></div>
-                </div>
-            </div>
-            </div>
-
-            <div id="mistakes-summary-grammar">
-            <div id="summary-table-grammar-outer-div" class="col-12 justify-content-center align-items-center" style="display: none;">
-                <div class="col-12 table-container" id="table-container-grammar">
-                    <div id="summary-table-grammar"></div>
-                </div>
-            </div>
-            </div>
-        </div>
-
-        <div class="row d-flex align-items-end">
-            <div class="col-12 d-flex text-center justify-content-end back-button-div">
-                <button class="btn btn-primary back-button" onclick="goBack()"><span
-                        class="material-symbols-rounded">arrow_back</span></button>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="../mental-arithmetic.js"></script>
-    <script>
-        window.onload = function () {
-            if (localStorage.getItem('controller') === null) {
-                window.location.href = "./";
+        /* Mobile-specific optimizations */
+        @media (max-width: 767px) {
+            body {
+                padding: 10px;
             }
-            document.querySelector('#template-container').removeAttribute('hidden');
+            
+            .container {
+                padding: 15px;
+                border-radius: 12px;
+            }
+            
+            h1 {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+            
+            .filter-section {
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+            }
+            
+            .button-group {
+                gap: 8px;
+            }
+            
+            .btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+            
+            .chart-container {
+                height: 400px;
+                margin-top: 20px;
+                padding: 15px;
+                border-radius: 15px;
+            }
+            
+            .chart-scrollable {
+                min-width: 500px;
+            }
+            
+            .chart-legend {
+                gap: 10px;
+            }
+            
+            .legend-item {
+                font-size: 11px;
+            }
+            
+            .info-box {
+                padding: 12px;
+                margin-top: 15px;
+            }
+            
+            .info-box p {
+                font-size: 12px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .container {
+                border-radius: 20px;
+                padding: 30px;
+            }
+            
+            h1 {
+                margin-bottom: 30px;
+                font-size: 28px;
+            }
+            
+            .chart-container {
+                height: 450px;
+            }
+            
+            .chart-body {
+                overflow: hidden;
+            }
+            
+            .chart-scroll-indicator {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Mokymosi Statistika</h1>
+        
+        <div class="filter-section">
+            <label class="filter-label">Pasirinkite Dalyką (tik vieną):</label>
+            <div class="button-group" id="subjectButtons"></div>
+        </div>
+        
+        <div class="filter-section">
+            <label class="filter-label">Pasirinkite Metrikos (galima kelis):</label>
+            <div class="button-group" id="metricButtons"></div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-legend" id="chartLegend"></div>
+            </div>
+            <div class="chart-body" id="chartBody">
+                <div class="chart-scrollable">
+                    <canvas id="statsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <p><strong>💡 Patarimas:</strong> Grafikas naudoja skirtingas ašis skirtingiems duomenų tipams. Procentai naudoja kairę ašį (0-100%), o absoliutūs skaičiai naudoja dešines ašis su savo skalėmis. Mobiliesiems - perstumkite grafiką horizontaliai.</p>
+        </div>
+    </div>
+
+    <script>
+        var DATA = {
+            "c": {
+                "title": "nuoseklumas",
+                "values": [100, 85, 100, 0, 100]
+            },
+            "m": {
+                "title": "matematika",
+                "values": {
+                    "0": { "title": "taškai", "values": [2, 1, 2, 2, 1, 1, 2, 2, 1] },
+                    "1": { "title": "teisingi atsakymai", "values": [33.33, 50, 33.33, 33.33, 50, 50, 33.33, 33.33, 50] },
+                    "2": { "title": "klaidos", "values": [66.67, 100, 66.67, 66.67, 200, 100, 66.67, 66.67, 100] },
+                    "3": { "title": "atsakyti klausimai", "values": [3, 2, 3, 3, 2, 2, 3, 3, 2] }
+                }
+            },
+            "t": {
+                "title": "teksto suvokimas",
+                "values": {
+                    "0": { "title": "taškai", "values": [2, 1, 2, 2, 1] },
+                    "1": { "title": "teisingi atsakymai", "values": [33.33, 50, 33.33, 33.33, 50] },
+                    "2": { "title": "klaidos", "values": [66.67, 200, 66.67, 66.67, 100] },
+                    "3": { "title": "atsakyti klausimai", "values": [3, 2, 3, 3, 2] }
+                }
+            },
+            "g": {
+                "title": "rašyba",
+                "values": {
+                    "0": { "title": "taškai", "values": [2, 1, 2, 2, 1] },
+                    "1": { "title": "teisingi atsakymai", "values": [33.33, 50, 33.33, 33.33, 50] },
+                    "2": { "title": "klaidos", "values": [66.67, 100, 66.67, 66.67, 100] },
+                    "3": { "title": "atsakyti klausimai", "values": [3, 2, 3, 3, 2] }
+                }
+            }
         };
 
-        function goBack() {
-            if (window.history.length > 1) {
-                window.history.back();
+        var lithuanianMonths = ['Sau', 'Vas', 'Kov', 'Bal', 'Geg', 'Bir', 'Lie', 'Rugp', 'Rugs', 'Spal', 'Lap', 'Gr'];
+        
+        var metricColors = ['#286D8A', '#32ac93', '#e74c3c', '#F28C28', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
+        
+        var selectedSubject = null;
+        var selectedMetrics = [];
+        var chart = null;
+        var availableMetrics = [];
+        var previousDatasets = [];
+
+        // Mobile scroll indicator functionality
+        function setupMobileScroll() {
+            const chartBody = document.getElementById('chartBody');
+            const scrollIndicator = document.getElementById('scrollIndicator');
+            
+            // Only show scroll indicator on mobile
+            if (window.innerWidth < 768) {
+                // Check if scrolling is needed
+                const checkScroll = () => {
+                    const isScrollable = chartBody.scrollWidth > chartBody.clientWidth;
+                    
+                    if (isScrollable) {
+                        scrollIndicator.classList.remove('hidden');
+                        
+                        // Hide indicator after user starts scrolling
+                        const hideOnScroll = () => {
+                            scrollIndicator.classList.add('hidden');
+                            chartBody.removeEventListener('scroll', hideOnScroll);
+                        };
+                        chartBody.addEventListener('scroll', hideOnScroll);
+                    } else {
+                        scrollIndicator.classList.add('hidden');
+                    }
+                };
+                
+                // Initial check
+                checkScroll();
+                
+                // Re-check on window resize
+                window.addEventListener('resize', checkScroll);
             } else {
-                window.location.href = "./";
+                scrollIndicator.classList.add('hidden');
             }
         }
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const prevPage = document.referrer;
+        // Update custom legend
+        function updateLegend(datasets) {
+            const legendContainer = document.getElementById('chartLegend');
+            legendContainer.innerHTML = '';
+            
+            datasets.forEach(dataset => {
+                const legendItem = document.createElement('div');
+                legendItem.className = 'legend-item';
+                
+                const colorBox = document.createElement('div');
+                colorBox.className = 'legend-color';
+                colorBox.style.backgroundColor = dataset.borderColor;
+                
+                const label = document.createElement('span');
+                label.textContent = dataset.label;
+                
+                legendItem.appendChild(colorBox);
+                legendItem.appendChild(label);
+                legendContainer.appendChild(legendItem);
+            });
+        }
 
-            if (prevPage.includes("veiksmai") || prevPage.includes("rasyba")) {
-                generateSummaryTable('current');
-            } else {
-                generateSummaryTable('total');
+        function getPreviousMonday(date) {
+            var d = new Date(date);
+            var day = d.getDay();
+            var diff = day === 0 ? 6 : day - 1;
+            d.setDate(d.getDate() - diff);
+            d.setHours(0, 0, 0, 0);
+            return d;
+        }
+
+        function generateMondayDates(count) {
+            var dates = [];
+            var today = new Date();
+            var currentMonday = getPreviousMonday(today);
+            
+            for (var i = 0; i < count; i++) {
+                dates.push(formatLithuanianDate(currentMonday));
+                currentMonday.setDate(currentMonday.getDate() - 7);
             }
+            
+            return dates.reverse();
+        }
 
-            if (prevPage.includes("rasyba")) {
-                displayMathSummary();
-                displayGrammarSummary();
-            } else {
-                displayGrammarSummary();
-                displayMathSummary();
+        function formatLithuanianDate(date) {
+            var day = date.getDate();
+            var month = lithuanianMonths[date.getMonth()];
+            return day + ' ' + month;
+        }
+
+        function isPercentageMetric(metricTitle) {
+            var lower = metricTitle.toLowerCase();
+            return lower.indexOf('atsakym') !== -1 || lower.indexOf('klaid') !== -1 || lower.indexOf('nuosekl') !== -1;
+        }
+
+        function extractMetricsFromData() {
+            var metrics = [];
+            var keys = Object.keys(DATA);
+            
+            for (var i = 0; i < keys.length; i++) {
+                var key = keys[i];
+                if (key === 'c') continue;
+                
+                var subjectValues = DATA[key].values;
+                if (typeof subjectValues === 'object' && !Array.isArray(subjectValues)) {
+                    var metricKeys = Object.keys(subjectValues);
+                    for (var j = 0; j < metricKeys.length; j++) {
+                        var metricKey = metricKeys[j];
+                        var metricData = subjectValues[metricKey];
+                        var isPercent = isPercentageMetric(metricData.title);
+                        
+                        var existing = false;
+                        for (var k = 0; k < metrics.length; k++) {
+                            if (metrics[k].id === metricKey && metrics[k].title === metricData.title) {
+                                existing = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!existing) {
+                            metrics.push({
+                                id: metricKey,
+                                title: metricData.title,
+                                type: isPercent ? 'percentage' : 'absolute',
+                                color: metricColors[metrics.length % metricColors.length],
+                                yAxisID: isPercent ? 'y-percent' : 'y-absolute-' + metricKey
+                            });
+                        }
+                    }
+                    break;
+                }
             }
-        });
+            
+            return metrics;
+        }
 
-        function displayMathSummary () {
-            document.querySelector("#display-math-summary-button").classList.add("active-summary-button")
-            document.querySelector("#display-grammar-summary-button").classList.remove("active-summary-button")
-            document.querySelector("#summary-table-outer-div").style.display = "flex";
-            document.querySelector("#summary-table-grammar-outer-div").style.display = "none";
-            if (document.querySelector("#summary-table").innerHTML === "Nėra klaidų!") {
-                document.querySelector("#table-container-math").style.boxShadow = "none";
-                document.querySelector("#mistakes-summary-math").style.fontSize = "2rem";
-                document.querySelector("#summary-table").style.height = "200px";
+        function getAxisIdForAbsoluteMetric(metricId, allSelectedMetrics, subjectData) {
+            if (!subjectData || !subjectData.values || !subjectData.values[metricId]) {
+                return 'y-absolute-' + metricId;
+            }
+            
+            var currentValues = subjectData.values[metricId].values;
+            var currentMax = Math.max.apply(null, currentValues);
+            
+            for (var i = 0; i < allSelectedMetrics.length; i++) {
+                var otherId = allSelectedMetrics[i];
+                if (otherId === metricId) continue;
+                
+                var otherMetric = null;
+                for (var j = 0; j < availableMetrics.length; j++) {
+                    if (availableMetrics[j].id === otherId && availableMetrics[j].type === 'absolute') {
+                        otherMetric = availableMetrics[j];
+                        break;
+                    }
+                }
+                
+                if (!otherMetric || !subjectData.values[otherId]) continue;
+                
+                var otherValues = subjectData.values[otherId].values;
+                var otherMax = Math.max.apply(null, otherValues);
+                
+                var maxDiff = Math.abs(currentMax - otherMax);
+                var largerMax = Math.max(currentMax, otherMax);
+                var threshold = largerMax * 0.15;
+                
+                if (maxDiff <= threshold) {
+                    var sharedId = parseInt(metricId) < parseInt(otherId) ? metricId : otherId;
+                    return 'y-absolute-shared-' + sharedId;
+                }
+            }
+            
+            return 'y-absolute-' + metricId;
+        }
+
+        function selectSubject(key) {
+            selectedSubject = key;
+            
+            if (key === 'c') {
+                selectedMetrics = [];
+            } else {
+                if (selectedMetrics.length === 0 && availableMetrics.length > 0) {
+                    selectedMetrics = [availableMetrics[0].id];
+                }
+            }
+            
+            var buttons = document.querySelectorAll('.btn-subject');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active');
+                if (buttons[i].getAttribute('data-subject-key') === key) {
+                    buttons[i].classList.add('active');
+                }
+            }
+            
+            updateMetricButtonsState();
+            updateChart();
+        }
+
+        function updateMetricButtonsState() {
+            var buttons = document.querySelectorAll('#metricButtons .btn');
+            var isConsistency = selectedSubject === 'c';
+            
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = isConsistency;
+                if (isConsistency) {
+                    buttons[i].classList.remove('active');
+                } else {
+                    var metricId = buttons[i].getAttribute('data-metric-id');
+                    if (selectedMetrics.indexOf(metricId) !== -1) {
+                        buttons[i].classList.add('active');
+                    } else {
+                        buttons[i].classList.remove('active');
+                    }
+                }
             }
         }
 
-        function displayGrammarSummary () {
-            document.querySelector("#display-math-summary-button").classList.remove("active-summary-button")
-            document.querySelector("#display-grammar-summary-button").classList.add("active-summary-button")
-            document.querySelector("#summary-table-outer-div").style.display = "none";
-            document.querySelector("#summary-table-grammar-outer-div").style.display = "flex";
+        function toggleMetric(id) {
+            if (selectedSubject === 'c') return;
+            
+            var index = selectedMetrics.indexOf(id);
+            if (index !== -1) {
+                selectedMetrics.splice(index, 1);
+            } else {
+                selectedMetrics.push(id);
+            }
+            
+            updateMetricButtonsState();
+            updateChart();
+        }
 
-            if ((document.querySelector("#summary-table-grammar").innerHTML === "Nėra klaidų!")) {
-                    document.querySelector("#table-container-grammar").style.boxShadow = "none";
-                    document.querySelector("#mistakes-summary-grammar").style.fontSize = "2rem";
-                    document.querySelector("#summary-table-grammar").style.height = "200px";
+        function initializeButtons() {
+            var subjectContainer = document.getElementById('subjectButtons');
+            var metricContainer = document.getElementById('metricButtons');
+            
+            availableMetrics = extractMetricsFromData();
+
+            var keys = Object.keys(DATA);
+            var firstKey = keys[0];
+            
+            for (var i = 0; i < keys.length; i++) {
+                var key = keys[i];
+                var data = DATA[key];
+                var btn = document.createElement('button');
+                btn.className = 'btn btn-subject';
+                btn.textContent = data.title;
+                btn.setAttribute('data-subject-key', key);
+                btn.onclick = (function(k) {
+                    return function() { selectSubject(k); };
+                })(key);
+                subjectContainer.appendChild(btn);
+            }
+
+            for (var j = 0; j < availableMetrics.length; j++) {
+                var metric = availableMetrics[j];
+                var btn2 = document.createElement('button');
+                btn2.className = 'btn';
+                var badge = document.createElement('span');
+                badge.className = 'badge ' + (metric.type === 'percentage' ? 'badge-percent' : 'badge-number');
+                badge.textContent = metric.type === 'percentage' ? '%' : '#';
+                btn2.textContent = metric.title + ' ';
+                btn2.appendChild(badge);
+                btn2.setAttribute('data-metric-id', metric.id);
+                btn2.onclick = (function(mid) {
+                    return function() { toggleMetric(mid); };
+                })(metric.id);
+                metricContainer.appendChild(btn2);
+            }
+            
+            if (firstKey) {
+                selectSubject(firstKey);
             }
         }
 
+        function getDataForSubject() {
+            if (!selectedSubject) return null;
+            
+            var subject = DATA[selectedSubject];
+            if (selectedSubject === 'c') {
+                return { 
+                    dates: generateMondayDates(subject.values.length), 
+                    values: subject.values,
+                    isConsistency: true
+                };
+            } else {
+                var firstMetricKey = Object.keys(subject.values)[0];
+                var firstMetric = subject.values[firstMetricKey];
+                return { 
+                    dates: generateMondayDates(firstMetric.values.length),
+                    values: subject.values,
+                    isConsistency: false
+                };
+            }
+        }
+
+        function updateChart() {
+            var subjectData = getDataForSubject();
+            if (!subjectData) return;
+            
+            var datasets = [];
+            var newDatasetLabels = [];
+
+            if (subjectData.isConsistency) {
+                var label = DATA.c.title;
+                newDatasetLabels.push(label);
+                
+                var wasAlreadyShown = false;
+                for (var p = 0; p < previousDatasets.length; p++) {
+                    if (previousDatasets[p] === label) {
+                        wasAlreadyShown = true;
+                        break;
+                    }
+                }
+                
+                datasets.push({
+                    label: label,
+                    data: subjectData.values,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.3,
+                    borderWidth: 3,
+                    borderDash: [],
+                    pointRadius: 4, // Smaller points for mobile
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 0,
+                    pointHoverBorderWidth: 3,
+                    pointStyle: 'circle',
+                    yAxisID: 'y-percent',
+                    animation: wasAlreadyShown ? false : {
+                        duration: 750,
+                        easing: 'easeInOutQuart'
+                    }
+                });
+            } else {
+                for (var i = 0; i < selectedMetrics.length; i++) {
+                    var metricId = selectedMetrics[i];
+                    var metric = null;
+                    for (var j = 0; j < availableMetrics.length; j++) {
+                        if (availableMetrics[j].id === metricId) {
+                            metric = availableMetrics[j];
+                            break;
+                        }
+                    }
+                    var metricData = subjectData.values[metricId];
+                    
+                    if (metric && metricData) {
+                        var datasetLabel = metricData.title;
+                        newDatasetLabels.push(datasetLabel);
+                        
+                        var wasShown = false;
+                        for (var p = 0; p < previousDatasets.length; p++) {
+                            if (previousDatasets[p] === datasetLabel) {
+                                wasShown = true;
+                                break;
+                            }
+                        }
+                        
+                        var yAxisId = metric.type === 'percentage' ? metric.yAxisID : getAxisIdForAbsoluteMetric(metricId, selectedMetrics, subjectData);
+                        
+                        datasets.push({
+                            label: datasetLabel,
+                            data: metricData.values,
+                            borderColor: metric.color,
+                            backgroundColor: metric.color + '20',
+                            tension: 0.3,
+                            borderWidth: 3,
+                            borderDash: [],
+                            pointRadius: 4, // Smaller points for mobile
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: metric.color,
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 0,
+                            pointHoverBorderWidth: 3,
+                            pointStyle: 'circle',
+                            yAxisID: yAxisId,
+                            animation: wasShown ? false : {
+                                duration: 750,
+                                easing: 'easeInOutQuart'
+                            }
+                        });
+                    }
+                }
+            }
+
+            var dashPatterns = [
+                [5, 5],
+                [10, 5],
+                [15, 3, 3, 3],
+                [2, 8],
+                [20, 5, 5, 5],
+                [8, 3, 2, 3]
+            ];
+
+            var pointStyles = ['circle', 'rectRot', 'triangle', 'rect', 'star', 'cross'];
+
+            if (datasets.length > 1) {
+                var datasetsNeedDashes = new Array(datasets.length).fill(false);
+                
+                for (var i = 0; i < datasets.length; i++) {
+                    for (var j = i + 1; j < datasets.length; j++) {
+                        if (doDatasetsOverlap(datasets[i], datasets[j])) {
+                            datasetsNeedDashes[i] = true;
+                            datasetsNeedDashes[j] = true;
+                        }
+                    }
+                }
+                
+                var dashIndex = 0;
+                var pointStyleIndex = 0;
+                
+                for (var i = 0; i < datasets.length; i++) {
+                    if (datasetsNeedDashes[i]) {
+                        datasets[i].borderDash = dashPatterns[dashIndex % dashPatterns.length];
+                        datasets[i].pointStyle = pointStyles[pointStyleIndex % pointStyles.length];
+                        dashIndex++;
+                        pointStyleIndex++;
+                    } else {
+                        datasets[i].borderDash = [];
+                        datasets[i].pointStyle = 'circle';
+                    }
+                }
+                
+                if (datasetsNeedDashes[0] && datasets.length > 1) {
+                    datasets[0].borderDash = dashPatterns[0];
+                    datasets[0].pointStyle = pointStyles[0];
+                }
+            }
+
+            function doDatasetsOverlap(dataset1, dataset2) {
+                var data1 = dataset1.data;
+                var data2 = dataset2.data;
+                
+                if (data1.length !== data2.length) return false;
+                
+                var overlapThreshold = 5;
+                var overlapCount = 0;
+                var totalPoints = data1.length;
+                
+                for (var k = 0; k < data1.length; k++) {
+                    var diff = Math.abs(data1[k] - data2[k]);
+                    
+                    if (diff <= overlapThreshold) {
+                        overlapCount++;
+                    }
+                }
+                
+                var overlapRatio = overlapCount / totalPoints;
+                return overlapRatio > 0.3;
+            }
+
+            previousDatasets = newDatasetLabels;
+
+            var usedAxisTypes = {};
+            var percentageMetrics = [];
+            var over100Metrics = [];
+            
+            if (subjectData.isConsistency) {
+                percentageMetrics.push({ title: DATA.c.title, maxValue: Math.max.apply(null, subjectData.values), color: '#10b981' });
+            }
+            
+            for (var i = 0; i < selectedMetrics.length; i++) {
+                var metricId = selectedMetrics[i];
+                for (var j = 0; j < availableMetrics.length; j++) {
+                    if (availableMetrics[j].id === metricId) {
+                        var metric = availableMetrics[j];
+                        var yAxisId = metric.type === 'percentage' ? metric.yAxisID : getAxisIdForAbsoluteMetric(metricId, selectedMetrics, subjectData);
+                        
+                        if (!usedAxisTypes[yAxisId]) {
+                            usedAxisTypes[yAxisId] = [];
+                        }
+                        usedAxisTypes[yAxisId].push(metric);
+                        
+                        if (metric.type === 'percentage') {
+                            var metricData = subjectData.values[metricId];
+                            var maxVal = Math.max.apply(null, metricData.values);
+                            var metricInfo = { 
+                                title: metric.title, 
+                                maxValue: maxVal,
+                                id: metricId,
+                                metric: metric,
+                                color: metric.color
+                            };
+                            
+                            if (maxVal > 100) {
+                                over100Metrics.push(metricInfo);
+                            } else {
+                                percentageMetrics.push(metricInfo);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+
+            for (var i = 0; i < datasets.length; i++) {
+                var dataset = datasets[i];
+                if (dataset.yAxisID === 'y-percent') {
+                    var maxInDataset = Math.max.apply(null, dataset.data);
+                    if (maxInDataset > 100) {
+                        for (var j = 0; j < over100Metrics.length; j++) {
+                            if (dataset.label.indexOf(over100Metrics[j].title) !== -1) {
+                                dataset.yAxisID = 'y-percent-' + over100Metrics[j].id;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            var yAxes = {};
+            var axisColorInfo = {};
+            
+            if (percentageMetrics.length > 0) {
+                var percentColors = [];
+                for (var i = 0; i < percentageMetrics.length; i++) {
+                    percentColors.push(percentageMetrics[i].color);
+                }
+                
+                axisColorInfo['y-percent'] = percentColors;
+                if (selectedSubject === 'c') { // only for nuoseklumas
+                    yAxes['y-percent'] = {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { display: false },
+                        min: 0,
+                        max: 105, // allows line above 100%
+                        ticks: { 
+                            stepSize: 10, // ticks every 10
+                            callback: function(value) { return value <= 100 ? value.toFixed(0) + '%' : ''; },
+                            color: '#666'
+                        },
+                        grid: {
+                            drawOnChartArea: true,
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        border: { display: false }
+                    };
+                } else {
+                    yAxes['y-percent'] = {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { 
+                            display: false
+                        },
+                        min: 0,
+                        max: 100,
+                        ticks: { 
+                            callback: function(value) { return value.toFixed(0) + '%'; },
+                            color: '#666'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        border: {
+                            display: false
+                        }
+                    };
+                }
+            }
+
+            for (var i = 0; i < over100Metrics.length; i++) {
+                var metric = over100Metrics[i];
+                var axisId = 'y-percent-' + metric.id;
+                axisColorInfo[axisId] = [metric.color];
+                
+                yAxes[axisId] = {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: { 
+                        display: false
+                    },
+                    min: 0,
+                    ticks: { 
+                        callback: function(value) { return value.toFixed(0) + '%'; },
+                        color: '#666'
+                    },
+                    grid: { 
+                        drawOnChartArea: true,
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    border: {
+                        display: false
+                    }
+                };
+            }
+
+            var rightAxisCount = 0;
+            var axisKeys = Object.keys(usedAxisTypes);
+            for (var i = 0; i < axisKeys.length; i++) {
+                var axisId = axisKeys[i];
+                if (axisId !== 'y-percent' && !axisId.startsWith('y-percent-')) {
+                    var metricsOnAxis = usedAxisTypes[axisId];
+                    var axisColors = metricsOnAxis.map(function(m) { return m.color; });
+                    
+                    axisColorInfo[axisId] = axisColors;
+                    
+                    yAxes[axisId] = {
+                        type: 'linear',
+                        display: true,
+                        position: percentageMetrics.length > 0 || over100Metrics.length > 0 || rightAxisCount > 0 ? 'right' : 'left',
+                        title: { 
+                            display: false
+                        },
+                        ticks: {
+                            callback: function(value) { return value.toFixed(1); },
+                            color: '#666'
+                        },
+                        grid: { 
+                            drawOnChartArea: rightAxisCount === 0 && percentageMetrics.length === 0 && over100Metrics.length === 0,
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        border: {
+                            display: false
+                        }
+                    };
+                    rightAxisCount = rightAxisCount + 1;
+                }
+            }
+
+            if (chart) {
+                chart.destroy();
+            }
+
+            var ctx = document.getElementById('statsChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: subjectData.dates,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: false // We're using our custom legend
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    var label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    var yAxisId = context.dataset.yAxisID;
+                                    if (yAxisId === 'y-percent' || yAxisId.indexOf('y-percent-') === 0) {
+                                        label += context.parsed.y + '%';
+                                    } else {
+                                        label += context.parsed.y;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: yAxes
+                },
+                plugins: [{
+                    id: 'coloredAxisLines',
+                    afterDatasetsDraw: function(chart) {
+                        var ctx = chart.ctx;
+                        var chartArea = chart.chartArea;
+                        
+                        Object.keys(axisColorInfo).forEach(function(scaleId) {
+                            var scale = chart.scales[scaleId];
+                            if (!scale) return;
+                            
+                            var colors = axisColorInfo[scaleId];
+                            if (!colors || colors.length === 0) return;
+                            
+                            var lineWidth = 3;
+                            var spacing = 1;
+                            
+                            var isLeft = scale.position === 'left';
+                            var x = isLeft ? scale.left : scale.right;
+                            var y1 = chartArea.top;
+                            var y2 = chartArea.bottom;
+
+                            var axisFullWidth = scale.width;
+                            
+                            let secondaryLineShift;
+                            for (var i = 0; i < colors.length; i++) {
+                                secondaryLineShift = i * lineWidth;
+                                ctx.save();
+                                ctx.strokeStyle = colors[i];
+                                ctx.lineWidth = lineWidth;
+                                ctx.beginPath();
+                                
+                                var offset = i * (lineWidth + spacing);
+                                var xPos = isLeft ? x + axisFullWidth - secondaryLineShift : x - axisFullWidth + secondaryLineShift;
+                                
+                                ctx.moveTo(xPos, y1);
+                                ctx.lineTo(xPos, y2);
+                                ctx.stroke();
+                                ctx.restore();
+                            }
+                        });
+                    }
+                }]
+            });
+            
+            // Update custom legend
+            updateLegend(datasets);
+            
+            // Setup mobile scroll after chart is created
+            setupMobileScroll();
+        }
+
+        initializeButtons();
+        
+        // Setup mobile scroll on initial load
+        window.addEventListener('load', setupMobileScroll);
+        window.addEventListener('resize', setupMobileScroll);
     </script>
 </body>
-
 </html>

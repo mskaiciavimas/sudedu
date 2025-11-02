@@ -6,6 +6,8 @@
     <title>Interactive Pixel Art Room</title>
     <link rel="stylesheet" type="text/css" href="../index.css">
     <link rel="stylesheet" href="../main-nav-bar.css">
+    <link rel="stylesheet" href="../pet-game-pets.css">
+    <link rel="stylesheet" href="../pet-game-items.css">
     <script src="../refresh-token.js"></script>
     <style>
 
@@ -229,16 +231,6 @@
             transform: scale(1);
         }
 
-        .cat-bed-1 {
-            width: calc(var(--unit-size) * 5);
-            height: calc(var(--unit-size) * 3);
-            background-image: url('../images/pet-game/bed.png');
-             background-repeat: no-repeat;   /* prevents infinite tiling */
-            background-position: center center;  /* centers the image */
-            background-size: cover;         /* scales image to cover */
-            z-index: 3;
-        }
-
         .bath-1 {
             width: calc(var(--unit-size) * 5);
             height: calc(var(--unit-size) * 3);
@@ -246,86 +238,7 @@
              background-repeat: no-repeat;
             background-position: center center;
             background-size: cover;
-            z-index: 3;
-        }
-
-        .cat-food-bowl-1,
-        .dog-food-bowl-1,
-        .cat-water-bowl-1 {
-            width: calc(var(--unit-size) * 2);
-            height: calc(var(--unit-size) * 1);
-            background-image: url('../images/pet-game/food_bowl_1_empty.png');
-             background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
-            z-index: 2;
-        }
-
-        .cat-food-bowl-1.full,
-        .dog-food-bowl-1.full,
-        .cat-water-bowl-1.full {
-            width: calc(var(--unit-size) * 2);
-            height: calc(var(--unit-size) * 1);
-            background-image: url('../images/pet-game/food_bowl_1_full.png');
-             background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
-            z-index: 2;
-        }
-
-        .table-1 {
-            width: calc(var(--unit-size) * 2);
-            height: calc(var(--unit-size) * 3);
-            background-image: url('../images/pet-game/table-1.png');
-             background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
-            z-index: 3;
-        }
-
-        .small-plant-1 {
-            width: calc(var(--unit-size) * 2);
-            height: calc(var(--unit-size) * 2);
-            background-image: url('../images/pet-game/smaoo-plant-1.png');
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
             z-index: 4;
-        }
-
-        .shelf-1 {
-            width: calc(var(--unit-size) * 2);
-            height: calc(var(--unit-size) * 2);
-            background-color: blue;
-            z-index: 3;
-        }
-
-        .wallpaper-1 {
-            width: calc(var(--unit-size) * 20);
-            height: calc(var(--unit-size) * 7);
-            background-image: url('../images/pet-game/wallpaper-1.png');
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
-            z-index: 1;
-        }
-
-        .flooring-1 {
-            width: calc(var(--unit-size) * 20);
-            height: calc(var(--unit-size) * 10);
-            background-image: url('../images/pet-game/flooring-1.png');
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
-            z-index: 1;
-        }
-
-        .cat-1-1,
-        .cat-2-1 {
-            background-image: url('../images/pet-game/cat_sprite_sheet_facing_left.png');
-            background-size: calc(var(--pet-size) * 16) calc(var(--pet-size)*26); /* 16 number of columns in iamge, 25 number of rows*/
-            background-position: 0 0;
-            animation: catWalksDownwards 0.85s steps(4) infinite; /* 10 images for animation*/
         }
 
         .pet {
@@ -342,13 +255,10 @@
             z-index: 1000 !important;
         }
 
-        .room-pet:hover {
-            transform: scale(1.05);
-        }
-
-        .room-pet.dragging {
-            z-index: 1000;
+        .room-object.dragging {
+            z-index: 1000 !important;
             cursor: grabbing;
+            outline: 2px solid red;
         }
 
         .pet-left {
@@ -366,269 +276,6 @@
         .pet.pet-left:hover {
             transform: scaleX(1) scale(1.05);
         }
-
-        @keyframes cat-1-sits-idle {
-            0% { background-position: 0 0; } /* 0 first column number 0 row number*/
-            100% { background-position: calc(var(--pet-size) * -10) 0; } /* -10 last column number 0 row number*/
-        }
-
-        @keyframes cat-1-sits-idle-blinks {
-            0% { background-position: 0 calc(var(--pet-size) * -1); } /* 0 first column number 0 row number*/
-            100% { background-position: calc(var(--pet-size) * -10) calc(var(--pet-size) * -1); } /* -10 last column number 0 row number*/
-        }
-
-        @keyframes cat-1-sleeps {
-            0% { background-position: 0 calc(var(--pet-size) * -2); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -2); }
-        }
-
-        @keyframes cat-1-dances {
-            0% { background-position: 0 calc(var(--pet-size) * -3); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -3); }
-        }
-
-        @keyframes cat-1-talks {
-            0% { background-position: 0 calc(var(--pet-size) * -4); }
-            100% { background-position: calc(var(--pet-size) * -8) calc(var(--pet-size) * -4); }
-        }
-
-        @keyframes cat-1-excited {
-            0% { background-position: 0 calc(var(--pet-size) * -5); }
-            100% { background-position: calc(var(--pet-size) * -12) calc(var(--pet-size) * -5); }
-        }
-
-        @keyframes cat-1-lays-idle {
-            0% { background-position: 0 calc(var(--pet-size) * -6); }
-            100% { background-position: calc(var(--pet-size) * -12) calc(var(--pet-size) * -6); }
-        }
-
-        @keyframes cat-1-sits-idle-thinks {
-            0% { background-position: 0 calc(var(--pet-size) * -7); }
-            100% { background-position: calc(var(--pet-size) * -9) calc(var(--pet-size) * -7); }
-        }
-
-        @keyframes cat-1-cries {
-            0% { background-position: 0 calc(var(--pet-size) * -8); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -8); }
-        }
-
-        @keyframes cat-1-in-box-1 {
-            0% { background-position: 0 calc(var(--pet-size) * -9); }
-            100% { background-position: calc(var(--pet-size) * -12) calc(var(--pet-size) * -9); }
-        }
-
-        @keyframes cat-1-in-box-2 {
-            0% { background-position: 0 calc(var(--pet-size) * -10); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -10); }
-        }
-
-        @keyframes cat-1-in-box-3 {
-            0% { background-position: 0 calc(var(--pet-size) * -11); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -11); }
-        }
-
-        @keyframes cat-1-surprised {
-            0% { background-position: 0 calc(var(--pet-size) * -12); }
-            100% { background-position: calc(var(--pet-size) * -12) calc(var(--pet-size) * -12); }
-        }
-
-        @keyframes cat-1-eats {
-            0% { background-position: 0 calc(var(--pet-size) * -13); }
-            100% { background-position: calc(var(--pet-size) * -15) calc(var(--pet-size) * -13); }
-        }
-
-        @keyframes cat-1-waits {
-            0% { background-position: 0 calc(var(--pet-size) * -14); }
-            100% { background-position: calc(var(--pet-size) * -6) calc(var(--pet-size) * -14); }
-        }
-
-        @keyframes cat-1-refuses {
-            0% { background-position: 0 calc(var(--pet-size) * -15); }
-            100% { background-position: calc(var(--pet-size) * -13) calc(var(--pet-size) * -15); }
-        }
-
-        @keyframes cat-1-angry {
-            0% { background-position: 0 calc(var(--pet-size) * -16); }
-            100% { background-position: calc(var(--pet-size) * -9) calc(var(--pet-size) * -16); }
-        }
-
-        @keyframes cat-1-happy {
-            0% { background-position: 0 calc(var(--pet-size) * -17); }
-            100% { background-position: calc(var(--pet-size) * -12) calc(var(--pet-size) * -17); }
-        }
-
-        @keyframes cat-1-angry-2 {
-            0% { background-position: 0 calc(var(--pet-size) * -18); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -18); }
-        }
-
-        @keyframes cat-1-licks-paw {
-            0% { background-position: 0 calc(var(--pet-size) * -19); }
-            100% { background-position: calc(var(--pet-size) * -11) calc(var(--pet-size) * -19); }
-        }
-        
-        @keyframes cat-1-medicine {
-            0% { background-position: 0 calc(var(--pet-size) * -20); }
-            100% { background-position: calc(var(--pet-size) * -5) calc(var(--pet-size) * -20); }
-        } 
-
-        @keyframes cat-1-sick {
-            0% { background-position: 0 calc(var(--pet-size) * -21); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -21); }
-        }
-
-        @keyframes cat-1-walks-upwards {
-            0% { background-position: 0 calc(var(--pet-size) * -22); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -22); }
-        }
-        
-        @keyframes cat-1-walks-downwards {
-            0% { background-position: 0 calc(var(--pet-size) * -23); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -23); }
-        } 
-
-        @keyframes cat-1-walks-sideways {
-            0% { background-position: 0 calc(var(--pet-size) * -24); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -24); }
-        }
-
-        @keyframes cat-1-stands-idle {
-            0% { background-position: 0 calc(var(--pet-size) * -25); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -25); }
-        }
-
-        @keyframes cat-2-sits-idle {
-            0% { background-position: 0 0; } /* 0 first column number 0 row number*/
-            100% { background-position: calc(var(--pet-size) * -10) 0; } /* -10 last column number 0 row number*/
-        }
-
-        @keyframes cat-2-sits-idle-blinks {
-            0% { background-position: 0 calc(var(--pet-size) * -1); } /* 0 first column number 0 row number*/
-            100% { background-position: calc(var(--pet-size) * -10) calc(var(--pet-size) * -1); } /* -10 last column number 0 row number*/
-        }
-
-        @keyframes cat-2-sleeps {
-            0% { background-position: 0 calc(var(--pet-size) * -2); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -2); }
-        }
-
-        @keyframes cat-2-dances {
-            0% { background-position: 0 calc(var(--pet-size) * -3); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -3); }
-        }
-
-        @keyframes cat-2-talks {
-            0% { background-position: 0 calc(var(--pet-size) * -4); }
-            100% { background-position: calc(var(--pet-size) * -8) calc(var(--pet-size) * -4); }
-        }
-
-        @keyframes cat-2-excited {
-            0% { background-position: 0 calc(var(--pet-size) * -5); }
-            100% { background-position: calc(var(--pet-size) * -12) calc(var(--pet-size) * -5); }
-        }
-
-        @keyframes cat-2-lays-idle {
-            0% { background-position: 0 calc(var(--pet-size) * -6); }
-            100% { background-position: calc(var(--pet-size) * -12) calc(var(--pet-size) * -6); }
-        }
-
-        @keyframes cat-2-sits-idle-thinks {
-            0% { background-position: 0 calc(var(--pet-size) * -7); }
-            100% { background-position: calc(var(--pet-size) * -9) calc(var(--pet-size) * -7); }
-        }
-
-        @keyframes cat-2-cries {
-            0% { background-position: 0 calc(var(--pet-size) * -8); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -8); }
-        }
-
-        @keyframes cat-2-in-box-1 {
-            0% { background-position: 0 calc(var(--pet-size) * -9); }
-            100% { background-position: calc(var(--pet-size) * -12) calc(var(--pet-size) * -9); }
-        }
-
-        @keyframes cat-2-in-box-2 {
-            0% { background-position: 0 calc(var(--pet-size) * -10); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -10); }
-        }
-
-        @keyframes cat-2-in-box-3 {
-            0% { background-position: 0 calc(var(--pet-size) * -11); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -11); }
-        }
-
-        @keyframes cat-2-surprised {
-            0% { background-position: 0 calc(var(--pet-size) * -12); }
-            100% { background-position: calc(var(--pet-size) * -12) calc(var(--pet-size) * -12); }
-        }
-
-        @keyframes cat-2-eats {
-            0% { background-position: 0 calc(var(--pet-size) * -13); }
-            100% { background-position: calc(var(--pet-size) * -15) calc(var(--pet-size) * -13); }
-        }
-
-        @keyframes cat-2-waits {
-            0% { background-position: 0 calc(var(--pet-size) * -14); }
-            100% { background-position: calc(var(--pet-size) * -6) calc(var(--pet-size) * -14); }
-        }
-
-        @keyframes cat-2-refuses {
-            0% { background-position: 0 calc(var(--pet-size) * -15); }
-            100% { background-position: calc(var(--pet-size) * -13) calc(var(--pet-size) * -15); }
-        }
-
-        @keyframes cat-2-angry {
-            0% { background-position: 0 calc(var(--pet-size) * -16); }
-            100% { background-position: calc(var(--pet-size) * -9) calc(var(--pet-size) * -16); }
-        }
-
-        @keyframes cat-2-happy {
-            0% { background-position: 0 calc(var(--pet-size) * -17); }
-            100% { background-position: calc(var(--pet-size) * -12) calc(var(--pet-size) * -17); }
-        }
-
-        @keyframes cat-2-angry-2 {
-            0% { background-position: 0 calc(var(--pet-size) * -18); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -18); }
-        }
-
-        @keyframes cat-2-licks-paw {
-            0% { background-position: 0 calc(var(--pet-size) * -19); }
-            100% { background-position: calc(var(--pet-size) * -11) calc(var(--pet-size) * -19); }
-        }
-        
-        @keyframes cat-2-medicine {
-            0% { background-position: 0 calc(var(--pet-size) * -20); }
-            100% { background-position: calc(var(--pet-size) * -5) calc(var(--pet-size) * -20); }
-        } 
-
-        @keyframes cat-2-sick {
-            0% { background-position: 0 calc(var(--pet-size) * -21); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -21); }
-        }
-
-        @keyframes cat-2-walks-upwards {
-            0% { background-position: 0 calc(var(--pet-size) * -22); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -22); }
-        }
-        
-        @keyframes cat-2-walks-downwards {
-            0% { background-position: 0 calc(var(--pet-size) * -23); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -23); }
-        } 
-
-        @keyframes cat-2-walks-sideways {
-            0% { background-position: 0 calc(var(--pet-size) * -24); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -24); }
-        }
-
-        @keyframes cat-2-stands-idle {
-            0% { background-position: 0 calc(var(--pet-size) * -25); }
-            100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -25); }
-        }
-
-
-        
 
         .message {
             position: fixed;
@@ -654,7 +301,7 @@
             border: none;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 1rem;
             font-family: 'SFpro', sans-serif;
         }
         .edit { 
@@ -1247,7 +894,9 @@
             width: 60px;
             height: 20px;
             padding: 6px;
-            border: 1px solid #ddd;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 1);
             border-radius: 4px;
             font-size: 14px;
             text-align: center;
@@ -1345,7 +994,7 @@
         }
 
         .item-requires {
-            padding: 0.75rem 1.5rem;
+            padding: 6px 12px;
             background: #10b981;
             background: #6b7280;
             color: #F5F5F7;
@@ -1354,8 +1003,9 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
-            width: 80%;
-            height: 24px;
+            min-height: 40px;
+            min-width: 60%;
+            font-size: 1rem;
             text-align: center;
             display: flex;
             justify-content: center;
@@ -1768,16 +1418,6 @@
             height: 75px;
             width: 75px;
             background-size: calc(75px * 16) calc(75px * 26);
-        }
-        
-        .cat-1.pet-preview {
-            margin-left: 9px;
-            margin-bottom: 9px;
-        }
-
-        .cat-1.item-preview {
-            margin-left: 20px;
-            margin-bottom: 9px;
         }
 
         .pet-btn.active {
@@ -3360,7 +3000,7 @@
                 const petSpecies = petNumber.split('-')[0]
                 const matchingBeds = Array.from(roomObjectsContainer.querySelectorAll("*")).filter(el => {
                     const classStr = el.className; // full class string
-                    return classStr.includes("bed") && classStr.includes(petSpecies) && !itemsInUse.includes(el.id);
+                    return classStr.includes("bed") && classStr.includes(petSpecies) && !classStr.includes("furniture-preview") && !itemsInUse.includes(el.id);
                 });
 
                 let equippedSkin = Object.values(skins).find(skin => skin.equiped);
@@ -3387,7 +3027,6 @@
                     let objectCoords = getObjectCoordinates(object.id);
                     [petStartingPosLeft, petStaringPosTop] = [objectCoords[0] + objectInteractivePart[0], objectCoords[1] - objectInteractivePart[1]];
                 } else {
-                    
                     const pet = document.getElementById(petNumber);
                     const suitableWalkingTiles = generateWalkabilityMap();
                     const validCoords = findValidPlacements(suitableWalkingTiles, pet);
@@ -3609,6 +3248,8 @@ function initGame() {
     taxesNavChoiceIndicator();
     bonusFromDailySupplyItems();
     toggleRoomDarknessBasedOnElectricityTax();
+
+    predictAndSetZIndex();
 
     const shopEl = document.querySelector(".switch-text-shop");
     if (shopEl) shopEl.textContent = "NETURIU";
@@ -4056,7 +3697,6 @@ function enableObjectDragging() {
                     
                     // Remove the temporary listeners
                     document.removeEventListener('pointermove', moveHandler);
-                    document.removeEventListener('pointerup', upHandler);
                     
                     // Start dragging with the original event position
                     const syntheticEvent = {
@@ -4082,6 +3722,8 @@ function enableObjectDragging() {
                 if (!isDragging) {
                     currentObject = null;
                 }
+
+                predictAndSetZIndex();
             };
 
             const cancelDrag = () => {
@@ -4776,27 +4418,34 @@ function moveObjectAlongPath(objectId, path, speed = 300, onComplete) {
     moveToNextStep();
 }
 
-function predictAndSetZIndex(movingObject, nextCol=null, nextRow=null) {
+function predictAndSetZIndex(movingObject = null, nextCol = null, nextRow = null) {
     
-    if (!movingObject || !movingObject.offsetWidth || !movingObject.offsetHeight) {
-        return;
-    }
-
     // Get all room objects (including pets)
     const allObjects = Array.from(document.querySelectorAll('.room-object, .pet'));
 
     let objectOccupiedTiles = {};
 
+    if (!movingObject) {
+        const objects = document.querySelectorAll('.room-object');
+        objects.forEach(obj => {
+            obj.style.zIndex = ''; // removes inline z-index
+        });
+    }
+
     // Build occupied tiles map
     allObjects.forEach(obj => {
-        if (userObjectAssets[obj.id]) {
-            const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]["assetIndex"]]["placingIndex"];
-            if (objPlacingOrder === 5 || objPlacingOrder === 9) {
-                return;
-            }
+    // Check both userObjectAssets and furniturePreviewDict
+    const assetSource = userObjectAssets[obj.id] || furniturePreviewDict[obj.id];
+    
+    if (assetSource) {
+        const objPlacingOrder = gameAssetIndex[assetSource.assetIndex]?.placingIndex;
+        if (objPlacingOrder === 5 || objPlacingOrder === 9) {
+            return;
         }
-        let coords = getObjectCoordinates(obj.id);
-        if (nextCol && nextRow) {
+    }
+    let coords = getObjectCoordinates(obj.id);
+        // Only apply prediction if we have a moving object
+        if (movingObject && nextCol && nextRow) {
             if (obj.id === movingObject.id) {
                 coords = [nextCol, nextRow];
             }
@@ -4807,11 +4456,11 @@ function predictAndSetZIndex(movingObject, nextCol=null, nextRow=null) {
         objectOccupiedTiles[obj.id] = occupiedTiles;
     });
 
-
-applyZIndexLogic(buildClusters(objectOccupiedTiles), movingObject, nextRow)
+    const requirePets = movingObject !== null;
+    applyZIndexLogic(buildClusters(objectOccupiedTiles, requirePets), movingObject, nextRow);
 }
 
-function buildClusters(objectOccupiedTiles) {
+function buildClusters(objectOccupiedTiles, requirePets = true) {
     const objectIds = Object.keys(objectOccupiedTiles);
 
     // Helper: check if two objects overlap
@@ -4862,8 +4511,17 @@ function buildClusters(objectOccupiedTiles) {
             return el && !el.classList.contains('pet');
         });
 
-        if (pets.length === 0 || nonPets.length === 0) {
-            return; // skip clusters without both
+        // Skip clusters based on requirePets flag
+        if (requirePets) {
+            // Original behavior: only include clusters with both pets and non-pets
+            if (pets.length === 0 || nonPets.length === 0) {
+                return;
+            }
+        } else {
+            // Initialization behavior: skip only if cluster is empty
+            if (cluster.length === 0) {
+                return;
+            }
         }
 
         // Build non-pet subclusters by finding overlapping groups among non-pets
@@ -4900,41 +4558,173 @@ function buildClusters(objectOccupiedTiles) {
     return finalClusters;
 }
 
+function buildAllClusters(objectOccupiedTiles) {
+    const objectIds = Object.keys(objectOccupiedTiles);
 
-function applyZIndexLogic(overlapClusters, movingObject, nextRow=null) {
+    // Helper: check if two objects overlap
+    function doObjectsOverlap(id1, id2) {
+        const tiles1 = objectOccupiedTiles[id1];
+        const tiles2 = objectOccupiedTiles[id2];
+        return tiles1.some(t1 => tiles2.some(t2 => t1[0] === t2[0] && t1[1] === t2[1]));
+    }
+
+    // Step 1: find bigger clusters of overlapping objects
+    let visited = new Set();
+    let biggerClusters = [];
+
+    objectIds.forEach(objId => {
+        if (visited.has(objId)) return;
+
+        let queue = [objId];
+        let currentCluster = [];
+
+        while (queue.length > 0) {
+            const curr = queue.pop();
+            if (visited.has(curr)) continue;
+            visited.add(curr);
+            currentCluster.push(curr);
+
+            objectIds.forEach(other => {
+                if (!visited.has(other) && doObjectsOverlap(curr, other)) {
+                    queue.push(other);
+                }
+            });
+        }
+
+        if (currentCluster.length > 0) {
+            biggerClusters.push(currentCluster);
+        }
+    });
+
+    // Step 2: split each bigger cluster into pets + non-pet subclusters
+    let finalClusters = [];
+
+    biggerClusters.forEach(cluster => {
+        const pets = cluster.filter(id => {
+            const el = document.getElementById(id);
+            return el && el.classList.contains('pet');
+        });
+        const nonPets = cluster.filter(id => {
+            const el = document.getElementById(id);
+            return el && !el.classList.contains('pet');
+        });
+
+        // For initialization, include all clusters (even without pets)
+        if (cluster.length === 0) {
+            return;
+        }
+
+        // Build non-pet subclusters by finding overlapping groups among non-pets
+        let nonPetVisited = new Set();
+        let nonPetClusters = [];
+
+        nonPets.forEach(objId => {
+            if (nonPetVisited.has(objId)) return;
+
+            let queue = [objId];
+            let currentSubCluster = [];
+
+            while (queue.length > 0) {
+                const curr = queue.pop();
+                if (nonPetVisited.has(curr)) continue;
+                nonPetVisited.add(curr);
+                currentSubCluster.push(curr);
+
+                nonPets.forEach(other => {
+                    if (!nonPetVisited.has(other) && doObjectsOverlap(curr, other)) {
+                        queue.push(other);
+                    }
+                });
+            }
+
+            if (currentSubCluster.length > 0) {
+                nonPetClusters.push(currentSubCluster);
+            }
+        });
+
+        finalClusters.push([pets, nonPetClusters]);
+    });
+
+    return finalClusters;
+}
+
+function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) {    
     // List of classes that should appear in front of pets
     const itemsInFrontOfPetClasses = ['food-bowl', 'water-bowl'];
-    
+    const clusteredItemsZIndexDelta = {};
+
     overlapClusters.forEach(cluster => {
         let clusterInfo = {
             passable: { items: [], pos: 0, "items-in-front-of-pet": false, pet: false }
         };
 
-        const pets = cluster[0];
+        const pets = cluster[0]; // pet IDs
         const objectSubclusters = cluster[1];
 
         let itemsInFrontOfPetCounter = 1;
         let subclusterCounter = 1;
 
-        // Process object subclusters
+        // --- Step 0: Identify wall-only vs floor/boundary items ---
+        const petIds = new Set(pets);
+        const allObjects = objectSubclusters.flat(Infinity).filter(item => !petIds.has(item));
+        const wallOnlyItems = [];
+        const floorBoundaryItems = [];
+
+        allObjects.forEach(item => {
+            if (!item && item !== 0) return;
+
+            const el = document.getElementById(item);
+            if (!el) return;
+
+            const coords = getTilesOccupiedByObject(getObjectCoordinates(item), 
+                Math.ceil(el.offsetWidth / unitSize), 
+                Math.ceil(el.offsetHeight / unitSize));
+
+            let hasFloorOrBoundary = false;
+            let allWall = true;
+
+            coords.forEach(([x, y]) => {
+                const tile = roomLayout[y]?.[x];
+                const tileType = tile?.type ?? tile;
+                if (tileType === 1 || tileType === 3) { // floor or boundary
+                    hasFloorOrBoundary = true;
+                    allWall = false;
+                }
+                if (tileType !== 2) { // not wall
+                    allWall = allWall && tileType === 2;
+                }
+            });
+
+            if (hasFloorOrBoundary) floorBoundaryItems.push(item);
+            else if (allWall) wallOnlyItems.push(item);
+        });
+
+        // --- Step 0b: Boost floor/boundary items above wall-only ---
+        if (floorBoundaryItems.length && wallOnlyItems.length) {
+            const wallZIndexes = wallOnlyItems.map(id => parseInt(window.getComputedStyle(document.getElementById(id))?.zIndex) || 0);
+            const maxWallZ = Math.max(...wallZIndexes);
+            floorBoundaryItems.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.zIndex = maxWallZ + 1;
+            });
+        }
+
+        // --- Step 1: Process object subclusters (non-pets) ---
         objectSubclusters.forEach(subcluster => {
+            const itemsZIndexes = {};
             const items = Array.isArray(subcluster) ? subcluster.flat(Infinity) : [subcluster];
             const nonPassKey = `non-passable-${subclusterCounter}`;
             clusterInfo[nonPassKey] = { items: [], "items-in-front-of-pet": false, pet: false, pos: 0 };
 
+            // Populate itemsZIndexes
             items.forEach(item => {
-                if (!item && item !== 0) {
-                    return;
-                }
+                if (!item && item !== 0) return;
 
-                const userAsset = userObjectAssets[item];
-                if (!userAsset || userAsset.assetIndex == null) {
-                    return;
-                }
+                const userAsset = userObjectAssets[item] || furniturePreviewDict[item];
+                if (!userAsset || userAsset.assetIndex == null) return;
+
                 const asset = gameAssetIndex[userAsset.assetIndex];
-                if (!asset) {
-                    return;
-                }
+                if (!asset) return;
 
                 if (asset.passable) {
                     clusterInfo.passable.items.push(item);
@@ -4947,7 +4737,8 @@ function applyZIndexLogic(overlapClusters, movingObject, nextRow=null) {
                     return;
                 }
 
-                // Check if element has any of the classes that should be in front of pets
+                itemsZIndexes[item] = parseInt(window.getComputedStyle(el).zIndex) || 0;
+
                 const hasItemInFrontOfPetClass = itemsInFrontOfPetClasses.some(className => 
                     el.classList.contains(className)
                 );
@@ -4965,97 +4756,119 @@ function applyZIndexLogic(overlapClusters, movingObject, nextRow=null) {
                 }
             });
 
+            // Resolve z-index conflicts
+            if (Object.keys(itemsZIndexes).length > 0) {
+                const zIndexGroups = {};
+                for (const [item, zIndex] of Object.entries(itemsZIndexes)) {
+                    if (!zIndexGroups[zIndex]) zIndexGroups[zIndex] = [];
+                    zIndexGroups[zIndex].push(item);
+                }
+
+                for (const [zIndex, itemsInGroup] of Object.entries(zIndexGroups)) {
+                    if (itemsInGroup.length <= 1) continue;
+                    const zIndexNum = parseInt(zIndex);
+                    const itemPositions = itemsInGroup.map(item => ({ item, pos: getObjectCoordinates(item)[1] }));
+                    itemPositions.sort((a, b) => a.pos - b.pos);
+
+                    const positionGroups = [];
+                    let currentGroup = [itemPositions[0]];
+                    for (let i = 1; i < itemPositions.length; i++) {
+                        if (itemPositions[i].pos === itemPositions[i-1].pos) currentGroup.push(itemPositions[i]);
+                        else { positionGroups.push(currentGroup); currentGroup = [itemPositions[i]]; }
+                    }
+                    positionGroups.push(currentGroup);
+
+                    let totalIncreased = 0;
+                    positionGroups.forEach((group, idx) => {
+                        const bonus = idx;
+                        group.forEach(({item}) => { itemsZIndexes[item] = zIndexNum + bonus; });
+                        if (idx === positionGroups.length - 1) totalIncreased = bonus;
+                    });
+
+                    if (totalIncreased > 0) {
+                        for (const [item, origZIndex] of Object.entries(itemsZIndexes)) {
+                            if (origZIndex > zIndexNum && !itemsInGroup.includes(item)) {
+                                itemsZIndexes[item] = origZIndex + totalIncreased;
+                            }
+                        }
+                    }
+                }
+
+                const minZ = Math.min(...Object.values(itemsZIndexes));
+                for (const [key, value] of Object.entries(itemsZIndexes)) {
+                    if (value > minZ) clusteredItemsZIndexDelta[key] = value - minZ;
+                }
+            }
+
             subclusterCounter++;
         });
 
-        // Process pets - FIX: Calculate their positions properly
+        // --- Step 2: Process pets (unchanged) ---
         pets.forEach(petId => {
             clusterInfo[petId] = {
                 items: [petId],
-                "items-in-front-of-pet": false, // FIX: pets are not items-in-front-of-pet
+                "items-in-front-of-pet": false,
                 pet: true,
-                pos: 0 // Will be calculated below
+                pos: 0
             };
         });
 
-        // Calculate positions for all clusters (including pets)
+        // --- Step 3: Calculate positions ---
         Object.entries(clusterInfo).forEach(([key, value]) => {
             let lowestClusterRow = 0;
-            value["items"].forEach((item) => {
+            value.items.forEach(item => {
                 let itemsRow = getObjectCoordinates(item)[1];
-                if (itemsRow > lowestClusterRow) {
-                    lowestClusterRow = itemsRow;
-                }
+                if (itemsRow > lowestClusterRow) lowestClusterRow = itemsRow;
             });
-
-            value["pos"] = lowestClusterRow;
-            if (nextRow) {
-                if (key === movingObject.id) {
-                    value["pos"] = nextRow;
-                }
-            }
+            value.pos = lowestClusterRow;
+            if (movingObject && nextRow && key === movingObject.id) value.pos = nextRow;
         });
 
-        // Convert to array and sort
+        // --- Step 4: Sort and assign z-index ---
         let entries = Object.entries(clusterInfo);
+        const passableEntries = entries.filter(([key]) => key === 'passable');
+        const nonPassableEntries = entries.filter(([key]) => key !== 'passable');
 
-        // Separate passable items - they should always have lowest z-index
-        const passableEntries = entries.filter(([key, value]) => key === 'passable');
-        const nonPassableEntries = entries.filter(([key, value]) => key !== 'passable');
-
-        // Sort non-passable items by position and tie-breaking rules
         nonPassableEntries.sort((a, b) => {
-            const aPos = a[1].pos || 0;
-            const bPos = b[1].pos || 0;
+            const aPos = a[1].pos || 0, bPos = b[1].pos || 0;
+            if (aPos !== bPos) return aPos - bPos;
 
-            if (aPos !== bPos) return aPos - bPos; // ascending sort
+            const aIFP = a[1]["items-in-front-of-pet"], bIFP = b[1]["items-in-front-of-pet"];
+            const aPet = a[1].pet, bPet = b[1].pet;
 
-            // Tie-breaking for same row position
-            const aIFP = a[1]["items-in-front-of-pet"];
-            const bIFP = b[1]["items-in-front-of-pet"];
-            const aPet = a[1].pet;
-            const bPet = b[1].pet;
-
-            // Priority order (higher z-index): Items-in-front-of-pet > Pet > Other objects
-            // (Items in front of pet should appear in front of pets when on same row)
-            
-            // If both are pets or both are items-in-front-of-pet, no preference
             if (aPet && bPet) return 0;
             if (aIFP && bIFP) return 0;
-            
-            // Items-in-front-of-pet beats everything (including pets)
-            if (aIFP && !bIFP) return 1;  // a (items-in-front-of-pet) gets higher z-index
-            if (bIFP && !aIFP) return -1; // b (items-in-front-of-pet) gets higher z-index
-            
-            // Pet beats non-pet, non-items-in-front-of-pet objects
-            if (aPet && !bIFP && !bPet) return 1;  // a (pet) gets higher z-index
-            if (bPet && !aIFP && !aPet) return -1; // b (pet) gets higher z-index
+            if (aIFP && !bIFP) return 1;
+            if (bIFP && !aIFP) return -1;
+            if (aPet && !bIFP && !bPet) return 1;
+            if (bPet && !aIFP && !aPet) return -1;
 
-            return 0; // No preference
+            return 0;
         });
 
-        // Combine: passable items first (lowest z-index), then sorted non-passable items
         entries = [...passableEntries, ...nonPassableEntries];
 
-        // Assign z-index values (higher index in sorted array = higher z-index)
         let zIndexStart = 3;
         entries.forEach((entry, idx) => {
             const [key, value] = entry;
             value.order = idx + 1;
-            const zIndex = zIndexStart + idx;
-                        
+            let zIndex = zIndexStart + idx;
+            let maxDelta = 0;
+
             value.items.forEach(item => {
                 const el = document.getElementById(item);
-                if (el) {
-                    el.style.zIndex = zIndex;
-                }
+                const itemDelta = clusteredItemsZIndexDelta[item] || 0;
+                maxDelta = Math.max(maxDelta, itemDelta);
+                if (el) el.style.zIndex = zIndex + itemDelta;
             });
+
+            zIndexStart += maxDelta;
         });
 
-        // Convert back to object
         clusterInfo = Object.fromEntries(entries);
     });
 }
+
 
 
 function isOverlapping(petObject, targetObject) {
@@ -5461,6 +5274,7 @@ toggleEditSaveBtn.addEventListener("click", () => {
         });
         updateStatsBeforeRerunningInitGameAndRenderPets();
         enableObjectDragging();
+        predictAndSetZIndex();
     editing = true;
     } else {
         updateObjectPositionChanges();
@@ -5471,6 +5285,7 @@ toggleEditSaveBtn.addEventListener("click", () => {
         updateStatsBeforeRerunningInitGameAndRenderPets();
         renderPets();
         enablePetDragging();
+        predictAndSetZIndex();
         resetEditButtonToggle();
         const allPets = document.querySelectorAll("#petContainer .pet");
         if (allPets[0]) {
@@ -5485,6 +5300,9 @@ cancelEditBtn.addEventListener("click", () => {
     updateStatsBeforeRerunningInitGameAndRenderPets();
     renderPets();
     enablePetDragging();
+
+    predictAndSetZIndex();
+    
     const allPets = document.querySelectorAll("#petContainer .pet");
     if (allPets[0]) {
         displayPetStats(allPets[0].id);
@@ -5513,6 +5331,10 @@ function resetEditButtonToggle() {
     toggleEditSaveBtn.classList.add("edit");
     cancelEditBtn.classList.add("hidden");
     editing = false;
+}
+
+function getFirstRowOfTileType(number) {
+  return roomLayout.findIndex(row => row.includes(number));
 }
     
 // Function to generate placement validity map and highlight valid tiles
@@ -5555,6 +5377,7 @@ function generatePlacementMap(draggedObjectId) {
     const objectHeight = Math.ceil(draggedElement.offsetHeight / unitSize);
 
     const draggedAssetPlacingRules = gameAssetIndex[combinedAssets[draggedElement.id]?.assetIndex]?.canBePlacedOn;
+    const draggedAssetPlacingIndex = gameAssetIndex[combinedAssets[draggedElement.id]?.assetIndex]?.placingIndex;
 
     // Create placement validity map
     const placementMap = [];
@@ -5619,7 +5442,6 @@ function generatePlacementMap(draggedObjectId) {
 
                 if (!(draggedAssetData["placingIndex"] === 5 || draggedAssetData["placingIndex"] === 9)) {
                     const objectsAtTile = getObjectsAtTile(x, y, draggedObjectId);
-
                     for (const existingObj of objectsAtTile) {
                         const existingAsset = combinedAssets[existingObj.id];
 
@@ -5630,11 +5452,57 @@ function generatePlacementMap(draggedObjectId) {
                             continue
                         }
 
+                        //Added to allow floor/boundary placed objects to overlap wall placed objects
+                        if ((draggedAssetPlacingRules.includes(1) || draggedAssetPlacingRules.includes(3)) && !draggedAssetPlacingRules.includes(2) && !(draggedAssetPlacingIndex === 8 && existingPlacingIndex === 8)) {
+                            if (tileType === 2) {
+                                if (draggedAssetPlacingRules.includes(3)) {
+                                    if (getFirstRowOfTileType(3) - (objectHeight - 1) <= row) {
+                                        tileAllowed = true;
+                                        break;
+                                    }
+                                } else if (draggedAssetPlacingRules.includes(1)) {
+                                    if (getFirstRowOfTileType(1) - (objectHeight - 1) <= row) {
+                                        tileAllowed = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
                         if (!draggedAssetPlacingRules.includes(existingPlacingIndex)) {
                             tileAllowed = false;
                             break;
                         } else {
-                            tileAllowed = true;
+                            if (existingPlacingIndex === 11 && draggedAssetPlacingIndex === 12) {
+                                const windowCoords = getObjectCoordinates(existingObj.id)
+                                const windowWidth = Math.ceil(existingObj.offsetWidth / unitSize);
+                                const windowHeight = Math.ceil(existingObj.offsetHeight / unitSize);
+                                const tilesOccupiedByWindow = getTilesOccupiedByObject(windowCoords, windowWidth, windowHeight);
+
+                                const maxY = Math.max(...tilesOccupiedByWindow.map(c => c[1]));
+                                const windowBottomTiles = tilesOccupiedByWindow.filter(c => c[1] === maxY);
+
+                                if (windowBottomTiles.some(c => c[0] === x && c[1] === y)) {
+                                    tileAllowed = true;
+                                }
+                            } else if (existingPlacingIndex === 11 && draggedAssetPlacingIndex === 13) {
+                                const windowCoords = getObjectCoordinates(existingObj.id)
+                                const windowWidth = Math.ceil(existingObj.offsetWidth / unitSize);
+                                const windowHeight = Math.ceil(existingObj.offsetHeight / unitSize);
+                                const tilesOccupiedByWindow = getTilesOccupiedByObject(windowCoords, windowWidth, windowHeight);
+                                const maxY = Math.max(...tilesOccupiedByWindow.map(c => c[1]));
+                                const windowTilesOtherThanBottom = tilesOccupiedByWindow.filter(c => c[1] !== maxY);
+                                
+                                // Check if current tile is actually occupied by this window AND is not bottom row
+                                if (windowTilesOtherThanBottom.some(c => c[0] === x && c[1] === y)) {
+                                    tileAllowed = true;
+                                } else {
+                                    tileAllowed = false;
+                                    break;
+                                }
+                            } else {
+                                tileAllowed = true;
+                            }
                         }
                     }
 
@@ -5665,6 +5533,26 @@ function generatePlacementMap(draggedObjectId) {
                             }
 
                             if (bottomTileValid) tileAllowed = true;
+
+                            const objectsAtTile = getObjectsAtTile(x, y, draggedObjectId);
+
+                            for (const existingObj of objectsAtTile) {
+                                const existingAsset = combinedAssets[existingObj.id];
+                                const existingAssetData = gameAssetIndex[existingAsset.assetIndex];
+                                const existingPlacingIndex = existingAssetData["placingIndex"] || 0;
+
+                                //if (existingPlacingIndex === 5 || existingPlacingIndex === 9) {
+                                    //tileAllowed = false;
+                                    //break;
+                                if (
+                                    (draggedAssetPlacingRules.includes(1) || draggedAssetPlacingRules.includes(3))
+                                    && !draggedAssetPlacingRules.includes(2)
+                                    && (draggedAssetPlacingIndex === 8 && existingPlacingIndex === 8)
+                                ) {
+                                    tileAllowed = false;
+                                    break;
+                                }
+                            }
                         }
                         }
                     } else {
@@ -5892,9 +5780,12 @@ function navigationResponsiveLayout() {
 window.addEventListener("resize", () => {
     updateStatsBeforeRerunningInitGameAndRenderPets();
     navigationResponsiveLayout();
+    endPreview()
 
     if (document.getElementById("pet-room-container").classList.contains("active")) {
         initGame();
+        document.querySelector("#end-preview-button").classList.add("hidden")
+        resetEditButtonToggle();
     }
 
     const checkbox = document.getElementById("shop-not-owned-toggle");
@@ -6533,6 +6424,8 @@ function previewFurniture (key) {
         setPetAndObjectContainersToGridDimentions();
         renderRoomObjects();
         toggleRoomDarknessBasedOnElectricityTax();
+        predictAndSetZIndex();
+
         toggleEditSaveBtn.click();
 
         document.querySelector("#end-preview-button").classList.remove("hidden")
@@ -6542,9 +6435,13 @@ function previewFurniture (key) {
         
     } else {
         furniturePreviewDict["furniture-preview"].position = [];
-        furniturePreviewDict["furniture-preview"].assetIndex = null;
         document.getElementById(tempDivId).remove();
-        messageToTheUser("Nepakanka vietos!")
+        if (gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex].placingIndex === 13 || gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex]["css-class"].includes("window-sill")) {
+            messageToTheUser("Nėra tinkamo dydžio lango arba jį užstoja kiti daiktai!")
+        } else {
+            messageToTheUser("Nepakanka vietos!")
+        }
+        furniturePreviewDict["furniture-preview"].assetIndex = null;
     }
 }
 
@@ -6947,7 +6844,11 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
                 } else {
                     userObjectAssets[tempDivId].position = [];
                     document.getElementById(tempDivId).remove();
-                    messageToTheUser("Nepakanka vietos!")
+                    if (gameAssetIndex[userObjectAssets[tempDivId].assetIndex].placingIndex === 13 || gameAssetIndex[userObjectAssets[tempDivId].assetIndex]["css-class"].includes("window-sill")) {
+                        messageToTheUser("Nėra tinkamo dydžio lango arba jį užstoja kiti daiktai!")
+                    } else {
+                        messageToTheUser("Nepakanka vietos!")
+                    }
                 }
             });
         }
@@ -7308,7 +7209,7 @@ function selectFullSpeciesBowls (providesFor) {
     let foodBowls = []
     providesFor.forEach(item => {
     const matching = Array.from(objects).filter(obj =>
-        obj.className.includes(`${item}-food-bowl`) && !obj.className.includes("full")
+        obj.className.includes(`${item}-food-bowl`) && !obj.className.includes("furniture-preview") && !obj.className.includes("full")
     );
         foodBowls.push(...matching); // add to the overall list
     });
@@ -7914,8 +7815,8 @@ function displayWaterBowlFillingOptions(obj) {
 
     const speciesSuitableForBowl = [...new Set(
         Array.from(obj.classList)
-            .filter(cls => cls.includes("water-bowl") && cls !== "water-bowl") // skip exact match
-            .map(cls => cls.split("-")[0])                                    // take [0] part
+            .filter(cls => cls.includes("water-bowl") && cls !== "water-bowl" && !cls.includes("furniture-preview")) 
+            .map(cls => cls.split("-")[0])
     )].join(", ");
 
 
@@ -9010,7 +8911,7 @@ async function cat1Hungry(pet, signal) {
     // Find all elements whose class includes both "food-bowl" and the species substring
     const matchingFoodBowls = Array.from(roomObjectsContainer.querySelectorAll("*")).filter(el => {
         const classStr = el.className; // full class string
-        return classStr.includes("food-bowl") && classStr.includes(petSpecies);
+        return classStr.includes("food-bowl") && classStr.includes(petSpecies) && !classStr.includes("furniture-preview");
     });
 
     let object;
@@ -9597,9 +9498,7 @@ window.onload = function () {
     }
 
     if (controller) {
-        controller.task = null;
-        controller.taskCompleted = false;
-        localStorage.setItem('controller', JSON.stringify(controller));
+        resetControllerTaskSettings();
     }
     navigationResponsiveLayout();
     document.querySelector('#gameContainer').removeAttribute('hidden');

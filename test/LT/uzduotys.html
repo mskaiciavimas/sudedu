@@ -159,6 +159,7 @@
             border-bottom-left-radius: 20px;
             display: flex;
             flex-direction: column;
+            min-width: 0;
         }
 
         #dynamic-teacher-content {
@@ -169,6 +170,7 @@
             justify-content: center;
             align-items: center;
             flex: 1;
+            min-width: 0;
         }
 
         .initial-button-div {
@@ -507,6 +509,7 @@
             flex-direction: column;
             justify-content: space-between;
             flex: 1;
+            min-width: 0;
         }
 
         #student-task-info-container-inner {
@@ -516,6 +519,8 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 20px;
             padding: 25px;
+            width: 100%;
+            min-width: 0;
         }
 
         .summary-inner-container:not(:empty) {
@@ -869,12 +874,9 @@
         }
 
 #student-task-student-knowledge-level,
-#student-task-student-performance-mean {
-    flex: 1;
-}
-
-#student-task-student-performance-mean {
-    padding-left: 10%;
+#student-task-student-performance-mean,
+#student-task-student-consistency-mean {
+    flex: 1 1 auto;
 }
 
 .categories-dropdown-holder,
@@ -887,7 +889,9 @@
 }
 
 .knowledge-level-select-text, 
-.student-points-label {
+.student-points-label,
+.student-consistency-label,
+.student-statistics-label {
     text-transform: uppercase;
     font-weight: 600;
 }
@@ -914,6 +918,9 @@
     display: flex;
     align-items: start;
     margin-top: 20px !important;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 15px;
 }
 
 .accordion-button {
@@ -1165,6 +1172,7 @@
       flex: 1 1 65%;
       height: 100%;
       margin-right: 10px;
+      min-width: 0;
     }
 
     /* Sidebar content */
@@ -1175,6 +1183,7 @@
         width: 100%;
         overflow-y: auto;
         margin-right: 15px;
+        min-width: 0;
     }
     
     #knowledge-level-select {
@@ -1391,6 +1400,12 @@
     }
 }
 
+#student-stats-graph-holder {
+    flex-wrap: wrap;
+    width: 100%;
+    flex-direction: column;
+    min-width: 0;
+}
 
  .input-group {
             display: flex;
@@ -1480,15 +1495,237 @@
     display: block;
 }
 
-        
 
-        @media (max-width: 1999px) {
-            #teacher-message-line,
-            #teacher-data-retrieval-message,
-            #student-message {
-                margin-right: 8vw;
-            }
+    .filter-section {
+        padding-bottom: 10px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .filter-label {
+        font-weight: 600;
+        color: #4a4a4a;
+        margin-bottom: 12px;
+        display: block;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .button-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .button-group-metrics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .btn-subject {
+        position: relative;
+        padding: 10px 20px;
+        border: none;
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 14px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        color: #333;
+        text-transform: uppercase;
+    }
+
+    .btn-subject::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+    border-radius: 14px;
+    pointer-events: none;
+    transition: background 0.3s ease;
+    }
+
+    .btn-subject::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    }
+
+    .btn-subject:hover:not(:disabled):not(.active) {
+        background: rgba(255, 255, 255, 0.4);
+    }
+
+    .btn-subject.active {
+        color: #F5F5F7;
+        background: linear-gradient(135deg, #A0C58F, #32ac93);
+    }
+
+    .btn-metric {
+        position: relative;
+        padding: 10px 20px;
+        border: none;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        color: #333;
+        text-transform: capitalize;
+    }
+
+    .btn-metric::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+    border-radius: 20px;
+    pointer-events: none;
+    transition: background 0.3s ease;
+    }
+
+    .btn-metric::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    }
+
+    .btn-metric:hover:not(:disabled):not(.active) {
+        background: rgba(255, 255, 255, 0.4);
+    }
+
+    .btn-metric:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    button[data-metric-id="0"].active {
+        background-color: #286D8A;
+        color: #F5F5F7;
+    }
+
+    button[data-metric-id="1"].active {
+        background-color: #32ac93;
+        color: #F5F5F7;
+    }
+
+    button[data-metric-id="2"].active {
+        background-color: #e74c3c;
+        color: #F5F5F7;
+    }
+
+    button[data-metric-id="3"].active {
+        background-color: #F28C28;
+        color: #F5F5F7;
+    }
+
+    button[data-metric-id="4"].active {
+        background-color: #8b5cf6;
+        color: #F5F5F7;
+    }
+
+    button[data-metric-id="5"].active {
+        background-color: #ec4899;
+        color: #F5F5F7;
+    }
+
+    button[data-metric-id="6"].active {
+        background-color: #06b6d4;
+        color: #F5F5F7;
+    }
+
+    button[data-metric-id="7"].active {
+        background-color: #84cc16;
+        color: #F5F5F7;
+    }
+
+    /* Enhanced chart container with fixed header */
+    .chart-container {
+        position: relative;
+        height: 350px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 20px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .chart-body {
+        flex: 1;
+        position: relative;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+    }
+
+    .chart-scrollable {
+        position: relative;
+        height: 100%;
+    }
+    
+    #statsChart {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .chart-scroll-indicator.hidden {
+        opacity: 0;
+    }
+
+    .info-box {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 15px;
+        margin-top: 20px;
+        border-radius: 20px;
+    }
+
+    .info-box p {
+        color: #1a1a1a;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+
+    @media (max-width: 1999px) {
+        #teacher-message-line,
+        #teacher-data-retrieval-message,
+        #student-message {
+            margin-right: 8vw;
         }
+    }
 
     @media (max-width: 992px) {
         .sidebar-wrapper,
@@ -1687,10 +1924,51 @@
     tr:last-child td {
     padding-bottom: 10px;
     }
+
+    .filter-section {
+                padding-bottom: 15px;
+            }
+            
+            .button-group {
+                gap: 8px;
+            }
+            
+            .chart-container {
+                height: 400px;
+                padding: 15px;
+                border-radius: 15px;
+            }
+            
+            .info-box {
+                padding: 12px;
+                margin-top: 15px;
+            }
+            
+            .info-box p {
+                font-size: 12px;
+            }
+            
+            .chart-scroll-indicator {
+                display: none;
+            }
+
+    .btn-metric,
+    .btn-subject {
+        background: rgba(255, 255, 255, 0.8);
+    }
+
+    .chart-container {
+        background: rgba(255, 255, 255, 0.8);
+        padding: 10px 3px;
+    }
+
+    .chart-container {
+        height: 300px;
+    }
 }
 
     @media (max-width: 578px) {
-                    html,
+            html,
             body {
                 width: 100vw;
             }
@@ -1748,6 +2026,22 @@
         .student-points {
             font-size: 1.25rem;
             padding-top: 0.25rem;
+        }
+
+        .btn-subject {
+            font-size: 0.75rem;
+        }
+
+        .btn-metric {
+            font-size: 0.8rem;
+        }
+
+        .chart-container {
+            height: 200px;
+        }
+
+        #knowledge-level-select {
+            width: 100px;
         }
     }
 
@@ -2101,7 +2395,7 @@
 
         <!-- RIGHT SIDE: Collapsible Sidebar with Task Options and Info -->
         <div class="sidebar-wrapper" id="sidebarWrapper">
-            <aside class="sidebar" id="sidebar">
+            <aside class="sidebar hide-scrollbar-mobile" id="sidebar">
                 <div class="sidebar-content" id="sidebarContent">
                     <div id="dynamic-teacher-content">
                         <!-- New Task Options Container -->
@@ -2379,6 +2673,25 @@
                                     <div class="student-statistic-top-section">
                                     <div id="student-task-student-knowledge-level"></div>
                                     <div id="student-task-student-performance-mean"></div>
+                                    <div id="student-task-student-consistency-mean"></div>
+                                    <div id="student-stats-graph-holder" style="display: none;">
+                                        <div class="student-statistics-label">Mokinio ilgalaikė statistika</div>
+                                        <div class="filter-section">
+                                            <div class="button-group" id="subjectButtons"></div>
+                                        </div>
+                                        
+                                        <div class="filter-section-metrics">
+                                            <div class="button-group-metrics" id="metricButtons"></div>
+                                        </div>
+                                        
+                                        <div class="chart-container">
+                                            <div class="chart-body scroll-indicators-horizontal" id="chartBody">
+                                                <div class="chart-scrollable">
+                                                    <canvas id="statsChart"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     </div>
                                     <div id="student-task-group-and-status-indicator">
                                         <div id="student-task-group"></div>
@@ -2520,7 +2833,7 @@
 
 
 <div class="sidebar-wrapper" id="sidebarWrapperStudent">
-    <aside class="sidebar" id="sidebarStudent">
+    <aside class="sidebar hide-scrollbar-mobile" id="sidebarStudent">
         <div class="sidebar-content" id="sidebarContentStudent">
 
         <!-- RIGHT SIDE: Task Info (collapsible on mobile) -->
@@ -2641,6 +2954,7 @@
     <script src="matematika_options.js"></script>
     <script src="../parameter_dictionary.js"></script>
     <script src="../main-nav-bar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 	<script>
         const redCircleColorCode = '#D57E7E';
@@ -2649,6 +2963,8 @@
         if (!userData) {
             window.location.href = './';
         }
+
+        let chart = null;
 
         let studentList;
         let tasksList;
@@ -2663,6 +2979,7 @@
         let taskContainerVisible = true;
         let changingTeacher = false;
         let classScoreMedian;
+        let classConsistencyMedian;
         const teacherGUI = document.getElementById('teacher-gui');
         const studentGUI = document.getElementById('student-gui');
         const adminGUI = document.getElementById('admin-gui');
@@ -3060,6 +3377,8 @@
             studentStatisticsKnowledgeLevel.style.display = "none";
             studentStatisticsPerformanceMean.innerHTML = '';
             studentStatisticsPerformanceMean.style.display = "none";
+            studentStatisticsConsistencyMean.innerHTML = '';
+            studentStatisticsConsistencyMean.style.display = "none";
             studentStatisticsMathDiv.style.display = "none";
             studentStatisticsMathErrorFrequency.innerHTML = '';
             studentStatisticsLangDiv.style.display = "none";
@@ -3079,6 +3398,12 @@
             studentScoreDuration.innerHTML = "";
             studentStatisticsIsdestymasCompletedTexts.innerHTML = "";
             studentStatisticsKomponavimasCompletedTexts.innerHTML = "";
+            document.querySelector("#subjectButtons").innerHTML = '';
+            document.querySelector("#metricButtons").innerHTML = '';
+            document.querySelector("#student-stats-graph-holder").style.display = "none";
+            if (chart) {
+                chart.destroy();
+            }
         }
 
         function clearTaskInfoContainerForStudents() {
@@ -3105,6 +3430,7 @@
         let studentStatisticsCompletedTasks = document.querySelector("#student-statistics-completed-tasks");
 
         let studentStatisticsPerformanceMean = document.querySelector("#student-task-student-performance-mean");
+        let studentStatisticsConsistencyMean = document.querySelector("#student-task-student-consistency-mean");
         let studentStatisticsKnowledgeLevel = document.querySelector("#student-task-student-knowledge-level");
         const studentStatisticsMathDiv = document.querySelector("#student-statistics-math");
         const studentStatisticsMathErrorFrequency = document.querySelector("#student-statistics-math-error-frequency");
@@ -3123,7 +3449,106 @@
         const studentTaskCompletionDate = document.querySelector("#student-task-completion-date")
         const studentTaskCompletionDateForStudents = document.querySelector("#student-task-completion-date-for-students")
         
+        function calculateAverageStudentsConsistency(stats) {
+            if (!stats.c || stats.c.length === 0) return 0;
+
+            const avg = stats.c.reduce((sum, val) => sum + val, 0) / stats.c.length;
+            return +(avg * 100).toFixed(2);
+        }
+
+        function calculateAverageStudentScore(stats) {
+            const validKeys = Object.keys(stats).filter(k => !['c', 'd'].includes(k));
+            let ratios = [];
+
+            for (const key of validKeys) {
+                for (const sub of stats[key]) {
+                if (Array.isArray(sub) && sub.length >= 4) {
+                    const points = sub[0];
+                    const total = sub[3];
+                    const ratio = total === 0 ? 0 : points / total;
+                    ratios.push(ratio);
+                }
+                }
+            }
+
+            if (ratios.length === 0) return 0;
+            return (ratios.reduce((a, b) => a + b, 0) / ratios.length).toFixed(2);
+        }
+
+        const statTypesKeys = {
+            "c": "nuoseklumas",
+            "m": "matematika",
+            "t": "teksto suvokimas",
+            "g": "rašyba",
+        }
+
+        const statKeys = {
+            0: "taškai",
+            1: "teisingi atsakymai",
+            2: "klaidos",
+            3: "atsakyti klausimai"
+        }
+
+        const statsToBeExpressedAsPercetnge = [1, 2];
+
+function transformStudentStats(stats) {
+  const result = {};
+
+  // Handle "c" as a list of percentages
+  if (stats.c) {
+    result.c = {
+      title: statTypesKeys.c,
+      values: stats.c.map(val => +(val * 100).toFixed(2))
+    };
+  }
+
+  // Handle other keys
+  for (const [key, sublists] of Object.entries(stats)) {
+    if (key === "c" || key === "d") continue;
+
+    const subjectTitle = statTypesKeys[key] || key;
+    const valuesObj = {};
+
+    // Initialize entries for each metric
+    Object.entries(statKeys).forEach(([i, metricTitle]) => {
+      valuesObj[i] = { title: metricTitle, values: [] };
+    });
+
+    // Fill in values from sublists
+    sublists.forEach((sub) => {
+      const total = sub[3] ?? 0;
+
+      sub.forEach((val, i) => {
+        let value;
+
+        if (i === 3) {
+          // Absolute number, no division
+          value = val;
+        } else {
+          // Calculate ratio (safe for 0 total)
+          const ratio = total === 0 ? 0 : val / total;
+
+          // Convert to percentage if needed
+          value = statsToBeExpressedAsPercetnge.includes(Number(i))
+            ? +(ratio * 100).toFixed(2)
+            : +ratio.toFixed(2);
+        }
+
+        valuesObj[i].values.push(value);
+      });
+    });
+
+    result[key] = { title: subjectTitle, values: valuesObj };
+  }
+
+  return result;
+}
+
+
         function displayStudentStatistics(student, studentTasks) {
+            const processedStudentStats = transformStudentStats(student[3]);
+            const averageStudentScore = calculateAverageStudentScore(student[3]);
+            const averageStudentConsistency = calculateAverageStudentsConsistency(student[3]);
             function processStudentTasks(studentTasks) {
                 // Initialize the result objects
                 const mathTasks = [[0, 0], []];
@@ -3242,8 +3667,11 @@
         studentStatisticsKnowledgeLevel.innerHTML = selectHTML;
         studentStatisticsKnowledgeLevel.style.display = "block";
 
-        studentStatisticsPerformanceMean.innerHTML = `<div class="student-points-holder"><div class="student-points-label">Taškai</div> <div class="student-points">${student[3]} (${classScoreMedian})</div></div>`;
+        studentStatisticsPerformanceMean.innerHTML = `<div class="student-points-holder"><div class="student-points-label">Taškai</div> <div class="student-points">${averageStudentScore} (${classScoreMedian})</div></div>`;
         studentStatisticsPerformanceMean.style.display = "block";
+
+        studentStatisticsConsistencyMean.innerHTML = `<div class="student-points-holder"><div class="student-consistency-label">Pastovumas</div> <div class="student-points">${averageStudentConsistency}% (${classConsistencyMedian}%)</div></div>`;
+        studentStatisticsConsistencyMean.style.display = "block";
 
         const knowledgeSelect = document.getElementById("knowledge-level-select");
 
@@ -3286,6 +3714,707 @@
                 }
             }
         });
+
+        // STATS PART START
+
+        var lithuanianMonths = ['Sau', 'Vas', 'Kov', 'Bal', 'Geg', 'Bir', 'Lie', 'Rugp', 'Rugs', 'Spal', 'Lap', 'Gr'];
+        
+        var metricColors = ['#286D8A', '#32ac93', '#e74c3c', '#F28C28', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
+        
+        var selectedSubject = null;
+        var selectedMetrics = [];
+        var availableMetrics = [];
+        var previousDatasets = [];
+
+        function getPreviousMonday(date) {
+            var d = new Date(date);
+            var day = d.getDay();
+            var diff = day === 0 ? 6 : day - 1;
+            d.setDate(d.getDate() - diff);
+            d.setHours(0, 0, 0, 0);
+            return d;
+        }
+
+        function generateMondayDates(count) {
+            var dates = [];
+            var today = new Date();
+            var currentMonday = getPreviousMonday(today);
+            
+            for (var i = 0; i < count; i++) {
+                dates.push(formatLithuanianDate(currentMonday));
+                currentMonday.setDate(currentMonday.getDate() - 7);
+            }
+            
+            return dates.reverse();
+        }
+
+        function formatLithuanianDate(date) {
+            var day = date.getDate();
+            var month = lithuanianMonths[date.getMonth()];
+            return day + ' ' + month;
+        }
+
+        function isPercentageMetric(metricTitle) {
+            var lower = metricTitle.toLowerCase();
+            return lower.indexOf('atsakym') !== -1 || lower.indexOf('klaid') !== -1 || lower.indexOf('nuosekl') !== -1;
+        }
+
+        function extractMetricsFromData() {
+            var metrics = [];
+            var keys = Object.keys(processedStudentStats);
+            
+            for (var i = 0; i < keys.length; i++) {
+                var key = keys[i];
+                if (key === 'c') continue;
+                
+                var subjectValues = processedStudentStats[key].values;
+                if (typeof subjectValues === 'object' && !Array.isArray(subjectValues)) {
+                    var metricKeys = Object.keys(subjectValues);
+                    for (var j = 0; j < metricKeys.length; j++) {
+                        var metricKey = metricKeys[j];
+                        var metricData = subjectValues[metricKey];
+                        var isPercent = isPercentageMetric(metricData.title);
+                        
+                        var existing = false;
+                        for (var k = 0; k < metrics.length; k++) {
+                            if (metrics[k].id === metricKey && metrics[k].title === metricData.title) {
+                                existing = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!existing) {
+                            metrics.push({
+                                id: metricKey,
+                                title: metricData.title,
+                                type: isPercent ? 'percentage' : 'absolute',
+                                color: metricColors[metrics.length % metricColors.length],
+                                yAxisID: isPercent ? 'y-percent' : 'y-absolute-' + metricKey
+                            });
+                        }
+                    }
+                    break;
+                }
+            }
+            
+            return metrics;
+        }
+
+        function getAxisIdForAbsoluteMetric(metricId, allSelectedMetrics, subjectData) {
+            if (!subjectData || !subjectData.values || !subjectData.values[metricId]) {
+                return 'y-absolute-' + metricId;
+            }
+            
+            var currentValues = subjectData.values[metricId].values;
+            var currentMax = Math.max.apply(null, currentValues);
+            
+            for (var i = 0; i < allSelectedMetrics.length; i++) {
+                var otherId = allSelectedMetrics[i];
+                if (otherId === metricId) continue;
+                
+                var otherMetric = null;
+                for (var j = 0; j < availableMetrics.length; j++) {
+                    if (availableMetrics[j].id === otherId && availableMetrics[j].type === 'absolute') {
+                        otherMetric = availableMetrics[j];
+                        break;
+                    }
+                }
+                
+                if (!otherMetric || !subjectData.values[otherId]) continue;
+                
+                var otherValues = subjectData.values[otherId].values;
+                var otherMax = Math.max.apply(null, otherValues);
+                
+                var maxDiff = Math.abs(currentMax - otherMax);
+                var largerMax = Math.max(currentMax, otherMax);
+                var threshold = largerMax * 0.15;
+                
+                if (maxDiff <= threshold) {
+                    var sharedId = parseInt(metricId) < parseInt(otherId) ? metricId : otherId;
+                    return 'y-absolute-shared-' + sharedId;
+                }
+            }
+            
+            return 'y-absolute-' + metricId;
+        }
+
+        function selectSubject(key) {
+            selectedSubject = key;
+            
+            if (key === 'c') {
+                selectedMetrics = [];
+            } else {
+                if (selectedMetrics.length === 0 && availableMetrics.length > 0) {
+                    selectedMetrics = [availableMetrics[0].id];
+                }
+            }
+            
+            var buttons = document.querySelectorAll('.btn-subject');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active');
+                if (buttons[i].getAttribute('data-subject-key') === key) {
+                    buttons[i].classList.add('active');
+                }
+            }
+            
+            updateMetricButtonsState();
+            updateChart();
+        }
+
+        function updateMetricButtonsState() {
+            var buttons = document.querySelectorAll('#metricButtons .btn-metric');
+            var isConsistency = selectedSubject === 'c';
+            
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = isConsistency;
+                if (isConsistency) {
+                    buttons[i].classList.remove('active');
+                } else {
+                    var metricId = buttons[i].getAttribute('data-metric-id');
+                    if (selectedMetrics.indexOf(metricId) !== -1) {
+                        buttons[i].classList.add('active');
+                    } else {
+                        buttons[i].classList.remove('active');
+                    }
+                }
+            }
+
+            var metricContainer = document.getElementById('metricButtons');
+            var chartOuterContainer = document.querySelector('.chart-scrollable');
+            var isMobile = window.matchMedia('(max-width: 578px)').matches;
+
+            if (selectedSubject === 'c' && isMobile) {
+                metricContainer.style.display = 'none';
+                chartOuterContainer.style.minWidth = "0";
+            } else {
+                metricContainer.style.display = 'flex';
+                chartOuterContainer.style.minWidth = "500px";
+            }
+        }
+
+        function toggleMetric(id) {
+            if (selectedSubject === 'c') return;
+            
+            var index = selectedMetrics.indexOf(id);
+            if (index !== -1) {
+                selectedMetrics.splice(index, 1);
+            } else {
+                selectedMetrics.push(id);
+            }
+            
+            updateMetricButtonsState();
+            updateChart();
+        }
+
+        function initializeButtons() {
+            var subjectContainer = document.getElementById('subjectButtons');
+            var metricContainer = document.getElementById('metricButtons');
+
+            subjectContainer.innerHTML = '';
+            metricContainer.innerHTML = '';
+            
+            availableMetrics = extractMetricsFromData();
+
+            var keys = Object.keys(processedStudentStats);
+            var firstKey = keys[0];
+            
+            for (var i = 0; i < keys.length; i++) {
+                var key = keys[i];
+                var data = processedStudentStats[key];
+                var btn = document.createElement('button');
+                btn.className = 'btn-subject';
+                btn.textContent = data.title;
+                btn.setAttribute('data-subject-key', key);
+                btn.onclick = (function(k) {
+                    return function() { selectSubject(k); };
+                })(key);
+                subjectContainer.appendChild(btn);
+            }
+
+            for (var j = 0; j < availableMetrics.length; j++) {
+                var metric = availableMetrics[j];
+                var btn2 = document.createElement('button');
+                btn2.className = 'btn-metric';
+                var badge = document.createElement('span');
+                btn2.textContent = metric.title + ' ';
+                btn2.setAttribute('data-metric-id', metric.id);
+                btn2.onclick = (function(mid) {
+                    return function() { toggleMetric(mid); };
+                })(metric.id);
+                metricContainer.appendChild(btn2);
+            }
+            
+            if (firstKey) {
+                selectSubject(firstKey);
+            }
+        }
+
+        function getDataForSubject() {
+            if (!selectedSubject) return null;
+            
+            var subject = processedStudentStats[selectedSubject];
+            if (selectedSubject === 'c') {
+                return { 
+                    dates: generateMondayDates(subject.values.length), 
+                    values: subject.values,
+                    isConsistency: true
+                };
+            } else {
+                var firstMetricKey = Object.keys(subject.values)[0];
+                var firstMetric = subject.values[firstMetricKey];
+                return { 
+                    dates: generateMondayDates(firstMetric.values.length),
+                    values: subject.values,
+                    isConsistency: false
+                };
+            }
+        }
+
+        function updateChart() {
+            if (chart) {
+                chart.destroy();
+                chart = null;
+            }
+
+            var subjectData = getDataForSubject();
+            if (!subjectData) return;
+            
+            var datasets = [];
+            var newDatasetLabels = [];
+
+            if (subjectData.isConsistency) {
+                var label = processedStudentStats.c.title;
+                newDatasetLabels.push(label);
+                
+                var wasAlreadyShown = false;
+                for (var p = 0; p < previousDatasets.length; p++) {
+                    if (previousDatasets[p] === label) {
+                        wasAlreadyShown = true;
+                        break;
+                    }
+                }
+                
+                datasets.push({
+                    label: label,
+                    data: subjectData.values,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.3,
+                    borderWidth: 3,
+                    borderDash: [],
+                    pointRadius: 4, // Smaller points for mobile
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 0,
+                    pointHoverBorderWidth: 3,
+                    pointStyle: 'circle',
+                    yAxisID: 'y-percent',
+                    animation: wasAlreadyShown ? false : {
+                        duration: 750,
+                        easing: 'easeInOutQuart'
+                    }
+                });
+            } else {
+                for (var i = 0; i < selectedMetrics.length; i++) {
+                    var metricId = selectedMetrics[i];
+                    var metric = null;
+                    for (var j = 0; j < availableMetrics.length; j++) {
+                        if (availableMetrics[j].id === metricId) {
+                            metric = availableMetrics[j];
+                            break;
+                        }
+                    }
+                    var metricData = subjectData.values[metricId];
+                    
+                    if (metric && metricData) {
+                        var datasetLabel = metricData.title;
+                        newDatasetLabels.push(datasetLabel);
+                        
+                        var wasShown = false;
+                        for (var p = 0; p < previousDatasets.length; p++) {
+                            if (previousDatasets[p] === datasetLabel) {
+                                wasShown = true;
+                                break;
+                            }
+                        }
+                        
+                        var yAxisId = metric.type === 'percentage' ? metric.yAxisID : getAxisIdForAbsoluteMetric(metricId, selectedMetrics, subjectData);
+                        
+                        datasets.push({
+                            label: datasetLabel,
+                            data: metricData.values,
+                            borderColor: metric.color,
+                            backgroundColor: metric.color + '20',
+                            tension: 0.3,
+                            borderWidth: 3,
+                            borderDash: [],
+                            pointRadius: 4, // Smaller points for mobile
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: metric.color,
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 0,
+                            pointHoverBorderWidth: 3,
+                            pointStyle: 'circle',
+                            yAxisID: yAxisId,
+                            animation: wasShown ? false : {
+                                duration: 750,
+                                easing: 'easeInOutQuart'
+                            }
+                        });
+                    }
+                }
+            }
+
+            var dashPatterns = [
+                [5, 5],
+                [10, 5],
+                [15, 3, 3, 3],
+                [2, 8],
+                [20, 5, 5, 5],
+                [8, 3, 2, 3]
+            ];
+
+            var pointStyles = ['circle', 'rectRot', 'triangle', 'rect', 'star', 'cross'];
+
+            if (datasets.length > 1) {
+                var datasetsNeedDashes = new Array(datasets.length).fill(false);
+                
+                for (var i = 0; i < datasets.length; i++) {
+                    for (var j = i + 1; j < datasets.length; j++) {
+                        if (doDatasetsOverlap(datasets[i], datasets[j])) {
+                            datasetsNeedDashes[i] = true;
+                            datasetsNeedDashes[j] = true;
+                        }
+                    }
+                }
+                
+                var dashIndex = 0;
+                var pointStyleIndex = 0;
+                
+                for (var i = 0; i < datasets.length; i++) {
+                    if (datasetsNeedDashes[i]) {
+                        datasets[i].borderDash = dashPatterns[dashIndex % dashPatterns.length];
+                        datasets[i].pointStyle = pointStyles[pointStyleIndex % pointStyles.length];
+                        dashIndex++;
+                        pointStyleIndex++;
+                    } else {
+                        datasets[i].borderDash = [];
+                        datasets[i].pointStyle = 'circle';
+                    }
+                }
+                
+                if (datasetsNeedDashes[0] && datasets.length > 1) {
+                    datasets[0].borderDash = dashPatterns[0];
+                    datasets[0].pointStyle = pointStyles[0];
+                }
+            }
+
+            function doDatasetsOverlap(dataset1, dataset2) {
+                var data1 = dataset1.data;
+                var data2 = dataset2.data;
+                
+                if (data1.length !== data2.length) return false;
+                
+                var overlapThreshold = 5;
+                var overlapCount = 0;
+                var totalPoints = data1.length;
+                
+                for (var k = 0; k < data1.length; k++) {
+                    var diff = Math.abs(data1[k] - data2[k]);
+                    
+                    if (diff <= overlapThreshold) {
+                        overlapCount++;
+                    }
+                }
+                
+                var overlapRatio = overlapCount / totalPoints;
+                return overlapRatio > 0.3;
+            }
+
+            previousDatasets = newDatasetLabels;
+
+            var usedAxisTypes = {};
+            var percentageMetrics = [];
+            var over100Metrics = [];
+            
+            if (subjectData.isConsistency) {
+                percentageMetrics.push({ title: processedStudentStats.c.title, maxValue: Math.max.apply(null, subjectData.values), color: '#10b981' });
+            }
+            
+            for (var i = 0; i < selectedMetrics.length; i++) {
+                var metricId = selectedMetrics[i];
+                for (var j = 0; j < availableMetrics.length; j++) {
+                    if (availableMetrics[j].id === metricId) {
+                        var metric = availableMetrics[j];
+                        var yAxisId = metric.type === 'percentage' ? metric.yAxisID : getAxisIdForAbsoluteMetric(metricId, selectedMetrics, subjectData);
+                        
+                        if (!usedAxisTypes[yAxisId]) {
+                            usedAxisTypes[yAxisId] = [];
+                        }
+                        usedAxisTypes[yAxisId].push(metric);
+                        
+                        if (metric.type === 'percentage') {
+                            var metricData = subjectData.values[metricId];
+                            var maxVal = Math.max.apply(null, metricData.values);
+                            var metricInfo = { 
+                                title: metric.title, 
+                                maxValue: maxVal,
+                                id: metricId,
+                                metric: metric,
+                                color: metric.color
+                            };
+                            
+                            if (maxVal > 100) {
+                                over100Metrics.push(metricInfo);
+                            } else {
+                                percentageMetrics.push(metricInfo);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+
+            for (var i = 0; i < datasets.length; i++) {
+                var dataset = datasets[i];
+                if (dataset.yAxisID === 'y-percent') {
+                    var maxInDataset = Math.max.apply(null, dataset.data);
+                    if (maxInDataset > 100) {
+                        for (var j = 0; j < over100Metrics.length; j++) {
+                            if (dataset.label.indexOf(over100Metrics[j].title) !== -1) {
+                                dataset.yAxisID = 'y-percent-' + over100Metrics[j].id;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            var yAxes = {};
+            var axisColorInfo = {};
+            
+            if (percentageMetrics.length > 0) {
+                var percentColors = [];
+                for (var i = 0; i < percentageMetrics.length; i++) {
+                    percentColors.push(percentageMetrics[i].color);
+                }
+                
+                axisColorInfo['y-percent'] = percentColors;
+                if (selectedSubject === 'c') { // only for nuoseklumas
+                    yAxes['y-percent'] = {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { display: false },
+                        min: 0,
+                        max: 100,
+                        ticks: { 
+                            stepSize: 10, // ticks every 10
+                            callback: function(value) { return value <= 100 ? value.toFixed(0) + '%' : ''; },
+                            color: '#666'
+                        },
+                        grid: {
+                            drawOnChartArea: true,
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        border: { display: false }
+                    };
+                } else {
+                    yAxes['y-percent'] = {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { 
+                            display: false
+                        },
+                        min: 0,
+                        max: 100,
+                        ticks: { 
+                            callback: function(value) { return value.toFixed(0) + '%'; },
+                            color: '#666'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        border: {
+                            display: false
+                        }
+                    };
+                }
+            }
+
+            for (var i = 0; i < over100Metrics.length; i++) {
+                var metric = over100Metrics[i];
+                var axisId = 'y-percent-' + metric.id;
+                axisColorInfo[axisId] = [metric.color];
+                
+                yAxes[axisId] = {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: { 
+                        display: false
+                    },
+                    min: 0,
+                    ticks: { 
+                        callback: function(value) { return value.toFixed(0) + '%'; },
+                        color: '#666'
+                    },
+                    grid: { 
+                        drawOnChartArea: true,
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    border: {
+                        display: false
+                    }
+                };
+            }
+
+            var rightAxisCount = 0;
+            var axisKeys = Object.keys(usedAxisTypes);
+            for (var i = 0; i < axisKeys.length; i++) {
+                var axisId = axisKeys[i];
+                if (axisId !== 'y-percent' && !axisId.startsWith('y-percent-')) {
+                    var metricsOnAxis = usedAxisTypes[axisId];
+                    var axisColors = metricsOnAxis.map(function(m) { return m.color; });
+                    
+                    axisColorInfo[axisId] = axisColors;
+                    
+                    yAxes[axisId] = {
+                        type: 'linear',
+                        display: true,
+                        position: percentageMetrics.length > 0 || over100Metrics.length > 0 || rightAxisCount > 0 ? 'right' : 'left',
+                        title: { 
+                            display: false
+                        },
+                        ticks: {
+                            callback: function(value) { return value.toFixed(1); },
+                            color: '#666'
+                        },
+                        grid: { 
+                            drawOnChartArea: rightAxisCount === 0 && percentageMetrics.length === 0 && over100Metrics.length === 0,
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        border: {
+                            display: false
+                        }
+                    };
+                    rightAxisCount = rightAxisCount + 1;
+                }
+            }
+
+            var ctx = document.getElementById('statsChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: subjectData.dates,
+                    datasets: datasets
+                },
+                options: {
+                    clip: false, 
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: false // We're using our custom legend
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    var label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    var yAxisId = context.dataset.yAxisID;
+                                    if (yAxisId === 'y-percent' || yAxisId.indexOf('y-percent-') === 0) {
+                                        label += context.parsed.y + '%';
+                                    } else {
+                                        label += context.parsed.y;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: yAxes
+                },
+                plugins: [{
+                    id: 'coloredAxisLines',
+                    afterDatasetsDraw: function(chart) {
+                        var ctx = chart.ctx;
+                        var chartArea = chart.chartArea;
+                        
+                        Object.keys(axisColorInfo).forEach(function(scaleId) {
+                            var scale = chart.scales[scaleId];
+                            if (!scale) return;
+                            
+                            var colors = axisColorInfo[scaleId];
+                            if (!colors || colors.length === 0) return;
+                            
+                            var lineWidth = 3;
+                            var spacing = 1;
+                            
+                            var isLeft = scale.position === 'left';
+                            var x = isLeft ? scale.left : scale.right;
+                            var y1 = chartArea.top;
+                            var y2 = chartArea.bottom;
+
+                            var axisFullWidth = scale.width;
+                            
+                            let secondaryLineShift;
+                            for (var i = 0; i < colors.length; i++) {
+                                secondaryLineShift = i * lineWidth;
+                                ctx.save();
+                                ctx.strokeStyle = hexToRgba(colors[i], 0.6);
+                                ctx.lineWidth = lineWidth;
+                                ctx.beginPath();
+                                
+                                var offset = i * (lineWidth + spacing);
+                                var xPos = isLeft ? x + axisFullWidth - secondaryLineShift : x - axisFullWidth + secondaryLineShift;
+                                
+                                ctx.moveTo(xPos, y1);
+                                ctx.lineTo(xPos, y2);
+                                ctx.stroke();
+                                ctx.restore();
+                            }
+                        });
+                    }
+                }]
+            });
+            addHideScrollbarForTouch();
+        }
+
+        if (processedStudentStats?.c?.values?.length > 2) {
+            initializeButtons();
+            document.querySelector("#student-stats-graph-holder").style.display = "flex";
+        } else {
+            document.querySelector("#student-stats-graph-holder").style.display = "none";
+        }
+
+        function hexToRgba(hex, opacity) {
+            // Remove the hash if it exists
+            hex = hex.replace('#', '');
+            
+            // Parse the hex values
+            var r = parseInt(hex.substring(0, 2), 16);
+            var g = parseInt(hex.substring(2, 4), 16);
+            var b = parseInt(hex.substring(4, 6), 16);
+            
+            return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+        }
+
+        // STATS PART END
+
+
+
+
+
+
 
         const taskStatusSummary = countTaskStatuses(studentTasks)
 
@@ -3580,7 +4709,7 @@
                 answeringMode = currentTaskDuration[0]
                 numberOfQuestions = currentTaskDuration[1]
 
-                if (answeringMode === "C39") {
+                if (answeringMode === "C39" || parsedTaskDescription[2] === "C83") {
                     earningsDiplay = `
                         <div class="earnings-estimation-outer">
                             <button class="earnings-estimation-display info-button"
@@ -3779,6 +4908,70 @@
 
         // Ensure the function runs after populating the dropdown
         handleTaskGroupChange();
+
+        function medianStudentScore(students) {
+        const studentAverages = students.map(student => {
+            const stats = student.stats;
+            const validKeys = Object.keys(stats).filter(k => !['c', 'd'].includes(k));
+
+            let allRatios = [];
+
+            for (const key of validKeys) {
+            const statArray = stats[key];
+            if (Array.isArray(statArray)) {
+                for (const sub of statArray) {
+                if (Array.isArray(sub) && sub.length >= 4) {
+                    const points = sub[0];
+                    const total = sub[3];
+                    const ratio = total === 0 ? 0 : points / total;
+                    allRatios.push(ratio);
+                }
+                }
+            }
+            }
+
+            if (allRatios.length === 0) return 0;
+            const avg = allRatios.reduce((a, b) => a + b, 0) / allRatios.length;
+            return avg;
+        });
+
+        // Sort for median
+        const sorted = studentAverages.sort((a, b) => a - b);
+        const mid = Math.floor(sorted.length / 2);
+
+        const median =
+            sorted.length % 2 === 0
+            ? (sorted[mid - 1] + sorted[mid]) / 2
+            : sorted[mid];
+
+        // Express as percentage, rounded to 2 digits
+        return +median.toFixed(2);
+        }
+        
+
+        function medianStudentConsistency(students) {
+            // Compute average consistency for each student
+            const studentConsistencies = students.map(student => {
+                const c = student.stats.c || [];
+                if (c.length === 0) return 0;
+                const avg = c.reduce((sum, val) => sum + val, 0) / c.length;
+                return avg; // fraction 0-1
+            });
+
+            // Sort to calculate median
+            const sorted = studentConsistencies.sort((a, b) => a - b);
+            const mid = Math.floor(sorted.length / 2);
+
+            const median =
+                sorted.length % 2 === 0
+                ? (sorted[mid - 1] + sorted[mid]) / 2
+                : sorted[mid];
+
+            // Express as percentage, rounded to 2 decimals
+            return +(median * 100).toFixed(2);
+        }
+
+
         
         function renderDataForTeachers(filteredList = studentList) {
         studentListDiv.innerHTML = '';
@@ -3786,19 +4979,9 @@
         // Sort students alphabetically by nickname
         const sortedStudents = [...filteredList].sort((a, b) => a.nickname.localeCompare(b.nickname));
 
-        const scores = sortedStudents.map(s => s.totalPoints).sort((a, b) => a - b);
+        classScoreMedian = medianStudentScore(sortedStudents);
 
-        if (scores.length === 0) {
-            classScoreMedian = 0; // or null, if no students
-        } else if (scores.length % 2 === 1) {
-            // Odd number of students → middle element
-            classScoreMedian = scores[Math.floor(scores.length / 2)];
-        } else {
-            // Even number → average of middle two
-            const mid1 = scores[scores.length / 2 - 1];
-            const mid2 = scores[scores.length / 2];
-            classScoreMedian = (mid1 + mid2) / 2;
-        }
+        classConsistencyMedian = medianStudentConsistency(sortedStudents);
 
         const listContainer = document.createElement('ul');
 
@@ -3838,7 +5021,7 @@
             studentName.classList.add('selected-option');
 
             // Display task info
-            displayStudentStatistics([student.id, student.nickname, student.knowledgeLvl, student.totalPoints], student.tasks);
+            displayStudentStatistics([student.id, student.nickname, student.knowledgeLvl, student.stats], student.tasks);
 
             if (currentAction !== "new-task") {
                 openSidebar();
@@ -4033,6 +5216,7 @@
 
                 studentList = await response.json().catch(() => ({}));
                 success = true;
+
                 populateTaskGroupDropdown();
                 renderDataForTeachers();
             } catch (error) {
@@ -4388,6 +5572,7 @@
         disableTeacherControlPannel();
         disableConfirmationButtons();
         try {
+            console.log(JSON.parse(taskData.task))
         const response = await apiFetch(apiBase + 'tasks', {
             method: 'POST',
             headers: {
@@ -4451,6 +5636,7 @@
                 controller.modeChoice8 = parsedCurrentTaskInstructions[9];
                 controller.task = ["setTask", currentTaskId];
                 controller.taskCompleted = false;
+                controller.taskRecorded = false;
 
                 controller.modeChoice4 = currentTaskDuration[0];
                 controller.setTaskDuration = currentTaskDuration[1];
@@ -4465,6 +5651,7 @@
 
                     controller.task = ["setTask", currentTaskId];
                     controller.taskCompleted = false;
+                    controller.taskRecorded = false;
                     
                     controller.modeChoice4 = currentTaskDuration[0];
                     controller.setTaskDuration = currentTaskDuration[1];
@@ -4480,6 +5667,7 @@
                         
                         controller.task = ["setTask", currentTaskId];
                         controller.taskCompleted = false;
+	                    controller.taskRecorded = false;
 
                         controller.modeChoice4 = currentTaskDuration[0];
                         controller.setTaskDuration = currentTaskDuration[1];
@@ -5112,11 +6300,38 @@ window.onload = function () {
     }
 
     if (controller) {
-        controller.task = null;
-        controller.taskCompleted = false;
-        localStorage.setItem('controller', JSON.stringify(controller));
+        resetControllerTaskSettings();
     }
 };
+
+function addHideScrollbarForTouch() {
+    // Check if device is touchscreen
+    const isTouchDevice = ('ontouchstart' in window) || 
+                          (navigator.maxTouchPoints > 0) || 
+                          (navigator.msMaxTouchPoints > 0);
+
+    if (!isTouchDevice) { 
+        document.querySelector(".chart-container .scroll-indicator-line-horizontal.bottom").style.bottom = "36px";
+        return;
+    }
+
+    if (window.matchMedia('(max-width: 578px)').matches) {
+        document.querySelector(".chart-container .scroll-indicator-line-horizontal.bottom").style.bottom = "16px";
+    } else {
+        document.querySelector(".chart-container .scroll-indicator-line-horizontal.bottom").style.bottom = "26px";
+    }
+
+    // Select all chart-body elements
+    const chartBodies = document.querySelectorAll('.chart-body');
+
+    chartBodies.forEach(el => {
+        el.classList.add('hide-scrollbar');
+    });
+}
+
+window.addEventListener('load', addHideScrollbarForTouch);
+window.addEventListener('resize', addHideScrollbarForTouch);
+
 
 	</script>
 </body>

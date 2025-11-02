@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Update Stats</title>
+  <link rel="stylesheet" type="text/css" href="../index.css">
+  <link rel="stylesheet" href="../main-nav-bar.css">
+  <script src="../refresh-token.js"></script> <!-- contains apiFetch -->
+</head>
+<body>
+
+  <h1>Test /testUpdateStats Endpoint</h1>
+
+  <!-- Buttons to trigger different scenarios -->
+  <button onclick="runScenario('sameWeek')">Same Week</button>
+  <button onclick="runScenario('skipWeeks')">Skip Weeks</button>
+  <button onclick="runScenario('maxCapacity')">Max Capacity</button>
+  <button onclick="runScenario('reset')">Reset</button>
+
+  <h2>Output:</h2>
+  <pre id="output"></pre>
+
+  <script src="../main-nav-bar.js"></script>
+
+  <script>
+    // Wrapper function that calls your custom apiFetch
+    async function runScenario(scenario) {
+      const output = document.getElementById('output');
+      output.textContent = 'Running scenario "' + scenario + '"...';
+
+      try {
+        // Use the project's global apiFetch (defined in refresh-token.js)
+        const data = await apiFetch('http://localhost:5000/students/testUpdateStats', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ scenario })
+        });
+
+        // apiFetch likely already parses JSON, so data is ready
+        output.textContent = JSON.stringify(data, null, 2); // formatted JSON
+      } catch (err) {
+        output.textContent = 'Error: ' + err.message;
+      }
+    }
+  </script>
+
+</body>
+</html>

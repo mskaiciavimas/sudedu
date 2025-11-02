@@ -2173,8 +2173,10 @@ function helpToggle() {
 					controller.correctAnswersTracker = 0;
 					atsakymai = {};
 					questionId = 1;
-					controller.tempTracking = true;
 					resetMistakeButtonsElement.style.display = "none";
+
+					controller.taskCompleted = false;
+	    			controller.taskRecorded = false;
 					localStorage.setItem('controller', JSON.stringify(controller));
 					initiateTheProgram();
 				}
@@ -2399,17 +2401,6 @@ if (controller.questionsStopped) {
 }
 
 document.getElementById('mistake-tracker').innerHTML = `Teisingai: ${controller.correctAnswersTracker}/${controller.answeredQuestionTracker}`;
-
-
-window.addEventListener("beforeunload", () => {
-	if (!redirectingToAuthentication) {
-		controller.task = null;
-		controller.taskCompleted = false;
-	}
-    localStorage.setItem("controller", JSON.stringify(controller));
-	localStorage.setItem("elapsedTime", timerDisplay.textContent);
-	localStorage.setItem("elapsedTime", timerDisplay.textContent);
-});
 
 const mistakesButtonElement = document.querySelector('.summary-button');
 mistakesButtonElement.addEventListener("click", () => {

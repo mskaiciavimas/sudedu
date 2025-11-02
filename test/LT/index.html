@@ -1612,6 +1612,8 @@ body.popup-active {
 				controller.modeChoice8 = 'C79';
 				controller.result = ['', '', '', '', '']
 				controller.task = null;
+                controller.taskCompleted = false;
+	            controller.taskRecorded = false;
 
 			} else if (controller.mode === "lang") {
 				const modeChoice8Value = document.querySelector('#mode_choice_8').value;
@@ -1664,9 +1666,7 @@ body.popup-active {
                 controller = JSON.parse(savedController);
             }
             if (controller) {
-                controller.task = null;
-                controller.taskCompleted = false;
-                localStorage.setItem('controller', JSON.stringify(controller));
+                resetControllerTaskSettings();
             }
 
             if (!userData || userData?.accType === "teacher") {
@@ -1914,59 +1914,334 @@ const questionNumberInputElement = document.querySelector('#question-number-inpu
 
 const personalChlDict = {
     0: {
-        "math": [
-            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
-        ],
-        "text-comp": [
-            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
-        ],
-        "grammar": [
-            '["lang","C75","C50","1",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C40","C73","C58",3,"1"]'
-        ]
+        "first-semester": {
+            "math": [
+                `[["math","C1","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C3","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`
+            ],
+            "text-comp": [
+                `[["lang","C75","C49","C51","C58"], ["C40","1"]]`,
+                `[["lang","C75","C49","C52","C58"], ["C40","1"]]`
+            ],
+            "grammar": [
+                `[["lang","C75","C83","C50",{"C61":[],"C62":[],"C63":[],"C64":[],"C65":[]},"C73",3], ["C40","1"]]`
+            ]
+        },
+        "second-semester": {
+            "math": [
+                `[["math","C1","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C3","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C1","C10","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C10","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C3","C10","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`
+            ],
+            "text-comp": [
+                `[["lang","C75","C49","C51","C58"], ["C40","1"]]`,
+                `[["lang","C75","C49","C52","C58"], ["C40","1"]]`
+            ],
+            "grammar": [
+                `[["lang","C75","C83","C50",{"C61":[],"C62":[],"C63":[],"C64":[],"C65":[]},"C73",3], ["C40","2"]]`
+            ]
+        }
     },
     1: {
-        "math": [
-            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
-        ],
-        "text-comp": [
-            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
-        ],
-        "grammar": [
-            '["lang","C75","C50","1",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C40","C73","C58",3,"1"]'
-        ]
+       "first-semester": {
+            "math": [
+                `[["math","C1","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C2","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C3","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C1","C8","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C2","C8","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C2","C8","C37","C42","C44","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C3","C8","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C3","C10","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C7","C32","","C41","C45","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+            ],
+            "text-comp": [
+                `[["lang","C75","C49","C51","C58"], ["C40","3"]]`,
+                `[["lang","C75","C49","C52","C58"], ["C40","3"]]`,
+                `[["lang","C75","C49","C51","C80"], ["C40","2"]]`,
+                `[["lang","C75","C49","C52","C80"], ["C40","2"]]`,
+            ],
+            "grammar": [
+                `[["lang","C75","C83","C50",{"C61":[],"C67":[]},"C73",3], ["C40","5"]]`
+            ]
+        },
+        "second-semester": {
+            "math": [
+                `[["math","C3","C8","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C1","C9","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C2","C10","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C3","C17","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C1","C11","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C2","C11","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C3","C11","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C1","C12","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","30"]]`,
+                `[["math","C2","C12","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","30"]]`,
+                `[["math","C3","C12","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","30"]]`,
+                `[["math","C1","C12","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C12","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C3","C12","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C1","C12","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C12","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C12","C37","C42","C44","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C3","C12","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C1","C9","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C10","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C10","C38","C42","C44","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C3","C17","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C3","C12","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","5"]]`,
+            ],
+            "text-comp": [
+                `[["lang","C75","C49","C51","C80"], ["C40","3"]]`,
+                `[["lang","C75","C49","C52","C80"], ["C40","3"]]`,
+                `[["lang","C75","C49","C51","C59"], ["C40","3"]]`,
+                `[["lang","C75","C49","C52","C59"], ["C40","3"]]`,
+                `[["lang","C75","C49","C51","C81"], ["C40","2"]]`,
+                `[["lang","C75","C49","C52","C81"], ["C40","2"]]`
+            ],
+            "grammar": [
+                `[["lang","C75","C83","C50",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C73",1], ["C40","10"]]`
+            ]
+        }
     },
     2: {
-        "math": [
-            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
-        ],
-        "text-comp": [
-            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
-        ],
-        "grammar": [
-            '["lang","C75","C50","1",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C40","C73","C58",3,"1"]'
-        ]
+        "first-semester": {
+            "math": [
+                `[["math","C1","C11","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C2","C11","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C2","C11","C38","C42","C44","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C3","C11","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C1","C12","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C2","C12","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C3","C12","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C1","C12","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C12","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C12","C38","C42","C44","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C3","C12","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C4","C18","","C41","C45","C47",["2","9"],false,"C79"], ["C40","20"]]`,
+                `[["math","C7","C33","","C41","C45","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+            ],
+            "text-comp": [
+                `[["lang","C75","C49","C51","C59"], ["C40","5"]]`,
+                `[["lang","C75","C49","C51","C81"], ["C40","3"]]`,
+                `[["lang","C75","C49","C51","C60"], ["C40","2"]]`,
+                `[["lang","C75","C49","C52","C59"], ["C40","5"]]`,
+                `[["lang","C75","C49","C52","C81"], ["C40","3"]]`,
+                `[["lang","C75","C49","C52","C60"], ["C40","2"]]`
+            ],
+            "grammar": [
+                '["lang","C75","C50","1",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C40","C73","C58",3,"1"]'
+            ]
+        },
+        "second-semester": {
+            "math": [
+                `[["math","C4","C18","","C41","C45","C47",["2","9"],false,"C79"], ["C40","20"]]`,
+                `[["math","C5","C18","","C41","C45","C47",["2","9"],false,"C79"], ["C40","20"]]`,
+                `[["math","C4","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","20"]]`,
+                `[["math","C5","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","20"]]`,
+                `[["math","C5","C18","","C42","C46","C47",["2","9"],false,"C79"], ["C40","20"]]`,
+                `[["math","C6","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","20"]]`,
+                `[["math","C1","C13","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C13","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C3","C13","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C3","C13","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
+            ],
+            "text-comp": [
+                `[["lang","C75","C49","C51","C81"], ["C40","5"]]`,
+                `[["lang","C75","C49","C51","C60"], ["C40","4"]]`,
+                `[["lang","C75","C49","C51","C82"], ["C40","3"]]`,
+                `[["lang","C75","C49","C52","C81"], ["C40","5"]]`,
+                `[["lang","C75","C49","C52","C60"], ["C40","4"]]`,
+                `[["lang","C75","C49","C52","C82"], ["C40","3"]]`
+            ],
+            "grammar": [
+                `[["lang","C75","C83","C50",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C73",1], ["C40","15"]]`
+            ]
+        }
     },
     3: {
-        "math": [
-            '[["math","C7","C36","","C41","C45","C47",["1","1"],false,"C79"], ["C40","50"]]'
-        ],
-        "text-comp": [
-            '[["lang","C75","C49","C51","C58"], ["C40","1"]]'
-        ],
-        "grammar": [
-            '[["lang","C75","C83","C50",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C73",3], ["C40","1"]]'
-        ]
+        "first-semester": {
+            "math": [
+                `[["math","C4","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","25"]]`,
+                `[["math","C5","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","25"]]`,
+                `[["math","C5","C18","","C42","C46","C47",["2","9"],false,"C79"], ["C40","25"]]`,
+                `[["math","C6","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","25"]]`,
+                `[["math","C1","C13","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
+                `[["math","C2","C13","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
+                `[["math","C3","C13","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
+                `[["math","C1","C13","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","5"]]`,
+                `[["math","C2","C13","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","5"]]`,
+                `[["math","C2","C13","C38","C42","C44","C47",["1","1"],false,"C79"], ["C40","5"]]`,
+                `[["math","C3","C13","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","5"]]`,
+                `[["math","C1","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+            ],
+            "text-comp": [
+                `[["lang","C76","C49","C51","C58"], ["C40","3"]]`,
+                `[["lang","C76","C49","C52","C58"], ["C40","3"]]`,
+                `[["lang","C76","C49","C51","C80"], ["C40","2"]]`,
+                `[["lang","C76","C49","C52","C80"], ["C40","2"]]`,
+            ],
+            "grammar": [
+                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C72":[]},"C73",1], ["C40","10"]]`
+            ]
+        },
+        "second-semester": {
+            "math": [
+                `[["math","C4","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","30"]]`,
+                `[["math","C5","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","30"]]`,
+                `[["math","C5","C18","","C42","C46","C47",["2","9"],false,"C79"], ["C40","30"]]`,
+                `[["math","C6","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","30"]]`,
+                `[["math","C4","C19","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C4","C20","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
+                `[["math","C5","C19","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C4","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C5","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C6","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C5","C30","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C16","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C5","C18","","C41","C45","C47",["2","9"],true,"C79"], ["C40","20"]]`,
+                `[["math","C6","C28","","C41","C45","C47",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C1","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C3","C14","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","5"]]`,
+                `[["math","C7","C35","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`
+            ],
+            "text-comp": [
+                `[["lang","C76","C49","C51","C80"], ["C40","3"]]`,
+                `[["lang","C76","C49","C52","C80"], ["C40","3"]]`,
+                `[["lang","C76","C49","C51","C59"], ["C40","3"]]`,
+                `[["lang","C76","C49","C52","C59"], ["C40","3"]]`,
+                `[["lang","C76","C49","C51","C81"], ["C40","2"]]`,
+                `[["lang","C76","C49","C52","C81"], ["C40","2"]]`
+            ],
+            "grammar": [
+                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C73",1], ["C40","12"]]`
+            ]
+        }
     },
     4: {
-        "math": [
-            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
-        ],
-        "text-comp": [
-            '["math","C4","C18",null,"C40","C41","C45","C47",["1","4"],false,"5","C79"]'
-        ],
-        "grammar": [
-            '["lang","C75","C50","1",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C40","C73","C58",3,"1"]'
-        ]
+        "first-semester": {
+            "math": [
+                `[["math","C4","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","35"]]`,
+                `[["math","C5","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","35"]]`,
+                `[["math","C5","C18","","C42","C46","C47",["2","9"],false,"C79"], ["C40","35"]]`,
+                `[["math","C6","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","35"]]`,
+                `[["math","C5","C30","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
+                `[["math","C1","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C3","C14","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","5"]]`,
+                `[["math","C4","C23","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C5","C22","","C41","C45","C48",["1","1"],true,"C79"], ["C40","10"]]`,
+                `[["math","C4","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C5","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C6","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C16","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C7","C35","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C6","C29","","C41","C45","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+            ],
+            "text-comp": [
+                `[["lang","C76","C49","C51","C59"], ["C40","5"]]`,
+                `[["lang","C76","C49","C51","C81"], ["C40","3"]]`,
+                `[["lang","C76","C49","C51","C60"], ["C40","2"]]`,
+                `[["lang","C76","C49","C52","C59"], ["C40","5"]]`,
+                `[["lang","C76","C49","C52","C81"], ["C40","3"]]`,
+                `[["lang","C76","C49","C52","C60"], ["C40","2"]]`
+            ],
+            "grammar": [
+                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","12"]]`
+            ]
+        },
+        "second-semester": {
+            "math": [
+                `[["math","C4","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","40"]]`,
+                `[["math","C5","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","40"]]`,
+                `[["math","C5","C18","","C42","C46","C47",["2","9"],false,"C79"], ["C40","40"]]`,
+                `[["math","C6","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","40"]]`,
+                `[["math","C4","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
+                `[["math","C5","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
+                `[["math","C6","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
+                `[["math","C2","C16","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
+                `[["math","C4","C26","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C7","C35","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C3","C15","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","5"]]`,
+                `[["math","C5","C30","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C6","C29","","C41","C45","C47",["1","1"],false,"C79"], ["C40","15"]]`,
+            ],
+            "text-comp": [
+                `[["lang","C76","C49","C51","C81"], ["C40","5"]]`,
+                `[["lang","C76","C49","C51","C60"], ["C40","4"]]`,
+                `[["lang","C76","C49","C51","C82"], ["C40","3"]]`,
+                `[["lang","C76","C49","C52","C81"], ["C40","5"]]`,
+                `[["lang","C76","C49","C52","C60"], ["C40","4"]]`,
+                `[["lang","C76","C49","C52","C82"], ["C40","3"]]`
+            ],
+            "grammar": [
+                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","15"]]`
+            ]
+        }
+    },
+    5: {
+        "first-semester": {
+            "math": [
+                `[["math","C4","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","35"]]`,
+                `[["math","C5","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","35"]]`,
+                `[["math","C5","C18","","C42","C46","C47",["2","9"],false,"C79"], ["C40","35"]]`,
+                `[["math","C6","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","35"]]`,
+                `[["math","C5","C30","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
+                `[["math","C1","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C3","C14","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","5"]]`,
+                `[["math","C4","C23","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C5","C22","","C41","C45","C48",["1","1"],true,"C79"], ["C40","10"]]`,
+                `[["math","C4","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C5","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C6","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C2","C16","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C7","C35","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C6","C29","","C41","C45","C47",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C5","C26","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+            ],
+            "text-comp": [
+                `[["lang","C76","C49","C52","C60"], ["C40","5"]]`,
+                `[["lang","C76","C49","C52","C82"], ["C40","4"]]`
+            ],
+            "grammar": [
+                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","30"]]`
+            ]
+        },
+        "second-semester": {
+            "math": [
+                `[["math","C4","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","40"]]`,
+                `[["math","C5","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","40"]]`,
+                `[["math","C5","C18","","C42","C46","C47",["2","9"],false,"C79"], ["C40","40"]]`,
+                `[["math","C6","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","40"]]`,
+                `[["math","C4","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
+                `[["math","C5","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
+                `[["math","C6","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
+                `[["math","C2","C16","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
+                `[["math","C4","C26","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
+                `[["math","C7","C35","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C3","C15","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","5"]]`,
+                `[["math","C5","C30","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
+                `[["math","C6","C29","","C41","C45","C47",["1","1"],false,"C79"], ["C40","15"]]`,
+                `[["math","C5","C26","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
+            ],
+            "text-comp": [
+                `[["lang","C76","C49","C52","C60"], ["C40","5"]]`,
+                `[["lang","C76","C49","C52","C82"], ["C40","4"]]`
+            ],
+            "grammar": [
+                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","30"]]`
+            ]
+        }
     },
 }
 
@@ -1980,6 +2255,21 @@ const tabHeight = 60;
 const overlap = 20;
 let tabs = [];
 
+function getLithuanianSchoolSemester(date = new Date()) {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+
+    // First semester: Sept (9) - Jan (1)
+    // Second semester: Feb (2) - June (6)
+    if (month >= 9 || month === 12) {
+        return "first-semester";
+    } else if (month >= 1 && month <= 6) {
+        return "second-semester";
+    } else {
+        return "second-semester"; // Summer holidays
+    }
+}
+
 function displayPersonalChl() {
     const displayArea = document.getElementById('chlDisplayArea');
     const indicatorsContainer = document.getElementById('chlIndicators');
@@ -1987,7 +2277,7 @@ function displayPersonalChl() {
     const nextBtn = document.getElementById('chlNavNext');
     const userClass = userData?.knowledgeLvl || getClassLocalStorage() || 2;
 
-    if (!personalChlDict[userClass]) {
+    if (!personalChlDict[userClass][getLithuanianSchoolSemester()]) {
         displayArea.innerHTML = '<p style="text-align: center; color: rgba(0,0,0,0.5);">Nėra prieinamų iššūkių</p>';
         return;
     }
@@ -1996,7 +2286,7 @@ function displayPersonalChl() {
     displayArea.innerHTML = '';
     indicatorsContainer.innerHTML = '';
 
-    const classData = personalChlDict[userClass];
+    const classData = personalChlDict[userClass][getLithuanianSchoolSemester()];
     const challenges = Object.keys(classData).map(key => {
         const items = classData[key];
         const randomItem = JSON.parse(items[Math.floor(Math.random() * items.length)]);
@@ -2083,7 +2373,7 @@ function displayPersonalChl() {
             let numberOfQuestions = challenge.duration[1];
             let earningsDisplay = "";
 
-            if (answeringMode === "C39") {
+            if (answeringMode === "C39" || challenge.chl[2] === "C83") {
                 earningsDisplay = `
                     <div class="earnings-estimation-outer">
                         <button class="earnings-estimation-display info-button"
@@ -2096,7 +2386,7 @@ function displayPersonalChl() {
                                 <span class="coin-icon">
                                         <img src="../images/icons/icon-sudedu-coin.png">
                                 </span>
-                                <span class="coin-amount">${Number((calculateTasksPerCorrectAnswerPoints(challenge.chl, challenge)*personalChlCoinBonusModifier).toFixed(2))}</span>
+                                <span class="coin-amount">${Number((calculateTasksPerCorrectAnswerPoints(challenge.chl, challenge)*personalChlCoinBonusMultiplier).toFixed(2))}</span>
                                 </span>
                                 <div class="info-icon">
                                 <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 256 256" xml:space="preserve">
@@ -2123,7 +2413,7 @@ function displayPersonalChl() {
                                 <span class="coin-icon">
                                         <img src="../images/icons/icon-sudedu-coin.png">
                                 </span>
-                                <span class="coin-amount">${Number((calculateTasksPerCorrectAnswerPoints(challenge.chl) * numberOfQuestions * personalChlCoinBonusModifier).toFixed(2))}</span>
+                                <span class="coin-amount">${Number((calculateTasksPerCorrectAnswerPoints(challenge.chl) * numberOfQuestions * personalChlCoinBonusMultiplier).toFixed(2))}</span>
                                 </span>
                                 <div class="info-icon">
                                 <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 256 256" xml:space="preserve">
@@ -2202,6 +2492,7 @@ function completePersonalChlTask(challengeInfo, challengeDuration) {
         controller.modeChoice8 = parsedCurrentTaskInstructions[9];
         controller.task = ["personalChl", null];
         controller.taskCompleted = false;
+	    controller.taskRecorded = false;
 
         controller.modeChoice4 = currentTaskDuration[0];
         controller.setTaskDuration = currentTaskDuration[1];
@@ -2216,6 +2507,7 @@ function completePersonalChlTask(challengeInfo, challengeDuration) {
 
             controller.task = ["personalChl", null];
             controller.taskCompleted = false;
+	        controller.taskRecorded = false;
             
             controller.modeChoice4 = currentTaskDuration[0];
             controller.setTaskDuration = currentTaskDuration[1];
@@ -2231,6 +2523,7 @@ function completePersonalChlTask(challengeInfo, challengeDuration) {
                 
                 controller.task = ["personalChl", null];
                 controller.taskCompleted = false;
+	            controller.taskRecorded = false;
 
                 controller.modeChoice4 = currentTaskDuration[0];
                 controller.setTaskDuration = currentTaskDuration[1];

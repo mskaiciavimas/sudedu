@@ -273,6 +273,44 @@ scrollbar-color: rgba(255,255,255,0.4) transparent;
     50% { opacity: 1; }
 }
 
+.scroll-indicator-line-horizontal  {
+    position: absolute;
+    right: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 10;
+    align-items: flex-end;
+    transform: rotate(-90deg);
+}
+
+.scroll-indicator-line-horizontal.top {
+    top: 12px;
+    display: none;
+}
+
+.scroll-indicator-line-horizontal.bottom {
+    bottom: 12px;
+}
+
+.scroll-indicator-line-horizontal.visible {
+    opacity: 1;
+}
+
+.indicator-line-horizontal  {
+    height: 2px;
+    background: #bf843f;
+    border-radius: 1px;
+    animation: pulse-opacity 1.5s ease-in-out infinite;
+}
+
+.chart-container .scroll-indicator-line-horizontal.bottom {
+    bottom: 26px;
+}
+
 .kid-5 {
   position: absolute;
   width: 300px; 
@@ -474,7 +512,7 @@ input[type="radio"] {
 }
 
 .rasyba-options-label {
-  font-size: 1.2rem !important;
+  font-size: 1.1rem !important;
 }
 
 .earnings-estimation-display {
@@ -715,7 +753,7 @@ button:disabled {
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 20px;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     padding: 7px;
     margin: 10px 0;
 }
@@ -756,7 +794,7 @@ button:disabled {
 .number-choice-label-iki,
 .number-choice-label-nuo {
     font-weight: 500;
-    font-size: 1.75rem;
+    font-size: 1.5rem;
 }
 
 .timer-question-number-div,
@@ -807,7 +845,7 @@ button:disabled {
 
 .timer-choice-label,
 .answer-number-label {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 500;
     margin-top: 0;
     margin-bottom: 0;
@@ -1177,6 +1215,22 @@ button:disabled {
 }
 
 @media (max-width: 767px) {
+  .hide-scrollbar-mobile {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+  }
+
+  /* Hide scrollbar for Chrome, Safari, Edge */
+  .hide-scrollbar-mobile::-webkit-scrollbar {
+      display: none;
+  }
+
+  /* Ensure container can still scroll */
+  .hide-scrollbar-mobile {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+  }
+
   #group_name,
   #mode_choice,
   #mode_choice_1,
@@ -1239,6 +1293,10 @@ button:disabled {
 
   .modal-content {
     max-width: 300px;
+  }
+
+  .chart-container .scroll-indicator-line-horizontal.bottom {
+    bottom: 16px;
   }
 }
 

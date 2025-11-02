@@ -16,6 +16,7 @@ let controller = {
   task: null,
   setTaskDuration: '',
   taskCompleted: false,
+  taskRecorded: false,
   modeChoiceLtDifficulty: '',
   questionFrequency: 0,
   timerLimit: 0,
@@ -29,8 +30,7 @@ let controller = {
   result: ['', '', '', '', ''],
 	answeredQuestionTracker: 0,
   correctAnswersTracker: 0,
-  questionsStopped: false,
-  tempTracking: true
+  questionsStopped: false
 }
 
 function resetControllerTaskSettings () {
@@ -47,7 +47,9 @@ function resetControllerTaskSettings () {
   controller.modeChoice7 = '',
   controller.modeChoice8 = '',
   controller.setTaskDuration = '',
+  controller.task = null;
   controller.taskCompleted = false,
+  controller.taskRecorded = false,
   controller.modeChoiceLtDifficulty = '',
   controller.questionFrequency = 0,
   controller.timerLimit = 0,
@@ -61,8 +63,7 @@ function resetControllerTaskSettings () {
   controller.result = ['', '', '', '', ''],
   controller.answeredQuestionTracker = 0,
   controller.correctAnswersTracker = 0,
-  controller.questionsStopped = false,
-  controller.tempTracking = true
+  controller.questionsStopped = false
   localStorage.setItem('controller', JSON.stringify(controller))
 }
 
@@ -93,9 +94,8 @@ if (document.querySelector("#stop-button-span")) {
         document.querySelector(".upper-line").style.display = "none";
       }
 
-      if (controller.taskCompleted && controller.tempTracking) {
-        sendTaskInfoToDatabase();
-        controller.tempTracking = false
+      if (userData && controller.taskCompleted && !controller.taskRecorded) {
+        sendSetTaskResultsToDatabase();
       }
 
       document.querySelector('#invisibleRow').style.display = "none";
@@ -104,9 +104,7 @@ if (document.querySelector("#stop-button-span")) {
       }
 
       if (controller.task) {
-        if (controller.taskCompleted === true) {
-          sendSetTaskResultsToDatabase();
-        } else {
+        if (!controller.taskCompleted) {
           if (controller.language === 'LT') {
             messageToTheUser('Užduotis nebaigta iki galo. Rezultatai neišsaugoti.');
           } else if (controller.language === 'EN') {
@@ -137,6 +135,7 @@ if (document.querySelector("#stop-button-span")) {
       }
       if (remainingTime <= 0) {
         controller.taskCompleted = true;
+        localStorage.setItem('controller', JSON.stringify(controller))
         formatFinalMessage()
       }
     } else if (controller.modeChoice4 === "C40") {
@@ -152,6 +151,7 @@ if (document.querySelector("#stop-button-span")) {
       if (controller.answeredQuestionTracker === controller.questionNumber) {
         localStorage.setItem("elapsedTime", timerDisplay.textContent)
         controller.taskCompleted = true;
+        localStorage.setItem('controller', JSON.stringify(controller))
         formatFinalMessage()
       }
     }
@@ -391,10 +391,9 @@ function formatFinalMessageForGrammar() {
   localStorage.setItem("elapsedTime", timerDisplay.textContent)
   recordGrammarFinalMistakes();
 
-      if (controller.taskCompleted && controller.tempTracking) {
-        sendTaskInfoToDatabase();
-        controller.tempTracking = false
-      }
+    if (userData && controller.taskCompleted && !controller.taskRecorded) {
+      sendSetTaskResultsToDatabase();
+    }
 
   document.querySelector('#restart-reset-button-row').style.display = "flex";
   document.getElementById('next-question').style.display = "none";
@@ -410,9 +409,7 @@ function formatFinalMessageForGrammar() {
   }
 
   if (controller.task) {
-    if (controller.taskCompleted === true) {
-      sendSetTaskResultsToDatabase();
-    } else {
+    if (!controller.taskCompleted) {
       if (controller.language === 'LT') {
         messageToTheUser('Užduotis nebaigta iki galo. Rezultatai neišsaugoti.')
       } else if (controller.language === 'EN') {
@@ -443,9 +440,8 @@ function formatFinalMessageForTextcomprehension() {
     localStorage.setItem("elapsedTime", timerDisplay.textContent)
     recordFinalMistakesForTextComprehension();
 
-      if (controller.taskCompleted && controller.tempTracking) {
-        sendTaskInfoToDatabase();
-        controller.tempTracking = false
+      if (userData && controller.taskCompleted && !controller.taskRecorded) {
+        sendSetTaskResultsToDatabase();
       }
 
     if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.answeredQuestionTracker >= 1) {
@@ -453,9 +449,7 @@ function formatFinalMessageForTextcomprehension() {
     }
 
     if (controller.task) {
-      if (controller.taskCompleted === true) {
-        sendSetTaskResultsToDatabase();
-      } else {
+      if (!controller.taskCompleted) {
         if (controller.language === 'LT') {
           messageToTheUser('Užduotis nebaigta iki galo. Rezultatai neišsaugoti.')
         } else if (controller.language === 'EN') {
@@ -493,37 +487,6 @@ async function sendSetTaskResultsToDatabase() {
     closer = messageToTheUser(closerText, false);
   }, 500);
 
-  function clearUserDataCookie() {
-    localStorage.removeItem('userData');
-  }
-
-  const userDataString = localStorage.getItem('userData');
-  let userData;
-
-  if (userDataString) {
-      userData = JSON.parse(userDataString);
-  } else {
-      window.location.href = '/LT/';
-      return;
-  }
-
-  if (!controller.task || controller.task.length !== 2) {
-    clearTimeout(showMessageTimeout);
-    if (closer) {
-      setTimeout(() => closer(), 0);
-    }
-
-    if (controller.language === 'LT') {
-      messageToTheUser("Įvyko klaida. Rezultatai neišsaugoti. Bandykite vėl vėliau.")
-    } else if (controller.language === 'EN') {
-      messageToTheUser("An error has occurred. Results were not saved. Please try again later.")
-    }
-    controller.task = null;
-    controller.taskCompleted = false;
-    localStorage.setItem('controller', JSON.stringify(controller))
-    return
-  }
-
   let elapsedTime = 0;
   if (localStorage.getItem("elapsedTime")) {
     elapsedTime = localStorage.getItem("elapsedTime")
@@ -543,24 +506,62 @@ async function sendSetTaskResultsToDatabase() {
     document.querySelector("#stop-button-span").disabled = true;
   }
 
-  if (controller.task[0] === "setTask") {
-    resultsData = [ [controller.answeredQuestionTracker, controller.mistakesTracker],
-                    controller.currentMistakes, elapsedTime
-                  ]
-    resultsDataString = JSON.stringify(resultsData);
+  let requestSuccess;
 
-    const taskResults = {
-        taskId: controller.task[1],
-        results: resultsDataString
-    };
+  if (controller.task) {
+    if (controller.task[0] === "setTask") {
+      resultsData = [ [controller.answeredQuestionTracker, controller.mistakesTracker],
+                      controller.currentMistakes, elapsedTime
+                    ]
+      resultsDataString = JSON.stringify(resultsData);
 
-    try {
-        const response = await apiFetch(apiBase + 'results', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(taskResults)
+      requestSuccess = await sendTaskResults(controller.task[1], resultsDataString)
+      if (requestSuccess) {
+        requestSuccess = await updateStudentPointsAndStatistics(coinMultiplier=0);
+      }
+
+      if (requestSuccess) {
+        clearTimeout(showMessageTimeout);
+        if (closer) {
+          setTimeout(() => closer(), 0);
+        }
+        if (controller.language === 'LT') {
+          messageToTheUser("Rezultatai sėkmingai išsaugoti.", false)
+        } else if (controller.language === 'EN') {
+          messageToTheUser("Results were saved successfully.", false)
+        }
+      } else {
+        clearTimeout(showMessageTimeout);
+        if (closer) {
+          setTimeout(() => closer(), 0);
+        }
+        if (controller.language === 'LT') {
+          messageToTheUser("Įvyko klaida. Rezultatai neišsaugoti. Bandykite vėl vėliau.")
+        } else if (controller.language === 'EN') {
+          messageToTheUser("An error has occurred. Results were not saved. Please try again later.")
+        }
+      }
+
+      sendTaskInfoToStatisticsDatabase();
+    } else if (controller.task[0] === "weekChl") {
+
+      const answered = controller.answeredQuestionTracker || 0;
+      const mistakes = controller.mistakesTracker || 1; // avoid dividing by 0
+
+      const resultsData = Math.floor(answered / mistakes);
+
+      console.log(userData)
+      try {
+        const response = await apiFetch(apiBase + 'class/updateWeekChlScore', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            studentId: userData.userId,
+            weekChlId: controller.task[1],
+            weekChlScore: resultsData
+          })
         });
 
         if (!response) {
@@ -568,12 +569,37 @@ async function sendSetTaskResultsToDatabase() {
         }
 
         if (!response.ok) {
-            const errorData  = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
-        } else {
-          controller.task = null;
-          controller.taskCompleted = false;
-          localStorage.setItem('controller', JSON.stringify(controller))
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+        }
+
+        clearTimeout(showMessageTimeout);
+        if (closer) {
+          setTimeout(() => closer(), 0); // close after 0.5s
+        }
+
+        if (controller.language === 'LT') {
+          messageToTheUser("Savaitės iššūkio taškai sėkmingai išsaugoti.", false);
+        } else if (controller.language === 'EN') {
+          messageToTheUser("Weekly challenge score saved successfully.", false);
+        }
+
+      } catch (error) {
+        console.error('Error saving week challenge score:', error);
+        clearTimeout(showMessageTimeout);
+        if (closer) {
+          setTimeout(() => closer(), 0); // close after 0.5s
+        }
+        if (controller.language === 'LT') {
+          messageToTheUser("Įvyko klaida. Savaitės iššūkio taškai neišsaugoti. Bandykite vėliau.");
+        } else if (controller.language === 'EN') {
+          messageToTheUser("An error occurred. Weekly challenge score not saved. Please try again later.");
+        }
+      }
+      } else if (controller.task[0] === "personalChl") {
+        requestSuccess = await updateStudentPointsAndStatistics(coinMultiplier=personalChlCoinBonusMultiplier);
+
+        if (requestSuccess) {
           clearTimeout(showMessageTimeout);
           if (closer) {
             setTimeout(() => closer(), 0);
@@ -583,15 +609,6 @@ async function sendSetTaskResultsToDatabase() {
           } else if (controller.language === 'EN') {
             messageToTheUser("Results were saved successfully.", false)
           }
-        }
-
-    } catch (error) {
-        console.log('Error saving task results:', error);
-        if (error.message === "Unauthorized") {
-          redirectingToAuthentication = true;
-            clearUserDataCookie();
-            localStorage.setItem('controller', JSON.stringify(controller))
-            //window.location.href = "prisijungimas";
         } else {
           clearTimeout(showMessageTimeout);
           if (closer) {
@@ -602,81 +619,40 @@ async function sendSetTaskResultsToDatabase() {
           } else if (controller.language === 'EN') {
             messageToTheUser("An error has occurred. Results were not saved. Please try again later.")
           }
-          controller.task = null;
-          controller.taskCompleted = false;
-          localStorage.setItem('controller', JSON.stringify(controller))
+        }
+
+        sendTaskInfoToStatisticsDatabase();
       }
-    }
-  } else if (controller.task[0] === "weekChl") {
+    } else {
+      requestSuccess = await updateStudentPointsAndStatistics();
 
-  const answered = controller.answeredQuestionTracker || 0;
-  const mistakes = controller.mistakesTracker || 1; // avoid dividing by 0
-
-  const resultsData = Math.floor(answered / mistakes);
-
-    try {
-      const response = await apiFetch(apiBase + 'class/updateWeekChlScore', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          studentId: userData.userId,
-          weekChlId: controller.task[1],
-          weekChlScore: resultsData
-        })
-      });
-
-      if (!response) {
-        return;
-      }
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
-      }
-
-      // success case
-      controller.task = null;
-      controller.taskCompleted = false;
-      localStorage.setItem('controller', JSON.stringify(controller));
-
-      clearTimeout(showMessageTimeout);
-      if (closer) {
-        setTimeout(() => closer(), 0); // close after 0.5s
-      }
-
-      if (controller.language === 'LT') {
-        messageToTheUser("Savaitės iššūkio taškai sėkmingai išsaugoti.", false);
-      } else if (controller.language === 'EN') {
-        messageToTheUser("Weekly challenge score saved successfully.", false);
-      }
-
-    } catch (error) {
-      console.error('Error saving week challenge score:', error);
-
-      if (error.message === "Unauthorized") {
-        redirectingToAuthentication = true;
-        clearUserDataCookie();
-        localStorage.setItem('controller', JSON.stringify(controller));
-        window.location.href = "prisijungimas";
+      if (requestSuccess) {
+        clearTimeout(showMessageTimeout);
+        if (closer) {
+          setTimeout(() => closer(), 0);
+        }
+        if (controller.language === 'LT') {
+          messageToTheUser("Rezultatai sėkmingai išsaugoti.", false)
+        } else if (controller.language === 'EN') {
+          messageToTheUser("Results were saved successfully.", false)
+        }
       } else {
         clearTimeout(showMessageTimeout);
         if (closer) {
-          setTimeout(() => closer(), 0); // close after 0.5s
+          setTimeout(() => closer(), 0);
         }
         if (controller.language === 'LT') {
-          messageToTheUser("Įvyko klaida. Savaitės iššūkio taškai neišsaugoti. Bandykite vėliau.");
+          messageToTheUser("Įvyko klaida. Rezultatai neišsaugoti. Bandykite vėl vėliau.")
         } else if (controller.language === 'EN') {
-          messageToTheUser("An error occurred. Weekly challenge score not saved. Please try again later.");
+          messageToTheUser("An error has occurred. Results were not saved. Please try again later.")
         }
-
-        controller.task = null;
-        controller.taskCompleted = false;
-        localStorage.setItem('controller', JSON.stringify(controller));
       }
+      sendTaskInfoToStatisticsDatabase();
     }
-    } 
+
+    controller.task = null;
+    controller.taskRecorded = true;
+    localStorage.setItem('controller', JSON.stringify(controller))
 
     if (document.querySelector("#stopButton")) {
       document.querySelector("#stopButton").disabled = false;
@@ -689,86 +665,83 @@ async function sendSetTaskResultsToDatabase() {
     }
     if (document.querySelector("#stop-button-span")) {
       document.querySelector("#stop-button-span").disabled = false;
+  }
+}
 
-  } else if (controller.task[0] === "personalChl") {
+async function sendTaskResults(taskId, resultsData) {
+  const resultsDataString = JSON.stringify(resultsData);
 
-    /*
-    try {
-      const response = await apiFetch(apiBase + 'class/updateWeekChlScore', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          studentId: userData.userId,
-          weekChlId: controller.task[1],
-          weekChlScore: resultsData
-        })
-      });
+  const taskResults = {
+    taskId,
+    results: resultsDataString
+  };
+  try {
+    const response = await apiFetch(apiBase + 'results', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(taskResults)
+    });
 
-      if (!response) {
-        return;
-      }
+    if (!response) return false;
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
-      }
-
-      // success case
-      controller.task = null;
-      controller.taskCompleted = false;
-      localStorage.setItem('controller', JSON.stringify(controller));
-
-      clearTimeout(showMessageTimeout);
-      if (closer) {
-        setTimeout(() => closer(), 0); // close after 0.5s
-      }
-
-      if (controller.language === 'LT') {
-        messageToTheUser("Savaitės iššūkio taškai sėkmingai išsaugoti.", false);
-      } else if (controller.language === 'EN') {
-        messageToTheUser("Weekly challenge score saved successfully.", false);
-      }
-
-    } catch (error) {
-      console.error('Error saving week challenge score:', error);
-
-      if (error.message === "Unauthorized") {
-        redirectingToAuthentication = true;
-        clearUserDataCookie();
-        localStorage.setItem('controller', JSON.stringify(controller));
-        window.location.href = "prisijungimas";
-      } else {
-        clearTimeout(showMessageTimeout);
-        if (closer) {
-          setTimeout(() => closer(), 0); // close after 0.5s
-        }
-        if (controller.language === 'LT') {
-          messageToTheUser("Įvyko klaida. Savaitės iššūkio taškai neišsaugoti. Bandykite vėliau.");
-        } else if (controller.language === 'EN') {
-          messageToTheUser("An error occurred. Weekly challenge score not saved. Please try again later.");
-        }
-          */
-
-        controller.task = null;
-        controller.taskCompleted = false;
-        localStorage.setItem('controller', JSON.stringify(controller));
-      ///}
-    ///}
-    } 
-
-    if (document.querySelector("#stopButton")) {
-      document.querySelector("#stopButton").disabled = false;
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.log(errorData.message || `HTTP error! Status: ${response.status}`);
+      return false
     }
-    if (document.querySelector("#stopButtonTextComp")) {
-      document.querySelector("#stopButtonTextComp").disabled = false;
+
+    return true
+
+  } catch (error) {
+    console.log('Error saving task results:', error);
+    return false
+  }
+}
+
+async function updateStudentPointsAndStatistics(coinMultiplier=1) {
+  let pointsEarned = 0;
+  let coinsEarned = 0;
+  let statType = 'c'; // default to consistency
+
+  // Calculate points and coins
+  pointsEarned = calculateTasksPerCorrectAnswerPoints("controller");
+  pointsEarned = pointsEarned * controller.correctAnswersTracker
+  if (coinMultiplier) {
+    coinsEarned = pointsEarned * coinMultiplier;
+  }
+
+  // Determine stat type based on mode
+  if (controller.mode === "math") {
+    statType = "m";
+  } else if (controller.mode === "lang") {
+    if (controller.modeChoice1 === "C49") statType = "t"; // text composition
+    else if (controller.modeChoice1 === "C83") statType = "g"; // grammar
+  }
+
+  let response;
+  try {
+    response = await apiFetch(apiBase + 'students/updateStudentStats', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        coins: coinsEarned,
+        points: pointsEarned,
+        statType,
+        correctAnswers: controller.correctAnswersTracker,
+        mistakes: controller.mistakesTracker,
+        totalAnswers: controller.answeredQuestionTracker,
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
     }
-    if (document.querySelector(".summary-button")) {
-      document.querySelector(".summary-button").disabled = false;
-    }
-    if (document.querySelector("#stop-button-span")) {
-      document.querySelector("#stop-button-span").disabled = false;
+
+    return true;
+  } catch (error) {
+    console.error('Error saving statistics:', error);
+    return false;
   }
 }
 
@@ -1927,7 +1900,6 @@ function checkAnswer () {
     firstTimeChecking = true;
     controller.randomSelection = [];
     controller.questionsStopped = false;
-    controller.tempTracking = true;
     answerFieldDivElement.style.display = "flex";
     questionsSubmitButtonRowElement.style.display = "flex";
     resetMistakeButtonsElement.style.display = "none";
@@ -2759,7 +2731,6 @@ function startQuestionsTimer () {
 	if (controller.mode === "math") {
 		generateCombinations();
 	}
-	controller.tempTracking = true;
 	
 	localStorage.setItem('controller', JSON.stringify(controller));
 	redirectToQuestions();
@@ -2790,7 +2761,6 @@ function startQuestionsNumber () {
 	if (controller.mode === "math") {
 			generateCombinations();
 	}
-	controller.tempTracking = true;
 	if (controller.combinations.length > controller.questionNumber) {
 	controller.combinations = controller.combinations.sort(() => 0.5 - Math.random()).slice(0, controller.questionNumber);
 	}
@@ -2994,7 +2964,7 @@ function startQuestionsNumber () {
 
 //TASK INFO COLLECTION START
 
-async function sendTaskInfoToDatabase() {
+async function sendTaskInfoToStatisticsDatabase() {
     // Restore controller
 
     return 
@@ -3388,7 +3358,7 @@ const pointWeights = {
     "C83": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "gramatika"}
 }
 
-const personalChlCoinBonusModifier = 1.1;
+const personalChlCoinBonusMultiplier = 1.1;
 
 function calculateTasksPerCorrectAnswerPoints (type) {
     const userClass = userData?.knowledgeLvl;
@@ -3641,7 +3611,7 @@ function calculateTasksPerCorrectAnswerPoints (type) {
 
 
 function displayCustomTaskPotentialEarnings () {
-  if (controller.modeChoice4 === "C39") {
+  if (controller.modeChoice4 === "C39" || controller.modeChoice1 === "C83") {
     document.querySelector(".custom-earnings-iki-holder").innerHTML = 'x';
     const el = document.querySelector(".custom-coin-amount .coin-amount");
     if (el) el.innerHTML = calculateTasksPerCorrectAnswerPoints("controller");
@@ -3796,6 +3766,134 @@ const bodyObserver = new MutationObserver(function(mutations) {
 
 // Start observing the document body for changes
 bodyObserver.observe(document.body, {
+    childList: true,
+    subtree: true
+});
+
+function initHorizontalScrollIndicators() {
+    const containers = document.querySelectorAll('.scroll-indicators-horizontal');
+   
+    containers.forEach(function(container) {
+        if (container.dataset.scrollInitHorizontal) return;
+        container.dataset.scrollInitHorizontal = 'true';
+       
+        const parent = container.parentElement;
+        if (!parent) return;
+       
+        const computedStyle = window.getComputedStyle(parent);
+        if (computedStyle.position === 'static') {
+            parent.style.position = 'relative';
+        }
+       
+        // Create left and right indicators
+        const leftIndicator = document.createElement('div');
+        leftIndicator.className = 'scroll-indicator-line-horizontal top';
+        
+        const rightIndicator = document.createElement('div');
+        rightIndicator.className = 'scroll-indicator-line-horizontal bottom';
+        
+        // === Left indicator (pointing left - inverted triangle) ===
+        const leftLine1 = document.createElement('div');
+        leftLine1.className = 'indicator-line-horizontal line-short';
+        leftLine1.style.animationDelay = '0s';
+        
+        const leftLine2 = document.createElement('div');
+        leftLine2.className = 'indicator-line-horizontal line-medium';
+        leftLine2.style.animationDelay = '0.15s';
+        
+        const leftLine3 = document.createElement('div');
+        leftLine3.className = 'indicator-line-horizontal line-long';
+        leftLine3.style.animationDelay = '0.3s';
+        
+        leftIndicator.appendChild(leftLine1);
+        leftIndicator.appendChild(leftLine2);
+        leftIndicator.appendChild(leftLine3);
+        
+        // === Right indicator (pointing right) ===
+        const rightLine1 = document.createElement('div');
+        rightLine1.className = 'indicator-line-horizontal line-long';
+        rightLine1.style.animationDelay = '0s';
+        
+        const rightLine2 = document.createElement('div');
+        rightLine2.className = 'indicator-line-horizontal line-medium';
+        rightLine2.style.animationDelay = '0.15s';
+        
+        const rightLine3 = document.createElement('div');
+        rightLine3.className = 'indicator-line-horizontal line-short';
+        rightLine3.style.animationDelay = '0.3s';
+        
+        rightIndicator.appendChild(rightLine1);
+        rightIndicator.appendChild(rightLine2);
+        rightIndicator.appendChild(rightLine3);
+       
+        parent.appendChild(leftIndicator);
+        parent.appendChild(rightIndicator);
+       
+        function updateIndicators() {
+            const scrollLeft = container.scrollLeft;
+            const scrollWidth = container.scrollWidth;
+            const clientWidth = container.clientWidth;
+            const canScroll = scrollWidth > clientWidth;
+           
+            if (!canScroll) {
+                leftIndicator.classList.remove('visible');
+                rightIndicator.classList.remove('visible');
+                return;
+            }
+           
+            const isAtLeft = scrollLeft <= 5;
+            const isAtRight = scrollLeft + clientWidth >= scrollWidth - 5;
+           
+            leftIndicator.classList.toggle('visible', !isAtLeft);
+            rightIndicator.classList.toggle('visible', !isAtRight);
+        }
+       
+        function updateIndicatorsWithDelays() {
+            setTimeout(updateIndicators, 100);
+            setTimeout(updateIndicators, 300);
+            setTimeout(updateIndicators, 500);
+        }
+       
+        container.addEventListener('scroll', updateIndicatorsWithDelays);
+        window.addEventListener('resize', updateIndicatorsWithDelays);
+        window.addEventListener('click', updateIndicatorsWithDelays);
+        window.addEventListener('touchend', updateIndicatorsWithDelays);
+       
+        const observer = new MutationObserver(updateIndicators);
+        observer.observe(container, { childList: true, subtree: true });
+       
+        updateIndicatorsWithDelays();
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', updateIndicators);
+        }
+        window.addEventListener('load', updateIndicators);
+    });
+}
+
+// Initialize existing containers
+initHorizontalScrollIndicators();
+
+// Watch for dynamically added containers
+const bodyObserverHorizontal = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        mutation.addedNodes.forEach(function(node) {
+            if (node.nodeType === 1) { // Element node
+                if (node.classList && node.classList.contains('scroll-indicators-horizontal')) {
+                    initHorizontalScrollIndicators();
+                }
+                if (node.querySelectorAll) {
+                    const newContainers = node.querySelectorAll('.scroll-indicators-horizontal');
+                    if (newContainers.length > 0) {
+                        initHorizontalScrollIndicators();
+                    }
+                }
+            }
+        });
+    });
+});
+
+bodyObserverHorizontal.observe(document.body, {
     childList: true,
     subtree: true
 });

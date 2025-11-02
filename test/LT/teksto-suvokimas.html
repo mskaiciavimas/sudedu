@@ -1707,7 +1707,9 @@ window.onload = function () {
           document.getElementById("final-message-row").style.display = "none";
           document.querySelector(".help-and-check-button-holder").style.display = "flex"
 
-          controller.tempTracking = true;
+					controller.taskCompleted = false;
+	        controller.taskRecorded = false;
+
           localStorage.setItem('controller', JSON.stringify(controller));
           initiateTheProgram();
 				}
@@ -1721,15 +1723,6 @@ window.onload = function () {
 
     initiateTheProgram();
 
-    window.addEventListener("beforeunload", () => {
-        if (!redirectingToAuthentication) {
-          controller.task = null;
-          controller.taskCompleted = false;
-        }
-        localStorage.setItem("controller", JSON.stringify(controller));
-        localStorage.setItem("elapsedTime", timerDisplay.textContent);
-        localStorage.setItem("elapsedTime", timerDisplay.textContent);
-      });
     })
     .catch(error => console.error('Error:', error));
 

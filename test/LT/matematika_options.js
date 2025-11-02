@@ -809,6 +809,9 @@ function updateControllerCustomTaskChoices () {
         controller.modeChoice8 = 'C79';
         controller.result = ['', '', '', '', '']
         controller.task = null;
+        controller.taskCompleted = false;
+	    controller.taskRecorded = false;
+
 
     } else if (controller.mode === "lang") {
         const modeChoice8Value = document.querySelector('#mode_choice_8').value;
@@ -855,6 +858,9 @@ function updateControllerCustomTaskChoices () {
         } else {
             controller.questionFrequency = 1;
         }
+        controller.task = null;
+        controller.taskCompleted = false;
+	    controller.taskRecorded = false;
     }
 }
 

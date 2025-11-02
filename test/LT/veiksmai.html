@@ -1087,14 +1087,6 @@ function adjustMiddleLineHeight() {
 window.addEventListener('resize', adjustMiddleLineHeight);
 adjustMiddleLineHeight();
 
-window.addEventListener("beforeunload", () => {
-	if (!redirectingToAuthentication) {
-		controller.task = null;
-		controller.taskCompleted = false;
-	}
-	localStorage.setItem("controller", JSON.stringify(controller));
-});
-
 const stopButtonSpanElement = document.querySelector('#stop-button-span');
 
 function stopQuestionsCloseActions () {
@@ -1142,6 +1134,11 @@ function stopEquations () {
 		document.querySelector("#equation-and-symbol").style.height = "auto";
 		document.querySelector(".equation").style.height = "auto";
 		stopButtonSpanElement.innerHTML = "close";
+
+		controller.taskCompleted = false;
+		controller.taskRecorded = false;
+		localStorage.setItem('controller', JSON.stringify(controller));
+
 		restartEquations();
 	}
 }

@@ -2201,7 +2201,7 @@
         const contentPanels = document.querySelectorAll('.content-panel');
 
         navButtons.forEach((button) => {
-            button.addEventListener('click', () => {
+            button.addEventListener('click', async () => {
                 const targetId = button.dataset.target;
                 
                 // Remove active class from all buttons and panels
@@ -2216,6 +2216,7 @@
                 if (targetId === 'nariai') {
                     renderMembers();
                 } else if (targetId === 'issukis') {
+                    await updateClassStats()
                     renderClassWeekChallenge();
                 } else if (targetId === 'profilis') {
                     renderProfileSettings();
@@ -2957,6 +2958,8 @@ async function updateClassStats() {
       child.style.opacity = "1";
     });
 
+    saveClassDataCache();
+
   } catch (err) {
     console.error('Error updating class stats:', err);
     // ✅ Optional: show specific error if relevant
@@ -3067,7 +3070,6 @@ if (storedCacheExpiry) {
             const data = await response.json();
 
             if (data.success) {
-                console.log("Challenge retrieved:", data.challenge, "Duration:", data.duration);
                 return {
                     challenge: data.challenge,
                     duration: data.duration
@@ -3177,7 +3179,8 @@ async function renderClassWeekChallenge () {
     }
 
     if (classDataCache.top3WeekChl.length === 0) {
-            document.getElementById("podium-container").style.display = "none";
+            document.querySelector(".podium-container-outer").style.display = "none";
+            document.querySelector(".section-title").style.display = "none";
         } else {
             const allStudents = classDataCache.remainingStudents.concat(classDataCache.requestingStudent);
             
@@ -3471,7 +3474,6 @@ function pointsLabelDeterminator (points) {
 
 async function initClassPage() {
   await fetchClassData();  
-  console.log(classDataCache)
   renderMembers();
 }
 
@@ -3543,6 +3545,7 @@ function completeWeekChlTask() {
         controller.modeChoice8 = parsedCurrentTaskInstructions[9];
         controller.task = ["weekChl", classDataCache.weekChlId];
         controller.taskCompleted = false;
+	    controller.taskRecorded = false;
 
         controller.modeChoice4 = currentTaskDuration[0];
         controller.setTaskDuration = currentTaskDuration[1];
@@ -3557,6 +3560,7 @@ function completeWeekChlTask() {
 
             controller.task = ["weekChl", classDataCache.weekChlId];
             controller.taskCompleted = false;
+	        controller.taskRecorded = false;
             
             controller.modeChoice4 = currentTaskDuration[0];
             controller.setTaskDuration = currentTaskDuration[1];
@@ -3572,6 +3576,7 @@ function completeWeekChlTask() {
                 
                 controller.task = ["setTask", currentTaskId];;
                 controller.taskCompleted = false;
+                controller.taskRecorded = false;
 
                 controller.modeChoice4 = currentTaskDuration[0];
                 controller.setTaskDuration = currentTaskDuration[1];
@@ -3590,9 +3595,7 @@ window.onload = function () {
     }
 
     if (controller) {
-        controller.task = null;
-        controller.taskCompleted = false;
-        localStorage.setItem('controller', JSON.stringify(controller));
+        resetControllerTaskSettings();
     }
 
     handleResponsiveLayout();
