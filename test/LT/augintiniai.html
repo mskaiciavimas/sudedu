@@ -4648,19 +4648,23 @@ function buildAllClusters(objectOccupiedTiles) {
     return finalClusters;
 }
 
-function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) {    
+function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) {
     // List of classes that should appear in front of pets
     const itemsInFrontOfPetClasses = ['food-bowl', 'water-bowl'];
     const clusteredItemsZIndexDelta = {};
 
     overlapClusters.forEach(cluster => {
         let clusterInfo = {
-            passable: { items: [], pos: 0, "items-in-front-of-pet": false, pet: false }
+            passable: {
+                items: [],
+                pos: 0,
+                "items-in-front-of-pet": false,
+                pet: false
+            }
         };
 
         const pets = cluster[0]; // pet IDs
         const objectSubclusters = cluster[1];
-
         let itemsInFrontOfPetCounter = 1;
         let subclusterCounter = 1;
 
@@ -4672,13 +4676,14 @@ function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) 
 
         allObjects.forEach(item => {
             if (!item && item !== 0) return;
-
             const el = document.getElementById(item);
             if (!el) return;
 
-            const coords = getTilesOccupiedByObject(getObjectCoordinates(item), 
-                Math.ceil(el.offsetWidth / unitSize), 
-                Math.ceil(el.offsetHeight / unitSize));
+            const coords = getTilesOccupiedByObject(
+                getObjectCoordinates(item),
+                Math.ceil(el.offsetWidth / unitSize),
+                Math.ceil(el.offsetHeight / unitSize)
+            );
 
             let hasFloorOrBoundary = false;
             let allWall = true;
@@ -4699,13 +4704,72 @@ function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) 
             else if (allWall) wallOnlyItems.push(item);
         });
 
-        // --- Step 0b: Boost floor/boundary items above wall-only ---
+        // --- Step 0b: Identify special overlap cases with placingIndex 8 ---
+        const specialOverlapItems = new Set(); // Wall items that should appear in front
+
         if (floorBoundaryItems.length && wallOnlyItems.length) {
-            const wallZIndexes = wallOnlyItems.map(id => parseInt(window.getComputedStyle(document.getElementById(id))?.zIndex) || 0);
-            const maxWallZ = Math.max(...wallZIndexes);
-            floorBoundaryItems.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.style.zIndex = maxWallZ + 1;
+            floorBoundaryItems.forEach(floorItemId => {
+                const floorEl = document.getElementById(floorItemId);
+                if (!floorEl) return;
+
+                const floorAsset = userObjectAssets[floorItemId] || furniturePreviewDict[floorItemId];
+                if (!floorAsset) return;
+
+                const floorAssetData = gameAssetIndex[floorAsset.assetIndex];
+                if (!floorAssetData || !floorAssetData.placingMap) return;
+
+                const [floorX, floorY] = getObjectCoordinates(floorItemId);
+                const floorWidth = Math.ceil(floorEl.offsetWidth / unitSize);
+                const floorHeight = Math.ceil(floorEl.offsetHeight / unitSize);
+
+                const floorTopRow = floorY - floorHeight + 1;
+                const floorBottomRow = floorY;
+
+                wallOnlyItems.forEach(wallItemId => {
+                    const wallEl = document.getElementById(wallItemId);
+                    if (!wallEl) return;
+
+                    const wallAsset = userObjectAssets[wallItemId] || furniturePreviewDict[wallItemId];
+                    if (!wallAsset) return;
+
+                    const wallAssetData = gameAssetIndex[wallAsset.assetIndex];
+                    if (!wallAssetData || wallAssetData.placingIndex !== 8) return;
+
+                    const [wallX, wallY] = getObjectCoordinates(wallItemId);
+                    const wallWidth = Math.ceil(wallEl.offsetWidth / unitSize);
+                    const wallHeight = Math.ceil(wallEl.offsetHeight / unitSize);
+                    const wallTopRow = wallY - wallHeight + 1;
+                    const wallBottomRow = wallY;
+
+                    const xOverlap = wallX < floorX + floorWidth && wallX + wallWidth > floorX;
+                    const yOverlap = wallTopRow <= floorBottomRow && wallBottomRow >= floorTopRow;
+
+                    if (xOverlap && yOverlap) {
+                        let hasValidOverlap = false;
+
+                        for (let wy = wallTopRow; wy <= wallBottomRow; wy++) {
+                            for (let wx = wallX; wx < wallX + wallWidth; wx++) {
+                                if (wy >= floorTopRow && wy <= floorBottomRow &&
+                                    wx >= floorX && wx < floorX + floorWidth) {
+
+                                    const relativeY = wy - floorTopRow;
+                                    const relativeX = wx - floorX;
+                                    const placingMapIndex = relativeY * floorWidth + relativeX;
+                                    const placingMapValue = floorAssetData.placingMap[placingMapIndex];
+
+                                    if (placingMapValue === 8 ||
+                                        (Array.isArray(placingMapValue) && placingMapValue.includes(8))) {
+                                        hasValidOverlap = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (hasValidOverlap) break;
+                        }
+
+                        if (hasValidOverlap) specialOverlapItems.add(wallItemId);
+                    }
+                });
             });
         }
 
@@ -4714,9 +4778,14 @@ function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) 
             const itemsZIndexes = {};
             const items = Array.isArray(subcluster) ? subcluster.flat(Infinity) : [subcluster];
             const nonPassKey = `non-passable-${subclusterCounter}`;
-            clusterInfo[nonPassKey] = { items: [], "items-in-front-of-pet": false, pet: false, pos: 0 };
 
-            // Populate itemsZIndexes
+            clusterInfo[nonPassKey] = {
+                items: [],
+                "items-in-front-of-pet": false,
+                pet: false,
+                pos: 0
+            };
+
             items.forEach(item => {
                 if (!item && item !== 0) return;
 
@@ -4726,12 +4795,14 @@ function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) 
                 const asset = gameAssetIndex[userAsset.assetIndex];
                 if (!asset) return;
 
+                const el = document.getElementById(item);
+
                 if (asset.passable) {
                     clusterInfo.passable.items.push(item);
+                    if (el) itemsZIndexes[item] = parseInt(window.getComputedStyle(el).zIndex) || 0;
                     return;
                 }
 
-                const el = document.getElementById(item);
                 if (!el) {
                     clusterInfo[nonPassKey].items.push(item);
                     return;
@@ -4739,7 +4810,7 @@ function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) 
 
                 itemsZIndexes[item] = parseInt(window.getComputedStyle(el).zIndex) || 0;
 
-                const hasItemInFrontOfPetClass = itemsInFrontOfPetClasses.some(className => 
+                const hasItemInFrontOfPetClass = itemsInFrontOfPetClasses.some(className =>
                     el.classList.contains(className)
                 );
 
@@ -4756,45 +4827,32 @@ function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) 
                 }
             });
 
-            // Resolve z-index conflicts
             if (Object.keys(itemsZIndexes).length > 0) {
-                // Get all items sorted by their initial z-index, then by position
                 const allItems = Object.entries(itemsZIndexes).map(([item, zIndex]) => ({
                     item,
                     zIndex,
                     pos: getObjectCoordinates(item)[1]
                 }));
-                
+
                 allItems.sort((a, b) => {
                     if (a.zIndex !== b.zIndex) return a.zIndex - b.zIndex;
                     return a.pos - b.pos;
                 });
 
-                // Assign new z-indexes maintaining relative differences
                 const minZ = allItems[0].zIndex;
                 let currentZ = minZ;
-                
+
                 for (let i = 0; i < allItems.length; i++) {
                     const current = allItems[i];
-                    
-                    // If this item had a higher z-index than previous, maintain that difference
                     if (i > 0) {
                         const prev = allItems[i - 1];
-                        if (current.zIndex > prev.zIndex) {
-                            currentZ = itemsZIndexes[prev.item] + (current.zIndex - prev.zIndex);
-                        } else if (current.pos > prev.pos) {
-                            // Same original z-index but lower position - increment
-                            currentZ = itemsZIndexes[prev.item] + 1;
-                        } else {
-                            // Same z-index and position - keep same z-index
-                            currentZ = itemsZIndexes[prev.item];
-                        }
+                        if (current.zIndex > prev.zIndex) currentZ = itemsZIndexes[prev.item] + (current.zIndex - prev.zIndex);
+                        else if (current.pos > prev.pos) currentZ = itemsZIndexes[prev.item] + 1;
+                        else currentZ = itemsZIndexes[prev.item];
                     }
-                    
                     itemsZIndexes[current.item] = currentZ;
                 }
 
-                // Calculate deltas from minimum
                 for (const [key, value] of Object.entries(itemsZIndexes)) {
                     if (value > minZ) clusteredItemsZIndexDelta[key] = value - minZ;
                 }
@@ -4817,7 +4875,7 @@ function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) 
         Object.entries(clusterInfo).forEach(([key, value]) => {
             let lowestClusterRow = 0;
             value.items.forEach(item => {
-                let itemsRow = getObjectCoordinates(item)[1];
+                const itemsRow = getObjectCoordinates(item)[1];
                 if (itemsRow > lowestClusterRow) lowestClusterRow = itemsRow;
             });
             value.pos = lowestClusterRow;
@@ -4832,23 +4890,22 @@ function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) 
         nonPassableEntries.sort((a, b) => {
             const aPos = a[1].pos || 0, bPos = b[1].pos || 0;
             if (aPos !== bPos) return aPos - bPos;
-
             const aIFP = a[1]["items-in-front-of-pet"], bIFP = b[1]["items-in-front-of-pet"];
             const aPet = a[1].pet, bPet = b[1].pet;
-
             if (aPet && bPet) return 0;
             if (aIFP && bIFP) return 0;
             if (aIFP && !bIFP) return 1;
             if (bIFP && !aIFP) return -1;
             if (aPet && !bIFP && !bPet) return 1;
             if (bPet && !aIFP && !aPet) return -1;
-
             return 0;
         });
 
         entries = [...passableEntries, ...nonPassableEntries];
 
         let zIndexStart = 3;
+        let maxWallZ = 0; // Track the highest wall z-index
+
         entries.forEach((entry, idx) => {
             const [key, value] = entry;
             value.order = idx + 1;
@@ -4859,16 +4916,186 @@ function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) 
                 const el = document.getElementById(item);
                 const itemDelta = clusteredItemsZIndexDelta[item] || 0;
                 maxDelta = Math.max(maxDelta, itemDelta);
-                if (el) el.style.zIndex = zIndex + itemDelta;
+
+                let finalZIndex = zIndex + itemDelta;
+
+                // Apply special overlap boost for placingIndex 8 items
+                if (specialOverlapItems.has(item)) {
+                    let maxFloorZ = finalZIndex;
+                    floorBoundaryItems.forEach(floorId => {
+                        const floorEl = document.getElementById(floorId);
+                        if (floorEl) {
+                            const floorZ = parseInt(window.getComputedStyle(floorEl).zIndex) || 0;
+                            maxFloorZ = Math.max(maxFloorZ, floorZ);
+                        }
+                    });
+                    finalZIndex = maxFloorZ + 1;
+                }
+
+                if (el) {
+                    el.style.zIndex = finalZIndex;
+
+                    // Track max wall z-index
+                    if (wallOnlyItems.includes(item)) {
+                        maxWallZ = Math.max(maxWallZ, finalZIndex);
+                    }
+                }
             });
 
             zIndexStart += maxDelta;
+        });
+
+        // --- Step 5: Ensure pet is above walls ---
+        pets.forEach(petId => {
+            const petEl = document.getElementById(petId);
+            if (petEl) {
+                const petZ = parseInt(window.getComputedStyle(petEl).zIndex) || 0;
+                if (petZ <= maxWallZ) petEl.style.zIndex = maxWallZ + 1;
+            }
         });
 
         clusterInfo = Object.fromEntries(entries);
     });
 }
 
+
+function generateWalkabilityMap() {
+    // Add safety check for roomLayout
+    if (!roomLayout || roomLayout.length === 0) {
+        console.error("roomLayout is not defined or empty");
+        return null;
+    }
+
+    const unitSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
+    const map = [];
+
+    // Initialize map with basic walkability
+    for (let row = 0; row < roomLayout.length; row++) {
+        map[row] = [];
+        for (let col = 0; col < roomLayout[0].length; col++) {
+            const tileType = roomLayout[row][col];
+            // Only floor (1) and boundary (3) tiles are walkable
+            const isWalkable = (tileType === 1 || tileType === 3);
+            map[row][col] = {
+                walkable: isWalkable,
+                allowedDirections: [true, true, true, true] // up, right, down, left
+            };
+        }
+    }
+
+    // Apply boundary tile restrictions (with safety checks)
+    for (let row = 0; row < roomLayout.length; row++) {
+        for (let col = 0; col < roomLayout[0].length; col++) {
+            if (roomLayout[row][col] === 3) { // boundary tile
+                if (row + 1 < roomLayout.length) {
+                    let hasNonPassableBottomBelow = false;
+
+                    // Add safety check for userObjectAssets
+                    if (userObjectAssets && gameAssetIndex) {
+                        Object.entries(userObjectAssets).forEach(([assetId, asset]) => {
+                            const assetData = gameAssetIndex[asset.assetIndex];
+                            if (!assetData) return;
+
+                            const [assetX, assetY] = asset.position;
+                            const element = document.getElementById(assetId);
+                            if (!element) return;
+
+                            const assetWidth = Math.ceil(element.offsetWidth / unitSize);
+                            const assetHeight = Math.ceil(element.offsetHeight / unitSize);
+                            const topRowOfAsset = assetY - assetHeight + 1;
+                            const bottomRowOfAsset = assetY;
+
+                            // 🚨 New steppable check: mark middle rows unwalkable
+                            if (assetData.steppable === false) {
+                                for (let r = topRowOfAsset + 1; r < bottomRowOfAsset; r++) {
+                                    if (r >= 0 && r < roomLayout.length) {
+                                        for (let c = assetX; c < assetX + assetWidth; c++) {
+                                            if (c >= 0 && c < roomLayout[0].length) {
+                                                map[r][c].walkable = false;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Existing passable check for boundary tiles
+                            if (assetData.passable === false) {
+                                // ✅ Only if (row+1, col) is bottom row of asset
+                                if (row + 1 === bottomRowOfAsset && col >= assetX && col < assetX + assetWidth) {
+                                    hasNonPassableBottomBelow = true;
+                                }
+                            }
+                        });
+                    }
+
+                    if (hasNonPassableBottomBelow) {
+                        map[row][col].walkable = false;
+                    }
+                }
+            }
+        }
+    }
+
+    // Set directional movement restrictions (with safety checks)
+    for (let row = 0; row < roomLayout.length; row++) {
+        for (let col = 0; col < roomLayout[0].length; col++) {
+            if (!map[row][col].walkable) continue;
+
+            if (userObjectAssets && gameAssetIndex) {
+                Object.entries(userObjectAssets).forEach(([assetId, asset]) => {
+                    const assetData = gameAssetIndex[asset.assetIndex];
+                    if (!assetData) return;
+
+                    const [assetX, assetY] = asset.position;
+                    const element = document.getElementById(assetId);
+                    if (!element) return;
+
+                    const assetWidth = Math.ceil(element.offsetWidth / unitSize);
+                    const assetHeight = Math.ceil(element.offsetHeight / unitSize);
+                    const topRowOfAsset = assetY - assetHeight + 1;
+                    const bottomRowOfAsset = assetY;
+                    const rowAboveBottom = bottomRowOfAsset - 1;
+
+                    // 🚨 NEW: Special handling for food-bowl items
+                    if (element.className.includes('food-bowl')) {
+                        // Block upward and downward movement on the food-bowl's cells
+                        if (row === bottomRowOfAsset && col >= assetX && col < assetX + assetWidth) {
+                            map[row][col].allowedDirections[0] = false; // up
+                            map[row][col].allowedDirections[2] = false; // down
+                        }
+                        // Block upward movement on cells one row below the food-bowl
+                        if (row === bottomRowOfAsset + 1 && col >= assetX && col < assetX + assetWidth) {
+                            map[row][col].allowedDirections[0] = false; // up
+                        }
+                    }
+
+                    // Only consider passable === false for movement restrictions
+                    if (assetData.passable === false) {
+                        if (assetHeight === 1) {
+                            // Case 3: single-height asset - block movement on the asset tile itself
+                            if (row === bottomRowOfAsset && col >= assetX && col < assetX + assetWidth) {
+                                map[row][col].allowedDirections[0] = false; // up
+                                map[row][col].allowedDirections[2] = false; // down
+                            }
+                        } else {
+                            // Cases 1 & 2: multi-height assets
+                            // Case 1: current tile is bottom row of the asset
+                            if (row === bottomRowOfAsset && col >= assetX && col < assetX + assetWidth) {
+                                map[row][col].allowedDirections[0] = false; // up
+                            }
+                            // Case 2: current tile is directly above bottom row of asset
+                            if (row === rowAboveBottom && col >= assetX && col < assetX + assetWidth) {
+                                map[row][col].allowedDirections[2] = false; // down
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    return map;
+}
 
 
 function isOverlapping(petObject, targetObject) {
@@ -5452,8 +5679,13 @@ function generatePlacementMap(draggedObjectId) {
                             continue
                         }
 
+                        if (existingPlacingIndex === 8) {
+                            tileAllowed = false;
+                            break;
+                        }
+
                         //Added to allow floor/boundary placed objects to overlap wall placed objects
-                        if ((draggedAssetPlacingRules.includes(1) || draggedAssetPlacingRules.includes(3)) && !draggedAssetPlacingRules.includes(2) && !(draggedAssetPlacingIndex === 8 && existingPlacingIndex === 8)) {
+                        if ((draggedAssetPlacingRules.includes(4)) && !draggedAssetPlacingRules.includes(2) && !(draggedAssetPlacingIndex === 8 && existingPlacingIndex === 8)) {
                             if (tileType === 2) {
                                 if (draggedAssetPlacingRules.includes(3)) {
                                     if (getFirstRowOfTileType(3) - (objectHeight - 1) <= row) {
@@ -5500,6 +5732,21 @@ function generatePlacementMap(draggedObjectId) {
                                     tileAllowed = false;
                                     break;
                                 }
+                            } else if (existingPlacingIndex === 14) {
+                               const objCoords = getObjectCoordinates(existingObj.id);
+                                const objWidth = Math.ceil(existingObj.offsetWidth / unitSize);
+                                const objHeight = Math.ceil(existingObj.offsetHeight / unitSize);
+                                const tilesOccupiedByObj = getTilesOccupiedByObject(objCoords, objWidth, objHeight);
+
+                                const minY = Math.min(...tilesOccupiedByObj.map(c => c[1]));
+                                const objTopTiles = tilesOccupiedByObj.filter(c => c[1] === minY);
+
+                                if (objTopTiles.some(c => c[0] === x && c[1] === y)) {
+                                    tileAllowed = true;
+                                } else {
+                                    tileAllowed = false;
+                                    break;
+                                }
                             } else {
                                 tileAllowed = true;
                             }
@@ -5525,9 +5772,28 @@ function generatePlacementMap(draggedObjectId) {
                                 for (const obj of bottomObjects) {
                                     const objData = gameAssetIndex[combinedAssets[obj.id].assetIndex];
                                     const objPlacingIndex = objData.placingIndex || 0;
+                                    
                                     if (draggedAssetPlacingRules.includes(objPlacingIndex)) {
                                         bottomTileValid = true;
-                                        break;
+                                    }
+
+                                    if (objPlacingIndex === 14) {
+                                        const objCoords = getObjectCoordinates(obj.id);
+                                        const objWidth = Math.ceil(obj.offsetWidth / unitSize);
+                                        const objHeight = Math.ceil(obj.offsetHeight / unitSize);
+                                        const tilesOccupiedByObj = getTilesOccupiedByObject(objCoords, objWidth, objHeight);
+
+                                        const minY = Math.min(...tilesOccupiedByObj.map(c => c[1]));
+                                        const objTopTiles = tilesOccupiedByObj.filter(c => c[1] === minY);
+
+                                        // Check if the BOTTOM tile (x, bottomOfSection) is on top of this object
+                                        if (objTopTiles.some(c => c[0] === x && c[1] === bottomOfSection)) {
+                                            bottomTileValid = true;
+                                            break;
+                                        } else {
+                                            bottomTileValid = false;
+                                            break;
+                                        }
                                     }
                                 }
                             }
