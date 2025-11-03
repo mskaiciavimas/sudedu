@@ -265,7 +265,7 @@ const parameterDictionary = {
     },
     "C67": {
         "parameter": "fsc-con",
-        "decodedParameterText": "PANAŠIAI SKAMBANČIO PRIEBALSĖS"
+        "decodedParameterText": "PANAŠIAI SKAMBANČIOS PRIEBALSĖS"
     },
     "C68": {
         "parameter": "fsc-vow",
