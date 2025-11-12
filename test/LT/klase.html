@@ -2069,7 +2069,7 @@
                     addTeacherButton.style.display = "flex";
                     changeTeacherToggleButton.style.display = "none"
                 } else {
-                    teacherName.innerHTML = `Mok. ${userData.teacher}`
+                    //teacherName.innerHTML = `Mok. ${userData.teacher}`
                     addTeacherInput.style.display = "none";
                     addTeacherButton.style.display = "none";
                     changeTeacherToggleButton.style.display = "flex"
@@ -2138,7 +2138,7 @@
                         addTeacherButton.style.display = "flex";
                         changeTeacherToggleButton.style.display = "none"
                     } else {
-                        teacherName.innerHTML = `Mok. ${userData.teacher}`
+                        //teacherName.innerHTML = `Mok. ${userData.teacher}`
                         teacherName.style.display = "flex"
                         addTeacherInput.style.display = "none";
                         addTeacherButton.style.display = "none";
@@ -2659,7 +2659,7 @@ function updateAvatarDisplay() {
 function renderMembers() {
     if (userData) {
     if (userData.teacher !== '' && userData.accType === "student") {
-        teacherName.innerHTML = `<span class="teachers-name">Mok. ${userData.teacher.split(" ")[0]}</span><span class="teachers-id">ID: ${userData.teacher.split(" ")[2].replace(/[^a-zA-Z0-9]/g, "")}</span>`
+        teacherName.innerHTML = `<span class="teachers-name">Mok. ${userData.teacher.split("(ID:")[0]}</span><span class="teachers-id">ID: ${userData.teacher.split("(ID:")[1].replace(/[^a-zA-Z0-9]/g, "")}</span>`
         addTeacherInput.style.display = "none";
         addTeacherButton.style.display = "none";
         changeTeacherToggleButton.style.display = "flex";
@@ -3628,10 +3628,11 @@ window.onload = function () {
     const savedController = localStorage.getItem('controller');
     if (savedController) {
         controller = JSON.parse(savedController);
-    }
-
-    if (controller) {
+        redirectToAppropriateLanguage(controller.language);
         resetControllerTaskSettings();
+    } else {
+        controller.language = "LT";
+        localStorage.setItem('controller', JSON.stringify(controller));
     }
 
     handleResponsiveLayout();

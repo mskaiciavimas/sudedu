@@ -1186,6 +1186,21 @@ const cleanup = detectMobileKeyboard();
 
 // 3. Optional: cleanup when needed
 // if (cleanup) cleanup();
+
+window.onload = function () {
+	if (userData) {
+		window.location.href = "./";
+	}
+    const savedController = localStorage.getItem('controller');
+    if (savedController) {
+        controller = JSON.parse(savedController);
+        redirectToAppropriateLanguage(controller.language);
+        resetControllerTaskSettings();
+    } else {
+        controller.language = "LT";
+        localStorage.setItem('controller', JSON.stringify(controller));
+    }
+}
 	</script>
 </body>
 </html>

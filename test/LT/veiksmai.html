@@ -706,6 +706,8 @@
 
 		const answerFieldDivElement = document.querySelector(".answer-field-div");
 
+		const answerFieldDivOuterElement = document.querySelector("#answer-field-outer");
+
 		function stylePage () {
 			if (controller.questionsStopped) {
 				linkElement.setAttribute("href", "../questions-stopped.css");
@@ -746,7 +748,7 @@
 					}
 			}
 
-			if (controller.modeChoice5 === "C42") {
+			if (controller.modeChoice5 === "C42" && !controller.questionsStopped) {
 				dynamicStyleSheet.setAttribute("href", "../questions-unknown-number-style-supplement.css");
 			} else {
 				dynamicStyleSheet.setAttribute("href", "");
@@ -883,6 +885,8 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 
 	// Function to set the margin of element2
 	function setMargins() {
+		var contentContainerElement = document.getElementById('content-container');
+		contentContainerElement.style.opacity = '0';
 
 		if (controller.questionsStopped) {
 			return
@@ -910,7 +914,6 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 			var firstElementRight = 0;
 			var lastElementLeft = 0;
 			var firstElmenetMarginRight = 0;
-			var contentContainerElement = document.getElementById('content-container');
 			var newMargin = 0
 			var answerDigits = 0;
 
@@ -1019,19 +1022,99 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 
 		} else {
 			const answerElement = document.getElementById('answer');
-			const requiredWidth = getCorrectAnswerLength() + 0.5;
+			const requiredWidth = getCorrectAnswerLength() + 1;
 			const currentWidthInCh = parseFloat(getComputedStyle(answerElement).width) / parseFloat(getComputedStyle(answerElement).fontSize);
 			
-			if (currentWidthInCh < requiredWidth) {
-				answerElement.style.width = requiredWidth + 'ch';
+
+			answerElement.style.width = Math.max(requiredWidth, 2.5) + 'ch';
+
+
+			if (equation2Element.innerHTML !== '' && document.querySelector("#equation").innerHTML === '') {
+				answerFieldDivOuterElement.style.paddingLeft = '0';
+			} else {
+				answerFieldDivOuterElement.style.paddingLeft = '';
 			}
+			
+			adjustFontToFit()
 		}
 
   		adjustMiddleLineHeight();
-		if (contentContainerElement) {
-			contentContainerElement.style.visibility = 'visible';
-		}
+
+		requestAnimationFrame(() => {
+			contentContainerElement.style.opacity = '1';
+		});
 	}
+
+function adjustFontToFit() {
+  const container = document.getElementById('content-container');
+  
+  // Helper function to check if fits in one row
+  function checkFit() {
+    const clone = container.cloneNode(true);
+    clone.style.position = 'absolute';
+    clone.style.visibility = 'hidden';
+    clone.style.width = '9999px';
+    clone.style.whiteSpace = 'nowrap';
+    document.body.appendChild(clone);
+    
+    const singleRowHeight = clone.offsetHeight;
+    document.body.removeChild(clone);
+    
+    const actualHeight = container.offsetHeight;
+    return actualHeight <= singleRowHeight + 10;
+  }
+  
+  // If already fits, do nothing
+  if (checkFit()) {
+    return;
+  }
+  
+  const decreaseAmount = 0.1; // Decrease by 0.1rem each iteration
+  const minFontSize = 1.0; // Minimum font size in rem
+  
+  const allElements = container.querySelectorAll('*');
+  const textareas = container.querySelectorAll('.answer-input, .remainder-input');
+  
+  // Store original values
+  const originalTextareaHeights = new Map();
+  const originalTextareaFontSizes = new Map();
+  
+  textareas.forEach(textarea => {
+    const style = window.getComputedStyle(textarea);
+    originalTextareaHeights.set(textarea, parseFloat(style.height));
+    originalTextareaFontSizes.set(textarea, parseFloat(style.fontSize));
+  });
+  
+  let iterations = 0;
+  const maxIterations = 20;
+  
+  while (!checkFit() && iterations < maxIterations) {
+    iterations++;
+    
+    // Decrease font size for all elements
+    allElements.forEach(el => {
+      const currentFontSize = parseFloat(window.getComputedStyle(el).fontSize);
+      const newFontSize = currentFontSize - (decreaseAmount * 16);
+      
+      if (newFontSize >= minFontSize * 16) {
+        el.style.fontSize = newFontSize + 'px';
+      }
+    });
+    
+    // Decrease textarea heights proportionally
+    textareas.forEach(textarea => {
+      const originalHeight = originalTextareaHeights.get(textarea);
+      const originalFontSize = originalTextareaFontSizes.get(textarea);
+      const currentFontSize = parseFloat(window.getComputedStyle(textarea).fontSize);
+      
+      const ratio = currentFontSize / originalFontSize;
+      const newHeight = originalHeight * ratio;
+      
+      textarea.style.height = newHeight + 'px';
+    });
+  }
+}
+
 
 function getCorrectAnswerLength() {
   const num1 = controller.randomSelection[0];

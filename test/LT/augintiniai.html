@@ -10190,10 +10190,11 @@ window.onload = function () {
     const savedController = localStorage.getItem('controller');
     if (savedController) {
         controller = JSON.parse(savedController);
-    }
-
-    if (controller) {
+        redirectToAppropriateLanguage(controller.language);
         resetControllerTaskSettings();
+    } else {
+        controller.language = "LT";
+        localStorage.setItem('controller', JSON.stringify(controller));
     }
     navigationResponsiveLayout();
     document.querySelector('#gameContainer').removeAttribute('hidden');

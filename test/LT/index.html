@@ -1664,9 +1664,11 @@ body.popup-active {
             const savedController = localStorage.getItem('controller');
             if (savedController) {
                 controller = JSON.parse(savedController);
-            }
-            if (controller) {
+                redirectToAppropriateLanguage(controller.language);
                 resetControllerTaskSettings();
+            } else {
+                controller.language = "LT";
+                localStorage.setItem('controller', JSON.stringify(controller));
             }
 
             if (!userData || userData?.accType === "teacher") {
@@ -1699,13 +1701,6 @@ body.popup-active {
         checkbox.checked = false; // Deselect the checkbox
     }
 });
-
-	if (localStorage.getItem('controller') !== null) {
-	controller = JSON.parse(localStorage.getItem('controller'));
-	controller.language = "LT";
-	localStorage.setItem('controller', JSON.stringify(controller));
-}
-
 
 //POPUP SCRIPT START
 
@@ -1865,7 +1860,7 @@ function displayMessages () {
     const messageBoard = document.getElementById('messageBoard');
     const currentDateEl = document.getElementById('currentDate');
 
-    // Set current date
+    // Set current date (full long form)
     const today = new Date();
     const dateStr = today.toLocaleDateString('lt-LT', { 
         year: 'numeric', 
@@ -1881,24 +1876,47 @@ function displayMessages () {
         msg.target.includes('all') || msg.target.includes(userType)
     );
 
+    // Clear board before populating
+    messageBoard.innerHTML = '';
+
+    const lithuanianMonths = [
+      'Saus.', 'Vas.', 'Kov.', 'Bal.', 'Geg.', 'Birž.',
+      'Liep.', 'Rugp.', 'Rugs.', 'Spal.', 'Lap.', 'Gruod.'
+    ];
+
     // Populate messages
     if (visibleMessages.length > 0) {
         visibleMessages.forEach(msg => {
             const messageEl = document.createElement('div');
             messageEl.className = 'board-message';
-            
-            const msgDate = new Date(msg.date);
-            const formattedDate = msgDate.toLocaleDateString('lt-LT', { 
-                month: 'short', 
-                day: 'numeric' 
-            });
-            
+
+            // Use msg.date if available, otherwise fallback to today
+            // Safely parse YYYY-MM-DD to avoid timezone problems
+            let msgDate;
+            if (msg.date && typeof msg.date === 'string') {
+                const parts = msg.date.split('-').map(Number);
+                if (parts.length === 3 && !Number.isNaN(parts[0])) {
+                    // new Date(year, monthIndex, day)
+                    msgDate = new Date(parts[0], (parts[1] || 1) - 1, parts[2] || 1);
+                } else {
+                    msgDate = new Date(msg.date); // fallback
+                }
+            } else {
+                msgDate = new Date();
+            }
+
+            const day = msgDate.getDate();
+            const monthIndex = msgDate.getMonth(); // 0–11
+
+            // day first, then short month (e.g. "20 Sau.")
+            const formattedDate = `${lithuanianMonths[monthIndex]} ${day}`;
+
             messageEl.innerHTML = `
-                ${msg.text}
+                <div class="message-text">${msg.text}</div>
                 <div class="message-meta">${formattedDate}</div>
             `;
 
-
+            // Open full popup when clicked
             messageEl.addEventListener('click', () => openObjectPopup(msg.fullText, msg.title, msg.date) );
             messageBoard.appendChild(messageEl);
         });
@@ -1906,6 +1924,7 @@ function displayMessages () {
         messageBoard.innerHTML = '<div class="empty-message">Naujienų nėra!</div>';
     }
 }
+
 
 displayMessages();
 

@@ -151,14 +151,16 @@ if (document.querySelector("#stop-button-span")) {
   document.querySelector("#stop-button-span").disabled = false;
 }
 
-    function formatFinalMessage () {
+    async function formatFinalMessage () {
 
       if (document.querySelector(".upper-line")) {
         document.querySelector(".upper-line").style.display = "none";
       }
 
+      let aditionalFinalMessage = null;
+
       if (userData && controller.taskCompleted && !controller.taskRecorded) {
-        sendSetTaskResultsToDatabase();
+        aditionalFinalMessage = await sendSetTaskResultsToDatabase();
         setPetOnWalkActionAfterQuestionsCompleted();
       }
 
@@ -178,6 +180,10 @@ if (document.querySelector("#stop-button-span")) {
       }
 
       controller.equation = finalMessageText();
+
+      if (aditionalFinalMessage) {
+        controller.equation += aditionalFinalMessage
+      }
       
       controller.equation2 = '';
       controller.result = ['', '', '', '', ''];
@@ -188,7 +194,7 @@ if (document.querySelector("#stop-button-span")) {
       localStorage.setItem('controller', JSON.stringify(controller))
     }
 
-	function formEquation () {
+	async function formEquation () {
     let remainingTime = parseInt(localStorage.getItem('remainingTime'));
     if (controller.modeChoice4 === "C39") {
       if (controller.combinations.length === 0 && remainingTime > 0 && !controller.questionsStopped) {
@@ -200,7 +206,7 @@ if (document.querySelector("#stop-button-span")) {
       if (remainingTime <= 0) {
         controller.taskCompleted = true;
         localStorage.setItem('controller', JSON.stringify(controller))
-        formatFinalMessage()
+        await formatFinalMessage()
       }
     } else if (controller.modeChoice4 === "C40") {
       if (controller.combinations.length === 0 && controller.answeredQuestionTracker < controller.questionNumber && !controller.questionsStopped) {
@@ -216,7 +222,7 @@ if (document.querySelector("#stop-button-span")) {
         localStorage.setItem("elapsedTime", timerDisplay.textContent)
         controller.taskCompleted = true;
         localStorage.setItem('controller', JSON.stringify(controller))
-        formatFinalMessage()
+        await formatFinalMessage()
       }
     }
   
@@ -451,12 +457,14 @@ function styleGrammarPage () {
   }
 }
 
-function formatFinalMessageForGrammar() {
+async function formatFinalMessageForGrammar() {
   localStorage.setItem("elapsedTime", timerDisplay.textContent)
   recordGrammarFinalMistakes();
 
+    let aditionalFinalMessage = null
+
     if (userData && controller.taskCompleted && !controller.taskRecorded) {
-      sendSetTaskResultsToDatabase();
+      aditionalFinalMessage = await sendSetTaskResultsToDatabase();
       setPetOnWalkActionAfterQuestionsCompleted();
     }
 
@@ -485,6 +493,10 @@ function formatFinalMessageForGrammar() {
 
   document.getElementById("field-for-final-message").innerHTML = `<div class="field-for-final-message-inner">${finalMessageText()}</div>`;
   
+  if (aditionalFinalMessage) {
+      document.getElementById("field-for-final-message").innerHTML += aditionalFinalMessage
+    }
+
   if (document.getElementById('hidden-input')) {
     document.getElementById('hidden-input').dataset.currentId = "";
     document.getElementById('hidden-input').value = ''
@@ -494,6 +506,15 @@ function formatFinalMessageForGrammar() {
   controller.questionsStopped = true;
   styleGrammarPage();
   localStorage.setItem('controller', JSON.stringify(controller))
+}
+
+function styleTextComprahensionPage () {
+  const linkElement = document.querySelector("#questionsStyleSheet");
+  if (controller.questionsStopped) {
+    linkElement.setAttribute("href", "../questions-stopped.css");
+  } else {
+    linkElement.removeAttribute("href");
+  }
 }
 
 function recordFinalMistakesForTextComprehension() {
@@ -507,12 +528,14 @@ function recordFinalMistakesForTextComprehension() {
   controller.currentMistakes = mistakeList
 }
 
-function formatFinalMessageForTextcomprehension() {
+async function formatFinalMessageForTextcomprehension() {
     localStorage.setItem("elapsedTime", timerDisplay.textContent)
     recordFinalMistakesForTextComprehension();
 
+      let aditionalFinalMessage = null
+
       if (userData && controller.taskCompleted && !controller.taskRecorded) {
-        sendSetTaskResultsToDatabase();
+        aditionalFinalMessage = await sendSetTaskResultsToDatabase();
         setPetOnWalkActionAfterQuestionsCompleted();
       }
 
@@ -531,6 +554,10 @@ function formatFinalMessageForTextcomprehension() {
     }
 
     document.getElementById("final-message-div").innerHTML = finalMessageText();
+
+    if (aditionalFinalMessage) {
+      document.getElementById("final-message-div").innerHTML += aditionalFinalMessage
+    }
     
     document.getElementById('check-answer-btn').disabled = true;
     document.getElementById('help-btn').disabled = true;
@@ -541,6 +568,7 @@ function formatFinalMessageForTextcomprehension() {
     document.getElementById("final-message-row").style.display = "flex";
     document.querySelector(".help-and-check-button-holder").style.display = "none"
     controller.questionsStopped = true;
+    styleTextComprahensionPage();
     localStorage.setItem('controller', JSON.stringify(controller))
 }
 
@@ -549,6 +577,8 @@ let redirectingToAuthentication = false;
 async function sendSetTaskResultsToDatabase() {
   let closer;
   let showMessageTimeout;
+  let additionalFinalMessage = null;
+
   showMessageTimeout = setTimeout(() => {
     let closerText; 
     if (controller.language === 'LT') {
@@ -585,11 +615,10 @@ async function sendSetTaskResultsToDatabase() {
       resultsData = [ [controller.answeredQuestionTracker, controller.mistakesTracker],
                       controller.currentMistakes, elapsedTime
                     ]
-      resultsDataString = JSON.stringify(resultsData);
 
-      requestSuccess = await sendTaskResults(controller.task[1], resultsDataString)
+      requestSuccess = await sendTaskResults(controller.task[1], resultsData)
       if (requestSuccess) {
-        requestSuccess = await updateStudentPointsAndStatistics(coinMultiplier=0);
+        [requestSuccess, pointsEarned, coinsEarned] = await updateStudentPointsAndStatistics(coinMultiplier=0);
       }
 
       if (requestSuccess) {
@@ -599,9 +628,32 @@ async function sendSetTaskResultsToDatabase() {
         }
         if (controller.language === 'LT') {
           messageToTheUser("Rezultatai sėkmingai išsaugoti.", false)
+          additionalFinalMessage = `
+          <span class="additional-final-message-holder">
+              <span>uždirbai: </span>
+              <span class="earnings-holder">
+                <span class="coin-icon">
+                        <img src="../images/icons/icon-sudedu-coin.png">
+                </span>
+                <span class="coin-amount">${coinsEarned}</span>
+              </span>
+          </span>
+          `
         } else if (controller.language === 'EN') {
           messageToTheUser("Results were saved successfully.", false)
+          additionalFinalMessage = `
+          <span class="additional-final-message-holder">
+              <span>you earned: </span>
+              <span class="earnings-holder">
+                <span class="coin-icon">
+                        <img src="../images/icons/icon-sudedu-coin.png">
+                </span>
+                <span class="coin-amount">${coinsEarned}</span>
+              </span>
+          </span>
+          `
         }
+
       } else {
         clearTimeout(showMessageTimeout);
         if (closer) {
@@ -620,9 +672,8 @@ async function sendSetTaskResultsToDatabase() {
       const answered = controller.answeredQuestionTracker || 0;
       const mistakes = controller.mistakesTracker || 1; // avoid dividing by 0
 
-      const resultsData = Math.floor(answered / mistakes);
+      const resultsData = Math.max(0, answered - mistakes);
 
-      console.log(userData)
       try {
         const response = await apiFetch(apiBase + 'class/updateWeekChlScore', {
           method: 'POST',
@@ -651,9 +702,25 @@ async function sendSetTaskResultsToDatabase() {
         }
 
         if (controller.language === 'LT') {
+          additionalFinalMessage = `
+          <span class="additional-final-message-holder">
+              <span>surinkti taškai: </span>
+              <span class="week-chl-points">
+                ${resultsData}
+              </span>
+          </span>
+          `;
           messageToTheUser("Savaitės iššūkio taškai sėkmingai išsaugoti.", false);
         } else if (controller.language === 'EN') {
           messageToTheUser("Weekly challenge score saved successfully.", false);
+          additionalFinalMessage = `
+          <span class="additional-final-message-holder">
+              <span>points acquired: </span>
+              <span class="week-chl-points">
+                ${resultsData}
+              </span>
+          </span>
+          `;
         }
 
       } catch (error) {
@@ -669,7 +736,7 @@ async function sendSetTaskResultsToDatabase() {
         }
       }
       } else if (controller.task[0] === "personalChl") {
-        requestSuccess = await updateStudentPointsAndStatistics(coinMultiplier=personalChlCoinBonusMultiplier);
+        [requestSuccess, pointsEarned, coinsEarned] = await updateStudentPointsAndStatistics(coinMultiplier=personalChlCoinBonusMultiplier);
 
         if (requestSuccess) {
           clearTimeout(showMessageTimeout);
@@ -677,8 +744,31 @@ async function sendSetTaskResultsToDatabase() {
             setTimeout(() => closer(), 0);
           }
           if (controller.language === 'LT') {
+            additionalFinalMessage = `
+          <span class="additional-final-message-holder">
+              <span>uždirbai: </span>
+              <span class="earnings-holder">
+                <span class="coin-icon">
+                        <img src="../images/icons/icon-sudedu-coin.png">
+                </span>
+                <span class="coin-amount">${coinsEarned}</span>
+              </span>
+          </span>
+          `;
             messageToTheUser("Rezultatai sėkmingai išsaugoti.", false)
           } else if (controller.language === 'EN') {
+            additionalFinalMessage = `
+            <span class="additional-final-message-holder">
+                <span>you earned: </span>
+                <span class="earnings-holder">
+                  <span class="coin-icon">
+                          <img src="../images/icons/icon-sudedu-coin.png">
+                  </span>
+                  <span class="coin-amount">${coinsEarned}</span>
+                </span>
+            </span>
+            `;
+
             messageToTheUser("Results were saved successfully.", false)
           }
         } else {
@@ -696,7 +786,7 @@ async function sendSetTaskResultsToDatabase() {
         sendTaskInfoToStatisticsDatabase();
       }
     } else {
-      requestSuccess = await updateStudentPointsAndStatistics();
+      [requestSuccess, pointsEarned, coinsEarned] = await updateStudentPointsAndStatistics();
 
       if (requestSuccess) {
         clearTimeout(showMessageTimeout);
@@ -704,8 +794,30 @@ async function sendSetTaskResultsToDatabase() {
           setTimeout(() => closer(), 0);
         }
         if (controller.language === 'LT') {
+          additionalFinalMessage = `
+          <span class="additional-final-message-holder">
+              <span>uždirbai: </span>
+              <span class="earnings-holder">
+                <span class="coin-icon">
+                        <img src="../images/icons/icon-sudedu-coin.png">
+                </span>
+                <span class="coin-amount">${coinsEarned}</span>
+              </span>
+          </span>
+          `;
           messageToTheUser("Rezultatai sėkmingai išsaugoti.", false)
         } else if (controller.language === 'EN') {
+          additionalFinalMessage = `
+          <span class="additional-final-message-holder">
+              <span>you earned: </span>
+              <span class="earnings-holder">
+                <span class="coin-icon">
+                        <img src="../images/icons/icon-sudedu-coin.png">
+                </span>
+                <span class="coin-amount">${coinsEarned}</span>
+              </span>
+          </span>
+          `;
           messageToTheUser("Results were saved successfully.", false)
         }
       } else {
@@ -722,7 +834,9 @@ async function sendSetTaskResultsToDatabase() {
       sendTaskInfoToStatisticsDatabase();
     }
 
-    controller.task = null;
+    if (controller.task[0] !== "weekChl") {
+      controller.task = null;
+    }
     controller.taskRecorded = true;
     localStorage.setItem('controller', JSON.stringify(controller))
 
@@ -737,7 +851,9 @@ async function sendSetTaskResultsToDatabase() {
     }
     if (document.querySelector("#stop-button-span")) {
       document.querySelector("#stop-button-span").disabled = false;
-  }
+    }
+
+    return additionalFinalMessage
 }
 
 async function sendTaskResults(taskId, resultsData) {
@@ -810,10 +926,10 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
       throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
     }
 
-    return true;
+    return [true, pointsEarned, coinsEarned];
   } catch (error) {
     console.error('Error saving statistics:', error);
-    return false;
+    return [false, pointsEarned, coinsEarned];
   }
 }
 
@@ -856,12 +972,13 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
   function displayEquation () {
     controller = JSON.parse(localStorage.getItem('controller'));
     var contentContainerElement = document.getElementById('content-container');
-		contentContainerElement.style.visibility = 'hidden';
+		contentContainerElement.style.opacity = '0';
     var mainRemainderField = document.getElementById('remainder-field');
     mainRemainderField.style.display = 'none';
 
-    if (!controller.questionsStopped) {
-    if (controller.modeChoice7 === "C48" && controller.randomSelection[2] === 'D' && (controller.modeChoice8 === '' || controller.modeChoice8 === 'C79')) {
+    if (controller.questionsStopped) {
+				linkElement.setAttribute("href", "../questions-stopped.css");
+		} else if (controller.modeChoice7 === "C48" && controller.randomSelection[2] === 'D' && (controller.modeChoice8 === '' || controller.modeChoice8 === 'C79')) {
 				linkElement.setAttribute("href", "../questions-stulpeliu-div.css");
 		} else if (controller.modeChoice7 === "C48" && controller.randomSelection[2] === 'D' && controller.modeChoice8 === 'C78') {
 				linkElement.setAttribute("href", "../questions-stulpeliu-div-us.css");
@@ -895,12 +1012,11 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
       linkElement.setAttribute("href", "../questions-bigger.css");
     }
 
-    if (controller.modeChoice5 === "C42") {
+    if (controller.modeChoice5 === "C42" && !controller.questionsStopped) {
       dynamicStyleSheet.setAttribute("href", "../questions-unknown-number-style-supplement.css");
     } else {
       dynamicStyleSheet.setAttribute("href", "");
-    }
-  }   
+    } 
 		
 
     if (controller.questionsStopped) {
@@ -908,7 +1024,7 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
       answerFieldDivElement.style.display = "none";
       questionsSubmitButtonRowElement.style.display = "none";
       resetMistakeButtonsElement.style.display = "flex";
-      contentContainerElement.style.visibility = 'visible';
+      contentContainerElement.style.opacity = '1';
     }
 
     if (controller.modeChoice7 === "C48") {
@@ -934,12 +1050,10 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
       equation2Element.style.display = "none";
       equationElement.innerHTML = controller.equation;
       equation2Element.innerHTML = '';
-      contentContainerElement.style.visibility = 'visible';
     } else if (controller.modeChoice5 === "C42") {
       equationElement.innerHTML = controller.equation;
       equation2Element.style.display = "block";
       equation2Element.innerHTML = controller.equation2;
-      contentContainerElement.style.visibility = 'visible';
     };
 
 
@@ -1308,9 +1422,9 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
               const sanitizedValue = event.target.value.replace(/[^0-9]/g, '');
               event.target.value = sanitizedValue;
           });
-          element.addEventListener("keydown", function (event) {
+          element.addEventListener("keydown", async function (event) {
             if (event.key === "Enter") {
-                checkAnswer();
+                await checkAnswer();
                 clearAnswerField();
             }
           });
@@ -1340,7 +1454,7 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
 
 
 
-function checkAnswer () {
+async function checkAnswer () {
     document.getElementById('hidden-input').focus();
     var isCorrect = true;
     userInput = answerInputElement.value.trim();
@@ -1920,7 +2034,7 @@ function checkAnswer () {
       if (isCorrect) {
         firstTimeChecking = true;
       }
-      formEquation();
+      await formEquation();
       displayEquation();
       answerInputElement.setAttribute("style", "background-color: rgba(255, 255, 255, 0.6)")
     } else {
@@ -1950,7 +2064,7 @@ function checkAnswer () {
     }
   }
 
-  function restartEquations () {	
+  async function restartEquations () {	
     disableFireworks();
     equationElement.style.fontSize = '';
     equationElement.style.paddingTop = '0rem';
@@ -1987,7 +2101,7 @@ function checkAnswer () {
     } else if (controller.modeChoice4 === "C40") {
       startTimer()
     }
-    formEquation();
+    await formEquation();
     displayEquation();
   }
 
@@ -2689,7 +2803,7 @@ function countDown() {
     localStorage.setItem("remainingTime", remainingTime);
   }
 
-  function updateTimer() {
+  async function updateTimer() {
     remainingTime -= 1000;
 
     if (remainingTime <= 0) {
@@ -2700,7 +2814,7 @@ function countDown() {
       controller.taskCompleted = true;
       localStorage.setItem('controller', JSON.stringify(controller))
       if (controller.mode === "math") {
-        formatFinalMessage();
+        await formatFinalMessage();
         displayEquation();
       } else if (controller.mode === "lang") {
         if (controller.modeChoice1 === "C83") {
@@ -4146,3 +4260,35 @@ function restartPetOnWalkActions() {
 function setObjectAnimation(object, animationName) {
     object.style.animation = `${animationName} ${animationStepsAndDurationNumberDict[animationName][1]}s steps(${animationStepsAndDurationNumberDict[animationName][0]}) infinite`;
 }
+
+function redirectToAppropriateLanguage(targetFolder) {
+  if (!targetFolder) return;
+
+  const path = window.location.pathname;
+  const parts = path.split('/').filter(Boolean);
+
+  // Determine current folder (language folder like LT, EN, etc.)
+  // If the last part looks like a file (has '.' or no subfolder after it), take the one before it.
+  let currentFolder;
+  if (parts.length >= 2 && (parts[parts.length - 1].includes('.') || parts[parts.length - 1] !== '')) {
+    currentFolder = parts[parts.length - 2]; // e.g. "LT"
+  } else {
+    currentFolder = parts[parts.length - 1];
+  }
+
+  // Detect filename or default to index.html
+  let fileName = 'index.html';
+  const lastPart = parts[parts.length - 1];
+  if (lastPart.includes('.')) {
+    fileName = lastPart;
+  } else if (lastPart !== targetFolder) {
+    fileName = lastPart + '.html'; // for /LT/game → game.html
+  }
+
+  if (currentFolder !== targetFolder) {
+    const newPath = `/${targetFolder}/${fileName}`;
+    // window.location.replace(newPath);
+  }
+}
+
+

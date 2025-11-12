@@ -3668,7 +3668,7 @@ function transformStudentStats(stats) {
         studentStatisticsPerformanceMean.innerHTML = `<div class="student-points-holder"><div class="student-points-label">Taškai</div> <div class="student-points">${averageStudentScore} (${classScoreMedian})</div></div>`;
         studentStatisticsPerformanceMean.style.display = "block";
 
-        studentStatisticsConsistencyMean.innerHTML = `<div class="student-points-holder"><div class="student-consistency-label">Pastovumas</div> <div class="student-points">${averageStudentConsistency}% (${classConsistencyMedian}%)</div></div>`;
+        studentStatisticsConsistencyMean.innerHTML = `<div class="student-points-holder"><div class="student-consistency-label">Nuoseklumas</div> <div class="student-points">${averageStudentConsistency}% (${classConsistencyMedian}%)</div></div>`;
         studentStatisticsConsistencyMean.style.display = "block";
 
         const knowledgeSelect = document.getElementById("knowledge-level-select");
@@ -3715,7 +3715,7 @@ function transformStudentStats(stats) {
 
         // STATS PART START
 
-        var lithuanianMonths = ['Sau', 'Vas', 'Kov', 'Bal', 'Geg', 'Bir', 'Lie', 'Rugp', 'Rugs', 'Spal', 'Lap', 'Gr'];
+        var lithuanianMonths = ['Saus.', 'Vas.', 'Kov.', 'Bal.', 'Geg.', 'Birž.', 'Liep.', 'Rugp.', 'Rugs.', 'Spal.', 'Lap.', 'Gruod.'];
         
         var metricColors = ['#286D8A', '#32ac93', '#e74c3c', '#F28C28', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
         
@@ -3749,7 +3749,7 @@ function transformStudentStats(stats) {
         function formatLithuanianDate(date) {
             var day = date.getDate();
             var month = lithuanianMonths[date.getMonth()];
-            return day + ' ' + month;
+            return month + ' ' + day;
         }
 
         function isPercentageMetric(metricTitle) {
@@ -4470,10 +4470,12 @@ function transformStudentStats(stats) {
 
         document.querySelector("#mistakes-summary-math").style.display = "block";
         document.querySelector("#mistakes-summary-grammar").style.display = "block";
-        if (document.querySelector("#summary-table").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table").innerHTML === '') {
+        if (document.querySelector("#summary-table").innerHTML === "Klaidų nėra!" || document.querySelector("#summary-table").innerHTML === '') {
             document.querySelector("#mistakes-summary-math").style.display = "none";
         }
-        if (document.querySelector("#summary-table-grammar").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table-grammar").innerHTML === '') {
+
+        console.log(document.querySelector("#summary-table-grammar").innerHTML)
+        if (document.querySelector("#summary-table-grammar").innerHTML === "Klaidų nėra!" || document.querySelector("#summary-table-grammar").innerHTML === '') {
             document.querySelector("#mistakes-summary-grammar").style.display = "none";
         }
 
@@ -4646,10 +4648,10 @@ function transformStudentStats(stats) {
                     document.querySelector("#mistakes-summary-grammar").style.display = "none";
                 }
 
-                if (document.querySelector("#summary-table").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table").innerHTML === '') {
+                if (document.querySelector("#summary-table").innerHTML === "Klaidų nėra!" || document.querySelector("#summary-table").innerHTML === '') {
                     document.querySelector("#mistakes-summary-math").style.display = "none";
                 }
-                if (document.querySelector("#summary-table-grammar").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table-grammar").innerHTML === '') {
+                if (document.querySelector("#summary-table-grammar").innerHTML === "Klaidų nėra!" || document.querySelector("#summary-table-grammar").innerHTML === '') {
                     document.querySelector("#mistakes-summary-grammar").style.display = "none";
                 }
             }
@@ -4798,6 +4800,7 @@ function transformStudentStats(stats) {
                 if (taskInfo[0] === "math" || (taskInfo[0] === "lang" && taskInfo[2] === "C83")) {
                     let mistakesList = [];
                     mistakesList = JSON.parse(task.result)[1]
+
                     if (mistakesList.length > 0) {
                         generateSummaryTable("custom", mistakesList, "summary-table-for-student", "summary-table-grammar-for-student") 
                     }
@@ -4814,10 +4817,10 @@ function transformStudentStats(stats) {
                     document.querySelector("#mistakes-summary-grammar-for-student").style.display = "none";
                 }
 
-                if (document.querySelector("#summary-table-for-student").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table-for-student").innerHTML === "") {
+                if (document.querySelector("#summary-table-for-student").innerHTML === "Klaidų nėra!" || document.querySelector("#summary-table-for-student").innerHTML === "") {
                     document.querySelector("#mistakes-summary-math-for-student").style.display = "none";
                 }
-                if (document.querySelector("#summary-table-grammar-for-student").innerHTML === "Nėra klaidų!" || document.querySelector("#summary-table-grammar-for-student").innerHTML === "") {
+                if (document.querySelector("#summary-table-grammar-for-student").innerHTML === "Klaidų nėra!" || document.querySelector("#summary-table-grammar-for-student").innerHTML === "") {
                     document.querySelector("#mistakes-summary-grammar-for-student").style.display = "none";
                 }
 
@@ -6236,7 +6239,7 @@ function displayFrequentMistakes () {
             document.querySelector("#display-grammar-summary-button").classList.remove("active-summary-button")
             document.querySelector("#summary-table-outer-div").style.display = "flex";
             document.querySelector("#summary-table-grammar-outer-div").style.display = "none";
-            if (document.querySelector("#summary-table").innerHTML === "Nėra klaidų!") {
+            if (document.querySelector("#summary-table").innerHTML === "Klaidų nėra!") {
                 document.querySelector("#table-container-math").style.boxShadow = "none";
                 document.querySelector("#mistakes-summary-math").style.fontSize = "2rem";
                 document.querySelector("#summary-table").style.height = "200px";
@@ -6249,7 +6252,7 @@ function displayFrequentMistakes () {
         document.querySelector("#summary-table-outer-div").style.display = "none";
         document.querySelector("#summary-table-grammar-outer-div").style.display = "flex";
 
-        if ((document.querySelector("#summary-table-grammar").innerHTML === "Nėra klaidų!")) {
+        if ((document.querySelector("#summary-table-grammar").innerHTML === "Klaidų nėra!")) {
                 document.querySelector("#table-container-grammar").style.boxShadow = "none";
                 document.querySelector("#mistakes-summary-grammar").style.fontSize = "2rem";
                 document.querySelector("#summary-table-grammar").style.height = "200px";
@@ -6298,12 +6301,13 @@ window.onload = function () {
     const savedController = localStorage.getItem('controller');
     if (savedController) {
         controller = JSON.parse(savedController);
-    }
-
-    if (controller) {
+        redirectToAppropriateLanguage(controller.language);
         resetControllerTaskSettings();
+    } else {
+        controller.language = "LT";
+        localStorage.setItem('controller', JSON.stringify(controller));
     }
-};
+}
 
 function addHideScrollbarForTouch() {
     // Check if device is touchscreen
