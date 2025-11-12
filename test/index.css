@@ -152,6 +152,15 @@
   font-style: italic;
 }
 
+:root {
+    --unit-size: 25px;
+    --original-unit-size: 25px;
+    --pet-size: calc(var(--unit-size)*3);
+    --wall-base-color: #F0EAD6;
+    --floor-base-color: #DEB887 ;
+    --baseboard-base-color: #B37B50;
+}
+
 body {
   font-family: 'SFpro', sans-serif;
   color: #212529;
@@ -309,6 +318,28 @@ scrollbar-color: rgba(255,255,255,0.4) transparent;
 
 .chart-container .scroll-indicator-line-horizontal.bottom {
     bottom: 26px;
+}
+
+.pet-on-walk-holder {
+  position: relative;
+}
+
+#pet-on-walk {
+  width: var(--pet-size);
+  height: var(--pet-size);
+  position: absolute;
+  user-select: none;
+  z-index: 20;
+  touch-action: none;
+  bottom: -10px;
+}
+
+#pet-on-walk.pet-left {
+  transform: scaleX(1);
+}
+
+#pet-on-walk.pet-right {
+  transform: scaleX(-1);
 }
 
 .kid-5 {

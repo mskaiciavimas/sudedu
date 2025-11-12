@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/css" href="../index.css">
 	<link id="questionsStyleSheet" rel="stylesheet" type="text/css" href="">
 	<link rel="stylesheet" type="text/css" href="../summary.css">
+	<link rel="stylesheet" href="../pet-game-pets.css">
 
 	<!-- Google tag (gtag.js) -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-96Q83PW8XY"></script>
@@ -286,7 +287,7 @@
 	.button-outer-holder {
 		display: flex;
 		justify-content: space-between;
-		padding-top: 15px;
+		padding-top: 10px;
 	}
 
 	.check-next-question-row {
@@ -436,7 +437,7 @@
 
 .tracker-timer-holder {
 	padding: 0 15px;
-	margin-bottom: 15px;
+	margin-bottom: 10px;
 }
 
 .trackers-row {
@@ -447,9 +448,14 @@
 .trackers-holder,
 .timer-holder {
 	display: flex;
-	flex: 1;
+	flex: 0 0 auto;
 	white-space: nowrap;
 	align-items: start;
+}
+
+.pet-on-walk-holder {
+	flex: 1 1 auto;
+	min-width: 0;
 }
 
 .timer-holder {
@@ -853,6 +859,9 @@
 					</div>
 			</div>
 		</div>
+		<div class="pet-on-walk-holder">
+        	<div id="pet-on-walk"></div>
+      	</div>
 		<div class="timer-holder">
 			<div id="timer"></div>
 
@@ -2176,6 +2185,9 @@ function helpToggle() {
 
 					controller.taskCompleted = false;
 	    			controller.taskRecorded = false;
+
+					restartPetOnWalkActions();
+
 					localStorage.setItem('controller', JSON.stringify(controller));
 					initiateTheProgram();
 				}

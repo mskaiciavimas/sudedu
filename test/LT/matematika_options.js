@@ -46,8 +46,10 @@ let rasybaOptionsLabelTextGaluneElement = document.querySelector('#rasyba-option
             toggleVisibility(modeChoice7Element, false);
             toggleVisibility(numberLabel, false);
             toggleVisibility(selectedNumberElement, false);
+            selectedNumberElement.value = 1
             toggleVisibility(numberLabel2, false);
             toggleVisibility(selectedNumber2Element, false);
+            selectedNumber2Element.value = 1
             toggleVisibility(remainderOptionElement, false);
             remainderCheckBox.checked = false;
 
@@ -117,15 +119,19 @@ let rasybaOptionsLabelTextGaluneElement = document.querySelector('#rasyba-option
         } else if (modeChoice1Selection === "C1" || modeChoice1Selection === "C2" || modeChoice1Selection === "C3") {
             toggleVisibility(numberLabel, false);
             toggleVisibility(selectedNumberElement, false);
+            selectedNumberElement.value = 1;
             toggleVisibility(numberLabel2, false);
             toggleVisibility(selectedNumber2Element, false);
+            selectedNumber2Element.value = 1;
             toggleVisibility(modeChoice3Element, true);
             toggleVisibility(modeChoice5Element, true);
         } else {
             toggleVisibility(numberLabel, false);
             toggleVisibility(selectedNumberElement, false);
+            selectedNumberElement.value = 1;
             toggleVisibility(numberLabel2, false);
             toggleVisibility(selectedNumber2Element, false);
+            selectedNumber2Element.value = 1;
             toggleVisibility(modeChoice3Element, false);
             toggleVisibility(modeChoice5Element, true);
         }

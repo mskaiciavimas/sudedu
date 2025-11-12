@@ -3061,7 +3061,7 @@ if (storedCacheExpiry) {
                 body: JSON.stringify({ taskId })
             });
 
-            if (!response) return;
+            if (!response) return null;
 
             if (!response.ok) {
                 throw new Error(`Server error ${response.status}: ${response.statusText}`);
@@ -3072,7 +3072,8 @@ if (storedCacheExpiry) {
             if (data.success) {
                 return {
                     challenge: data.challenge,
-                    duration: data.duration
+                    duration: data.duration,
+                    weekDuration: data.weekDuration
                 };
             } else {
                 console.warn("Challenge not found:", data.error);
@@ -3084,10 +3085,40 @@ if (storedCacheExpiry) {
         }
     }
 
+    async function updateChallengeScore(newScore) {
+        try {
+            const response = await apiFetch(apiBase + 'class/updateChallengeScore', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ score: newScore })
+            });
+
+            if (!response) return null;
+
+            if (!response.ok) {
+                throw new Error(`Server error ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+
+            if (data.success) {
+                return {
+                    newScore: data.newScore
+                };
+            } else {
+                console.warn("Score update failed:", data.error);
+                return null;
+            }
+        } catch (error) {
+            console.error("Error updating challenge score:", error);
+            return null;
+        }
+    }
+
 
     function formatWeekChallengeDescription(task) {
         const parsedTaskDescription = JSON.parse(task.challenge);
-        const parsedTaskDuration = JSON.parse(task.duration);
+        const parsedTaskDuration = JSON.parse(task.weekDuration);
         const formattedTaskDescription = getOptionTextFromValues(parsedTaskDescription, parsedTaskDuration);
 
         const classWeekChallengeTaskDescription = document.getElementById("class-challenge-task-list")
@@ -3521,9 +3552,10 @@ window.addEventListener('load', positionWeekChallengeItems);
 
 
 function completeWeekChlTask() {
-    console.log(weekChallengeInfo)
     const parsedCurrentTaskInstructions = JSON.parse(weekChallengeInfo.challenge);
-    const currentTaskDuration = JSON.parse(weekChallengeInfo.duration);
+    const currentTaskDuration = JSON.parse(weekChallengeInfo.weekDuration);
+
+    console.log(parsedCurrentTaskInstructions, currentTaskDuration)
 
     if (localStorage.getItem('controller') !== null) {
         controller = JSON.parse(localStorage.getItem('controller'))
@@ -3536,7 +3568,11 @@ function completeWeekChlTask() {
         controller.mode = 'math';
         controller.modeChoice1 = parsedCurrentTaskInstructions[1];
         controller.modeChoice2 = parsedCurrentTaskInstructions[2];
-        controller.modeChoice3 = parsedCurrentTaskInstructions[3];
+        if (parsedCurrentTaskInstructions[3] === "C37") {
+            controller.modeChoice3 = true;
+        } else if (parsedCurrentTaskInstructions[3] === "C38") {
+            controller.modeChoice3 = false;
+        }
         controller.modeChoice5 = parsedCurrentTaskInstructions[4];
         controller.modeChoice6 = parsedCurrentTaskInstructions[5];
         controller.modeChoice7 = parsedCurrentTaskInstructions[6];

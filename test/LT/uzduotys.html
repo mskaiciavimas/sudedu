@@ -3464,9 +3464,7 @@
                 for (const sub of stats[key]) {
                 if (Array.isArray(sub) && sub.length >= 4) {
                     const points = sub[0];
-                    const total = sub[3];
-                    const ratio = total === 0 ? 0 : points / total;
-                    ratios.push(ratio);
+                    ratios.push(points);
                 }
                 }
             }
@@ -3521,7 +3519,7 @@ function transformStudentStats(stats) {
       sub.forEach((val, i) => {
         let value;
 
-        if (i === 3) {
+        if (i === 0 || i === 3) {
           // Absolute number, no division
           value = val;
         } else {
@@ -4284,6 +4282,7 @@ function transformStudentStats(stats) {
                     yAxes[axisId] = {
                         type: 'linear',
                         display: true,
+                        min: 0,
                         position: percentageMetrics.length > 0 || over100Metrics.length > 0 || rightAxisCount > 0 ? 'right' : 'left',
                         title: { 
                             display: false
@@ -4922,9 +4921,7 @@ function transformStudentStats(stats) {
                 for (const sub of statArray) {
                 if (Array.isArray(sub) && sub.length >= 4) {
                     const points = sub[0];
-                    const total = sub[3];
-                    const ratio = total === 0 ? 0 : points / total;
-                    allRatios.push(ratio);
+                    allRatios.push(points);
                 }
                 }
             }

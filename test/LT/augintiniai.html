@@ -88,15 +88,6 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --unit-size: 25px;
-            --original-unit-size: 25px;
-            --pet-size: calc(var(--unit-size)*3);
-            --wall-base-color: #F0EAD6;
-            --floor-base-color: #DEB887 ;
-            --baseboard-base-color: #B37B50;
-        }
-
         html {
             display: flex;
             justify-content: center;
@@ -231,16 +222,6 @@
             transform: scale(1);
         }
 
-        .bath-1 {
-            width: calc(var(--unit-size) * 5);
-            height: calc(var(--unit-size) * 3);
-            background-image: url('../images/pet-game/bath.png');
-             background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
-            z-index: 4;
-        }
-
         .pet {
             width: var(--pet-size);
             height: var(--pet-size);
@@ -302,7 +283,6 @@
             border-radius: 20px;
             cursor: pointer;
             font-size: 1rem;
-            font-family: 'SFpro', sans-serif;
         }
         .edit { 
             background-color: #3b82f6; color: #F5F5F7; 
@@ -427,7 +407,8 @@
 #customConfirmYes,
 .treat-use-btn,
 .food-use-btn,
-.fill-water-bowl-btn  {
+.fill-water-bowl-btn,
+.fill-bath-btn  {
   letter-spacing: 0.01em;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   /*box-shadow: 
@@ -453,7 +434,8 @@
 #customConfirmYes::before,
 .treat-use-btn::before,
 .food-use-btn::before,
-.fill-water-bowl-btn::before {
+.fill-water-bowl-btn::before,
+.fill-bath-btn::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -479,7 +461,8 @@
 #customConfirmYes::after,
 .treat-use-btn::after,
 .food-use-btn::after,
-.fill-water-bowl-btn::after {
+.fill-water-bowl-btn::after,
+.fill-bath-btn::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -505,7 +488,8 @@
 #customConfirmYes:hover::before,
 .treat-use-btn:hover::before,
 .food-use-btn:hover::before,
-.fill-water-bowl-btn:hover::before   {
+.fill-water-bowl-btn:hover::before,
+.fill-bath-btn:hover::before {
   background: rgba(255, 255, 255, 0.15);
 }
 
@@ -850,7 +834,6 @@
             flex-direction: row;
             flex: 1;
             gap: 15px;
-            min-width: 50%;
             align-items: center;
             line-height: 1;
         }
@@ -875,6 +858,7 @@
             font-size: 0.9rem;
             display: flex;
             flex-direction: column;
+            margin-top: 2px;
         }
 
         .food-item-name {
@@ -901,12 +885,6 @@
             font-size: 14px;
             text-align: center;
         }
-
-        .purchase-quantity,
-        .pet-supply-use-quantity {
-            padding: 0;
-        }
-
 
         .shop-item {
             background: rgba(255, 255, 255, 0.8);
@@ -961,11 +939,6 @@
             width: 24px;
         }
 
-        .shop-item.owned {
-            border-color: #10b981;
-            background: #ecfdf5;
-        }
-
         .purchase-btn.owned,
         .use-btn.used,
         .use-btn.equipped,
@@ -989,7 +962,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
             margin-top: 15px;
         }
 
@@ -1019,14 +991,15 @@
             background: linear-gradient(135deg, #40c9a9, #32ac93);
             color: #F5F5F7;
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.8rem;
             font-weight: bold;
             border: 2px solid #F5F5F7;
+            z-index: 9999;
         }
 
         .item-preview-holder {
@@ -1049,7 +1022,7 @@
             align-items: center;
             justify-content: center;
             background-color: rgb(210, 180, 140);
-            padding: 10px;
+            padding: 2px;
             border-radius: 10px;
         }
 
@@ -1121,22 +1094,6 @@
             margin-bottom: 28px;
         }
 
-        .purchase-quantity,
-        .pet-supply-use-quantity {
-            width: 40px;
-            background-color: #F5F5F7;
-            border: 1px solid #212529;
-            border-radius: 5px;
-            text-align: center;
-            height: 22px;
-        }
-
-        .purchase-quantity:focus,
-        .purchase-quantity:active,
-        .pet-supply-use-quantity:focus,
-        .pet-supply-use-quantity:active {
-            border: none;
-        }
 
         @keyframes draw {
         0% {
@@ -1454,6 +1411,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-top: 2px;
+            gap: 4px;
         }
 
         .food-item .item-description-icons {
@@ -1898,12 +1857,14 @@
     align-items: center;
 }
 
-.water-bowl-options-container {
+.water-bowl-options-container,
+.bath-options-container {
     display: flex;
     justify-content: end;
 }
 
-.fill-water-bowl-btn {
+.fill-water-bowl-btn,
+.fill-bath-btn {
     align-items: center;
     gap: 0.5rem;
     border-radius: 20px;
@@ -1942,6 +1903,68 @@
 .pet-on-walk-holder {
     display: flex;
     flex-direction: column;
+}
+
+.furniture-preview-button {
+    border: 2px solid #F5F5F7;
+    background: linear-gradient(135deg, #3288AC, #286D8A);
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.furniture-preview-button svg {
+    height: 20px;
+    width: 20px;
+    color: #F5F5F7
+}
+
+.item-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.purchase-quantity-holder {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 1);
+}
+
+.purchase-quantity,
+.pet-supply-use-quantity,
+.food-quantity-input {
+    width: 26px;              /* fixed width */
+    height: 30px;             /* fixed height */
+    padding: 0;               /* remove internal padding */
+    border: none;
+    text-align: center;       /* horizontally center text */
+    line-height: 30px;        /* vertically center text */
+    font-size: 1rem;
+    box-sizing: border-box;   /* include border in width/height */
+    -moz-appearance: textfield;  /* remove spinner in Firefox */
+}
+
+.purchase-quantity::-webkit-outer-spin-button,
+.purchase-quantity::-webkit-inner-spin-button,
+.pet-supply-use-quantity::-webkit-outer-spin-button,
+.pet-supply-use-quantity::-webkit-inner-spin-button,
+.food-quantity-input::-webkit-outer-spin-button,
+.food-quantity-input::-webkit-inner-spin-button {
+    -webkit-appearance: none; /* remove spinner in Chrome/Safari */
+    margin: 0;
+}
+
+.control-btn {
+    height: 20px;
+    width: 20px;
 }
 
 @media (max-width: 1024px) {
@@ -2305,16 +2328,8 @@
 
     .item-description,
     .pet-supply-use-quantity-label,
-    .pet-supply-use-quantity,
-    .purchase-quantity-label,
-    .purchase-quantity,
     .item-price span {
         font-size: 1.35rem;
-    }
-
-    .pet-supply-use-quantity,
-    .purchase-quantity {
-        height: 30px;
     }
 
     .use-btn,
@@ -2485,6 +2500,7 @@
 
     .food-use-btn,
     .fill-water-bowl-btn,
+    .fill-bath-btn
     .treat-use-btn {
         font-size: 1.25rem;
     }
@@ -2945,7 +2961,7 @@
     <script src="../mental-arithmetic.js"></script>
     <script src="../main-nav-bar.js"></script>
     <script>
-        if (!userData) {
+        if (!userData || userData?.accType === "teacher") {
             window.location.href = './';
         }
 
@@ -2965,6 +2981,9 @@
             "electricityTax": 20
         }
         let petOnWalk = "";
+        const speciesTranslationDict = {
+            "cat": "katė"
+        }
 
         function convertUserPetAssetsDictToCompactList(data) {
             console.log(data);
@@ -3050,7 +3069,7 @@
 
                 predictAndSetZIndex(petDiv);
 
-                setPetAnimation(petDiv, `${petNumber}-sleeps`)
+                setObjectAnimation(petDiv, `${petNumber}-sleeps`)
             }
 
             Object.entries(petStatsList).forEach(([petId, stats]) => {
@@ -3065,7 +3084,7 @@
 
                 const currentTime = Math.floor(Date.now() / 1000 / 60);
                 const timeElapsed = currentTime - stats[3];
-                const statDecrease = Math.floor(timeElapsed * 5);
+                const statDecrease = Math.floor(timeElapsed * PET_STATS_EXPIRATION);
 
                 const food = Math.max(bonusStats[petSpecies]["food"], stats[0] - statDecrease);
                 const water = Math.max(bonusStats[petSpecies]["water"], stats[1] - statDecrease);
@@ -3399,26 +3418,36 @@ function parseGameData(dataFromServer) {
 async function fetchGameData() {
     let showMessageTimeout;
     let closer;
+    
     // Schedule showing the message after 500ms
     showMessageTimeout = setTimeout(() => {
         closer = messageToTheUser("Duomenys ieškomi duomenų bazėje. Procesas gali užtrukti kelias minutes.", false);
     }, 500);
 
-    Array.from(document.getElementById("gameContainer").children).forEach(child => {
-        child.style.pointerEvents = "none";  // disables clicks
-        child.style.opacity = "0.5";         // optional visual cue
+    const gameContainer = document.getElementById("gameContainer");
+    Array.from(gameContainer.children).forEach(child => {
+        child.style.pointerEvents = "none";
+        child.style.opacity = "0.5";
     });
+    
     try {
+        // ✅ Get fresh userData right before making the request
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        
+        if (!userData?.userId) {
+            throw new Error('No user data found');
+        }
+
         const response = await apiFetch(apiBase + 'petGame/gameData', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ studentId: userData.userId })  // stringify the whole object, not the id itself
+            body: JSON.stringify({ studentId: userData.userId })
         });
 
         if (!response) {
-            return;
+            throw new Error('No response from server');
         }
 
         if (!response.ok) {
@@ -3426,22 +3455,22 @@ async function fetchGameData() {
         }
 
         const result = await response.json();
-        Array.from(document.getElementById("gameContainer").children).forEach(child => {
-            child.style.pointerEvents = "auto";  // enables clicks
-            child.style.opacity = "1";           // restore visual
-        });
-        parseGameData(result)
+        parseGameData(result);
 
     } catch (error) {
         messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
         console.error("Error fetching game data:", error);
     } finally {
-        // Cancel showing the message if not yet displayed
+        // ✅ Re-enable container (moved to finally to always execute)
+        Array.from(gameContainer.children).forEach(child => {
+            child.style.pointerEvents = "auto";
+            child.style.opacity = "1";
+        });
+        
         clearTimeout(showMessageTimeout);
-
-        // Close message if it was displayed
+        
         if (closer) {
-            setTimeout(() => closer(), 0); // close after 0.5s
+            setTimeout(() => closer(), 0);
         }
     }
 }
@@ -3459,8 +3488,63 @@ let offsetY = 0;
 const objectInteractions = {
     'pet': (obj) => displayPetTreatOptions(obj),
     'food-bowl': (obj) => displayFoodOptions(obj),
-    'water-bowl': (obj) => displayWaterBowlFillingOptions(obj)
+    'water-bowl': (obj) => displayWaterBowlFillingOptions(obj),
+    'music-player': (obj) => toggleMusicPlayer(obj),
+    'bath': (obj) => displayBathFillingOption (obj)
+
 };
+
+function toggleMusicPlayer(obj) {
+  const musicPlayerAutoOff = 4000; // milliseconds
+
+  const pets = document.querySelectorAll('.pet');
+
+  if (!obj.objectOn) {
+    // Turn ON
+    obj.objectOn = true;
+    setObjectAnimation(obj, "musicPlayerOn");
+    initUserTriggeredAction("music", obj);
+
+    // Automatically turn off after delay
+    setTimeout(() => {
+      if (!obj.objectOn) return; // already off
+
+      obj.objectOn = false;
+      setObjectAnimation(obj, "musicPlayerOff");
+
+      pets.forEach((pet) => {
+        const firstAction = pendingPetActions[pet.id]?.[0];
+        const dancingIsFirstItem = firstAction && firstAction[0] === petDances;
+
+        pendingPetActions[pet.id] = (pendingPetActions[pet.id] || []).filter(
+          ([fn, args]) => fn !== petDances
+        );
+
+        if (dancingIsFirstItem) {
+          managePetActions(pet);
+        }
+      });
+    }, musicPlayerAutoOff);
+
+  } else {
+    // Turn OFF manually
+    obj.objectOn = false;
+    setObjectAnimation(obj, "musicPlayerOff");
+
+    pets.forEach((pet) => {
+      const firstAction = pendingPetActions[pet.id]?.[0];
+      const dancingIsFirstItem = firstAction && firstAction[0] === petDances;
+
+      pendingPetActions[pet.id] = (pendingPetActions[pet.id] || []).filter(
+        ([fn, args]) => fn !== petDances
+      );
+
+      if (dancingIsFirstItem) {
+        managePetActions(pet);
+      }
+    });
+  }
+}
 
 // Disable right-click context menu and image highlighting in room container
 roomContainer.addEventListener('contextmenu', function(e) {
@@ -3521,7 +3605,7 @@ function enablePetDragging() {
 
             if (petControllers[pet.id]) {
                 petControllers[pet.id].abort();
-                setPetAnimation(pet, `${pet.id}-stands-idle`);
+                setObjectAnimation(pet, `${pet.id}-stands-idle`);
             }
             
             holdTimer = setInterval(() => {
@@ -3541,7 +3625,7 @@ function enablePetDragging() {
             if (holdTimer) {
                 clearInterval(holdTimer);
             }
-            setPetAnimation(pet, `${pet.id}-stands-idle`)
+            setObjectAnimation(pet, `${pet.id}-stands-idle`)
             pet.actionTimer = setTimeout(() => {
                 managePetActions(pet);
                 pet.actionTimer = null; // Clean up reference
@@ -3965,68 +4049,6 @@ document.addEventListener('pointerup', function(e) {
     }
 });
 
-        const animationStepsAndDurationNumberDict = {
-            "cat-1-sits-idle": [10, 2],
-            "cat-1-sits-idle-blinks": [10, 2],
-            "cat-1-sleeps": [4, 2],
-            "cat-1-dances": [4, 0.5],
-            "cat-1-talks": [8, 2],
-            "cat-1-excited": [12, 1.5],
-            "cat-1-lays-idle": [12, 2],
-            "cat-1-sits-idle-thinks": [9, 2],
-            "cat-1-cries": [4, 0.5],
-            "cat-1-in-box-1": [12, 1.5],
-            "cat-1-in-box-2": [4, 2],
-            "cat-1-in-box-3": [4, 0.5],
-            "cat-1-surprised": [12, 1.5],
-            "cat-1-eats": [15, 2],
-            "cat-1-waits": [6, 0.5],
-            "cat-1-refuses": [13, 2],
-            "cat-1-angry": [9, 2],
-            "cat-1-happy": [12, 2],
-            "cat-1-angry-2": [4, 1],
-            "cat-1-licks-paw": [11, 2],
-            "cat-1-medicine": [5, 1.5],
-            "cat-1-sick": [4, 1],
-            "cat-1-walks-upwards": [4, 0.85],
-            "cat-1-walks-downwards": [4, 0.85],
-            "cat-1-walks-sideways": [4, 0.85],
-            "cat-1-stands-idle": [4, 0.85],
-            "cat-2-sits-idle": [10, 2],
-            "cat-2-sits-idle-blinks": [10, 2],
-            "cat-2-sleeps": [4, 2],
-            "cat-2-dances": [4, 0.5],
-            "cat-2-talks": [8, 2],
-            "cat-2-excited": [12, 1.5],
-            "cat-2-lays-idle": [12, 2],
-            "cat-2-sits-idle-thinks": [9, 2],
-            "cat-2-cries": [4, 0.5],
-            "cat-2-in-box-1": [12, 1.5],
-            "cat-2-in-box-2": [4, 2],
-            "cat-2-in-box-3": [4, 0.5],
-            "cat-2-surprised": [12, 1.5],
-            "cat-2-eats": [15, 2],
-            "cat-2-waits": [6, 0.5],
-            "cat-2-refuses": [13, 2],
-            "cat-2-angry": [9, 2],
-            "cat-2-happy": [12, 2],
-            "cat-2-angry-2": [4, 1],
-            "cat-2-licks-paw": [11, 2],
-            "cat-2-medicine": [5, 1.5],
-            "cat-2-sick": [4, 1],
-            "cat-2-walks-upwards": [4, 0.85],
-            "cat-2-walks-downwards": [4, 0.85],
-            "cat-2-walks-sideways": [4, 0.85],
-            "cat-2-stands-idle": [4, 0.85]
-
-
-        }
-
-//Switch animation dynamically with JavaScript
-function setPetAnimation(pet, animationName) {
-    pet.style.animation = `${animationName} ${animationStepsAndDurationNumberDict[animationName][1]}s steps(${animationStepsAndDurationNumberDict[animationName][0]}) infinite`;
-}
-
 
 function movePetToTile(pet, startCoord, endCoord, speed = 300) {
     if (!pet) return Promise.resolve();
@@ -4372,13 +4394,13 @@ function moveObjectAlongPath(objectId, path, speed = 300, onComplete) {
         // Preserve your original animation logic exactly
         if (deltaRow > 0) {
             // Moving down
-            setPetAnimation(object, `${objectId}-walks-downwards`);
+            setObjectAnimation(object, `${objectId}-walks-downwards`);
         } else if (deltaRow < 0) {
             // Moving up
-            setPetAnimation(object, `${objectId}-walks-upwards`);
+            setObjectAnimation(object, `${objectId}-walks-upwards`);
         } else if (deltaCol !== 0) {
             // Moving horizontally
-            setPetAnimation(object, `${objectId}-walks-sideways`);
+            setObjectAnimation(object, `${objectId}-walks-sideways`);
             
             // Set direction (sprite originally faces left)
             if (deltaCol < 0) {
@@ -4408,7 +4430,7 @@ function moveObjectAlongPath(objectId, path, speed = 300, onComplete) {
                     object.style.transition = '';
                     activeMovements.delete(objectId);
                     typeof predictAndSetZIndex === 'function' && predictAndSetZIndex(object, col, row);
-                    setPetAnimation(object, `${objectId}-stands-idle`);
+                    setObjectAnimation(object, `${objectId}-stands-idle`);
                     onComplete?.();
                 }
             }, speed);
@@ -5172,10 +5194,10 @@ function cancelMovement(objectId) {
         }
         activeMovements.delete(objectId);
         if (object && object.classList.contains("pet")) {
-            setPetAnimation(object, `${object.id}-stands-idle`);
+            setObjectAnimation(object, `${object.id}-stands-idle`);
         }
     } else {
-        setPetAnimation(object, `${object.id}-stands-idle`);
+        setObjectAnimation(object, `${object.id}-stands-idle`);
     }
 }
 
@@ -5424,13 +5446,15 @@ async function sendPetStatsUpdateToDatabase(petId) {
     const pet = document.getElementById(petId);
     if (!pet?._stats) return false;
 
-    const petsArray = [
-        [petId, [
+    const statList = [
             pet._stats.foodNew,
             pet._stats.waterNew,
             pet._stats.loveNew,
             Math.floor(Date.now() / 1000 / 60)
-        ]]
+        ]
+
+    const petsArray = [
+        [petId, statList]
     ];
 
     try {
@@ -5448,6 +5472,9 @@ async function sendPetStatsUpdateToDatabase(petId) {
 
         if (response.ok) {
             document.querySelector('.some-pet-element')?.classList.add('tick-svg');
+
+            updatePetOnWalkStatsInLocalStorage(petId, statList)
+
             return true;
         } else {
             messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
@@ -6723,11 +6750,13 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
     // Collect owned items
     for (const key in userObjectAssets) {
         const assetIndex = userObjectAssets[key].assetIndex;
-        ownedIndexes.add(assetIndex);
+        if (userObjectAssets[key].position.length !== 0) {
+            ownedIndexes.add(assetIndex);
 
         const cssClassStr = gameAssetIndex[assetIndex]?.['css-class'];
         if (cssClassStr) {
             cssClassStr.split(' ').forEach(cls => ownedCssClasses.add(cls));
+        }
         }
     }
 
@@ -6818,7 +6847,14 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
         if (item['css-class'].includes("previewable")) {
             previewButton = document.createElement('button');
             previewButton.className = 'furniture-preview-button';
-            previewButton.innerHTML = "Peržiūra";
+            previewButton.innerHTML = `
+                <svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+                <g id="#000000ff">
+                    <path fill="currentColor" opacity="1.00" d=" M 36.64 15.81 C 50.35 12.75 64.60 18.19 74.99 27.10 C 80.59 32.24 86.00 37.71 90.00 44.21 L 90.00 45.73 C 88.02 49.39 85.71 52.88 82.91 55.98 C 78.00 61.42 72.60 66.65 65.92 69.86 C 60.03 72.66 53.67 74.84 47.09 74.94 C 33.60 75.71 20.23 69.69 10.94 60.06 C 6.55 55.91 2.82 51.08 0.00 45.74 L 0.00 44.21 C 3.86 37.89 9.09 32.58 14.49 27.57 C 20.71 21.84 28.52 18.03 36.64 15.81 M 42.33 24.28 C 35.57 24.96 29.44 29.28 26.35 35.30 C 23.27 41.54 23.38 49.22 26.69 55.35 C 29.39 59.98 33.82 63.75 39.08 65.06 C 46.25 67.12 54.61 65.29 59.84 59.85 C 67.89 52.16 67.88 37.84 59.85 30.15 C 55.40 25.51 48.63 23.50 42.33 24.28 Z" />
+                    <path fill="currentColor" opacity="1.00" d=" M 43.34 36.28 C 47.08 35.56 51.53 37.40 52.99 41.08 C 54.64 44.43 53.88 48.67 51.37 51.37 C 48.85 53.67 45.00 54.58 41.80 53.27 C 36.93 51.78 34.78 45.49 37.00 41.08 C 38.00 38.42 40.65 36.81 43.34 36.28 Z" />
+                </g>
+                </svg>
+                `;
             previewButton.onclick = () => previewFurniture(key);
         }
 
@@ -6882,29 +6918,56 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
 
             let quantityInput = null;
             if (!item.oneOfKind) {
-                quantityInput = document.createElement('input');
+                const quantityInputHolder = document.createElement('div');
+                quantityInputHolder.className = 'purchase-quantity-holder input-wrapper';
+
+                const quantityInput = document.createElement('input');
                 quantityInput.type = 'number';
                 quantityInput.min = 1;
+                quantityInput.max = 999;
+                quantityInput.step = 1;
                 quantityInput.value = 1;
                 quantityInput.className = 'purchase-quantity';
+                quantityInput.id = `purchase-qty-${key}`;
+                quantityInput.readOnly = true;
 
-                const quantityInputLabel = document.createElement('label');
-                quantityInputLabel.className = 'purchase-quantity-label';
-                quantityInputLabel.innerHTML = 'Kiekis: ';
+                const minusBtn = document.createElement('button');
+                minusBtn.className = 'control-btn';
+                minusBtn.textContent = '−';
+                minusBtn.onmousedown = () => {
+                    startHold(quantityInput.id, 1, 999, false);
+                    updatePrice();
+                };
+                minusBtn.onmouseup = minusBtn.onmouseleave = stopHold;
+                minusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, false); updatePrice(); };
+                minusBtn.ontouchend = minusBtn.ontouchcancel = stopHold;
 
-                const quantityInputHolder = document.createElement('div');
-                quantityInputHolder.className = 'purchase-quantity-holder';
-                quantityInputHolder.appendChild(quantityInputLabel);
+                const plusBtn = document.createElement('button');
+                plusBtn.className = 'control-btn';
+                plusBtn.textContent = '+';
+                plusBtn.onmousedown = () => {
+                    startHold(quantityInput.id, 1, 999, true);
+                    updatePrice();
+                };
+                plusBtn.onmouseup = plusBtn.onmouseleave = stopHold;
+                plusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, true); updatePrice(); };
+                plusBtn.ontouchend = plusBtn.ontouchcancel = stopHold;
+
+                quantityInputHolder.appendChild(minusBtn);
                 quantityInputHolder.appendChild(quantityInput);
-
+                quantityInputHolder.appendChild(plusBtn);
                 priceAndQuantDiv.appendChild(quantityInputHolder);
 
-                // Update price when quantity changes
-                quantityInput.addEventListener('input', () => {
+                const updatePrice = () => {
                     const qty = parseInt(quantityInput.value, 10) || 1;
                     priceSpan.textContent = item.cost * qty;
-                });
+                };
+
+                // Also optional: in case someone types manually (if you remove readOnly later)
+                quantityInput.addEventListener('input', updatePrice);
+                quantityInput.addEventListener('change', updatePrice);
             }
+
 
             if (ownedIndexes.has(assetIndex)) {
                 if (item.oneOfKind) {
@@ -6929,7 +6992,7 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
             });
 
             if (previewButton && !(ownedIndexes.has(assetIndex) && item.oneOfKind)) {
-                itemDiv.appendChild(previewButton);
+                previewHolder.appendChild(previewButton);
             }
             itemDiv.appendChild(previewHolder);
             itemDiv.appendChild(infoDiv);
@@ -7374,32 +7437,54 @@ function renderPetSupplies(selectedCategory = 'all', selectedPetType = null) {
 
         let quantityInput = null;
         if (!item.oneOfKind && item.stackable !== false) {
-            quantityInput = document.createElement('input');
+            const quantityInputHolder = document.createElement('div');
+            quantityInputHolder.className = 'pet-supply-use-quantity-holder input-wrapper';
+
+            const quantityInput = document.createElement('input');
             quantityInput.type = 'number';
             quantityInput.min = 1;
-            quantityInput.max = asset.quantity; // Don't allow more than owned
+            quantityInput.max = asset.quantity; // don't allow more than owned
             quantityInput.value = 1;
-            quantityInput.className = 'pet-supply-use-quantity'; // Specific class name
+            quantityInput.className = 'pet-supply-use-quantity';
+            quantityInput.readOnly = true; // prevent manual typing if using buttons
 
-            quantityInput.addEventListener('input', () => {
-                const max = parseInt(quantityInput.max, 10);
-                const min = parseInt(quantityInput.min, 10);
-                let value = parseInt(quantityInput.value, 10);
+            // Buttons
+            const minusBtn = document.createElement('button');
+            minusBtn.className = 'control-btn';
+            minusBtn.textContent = '−';
+            minusBtn.onmousedown = () => startHold(quantityInput.id, 1, asset.quantity, false, updateQuantity);
+            minusBtn.onmouseup = minusBtn.onmouseleave = stopHold;
+            minusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, asset.quantity, false, updateQuantity); };
+            minusBtn.ontouchend = minusBtn.ontouchcancel = stopHold;
 
+            const plusBtn = document.createElement('button');
+            plusBtn.className = 'control-btn';
+            plusBtn.textContent = '+';
+            plusBtn.onmousedown = () => startHold(quantityInput.id, 1, asset.quantity, true, updateQuantity);
+            plusBtn.onmouseup = plusBtn.onmouseleave = stopHold;
+            plusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, asset.quantity, true, updateQuantity); };
+            plusBtn.ontouchend = plusBtn.ontouchcancel = stopHold;
+
+            quantityInput.id = `pet-supply-qty-${asset.assetIndex}`;
+
+            quantityInputHolder.appendChild(minusBtn);
+            quantityInputHolder.appendChild(quantityInput);
+            quantityInputHolder.appendChild(plusBtn);
+
+            // Update function
+            function updateQuantity(input) {
+                if (!input) input = quantityInput;
+                let value = parseInt(input.value, 10);
+                const min = parseInt(input.min, 10);
+                const max = parseInt(input.max, 10);
                 if (isNaN(value) || value < min) value = min;
                 if (value > max) value = max;
+                input.value = value;
+            }
 
-                quantityInput.value = value;
-            });
-
-            const quantityInputLabel = document.createElement('label');
-            quantityInputLabel.className = 'pet-supply-use-quantity-label'; // Specific class name
-            quantityInputLabel.innerHTML = 'Kiekis: ';
-
-            const quantityInputHolder = document.createElement('div');
-            quantityInputHolder.className = 'pet-supply-use-quantity-holder'; // Specific class name
-            quantityInputHolder.appendChild(quantityInputLabel);
-            quantityInputHolder.appendChild(quantityInput);
+            // Optional: if you want manual input allowed
+            quantityInput.addEventListener('input', () => updateQuantity(quantityInput));
+            quantityInput.addEventListener('change', () => updateQuantity(quantityInput));
 
             infoDiv.appendChild(quantityInputHolder);
         }
@@ -7541,7 +7626,6 @@ function renderPetSkins(selectedPetType = null) {
             // Simplified skin check - look for 'skin' in css-class
             if (!item['css-class'] || !item['css-class'].includes('skin')) continue;
 
-            console.log(selectedPetType)
             if (selectedPetType && !item['css-class'].includes(selectedPetType)) continue;
 
             const itemDiv = document.createElement('div');
@@ -7901,7 +7985,10 @@ function createPetButtons() {
         checkbox.type = 'checkbox';
         checkbox.id = `pet-on-walk-toggle-${pet.id}`;
         checkbox.className = "pet-on-walk-toggle";
-        checkbox.checked = petOnWalk === pet.id;
+        const skins = userPetAssets.pets[pet.id].skins
+        const equippedSkin = Object.values(skins).find(skin => skin.equiped);
+        equippedSkinName = gameAssetIndex[equippedSkin.assetIndex]["css-class"].split(" ")[1];
+        checkbox.checked = petOnWalk === equippedSkinName;
 
         const span = document.createElement('span');
         span.className = 'switch-slider';
@@ -7937,7 +8024,10 @@ function createPetButtons() {
                 checkboxHolder.querySelectorAll('input[type="checkbox"]').forEach(cb => {
                     if (cb !== checkbox) cb.checked = false;
                 });
-                petOnWalk = pet.id;
+                const skins = userPetAssets.pets[pet.id].skins
+                const equippedSkin = Object.values(skins).find(skin => skin.equiped);
+                petOnWalk = gameAssetIndex[equippedSkin.assetIndex]["css-class"].split(" ")[1];
+                console.log(petOnWalk)
                 sendPetOnWalkUpdateToServer();
                 switchText.textContent = '';
                 // update other switches
@@ -7977,14 +8067,29 @@ async function sendPetOnWalkUpdateToServer() {
 
         if (response.ok) {
             document.querySelector('.some-pet-element')?.classList.add('tick-svg');
+            userData.petOnWalk = petOnWalk
+            localStorage.setItem('userData', JSON.stringify(userData));
             return true;
         } else {
             console.error(`Failed to update pet stats: ${response.status}`);
+            messageToTheUser("Nepavyko pasiimti augintinio kartu į užduotis. Bandyk vėl vėliau.")
             return false;
         }
     } catch (error) {
         console.error('Error sending pet stats update:', error);
+        messageToTheUser("Nepavyko pasiimti augintinio kartu į užduotis. Bandyk vėl vėliau.")
         return false;
+    }
+}
+
+function updatePetOnWalkStatsInLocalStorage (petId, statList) {
+    const skins = userPetAssets.pets[petId].skins
+    const equippedSkin = Object.values(skins).find(skin => skin.equiped);
+    const equippedSkinName = gameAssetIndex[equippedSkin.assetIndex]["css-class"].split(" ")[1];
+
+    if (petOnWalk === equippedSkinName) {
+        userData.petStats = statList
+        localStorage.setItem('userData', JSON.stringify(userData));
     }
 }
 
@@ -7994,7 +8099,7 @@ function displayPetStats(activePetId) {
     const currentPet = document.getElementById(activePetId);
     const currentTime = Math.floor(Date.now() / 1000 / 60);
     const timeElapsed = currentTime - currentPet._stats.date;
-    const statDecrease = Math.floor(timeElapsed * 5);
+    const statDecrease = Math.floor(timeElapsed * PET_STATS_EXPIRATION);
 
     const petSpecies = activePetId.split("-")[0];
     const bonusStats = bonusFromDailySupplyItems();
@@ -8006,6 +8111,8 @@ function displayPetStats(activePetId) {
     currentPet._stats.love = Math.max(bonusStats[petSpecies]["love"], currentPet._stats.love - statDecrease);
     currentPet._stats.loveNew = Math.max(bonusStats[petSpecies]["love"], currentPet._stats.loveNew - statDecrease);
     currentPet._stats.date = currentTime;
+
+    updatePetOnWalkStatsInLocalStorage(activePetId, [currentPet._stats.foodNew, currentPet._stats.waterNew, currentPet._stats.loveNew, currentPet._stats.date])
 
     setPetStatsBar("food-bar", currentPet._stats.food+1);
     setPetStatsBar("water-bar", currentPet._stats.water+1);
@@ -8037,7 +8144,7 @@ function increasePetStatsInDatabase(petId, stat, amount) {
 
     const currentTime = Math.floor(Date.now() / 1000 / 60);
     const timeElapsed = currentTime - currentPet._stats.date;
-    const statDecrease = Math.floor(timeElapsed * 5);
+    const statDecrease = Math.floor(timeElapsed * PET_STATS_EXPIRATION);
 
     const petSpecies = petId.split("-")[0];
     const bonusStats = bonusFromDailySupplyItems();
@@ -8055,6 +8162,8 @@ function increasePetStatsInDatabase(petId, stat, amount) {
     currentPet._stats.date = Math.floor(Date.now() / 1000 / 60);
     sendPetStatsUpdateToDatabase(petId);
 }
+
+
 
 function increasePetStatsInDisplay(petId, stat) {
     const pet = document.getElementById(petId)
@@ -8083,10 +8192,11 @@ function displayWaterBowlFillingOptions(obj) {
 
     const speciesSuitableForBowl = [...new Set(
         Array.from(obj.classList)
-            .filter(cls => cls.includes("water-bowl") && cls !== "water-bowl" && !cls.includes("furniture-preview")) 
+            .filter(cls => cls.includes("water-bowl") && cls !== "water-bowl" && !cls.includes("furniture-preview"))
             .map(cls => cls.split("-")[0])
-    )].join(", ");
-
+    )]
+    .map(species => speciesTranslationDict[species] || species)  // translate each if available
+    .join(", ");
 
     const waterBowlOptionsElement = document.createElement('div');
     waterBowlOptionsElement.className = 'water-bowl-options-container';
@@ -8111,31 +8221,70 @@ function displayWaterBowlFillingOptions(obj) {
     openObjectPopup(waterBowlOptionsElement, 'Vandens dubenėlis', `Tinka: ${speciesSuitableForBowl}`)
 }
 
+function displayBathFillingOption(obj) {
+    if (obj._full && obj._full === true) {
+        messageToTheUser("Vonia jau pripilta!")
+        return
+    }
+
+    const speciesSuitableForBath = [...new Set(
+        Array.from(obj.classList)
+            .filter(cls => cls.includes("-bath") && !cls.includes("furniture-preview"))
+            .map(cls => cls.split("-")[0])
+    )]
+    .map(species => speciesTranslationDict[species] || species)
+    .join(", ");
+
+    const bathOptionsElement = document.createElement('div');
+    bathOptionsElement.className = 'bath-options-container';
+
+    const btn = document.createElement('button');
+        btn.className = 'fill-bath-btn';
+        btn.textContent = 'Pripildyti';
+        btn.addEventListener('click', () => {
+            closeObjectPopup();
+
+            if (!taxesData.waterTax.paid) {
+                messageToTheUser("Nėra vandens. Sumokėk vandens mokestį!","error");
+                return
+            }
+            
+            obj._full = true;
+
+            const bathType = Array.from(obj.classList).find(cls => cls.startsWith("bath-"))
+            setObjectAnimation(obj, `${bathType}-filled`)
+            initUserTriggeredAction("bath", obj)
+        });
+
+        bathOptionsElement.appendChild(btn);
+
+    openObjectPopup(bathOptionsElement, 'Vonia', `Tinka: ${speciesSuitableForBath}`)
+}
+
 
 function displayFoodOptions(obj) {
     if (obj.className.includes("full")) {
-        messageToTheUser("Dubenelis jau pilnas!")
-        return
+        messageToTheUser("Dubenelis jau pilnas!");
+        return;
     }
 
     if (selectedConsumable.length !== 0 &&
         gameAssetIndex[userPetAssets["supplies"][selectedConsumable[0]].assetIndex]["provides"][0] === "food"
     ) {
-        const selectedFoodInfo = gameAssetIndex[userPetAssets["supplies"][selectedConsumable[0]].assetIndex]
-
+        const selectedFoodInfo = gameAssetIndex[userPetAssets["supplies"][selectedConsumable[0]].assetIndex];
         const targetClasses = selectedFoodInfo.provides[1];
-        
+
         if (!targetClasses.some(cls => obj.className.includes(cls))) {
-            messageToTheUser("Dubenėlis netinkamas šiam maistui.")
-            return
+            messageToTheUser("Dubenėlis netinkamas šiam maistui.");
+            return;
         }
 
         clearPlacementHighlights();
 
-        obj.classList.add("full")
-        obj._foodContent = [selectedFoodInfo["provides"], selectedConsumable[1]]
+        obj.classList.add("full");
+        obj._foodContent = [selectedFoodInfo["provides"], selectedConsumable[1]];
 
-        initUserTriggeredAction("food", obj)
+        initUserTriggeredAction("food", obj);
 
         const updatedQuantity = userPetAssets["supplies"][selectedConsumable[0]]["quantity"] - selectedConsumable[1];
         if (updatedQuantity <= 0) {
@@ -8144,26 +8293,26 @@ function displayFoodOptions(obj) {
             userPetAssets.supplies[selectedConsumable[0]]["quantity"] = updatedQuantity;
         }
         selectedConsumable = [];
-        clearPlacementHighlights()
+        clearPlacementHighlights();
         sendPetAssetsUpdateToDatabase();
     } else {
         selectedConsumable = [];
         const matchedSupplies = [];
 
         Object.entries(userPetAssets.supplies).forEach(([supplyKey, supply]) => {
-        const item = gameAssetIndex[supply.assetIndex];
-        if (item && item["provides"][0] === "food") {
-            const targetClasses = item.provides[1];
-            targetClasses.forEach(cls => {
-                for (const c of obj.classList) {
-                    if (c.includes(cls)) {
-                        matchedSupplies.push({ key: supplyKey, supply, item }); // save dict key here
-                        break;
+            const item = gameAssetIndex[supply.assetIndex];
+            if (item && item["provides"][0] === "food") {
+                const targetClasses = item.provides[1];
+                targetClasses.forEach(cls => {
+                    for (const c of obj.classList) {
+                        if (c.includes(cls)) {
+                            matchedSupplies.push({ key: supplyKey, supply, item });
+                            break;
+                        }
                     }
-                }
-            });
-        }
-    });
+                });
+            }
+        });
 
         // Create container element
         const foodOptionsElement = document.createElement('div');
@@ -8171,9 +8320,11 @@ function displayFoodOptions(obj) {
 
         const speciesSuitableForBowl = [...new Set(
             Array.from(obj.classList)
-                .filter(cls => cls.includes("food-bowl") && cls !== "food-bowl") // skip exact match
-                .map(cls => cls.split("-")[0])                                    // take [0] part
-            )].join(", ");
+                .filter(cls => cls.includes("food-bowl") && cls !== "food-bowl")
+                .map(cls => cls.split("-")[0])
+        )]
+            .map(species => speciesTranslationDict[species] || species)
+            .join(", ");
 
         if (matchedSupplies.length === 0) {
             const itemDiv = document.createElement('div');
@@ -8181,7 +8332,7 @@ function displayFoodOptions(obj) {
 
             const noItemMessage = document.createElement('div');
             noItemMessage.className = 'no-item-message';
-            noItemMessage.innerHTML = "Maisto tinkamo įdėti į šį dubenėlį nėra. Gali nupirkti parduotuvėje."
+            noItemMessage.innerHTML = "Maisto tinkamo įdėti į šį dubenėlį nėra. Gali nupirkti parduotuvėje.";
 
             foodOptionsElement.append(noItemMessage);
         }
@@ -8196,8 +8347,7 @@ function displayFoodOptions(obj) {
             const previewHolder = document.createElement('div');
             previewHolder.className = 'food-item-preview-holder';
 
-            const infoDiv = document.createElement('div');
-            infoDiv.className = 'item-info';
+            previewHolder.appendChild(previewDiv)
 
             const nameH3 = document.createElement('h3');
             nameH3.className = 'food-item-name';
@@ -8205,8 +8355,7 @@ function displayFoodOptions(obj) {
 
             const description = document.createElement('div');
             description.className = 'food-item-description';
-            description.innerHTML = item.description;
-            description.innerHTML += generateConsumableItemDescription(item)
+            description.innerHTML = item.description + generateConsumableItemDescription(item);
 
             const quantitySpan = document.createElement('span');
             quantitySpan.className = 'item-quantity';
@@ -8216,41 +8365,80 @@ function displayFoodOptions(obj) {
             nameAndDescriptionHolder.className = 'food-item-name-description-holder';
 
             nameH3.appendChild(quantitySpan);
-
             nameAndDescriptionHolder.appendChild(nameH3);
             nameAndDescriptionHolder.appendChild(description);
 
             const previewAndTextHolder = document.createElement('div');
             previewAndTextHolder.className = 'food-item-preview-text-holder';
-
             previewAndTextHolder.appendChild(previewHolder);
             previewAndTextHolder.appendChild(nameAndDescriptionHolder);
 
             // Quantity input if stackable
             let quantityInput = null;
+            let quantityInputHolder = null;
+
             if (supply.quantity) {
+                quantityInputHolder = document.createElement('div');
+                quantityInputHolder.className = 'purchase-quantity-holder input-wrapper';
+
                 quantityInput = document.createElement('input');
                 quantityInput.type = 'number';
                 quantityInput.min = 1;
                 quantityInput.max = supply.quantity;
+                quantityInput.step = 1;
+                quantityInput.value = 1;
                 quantityInput.className = 'food-quantity-input';
-                quantityInput.defaultValue = 1;
+                quantityInput.readOnly = true;
+                quantityInput.id = `food-qty-${supply.assetIndex}`;
 
+                const minusBtn = document.createElement('button');
+                minusBtn.className = 'control-btn';
+                minusBtn.textContent = '−';
+                minusBtn.onmousedown = () => startHold(quantityInput.id, 1, supply.quantity, false, updateQuantity);
+                minusBtn.onmouseup = minusBtn.onmouseleave = stopHold;
+                minusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, supply.quantity, false, updateQuantity); };
+                minusBtn.ontouchend = minusBtn.ontouchcancel = stopHold;
+
+                const plusBtn = document.createElement('button');
+                plusBtn.className = 'control-btn';
+                plusBtn.textContent = '+';
+                plusBtn.onmousedown = () => startHold(quantityInput.id, 1, supply.quantity, true, updateQuantity);
+                plusBtn.onmouseup = plusBtn.onmouseleave = stopHold;
+                plusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, supply.quantity, true, updateQuantity); };
+                plusBtn.ontouchend = plusBtn.ontouchcancel = stopHold;
+
+                quantityInputHolder.appendChild(minusBtn);
+                quantityInputHolder.appendChild(quantityInput);
+                quantityInputHolder.appendChild(plusBtn);
+
+                const quantAndBtnHolder = document.createElement('div');
+                quantAndBtnHolder.className = 'food-item-quant-btn-holder';
+                quantAndBtnHolder.appendChild(quantityInputHolder);
+
+                // Keep value within min/max if manually edited
                 quantityInput.addEventListener('input', () => {
+                    let value = parseInt(quantityInput.value, 10);
                     const max = parseInt(quantityInput.max, 10);
                     const min = parseInt(quantityInput.min, 10);
-                    let value = parseInt(quantityInput.value, 10);
-
                     if (isNaN(value) || value < min) value = min;
                     if (value > max) value = max;
-
                     quantityInput.value = value;
-            });
-            }
+                    updateQuantity(quantityInput);
+                });
+                quantityInput.addEventListener('change', () => updateQuantity(quantityInput));
 
-            const quantAndBtnHolder = document.createElement('div');
-            quantAndBtnHolder.className = 'food-item-quant-btn-holder';
-            if (quantityInput) quantAndBtnHolder.appendChild(quantityInput);
+                function updateQuantity(input) {
+                    console.log('Selected quantity:', input.value);
+                }
+
+                itemDiv.appendChild(previewAndTextHolder);
+                itemDiv.appendChild(quantAndBtnHolder);
+            } else {
+                const quantAndBtnHolder = document.createElement('div');
+                quantAndBtnHolder.className = 'food-item-quant-btn-holder';
+                itemDiv.appendChild(previewAndTextHolder);
+                itemDiv.appendChild(quantAndBtnHolder);
+            }
 
             // Use button
             const btn = document.createElement('button');
@@ -8263,43 +8451,38 @@ function displayFoodOptions(obj) {
                     if (supply.quantity <= 0) {
                         delete userPetAssets.supplies[key];
                     } else {
-                        userPetAssets.supplies[key]["quantity"] = supply.quantity
+                        userPetAssets.supplies[key]["quantity"] = supply.quantity;
                     }
                     sendPetAssetsUpdateToDatabase();
                     closeObjectPopup();
-                    obj.classList.add("full")
-                    obj._foodContent = [item["provides"], useQuantity]
-
-                    initUserTriggeredAction("food", obj)
+                    obj.classList.add("full");
+                    obj._foodContent = [item["provides"], useQuantity];
+                    initUserTriggeredAction("food", obj);
                 }
             });
 
-            quantAndBtnHolder.appendChild(btn);
-
-            itemDiv.appendChild(previewAndTextHolder);
-            itemDiv.appendChild(quantAndBtnHolder);
-
+            itemDiv.querySelector('.food-item-quant-btn-holder')?.appendChild(btn);
             foodOptionsElement.appendChild(itemDiv);
         });
-        
-        openObjectPopup(foodOptionsElement, "Maisto dubenėlis", `Tinka: ${speciesSuitableForBowl}`)
+
+        openObjectPopup(foodOptionsElement, "Maisto dubenėlis", `Tinka: ${speciesSuitableForBowl}`);
     }
 }
 
+
 function displayPetTreatOptions(obj) {
     if (selectedConsumable.length !== 0) {
-        const selectedFoodInfo = gameAssetIndex[userPetAssets["supplies"][selectedConsumable[0]].assetIndex]
-        console.log(selectedFoodInfo)
+        const selectedFoodInfo = gameAssetIndex[userPetAssets["supplies"][selectedConsumable[0]].assetIndex];
 
         if (selectedFoodInfo["provides"][0] === "love") {
             const targetClasses = selectedFoodInfo.provides[1];
-            
+
             if (!targetClasses.some(cls => obj.className.includes(cls))) {
-                messageToTheUser("Skanukas netinka šiam augintiniui.")
-                return
+                messageToTheUser("Skanukas netinka šiam augintiniui.");
+                return;
             }
-            
-            initUserTriggeredAction("love", [obj, selectedFoodInfo["provides"][2], [selectedConsumable[1]]])
+
+            initUserTriggeredAction("love", [obj, selectedFoodInfo["provides"][2], [selectedConsumable[1]]]);
 
             const updatedQuantity = userPetAssets["supplies"][selectedConsumable[0]]["quantity"] - selectedConsumable[1];
             if (updatedQuantity <= 0) {
@@ -8314,33 +8497,32 @@ function displayPetTreatOptions(obj) {
         const matchedSupplies = [];
 
         Object.entries(userPetAssets.supplies).forEach(([supplyKey, supply]) => {
-        const item = gameAssetIndex[supply.assetIndex];
-        if (item && item["provides"][0] === "love") {
-            const targetClasses = item.provides[1];
-            targetClasses.forEach(cls => {
-                for (const c of obj.classList) {
-                    if (c.includes(cls)) {
-                        matchedSupplies.push({ key: supplyKey, supply, item }); // save dict key here
-                        break;
+            const item = gameAssetIndex[supply.assetIndex];
+            if (item && item["provides"][0] === "love") {
+                const targetClasses = item.provides[1];
+                targetClasses.forEach(cls => {
+                    for (const c of obj.classList) {
+                        if (c.includes(cls)) {
+                            matchedSupplies.push({ key: supplyKey, supply, item });
+                            break;
+                        }
                     }
-                }
-            });
-        }
-    });
+                });
+            }
+        });
 
-        // Create container element
-        const foodOptionsElement = document.createElement('div');
-        foodOptionsElement.className = 'treats-options-container';
-        
+        const treatsOptionsElement = document.createElement('div');
+        treatsOptionsElement.className = 'treats-options-container';
+
         if (matchedSupplies.length === 0) {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'food-item';
 
             const noItemMessage = document.createElement('div');
             noItemMessage.className = 'no-item-message';
-            noItemMessage.innerHTML = "Skaniukų tinkamų šiam augintiniui nėra. Gali nupirkti parduotuvėje."
+            noItemMessage.innerHTML = "Skaniukų tinkamų šiam augintiniui nėra. Gali nupirkti parduotuvėje.";
 
-            foodOptionsElement.append(noItemMessage);
+            treatsOptionsElement.append(noItemMessage);
         }
 
         matchedSupplies.forEach(({ key, supply, item }) => {
@@ -8353,8 +8535,7 @@ function displayPetTreatOptions(obj) {
             const previewHolder = document.createElement('div');
             previewHolder.className = 'food-item-preview-holder';
 
-            const infoDiv = document.createElement('div');
-            infoDiv.className = 'item-info';
+            previewHolder.appendChild(previewDiv);
 
             const nameH3 = document.createElement('h3');
             nameH3.className = 'food-item-name';
@@ -8362,9 +8543,7 @@ function displayPetTreatOptions(obj) {
 
             const description = document.createElement('div');
             description.className = 'food-item-description';
-            description.innerHTML = item.description;
-            description.innerHTML += generateConsumableItemDescription(item)
-
+            description.innerHTML = item.description + generateConsumableItemDescription(item);
 
             const quantitySpan = document.createElement('span');
             quantitySpan.className = 'item-quantity';
@@ -8374,41 +8553,72 @@ function displayPetTreatOptions(obj) {
             nameAndDescriptionHolder.className = 'food-item-name-description-holder';
 
             nameH3.appendChild(quantitySpan);
-
             nameAndDescriptionHolder.appendChild(nameH3);
             nameAndDescriptionHolder.appendChild(description);
 
             const previewAndTextHolder = document.createElement('div');
             previewAndTextHolder.className = 'food-item-preview-text-holder';
-
             previewAndTextHolder.appendChild(previewHolder);
             previewAndTextHolder.appendChild(nameAndDescriptionHolder);
 
-            // Quantity input if stackable
+            // Quantity input with buttons
             let quantityInput = null;
+            let quantityInputHolder = null;
+
             if (supply.quantity) {
+                quantityInputHolder = document.createElement('div');
+                quantityInputHolder.className = 'purchase-quantity-holder input-wrapper';
+
                 quantityInput = document.createElement('input');
                 quantityInput.type = 'number';
                 quantityInput.min = 1;
                 quantityInput.max = supply.quantity;
+                quantityInput.step = 1;
+                quantityInput.value = 1;
                 quantityInput.className = 'food-quantity-input';
-                quantityInput.defaultValue = 1;
+                quantityInput.readOnly = true;
+                quantityInput.id = `treat-qty-${supply.assetIndex}`;
 
+                const minusBtn = document.createElement('button');
+                minusBtn.className = 'control-btn';
+                minusBtn.textContent = '−';
+                minusBtn.onmousedown = () => startHold(quantityInput.id, 1, supply.quantity, false, updateQuantity);
+                minusBtn.onmouseup = minusBtn.onmouseleave = stopHold;
+                minusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, supply.quantity, false, updateQuantity); };
+                minusBtn.ontouchend = minusBtn.ontouchcancel = stopHold;
+
+                const plusBtn = document.createElement('button');
+                plusBtn.className = 'control-btn';
+                plusBtn.textContent = '+';
+                plusBtn.onmousedown = () => startHold(quantityInput.id, 1, supply.quantity, true, updateQuantity);
+                plusBtn.onmouseup = plusBtn.onmouseleave = stopHold;
+                plusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, supply.quantity, true, updateQuantity); };
+                plusBtn.ontouchend = plusBtn.ontouchcancel = stopHold;
+
+                quantityInputHolder.appendChild(minusBtn);
+                quantityInputHolder.appendChild(quantityInput);
+                quantityInputHolder.appendChild(plusBtn);
+
+                // Keep value within min/max if manually edited
                 quantityInput.addEventListener('input', () => {
+                    let value = parseInt(quantityInput.value, 10);
                     const max = parseInt(quantityInput.max, 10);
                     const min = parseInt(quantityInput.min, 10);
-                    let value = parseInt(quantityInput.value, 10);
-
                     if (isNaN(value) || value < min) value = min;
                     if (value > max) value = max;
-
                     quantityInput.value = value;
-            });
+                    updateQuantity(quantityInput);
+                });
+                quantityInput.addEventListener('change', () => updateQuantity(quantityInput));
+
+                function updateQuantity(input) {
+                    console.log('Selected quantity:', input.value);
+                }
             }
 
             const quantAndBtnHolder = document.createElement('div');
             quantAndBtnHolder.className = 'food-item-quant-btn-holder';
-            if (quantityInput) quantAndBtnHolder.appendChild(quantityInput);
+            if (quantityInputHolder) quantAndBtnHolder.appendChild(quantityInputHolder);
 
             // Use button
             const btn = document.createElement('button');
@@ -8421,12 +8631,12 @@ function displayPetTreatOptions(obj) {
                     if (supply.quantity <= 0) {
                         delete userPetAssets.supplies[key];
                     } else {
-                        userPetAssets.supplies[key]["quantity"] = supply.quantity
+                        userPetAssets.supplies[key]["quantity"] = supply.quantity;
                     }
                     sendPetAssetsUpdateToDatabase();
                     closeObjectPopup();
 
-                    initUserTriggeredAction("love", [obj, item["provides"][2], useQuantity])
+                    initUserTriggeredAction("love", [obj, item["provides"][2], useQuantity]);
                 }
             });
 
@@ -8435,21 +8645,22 @@ function displayPetTreatOptions(obj) {
             itemDiv.appendChild(previewAndTextHolder);
             itemDiv.appendChild(quantAndBtnHolder);
 
-            foodOptionsElement.appendChild(itemDiv);
+            treatsOptionsElement.appendChild(itemDiv);
         });
 
         openObjectPopup(
-        foodOptionsElement,
-        `<div id="pet-container-${obj.id}">
-            <span id="pet-name-${obj.id}">${userPetAssets["pets"][obj.id].name}</span>
-            <button class="edit-name-button" onclick="editPetName('${obj.id}', this)">
-                <span class="edit-icon"><img src="../images/icons/icon-edit.svg"></span>
-            </button>
-        </div>`,
-        ''
-        );    
+            treatsOptionsElement,
+            `<div id="pet-container-${obj.id}">
+                <span id="pet-name-${obj.id}">${userPetAssets["pets"][obj.id].name}</span>
+                <button class="edit-name-button" onclick="editPetName('${obj.id}', this)">
+                    <span class="edit-icon"><img src="../images/icons/icon-edit.svg"></span>
+                </button>
+            </div>`,
+            ''
+        );
     }
 }
+
 
 function generateConsumableItemDescription(item) {
     if (!item || item.provides.length !== 3) return '';
@@ -8459,16 +8670,14 @@ function generateConsumableItemDescription(item) {
 
     let container = `<div class="item-description-icons">`;
 
-    for (let i = 0; i < providesQuantity; i++) {
-        container += `
-            <svg class="item-description-icon">
-                <use href="#icon-${providesType}"></use>
-            </svg>
-        `;
-    }
+    container += `
+        <svg class="item-description-icon">
+            <use href="#icon-${providesType}"></use>
+        </svg> x ${providesQuantity}
+    `;
 
     if (!item.petAsset) {
-        container += '&nbsp;per dieną'
+        container += 'per dieną'
     }
 
     container += `</div>`;
@@ -8497,7 +8706,7 @@ async function startSleeping(pet, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
     
-    setPetAnimation(pet, `${pet.id}-sleeps`);
+    setObjectAnimation(pet, `${pet.id}-sleeps`);
 
     const timeMin = 1000;
     const timeMax = 3000;
@@ -8510,7 +8719,7 @@ async function startSleeping(pet, signal) {
         }
 
     
-    setPetAnimation(pet, `${pet.id}-lays-idle`);
+    setObjectAnimation(pet, `${pet.id}-lays-idle`);
 
     const timeMin2 = 1000;
     const timeMax2 = 3000;
@@ -8526,7 +8735,11 @@ async function startSleeping(pet, signal) {
 }
 
 function managePetActions(pet) {
-    // Check if pet room container is visible
+
+    if (pet._busy) {
+        return
+    }
+
     const petRoomContainer = document.getElementById("pet-room-container");
     if (!petRoomContainer || 
         petRoomContainer.style.display === "none" || 
@@ -8536,7 +8749,7 @@ function managePetActions(pet) {
         // Abort any ongoing action for this pet
         if (petControllers[pet.id]) {
             petControllers[pet.id].abort();
-            setPetAnimation(pet, `${pet.id}-stands-idle`);
+            setObjectAnimation(pet, `${pet.id}-stands-idle`);
             delete petControllers[pet.id]; // Clean up the controller
         }
         return; // Exit the function without starting new actions
@@ -8545,7 +8758,7 @@ function managePetActions(pet) {
     // cancel any ongoing action for this pet
     if (petControllers[pet.id]) {
         petControllers[pet.id].abort();
-        setPetAnimation(pet, `${pet.id}-stands-idle`);
+        setObjectAnimation(pet, `${pet.id}-stands-idle`);
     }
 
     // create a new controller for this action chain
@@ -8582,8 +8795,7 @@ function managePetActions(pet) {
             situationalPetActions.push(petAutonomousActionsSituational[pet.id]["sad"]);
         }
 
-        let petHappiness = 3;
-        if (petHappiness <= 3) {
+        if (!calculateHappinesIndexForPet(pet.id)) {
             situationalPetActions.push(petAutonomousActionsSituational[pet.id]["angry"]);
             situationalPetActions.push(petAutonomousActionsSituational[pet.id]["sad"]);
         }
@@ -8624,6 +8836,27 @@ function managePetActions(pet) {
     }
 }
 
+async function petDances(pet, signal) {
+  if (signal.aborted) {
+    cancelMovement(pet.id);
+    throw new DOMException("Aborted", "AbortError");
+  }
+
+  cancelMovement(pet.id);
+  setObjectAnimation(pet, `${pet.id}-dances`);
+
+  await cancellableWait(4000, signal);
+
+  if (signal.aborted) {
+    cancelMovement(pet.id);
+    throw new DOMException("Aborted", "AbortError");
+  }
+
+  pendingPetActions[pet.id].shift();
+  managePetActions(pet);
+}
+
+
 async function petHappy(pet, quantity, signal) {
         if (signal.aborted) {
             cancelMovement(pet.id)
@@ -8634,7 +8867,7 @@ async function petHappy(pet, quantity, signal) {
 
     cancelMovement(pet.id)
 
-    setPetAnimation(pet, `${pet.id}-happy`);
+    setObjectAnimation(pet, `${pet.id}-happy`);
 
     await cancellableWait(2000, signal);
         if (signal.aborted) {
@@ -8689,7 +8922,7 @@ async function petEats(pet, object, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
 
-        setPetAnimation(pet, `${pet.id}-eats`);
+        setObjectAnimation(pet, `${pet.id}-eats`);
         if (objectWidthInTiles - objectInteractivePart[0] * 2 !== petWidthInTiles) {
             changeCatFacingDirection(pet, "left");
         }
@@ -8700,7 +8933,7 @@ async function petEats(pet, object, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
 
-        setPetAnimation(pet, `${pet.id}-sits-idle`);
+        setObjectAnimation(pet, `${pet.id}-sits-idle`);
         increasePetStatsInDisplay(pet.id, "food");
         object.classList.remove("full");
 
@@ -8714,7 +8947,7 @@ async function petEats(pet, object, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
 
-        setPetAnimation(pet, `${pet.id}-eats`);
+        setObjectAnimation(pet, `${pet.id}-eats`);
         if (objectWidthInTiles - objectInteractivePart[0] * 2 !== petWidthInTiles) {
             changeCatFacingDirection(pet, "right");
         }
@@ -8725,7 +8958,7 @@ async function petEats(pet, object, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
 
-        setPetAnimation(pet, `${pet.id}-sits-idle`);
+        setObjectAnimation(pet, `${pet.id}-sits-idle`);
         increasePetStatsInDisplay(pet.id, "food");
         object.classList.remove("full");
 
@@ -8775,7 +9008,7 @@ async function petDrinks(pet, object, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
 
-        setPetAnimation(pet, `${pet.id}-eats`);
+        setObjectAnimation(pet, `${pet.id}-eats`);
         if (objectWidthInTiles - objectInteractivePart[0] * 2 !== petWidthInTiles) {
             changeCatFacingDirection(pet, "left");
         }
@@ -8786,7 +9019,7 @@ async function petDrinks(pet, object, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
 
-        setPetAnimation(pet, `${pet.id}-sits-idle`);
+        setObjectAnimation(pet, `${pet.id}-sits-idle`);
         increasePetStatsInDisplay(pet.id, "water");
         object.classList.remove("full");
 
@@ -8800,7 +9033,7 @@ async function petDrinks(pet, object, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
 
-        setPetAnimation(pet, `${pet.id}-eats`);
+        setObjectAnimation(pet, `${pet.id}-eats`);
         if (objectWidthInTiles - objectInteractivePart[0] * 2 !== petWidthInTiles) {
             changeCatFacingDirection(pet, "right");
         }
@@ -8811,7 +9044,7 @@ async function petDrinks(pet, object, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
 
-        setPetAnimation(pet, `${pet.id}-sits-idle`);
+        setObjectAnimation(pet, `${pet.id}-sits-idle`);
         increasePetStatsInDisplay(pet.id, "water");
         object.classList.remove("full");
 
@@ -8820,6 +9053,93 @@ async function petDrinks(pet, object, signal) {
 
     } else {
         messageToTheUser(`Augintiniai negali prieiti prie maisto. Perstatyk baldus!`);
+        pendingPetActions[pet.id].shift();
+        managePetActions(pet);
+    }
+}
+
+
+async function petBathes(pet, object, signal) {
+    if (signal.aborted) {
+        cancelMovement(pet.id)
+        throw new DOMException("Aborted", "AbortError");
+    }
+
+    if (!object) return;
+
+    let petCoords = getObjectCoordinates(pet.id);
+
+    let objectInteractivePart = gameAssetIndex[userObjectAssets[object.id]["assetIndex"]]["interactive-spot"];
+    let objectCoords = getObjectCoordinates(object.id);
+
+    let objectInteractiveCoords = [objectCoords[0] + objectInteractivePart[0], objectCoords[1] - objectInteractivePart[1]];
+
+    let objectWidthInTiles = Math.ceil(object.offsetWidth / unitSize);
+    let objectHightInTiles = Math.ceil(object.offsetHeight / unitSize);
+    let petWidthInTiles = Math.ceil(pet.offsetHeight / unitSize);
+    let objectInteractiveBottomRightCoords = [objectCoords[0] + objectWidthInTiles - objectInteractivePart[0] - petWidthInTiles, objectCoords[1] - objectInteractivePart[1]];
+
+    let ableToPostitionToInteract = canPlaceObjectAt(objectInteractiveCoords[0], objectInteractiveCoords[1], pet.offsetWidth, pet.offsetHeight, generateWalkabilityMap());
+    let ableToPostitionToInteractAlt = canPlaceObjectAt(objectCoords[0], objectCoords[1], pet.offsetWidth, pet.offsetHeight, generateWalkabilityMap());
+
+    let finalBathInteractionCoords = null;
+    if (ableToPostitionToInteract) {
+        finalBathInteractionCoords = objectInteractiveCoords
+    } else if (ableToPostitionToInteractAlt) {
+        finalBathInteractionCoords = objectCoords
+    }
+
+    if (finalBathInteractionCoords) {
+
+        if (signal.aborted) {
+            cancelMovement(pet.id)
+            throw new DOMException("Aborted", "AbortError");
+        }
+
+        await movePetToTile(pet, getObjectCoordinates(pet.id), finalBathInteractionCoords, 300, signal);
+            if (signal.aborted) {
+            cancelMovement(pet.id)
+            throw new DOMException("Aborted", "AbortError");
+        }
+
+        pet.style.visibility = "hidden";
+
+        const bathType = Array.from(object.classList).find(cls => cls.startsWith("bath-"))
+
+        const skins = userPetAssets.pets[pet.id].skins;
+
+        let equippedSkin = Object.values(skins).find(skin => skin.equiped);
+        
+        if (!equippedSkin) {
+            const firstSkinKey = Object.keys(skins)[0];
+            equippedSkin = skins[firstSkinKey];
+            equippedSkin.equiped = true;
+            sendPetAssetsUpdateToDatabase();
+        }
+
+        const equippedSkinSecondClass = gameAssetIndex[equippedSkin.assetIndex]["css-class"].split(" ")[1];
+
+        object.classList.add(equippedSkinSecondClass);
+
+        setObjectAnimation(object, `${bathType}-with-pet`)
+        pendingPetActions[pet.id].shift();
+        pet._busy = true;
+
+        await cancellableWait(5000, signal);
+            if (signal.aborted) {
+            cancelMovement(pet.id)
+            throw new DOMException("Aborted", "AbortError");
+        }
+
+        pet.style.visibility = "visible";
+
+        setObjectAnimation(object, `${bathType}-empty`);
+        object._full = false;
+        pet._busy = false;
+
+        managePetActions(pet);
+    } else {
+        messageToTheUser(`Augintinis negali prieiti prie vonios. Perstatyk baldus!`);
         pendingPetActions[pet.id].shift();
         managePetActions(pet);
     }
@@ -8874,7 +9194,7 @@ async function petSleeps(pet, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
 
-    setPetAnimation(pet, `${pet.id}-sleeps`);
+    setObjectAnimation(pet, `${pet.id}-sleeps`);
 
     const timeMin = 15000;
     const timeMax = 45000;
@@ -8886,7 +9206,7 @@ async function petSleeps(pet, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
 
-    setPetAnimation(pet, `${pet.id}-sits-idle`);
+    setObjectAnimation(pet, `${pet.id}-sits-idle`);
     managePetActions(pet);
 }
 
@@ -8911,7 +9231,7 @@ async function petWalksAround(pet, signal) {
     if (!endCoordsValidityChecker(petPos[0], petPos[1], randomCoord[0], randomCoord[1], pet.id, suitableWalkingTiles)) {
         if (petControllers[pet.id]) {
             petControllers[pet.id].abort();
-            setPetAnimation(pet, `${pet.id}-stands-idle`);
+            setObjectAnimation(pet, `${pet.id}-stands-idle`);
             delete petControllers[pet.id]; // Clean up the controller
         }
         return
@@ -8992,7 +9312,7 @@ async function petStandsIdle(pet, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
     
-    setPetAnimation(pet, `${pet.id}-stands-idle`);
+    setObjectAnimation(pet, `${pet.id}-stands-idle`);
 
     const timeMin = 3000;
     const timeMax = 5000;
@@ -9012,7 +9332,7 @@ async function petSitsIdle(pet, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
     
-    setPetAnimation(pet, `${pet.id}-sits-idle`);
+    setObjectAnimation(pet, `${pet.id}-sits-idle`);
 
     const timeMin = 3000;
     const timeMax = 5000;
@@ -9032,7 +9352,7 @@ async function petLaysIdle(pet, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
     
-    setPetAnimation(pet, `${pet.id}-lays-idle`);
+    setObjectAnimation(pet, `${pet.id}-lays-idle`);
 
     const timeMin = 5000;
     const timeMax = 10000;
@@ -9052,7 +9372,7 @@ async function petTalks(pet, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
     
-    setPetAnimation(pet, `${pet.id}-talks`);
+    setObjectAnimation(pet, `${pet.id}-talks`);
 
     const timeMin = 2000;
     const timeMax = 4000;
@@ -9072,7 +9392,7 @@ async function cat1LicksPaw(pet, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
     
-    setPetAnimation(pet, `${pet.id}-licks-paw`);
+    setObjectAnimation(pet, `${pet.id}-licks-paw`);
 
     const timeMin = 5000;
     const timeMax = 10000;
@@ -9092,7 +9412,7 @@ async function cat1Cries(pet, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
     
-    setPetAnimation(pet, `${pet.id}-cries`);
+    setObjectAnimation(pet, `${pet.id}-cries`);
 
     const timeMin = 5000;
     const timeMax = 10000;
@@ -9112,7 +9432,7 @@ async function cat1Sad(pet, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
     
-    setPetAnimation(pet, `${pet.id}-sits-idle-thinks`);
+    setObjectAnimation(pet, `${pet.id}-sits-idle-thinks`);
 
     const timeMin = 5000;
     const timeMax = 10000;
@@ -9132,7 +9452,7 @@ async function cat1Angry(pet, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
     
-    setPetAnimation(pet, `${pet.id}-angry`);
+    setObjectAnimation(pet, `${pet.id}-angry`);
 
     const timeMin = 2000;
     const timeMax = 4000;
@@ -9152,7 +9472,7 @@ async function cat1Angry2(pet, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
     
-    setPetAnimation(pet, `${pet.id}-angry-2`);
+    setObjectAnimation(pet, `${pet.id}-angry-2`);
 
     const timeMin = 3000;
     const timeMax = 6000;
@@ -9228,7 +9548,7 @@ async function cat1Hungry(pet, signal) {
         }
 
 
-        setPetAnimation(pet, randomAnimation);
+        setObjectAnimation(pet, randomAnimation);
         if (objectWidthInTiles - objectInteractivePart[0] * 2 !== petWidthInTiles) {
             changeCatFacingDirection(pet, "left");
         }
@@ -9248,7 +9568,7 @@ async function cat1Hungry(pet, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
 
-        setPetAnimation(pet, randomAnimation);
+        setObjectAnimation(pet, randomAnimation);
         if (objectWidthInTiles - objectInteractivePart[0] * 2 !== petWidthInTiles) {
             changeCatFacingDirection(pet, "right");
         }
@@ -9401,6 +9721,44 @@ function initUserTriggeredAction(type, object) {
         
         pendingPetActions[object[0].id].unshift([petHappy, [object[0], object[1]]]);
         managePetActions(object[0]);
+    
+    } else if (type === "music") {
+        const pets = document.querySelectorAll('.pet');
+        pets.forEach((pet) => {
+            if (!pendingPetActions[pet.id]) {
+                pendingPetActions[pet.id] = [];
+            }
+
+            // Queue the dance action for this pet
+            pendingPetActions[pet.id].unshift([petDances, [pet]]);
+
+            managePetActions(pet);
+        });
+    } else if (type === "bath") {
+        const bathClasses = Array.from(object.classList);
+
+        const petContainer = document.getElementById("petContainer");
+        const petDivs = petContainer.querySelectorAll("div.pet");
+
+        const suitablePets = Array.from(petDivs).filter(div => {
+            const petSpecies = div.id.split("-")[0];
+
+            // Check if petSpecies is a substring of any bowl class
+            return bathClasses.some(cls => cls.includes(petSpecies));
+        });
+
+        if (suitablePets.length === 0) {
+            return
+        }
+
+        let selectedPet = suitablePets[Math.floor(Math.random() * suitablePets.length)];
+
+        if (!pendingPetActions[selectedPet.id]) {
+            pendingPetActions[selectedPet.id] = [];
+        }
+
+        pendingPetActions[selectedPet.id].unshift([petBathes, [selectedPet, object]]);
+        managePetActions(selectedPet);
     }
 }
 
@@ -9653,35 +10011,29 @@ async function sendTaxUpdate(taxesArray) {
 }
 
 function bonusFromDailySupplyItems() {
-    const container = document.getElementById("roomObjectsContainer");
-    const roomObjects = container.querySelectorAll(".room-object:not(.furniture-preview)");
-    const roomObjectsArray = Array.from(roomObjects);
-
     let continiousStatsBonus = {};
 
-    roomObjectsArray.forEach(obj => {
-        const asset = gameAssetIndex[userObjectAssets[obj.id].assetIndex];
-        const provides = asset.provides;
+    // Loop through all placed user objects
+    for (const [objId, objData] of Object.entries(userObjectAssets)) {
+        // Skip items that are not placed (no position)
+        if (!objData.position || objData.position.length === 0) continue;
 
-        if (provides && provides.length === 3) {
-            const stat = provides[0];      // "love", "food", "water"
-            const pets = provides[1];      // ["cat", "dog"]
-            const value = provides[2];     // number to add
+        const asset = gameAssetIndex[objData.assetIndex];
+        if (!asset || !asset.provides || asset.provides.length !== 3) continue;
 
-            pets.forEach(pet => {
-                // initialize pet dictionary if it doesn't exist
-                if (!continiousStatsBonus[pet]) {
-                    continiousStatsBonus[pet] = { food: 0, water: 0, love: 0 };
-                }
+        const [stat, pets, value] = asset.provides; // e.g. ["love", ["cat", "dog"], 2]
 
-                // add to the correct stat
-                continiousStatsBonus[pet][stat] += value;
-            });
-        }
-    });
+        pets.forEach(pet => {
+            if (!continiousStatsBonus[pet]) {
+                continiousStatsBonus[pet] = { food: 0, water: 0, love: 0 };
+            }
+            continiousStatsBonus[pet][stat] += value;
+        });
+    }
 
     return continiousStatsBonus;
 }
+
 
 function editPetName(petId, buttonEl) {
     const petNameSpan = document.getElementById(`pet-name-${petId}`);
@@ -9752,12 +10104,87 @@ function calculateHappinesIndexForPet (petId) {
 
     if (foodAmount === 0 || waterAmount === 0) {
         indicator.style.display = "flex";
+        return false
     } else if (happinesIndex < 0.35) {
         indicator.style.display = "flex";
+        return false
     } else {
         indicator.style.display = "none";
+        return true
     }
 }
+
+let holdInterval = null;
+let holdTimeout = null;
+let holdSpeed = 200; // initial speed in ms
+const minSpeed = 50; // fastest speed in ms
+const speedIncrease = 0.9; // multiplier to speed up (lower = faster)
+
+// Increment input value
+function incrementValue(inputId, min = 1, max = 999) {
+    const input = document.getElementById(inputId);
+    let value = parseInt(input.value) || min;
+    if (value < max) {
+        input.value = value + 1;
+    }
+}
+
+// Decrement input value
+function decrementValue(inputId, min = 1, max = 999) {
+    const input = document.getElementById(inputId);
+    let value = parseInt(input.value) || min;
+    if (value > min) {
+        input.value = value - 1;
+    }
+}
+
+// Start holding for auto increment/decrement
+function startHold(inputId, min, max, isIncrement) {
+    // Immediate first action
+    if (isIncrement) incrementValue(inputId, min, max);
+    else decrementValue(inputId, min, max);
+
+    holdSpeed = 200; // reset speed
+
+    holdTimeout = setTimeout(() => {
+        const repeat = () => {
+            if (isIncrement) incrementValue(inputId, min, max);
+            else decrementValue(inputId, min, max);
+
+            // gradually speed up
+            if (holdSpeed > minSpeed) {
+                holdSpeed = Math.max(minSpeed, holdSpeed * speedIncrease);
+            }
+
+            clearInterval(holdInterval);
+            holdInterval = setInterval(repeat, holdSpeed);
+        };
+
+        holdInterval = setInterval(repeat, holdSpeed);
+    }, 300); // initial delay
+}
+
+// Stop hold
+function stopHold() {
+    clearTimeout(holdTimeout);
+    clearInterval(holdInterval);
+    holdInterval = null;
+    holdTimeout = null;
+    holdSpeed = 200;
+}
+
+
+// Validate manual input (optional)
+document.querySelectorAll('input.purchase-quantity').forEach(input => {
+    input.addEventListener('change', function() {
+        const min = parseInt(this.min) || 1;
+        const max = parseInt(this.max) || 999;
+        let value = parseInt(this.value) || min;
+        if (value < min) this.value = min;
+        else if (value > max) this.value = max;
+
+    });
+});
 
 window.onload = function () {
     const savedController = localStorage.getItem('controller');

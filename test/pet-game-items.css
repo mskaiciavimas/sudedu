@@ -229,13 +229,167 @@
     z-index: 4;
 }
 
-.carpet-1-m-1 {
+.carpet-1-m-h-1 {
     width: calc(var(--unit-size) * 6);
     height: calc(var(--unit-size) * 3);
-    background-image: url('images/pet-game/carpet-1-m-1.png');
+    background-image: url('images/pet-game/carpet-1-m-h-1.png');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
     z-index: 2;
 }
 
+.carpet-1-m-v-1 {
+    width: calc(var(--unit-size) * 3);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/carpet-1-m-v-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 2;
+}
+
+.carpet-1-s-h-1 {
+    width: calc(var(--unit-size) * 3);
+    height: calc(var(--unit-size) * 2);
+    background-image: url('images/pet-game/carpet-1-s-h-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 2;
+}
+
+.carpet-1-s-v-1 {
+    width: calc(var(--unit-size) * 2);
+    height: calc(var(--unit-size) * 3);
+    background-image: url('images/pet-game/carpet-1-s-v-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 2;
+}
+
+.carpet-1-l-h-1 {
+    width: calc(var(--unit-size) * 12);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/carpet-1-l-h-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 2;
+}
+
+.carpet-1-l-v-1 {
+    width: calc(var(--unit-size) * 6);
+    height: calc(var(--unit-size) * 8);
+    background-image: url('images/pet-game/carpet-1-l-v-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 2;
+}
+
+.gramophone-1 {
+    width: calc(var(--unit-size) * 3);
+    height: calc(var(--unit-size) * 4);
+    background-image: url('images/pet-game/gramophone-1.png');
+    background-repeat: no-repeat;
+    background-size: calc(var(--unit-size) * 3 * 2) calc(var(--unit-size) * 4 * 2); /* sprite sheet total size */
+    animation: musicPlayerOff 1s steps(1) infinite;
+    z-index: 4;
+}
+
+.gramophone-1.item-preview {
+    width: calc(var(--unit-size) * 3);
+    height: calc(var(--unit-size) * 4);
+    background-image: url('images/pet-game/gramophone-1-preview.png');
+    background-repeat: no-repeat;
+    animation: none;
+    z-index: 4;
+}
+
+@keyframes musicPlayerOff {
+    0% { background-position: 0 0; } /* 0 first column number 0 row number*/
+}
+
+@keyframes musicPlayerOn {
+    0%, 50% { background-position: 0 calc(var(--unit-size) * 4 * -1); } /* Bottom-left frame */
+    50.01%, 100% { background-position: calc(var(--unit-size) * 3 * -1) calc(var(--unit-size) * 4 * -1); } /* Bottom-right frame */
+}
+
+.bath-1-1 {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 5);
+    background-image: url('images/pet-game/bath-1-1.png');
+    background-repeat: no-repeat;
+    background-size: calc(var(--unit-size) * 5 * 7) calc(var(--unit-size) * 5 * 3);
+    animation: bath-1-empty 1s steps(1) infinite;
+    z-index: 4;
+}
+
+.bath-1-1.cat-1-1 {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 5);
+    background-image: url('images/pet-game/bath-1-1-cat-1-1.png');
+    background-repeat: no-repeat;
+    background-size: calc(var(--unit-size) * 5 * 7) calc(var(--unit-size) * 5 * 3);
+    animation: bath-1-empty 1s steps(1) infinite;
+    z-index: 4;
+}
+
+.bath-1-1.item-preview {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 3);
+    background-image: url('images/pet-game/bath-1-1-preview.png');
+    animation: none;
+    background-repeat: no-repeat;
+}
+
+
+/* --- Empty --- */
+@keyframes bath-1-empty {
+    from { background-position: 0 calc(0 * var(--unit-size) * -5); }
+    to   { background-position: calc(-6 * var(--unit-size) * 5) calc(0 * var(--unit-size) * -5); }
+}
+
+/* --- Filled --- */
+@keyframes bath-1-filled {
+    from { background-position: 0 calc(-1 * var(--unit-size) * 5); }
+    to   { background-position: calc(-6 * var(--unit-size) * 5) calc(-1 * var(--unit-size) * 5); }
+}
+
+/* --- With pet --- */
+@keyframes bath-1-with-pet {
+    from { background-position: 0 calc(-2 * var(--unit-size) * 5); }
+    to   { background-position: calc(-6 * var(--unit-size) * 5) calc(-2 * var(--unit-size) * 5); }
+}
+
+.cat-food-1 {
+    width: calc(var(--unit-size) * 2);
+    height: calc(var(--unit-size) * 2);
+    background-image: url('images/pet-game/cat-food-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 4;
+}
+
+.food-salmon {
+    width: calc(var(--unit-size) * 3);
+    height: calc(var(--unit-size) * 2);
+    background-image: url('images/pet-game/food-salmon.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 4;
+}
+
+.cat-treat-1 {
+    width: calc(var(--unit-size) * 2);
+    height: calc(var(--unit-size) * 2);
+    background-image: url('images/pet-game/cat-treat-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 4;
+}

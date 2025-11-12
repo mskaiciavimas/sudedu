@@ -1,3 +1,66 @@
+const PET_STATS_EXPIRATION = 0.0035 // EXPIRE FULLY IN 48 hrs
+
+const animationStepsAndDurationNumberDict = {
+            "cat-1-sits-idle": [10, 2],
+            "cat-1-sits-idle-blinks": [10, 2],
+            "cat-1-sleeps": [4, 2],
+            "cat-1-dances": [4, 0.5],
+            "cat-1-talks": [8, 2],
+            "cat-1-excited": [12, 1.5],
+            "cat-1-lays-idle": [12, 2],
+            "cat-1-sits-idle-thinks": [9, 2],
+            "cat-1-cries": [4, 0.5],
+            "cat-1-in-box-1": [12, 1.5],
+            "cat-1-in-box-2": [4, 2],
+            "cat-1-in-box-3": [4, 0.5],
+            "cat-1-surprised": [12, 1.5],
+            "cat-1-eats": [15, 2],
+            "cat-1-waits": [6, 0.5],
+            "cat-1-refuses": [13, 2],
+            "cat-1-angry": [9, 2],
+            "cat-1-happy": [12, 2],
+            "cat-1-angry-2": [4, 1],
+            "cat-1-licks-paw": [11, 2],
+            "cat-1-medicine": [5, 1.5],
+            "cat-1-sick": [4, 1],
+            "cat-1-walks-upwards": [4, 0.85],
+            "cat-1-walks-downwards": [4, 0.85],
+            "cat-1-walks-sideways": [4, 0.85],
+            "cat-1-stands-idle": [4, 0.85],
+            "cat-2-sits-idle": [10, 2],
+            "cat-2-sits-idle-blinks": [10, 2],
+            "cat-2-sleeps": [4, 2],
+            "cat-2-dances": [4, 0.5],
+            "cat-2-talks": [8, 2],
+            "cat-2-excited": [12, 1.5],
+            "cat-2-lays-idle": [12, 2],
+            "cat-2-sits-idle-thinks": [9, 2],
+            "cat-2-cries": [4, 0.5],
+            "cat-2-in-box-1": [12, 1.5],
+            "cat-2-in-box-2": [4, 2],
+            "cat-2-in-box-3": [4, 0.5],
+            "cat-2-surprised": [12, 1.5],
+            "cat-2-eats": [15, 2],
+            "cat-2-waits": [6, 0.5],
+            "cat-2-refuses": [13, 2],
+            "cat-2-angry": [9, 2],
+            "cat-2-happy": [12, 2],
+            "cat-2-angry-2": [4, 1],
+            "cat-2-licks-paw": [11, 2],
+            "cat-2-medicine": [5, 1.5],
+            "cat-2-sick": [4, 1],
+            "cat-2-walks-upwards": [4, 0.85],
+            "cat-2-walks-downwards": [4, 0.85],
+            "cat-2-walks-sideways": [4, 0.85],
+            "cat-2-stands-idle": [4, 0.85],
+            "musicPlayerOff": [1, 1],
+            "musicPlayerOn": [1 ,1],
+            "bath-1-empty": [1 ,1],
+            "bath-1-filled": [6 ,1],
+            "bath-1-with-pet": [6 ,1]
+        }
+
+
 let controller = {
   language: '',
   mode: '',
@@ -96,6 +159,7 @@ if (document.querySelector("#stop-button-span")) {
 
       if (userData && controller.taskCompleted && !controller.taskRecorded) {
         sendSetTaskResultsToDatabase();
+        setPetOnWalkActionAfterQuestionsCompleted();
       }
 
       document.querySelector('#invisibleRow').style.display = "none";
@@ -393,6 +457,7 @@ function formatFinalMessageForGrammar() {
 
     if (userData && controller.taskCompleted && !controller.taskRecorded) {
       sendSetTaskResultsToDatabase();
+      setPetOnWalkActionAfterQuestionsCompleted();
     }
 
   document.querySelector('#restart-reset-button-row').style.display = "flex";
@@ -420,6 +485,12 @@ function formatFinalMessageForGrammar() {
 
   document.getElementById("field-for-final-message").innerHTML = `<div class="field-for-final-message-inner">${finalMessageText()}</div>`;
   
+  if (document.getElementById('hidden-input')) {
+    document.getElementById('hidden-input').dataset.currentId = "";
+    document.getElementById('hidden-input').value = ''
+    document.getElementById('hidden-input').blur();
+  }
+
   controller.questionsStopped = true;
   styleGrammarPage();
   localStorage.setItem('controller', JSON.stringify(controller))
@@ -442,6 +513,7 @@ function formatFinalMessageForTextcomprehension() {
 
       if (userData && controller.taskCompleted && !controller.taskRecorded) {
         sendSetTaskResultsToDatabase();
+        setPetOnWalkActionAfterQuestionsCompleted();
       }
 
     if (!controller.questionsStopped && controller.mistakesTracker === 0 && controller.answeredQuestionTracker >= 1) {
@@ -3897,3 +3969,180 @@ bodyObserverHorizontal.observe(document.body, {
     childList: true,
     subtree: true
 });
+
+
+async function renderPetOnWalk () {
+  if (typeof userData === "undefined" || !userData) return;
+  if (!userData.petOnWalk || userData.petOnWalk === "") return;
+
+  function petOnWalkIsHappy () {
+    const [recordedFoodAmount, recordedWaterAmount, recordedLoveAmount, recordedTime] = userData.petStats
+    const currentTime = Math.floor(Date.now() / 1000 / 60);
+    const timeElapsed = currentTime - recordedTime;
+    const statDecrease = Math.floor(timeElapsed * PET_STATS_EXPIRATION);
+
+    const foodAmount = recordedFoodAmount - statDecrease;
+    const waterAmount = recordedWaterAmount - statDecrease;
+    const loveAmount = recordedLoveAmount - statDecrease;
+
+    const happinesIndex = Math.round(((foodAmount + waterAmount + loveAmount) / 30) * 100) / 100;
+
+    if (foodAmount === 0 || waterAmount === 0) {
+        return false
+    } else if (happinesIndex < 0.35) {
+        return false
+    } else {
+        return true
+    }
+  }
+
+  if (petOnWalkIsHappy()) {
+    const petOnWalkDiv = document.querySelector("#pet-on-walk")
+    petOnWalkDiv.classList.add(userData.petOnWalk)
+    petOnWalkDiv._petType = userData.petOnWalk.split('-').slice(0, 2).join('-');
+    const randomPosition = await getRandomLeft();
+    petOnWalkDiv.style.left = `${randomPosition}px`
+    setObjectAnimation(petOnWalkDiv, `${petOnWalkDiv._petType}-sits-idle`)
+
+    // Start walking once the DOM is ready
+    setTimeout(() => {
+      walkToRandomPosition();
+    }, 1000);
+  }
+}
+
+renderPetOnWalk();
+
+function getRandomLeft() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const petEl = document.querySelector("#pet-on-walk");
+      const parentEl = document.querySelector(".pet-on-walk-holder");
+      
+      if (!petEl || !parentEl) {
+        resolve(0);
+        return;
+      }
+
+      // Use computed style width - the ACTUAL rendered width
+      const parentComputedStyle = getComputedStyle(parentEl);
+      const parentWidth = parseFloat(parentComputedStyle.width);
+      
+      const petWidth = petEl.offsetWidth;
+      
+      const maxLeft = Math.max(0, parentWidth - petWidth);
+      const randomLeft = Math.random() * maxLeft;
+      
+      resolve(randomLeft);
+    }, 200); // 200ms delay to let flex fully compute
+  });
+}
+
+// Function to move pet smoothly to a random position
+async function walkToRandomPosition() {
+  const petEl = document.querySelector("#pet-on-walk");
+  const newLeft = await getRandomLeft();
+
+  const currentLeft = petEl.offsetLeft;
+  const delta = newLeft - currentLeft;
+
+  if (Math.abs(delta) > 50) {
+
+    // Set walking animation
+    setObjectAnimation(petEl, `${petEl._petType}-walks-sideways`);
+
+    // Flip sprite depending on direction
+    if (delta < 0) {
+      petEl.classList.remove("pet-right");
+      petEl.classList.add("pet-left");
+    } else {
+      petEl.classList.remove("pet-left");
+      petEl.classList.add("pet-right");
+    }
+
+    // Random walking duration between 2–4 seconds
+    const speed = 0.1; // pixels per ms
+    const distance = Math.abs(newLeft - currentLeft);
+    const duration = distance / speed;
+    petEl.style.transition = `left ${duration}ms linear`;
+    petEl.style.left = `${newLeft}px`;
+
+    // Wait for transition to finish
+    await new Promise(resolve => {
+      function onTransitionEnd(e) {
+        if (e.propertyName === "left") {
+          petEl.removeEventListener("transitionend", onTransitionEnd);
+          resolve();
+        }
+      }
+      petEl.addEventListener("transitionend", onTransitionEnd);
+    });
+  }
+
+  startRandomPetOnWalkAction()
+}
+
+let petOnWalkAction = null; // only global for the timeout
+
+function startRandomPetOnWalkAction() {
+  // Pick random action
+  const randomAction = petOnWalkActionDict.questionActive[
+    Math.floor(Math.random() * petOnWalkActionDict.questionActive.length)
+  ];
+
+  // Use the action, e.g., set animation
+  const petEl = document.querySelector("#pet-on-walk");
+  if (petEl && petEl._petType) {
+    setObjectAnimation(petEl, `${petEl._petType}-${randomAction}`);
+  }
+
+  // Schedule next action in 1–3 minutes
+  const delay = 60_000 + Math.random() * 120_000;
+  petOnWalkAction = setTimeout(startRandomPetOnWalkAction, delay);
+}
+
+const petOnWalkActionDict = {
+  "questionActive": ["sits-idle", "lays-idle", "licks-paw", "sleeps"],
+  "questionsStopped": ["happy"]
+}
+
+
+function setPetOnWalkActionAfterQuestionsCompleted() {
+  // Cancel any scheduled random action
+  if (petOnWalkAction) {
+    clearTimeout(petOnWalkAction);
+    petOnWalkAction = null;
+  } else {
+    return
+  }
+
+  // Pick a random action from questionsStopped
+  const randomAction = petOnWalkActionDict.questionsStopped[
+    Math.floor(Math.random() * petOnWalkActionDict.questionsStopped.length)
+  ];
+
+  // Set it as animation indefinitely
+  const petEl = document.querySelector("#pet-on-walk");
+  if (petEl && petEl._petType) {
+    setObjectAnimation(petEl, `${petEl._petType}-${randomAction}`);
+    const delay = 15_000 + Math.random() * 30_000;
+    petOnWalkAction = setTimeout(walkToRandomPosition, delay);
+  }
+}
+
+function restartPetOnWalkActions() {
+  // Cancel any scheduled random action
+  if (petOnWalkAction) {
+    clearTimeout(petOnWalkAction);
+    petOnWalkAction = null;
+  } else {
+    return
+  }
+
+  walkToRandomPosition();
+}
+
+//Switch animation dynamically with JavaScript
+function setObjectAnimation(object, animationName) {
+    object.style.animation = `${animationName} ${animationStepsAndDurationNumberDict[animationName][1]}s steps(${animationStepsAndDurationNumberDict[animationName][0]}) infinite`;
+}

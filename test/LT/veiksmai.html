@@ -16,6 +16,7 @@
 	<link id="questionsStyleSheet" rel="stylesheet" type="text/css" href="../questions-bigger.css">
 	<link id="dynamicStyleSheet" rel="stylesheet" type="text/css" href="">
 	<link rel="stylesheet" type="text/css" href="../summary.css">
+	<link rel="stylesheet" href="../pet-game-pets.css">
 </head>
 
 <!-- Google tag (gtag.js) -->
@@ -121,6 +122,16 @@
         .trackers-holder,
         .timer-holder {
           align-items: center;
+        }
+
+		.trackers-holder,
+        .timer-holder {
+          flex: 0 0 auto
+        }
+
+		.pet-on-walk-holder {
+          flex: 1 1 auto;
+		  min-width: 0;
         }
 
 		.middle-and-upper-lines-holder {
@@ -518,7 +529,7 @@
   </nav>
 
 	<div class="container content" id="template-container" style="" hidden>
-		 <div class="tracker-timer-holder">
+		<div class="tracker-timer-holder">
 		<div class="trackers-row">
 			<div class="trackers-holder">
 				<div class="trackers">
@@ -529,10 +540,13 @@
 						<h3 id="mistake-tracker"></h3>
 					</div>
 				</div>
-		</div>
-		<div class="timer-holder">
-			<div id="timer"></div>
-		</div>
+			</div>
+			<div class="pet-on-walk-holder">
+				<div id="pet-on-walk"></div>
+			</div>
+			<div class="timer-holder">
+				<div id="timer"></div>
+			</div>
 		</div>
 		</div>
 
@@ -1129,6 +1143,8 @@ function stopEquations () {
 		controller.taskCompleted = false;
 		controller.taskRecorded = false;
 		localStorage.setItem('controller', JSON.stringify(controller));
+
+		restartPetOnWalkActions();
 
 		restartEquations();
 	}
