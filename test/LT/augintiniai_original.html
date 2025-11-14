@@ -172,11 +172,6 @@
             background-color:  var(--wall-base-color);
         }
 
-        .tile.edge {
-            background-color:  var(--edge-base-color);
-            border: 1px solid var(--edge-base-color);
-        }
-
         .tile.boundary {
             position: relative;
             border: none;
@@ -2043,57 +2038,6 @@
 
 /* GIFT CSS END */
 
-#viewport-container {
-    width: 500px;
-    height: 500px;
-    overflow: hidden;
-    position: relative;
-    background: linear-gradient(to top, #ffbf9c, #ffbf92, #ffbf89, #ffbf7e, #ffc074);
-}
-
-#room-transform-wrapper {
-    position: absolute;
-    transform-origin: 0 0;
-    transition: none;
-}
-
-/* Visual indicator for pan mode */
-.pan-mode-active {
-    cursor: grab !important;
-}
-
-.pan-mode-active * {
-    cursor: grab !important;
-}
-
-.panning {
-    cursor: grabbing !important;
-}
-
-.panning * {
-    cursor: grabbing !important;
-}
-
-#pan-mode-indicator {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(59, 130, 246, 0.9);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 600;
-    z-index: 10000;
-    display: none;
-    pointer-events: none;
-}
-
-#pan-mode-indicator.active {
-    display: block;
-}
-
 
 @media (max-width: 1024px) {
     .nav-item {
@@ -2856,15 +2800,14 @@
             </div>
         </div>
     </div>
-            <div id="viewport-container">
-                <div id="room-transform-wrapper">
-                    <div id="room-container">
-                        <div id="roomGridContainer">
-                            <div id="roomGrid" class="room-grid"></div>
-                        </div>
-                        <div id="petContainer"></div>
-                        <div id="roomObjectsContainer"></div>
+            <div id="room-container">
+                <div id="roomGridContainer">
+                    <div id="roomGrid" class="room-grid">
+                </div>
                     </div>
+                <div id="petContainer">
+                </div>
+                    <div id="roomObjectsContainer">
                 </div>
             </div>
             <div id="button-container">
@@ -3094,18 +3037,6 @@
             window.location.href = './';
         }
 
-        let viewportState = {
-            scale: 1,
-            x: 0,
-            y: 0,
-            minScale: 0.5,
-            maxScale: 1,
-            isDragging: false,
-            dragStartX: 0,
-            dragStartY: 0,
-            spacePressed: false
-        };
-
         let unitSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
         let gameAssetIndex = {};
         let userPetAssets = {};
@@ -3271,28 +3202,25 @@
         }
 
         let userObjectAssets = {};
-
-        // 1 - floor, 2 - wall, 3 - boundary between wall and floor, 4 - edge
+            
         const roomLayout = [
-          [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
-          [4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4],
-          [4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4],
-          [4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4],
-          [4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4],
-          [4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4],
-          [4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4],
-          [4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+          [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2], // Row 0 - top wall
+          [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2], // Row 1 - wall-floor boundary
+          [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2], // Row 0 - top wall
+          [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2], // Row 1 - wall-floor boundary
+          [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2], // Row 1 - wall-floor boundary
+          [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2], // Row 2 - floor with walls
+          [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3], // Row 4 - floor with walls
+          [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Row 5 - floor with walls
+          [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Row 6 - floor with walls
+          [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Row 7 - floor with walls
+          [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Row 8 - floor-wall boundary
+          [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Row 3 - floor with walls
+          [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Row 4 - floor with walls
+          [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Row 5 - floor with walls
+          [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Row 6 - floor with walls
+          [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Row 7 - floor with walls
+          [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Row 8 - floor-wall boundary
         ];
 
 
@@ -3327,9 +3255,6 @@
                             break;
                         case 3:
                             tile.classList.add('boundary');
-                            break;
-                        case 4:
-                            tile.classList.add('edge');
                     }
                     
                     roomGrid.appendChild(tile);
@@ -3416,8 +3341,6 @@ function initGame() {
     toggleRoomDarknessBasedOnElectricityTax();
 
     predictAndSetZIndex();
-
-    initViewportControls();
 
     const shopEl = document.querySelector(".switch-text-shop");
     if (shopEl) shopEl.textContent = "NETURIU";
@@ -3715,24 +3638,18 @@ roomContainer.style.webkitUserSelect = 'none';
 roomContainer.style.mozUserSelect = 'none';
 
 function startDragging(e) {
+    // Only allow left mouse button OR finger touch
     if (e.pointerType === "mouse" && e.button !== 0) return;
-    if (viewportState.isDragging || viewportState.spacePressed) return;
-
+    
     isDragging = true;
     currentObject.classList.add('dragging');
-
-    // pointer position in pixels
-    const mouseX = e.clientX;
-    const mouseY = e.clientY;
-
-    // object's actual pixel position
+    
     const rect = currentObject.getBoundingClientRect();
-
-    // pixel offsets: where inside the element the pointer is
-    offsetX = mouseX - rect.left;
-    offsetY = mouseY - rect.top;
+    const parentRect = currentObject.parentElement.getBoundingClientRect();
+    
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.bottom; // offset from pointer to bottom
 }
-
 
 function enablePetDragging() {
     const pets = document.querySelectorAll('.pet');
@@ -4055,21 +3972,14 @@ function disableObjectDragging() {
 
 // Global pointer move handler
 document.addEventListener('pointermove', function(e) {
-    // Handle viewport panning first
-    if (viewportState.isDragging) {
-        handleViewportPanMove(e);
-        return;
-    }
-    
-    // Then handle object dragging
     if (isDragging && currentObject) {
-        const roomCoords = screenToRoom(e.clientX, e.clientY);
+        const parentRect = currentObject.parentElement.getBoundingClientRect();
+        let newX = e.clientX - parentRect.left - offsetX;
+        let newY = e.clientY - parentRect.top - offsetY - currentObject.offsetHeight;
         
-        // Update object position in room coordinates
-        const newX = roomCoords.x - offsetX;
-        const newY = roomCoords.y - offsetY;
+        newX = Math.max(0, Math.min(newX, parentRect.width - currentObject.offsetWidth));
+        newY = Math.max(0, Math.min(newY, parentRect.height - currentObject.offsetHeight));
         
-        // Convert back to pixels for positioning
         currentObject.style.left = newX + 'px';
         currentObject.style.top = newY + 'px';
     }
@@ -5827,9 +5737,7 @@ function generatePlacementMap(draggedObjectId) {
                 const tileType = tile.type ?? tile;
 
                 // tileType: 1=floor, 2=wall, 3=boundary
-                if (tileType === 4) {
-                    tileAllowed = false;
-                } else if (tileType === 1) {
+                if (tileType === 1) {
                     if (!draggedAssetPlacingRules.includes(1)) {
                         tileAllowed = false;
                     }
@@ -6027,11 +5935,6 @@ function generatePlacementMap(draggedObjectId) {
                             }
                         }
                     }
-
-                if (tileType === 4) {
-                    tileAllowed = false;
-                }
-
                 if (!tileAllowed) {
                     sectionAllowed = false;
                     break; // stop this row
@@ -10570,151 +10473,6 @@ function displayReceivedMessages () {
 
         openObjectPopup(content=finalMessage, title='Žinutė nuo SUDEDU', subtitle = '', functionToTrigger=displayReceivedMessages, saferClosing=true)
     }
-}
-
-function applyViewportTransform() {
-    const wrapper = document.getElementById('room-transform-wrapper');
-    if (wrapper) {
-        wrapper.style.transform = `translate(${viewportState.x}px, ${viewportState.y}px) scale(${viewportState.scale})`;
-    }
-}
-
-// Convert screen coordinates to room coordinates
-function screenToRoom(screenX, screenY) {
-    const viewport = document.getElementById('viewport-container');
-    const rect = viewport.getBoundingClientRect();
-    return {
-        x: (screenX - rect.left - viewportState.x) / viewportState.scale,
-        y: (screenY - rect.top - viewportState.y) / viewportState.scale
-    };
-}
-
-// Convert room coordinates to screen coordinates
-function roomToScreen(roomX, roomY) {
-    return {
-        x: roomX * viewportState.scale + viewportState.x,
-        y: roomY * viewportState.scale + viewportState.y
-    };
-}
-
-// Handle viewport zoom
-function handleViewportZoom(e) {
-    e.preventDefault();
-    
-    const delta = e.deltaY * -0.001;
-    const newScale = Math.min(
-        Math.max(viewportState.scale + delta, viewportState.minScale), 
-        viewportState.maxScale
-    );
-    
-    // Zoom towards mouse position
-    const viewport = document.getElementById('viewport-container');
-    const rect = viewport.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    
-    // Calculate the point in room coordinates
-    const roomX = (mouseX - viewportState.x) / viewportState.scale;
-    const roomY = (mouseY - viewportState.y) / viewportState.scale;
-    
-    // Adjust position to keep the same point under the mouse
-    viewportState.x = mouseX - roomX * newScale;
-    viewportState.y = mouseY - roomY * newScale;
-    viewportState.scale = newScale;
-    
-    applyViewportTransform();
-}
-
-// Handle viewport pan start
-function handleViewportPanStart(e) {
-    const isTouchMultiFinger = e.touches?.length >= 2;
-    const isMiddleClick = e.button === 1;
-    const isSpacebarDrag = viewportState.spacePressed && (e.button === 0 || e.touches?.length === 1);
-    
-    if (isMiddleClick || isSpacebarDrag || isTouchMultiFinger) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        viewportState.isDragging = true;
-        document.body.classList.add('panning');
-        
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        
-        viewportState.dragStartX = clientX - viewportState.x;
-        viewportState.dragStartY = clientY - viewportState.y;
-    }
-}
-
-// Handle viewport pan move
-function handleViewportPanMove(e) {
-    if (!viewportState.isDragging) return;
-    
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    
-    viewportState.x = clientX - viewportState.dragStartX;
-    viewportState.y = clientY - viewportState.dragStartY;
-    
-    applyViewportTransform();
-}
-
-// Handle viewport pan end
-function handleViewportPanEnd() {
-    viewportState.isDragging = false;
-    document.body.classList.remove('panning');
-}
-
-// Keyboard handlers for spacebar
-function handleKeyDown(e) {
-    if (e.code === 'Space' && !viewportState.spacePressed) {
-        e.preventDefault();
-        viewportState.spacePressed = true;
-        document.body.classList.add('pan-mode-active');
-        document.getElementById('pan-mode-indicator')?.classList.add('active');
-    }
-}
-
-function handleKeyUp(e) {
-    if (e.code === 'Space') {
-        e.preventDefault();
-        viewportState.spacePressed = false;
-        document.body.classList.remove('pan-mode-active');
-        document.getElementById('pan-mode-indicator')?.classList.remove('active');
-        
-        if (viewportState.isDragging) {
-            handleViewportPanEnd();
-        }
-    }
-}
-
-// Initialize viewport controls
-function initViewportControls() {
-    const viewport = document.getElementById('viewport-container');
-    if (!viewport) return;
-    
-    // Wheel zoom
-    viewport.addEventListener('wheel', handleViewportZoom, { passive: false });
-    
-    // Pan events
-    viewport.addEventListener('pointerdown', handleViewportPanStart);
-    viewport.addEventListener('touchstart', handleViewportPanStart, { passive: false });
-    
-    // Global move/up for panning
-    window.addEventListener('pointermove', handleViewportPanMove);
-    window.addEventListener('pointerup', handleViewportPanEnd);
-    window.addEventListener('touchmove', handleViewportPanMove, { passive: false });
-    window.addEventListener('touchend', handleViewportPanEnd);
-    
-    // Keyboard
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    
-    // Prevent context menu
-    viewport.addEventListener('contextmenu', (e) => e.preventDefault());
-    
-    // Initial transform
-    applyViewportTransform();
 }
 
 

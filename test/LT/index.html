@@ -146,6 +146,66 @@
     align-items: center;
 }
 
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 24px 0;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+/* TEMPORARY STUFF START*/
+.temp-login-btn {
+    width: 100%;
+    padding: 14px 24px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    font-family: 'SFpro', sans-serif;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #40c9a9, #32ac93);
+    color: white;
+}
+
+.temp-login-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+    border-radius: 20px;
+    pointer-events: none;
+    transition: background 0.3s ease;
+}
+
+.temp-login-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.divider span {
+    padding: 0 16px;
+}
+/* TEMPORARY STUFF END */
 
 .personal-chl {
     position: relative;
@@ -368,32 +428,27 @@
 }
 
 .class-options {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 25px;
-}
-
-.class-option {
-    padding: 12px 20px;
+    width: 100%;
+    height: 51px;
+    padding: 0 24px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    font-family: 'SFpro', sans-serif;
+    border: none;
+    border-radius: 25px;
+    font-family: 'SFpro', sans-serif;
     background-color: #f8f9fa;
     border: 2px solid #dee2e6;
-    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
 }
 
-.class-option:hover {
-    background-color: #e9ecef;
-    transform: translateY(-2px);
-}
-
-.class-option.selected {
-    background-color: #40c9a9;
-    color: white;
-    border-color: #40c9a9;
+.class-options:active,
+.class-options:focus {
+    outline: none;
 }
 
 .class-popup-note {
@@ -422,12 +477,7 @@ body.popup-active {
     font-weight: 500;
     font-size: 16px;
     transition: all 0.3s ease;
-    margin-top: 10px;
-}
-
-.class-popup-button:hover {
-    background-color: #40c9a9;
-    transform: translateY(-2px);
+    margin-top: 20px;
 }
 
 .class-popup-button:disabled {
@@ -1198,16 +1248,22 @@ body.popup-active {
 		<!-- POPUP ELEMENTS START -->
 		<div class="class-popup-modal" id="classPopup">
 			<div class="class-popup-content">
-				<h2 class="class-popup-title">Pasirink savo klasę</h2>
-				<div class="class-options" style="flex-direction: column;">
-					<div class="class-option" data-class="0">Priešmokyklinė</div>
-					<div class="class-option" data-class="1">1 klasė</div>
-					<div class="class-option" data-class="2">2 klasė</div>
-					<div class="class-option" data-class="3">3 klasė</div>
-					<div class="class-option" data-class="4">4 klasė</div>
-					<div class="class-option" data-class="5">Aukštesnė</div>
-				</div>
-				<button class="class-popup-button" id="classPopupButton" disabled>Toliau</button>
+                <button type="button" class="temp-login-btn" id="authBtn" onclick="window.location.href=getLoginPage()">
+                    Prisijunk
+                </button>
+                <div class="divider">
+                    <span>arba</span>
+                </div>
+                <select class="class-options" id="classSelect">
+                    <option value="" selected disabled>Pasirink savo klasę</option>
+                    <option value="0">Priešmokyklinė</option>
+                    <option value="1">1 klasė</option>
+                    <option value="2">2 klasė</option>
+                    <option value="3">3 klasė</option>
+                    <option value="4">4 klasė</option>
+                    <option value="5">Aukštesnė</option>
+                </select>
+                <button class="class-popup-button" id="classPopupButton" disabled>Pirmyn!</button>
 			</div>
 		</div>
 		<!-- POPUP ELEMENTS END -->
@@ -1661,6 +1717,7 @@ body.popup-active {
 		submitButtonElement.addEventListener("click", submitSelection);
 
 		window.onload = function () {
+            wakeUpServer();
             const savedController = localStorage.getItem('controller');
             if (savedController) {
                 controller = JSON.parse(savedController);
@@ -1740,33 +1797,26 @@ function getClassLocalStorage() {
     return item.value;
 }
 
-// Function to show the class popup
 function showClassPopup() {
     const popup = document.getElementById('classPopup');
     const nextButton = document.getElementById('classPopupButton');
+    const classSelect = document.getElementById('classSelect');
     let selectedClass = null;
-    
+
+    // Show popup
     popup.classList.add('active');
     document.body.classList.add('popup-active');
-    
-    // Add event listeners to class options
-    const classOptions = document.querySelectorAll('.class-option');
-    classOptions.forEach(option => {
-        option.addEventListener('click', function() {
-            // Remove selected class from all options
-            classOptions.forEach(opt => opt.classList.remove('selected'));
-            // Add selected class to clicked option
-            this.classList.add('selected');
-            
-            // Store the selected class
-            selectedClass = Number(this.getAttribute('data-class'));
-            
-            // Enable the Next button
-            nextButton.disabled = false;
-        });
+
+    // Disable Next button initially
+    nextButton.disabled = true;
+
+    // Listen for changes in the dropdown
+    classSelect.addEventListener('change', function() {
+        selectedClass = Number(this.value);
+        nextButton.disabled = this.value === ""; // enable only if a real option is selected
     });
-    
-    // Add event listener to Next button
+
+    // Next button click
     nextButton.addEventListener('click', function() {
         if (selectedClass !== null && selectedClass !== undefined) {
             // Set localStorage with selected class and expiration
@@ -1775,11 +1825,11 @@ function showClassPopup() {
             userClass = selectedClass;
 
             if (userData) {
-                updateUserClass (userClass);
+                updateUserClass(userClass);
                 userData.knowledgeLvl = userClass;
                 localStorage.setItem('userData', JSON.stringify(userData));
             }
-            
+
             // Close popup
             popup.classList.remove('active');
             document.body.classList.remove('popup-active');
@@ -1788,6 +1838,7 @@ function showClassPopup() {
         }
     });
 }
+
 
 async function updateUserClass (userClassSelection) {
     try {
@@ -2995,6 +3046,68 @@ const percentUsed = (totalBytes / LOCALSTORAGE_LIMIT) * 100;
 console.log(`LocalStorage used: ${percentUsed.toFixed(2)}% of 5 MB`);
 
 // LOCAL STORAGE LIMIT END
+
+async function wakeUpServer() {
+
+    if (!userData) return
+
+    let showMessageTimeout;
+    let closer;
+
+    const container = document.getElementById("template-container");
+    if (container) {
+        Array.from(container.children).forEach(child => {
+            child.style.pointerEvents = "none";
+            child.style.opacity = "0.5";
+        });
+    }
+
+    // Schedule showing the message after 500ms
+    showMessageTimeout = setTimeout(() => {
+        closer = messageToTheUser(
+            "Laukiama žinutės iš serverio. Procesas gali užtrukti kelias minutes.",
+            false
+        );
+    }, 500);
+
+    try {
+        const response = await fetch(apiBase + 'auth/wake-up', { method: 'GET' });
+
+        if (!response) {
+            throw new Error('No response from server');
+        }
+
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        if (result.code !== 'OK') {
+            throw new Error('Unexpected response code');
+        }
+
+        return true;
+    } catch (error) {
+        console.error("Wake-up failed:", error);
+        messageToTheUser("Nepavyko susisiekti su serveriu. Praktikuotis vis dar galima, bet rezultatai nebus išsaugoti!", 'error');
+        return false;
+    } finally {
+        if (container) {
+            Array.from(container.children).forEach(child => {
+                child.style.pointerEvents = "auto";
+                child.style.opacity = "1";
+            });
+        }
+
+        clearTimeout(showMessageTimeout);
+
+        // Close message if it was displayed
+        if (closer) {
+            setTimeout(() => closer(), 0);
+        }
+    }
+}
+
 
 	</script>
 </body>

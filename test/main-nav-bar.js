@@ -4,6 +4,10 @@ if (userDataString) {
     userData = JSON.parse(userDataString)
 }
 
+if (userData?.accType === "admin" && !window.location.href.includes("admin.html")) {
+    window.location.href = "./admin.html";
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     
     const navbar = document.getElementById('mainNavbar');

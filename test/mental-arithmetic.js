@@ -635,7 +635,7 @@ async function sendSetTaskResultsToDatabase() {
                 <span class="coin-icon">
                         <img src="../images/icons/icon-sudedu-coin.png">
                 </span>
-                <span class="coin-amount">${coinsEarned}</span>
+                <span class="coin-amount">${coinsEarned.toFixed(2)}</span>
               </span>
           </span>
           `
@@ -648,7 +648,7 @@ async function sendSetTaskResultsToDatabase() {
                 <span class="coin-icon">
                         <img src="../images/icons/icon-sudedu-coin.png">
                 </span>
-                <span class="coin-amount">${coinsEarned}</span>
+                <span class="coin-amount">${coinsEarned.toFixed(2)}</span>
               </span>
           </span>
           `
@@ -751,7 +751,7 @@ async function sendSetTaskResultsToDatabase() {
                 <span class="coin-icon">
                         <img src="../images/icons/icon-sudedu-coin.png">
                 </span>
-                <span class="coin-amount">${coinsEarned}</span>
+                <span class="coin-amount">${coinsEarned.toFixed(2)}</span>
               </span>
           </span>
           `;
@@ -764,7 +764,7 @@ async function sendSetTaskResultsToDatabase() {
                   <span class="coin-icon">
                           <img src="../images/icons/icon-sudedu-coin.png">
                   </span>
-                  <span class="coin-amount">${coinsEarned}</span>
+                  <span class="coin-amount">${coinsEarned.toFixed(2)}</span>
                 </span>
             </span>
             `;
@@ -801,7 +801,7 @@ async function sendSetTaskResultsToDatabase() {
                 <span class="coin-icon">
                         <img src="../images/icons/icon-sudedu-coin.png">
                 </span>
-                <span class="coin-amount">${coinsEarned}</span>
+                <span class="coin-amount">${coinsEarned.toFixed(2)}</span>
               </span>
           </span>
           `;
@@ -814,7 +814,7 @@ async function sendSetTaskResultsToDatabase() {
                 <span class="coin-icon">
                         <img src="../images/icons/icon-sudedu-coin.png">
                 </span>
-                <span class="coin-amount">${coinsEarned}</span>
+                <span class="coin-amount">${coinsEarned.toFixed(2)}</span>
               </span>
           </span>
           `;
@@ -834,7 +834,7 @@ async function sendSetTaskResultsToDatabase() {
       sendTaskInfoToStatisticsDatabase();
     }
 
-    if (controller.task[0] !== "weekChl") {
+    if (controller.task && controller.task[0] !== "weekChl") {
       controller.task = null;
     }
     controller.taskRecorded = true;
@@ -3404,7 +3404,7 @@ const infoMessages = {
 
 let popupOpenTime = 0;
 // Open popup with dynamic content
-function openObjectPopup(content, title='', subtitle = '') {
+function openObjectPopup(content, title='', subtitle = '', functionToTrigger=null, saferClosing=false) {
     popupOpenTime = Date.now();
     // Clear existing content
     objectPopupContent.innerHTML = '';
@@ -3424,23 +3424,32 @@ function openObjectPopup(content, title='', subtitle = '') {
 
     // Show the popup
     objectPopup.style.display = 'flex';
+
+    function closeObjectPopup () {
+        objectPopup.style.display = 'none';
+        if (functionToTrigger) {
+          setTimeout(() => {
+            functionToTrigger();
+          }, 750);
+        }
+    }
+
+    objectPopupClose.addEventListener("click", () => {
+        closeObjectPopup();
+    }, { once: true });
+
+    if (!saferClosing) {
+      objectPopup.addEventListener("click", (e) => {
+          if (e.target === objectPopup && Date.now() - popupOpenTime > 300) {
+              closeObjectPopup();
+          }
+      }, { once: true });
+    }
 }
 
 function closeObjectPopup () {
     objectPopup.style.display = 'none';
 }
-
-// Close button
-objectPopupClose.addEventListener("click", () => {
-  objectPopup.style.display = "none";
-});
-
-// Modified close listener
-objectPopup.addEventListener("click", (e) => {
-    if (e.target === objectPopup && Date.now() - popupOpenTime > 300) {
-        objectPopup.style.display = "none";
-    }
-});
 
 //OBJECT POP UP END
 
@@ -4290,5 +4299,3 @@ function redirectToAppropriateLanguage(targetFolder) {
     // window.location.replace(newPath);
   }
 }
-
-
