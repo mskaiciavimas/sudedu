@@ -3880,7 +3880,7 @@ function showDeleteIcon(element) {
 function removeObjectByClickingDeleteIcon(element) {
     const obj = element.parentNode
     const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]["assetIndex"]]["placingIndex"]
-    if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 9)) {
+    if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10)) {
         messageToTheUser("Šį daiktą galėsi išimti iš kambario tik nuėmęs nuo jo kitus!");
         return;
     } else if (element && element.parentNode) {
@@ -3978,7 +3978,7 @@ function enableObjectDragging() {
                 if (!dragStarted) {
                     hasMoved = true;
                     const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
-                    if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 9)) {
+                    if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10)) {
                         messageToTheUser("Šį daiktą galėsi pajudinti tik nuėmęs nuo jo kitus!");
                         cancelDrag(); // stop listening so it won’t repeat
                         return;
@@ -5847,7 +5847,7 @@ function generatePlacementMap(draggedObjectId) {
           }
 
           // Preserve original branch ordering exactly, including the check against draggedAssetData["placingIndex"]
-          if (!(draggedAssetData["placingIndex"] === 5 || draggedAssetData["placingIndex"] === 9)) {
+          if (!(draggedAssetData["placingIndex"] === 5 || draggedAssetData["placingIndex"] === 6 || draggedAssetData["placingIndex"] === 9 || draggedAssetData["placingIndex"] === 10)) {
             const objectsAtTile = getObjectsAtTileCached(x, y);
             for (const existingObj of objectsAtTile) {
               const existingPlacingIndex = getExistingPlacingIndex(existingObj);
@@ -6007,7 +6007,7 @@ function generatePlacementMap(draggedObjectId) {
               const existingAssetData = gameAssetIndex[existingAsset.assetIndex];
               const existingPlacingIndex = existingAssetData["placingIndex"] || 0;
 
-              if (existingPlacingIndex === 5 || existingPlacingIndex === 9) {
+              if ((draggedAssetData["placingIndex"] === 5 && existingPlacingIndex === 5) || (draggedAssetData["placingIndex"] === 6 && existingPlacingIndex === 6) || (draggedAssetData["placingIndex"] === 9 && existingPlacingIndex === 9) || (draggedAssetData["placingIndex"] === 10 && existingPlacingIndex === 10)) {
                 tileAllowed = false;
                 break;
               }
@@ -7748,7 +7748,6 @@ function highlightSpecificObjects(objects) {
         const occupiedTiles = getTilesOccupiedByObject(coords, objectWidth, objectHeight)
           
         for (let i = 0; i < occupiedTiles.length; i++) {
-            console.log(occupiedTiles[i])
             createPlacementHighlight(occupiedTiles[i][0], occupiedTiles[i][1], true)
         }  
     });
