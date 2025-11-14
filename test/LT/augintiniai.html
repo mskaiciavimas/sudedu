@@ -161,53 +161,6 @@
             position: relative;
         }
 
-        .tile {
-            width: var(--unit-size);
-            height: var(--unit-size);
-            border: 1px dashed rgba(139, 115, 85, 0.3);
-            box-sizing: border-box;
-        }
-
-        .tile.wall {
-            background-color:  var(--wall-base-color);
-        }
-
-        .tile.edge {
-            background-color:  var(--edge-base-color);
-            border: 1px solid var(--edge-base-color);
-        }
-
-        .tile.boundary {
-            position: relative;
-            border: none;
-            background: linear-gradient(
-                to bottom,
-                var(--wall-base-color) 0%,
-                var(--wall-base-color) 60%,
-                black 60%,
-                black 66%,
-                var(--baseboard-base-color) 66%,
-                var(--baseboard-base-color) 94%,
-                black 94%,
-                black 100%
-            );
-        }
-
-        .tile.boundary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border: 1px dashed rgba(139, 115, 85, 0.3);
-            pointer-events: none;
-        }
-
-        .tile.floor {
-            background-color: var(--floor-base-color);
-        }
-
         .room-object {
             position: absolute;
             cursor: pointer;
@@ -590,7 +543,7 @@
         
         #content-outer-container,
         #pet-room-container {
-            min-height: 100%;
+            height: 100%;
         }
 
         #pet-room-container {
@@ -598,6 +551,7 @@
             margin-bottom: auto;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
 
         #content-outer-container {
@@ -607,7 +561,10 @@
         }
 
         #game-panel {
-            margin: 20px 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         #room-container {
@@ -2044,11 +2001,16 @@
 /* GIFT CSS END */
 
 #viewport-container {
-    width: 500px;
-    height: 500px;
+    min-height: 0;
+    flex: 1 1 auto;
+    width: 100%;
     overflow: hidden;
     position: relative;
-    background: linear-gradient(to top, #ffbf9c, #ffbf92, #ffbf89, #ffbf7e, #ffc074);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
 }
 
 #room-transform-wrapper {
@@ -2126,12 +2088,11 @@
     }
 
     #pet-room-container {
-        height: auto;
         justify-content: start;
     }
 
     .game-content-panel.mobile {
-        padding: 15px 15px !important;
+        padding: 15px 10px !important;
     }
 
     .shop-header {
@@ -2814,6 +2775,7 @@
             <div id="pet-room-container" class="game-content-panel active">
 
             <div id="game-panel">
+            <div class="pet-buttons-and-stats-holder">
             <div id="pet-buttons-outer">
             <div id="pet-buttons-outer">
                 <div id="pet-buttons"></div>
@@ -2822,45 +2784,50 @@
         
             </div>
 
-    <div class="pet-stats-bars">
-        <div class="stats-bar-outer">
-            <div class="stats-bar-icon">
-                <svg class="stats-icon">
-                    <use href="#icon-food"></use>
-                </svg>
+            <div class="pet-stats-bars">
+                <div class="stats-bar-outer">
+                    <div class="stats-bar-icon">
+                        <svg class="stats-icon">
+                            <use href="#icon-food"></use>
+                        </svg>
+                        </div>
+                    <div class="stat-bar" id="food-bar" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0">
+                        <div class="segments"></div>
+                    </div>
                 </div>
-            <div class="stat-bar" id="food-bar" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0">
-                <div class="segments"></div>
-            </div>
-        </div>
 
-        <div class="stats-bar-outer">
-            <div class="stats-bar-icon">
-                <svg class="stats-icon">
-                    <use href="#icon-water"></use>
-                </svg>
-            </div>
-            <div class="stat-bar" id="water-bar" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0">
-                <div class="segments"></div>
-            </div>
-        </div>
+                <div class="stats-bar-outer">
+                    <div class="stats-bar-icon">
+                        <svg class="stats-icon">
+                            <use href="#icon-water"></use>
+                        </svg>
+                    </div>
+                    <div class="stat-bar" id="water-bar" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0">
+                        <div class="segments"></div>
+                    </div>
+                </div>
 
-        <div class="stats-bar-outer">
-            <div class="stats-bar-icon">
-                <svg class="stats-icon">
-                    <use href="#icon-love"></use>
-                </svg>
+                <div class="stats-bar-outer">
+                    <div class="stats-bar-icon">
+                        <svg class="stats-icon">
+                            <use href="#icon-love"></use>
+                        </svg>
+                    </div>
+                    <div class="stat-bar" id="love-bar" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0">
+                        <div class="segments"></div>
+                    </div>
+                </div>
             </div>
-            <div class="stat-bar" id="love-bar" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0">
-                <div class="segments"></div>
             </div>
-        </div>
-    </div>
+
             <div id="viewport-container">
                 <div id="room-transform-wrapper">
                     <div id="room-container">
                         <div id="roomGridContainer">
-                            <div id="roomGrid" class="room-grid"></div>
+                            <div id="room-transform-wrapper" style="width: 504px; height: 420px;">
+                                <canvas id="roomGrid" style="user-select: none; display: block;"></canvas>
+                            </div>
+
                         </div>
                         <div id="petContainer"></div>
                         <div id="roomObjectsContainer"></div>
@@ -3115,6 +3082,7 @@
         let petControllers = {};
         let petStatsList = '';
         let taxesData = {}
+        let globalWalkabilityMap;
         const taxPaymentPeriod = 14 //days
         const taxGracePeriod = 2 //days;
         const taxPrice = {
@@ -3148,6 +3116,8 @@
             const pets = userPetAssets.pets;
 
             let itemsInUse = [];
+
+            globalWalkabilityMap = generateWalkabilityMap();
 
             for (const petNumber in pets) {
                 const petDict = pets[petNumber];
@@ -3188,8 +3158,7 @@
                     [petStartingPosLeft, petStaringPosTop] = [objectCoords[0] + objectInteractivePart[0], objectCoords[1] - objectInteractivePart[1]];
                 } else {
                     const pet = document.getElementById(petNumber);
-                    const suitableWalkingTiles = generateWalkabilityMap();
-                    const validCoords = findValidPlacements(suitableWalkingTiles, pet);
+                    const validCoords = findValidPlacements(globalWalkabilityMap, pet);
 
                     if (validCoords.length === 0) {
                         return;
@@ -3272,70 +3241,149 @@
 
         let userObjectAssets = {};
 
-        // 1 - floor, 2 - wall, 3 - boundary between wall and floor, 4 - edge
+        // 1.0 - floor, 2.0 - wall, 3.0 - boundary between wall and floor, 
+        // 4.1 - horizontal edge, 4.2 - vertical edge, 4.3 - top left corner, 4.4 - top right corner, 4.5 - bottom right corner, 4.6 - bottom left corner
+        
+        //[4.3, ...Array(20).fill(4.1),4.4] - border with edges and horizontal line filled to set number (20)
+        //...Array(6).fill([4.2, ...Array(20).fill(2.0), 4.2]) - multiple rows of wall tiles with edges at the end 6 rows of 20 wall tiles and 2 borders at ends
+        
         const roomLayout = [
-          [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
-          [4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4],
-          [4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4],
-          [4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4],
-          [4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4],
-          [4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4],
-          [4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4],
-          [4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-          [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+          [4.3, ...Array(40).fill(4.1), 4.4],
+          ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2]),
+          [4.2, ...Array(40).fill(3.0), 4.2],
+          ...Array(20).fill([4.2, ...Array(40).fill(1.0), 4.2]),
+          [4.6, ...Array(40).fill(4.1), 4.5],
         ];
 
+        const roomGrid = document.getElementById('roomGrid');
+        const ctx = roomGrid.getContext('2d');
+        const tileSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
 
-        function renderRoomGrid() {
-            const roomGrid = document.getElementById('roomGrid');
+        function renderRoomGrid(offsetX = 0, offsetY = 0, scale = 1) {
+            const canvas = document.getElementById('roomGrid');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
 
-            roomGrid.innerHTML = ''
-                        
-            // Define how many columns/rows you want
             const cols = roomLayout[0].length;
             const rows = roomLayout.length;
+            const tileSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
 
-            // Apply grid template using JS
-            roomGrid.style.gridTemplateColumns = `repeat(${cols}, ${unitSize}px)`;
-            roomGrid.style.gridTemplateRows = `repeat(${rows}, ${unitSize}px)`;
+            // Set canvas size based on grid
+            canvas.width = cols * tileSize;
+            canvas.height = rows * tileSize;
 
-            for (let row = 0; row < roomLayout.length; row++) {
-                for (let col = 0; col < roomLayout[0].length; col++) {
-                    const tile = document.createElement('div');
-                    const tileType = roomLayout[row][col];
-                    
-                    tile.className = 'tile';
-                    tile.dataset.row = row;
-                    tile.dataset.col = col;
-                    
-                    switch(tileType) {
-                        case 1:
-                            tile.classList.add('floor');
-                            break;
-                        case 2:
-                            tile.classList.add('wall');
-                            break;
-                        case 3:
-                            tile.classList.add('boundary');
-                            break;
-                        case 4:
-                            tile.classList.add('edge');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(offsetX, offsetY);
+            ctx.scale(scale, scale);
+
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const type = roomLayout[row][col];
+                    const x = col * tileSize;
+                    const y = row * tileSize;
+
+                    // Fill color
+                    let fillColor;
+                    switch(type) {
+                        case 1.0: fillColor = '#DEB887'; break; // floor
+                        case 2.0: fillColor = '#F0EAD6'; break; // wall
+                        case 3.0: fillColor = '#B37B50'; break; // boundary
+                        case 4.1: case 4.2: case 4.3: case 4.4: case 4.5: case 4.6:
+                            fillColor = '#A77851'; break; // edges
+                        default: fillColor = '#fff';
                     }
-                    
-                    roomGrid.appendChild(tile);
+                    ctx.fillStyle = fillColor;
+                    ctx.fillRect(x, y, tileSize, tileSize);
+
+                    // Define borders per tile type
+                    let sides = [false, false, false, false]; // [top, right, bottom, left]
+                    let strokeColor = '#000';
+                    let lineWidth = 1;
+
+                    switch(type) {
+                        case 1.0: // floor - maybe light outline
+                            sides = [true, true, true, true];
+                            strokeColor = 'grey';
+                            lineWidth = 0.2;
+                            break;
+                        case 2.0: // wall - full thick border
+                            sides = [true, true, true, true];
+                            strokeColor = 'grey';
+                            lineWidth = 0.2;
+                            break;
+                        case 3.0: // boundary
+                            sides = [true, true, true, true];
+                            strokeColor = 'grey';
+                            lineWidth = 0.2;
+                            break;
+                        case 4.1: // horizontal edge
+                            sides = [true, false, true, false]; // top & bottom
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.2: // vertical edge
+                            sides = [false, true, false, true]; // left & right
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.3: // top-left corner
+                            sides = [true, false, false, true];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.4: // top-right corner
+                            sides = [true, true, false, false];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.5: // bottom-right corner
+                            sides = [false, true, true, false];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.6: // bottom-left corner
+                            sides = [false, false, true, true];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                    }
+
+                    // Draw borders manually
+                    ctx.strokeStyle = strokeColor;
+                    ctx.lineWidth = lineWidth;
+                    if (sides[0]) { ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + tileSize, y); ctx.stroke(); } // top
+                    if (sides[1]) { ctx.beginPath(); ctx.moveTo(x + tileSize, y); ctx.lineTo(x + tileSize, y + tileSize); ctx.stroke(); } // right
+                    if (sides[2]) { ctx.beginPath(); ctx.moveTo(x, y + tileSize); ctx.lineTo(x + tileSize, y + tileSize); ctx.stroke(); } // bottom
+                    if (sides[3]) { ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + tileSize); ctx.stroke(); } // left
                 }
             }
+
+            ctx.restore();
         }
+
+
+function resizeCanvas() {
+    const canvas = document.getElementById('roomGrid');
+    const container = canvas.parentElement;
+
+    // Calculate room dimensions
+    const cols = roomLayout[0].length;
+    const rows = roomLayout.length;
+    const tileSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
+    
+    // Set canvas to room size (not container size)
+    canvas.width = cols * tileSize;
+    canvas.height = rows * tileSize;
+
+    renderRoomGrid(viewportState.x, viewportState.y, viewportState.scale);
+}
+
+// Call on load AFTER DOM is ready
+window.addEventListener('load', resizeCanvas);
+
+// Call on window resize
+window.addEventListener('resize', resizeCanvas);
 
         function setPetAndObjectContainersToGridDimentions() {
             const roomGrid = document.getElementById('roomGrid');
@@ -3900,6 +3948,8 @@ function enableObjectDragging() {
         // Create edit mode handler
         obj._editModeHandler = function(e) {
             if (e.pointerType === "mouse" && e.button !== 0) return;
+
+            const placementMap = generatePlacementMap(obj.id);
             
             e.preventDefault();
             e.stopPropagation();
@@ -3916,7 +3966,8 @@ function enableObjectDragging() {
                 const deltaY = Math.abs(moveEvent.clientY - startY);
                 
                 // Increase threshold to prevent accidental dragging on clicks
-                if ((deltaX > 10 || deltaY > 10) && !dragStarted) {
+                //if ((deltaX > 10 || deltaY > 10) && !dragStarted) {
+                if (!dragStarted) {
                     hasMoved = true;
                     const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
                     if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 9)) {
@@ -3928,7 +3979,9 @@ function enableObjectDragging() {
                     dragStarted = true;
                     currentObject = obj;
 
-                    obj._placementMap = determineAndHighlightValidTiles(obj.id);
+                    obj._placementMap = placementMap
+
+                    determineAndHighlightValidTiles(placementMap);
 
                     const rect = obj.getBoundingClientRect();
                     const parentRect = obj.parentElement.getBoundingClientRect();
@@ -4149,8 +4202,6 @@ document.addEventListener('pointerup', function(e) {
     currentObject.classList.remove('dragging');
 
     if ([...currentObject.classList].some(cls => cls.includes("pet"))) {
-        const walkMap = generateWalkabilityMap();
-
         const petWidthInTiles = Math.ceil(currentObject.offsetWidth / unitSize);
         const petHeightInTiles = Math.ceil(currentObject.offsetHeight / unitSize);
 
@@ -4162,8 +4213,8 @@ document.addEventListener('pointerup', function(e) {
         let bottomRow = tileY + petHeightInTiles - 1;
 
         // If bottom row not walkable, find closest position where **entire bottom row** is walkable
-        if (!isBottomRowWalkable(walkMap, bottomRow, tileX, petWidthInTiles)) {
-            const closest = findClosestWalkablePosition(walkMap, bottomRow, tileX, petWidthInTiles);
+        if (!isBottomRowWalkable(globalWalkabilityMap, bottomRow, tileX, petWidthInTiles)) {
+            const closest = findClosestWalkablePosition(globalWalkabilityMap, bottomRow, tileX, petWidthInTiles);
             if (closest) {
                 // Align pet so **bottom row** sits on walkable tiles
                 currentObject.style.left = closest.col * unitSize + 'px';
@@ -4213,7 +4264,7 @@ document.addEventListener('pointerup', function(e) {
 });
 
 
-function movePetToTile(pet, startCoord, endCoord, speed = 300) {
+function movePetToTile(pet, startCoord, endCoord) {
     if (!pet) return Promise.resolve();
     
     const [startCol, startRow] = startCoord;
@@ -4230,7 +4281,7 @@ function movePetToTile(pet, startCoord, endCoord, speed = 300) {
     }
     
     return new Promise((resolve) => {
-        moveObjectAlongPath(pet.id, path, speed, resolve);
+        moveObjectAlongPath(pet.id, path, resolve);
     });
 }
 
@@ -4273,7 +4324,7 @@ function findPath(startCol, startRow, endCol, endRow, objectId) {
     const widthInTiles = Math.ceil(objWidth / unitSize);
 
     // Generate walkability map
-    const walkabilityMap = generateWalkabilityMap();
+    const walkabilityMap = globalWalkabilityMap;
     
     // Add safety check
     if (!walkabilityMap || walkabilityMap.length === 0) {
@@ -4363,162 +4414,13 @@ function findPath(startCol, startRow, endCol, endRow, objectId) {
     return null;
 }
 
-function generateWalkabilityMap() {
-    // Add safety check for roomLayout
-    if (!roomLayout || roomLayout.length === 0) {
-        console.error("roomLayout is not defined or empty");
-        return null;
-    }
-    
-    const unitSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
-    const map = [];
-
-    // Initialize map with basic walkability
-    for (let row = 0; row < roomLayout.length; row++) {
-        map[row] = [];
-        for (let col = 0; col < roomLayout[0].length; col++) {
-            const tileType = roomLayout[row][col];
-
-            // Only floor (1) and boundary (3) tiles are walkable
-            const isWalkable = (tileType === 1 || tileType === 3);
-
-            map[row][col] = {
-                walkable: isWalkable,
-                allowedDirections: [true, true, true, true] // up, right, down, left
-            };
-        }
-    }
-
-    // Apply boundary tile restrictions (with safety checks)
-    for (let row = 0; row < roomLayout.length; row++) {
-        for (let col = 0; col < roomLayout[0].length; col++) {
-            if (roomLayout[row][col] === 3) { // boundary tile
-                if (row + 1 < roomLayout.length) {
-                    let hasNonPassableBottomBelow = false;
-
-                    // Add safety check for userObjectAssets
-                    if (userObjectAssets && gameAssetIndex) {
-                        Object.entries(userObjectAssets).forEach(([assetId, asset]) => {
-                            const assetData = gameAssetIndex[asset.assetIndex];
-                            if (!assetData) return;
-
-                            const [assetX, assetY] = asset.position; // bottom-left corner
-                            const element = document.getElementById(assetId);
-                            if (!element) return;
-
-                            const assetWidth = Math.ceil(element.offsetWidth / unitSize);
-                            const assetHeight = Math.ceil(element.offsetHeight / unitSize);
-
-                            const topRowOfAsset = assetY - assetHeight + 1;
-                            const bottomRowOfAsset = assetY;
-
-                            // 🚨 New steppable check: mark middle rows unwalkable
-                            if (assetData.steppable === false) {
-                                for (let r = topRowOfAsset + 1; r < bottomRowOfAsset; r++) {
-                                    if (r >= 0 && r < roomLayout.length) {
-                                        for (let c = assetX; c < assetX + assetWidth; c++) {
-                                            if (c >= 0 && c < roomLayout[0].length) {
-                                                map[r][c].walkable = false;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Existing passable check for boundary tiles
-                            if (assetData.passable === false) {
-                                // ✅ Only if (row+1, col) is bottom row of asset
-                                if (row + 1 === bottomRowOfAsset &&
-                                    col >= assetX && col < assetX + assetWidth) {
-                                    hasNonPassableBottomBelow = true;
-                                }
-                            }
-                        });
-                    }
-
-                    if (hasNonPassableBottomBelow) {
-                        map[row][col].walkable = false;
-                    }
-                }
-            }
-        }
-    }
-
-    // Set directional movement restrictions (with safety checks)
-    for (let row = 0; row < roomLayout.length; row++) {
-        for (let col = 0; col < roomLayout[0].length; col++) {
-            if (!map[row][col].walkable) continue;
-
-            if (userObjectAssets && gameAssetIndex) {
-                Object.entries(userObjectAssets).forEach(([assetId, asset]) => {
-                    const assetData = gameAssetIndex[asset.assetIndex];
-                    if (!assetData) return;
-
-                    const [assetX, assetY] = asset.position;
-                    const element = document.getElementById(assetId);
-                    if (!element) return;
-
-                    const assetWidth = Math.ceil(element.offsetWidth / unitSize);
-                    const assetHeight = Math.ceil(element.offsetHeight / unitSize);
-
-                    const topRowOfAsset = assetY - assetHeight + 1;
-                    const bottomRowOfAsset = assetY;
-                    const rowAboveBottom = bottomRowOfAsset - 1;
-
-                    // 🚨 NEW: Special handling for food-bowl items
-                    if (element.className.includes('food-bowl')) {
-                        // Block upward and downward movement on the food-bowl's cells
-                        if (row === bottomRowOfAsset &&
-                            col >= assetX && col < assetX + assetWidth) {
-                            map[row][col].allowedDirections[0] = false; // up
-                            map[row][col].allowedDirections[2] = false; // down
-                        }
-                        
-                        // Block upward movement on cells one row below the food-bowl
-                        if (row === bottomRowOfAsset + 1 &&
-                            col >= assetX && col < assetX + assetWidth) {
-                            map[row][col].allowedDirections[0] = false; // up
-                        }
-                    }
-
-                    // Only consider passable === false for movement restrictions
-                    if (assetData.passable === false) {
-                        if (assetHeight === 1) {
-                            // Case 3: single-height asset - block movement on the asset tile itself
-                            if (row === bottomRowOfAsset &&
-                                col >= assetX && col < assetX + assetWidth) {
-                                map[row][col].allowedDirections[0] = false; // up
-                                map[row][col].allowedDirections[2] = false; // down
-                            }
-                        } else {
-                            // Cases 1 & 2: multi-height assets
-                            // Case 1: current tile is bottom row of the asset
-                            if (row === bottomRowOfAsset &&
-                                col >= assetX && col < assetX + assetWidth) {
-                                map[row][col].allowedDirections[0] = false; // up
-                            }
-
-                            // Case 2: current tile is directly above bottom row of asset
-                            if (row === rowAboveBottom &&
-                                col >= assetX && col < assetX + assetWidth) {
-                                map[row][col].allowedDirections[2] = false; // down
-                            }
-                        }
-                    }
-                });
-            }
-        }
-    }
-    return map;
-}
-
-
 // Global variable to track active movements
 const activeMovements = new Map();
 
 // Function to move an object along a path
 // Function to move an object along a path
-function moveObjectAlongPath(objectId, path, speed = 300, onComplete) {
+function moveObjectAlongPath(objectId, path, onComplete) {
+    const speed = 150
     const object = document.getElementById(objectId);
     if (!object || !path?.length) {
         onComplete?.();
@@ -4876,12 +4778,12 @@ function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) 
             coords.forEach(([x, y]) => {
                 const tile = roomLayout[y]?.[x];
                 const tileType = tile?.type ?? tile;
-                if (tileType === 1 || tileType === 3) { // floor or boundary
+                if (tileType === 1.0 || tileType === 3.0) { // floor or boundary
                     hasFloorOrBoundary = true;
                     allWall = false;
                 }
-                if (tileType !== 2) { // not wall
-                    allWall = allWall && tileType === 2;
+                if (tileType !== 2.0) { // not wall
+                    allWall = allWall && tileType === 2.0;
                 }
             });
 
@@ -5160,7 +5062,7 @@ function generateWalkabilityMap() {
         for (let col = 0; col < roomLayout[0].length; col++) {
             const tileType = roomLayout[row][col];
             // Only floor (1) and boundary (3) tiles are walkable
-            const isWalkable = (tileType === 1 || tileType === 3);
+            const isWalkable = (tileType === 1.0 || tileType === 3.0);
             map[row][col] = {
                 walkable: isWalkable,
                 allowedDirections: [true, true, true, true] // up, right, down, left
@@ -5754,306 +5656,335 @@ function getFirstRowOfTileType(number) {
   return roomLayout.findIndex(row => row.includes(number));
 }
     
-// Function to generate placement validity map and highlight valid tiles
 function generatePlacementMap(draggedObjectId) {
-    if (!gameAssetIndex || !userObjectAssets) {
-        console.error("Game data not loaded");
-        return null;
-    }
+  if (!gameAssetIndex || !userObjectAssets) {
+    console.error("Game data not loaded");
+    return null;
+  }
 
-    const combinedAssets = { ...userObjectAssets };
+  // Build combinedAssets once (exact original behavior)
+  const combinedAssets = { ...userObjectAssets };
+  if (furniturePreviewDict["furniture-preview"].assetIndex !== null) {
+    combinedAssets["furniture-preview"] = furniturePreviewDict["furniture-preview"];
+  }
 
-    // Only add furniture-preview if assetIndex is not null
-    if (furniturePreviewDict["furniture-preview"].assetIndex !== null) {
-        combinedAssets["furniture-preview"] = furniturePreviewDict["furniture-preview"];
-    }
+  // Get the dragged object's asset data (exact original)
+  const draggedAsset = combinedAssets[draggedObjectId];
+  if (!draggedAsset) {
+    console.error("Dragged object not found in combinedAssets");
+    return null;
+  }
+  const draggedAssetData = gameAssetIndex[draggedAsset.assetIndex];
+  if (!draggedAssetData) {
+    console.error("Asset data not found for dragged object");
+    return null;
+  }
 
-    // Get the dragged object's asset data
-    const draggedAsset = combinedAssets[draggedObjectId];
-    
-    if (!draggedAsset) {
-        console.error("Dragged object not found in combinedAssets");
-        return null;
-    }
+  // Get object dimensions in tiles (exact original)
+  const draggedElement = document.getElementById(draggedObjectId);
+  if (!draggedElement) {
+    console.error("Dragged element not found in DOM");
+    return null;
+  }
+  const objectWidth = Math.ceil(draggedElement.offsetWidth / unitSize);
+  const objectHeight = Math.ceil(draggedElement.offsetHeight / unitSize);
 
-    const draggedAssetData = gameAssetIndex[draggedAsset.assetIndex];
+  // EXACT same way original derived these:
+  const draggedAssetPlacingRules = gameAssetIndex[combinedAssets[draggedElement.id]?.assetIndex]?.canBePlacedOn;
+  const draggedAssetPlacingIndex = gameAssetIndex[combinedAssets[draggedElement.id]?.assetIndex]?.placingIndex;
 
-    if (!draggedAssetData) {
-        console.error("Asset data not found for dragged object");
-        return null;
-    }
+  // cache some repeated globals locally
+  const rl = roomLayout;
+  const roomRows = rl.length;
+  const roomCols = rl[0].length;
 
-    // Get object dimensions in tiles
-    const draggedElement = document.getElementById(draggedObjectId);
-    if (!draggedElement) {
-        console.error("Dragged element not found in DOM");
-        return null;
-    }
+  // Pre-cache possibly expensive first-row lookups used repeatedly
+  // (kept as-is: call only if rule requires it)
+  let firstRowTileType1 = null;
+  let firstRowTileType3 = null;
+  function getFirstRow1() {
+    if (firstRowTileType1 === null) firstRowTileType1 = getFirstRowOfTileType(1);
+    return firstRowTileType1;
+  }
+  function getFirstRow3() {
+    if (firstRowTileType3 === null) firstRowTileType3 = getFirstRowOfTileType(3);
+    return firstRowTileType3;
+  }
 
-    const objectWidth = Math.ceil(draggedElement.offsetWidth / unitSize);
-    const objectHeight = Math.ceil(draggedElement.offsetHeight / unitSize);
+  // === CACHES: safe because helpers are expected deterministic for the same inputs ===
+  // Cache keyed by "x,y,draggedObjectId" to match original signature
+  const objectsAtTileCache = new Map();
+  function getObjectsAtTileCached(x, y) {
+    const key = x + "," + y + "," + draggedObjectId;
+    if (objectsAtTileCache.has(key)) return objectsAtTileCache.get(key);
+    const val = getObjectsAtTile(x, y, draggedObjectId) || [];
+    objectsAtTileCache.set(key, val);
+    return val;
+  }
 
-    const draggedAssetPlacingRules = gameAssetIndex[combinedAssets[draggedElement.id]?.assetIndex]?.canBePlacedOn;
-    const draggedAssetPlacingIndex = gameAssetIndex[combinedAssets[draggedElement.id]?.assetIndex]?.placingIndex;
+  // Cache coordinates/tiles for objects by object id and also cache placingIndex per object id
+  const objectTilesCache = new Map(); // id -> {coords,w,h,tiles}
+  const existingPlacingIndexCache = new Map(); // id -> placingIndex (number)
+  function getTilesOccupiedByObjectCached(obj) {
+    const id = obj.id;
+    if (objectTilesCache.has(id)) return objectTilesCache.get(id);
+    const coords = getObjectCoordinates(id);
+    const w = Math.ceil(obj.offsetWidth / unitSize);
+    const h = Math.ceil(obj.offsetHeight / unitSize);
+    const tiles = getTilesOccupiedByObject(coords, w, h) || [];
+    const entry = { coords, w, h, tiles };
+    objectTilesCache.set(id, entry);
+    return entry;
+  }
+  function getExistingPlacingIndex(existingObj) {
+    const id = existingObj.id;
+    if (existingPlacingIndexCache.has(id)) return existingPlacingIndexCache.get(id);
+    const existingAsset = combinedAssets[id];
+    const existingAssetData = existingAsset ? gameAssetIndex[existingAsset.assetIndex] : null;
+    const idx = (existingAssetData && existingAssetData["placingIndex"]) || 0;
+    existingPlacingIndexCache.set(id, idx);
+    return idx;
+  }
 
-    // Create placement validity map
-    const placementMap = [];
-    
-    // Initialize map
-    for (let row = 0; row < roomLayout.length; row++) {
-        placementMap[row] = [];
-        for (let col = 0; col < roomLayout[0].length; col++) {
-            placementMap[row][col] = {
-                canPlace: false,
-            };
-        }
-    }
+  // Initialize placementMap exactly like original
+  const placementMap = [];
+  for (let r = 0; r < roomRows; r++) {
+    placementMap[r] = [];
+    for (let c = 0; c < roomCols; c++) placementMap[r][c] = { canPlace: false };
+  }
 
-    for (let row = 0; row < roomLayout.length; row++) {
-    for (let col = 0; col < roomLayout[0].length; col++) {
-        let rightEndofSection = col + objectWidth - 1;
-        let bottomOfSection = row + objectHeight - 1;
+  // Main nested loops — all conditions and order preserved exactly
+  for (let row = 0; row < roomRows; row++) {
+    for (let col = 0; col < roomCols; col++) {
+      let rightEndofSection = col + objectWidth - 1;
+      let bottomOfSection = row + objectHeight - 1;
 
-        if (rightEndofSection >= roomLayout[0].length || bottomOfSection >= roomLayout.length) {
-            continue; // skip, object doesn't fit
-        }
+      if (rightEndofSection >= roomCols || bottomOfSection >= roomRows) {
+        continue; // skip, object doesn't fit
+      }
 
-        let sectionAllowed = true;
+      let sectionAllowed = true;
 
-        for (let y = row; y <= bottomOfSection; y++) {
-            for (let x = col; x <= rightEndofSection; x++) {
-                let tileAllowed = true;
-                const tile = roomLayout[y][x];
-                const tileType = tile.type ?? tile;
+      for (let y = row; y <= bottomOfSection; y++) {
+        for (let x = col; x <= rightEndofSection; x++) {
+          let tileAllowed = true;
+          const tile = rl[y][x];
+          const tileType = tile.type ?? tile;
 
-                // tileType: 1=floor, 2=wall, 3=boundary
-                if (tileType === 4) {
-                    tileAllowed = false;
-                } else if (tileType === 1) {
-                    if (!draggedAssetPlacingRules.includes(1)) {
-                        tileAllowed = false;
-                    }
-                } 
-                else if (tileType === 3) {
-                    if (!draggedAssetPlacingRules.includes(3)) {
-                        tileAllowed = false;
-                    }
-                } 
-                else if (tileType === 2) {
-                    if (!draggedAssetPlacingRules.includes(2)) {
-                        if (draggedAssetPlacingRules.includes(4)) {
-                            const bottomSupportTile = roomLayout[bottomOfSection][x];
-                            if (
-                                (bottomSupportTile === 1 && draggedAssetPlacingRules.includes(1)) || // bottom on floor
-                                (bottomSupportTile === 3 && draggedAssetPlacingRules.includes(3)) // bottom on boundary
-                            ) {
-                                tileAllowed = true;
-                            } else {
-                                tileAllowed = false;
-                            }
-                        } else {
-                            tileAllowed = false;
-                        }
-                    } else {
-                        tileAllowed = true;
-                    }
+          // EXACT original tile type checks (explicit values)
+          if (tileType === 4.0 || tileType === 4.1 || tileType === 4.2 || tileType === 4.3 || tileType === 4.4 || tileType === 4.5 || tileType === 4.6) {
+            tileAllowed = false;
+          } else if (tileType === 1.0) {
+            if (!draggedAssetPlacingRules.includes(1)) {
+              tileAllowed = false;
+            }
+          } else if (tileType === 3.0) {
+            if (!draggedAssetPlacingRules.includes(3)) {
+              tileAllowed = false;
+            }
+          } else if (tileType === 2.0) {
+            if (!draggedAssetPlacingRules.includes(2)) {
+              if (draggedAssetPlacingRules.includes(4)) {
+                const bottomSupportTile = rl[bottomOfSection][x];
+                if (
+                  (bottomSupportTile === 1 && draggedAssetPlacingRules.includes(1)) || // bottom on floor
+                  (bottomSupportTile === 3 && draggedAssetPlacingRules.includes(3)) // bottom on boundary
+                ) {
+                  tileAllowed = true;
+                } else {
+                  tileAllowed = false;
                 }
+              } else {
+                tileAllowed = false;
+              }
+            } else {
+              tileAllowed = true;
+            }
+          }
 
-                if (!(draggedAssetData["placingIndex"] === 5 || draggedAssetData["placingIndex"] === 9)) {
-                    const objectsAtTile = getObjectsAtTile(x, y, draggedObjectId);
-                    for (const existingObj of objectsAtTile) {
-                        const existingAsset = combinedAssets[existingObj.id];
+          // Preserve original branch ordering exactly, including the check against draggedAssetData["placingIndex"]
+          if (!(draggedAssetData["placingIndex"] === 5 || draggedAssetData["placingIndex"] === 9)) {
+            const objectsAtTile = getObjectsAtTileCached(x, y);
+            for (const existingObj of objectsAtTile) {
+              const existingPlacingIndex = getExistingPlacingIndex(existingObj);
 
-                        const existingAssetData = gameAssetIndex[existingAsset.assetIndex];
-                        const existingPlacingIndex = existingAssetData["placingIndex"] || 0;
+              if (existingPlacingIndex === 5 || existingPlacingIndex === 9) {
+                continue;
+              }
 
-                        if (existingPlacingIndex === 5 || existingPlacingIndex === 9) {
-                            continue
-                        }
+              if (existingPlacingIndex === 8) {
+                tileAllowed = false;
+                break;
+              }
 
-                        if (existingPlacingIndex === 8) {
-                            tileAllowed = false;
-                            break;
-                        }
-
-                        //Added to allow floor/boundary placed objects to overlap wall placed objects
-                        if ((draggedAssetPlacingRules.includes(4)) && !draggedAssetPlacingRules.includes(2) && !(draggedAssetPlacingIndex === 8 && existingPlacingIndex === 8)) {
-                            if (tileType === 2) {
-                                if (draggedAssetPlacingRules.includes(3)) {
-                                    if (getFirstRowOfTileType(3) - (objectHeight - 1) <= row) {
-                                        tileAllowed = true;
-                                        break;
-                                    }
-                                } else if (draggedAssetPlacingRules.includes(1)) {
-                                    if (getFirstRowOfTileType(1) - (objectHeight - 1) <= row) {
-                                        tileAllowed = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        if (!draggedAssetPlacingRules.includes(existingPlacingIndex)) {
-                            tileAllowed = false;
-                            break;
-                        } else {
-                            if (existingPlacingIndex === 11 && draggedAssetPlacingIndex === 12) {
-                                const windowCoords = getObjectCoordinates(existingObj.id)
-                                const windowWidth = Math.ceil(existingObj.offsetWidth / unitSize);
-                                const windowHeight = Math.ceil(existingObj.offsetHeight / unitSize);
-                                const tilesOccupiedByWindow = getTilesOccupiedByObject(windowCoords, windowWidth, windowHeight);
-
-                                const maxY = Math.max(...tilesOccupiedByWindow.map(c => c[1]));
-                                const windowBottomTiles = tilesOccupiedByWindow.filter(c => c[1] === maxY);
-
-                                if (windowBottomTiles.some(c => c[0] === x && c[1] === y)) {
-                                    tileAllowed = true;
-                                }
-                            } else if (existingPlacingIndex === 11 && draggedAssetPlacingIndex === 13) {
-                                const windowCoords = getObjectCoordinates(existingObj.id)
-                                const windowWidth = Math.ceil(existingObj.offsetWidth / unitSize);
-                                const windowHeight = Math.ceil(existingObj.offsetHeight / unitSize);
-                                const tilesOccupiedByWindow = getTilesOccupiedByObject(windowCoords, windowWidth, windowHeight);
-                                const maxY = Math.max(...tilesOccupiedByWindow.map(c => c[1]));
-                                const windowTilesOtherThanBottom = tilesOccupiedByWindow.filter(c => c[1] !== maxY);
-                                
-                                // Check if current tile is actually occupied by this window AND is not bottom row
-                                if (windowTilesOtherThanBottom.some(c => c[0] === x && c[1] === y)) {
-                                    tileAllowed = true;
-                                } else {
-                                    tileAllowed = false;
-                                    break;
-                                }
-                            } else if (existingPlacingIndex === 14) {
-                               const objCoords = getObjectCoordinates(existingObj.id);
-                                const objWidth = Math.ceil(existingObj.offsetWidth / unitSize);
-                                const objHeight = Math.ceil(existingObj.offsetHeight / unitSize);
-                                const tilesOccupiedByObj = getTilesOccupiedByObject(objCoords, objWidth, objHeight);
-
-                                const minY = Math.min(...tilesOccupiedByObj.map(c => c[1]));
-                                const objTopTiles = tilesOccupiedByObj.filter(c => c[1] === minY);
-
-                                if (objTopTiles.some(c => c[0] === x && c[1] === y)) {
-                                    tileAllowed = true;
-                                } else {
-                                    tileAllowed = false;
-                                    break;
-                                }
-                            } else {
-                                tileAllowed = true;
-                            }
-                        }
+              // Added to allow floor/boundary placed objects to overlap wall placed objects
+              if ((draggedAssetPlacingRules.includes(4)) && !draggedAssetPlacingRules.includes(2) && !(draggedAssetPlacingIndex === 8 && existingPlacingIndex === 8)) {
+                if (tileType === 2.0) {
+                  if (draggedAssetPlacingRules.includes(3)) {
+                    if (getFirstRow3() - (objectHeight - 1) <= row) {
+                      tileAllowed = true;
+                      break;
                     }
+                  } else if (draggedAssetPlacingRules.includes(1)) {
+                    if (getFirstRow1() - (objectHeight - 1) <= row) {
+                      tileAllowed = true;
+                      break;
+                    }
+                  }
+                }
+              }
 
-                    if (!tileAllowed) {
-                        if (tileType === 2 && !draggedAssetPlacingRules.includes(2) && draggedAssetPlacingRules.includes(7)) {
-                            // Check the tile below the object (bottomOfSection)
-                            const bottomTileType = roomLayout[bottomOfSection][x];
-                            const bottomObjects = getObjectsAtTile(x, bottomOfSection, draggedObjectId);
+              if (!draggedAssetPlacingRules.includes(existingPlacingIndex)) {
+                tileAllowed = false;
+                break;
+              } else {
+                // Exact same nested special-case handling as original
+                if (existingPlacingIndex === 11 && draggedAssetPlacingIndex === 12) {
+                  const winEntry = getTilesOccupiedByObjectCached(existingObj);
+                  const tilesOccupiedByWindow = winEntry.tiles;
+                  const maxY = Math.max(...tilesOccupiedByWindow.map(c => c[1]));
+                  const windowBottomTiles = tilesOccupiedByWindow.filter(c => c[1] === maxY);
+                  if (windowBottomTiles.some(c => c[0] === x && c[1] === y)) {
+                    tileAllowed = true;
+                  }
+                } else if (existingPlacingIndex === 11 && draggedAssetPlacingIndex === 13) {
+                  const winEntry = getTilesOccupiedByObjectCached(existingObj);
+                  const tilesOccupiedByWindow = winEntry.tiles;
+                  const maxY = Math.max(...tilesOccupiedByWindow.map(c => c[1]));
+                  const windowTilesOtherThanBottom = tilesOccupiedByWindow.filter(c => c[1] !== maxY);
+                  if (windowTilesOtherThanBottom.some(c => c[0] === x && c[1] === y)) {
+                    tileAllowed = true;
+                  } else {
+                    tileAllowed = false;
+                    break;
+                  }
+                } else if (existingPlacingIndex === 14) {
+                  const objEntry = getTilesOccupiedByObjectCached(existingObj);
+                  const tilesOccupiedByObj = objEntry.tiles;
+                  const minY = Math.min(...tilesOccupiedByObj.map(c => c[1]));
+                  const objTopTiles = tilesOccupiedByObj.filter(c => c[1] === minY);
+                  if (objTopTiles.some(c => c[0] === x && c[1] === y)) {
+                    tileAllowed = true;
+                  } else {
+                    tileAllowed = false;
+                    break;
+                  }
+                } else {
+                  tileAllowed = true;
+                }
+              }
+            }
 
-                            let bottomTileValid = false;
+            if (!tileAllowed) {
+              if (tileType === 2.0 && !draggedAssetPlacingRules.includes(2) && draggedAssetPlacingRules.includes(7)) {
+                // Check the tile below the object (bottomOfSection)
+                const bottomTileType = rl[bottomOfSection][x];
+                const bottomObjects = getObjectsAtTileCached(x, bottomOfSection);
 
-                            // First, check if the tile type itself supports placement
-                            if (
-                                (bottomTileType === 1 && draggedAssetPlacingRules.includes(1)) ||
-                                (bottomTileType === 3 && draggedAssetPlacingRules.includes(3))
-                            ) {
+                let bottomTileValid = false;
+
+                // First, check if the tile type itself supports placement
+                if (
+                  (bottomTileType === 1.0 && draggedAssetPlacingRules.includes(1)) ||
+                  (bottomTileType === 3.0 && draggedAssetPlacingRules.includes(3))
+                ) {
+                  bottomTileValid = true;
+                } else {
+                    for (const obj of bottomObjects) {
+                        const objPlacingIndex = getExistingPlacingIndex(obj);
+
+                        const objEntry = getTilesOccupiedByObjectCached(obj);
+                        const tilesOccupiedByObj = objEntry.tiles;
+                        const ys = tilesOccupiedByObj.map(c => c[1]);
+                        const minY = Math.min(...ys); // top row
+                        const objTopTiles = tilesOccupiedByObj.filter(c => c[1] === minY);
+
+                        if (draggedAssetPlacingRules.includes(objPlacingIndex)) {
+                        const isOnTopRow = objTopTiles.some(c => c[0] === x && c[1] === bottomOfSection);
+
+                        // Only set true if tile is NOT on the top row
+                        bottomTileValid = !isOnTopRow;
+                        }
+
+                        if (objPlacingIndex === 14) {
+                            const secondTopTiles = tilesOccupiedByObj.filter(c => c[1] === [...new Set(tilesOccupiedByObj.map(t => t[1]))].sort((a,b)=>a-b)[1] ?? Math.min(...tilesOccupiedByObj.map(t=>t[1])));
+
+                            // Check if the BOTTOM tile (x, bottomOfSection) is on top of this object
+                            if (secondTopTiles.some(c => c[0] === x && c[1] === bottomOfSection)) {
                                 bottomTileValid = true;
+                                break;
                             } else {
-                                // Then check if any objects on that tile allow placement
-                                for (const obj of bottomObjects) {
-                                    const objData = gameAssetIndex[combinedAssets[obj.id].assetIndex];
-                                    const objPlacingIndex = objData.placingIndex || 0;
-                                    
-                                    if (draggedAssetPlacingRules.includes(objPlacingIndex)) {
-                                        bottomTileValid = true;
-                                    }
-
-                                    if (objPlacingIndex === 14) {
-                                        const objCoords = getObjectCoordinates(obj.id);
-                                        const objWidth = Math.ceil(obj.offsetWidth / unitSize);
-                                        const objHeight = Math.ceil(obj.offsetHeight / unitSize);
-                                        const tilesOccupiedByObj = getTilesOccupiedByObject(objCoords, objWidth, objHeight);
-
-                                        const minY = Math.min(...tilesOccupiedByObj.map(c => c[1]));
-                                        const objTopTiles = tilesOccupiedByObj.filter(c => c[1] === minY);
-
-                                        // Check if the BOTTOM tile (x, bottomOfSection) is on top of this object
-                                        if (objTopTiles.some(c => c[0] === x && c[1] === bottomOfSection)) {
-                                            bottomTileValid = true;
-                                            break;
-                                        } else {
-                                            bottomTileValid = false;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (bottomTileValid) tileAllowed = true;
-
-                            const objectsAtTile = getObjectsAtTile(x, y, draggedObjectId);
-
-                            for (const existingObj of objectsAtTile) {
-                                const existingAsset = combinedAssets[existingObj.id];
-                                const existingAssetData = gameAssetIndex[existingAsset.assetIndex];
-                                const existingPlacingIndex = existingAssetData["placingIndex"] || 0;
-
-                                //if (existingPlacingIndex === 5 || existingPlacingIndex === 9) {
-                                    //tileAllowed = false;
-                                    //break;
-                                if (
-                                    (draggedAssetPlacingRules.includes(1) || draggedAssetPlacingRules.includes(3))
-                                    && !draggedAssetPlacingRules.includes(2)
-                                    && (draggedAssetPlacingIndex === 8 && existingPlacingIndex === 8)
-                                ) {
-                                    tileAllowed = false;
-                                    break;
-                                }
-                            }
-                        }
-                        }
-                    } else {
-                        const objectsAtTile = getObjectsAtTile(x, y, draggedObjectId);
-
-                        for (const existingObj of objectsAtTile) {
-                            const existingAsset = combinedAssets[existingObj.id];
-                            const existingAssetData = gameAssetIndex[existingAsset.assetIndex];
-                            const existingPlacingIndex = existingAssetData["placingIndex"] || 0;
-
-                            if (existingPlacingIndex === 5 || existingPlacingIndex === 9) {
-                                tileAllowed = false;
+                                bottomTileValid = false;
                                 break;
                             }
                         }
                     }
+                }
 
-                if (tileType === 4) {
+
+                if (bottomTileValid) tileAllowed = true;
+
+                const objectsAtTile2 = getObjectsAtTileCached(x, y);
+
+                for (const existingObj of objectsAtTile2) {
+                  const existingAsset = combinedAssets[existingObj.id];
+                  const existingAssetData = gameAssetIndex[existingAsset.assetIndex];
+                  const existingPlacingIndex = existingAssetData["placingIndex"] || 0;
+
+                  if (
+                    (draggedAssetPlacingRules.includes(1) || draggedAssetPlacingRules.includes(3))
+                    && !draggedAssetPlacingRules.includes(2)
+                    && (draggedAssetPlacingIndex === 8 && existingPlacingIndex === 8)
+                  ) {
                     tileAllowed = false;
+                    break;
+                  }
                 }
-
-                if (!tileAllowed) {
-                    sectionAllowed = false;
-                    break; // stop this row
-                }
+              }
             }
-            if (!sectionAllowed) break; // stop this section
-        }
+          } else {
+            const objectsAtTile = getObjectsAtTileCached(x, y);
 
-        if (sectionAllowed) {
-            
-            for (let y = row; y <= bottomOfSection; y++) {
-                for (let x = col; x <= rightEndofSection; x++) {
-                    placementMap[y][x] = { canPlace: true };
-                }
+            for (const existingObj of objectsAtTile) {
+              const existingAsset = combinedAssets[existingObj.id];
+              const existingAssetData = gameAssetIndex[existingAsset.assetIndex];
+              const existingPlacingIndex = existingAssetData["placingIndex"] || 0;
+
+              if (existingPlacingIndex === 5 || existingPlacingIndex === 9) {
+                tileAllowed = false;
+                break;
+              }
             }
-        }
-    }
+          }
 
+          // The original had this repeated check — preserve it exactly
+          if (tileType === 4.0 || tileType === 4.1 || tileType === 4.2 || tileType === 4.3 || tileType === 4.4 || tileType === 4.5 || tileType === 4.6) {
+            tileAllowed = false;
+          }
+
+          if (!tileAllowed) {
+            sectionAllowed = false;
+            break; // stop this row
+          }
+        } // end x loop
+
+        if (!sectionAllowed) break; // stop this section
+      } // end y loop
+
+      if (sectionAllowed) {
+        for (let y2 = row; y2 <= bottomOfSection; y2++) {
+          for (let x2 = col; x2 <= rightEndofSection; x2++) {
+            placementMap[y2][x2] = { canPlace: true };
+          }
+        }
+      }
+    } // end col
+  } // end row
+
+  return placementMap;
 }
 
-return placementMap;
-}
+
 
 // Helper function to get all objects at a specific tile
 function getObjectsAtTile(tileCol, tileRow, excludeObjectId = null) {
@@ -6102,10 +6033,8 @@ function clearPlacementHighlights() {
     });
 }
 
-function determineAndHighlightValidTiles(draggedObjectId) {
-    const placementMap = generatePlacementMap(draggedObjectId);
+function determineAndHighlightValidTiles(placementMap) {
     highlightValidPlacements(placementMap)
-    return placementMap
 }
 
 // Function to highlight valid placement tiles
@@ -6280,13 +6209,13 @@ function adjustUnitSizeForSmallScreens(roomLayout) {
 
         // Set CSS variable
         document.documentElement.style.setProperty("--unit-size", `${unitSize}px`);
-        document.documentElement.style.setProperty("--pet-size", `calc(${unitSize}px * 3)`);
+        document.documentElement.style.setProperty("--pet-size", `calc(${unitSize}px * 6)`);
     } else {
         unitSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--original-unit-size'));
 
         // Reset to default if needed
         document.documentElement.style.setProperty("--unit-size", `${unitSize}px`);
-        document.documentElement.style.setProperty("--pet-size", `${unitSize*3}px`);
+        document.documentElement.style.setProperty("--pet-size", `${unitSize*6}px`);
     }
 }
 
@@ -9075,13 +9004,13 @@ async function petEats(pet, object, signal) {
     let objectCoords = getObjectCoordinates(object.id);
 
     let objectInteractiveCoords = [objectCoords[0] + objectInteractivePart[0], objectCoords[1] - objectInteractivePart[1]];
-    let ableToPostitionToInteract = canPlaceObjectAt(objectInteractiveCoords[0], objectInteractiveCoords[1], pet.offsetWidth, pet.offsetHeight, generateWalkabilityMap());
+    let ableToPostitionToInteract = canPlaceObjectAt(objectInteractiveCoords[0], objectInteractiveCoords[1], pet.offsetWidth, pet.offsetHeight, globalWalkabilityMap);
 
     let objectWidthInTiles = Math.ceil(object.offsetWidth / unitSize);
     let objectHightInTiles = Math.ceil(object.offsetHeight / unitSize);
     let petWidthInTiles = Math.ceil(pet.offsetHeight / unitSize);
     let objectInteractiveBottomRightCoords = [objectCoords[0] + objectWidthInTiles - objectInteractivePart[0] - petWidthInTiles, objectCoords[1] - objectInteractivePart[1]];
-    let ableToPostitionToInteractReverse = canPlaceObjectAt(objectInteractiveBottomRightCoords[0], objectInteractiveBottomRightCoords[1], pet.offsetWidth, pet.offsetHeight, generateWalkabilityMap());
+    let ableToPostitionToInteractReverse = canPlaceObjectAt(objectInteractiveBottomRightCoords[0], objectInteractiveBottomRightCoords[1], pet.offsetWidth, pet.offsetHeight, globalWalkabilityMap);
 
         if (signal.aborted) {
             cancelMovement(pet.id)
@@ -9091,7 +9020,7 @@ async function petEats(pet, object, signal) {
     if ((ableToPostitionToInteract && !ableToPostitionToInteractReverse) ||
         (ableToPostitionToInteract && petCoords[0] - objectCoords[0] >= 0)) {
 
-        await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveCoords, 300, signal);
+        await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveCoords, signal);
             if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
@@ -9116,7 +9045,7 @@ async function petEats(pet, object, signal) {
         managePetActions(pet);
 
     } else if (ableToPostitionToInteractReverse) {
-        await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveBottomRightCoords, 300, signal);
+        await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveBottomRightCoords, signal);
             if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
@@ -9161,13 +9090,13 @@ async function petDrinks(pet, object, signal) {
     let objectCoords = getObjectCoordinates(object.id);
 
     let objectInteractiveCoords = [objectCoords[0] + objectInteractivePart[0], objectCoords[1] - objectInteractivePart[1]];
-    let ableToPostitionToInteract = canPlaceObjectAt(objectInteractiveCoords[0], objectInteractiveCoords[1], pet.offsetWidth, pet.offsetHeight, generateWalkabilityMap());
+    let ableToPostitionToInteract = canPlaceObjectAt(objectInteractiveCoords[0], objectInteractiveCoords[1], pet.offsetWidth, pet.offsetHeight, globalWalkabilityMap);
 
     let objectWidthInTiles = Math.ceil(object.offsetWidth / unitSize);
     let objectHightInTiles = Math.ceil(object.offsetHeight / unitSize);
     let petWidthInTiles = Math.ceil(pet.offsetHeight / unitSize);
     let objectInteractiveBottomRightCoords = [objectCoords[0] + objectWidthInTiles - objectInteractivePart[0] - petWidthInTiles, objectCoords[1] - objectInteractivePart[1]];
-    let ableToPostitionToInteractReverse = canPlaceObjectAt(objectInteractiveBottomRightCoords[0], objectInteractiveBottomRightCoords[1], pet.offsetWidth, pet.offsetHeight, generateWalkabilityMap());
+    let ableToPostitionToInteractReverse = canPlaceObjectAt(objectInteractiveBottomRightCoords[0], objectInteractiveBottomRightCoords[1], pet.offsetWidth, pet.offsetHeight, globalWalkabilityMap);
 
         if (signal.aborted) {
             cancelMovement(pet.id)
@@ -9177,7 +9106,7 @@ async function petDrinks(pet, object, signal) {
     if ((ableToPostitionToInteract && !ableToPostitionToInteractReverse) ||
         (ableToPostitionToInteract && petCoords[0] - objectCoords[0] >= 0)) {
 
-        await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveCoords, 300, signal);
+        await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveCoords, signal);
             if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
@@ -9202,7 +9131,7 @@ async function petDrinks(pet, object, signal) {
         managePetActions(pet);
 
     } else if (ableToPostitionToInteractReverse) {
-        await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveBottomRightCoords, 300, signal);
+        await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveBottomRightCoords, signal);
             if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
@@ -9254,8 +9183,8 @@ async function petBathes(pet, object, signal) {
     let petWidthInTiles = Math.ceil(pet.offsetHeight / unitSize);
     let objectInteractiveBottomRightCoords = [objectCoords[0] + objectWidthInTiles - objectInteractivePart[0] - petWidthInTiles, objectCoords[1] - objectInteractivePart[1]];
 
-    let ableToPostitionToInteract = canPlaceObjectAt(objectInteractiveCoords[0], objectInteractiveCoords[1], pet.offsetWidth, pet.offsetHeight, generateWalkabilityMap());
-    let ableToPostitionToInteractAlt = canPlaceObjectAt(objectCoords[0], objectCoords[1], pet.offsetWidth, pet.offsetHeight, generateWalkabilityMap());
+    let ableToPostitionToInteract = canPlaceObjectAt(objectInteractiveCoords[0], objectInteractiveCoords[1], pet.offsetWidth, pet.offsetHeight, globalWalkabilityMap);
+    let ableToPostitionToInteractAlt = canPlaceObjectAt(objectCoords[0], objectCoords[1], pet.offsetWidth, pet.offsetHeight, globalWalkabilityMap);
 
     let finalBathInteractionCoords = null;
     if (ableToPostitionToInteract) {
@@ -9271,7 +9200,7 @@ async function petBathes(pet, object, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
 
-        await movePetToTile(pet, getObjectCoordinates(pet.id), finalBathInteractionCoords, 300, signal);
+        await movePetToTile(pet, getObjectCoordinates(pet.id), finalBathInteractionCoords, signal);
             if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
@@ -9363,7 +9292,7 @@ async function petSleeps(pet, signal) {
     let objectCoords = getObjectCoordinates(object.id);
     let objectInteractiveCoords = [objectCoords[0] + objectInteractivePart[0], objectCoords[1] - objectInteractivePart[1]];
 
-    await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveCoords, 300, signal);
+    await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveCoords, signal);
         if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
@@ -9391,7 +9320,7 @@ async function petWalksAround(pet, signal) {
             throw new DOMException("Aborted", "AbortError");
         }
     pet = document.getElementById(pet.id)
-    const suitableWalkingTiles = generateWalkabilityMap();
+    const suitableWalkingTiles = globalWalkabilityMap;
     const validCoords = findValidPlacements(suitableWalkingTiles, pet);
 
     if (validCoords.length === 0) {
@@ -9411,7 +9340,7 @@ async function petWalksAround(pet, signal) {
         }
         return
     }
-    await movePetToTile(pet, getObjectCoordinates(pet.id), randomCoord, 300, signal);
+    await movePetToTile(pet, getObjectCoordinates(pet.id), randomCoord, signal);
         if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
@@ -9693,13 +9622,13 @@ async function cat1Hungry(pet, signal) {
     let objectCoords = getObjectCoordinates(object.id);
 
     let objectInteractiveCoords = [objectCoords[0] + objectInteractivePart[0], objectCoords[1] - objectInteractivePart[1]];
-    let ableToPostitionToInteract = canPlaceObjectAt(objectInteractiveCoords[0], objectInteractiveCoords[1], pet.offsetWidth, pet.offsetHeight, generateWalkabilityMap());
+    let ableToPostitionToInteract = canPlaceObjectAt(objectInteractiveCoords[0], objectInteractiveCoords[1], pet.offsetWidth, pet.offsetHeight, globalWalkabilityMap);
 
     let objectWidthInTiles = Math.ceil(object.offsetWidth / unitSize);
     let objectHightInTiles = Math.ceil(object.offsetHeight / unitSize);
     let petWidthInTiles = Math.ceil(pet.offsetHeight / unitSize);
     let objectInteractiveBottomRightCoords = [objectCoords[0] + objectWidthInTiles - objectInteractivePart[0] - petWidthInTiles, objectCoords[1] - objectInteractivePart[1]];
-    let ableToPostitionToInteractReverse = canPlaceObjectAt(objectInteractiveBottomRightCoords[0], objectInteractiveBottomRightCoords[1], pet.offsetWidth, pet.offsetHeight, generateWalkabilityMap());
+    let ableToPostitionToInteractReverse = canPlaceObjectAt(objectInteractiveBottomRightCoords[0], objectInteractiveBottomRightCoords[1], pet.offsetWidth, pet.offsetHeight, globalWalkabilityMap);
 
         if (signal.aborted) {
             cancelMovement(pet.id)
@@ -9716,7 +9645,7 @@ async function cat1Hungry(pet, signal) {
     if ((ableToPostitionToInteract && !ableToPostitionToInteractReverse) ||
         (ableToPostitionToInteract && petCoords[0] - objectCoords[0] >= 0)) {
 
-        await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveCoords, 300, signal);
+        await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveCoords, signal);
             if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
@@ -9737,7 +9666,7 @@ async function cat1Hungry(pet, signal) {
         managePetActions(pet);
 
     } else if (ableToPostitionToInteractReverse) {
-        await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveBottomRightCoords, 300, signal);
+        await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveBottomRightCoords, signal);
             if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
@@ -10572,6 +10501,7 @@ function displayReceivedMessages () {
     }
 }
 
+// Apply translation + scale
 function applyViewportTransform() {
     const wrapper = document.getElementById('room-transform-wrapper');
     if (wrapper) {
@@ -10579,7 +10509,7 @@ function applyViewportTransform() {
     }
 }
 
-// Convert screen coordinates to room coordinates
+// Screen ↔ room coordinate conversions
 function screenToRoom(screenX, screenY) {
     const viewport = document.getElementById('viewport-container');
     const rect = viewport.getBoundingClientRect();
@@ -10589,7 +10519,6 @@ function screenToRoom(screenX, screenY) {
     };
 }
 
-// Convert room coordinates to screen coordinates
 function roomToScreen(roomX, roomY) {
     return {
         x: roomX * viewportState.scale + viewportState.x,
@@ -10597,75 +10526,116 @@ function roomToScreen(roomX, roomY) {
     };
 }
 
-// Handle viewport zoom
+// ------------------ Desktop zoom ------------------
 function handleViewportZoom(e) {
     e.preventDefault();
-    
+
     const delta = e.deltaY * -0.001;
     const newScale = Math.min(
-        Math.max(viewportState.scale + delta, viewportState.minScale), 
+        Math.max(viewportState.scale + delta, viewportState.minScale),
         viewportState.maxScale
     );
-    
-    // Zoom towards mouse position
+
     const viewport = document.getElementById('viewport-container');
     const rect = viewport.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
-    
-    // Calculate the point in room coordinates
+
     const roomX = (mouseX - viewportState.x) / viewportState.scale;
     const roomY = (mouseY - viewportState.y) / viewportState.scale;
-    
-    // Adjust position to keep the same point under the mouse
+
     viewportState.x = mouseX - roomX * newScale;
     viewportState.y = mouseY - roomY * newScale;
     viewportState.scale = newScale;
-    
+
     applyViewportTransform();
 }
 
-// Handle viewport pan start
+// ------------------ Mobile pinch zoom ------------------
+let initialPinchDistance = null;
+let initialPinchScale = 1;
+
+function getDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx*dx + dy*dy);
+}
+
+function handleTouchMove(e) {
+    if (e.touches.length === 2) {
+        e.preventDefault();
+
+        const currentDistance = getDistance(e.touches);
+
+        if (!initialPinchDistance) {
+            initialPinchDistance = currentDistance;
+            initialPinchScale = viewportState.scale;
+            return;
+        }
+
+        const scaleFactor = currentDistance / initialPinchDistance;
+        let newScale = initialPinchScale * scaleFactor;
+        newScale = Math.min(Math.max(newScale, viewportState.minScale), viewportState.maxScale);
+
+        const viewport = document.getElementById('viewport-container');
+        const rect = viewport.getBoundingClientRect();
+        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
+
+        const roomX = (midX - viewportState.x) / viewportState.scale;
+        const roomY = (midY - viewportState.y) / viewportState.scale;
+
+        viewportState.x = midX - roomX * newScale;
+        viewportState.y = midY - roomY * newScale;
+        viewportState.scale = newScale;
+
+        applyViewportTransform();
+    }
+}
+
+function handleTouchEnd(e) {
+    if (e.touches.length < 2) initialPinchDistance = null;
+}
+
+// ------------------ Pan/Drag ------------------
 function handleViewportPanStart(e) {
     const isTouchMultiFinger = e.touches?.length >= 2;
     const isMiddleClick = e.button === 1;
     const isSpacebarDrag = viewportState.spacePressed && (e.button === 0 || e.touches?.length === 1);
-    
-    if (isMiddleClick || isSpacebarDrag || isTouchMultiFinger) {
+
+    if (isMiddleClick || isSpacebarDrag || (e.touches?.length === 1 && !isTouchMultiFinger)) {
         e.preventDefault();
         e.stopPropagation();
-        
+
         viewportState.isDragging = true;
         document.body.classList.add('panning');
-        
+
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        
+
         viewportState.dragStartX = clientX - viewportState.x;
         viewportState.dragStartY = clientY - viewportState.y;
     }
 }
 
-// Handle viewport pan move
 function handleViewportPanMove(e) {
     if (!viewportState.isDragging) return;
-    
+
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    
+
     viewportState.x = clientX - viewportState.dragStartX;
     viewportState.y = clientY - viewportState.dragStartY;
-    
+
     applyViewportTransform();
 }
 
-// Handle viewport pan end
 function handleViewportPanEnd() {
     viewportState.isDragging = false;
     document.body.classList.remove('panning');
 }
 
-// Keyboard handlers for spacebar
+// ------------------ Keyboard ------------------
 function handleKeyDown(e) {
     if (e.code === 'Space' && !viewportState.spacePressed) {
         e.preventDefault();
@@ -10681,38 +10651,39 @@ function handleKeyUp(e) {
         viewportState.spacePressed = false;
         document.body.classList.remove('pan-mode-active');
         document.getElementById('pan-mode-indicator')?.classList.remove('active');
-        
-        if (viewportState.isDragging) {
-            handleViewportPanEnd();
-        }
+
+        if (viewportState.isDragging) handleViewportPanEnd();
     }
 }
 
-// Initialize viewport controls
+// ------------------ Initialize ------------------
 function initViewportControls() {
     const viewport = document.getElementById('viewport-container');
     if (!viewport) return;
-    
-    // Wheel zoom
+
+    // Desktop zoom
     viewport.addEventListener('wheel', handleViewportZoom, { passive: false });
-    
-    // Pan events
+
+    // Pan/drag
     viewport.addEventListener('pointerdown', handleViewportPanStart);
     viewport.addEventListener('touchstart', handleViewportPanStart, { passive: false });
-    
-    // Global move/up for panning
+
     window.addEventListener('pointermove', handleViewportPanMove);
     window.addEventListener('pointerup', handleViewportPanEnd);
     window.addEventListener('touchmove', handleViewportPanMove, { passive: false });
     window.addEventListener('touchend', handleViewportPanEnd);
-    
+
+    // Mobile pinch zoom
+    viewport.addEventListener('touchmove', handleTouchMove, { passive: false });
+    viewport.addEventListener('touchend', handleTouchEnd);
+
     // Keyboard
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
-    
+
     // Prevent context menu
     viewport.addEventListener('contextmenu', (e) => e.preventDefault());
-    
+
     // Initial transform
     applyViewportTransform();
 }
