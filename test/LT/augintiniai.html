@@ -3094,6 +3094,7 @@
             "cat": "katė"
         }
         const receivedMessages = [];
+        let multiTouchActive = false;
 
         function convertUserPetAssetsDictToCompactList(data) {
             let pets = Object.entries(data.pets).map(([p, v]) => [
@@ -3791,7 +3792,8 @@ function enablePetDragging() {
         pet.style.touchAction = 'none';
         
         pet.addEventListener('pointerdown', function(e) {
-            
+
+            if (multiTouchActive) return;
             if (e.touches?.length >= 2) return;
             // Only allow left mouse or touch
             if (e.pointerType === "mouse" && e.button !== 0) return;
@@ -3949,6 +3951,8 @@ function enableObjectDragging() {
         
         // Create edit mode handler
         obj._editModeHandler = function(e) {
+
+            if (multiTouchActive) return;
             if (e.touches?.length >= 2) return;
 
             if (e.pointerType === "mouse" && e.button !== 0) return;
@@ -4092,7 +4096,7 @@ function disableObjectDragging() {
             }
             
             // Only trigger interaction if it was a quick click, not a long hold
-            if (!wasLongHold && !isDragging && !editing) {
+            if (!wasLongHold && !isDragging && !editing && !multiTouchActive) {
                 for (const cls of this.classList) {
                     if (objectInteractions[cls]) {
                         objectInteractions[cls](obj);
@@ -4243,7 +4247,7 @@ document.addEventListener('pointerup', function(e) {
 
     isDragging = false;
     currentObject = null;
-    } else if (currentObject && !editing) {
+    } else if (currentObject && !editing && !multiTouchActive) {
         // Only trigger interactions in normal mode and if we have a current object
         for (const cls of currentObject.classList) {
             if (objectInteractions[cls]) {
@@ -5844,13 +5848,25 @@ function generatePlacementMap(draggedObjectId) {
               } else {
                 // Exact same nested special-case handling as original
                 if (existingPlacingIndex === 11 && draggedAssetPlacingIndex === 12) {
-                  const winEntry = getTilesOccupiedByObjectCached(existingObj);
-                  const tilesOccupiedByWindow = winEntry.tiles;
-                  const maxY = Math.max(...tilesOccupiedByWindow.map(c => c[1]));
-                  const windowBottomTiles = tilesOccupiedByWindow.filter(c => c[1] === maxY);
-                  if (windowBottomTiles.some(c => c[0] === x && c[1] === y)) {
-                    tileAllowed = true;
-                  }
+                    const winEntry = getTilesOccupiedByObjectCached(existingObj);
+                    const tilesOccupiedByWindow = winEntry.tiles;
+
+                    // Find the maximum Y (bottom row)
+                    const maxY = Math.max(...tilesOccupiedByWindow.map(c => c[1]));
+
+                    // Collect bottom row tiles
+                    const bottomRowTiles = tilesOccupiedByWindow.filter(c => c[1] === maxY);
+
+                    // Optionally collect tiles from the row above the bottom, if it exists
+                    const aboveBottomRowTiles = tilesOccupiedByWindow.filter(c => c[1] === maxY - 1);
+
+                    // Combine both sets of tiles
+                    const relevantTiles = [...bottomRowTiles, ...aboveBottomRowTiles];
+
+                    // Allow tile if it’s in the bottom row or the row above
+                    if (relevantTiles.some(c => c[0] === x && c[1] === y)) {
+                        tileAllowed = true;
+                    }
                 } else if (existingPlacingIndex === 11 && draggedAssetPlacingIndex === 13) {
                   const winEntry = getTilesOccupiedByObjectCached(existingObj);
                   const tilesOccupiedByWindow = winEntry.tiles;
@@ -10606,17 +10622,16 @@ function handleTouchEnd(e) {
     if (e.touches.length < 2) initialPinchDistance = null;
 }
 
-// ------------------ Pan/Drag ------------------
 function handleViewportPanStart(e) {
     const isTouchMultiFinger = e.touches?.length >= 2;
     const isMiddleClick = e.button === 1;
     const isSpacebarDrag = viewportState.spacePressed && e.button === 0;
 
-    // ONLY start viewport drag if:
     if (isMiddleClick || isSpacebarDrag || isTouchMultiFinger) {
+        if (isTouchMultiFinger) multiTouchActive = true; // mark multi-touch started
+
         e.preventDefault();
         e.stopPropagation();
-
         viewportState.isDragging = true;
         document.body.classList.add('panning');
 
@@ -10627,6 +10642,7 @@ function handleViewportPanStart(e) {
         viewportState.dragStartY = clientY - viewportState.y;
     }
 }
+
 
 function handleViewportPanMove(e) {
     if (!viewportState.isDragging) return;
@@ -10640,9 +10656,16 @@ function handleViewportPanMove(e) {
     applyViewportTransform();
 }
 
-function handleViewportPanEnd() {
+function handleViewportPanEnd(e) {
     viewportState.isDragging = false;
     document.body.classList.remove('panning');
+
+    // If this was a touch event and no fingers remain, reset multiTouchActive
+    if (e?.type.startsWith('touch')) {
+        if (e.touches?.length === 0) {
+            multiTouchActive = false;
+        }
+    }
 }
 
 // ------------------ Keyboard ------------------
