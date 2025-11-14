@@ -1947,8 +1947,8 @@
 
 /* Gift box pop-out */
 .gift-box {
-  width: calc(var(--unit-size) * 4);
-  height: calc(var(--unit-size) * 4);
+  width: 100%;
+  height: 100%;
   background-repeat: no-repeat;
   background-size: cover;
   border-radius: 8px;
@@ -4160,9 +4160,13 @@ function checkPlacement(obj, placementMap, unitSize) {
 }
 
 function isBottomRowWalkable(walkMap, startRow, startCol, width) {
-    // startRow = bottom row where pet would sit
-    // startCol = leftmost column of the pet
+    // Check if row is inside walkMap
+    if (startRow < 0 || startRow >= walkMap.length) return false;
+
     for (let col = startCol; col < startCol + width; col++) {
+        // Check if column is inside walkMap
+        if (col < 0 || col >= walkMap[0].length) return false;
+
         if (!walkMap[startRow][col]?.walkable) {
             return false;
         }
@@ -4529,16 +4533,16 @@ function predictAndSetZIndex(movingObject = null, nextCol = null, nextRow = null
 
     // Build occupied tiles map
     allObjects.forEach(obj => {
-    // Check both userObjectAssets and furniturePreviewDict
-    const assetSource = userObjectAssets[obj.id] || furniturePreviewDict[obj.id];
-    
-    if (assetSource) {
-        const objPlacingOrder = gameAssetIndex[assetSource.assetIndex]?.placingIndex;
-        if (objPlacingOrder === 5 || objPlacingOrder === 9) {
-            return;
+        // Check both userObjectAssets and furniturePreviewDict
+        const assetSource = userObjectAssets[obj.id] || furniturePreviewDict[obj.id];
+        
+        if (assetSource) {
+            const objPlacingOrder = gameAssetIndex[assetSource.assetIndex]?.placingIndex;
+            if (objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10) {
+                return;
+            }
         }
-    }
-    let coords = getObjectCoordinates(obj.id);
+        let coords = getObjectCoordinates(obj.id);
         // Only apply prediction if we have a moving object
         if (movingObject && nextCol && nextRow) {
             if (obj.id === movingObject.id) {
@@ -4868,6 +4872,40 @@ function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) 
             });
         }
 
+        // --- Step 0c: Build item-on-item map for wall items ---
+        const itemOnItemMap = {}; // Maps wall item ID to the item it sits on top of
+
+        wallOnlyItems.forEach(wallItemId => {
+            const wallEl = document.getElementById(wallItemId);
+            if (!wallEl) return;
+
+            const [wallX, wallY] = getObjectCoordinates(wallItemId);
+            const wallWidth = Math.ceil(wallEl.offsetWidth / unitSize);
+            const wallHeight = Math.ceil(wallEl.offsetHeight / unitSize);
+
+            // Check if this wall item is on top of a floor/boundary item
+            floorBoundaryItems.forEach(floorItemId => {
+                const floorEl = document.getElementById(floorItemId);
+                if (!floorEl) return;
+
+                const [floorX, floorY] = getObjectCoordinates(floorItemId);
+                const floorWidth = Math.ceil(floorEl.offsetWidth / unitSize);
+                const floorHeight = Math.ceil(floorEl.offsetHeight / unitSize);
+
+                const wallTopRow = wallY - wallHeight + 1;
+                const wallBottomRow = wallY;
+                const floorTopRow = floorY - floorHeight + 1;
+                const floorBottomRow = floorY;
+
+                const xOverlap = wallX < floorX + floorWidth && wallX + wallWidth > floorX;
+                const yOverlap = wallTopRow <= floorBottomRow && wallBottomRow >= floorTopRow;
+
+                if (xOverlap && yOverlap) {
+                    itemOnItemMap[wallItemId] = floorItemId;
+                }
+            });
+        });
+
         // --- Step 1: Process object subclusters (non-pets) ---
         objectSubclusters.forEach(subcluster => {
             const itemsZIndexes = {};
@@ -4970,7 +5008,14 @@ function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) 
         Object.entries(clusterInfo).forEach(([key, value]) => {
             let lowestClusterRow = 0;
             value.items.forEach(item => {
-                const itemsRow = getObjectCoordinates(item)[1];
+                let itemsRow = getObjectCoordinates(item)[1];
+                
+                // If this is a wall item on top of another item, use that item's bottom row
+                if (wallOnlyItems.includes(item) && itemOnItemMap[item]) {
+                    const baseItemId = itemOnItemMap[item];
+                    itemsRow = getObjectCoordinates(baseItemId)[1];
+                }
+                
                 if (itemsRow > lowestClusterRow) lowestClusterRow = itemsRow;
             });
             value.pos = lowestClusterRow;
@@ -5030,8 +5075,8 @@ function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) 
                 if (el) {
                     el.style.zIndex = finalZIndex;
 
-                    // Track max wall z-index
-                    if (wallOnlyItems.includes(item)) {
+                    // Track max wall z-index (only for items that are NOT on top of other items)
+                    if (wallOnlyItems.includes(item) && !itemOnItemMap[item]) {
                         maxWallZ = Math.max(maxWallZ, finalZIndex);
                     }
                 }
@@ -5040,7 +5085,7 @@ function applyZIndexLogic(overlapClusters, movingObject = null, nextRow = null) 
             zIndexStart += maxDelta;
         });
 
-        // --- Step 5: Ensure pet is above walls ---
+        // --- Step 5: Ensure pet is above standalone wall items only ---
         pets.forEach(petId => {
             const petEl = document.getElementById(petId);
             if (petEl) {
@@ -5082,54 +5127,46 @@ function generateWalkabilityMap() {
     for (let row = 0; row < roomLayout.length; row++) {
         for (let col = 0; col < roomLayout[0].length; col++) {
             if (roomLayout[row][col] === 3) { // boundary tile
-                if (row + 1 < roomLayout.length) {
-                    let hasNonPassableBottomBelow = false;
+                let hasNonPassableBelow = false;
 
-                    // Add safety check for userObjectAssets
-                    if (userObjectAssets && gameAssetIndex) {
-                        Object.entries(userObjectAssets).forEach(([assetId, asset]) => {
-                            const assetData = gameAssetIndex[asset.assetIndex];
-                            if (!assetData) return;
+                if (userObjectAssets && gameAssetIndex) {
+                    Object.entries(userObjectAssets).forEach(([assetId, asset]) => {
+                        const assetData = gameAssetIndex[asset.assetIndex];
+                        if (!assetData) return;
 
-                            const [assetX, assetY] = asset.position;
-                            const element = document.getElementById(assetId);
-                            if (!element) return;
+                        const [assetX, assetY] = asset.position;
+                        const element = document.getElementById(assetId);
+                        if (!element) return;
 
-                            const assetWidth = Math.ceil(element.offsetWidth / unitSize);
-                            const assetHeight = Math.ceil(element.offsetHeight / unitSize);
-                            const topRowOfAsset = assetY - assetHeight + 1;
-                            const bottomRowOfAsset = assetY;
+                        const assetWidth = Math.ceil(element.offsetWidth / unitSize);
+                        const assetHeight = Math.ceil(element.offsetHeight / unitSize);
+                        const topRowOfAsset = assetY - assetHeight + 1;
+                        const bottomRowOfAsset = assetY;
 
-                            // 🚨 New steppable check: mark middle rows unwalkable
-                            if (assetData.steppable === false) {
-                                for (let r = topRowOfAsset + 1; r < bottomRowOfAsset; r++) {
-                                    if (r >= 0 && r < roomLayout.length) {
-                                        for (let c = assetX; c < assetX + assetWidth; c++) {
-                                            if (c >= 0 && c < roomLayout[0].length) {
-                                                map[r][c].walkable = false;
-                                            }
-                                        }
-                                    }
+                        // Only consider non-passable assets
+                        if (assetData.passable === false) {
+                            // Check if asset overlaps row+1 or row+2
+                            for (let r = row + 1; r <= row + 2; r++) {
+                                if (r >= topRowOfAsset && r <= bottomRowOfAsset && col >= assetX && col < assetX + assetWidth) {
+                                    hasNonPassableBelow = true;
+                                    break;
                                 }
                             }
+                        }
+                    });
+                }
 
-                            // Existing passable check for boundary tiles
-                            if (assetData.passable === false) {
-                                // ✅ Only if (row+1, col) is bottom row of asset
-                                if (row + 1 === bottomRowOfAsset && col >= assetX && col < assetX + assetWidth) {
-                                    hasNonPassableBottomBelow = true;
-                                }
-                            }
-                        });
-                    }
-
-                    if (hasNonPassableBottomBelow) {
-                        map[row][col].walkable = false;
+                if (hasNonPassableBelow) {
+                    map[row][col].walkable = false;       // boundary row
+                    if (row + 1 < roomLayout.length) {
+                        map[row + 1][col].walkable = false; // row immediately below
                     }
                 }
             }
         }
     }
+
+
 
     // Set directional movement restrictions (with safety checks)
     for (let row = 0; row < roomLayout.length; row++) {
@@ -5155,7 +5192,6 @@ function generateWalkabilityMap() {
                     if (element.className.includes('food-bowl')) {
                         // Block upward and downward movement on the food-bowl's cells
                         if (row === bottomRowOfAsset && col >= assetX && col < assetX + assetWidth) {
-                            map[row][col].allowedDirections[0] = false; // up
                             map[row][col].allowedDirections[2] = false; // down
                         }
                         // Block upward movement on cells one row below the food-bowl
@@ -5166,8 +5202,8 @@ function generateWalkabilityMap() {
 
                     // Only consider passable === false for movement restrictions
                     if (assetData.passable === false) {
-                        if (assetHeight === 1) {
-                            // Case 3: single-height asset - block movement on the asset tile itself
+                        if (assetHeight === 1 || assetHeight === 2) {
+                            // Case 3: up to double-tile height asset - block movement on the asset tile itself
                             if (row === bottomRowOfAsset && col >= assetX && col < assetX + assetWidth) {
                                 map[row][col].allowedDirections[0] = false; // up
                                 map[row][col].allowedDirections[2] = false; // down
@@ -5882,8 +5918,9 @@ function generatePlacementMap(draggedObjectId) {
                   const objEntry = getTilesOccupiedByObjectCached(existingObj);
                   const tilesOccupiedByObj = objEntry.tiles;
                   const minY = Math.min(...tilesOccupiedByObj.map(c => c[1]));
-                  const objTopTiles = tilesOccupiedByObj.filter(c => c[1] === minY);
-                  if (objTopTiles.some(c => c[0] === x && c[1] === y)) {
+                  const secondTopTiles = tilesOccupiedByObj.filter(c => c[1] === [...new Set(tilesOccupiedByObj.map(t => t[1]))].sort((a,b)=>a-b)[1] ?? Math.min(...tilesOccupiedByObj.map(t=>t[1])));
+                  
+                  if (secondTopTiles.some(c => c[0] === x && c[1] === bottomOfSection)) {
                     tileAllowed = true;
                   } else {
                     tileAllowed = false;
@@ -5896,7 +5933,7 @@ function generatePlacementMap(draggedObjectId) {
             }
 
             if (!tileAllowed) {
-              if (tileType === 2.0 && !draggedAssetPlacingRules.includes(2) && draggedAssetPlacingRules.includes(7)) {
+              if ((tileType === 2.0 || tileType === 3.0) && !draggedAssetPlacingRules.includes(2) && draggedAssetPlacingRules.includes(7)) {
                 // Check the tile below the object (bottomOfSection)
                 const bottomTileType = rl[bottomOfSection][x];
                 const bottomObjects = getObjectsAtTileCached(x, bottomOfSection);
@@ -6252,7 +6289,6 @@ let shopState = {
 };
 
 async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn) {
-    console.log(item, assetIndex, quantity, selectedCategory, btn)
     updateShopState();
     
     const itemDetails = gameAssetIndex[assetIndex];
@@ -7041,11 +7077,13 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
             btn.textContent = 'Pirkti';
 
             let quantityInput = null;
+
             if (!item.oneOfKind) {
                 const quantityInputHolder = document.createElement('div');
                 quantityInputHolder.className = 'purchase-quantity-holder input-wrapper';
 
-                const quantityInput = document.createElement('input');
+                // Quantity input
+                quantityInput = document.createElement('input');
                 quantityInput.type = 'number';
                 quantityInput.min = 1;
                 quantityInput.max = 999;
@@ -7055,39 +7093,36 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
                 quantityInput.id = `purchase-qty-${key}`;
                 quantityInput.readOnly = true;
 
-                const minusBtn = document.createElement('button');
-                minusBtn.className = 'control-btn';
-                minusBtn.textContent = '−';
-                minusBtn.onmousedown = () => {
-                    startHold(quantityInput.id, 1, 999, false);
-                    updatePrice();
-                };
-                minusBtn.onmouseup = minusBtn.onmouseleave = stopHold;
-                minusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, false); updatePrice(); };
-                minusBtn.ontouchend = minusBtn.ontouchcancel = stopHold;
-
-                const plusBtn = document.createElement('button');
-                plusBtn.className = 'control-btn';
-                plusBtn.textContent = '+';
-                plusBtn.onmousedown = () => {
-                    startHold(quantityInput.id, 1, 999, true);
-                    updatePrice();
-                };
-                plusBtn.onmouseup = plusBtn.onmouseleave = stopHold;
-                plusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, true); updatePrice(); };
-                plusBtn.ontouchend = plusBtn.ontouchcancel = stopHold;
-
-                quantityInputHolder.appendChild(minusBtn);
-                quantityInputHolder.appendChild(quantityInput);
-                quantityInputHolder.appendChild(plusBtn);
-                priceAndQuantDiv.appendChild(quantityInputHolder);
-
+                // Price update function
                 const updatePrice = () => {
                     const qty = parseInt(quantityInput.value, 10) || 1;
                     priceSpan.textContent = item.cost * qty;
                 };
 
-                // Also optional: in case someone types manually (if you remove readOnly later)
+                // Buttons
+                const minusBtn = document.createElement('button');
+                minusBtn.className = 'control-btn';
+                minusBtn.textContent = '−';
+                minusBtn.onmousedown = () => startHold(quantityInput.id, 1, 999, false, updatePrice);
+                minusBtn.onmouseup = minusBtn.onmouseleave = stopHold;
+                minusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, false, updatePrice); };
+                minusBtn.ontouchend = minusBtn.ontouchcancel = stopHold;
+
+                const plusBtn = document.createElement('button');
+                plusBtn.className = 'control-btn';
+                plusBtn.textContent = '+';
+                plusBtn.onmousedown = () => startHold(quantityInput.id, 1, 999, true, updatePrice);
+                plusBtn.onmouseup = plusBtn.onmouseleave = stopHold;
+                plusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, true, updatePrice); };
+                plusBtn.ontouchend = plusBtn.ontouchcancel = stopHold;
+
+                // Append elements
+                quantityInputHolder.appendChild(minusBtn);
+                quantityInputHolder.appendChild(quantityInput);
+                quantityInputHolder.appendChild(plusBtn);
+                priceAndQuantDiv.appendChild(quantityInputHolder);
+
+                // Optional: manual input (if readOnly removed later)
                 quantityInput.addEventListener('input', updatePrice);
                 quantityInput.addEventListener('change', updatePrice);
             }
@@ -7572,24 +7607,31 @@ function renderPetSupplies(selectedCategory = 'all', selectedPetType = null) {
             quantityInput.className = 'pet-supply-use-quantity';
             quantityInput.readOnly = true; // prevent manual typing if using buttons
 
+            // Set ID before using it in buttons
+            quantityInput.id = `pet-supply-qty-${asset.assetIndex}`;
+
             // Buttons
             const minusBtn = document.createElement('button');
             minusBtn.className = 'control-btn';
             minusBtn.textContent = '−';
-            minusBtn.onmousedown = () => startHold(quantityInput.id, 1, asset.quantity, false, updateQuantity);
+            minusBtn.onmousedown = () => startHold(quantityInput.id, 1, asset.quantity, false, () => updateQuantity(quantityInput));
             minusBtn.onmouseup = minusBtn.onmouseleave = stopHold;
-            minusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, asset.quantity, false, updateQuantity); };
+            minusBtn.ontouchstart = (e) => { 
+                e.preventDefault(); 
+                startHold(quantityInput.id, 1, asset.quantity, false, () => updateQuantity(quantityInput)); 
+            };
             minusBtn.ontouchend = minusBtn.ontouchcancel = stopHold;
 
             const plusBtn = document.createElement('button');
             plusBtn.className = 'control-btn';
             plusBtn.textContent = '+';
-            plusBtn.onmousedown = () => startHold(quantityInput.id, 1, asset.quantity, true, updateQuantity);
+            plusBtn.onmousedown = () => startHold(quantityInput.id, 1, asset.quantity, true, () => updateQuantity(quantityInput));
             plusBtn.onmouseup = plusBtn.onmouseleave = stopHold;
-            plusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, asset.quantity, true, updateQuantity); };
+            plusBtn.ontouchstart = (e) => { 
+                e.preventDefault(); 
+                startHold(quantityInput.id, 1, asset.quantity, true, () => updateQuantity(quantityInput)); 
+            };
             plusBtn.ontouchend = plusBtn.ontouchcancel = stopHold;
-
-            quantityInput.id = `pet-supply-qty-${asset.assetIndex}`;
 
             quantityInputHolder.appendChild(minusBtn);
             quantityInputHolder.appendChild(quantityInput);
@@ -8307,12 +8349,96 @@ function increasePetStatsInDisplay(petId, stat) {
     }
 }
 
+function getAppliedBackgroundImageSelector(element) {
+    // Check inline style first
+    const inlineBg = element.style.backgroundImage;
+    if (inlineBg) return "inline style";
+
+    let appliedRule = null;
+
+    const sheets = Array.from(document.styleSheets);
+    sheets.forEach(sheet => {
+        let rules;
+        try {
+            rules = sheet.cssRules;
+        } catch (e) {
+            return; // skip cross-origin sheets
+        }
+        if (!rules) return;
+
+        Array.from(rules).forEach(rule => {
+            if (rule.style && rule.style.backgroundImage) {
+                try {
+                    if (element.matches(rule.selectorText)) {
+                        // Keep the last matching rule in the cascade
+                        appliedRule = rule.selectorText;
+                    }
+                } catch (e) {
+                    // invalid selector, skip
+                }
+            }
+        });
+    });
+
+    return appliedRule;
+}
+
+function preloadBackgroundImageForSelectors(class1, class2) {
+    const combinedSelector = `${class1}${class2}`; // ensure dot notation
+    const sheets = Array.from(document.styleSheets);
+    let bgUrl = null;
+
+    sheets.forEach(sheet => {
+        let rules;
+        try {
+            rules = sheet.cssRules;
+        } catch (e) {
+            return; // skip cross-origin stylesheets
+        }
+        if (!rules) return;
+
+        // Determine base URL for resolving relative paths
+        let baseUrl;
+        if (sheet.href) {
+            baseUrl = new URL(sheet.href, window.location.href).href.replace(/\/[^/]*$/, '/'); // folder of CSS
+        } else {
+            baseUrl = window.location.href.replace(/\/[^/]*$/, '/'); // inline style: use page URL folder
+        }
+
+        Array.from(rules).forEach(rule => {
+            if (rule.selectorText === combinedSelector && rule.style && rule.style.backgroundImage) {
+                const match = rule.style.backgroundImage.match(/url\(["']?(.*?)["']?\)/);
+                if (match) {
+                    try {
+                        // Resolve relative URL to absolute
+                        bgUrl = new URL(match[1], baseUrl).href;
+                    } catch (err) {
+                        console.warn(`Failed to resolve URL for ${combinedSelector}: ${match[1]}`);
+                    }
+                }
+            }
+        });
+    });
+
+    if (bgUrl) {
+        const img = new Image();
+        img.onload = () => console.log(`Preloaded successfully: ${bgUrl}`);
+        img.onerror = () => console.warn(`Failed to preload image: ${bgUrl}`);
+        img.src = bgUrl; // preload image
+    } else {
+        console.warn(`No background-image found for selector ${combinedSelector}`);
+    }
+}
+
 
 function displayWaterBowlFillingOptions(obj) {
     if (obj.className.includes("full")) {
         messageToTheUser("Dubenelis jau pilnas!")
         return
     }
+
+    const objectsClass = getAppliedBackgroundImageSelector(obj)
+    preloadBackgroundImageForSelectors(objectsClass, ".full")
 
     const speciesSuitableForBowl = [...new Set(
         Array.from(obj.classList)
@@ -8391,6 +8517,9 @@ function displayFoodOptions(obj) {
         messageToTheUser("Dubenelis jau pilnas!");
         return;
     }
+
+    const objectsClass = getAppliedBackgroundImageSelector(obj)
+    preloadBackgroundImageForSelectors(objectsClass, ".full")
 
     if (selectedConsumable.length !== 0 &&
         gameAssetIndex[userPetAssets["supplies"][selectedConsumable[0]].assetIndex]["provides"][0] === "food"
@@ -9877,6 +10006,9 @@ function initUserTriggeredAction(type, object) {
 
         let selectedPet = suitablePets[Math.floor(Math.random() * suitablePets.length)];
 
+        const objectsClass = getAppliedBackgroundImageSelector(object)
+        preloadBackgroundImageForSelectors(objectsClass, `.${selectedPet.classList[1]}`)
+
         if (!pendingPetActions[selectedPet.id]) {
             pendingPetActions[selectedPet.id] = [];
         }
@@ -10244,38 +10376,35 @@ let holdSpeed = 200; // initial speed in ms
 const minSpeed = 50; // fastest speed in ms
 const speedIncrease = 0.9; // multiplier to speed up (lower = faster)
 
-// Increment input value
-function incrementValue(inputId, min = 1, max = 999) {
+function incrementValue(inputId, min = 1, max = 999, callback) {
     const input = document.getElementById(inputId);
     let value = parseInt(input.value) || min;
     if (value < max) {
         input.value = value + 1;
+        if (callback) callback(); // call updatePrice here
     }
 }
 
-// Decrement input value
-function decrementValue(inputId, min = 1, max = 999) {
+function decrementValue(inputId, min = 1, max = 999, callback) {
     const input = document.getElementById(inputId);
     let value = parseInt(input.value) || min;
     if (value > min) {
         input.value = value - 1;
+        if (callback) callback(); // call updatePrice here
     }
 }
 
-// Start holding for auto increment/decrement
-function startHold(inputId, min, max, isIncrement) {
-    // Immediate first action
-    if (isIncrement) incrementValue(inputId, min, max);
-    else decrementValue(inputId, min, max);
+function startHold(inputId, min, max, isIncrement, callback) {
+    if (isIncrement) incrementValue(inputId, min, max, callback);
+    else decrementValue(inputId, min, max, callback);
 
-    holdSpeed = 200; // reset speed
+    holdSpeed = 200;
 
     holdTimeout = setTimeout(() => {
         const repeat = () => {
-            if (isIncrement) incrementValue(inputId, min, max);
-            else decrementValue(inputId, min, max);
+            if (isIncrement) incrementValue(inputId, min, max, callback);
+            else decrementValue(inputId, min, max, callback);
 
-            // gradually speed up
             if (holdSpeed > minSpeed) {
                 holdSpeed = Math.max(minSpeed, holdSpeed * speedIncrease);
             }
@@ -10285,8 +10414,9 @@ function startHold(inputId, min, max, isIncrement) {
         };
 
         holdInterval = setInterval(repeat, holdSpeed);
-    }, 300); // initial delay
+    }, 300);
 }
+
 
 // Stop hold
 function stopHold() {
