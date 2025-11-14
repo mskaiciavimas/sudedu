@@ -3791,6 +3791,8 @@ function enablePetDragging() {
         pet.style.touchAction = 'none';
         
         pet.addEventListener('pointerdown', function(e) {
+            
+            if (e.touches?.length >= 2) return;
             // Only allow left mouse or touch
             if (e.pointerType === "mouse" && e.button !== 0) return;
 
@@ -3947,6 +3949,8 @@ function enableObjectDragging() {
         
         // Create edit mode handler
         obj._editModeHandler = function(e) {
+            if (e.touches?.length >= 2) return;
+
             if (e.pointerType === "mouse" && e.button !== 0) return;
 
             const placementMap = generatePlacementMap(obj.id);
