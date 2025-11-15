@@ -2841,7 +2841,7 @@
                 <div id="room-transform-wrapper">
                     <div id="room-container">
                         <div id="roomGridContainer">
-                            <div id="room-transform-wrapper" style="width: 504px; height: 420px;">
+                            <div id="" style="width: 504px; height: 420px;">
                                 <canvas id="roomGrid" style="user-select: none; display: block;"></canvas>
                             </div>
 
@@ -3086,8 +3086,8 @@
 
         let viewportState = {
             scale: 1,
-            x: 0,
-            y: 0,
+            x: 10,
+            y: 10,
             minScale: 0.5,
             maxScale: 1,
             isDragging: false,
@@ -3095,6 +3095,10 @@
             dragStartY: 0,
             spacePressed: false
         };
+
+        if (window.innerWidth <= 768) {
+            viewportState.maxScale = 1.5
+        }
 
         const topHalfClickBlockedItemClasses = ["bath-1"]
 
@@ -3267,18 +3271,70 @@
 
         let userObjectAssets = {};
 
-        // 1.0 - floor, 2.0 - wall, 3.0 - boundary between wall and floor, 
-        // 4.1 - horizontal edge, 4.2 - vertical edge, 4.3 - top left corner, 4.4 - top right corner, 4.5 - bottom right corner, 4.6 - bottom left corner
-        
+        // 1.0 - floor
+        // 2.0 - wall
+        // 3.0 - boundary between wall and floor, 
+        // 4.1 - horizontal edge, 4.2 - vertical edge, 
+        // 4.31 - top left corner, 4.32 - top right corner, 4.33 - bottom right corner, 4.34 - bottom left corner, 
+        // 4.41 - T junction top, 4.42 - T junction right, 4.43 - T junction bottom, 4.44 - T junction left, 
+        // 4.51 - downward-facing wall end, 4.52 - left-facing wall end, 4.53 - upward-facing wall end, 4.54 - right-facing wall end
+        // 5.0 - threshold
+        // 6.0 - stairs
+        // 7.0 - void
+
+
         //[4.3, ...Array(20).fill(4.1),4.4] - border with edges and horizontal line filled to set number (20)
         //...Array(6).fill([4.2, ...Array(20).fill(2.0), 4.2]) - multiple rows of wall tiles with edges at the end 6 rows of 20 wall tiles and 2 borders at ends
         
+        /*
         const roomLayout = [
           [4.3, ...Array(40).fill(4.1), 4.4],
           ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2]),
           [4.2, ...Array(40).fill(3.0), 4.2],
           ...Array(20).fill([4.2, ...Array(40).fill(1.0), 4.2]),
           [4.6, ...Array(40).fill(4.1), 4.5],
+        ];
+        */
+
+        const roomLayout = [
+          // Top part of floor 2
+          [4.31, ...Array(40).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.32],
+          ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2]),
+          [4.2, ...Array(40).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2],
+          ...Array(2).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
+
+          // Part at the door of floor 2
+          ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.2]),
+          ...Array(6).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2]),
+          ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.2]),
+
+          // Lower part of floor 2
+          ...Array(10).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
+
+          // Entrance to stairs floor 2
+          [4.34, ...Array(24).fill(4.1), 4.32, ...Array(6).fill(6.0), 4.31, ...Array(8).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33],
+          
+          // Stairs and void
+          ...Array(8).fill([...Array(25).fill(7.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(7.0), ...Array(42).fill(7.0)]),
+
+          // Stairs and wall of floor 1
+          [4.31, ...Array(24).fill(4.1), 4.42, ...Array(6).fill(6.0), 4.44, ...Array(8).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.32],
+
+          // Top part of floor 1, stairs and wall
+          ...Array(12).fill([4.2, ...Array(24).fill(2.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2]),
+        
+          // Top part of floor 1, stairs and boundary
+          [4.2, ...Array(24).fill(3.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2],
+
+          // Part at the door of floor 1
+          ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.2]),
+          ...Array(5).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2]),
+          ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.2]),
+
+          // Bottom part of floor 1
+          ...Array(13).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
+          [4.34, ...Array(40).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33],
+          
         ];
 
         const roomGrid = document.getElementById('roomGrid');
@@ -3315,8 +3371,14 @@
                         case 1.0: fillColor = '#DEB887'; break; // floor
                         case 2.0: fillColor = '#F0EAD6'; break; // wall
                         case 3.0: fillColor = '#B37B50'; break; // boundary
-                        case 4.1: case 4.2: case 4.3: case 4.4: case 4.5: case 4.6:
+                        case 4.1: case 4.2: 
+                        case 4.31: case 4.32:case 4.33: case 4.34: 
+                        case 4.41: case 4.42: case 4.43: case 4.44: 
+                        case 4.51: case 4.52: case 4.53: case 4.54: 
                             fillColor = '#A77851'; break; // edges
+                        case 5.0: fillColor = '#b8966c'; break;
+                        case 6.0: fillColor = "#5C4033"; break
+                        case 7.0: fillColor = "transparent"; break
                         default: fillColor = '#fff';
                     }
                     ctx.fillStyle = fillColor;
@@ -3328,7 +3390,7 @@
                     let lineWidth = 1;
 
                     switch(type) {
-                        case 1.0: // floor - maybe light outline
+                        case 1.0: // floor
                             sides = [true, true, true, true];
                             strokeColor = 'grey';
                             lineWidth = 0.2;
@@ -3353,24 +3415,74 @@
                             strokeColor = '#000';
                             lineWidth = 1;
                             break;
-                        case 4.3: // top-left corner
+                        case 4.31: // top-left corner
                             sides = [true, false, false, true];
                             strokeColor = '#000';
                             lineWidth = 1;
                             break;
-                        case 4.4: // top-right corner
+                        case 4.32: // top-right corner
                             sides = [true, true, false, false];
                             strokeColor = '#000';
                             lineWidth = 1;
                             break;
-                        case 4.5: // bottom-right corner
+                        case 4.33: // bottom-right corner
                             sides = [false, true, true, false];
                             strokeColor = '#000';
                             lineWidth = 1;
                             break;
-                        case 4.6: // bottom-left corner
+                        case 4.34: // bottom-left corner
                             sides = [false, false, true, true];
                             strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.41: // T junction top
+                            sides = [true, false, false, false];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.42: // T junction right
+                            sides = [false, true, false, false];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.43: // T junction bottom
+                            sides = [false, false, true, false];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.44: // T junction left
+                            sides = [false, false, false, true];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.51: // downward-facing end
+                            sides = [false, true, true, true];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.52: // left-facing wall end
+                            sides = [true, false, true, true];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.53: // upward-facing wall end
+                            sides = [true, true, false, true];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.54: // right-facing wall end
+                            sides = [true, true, true, false];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 5.0: // floor / threshold
+                            sides = [true, true, true, true];
+                            strokeColor = 'black';
+                            lineWidth = 0.2;
+                            break;
+                        case 6.0: // right-facing wall end
+                            sides = [false, false, true, false];
+                            strokeColor = 'black';
                             lineWidth = 1;
                             break;
                     }
@@ -3720,56 +3832,66 @@ const objectInteractions = {
 };
 
 function toggleMusicPlayer(obj) {
-  const musicPlayerAutoOff = 4000; // milliseconds
+    const musicPlayerAutoOff = 4000; // milliseconds
+    const pets = document.querySelectorAll('.pet');
 
-  const pets = document.querySelectorAll('.pet');
+    // Helper to stop pets from dancing and manage actions
+    const stopPetsDancing = () => {
+        pets.forEach((pet) => {
+            const firstAction = pendingPetActions[pet.id]?.[0];
+            const dancingIsFirstItem = firstAction && firstAction[0] === petDances;
 
-  if (!obj.objectOn) {
-    // Turn ON
-    obj.objectOn = true;
-    setObjectAnimation(obj, "musicPlayerOn");
-    initUserTriggeredAction("music", obj);
+            pendingPetActions[pet.id] = (pendingPetActions[pet.id] || []).filter(
+                ([fn, args]) => fn !== petDances
+            );
 
-    // Automatically turn off after delay
-    setTimeout(() => {
-      if (!obj.objectOn) return; // already off
+            if (dancingIsFirstItem) {
+                managePetActions(pet);
+            }
+        });
+    };
 
-      obj.objectOn = false;
-      setObjectAnimation(obj, "musicPlayerOff");
+    if (!obj.objectOn) {
+        // Turn ON
+        obj.objectOn = true;
+        setObjectAnimation(obj, "musicPlayerOn");
+        initUserTriggeredAction("music", obj);
 
-      pets.forEach((pet) => {
-        const firstAction = pendingPetActions[pet.id]?.[0];
-        const dancingIsFirstItem = firstAction && firstAction[0] === petDances;
-
-        pendingPetActions[pet.id] = (pendingPetActions[pet.id] || []).filter(
-          ([fn, args]) => fn !== petDances
-        );
-
-        if (dancingIsFirstItem) {
-          managePetActions(pet);
+        // Cancel any existing auto-off timer
+        if (obj._autoOffTimer) {
+            clearTimeout(obj._autoOffTimer);
         }
-      });
-    }, musicPlayerAutoOff);
 
-  } else {
-    // Turn OFF manually
-    obj.objectOn = false;
-    setObjectAnimation(obj, "musicPlayerOff");
+        // Automatically turn off after delay
+        obj._autoOffTimer = setTimeout(() => {
+            obj._autoOffTimer = null;
 
-    pets.forEach((pet) => {
-      const firstAction = pendingPetActions[pet.id]?.[0];
-      const dancingIsFirstItem = firstAction && firstAction[0] === petDances;
+            if (!obj.objectOn) return; // Already turned off manually
 
-      pendingPetActions[pet.id] = (pendingPetActions[pet.id] || []).filter(
-        ([fn, args]) => fn !== petDances
-      );
+            obj.objectOn = false;
+            setObjectAnimation(obj, "musicPlayerOff");
 
-      if (dancingIsFirstItem) {
-        managePetActions(pet);
-      }
-    });
-  }
+            // Pet handling (same as original)
+            stopPetsDancing();
+
+        }, musicPlayerAutoOff);
+
+    } else {
+        // Turn OFF manually
+        obj.objectOn = false;
+        setObjectAnimation(obj, "musicPlayerOff");
+
+        // Cancel pending auto-off
+        if (obj._autoOffTimer) {
+            clearTimeout(obj._autoOffTimer);
+            obj._autoOffTimer = null;
+        }
+
+        // Pet handling (same as original)
+        stopPetsDancing();
+    }
 }
+
 
 // Disable right-click context menu and image highlighting in room container
 roomContainer.addEventListener('contextmenu', function(e) {
@@ -3888,7 +4010,7 @@ function removeObjectsMarkedForRemoval() {
     const objectToRemove = document.querySelector(".marked-for-deletion")
     console.log(objectToRemove)
     const objPlacingOrder = gameAssetIndex[userObjectAssets[objectToRemove.id]["assetIndex"]]["placingIndex"]
-    if (hasBlockingObjects(objectToRemove) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10)) {
+    if (hasBlockingObjects(objectToRemove) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10 || objPlacingOrder === 15)) {
         messageToTheUser("Šį daiktą galėsi išimti iš kambario tik nuėmęs nuo jo kitus!");
         return;
     } else if (objectToRemove) {
@@ -3991,7 +4113,7 @@ function enableObjectDragging() {
                     if (!dragStarted) {
                         hasMoved = true;
                         const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
-                        if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10)) {
+                        if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10 || objPlacingOrder === 15)) {
                             messageToTheUser("Šį daiktą galėsi pajudinti tik nuėmęs nuo jo kitus!");
                             cancelDrag(); // stop listening so it won’t repeat
                             return;
@@ -4552,7 +4674,7 @@ function predictAndSetZIndex(movingObject = null, nextCol = null, nextRow = null
         
         if (assetSource) {
             const objPlacingOrder = gameAssetIndex[assetSource.assetIndex]?.placingIndex;
-            if (objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10) {
+            if (objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10 || objPlacingOrder === 15) {
                 return;
             }
         }
@@ -5129,7 +5251,7 @@ function generateWalkabilityMap() {
         for (let col = 0; col < roomLayout[0].length; col++) {
             const tileType = roomLayout[row][col];
             // Only floor (1) and boundary (3) tiles are walkable
-            const isWalkable = (tileType === 1.0 || tileType === 3.0);
+            const isWalkable = (tileType === 1.0 || tileType === 3.0 || tileType === 5.0 || tileType === 6.0);
             map[row][col] = {
                 walkable: isWalkable,
                 allowedDirections: [true, true, true, true] // up, right, down, left
@@ -5865,7 +5987,7 @@ function generatePlacementMap(draggedObjectId) {
           }
 
           // Preserve original branch ordering exactly, including the check against draggedAssetData["placingIndex"]
-          if (!(draggedAssetData["placingIndex"] === 5 || draggedAssetData["placingIndex"] === 6 || draggedAssetData["placingIndex"] === 9 || draggedAssetData["placingIndex"] === 10)) {
+          if (!(draggedAssetData["placingIndex"] === 5 || draggedAssetData["placingIndex"] === 6 || draggedAssetData["placingIndex"] === 9 || draggedAssetData["placingIndex"] === 10 || draggedAssetData["placingIndex"] === 15)) {
             const objectsAtTile = getObjectsAtTileCached(x, y);
             for (const existingObj of objectsAtTile) {
               const existingPlacingIndex = getExistingPlacingIndex(existingObj);
@@ -6025,7 +6147,7 @@ function generatePlacementMap(draggedObjectId) {
               const existingAssetData = gameAssetIndex[existingAsset.assetIndex];
               const existingPlacingIndex = existingAssetData["placingIndex"] || 0;
 
-              if ((draggedAssetData["placingIndex"] === 5 && existingPlacingIndex === 5) || (draggedAssetData["placingIndex"] === 6 && existingPlacingIndex === 6) || (draggedAssetData["placingIndex"] === 9 && existingPlacingIndex === 9) || (draggedAssetData["placingIndex"] === 10 && existingPlacingIndex === 10)) {
+              if ((draggedAssetData["placingIndex"] === 5 && existingPlacingIndex === 5) || (draggedAssetData["placingIndex"] === 6 && existingPlacingIndex === 6) || (draggedAssetData["placingIndex"] === 9 && existingPlacingIndex === 9) || (draggedAssetData["placingIndex"] === 10 && existingPlacingIndex === 10) || (draggedAssetData["placingIndex"] === 15 && existingPlacingIndex === 15)) {
                 tileAllowed = false;
                 break;
               }
@@ -6274,7 +6396,7 @@ window.addEventListener("resize", () => {
 function adjustUnitSizeForSmallScreens(roomLayout) {
     if (!roomLayout || !roomLayout[0]) return;
 
-    const numTiles = roomLayout[0].length; // number of columns
+    const numTiles = 42; // number of columns
     const screenWidth = window.innerWidth;
 
     // Define breakpoint for "small screens"
@@ -6926,14 +7048,14 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
     // Collect owned items
     for (const key in userObjectAssets) {
         const assetIndex = userObjectAssets[key].assetIndex;
-        if (userObjectAssets[key].position.length !== 0) {
-            ownedIndexes.add(assetIndex);
+
+        ownedIndexes.add(assetIndex);
 
         const cssClassStr = gameAssetIndex[assetIndex]?.['css-class'];
         if (cssClassStr) {
             cssClassStr.split(' ').forEach(cls => ownedCssClasses.add(cls));
         }
-        }
+        
     }
 
     // Collect owned pets
@@ -7094,6 +7216,8 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
             btn.className = 'purchase-btn';
             btn.textContent = 'Pirkti';
 
+            
+
             let quantityInput = null;
 
             if (!item.oneOfKind) {
@@ -7144,7 +7268,6 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
                 quantityInput.addEventListener('input', updatePrice);
                 quantityInput.addEventListener('change', updatePrice);
             }
-
 
             if (ownedIndexes.has(assetIndex)) {
                 if (item.oneOfKind) {
@@ -7278,7 +7401,169 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
 
     container.innerHTML = '';
 
+    // Group stackable items by assetIndex
+    const stackableGroups = {};
+    const regularItems = [];
+
     for (const key in userObjectAssets) {
+        const asset = userObjectAssets[key];
+        const assetIndex = asset.assetIndex;
+        const item = gameAssetIndex[assetIndex];
+        if (!item) continue;
+
+        if (item.stackable) {
+            if (!stackableGroups[assetIndex]) {
+                stackableGroups[assetIndex] = [];
+            }
+            stackableGroups[assetIndex].push(key);
+        } else {
+            regularItems.push(key);
+        }
+    }
+
+    // Clean up excess unused stackable instances (keep only 1 unused per type)
+    for (const assetIndex in stackableGroups) {
+        const keys = stackableGroups[assetIndex];
+        const unusedKeys = keys.filter(k => 
+            !userObjectAssets[k].position || userObjectAssets[k].position.length === 0
+        );
+
+        // If more than 1 unused instance, delete extras
+        if (unusedKeys.length > 1) {
+            for (let i = 1; i < unusedKeys.length; i++) {
+                delete userObjectAssets[unusedKeys[i]];
+            }
+            // Update the group to reflect deletions
+            stackableGroups[assetIndex] = keys.filter(k => userObjectAssets[k]);
+        }
+    }
+
+    // Render stackable items (one card per type)
+    for (const assetIndex in stackableGroups) {
+        const item = gameAssetIndex[assetIndex];
+        if (!item) continue;
+
+        // Category filter
+        if (selectedCategory !== 'all' && !item.category.includes(selectedCategory)) continue;
+
+        const keys = stackableGroups[assetIndex];
+        const usedCount = keys.filter(k => 
+            userObjectAssets[k].position && userObjectAssets[k].position.length > 0
+        ).length;
+
+        // Usage filter
+        if (unusedOnly && usedCount === keys.length) continue;
+
+        const itemDiv = document.createElement('div');
+        itemDiv.className = `shop-item ${item.category.join(' ')}`;
+
+        const previewDiv = document.createElement('div');
+        previewDiv.className = `item-preview ${item['css-class']}`;
+
+        const previewHolder = document.createElement('div');
+        previewHolder.className = `item-preview-holder`;
+
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'item-info';
+
+        const nameH3 = document.createElement('h3');
+        nameH3.className = 'item-name';
+        nameH3.textContent = item.title;
+
+        const descP = document.createElement('p');
+        descP.className = 'item-description';
+        descP.innerHTML = item.description;
+        descP.innerHTML += generateConsumableItemDescription(item);
+
+        // Show usage count for stackable items
+        if (usedCount > 0) {
+            const countSpan = document.createElement('span');
+            countSpan.className = 'item-quantity';
+            countSpan.textContent = `Naudojama: ${usedCount}`;
+            descP.appendChild(countSpan);
+        }
+
+        infoDiv.appendChild(nameH3);
+        infoDiv.appendChild(descP);
+
+        const btn = document.createElement('button');
+        btn.className = 'use-btn';
+        btn.textContent = 'Naudoti';
+        btn.disabled = false;
+
+        btn.addEventListener('click', () => {
+            // Create a new instance for stackable items
+            const newKey = `O${Object.keys(userObjectAssets).length + 1}`;
+            userObjectAssets[newKey] = { assetIndex: parseInt(assetIndex), position: [] };
+
+            let tempDivId = renderSingleRoomObject(newKey);
+
+            document.querySelectorAll('.game-content-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('pet-room-container').classList.add('active');
+
+            const navButtons = document.querySelectorAll('.nav-item');
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            navButtons[0].classList.add('active');
+            
+            userObjectAssets[tempDivId].position = getObjectCoordinates(tempDivId);
+
+            updateStatsBeforeRerunningInitGameAndRenderPets();
+            initGame();
+
+            // Attempt to place the item at a valid position
+            const placementMap = generatePlacementMap(tempDivId);
+            const validPosition = findValidPosition(placementMap, tempDivId);
+
+            if (validPosition) {
+                userObjectAssets[tempDivId].position = validPosition;
+                sendObjectAssetsUpdateToDatabase();
+                updateStatsBeforeRerunningInitGameAndRenderPets();
+                initGame();
+            } else {
+                userObjectAssets[tempDivId].position = [];
+                document.getElementById(tempDivId).remove();
+                delete userObjectAssets[tempDivId]; // Remove the failed instance
+                if (gameAssetIndex[parseInt(assetIndex)].placingIndex === 13 || 
+                    gameAssetIndex[parseInt(assetIndex)]["css-class"].includes("window-sill")) {
+                    messageToTheUser("Nėra tinkamo dydžio lango arba jį užstoja kiti daiktai!");
+                } else {
+                    messageToTheUser("Nepakanka vietos!");
+                }
+                predictAndSetZIndex();
+            }
+        });
+
+        // Add delete button for stackable items when none are in use
+        if (usedCount === 0) {
+            const itemDeleteBtnHolder = document.createElement('div');
+            itemDeleteBtnHolder.className = 'item-delete-btn-holder';
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'item-delete-btn';
+            deleteBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 6 L6 18 M6 6 L18 18" stroke="#F5F5F7" stroke-width="2"/></svg>';
+
+            deleteBtn.addEventListener('click', () => {
+                showCustomConfirm(`Ar tikrai nori išmestį šį daiktą? Jo susigrąžinti negalėsi.`, () => {
+                    // Delete all instances of this stackable item
+                    keys.forEach(key => {
+                        removeObjectFromUserAssets(key);
+                    });
+                });
+            });
+            
+            itemDeleteBtnHolder.appendChild(deleteBtn);
+            previewDiv.appendChild(itemDeleteBtnHolder);
+        }
+
+        previewHolder.appendChild(previewDiv);
+        itemDiv.appendChild(previewHolder);
+        itemDiv.appendChild(infoDiv);
+        itemDiv.appendChild(btn);
+
+        container.appendChild(itemDiv);
+    }
+
+    // Render regular (non-stackable) items
+    for (const key of regularItems) {
         const asset = userObjectAssets[key];
         const assetIndex = asset.assetIndex;
         const item = gameAssetIndex[assetIndex];
@@ -7308,7 +7593,7 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
         const descP = document.createElement('p');
         descP.className = 'item-description';
         descP.innerHTML = item.description;
-        descP.innerHTML += generateConsumableItemDescription(item)
+        descP.innerHTML += generateConsumableItemDescription(item);
 
         infoDiv.appendChild(nameH3);
         infoDiv.appendChild(descP);
@@ -7332,7 +7617,7 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
 
                 const navButtons = document.querySelectorAll('.nav-item');
                 navButtons.forEach(btn => btn.classList.remove('active'));
-                navButtons[0].classList.add('active')
+                navButtons[0].classList.add('active');
                 
                 userObjectAssets[tempDivId].position = getObjectCoordinates(tempDivId);
 
@@ -7351,10 +7636,11 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
                 } else {
                     userObjectAssets[tempDivId].position = [];
                     document.getElementById(tempDivId).remove();
-                    if (gameAssetIndex[userObjectAssets[tempDivId].assetIndex].placingIndex === 13 || gameAssetIndex[userObjectAssets[tempDivId].assetIndex]["css-class"].includes("window-sill")) {
-                        messageToTheUser("Nėra tinkamo dydžio lango arba jį užstoja kiti daiktai!")
+                    if (gameAssetIndex[userObjectAssets[tempDivId].assetIndex].placingIndex === 13 || 
+                        gameAssetIndex[userObjectAssets[tempDivId].assetIndex]["css-class"].includes("window-sill")) {
+                        messageToTheUser("Nėra tinkamo dydžio lango arba jį užstoja kiti daiktai!");
                     } else {
-                        messageToTheUser("Nepakanka vietos!")
+                        messageToTheUser("Nepakanka vietos!");
                     }
                     predictAndSetZIndex();
                 }
@@ -7362,22 +7648,21 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
         }
 
         if (asset.position && asset.position.length === 0) {
-        const itemDeleteBtnHolder = document.createElement('div');
-        itemDeleteBtnHolder.className = 'item-delete-btn-holder';
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'item-delete-btn';
-        deleteBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 6 L6 18 M6 6 L18 18" stroke="#F5F5F7" stroke-width="2"/></svg>';
+            const itemDeleteBtnHolder = document.createElement('div');
+            itemDeleteBtnHolder.className = 'item-delete-btn-holder';
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'item-delete-btn';
+            deleteBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 6 L6 18 M6 6 L18 18" stroke="#F5F5F7" stroke-width="2"/></svg>';
 
-        // Trigger custom confirmation
-        deleteBtn.addEventListener('click', () => {
-            showCustomConfirm(`Ar tikrai nori išmestį šį daiktą? Jo susigrąžinti negalėsi.`, removeObjectFromUserAssets, key)
-        });
-        // Append delete button next to other buttons
-        itemDeleteBtnHolder.appendChild(deleteBtn)
-        previewDiv.appendChild(itemDeleteBtnHolder);
-    }
+            deleteBtn.addEventListener('click', () => {
+                showCustomConfirm(`Ar tikrai nori išmestį šį daiktą? Jo susigrąžinti negalėsi.`, removeObjectFromUserAssets, key);
+            });
+            
+            itemDeleteBtnHolder.appendChild(deleteBtn);
+            previewDiv.appendChild(itemDeleteBtnHolder);
+        }
 
-        previewHolder.appendChild(previewDiv)
+        previewHolder.appendChild(previewDiv);
         itemDiv.appendChild(previewHolder);
         itemDiv.appendChild(infoDiv);
         itemDiv.appendChild(btn);
@@ -10549,7 +10834,7 @@ async function handleReceivedMessagesAndGifts(gifts) {
           // SUPPLY logic (can be stackable)
           if (!userPetAssets.supplies) userPetAssets.supplies = {};
 
-          if (item.stackable) {
+          if (item.stackable && !item.oneOfKind) {
             // Stack with existing
             let existingSupplyKey = null;
             for (const key in userPetAssets.supplies) {
@@ -10912,6 +11197,87 @@ function blockTopHalfOfSelectedDivsClickEvents() { //To prevent clicking of obje
     });
   });
 }
+
+
+// FUNCTIONS TO HELP DEVELOPMENT START
+
+function highlightWalkabilityMap() {
+    const walkabilityMap = globalWalkabilityMap;
+    if (!walkabilityMap) return;
+
+    const unitSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
+    const container = document.getElementById('room-container');
+
+    for (let row = 0; row < walkabilityMap.length; row++) {
+        for (let col = 0; col < walkabilityMap[0].length; col++) {
+            const tile = walkabilityMap[row][col];
+            if (!tile) continue;
+
+            // Determine color based on allowedDirections
+            let color;
+            if (!tile.walkable) {
+                color = 'rgba(50,50,50,0.5)'; // Non-walkable
+            } else {
+                const dirs = tile.allowedDirections;
+                const vertical = dirs[0] && dirs[2];
+                const horizontal = dirs[1] && dirs[3];
+                const all = vertical && horizontal;
+
+                if (all) color = 'rgba(0, 255, 0, 0.2)';         // All directions
+                else if (vertical) color = 'rgba(0, 0, 255, 0.2)'; // Up/Down only
+                else if (horizontal) color = 'rgba(255, 255, 0, 0.2)'; // Left/Right only
+                else color = 'rgba(255, 165, 0, 0.2)';           // Single or other
+            }
+
+            createTileHighlight(container, col, row, unitSize, color);
+        }
+    }
+}
+
+// Standalone function to create a tile highlight
+function createTileHighlight(container, col, row, size, color) {
+    const div = document.createElement('div');
+    div.style.position = 'absolute';
+    div.style.width = `${size}px`;
+    div.style.height = `${size}px`;
+    div.style.left = `${col * size}px`;
+    div.style.top = `${row * size}px`;
+    div.style.backgroundColor = color;
+    div.style.pointerEvents = 'none';
+    div.style.zIndex = 9999
+    container.appendChild(div);
+    return div;
+}
+
+// Overlay directional triangles inside a tile
+function createDirectionOverlay(tileDiv, direction, color) {
+    const overlay = document.createElement('div');
+    overlay.style.position = 'absolute';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.left = '0';
+    overlay.style.top = '0';
+    overlay.style.backgroundColor = color; // use rgba for transparency
+    overlay.style.pointerEvents = 'none';
+
+    // Use clip-path to form triangle
+    switch(direction) {
+        case 0: overlay.style.clipPath = 'polygon(50% 0%, 0% 100%, 100% 100%)'; break; // Up
+        case 1: overlay.style.clipPath = 'polygon(0% 0%, 100% 50%, 0% 100%)'; break; // Right
+        case 2: overlay.style.clipPath = 'polygon(0% 0%, 100% 0%, 50% 100%)'; break; // Down
+        case 3: overlay.style.clipPath = 'polygon(100% 0%, 100% 100%, 0% 50%)'; break; // Left
+    }
+
+    tileDiv.appendChild(overlay);
+}
+
+/*
+setTimeout(() => {
+    highlightWalkabilityMap(globalWalkabilityMap);
+}, 2000);
+*/
+
+// FUNCTIONS TO HELP DEVELOPMENT END
 
     </script>
 </body>
