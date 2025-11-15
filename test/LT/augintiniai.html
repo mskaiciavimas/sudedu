@@ -4095,6 +4095,19 @@ function enableObjectDragging() {
         
         // Create edit mode handler
         obj._editModeHandler = function(e) {
+            // IMMEDIATELY check for multi-touch - stop everything if true
+            if (multiTouchActive) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            
+            if (e.touches?.length >= 2) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            
             if (e.pointerType === "mouse" && e.button !== 0) return;
 
             const placementMap = generatePlacementMap(obj.id);
@@ -4113,6 +4126,11 @@ function enableObjectDragging() {
             // Mobile: require hold before drag
             if (isMobile && e.pointerType === "touch") {
                 holdTimer = setTimeout(() => {
+                    // Double-check multi-touch hasn't started during the hold
+                    if (multiTouchActive) {
+                        return;
+                    }
+                    
                     // Vibrate on successful hold
                     if (navigator.vibrate) {
                         navigator.vibrate(50);
@@ -4145,6 +4163,12 @@ function enableObjectDragging() {
             }
             
             const moveHandler = (moveEvent) => {
+                // Check if multi-touch started during move
+                if (multiTouchActive) {
+                    cancelDrag();
+                    return;
+                }
+                
                 const deltaX = Math.abs(moveEvent.clientX - startX);
                 const deltaY = Math.abs(moveEvent.clientY - startY);
                 
@@ -4187,6 +4211,17 @@ function enableObjectDragging() {
             };
             
             const upHandler = (upEvent) => {
+                // Check if multi-touch is active
+                if (multiTouchActive) {
+                    if (holdTimer) {
+                        clearTimeout(holdTimer);
+                        holdTimer = null;
+                    }
+                    document.removeEventListener('pointermove', moveHandler);
+                    document.removeEventListener('pointerup', upHandler);
+                    return;
+                }
+                
                 // Clear hold timer if still waiting
                 if (holdTimer) {
                     clearTimeout(holdTimer);
@@ -4225,7 +4260,6 @@ function enableObjectDragging() {
         obj.addEventListener('pointerdown', obj._editModeHandler);
     });
 }
-
 // Disable object dragging for normal mode
 function disableObjectDragging() {
     // Remove all delete icons when exiting edit mode
@@ -11176,9 +11210,12 @@ function handleViewportPanStart(e) {
     const isMiddleClick = e.button === 1;
     const isSpacebarDrag = viewportState.spacePressed && e.button === 0;
 
-    if (isMiddleClick || isSpacebarDrag || isTouchMultiFinger) {
-        if (isTouchMultiFinger) multiTouchActive = true;
+    // Set multiTouchActive IMMEDIATELY on two-finger touch
+    if (isTouchMultiFinger) {
+        multiTouchActive = true;
+    }
 
+    if (isMiddleClick || isSpacebarDrag || isTouchMultiFinger) {
         e.preventDefault();
         e.stopPropagation();
         viewportState.isDragging = true;
