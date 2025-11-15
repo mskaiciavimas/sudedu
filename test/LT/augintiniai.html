@@ -4061,6 +4061,7 @@ function removeObjectsMarkedForRemoval() {
 
 document.querySelector("#delete-selected-item-button").addEventListener("click", () => {
     removeObjectsMarkedForRemoval()
+    clearPlacementHighlights();
 });;
 
 function hasBlockingObjects(target) {
@@ -4130,7 +4131,7 @@ function enableObjectDragging() {
         obj.removeEventListener('contextmenu', obj._contextMenuHandler);
         
         // Mobile: use contextmenu for long press
-if (isMobile) {
+    if (isMobile) {
     obj._pointerDownHandler = function(e) {
         if (multiTouchActive) return;
 
@@ -4194,12 +4195,8 @@ if (isMobile) {
             if (!longPressFired && duration < 300 && dx < 10 && dy < 10) {
                 // QUICK TAP - MARK FOR DELETION
                 if (navigator.vibrate) navigator.vibrate(20);
-                
-                // Toggle selection for deletion
-                obj.classList.toggle('marked-for-deletion');
-                
-                // Or call your deletion marking function:
-                // markObjectForDeletion(obj.id);
+            
+                showDeleteIcon(obj)
             }
             
             cleanup();
@@ -4214,8 +4211,8 @@ if (isMobile) {
         document.addEventListener('pointerup', onUp);
     };
 
-    obj.addEventListener('pointerdown', obj._pointerDownHandler);
-}
+        obj.addEventListener('pointerdown', obj._pointerDownHandler);
+    }
 
         
         obj._editModeHandler = function(e) {
@@ -4252,11 +4249,9 @@ if (isMobile) {
                     return;
                 }
                 
-                const deltaX = Math.abs(moveEvent.clientX - startX);
-                const deltaY = Math.abs(moveEvent.clientY - startY);
                 
                 // Start drag on any movement
-                if ((deltaX > 3 || deltaY > 3) && !dragStarted) {
+                if (!dragStarted) {
                     dragStarted = true;
                     
                     // Desktop: check blocking and show placement map
@@ -4272,9 +4267,9 @@ if (isMobile) {
                         }
 
                         const placementMap = generatePlacementMap(obj.id);
+                        determineAndHighlightValidTiles(placementMap);
                         obj._placementMap = placementMap;
                         obj._originalCoords = getObjectCoordinates(obj.id);
-                        determineAndHighlightValidTiles(placementMap);
                     }
                     
                     currentObject = obj;
@@ -4304,6 +4299,7 @@ if (isMobile) {
                     obj._readyToDrag = false;
                     obj.classList.remove("dragging");
                     clearPlacementHighlights();
+                    removeAllDeleteItemHighlights();
                 }
                 
                 // Desktop: show delete icon on click without drag
@@ -4325,6 +4321,7 @@ if (isMobile) {
                 if (isMobile) {
                     obj._readyToDrag = false;
                     clearPlacementHighlights();
+                    removeAllDeleteItemHighlights();
                 }
             };
             
@@ -4534,6 +4531,7 @@ document.addEventListener('pointerup', function(e) {
     currentObject.style.left = snappedLeft + 'px';
     currentObject.style.top = snappedTop + 'px';
     currentObject.classList.remove('dragging');
+    removeAllDeleteItemHighlights();
 
     if ([...currentObject.classList].some(cls => cls.includes("pet"))) {
         const petWidthInTiles = Math.ceil(currentObject.offsetWidth / unitSize);
@@ -4591,6 +4589,7 @@ document.addEventListener('pointerup', function(e) {
             const clickedObject = e.target.closest('.room-object');
             if (!clickedObject) {
                 removeAllDeleteItemHighlights();
+                clearPlacementHighlights()
             }
         }
     }
@@ -5979,6 +5978,7 @@ toggleEditSaveBtn.addEventListener("click", () => {
             displayPetStats(allPets[0].id);
         }
         clearPlacementHighlights()
+        removeAllDeleteItemHighlights();
     }
 });
 
@@ -5988,6 +5988,8 @@ cancelEditBtn.addEventListener("click", () => {
     updateStatsBeforeRerunningInitGameAndRenderPets();
     renderPets();
     enablePetDragging();
+    clearPlacementHighlights()
+    removeAllDeleteItemHighlights();
 
     predictAndSetZIndex();
     
@@ -6410,51 +6412,51 @@ function getObjectsAtTile(tileCol, tileRow, excludeObjectId = null) {
     return objectsAtTile;
 }
 
-function clearPlacementHighlights() {
-    document.querySelectorAll('.placement-highlight').forEach(highlight => {
-        highlight.remove();
-    });
-}
-
 function determineAndHighlightValidTiles(placementMap) {
     highlightValidPlacements(placementMap)
 }
 
-// Function to highlight valid placement tiles
 function highlightValidPlacements(placementMap) {
-    // Remove existing highlights
     clearPlacementHighlights();
-
     if (!placementMap) return;
 
-    // Create highlight overlays for valid positions
+    const canvas = document.getElementById('placement-canvas') || createHighlightCanvas();
+    const ctx = canvas.getContext('2d');
+
+    const tileSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     for (let row = 0; row < roomLayout.length; row++) {
         for (let col = 0; col < roomLayout[0].length; col++) {
-            if (placementMap[row] && placementMap[row][col] && placementMap[row][col].canPlace) {
-                createPlacementHighlight(col, row, true);
-            } else if (placementMap[row] && placementMap[row][col]) {
-                createPlacementHighlight(col, row, false);
+            if (placementMap[row]?.[col]) {
+                const canPlace = placementMap[row][col].canPlace;
+                ctx.fillStyle = canPlace ? 'rgba(0, 255, 0, 0.15)' : 'rgba(255, 0, 0, 0.15)';
+                ctx.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
             }
         }
     }
 }
 
-// Function to create individual highlight overlay
-function createPlacementHighlight(col, row, isValid) {
-    const highlight = document.createElement('div');
-    highlight.className = `placement-highlight ${isValid ? 'valid' : 'invalid'}`;
-    highlight.style.cssText = `
-        position: absolute;
-        left: calc(${col} * var(--unit-size));
-        top: calc(${row} * var(--unit-size));
-        width: var(--unit-size);
-        height: var(--unit-size);
-        background-color: ${isValid ? 'rgba(0, 255, 0, 0.15)' : 'rgba(255, 0, 0, 0.15)'};
-        pointer-events: none;
-        z-index: 1000;
-    `;
-    
-    document.getElementById('room-container').appendChild(highlight);
+function createHighlightCanvas() {
+    const canvas = document.createElement('canvas');
+    canvas.id = 'placement-canvas';
+    canvas.width = roomLayout[0].length * tileSize;
+    canvas.height = roomLayout.length * tileSize;
+    canvas.style.position = 'absolute';
+    canvas.style.pointerEvents = 'none';
+    canvas.style.zIndex = '100';
+    // position it over your room
+    document.getElementById('room-container').appendChild(canvas);
+    return canvas;
+}
+
+function clearPlacementHighlights() {
+    const canvas = document.getElementById('placement-canvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
 }
 
 // NAVIGATION START
@@ -11283,6 +11285,7 @@ function handleTouchEnd(e) {
         
         // Clear placement highlights
         clearPlacementHighlights();
+        removeAllDeleteItemHighlights();
         
         if (multiTouchCooldown) {
             clearTimeout(multiTouchCooldown);
@@ -11357,6 +11360,7 @@ function handleViewportPanEnd(e) {
             
             // Clear placement highlights
             clearPlacementHighlights();
+            removeAllDeleteItemHighlights();
             
             if (multiTouchCooldown) {
                 clearTimeout(multiTouchCooldown);
