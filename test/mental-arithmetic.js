@@ -3320,7 +3320,7 @@ async function sendTaskInfoToStatisticsDatabase() {
 
 //TASK INFO COLLECTION END
 
-function messageToTheUser(message, errorMessage = true) {
+function messageToTheUser(message, errorMessage=true, extendedMessage=false) {
     // Remove any existing popup
     const existingPopup = document.querySelector('.modern-popup');
     if (existingPopup) {
@@ -3361,7 +3361,13 @@ function messageToTheUser(message, errorMessage = true) {
     };
 
     // auto-close after 6s
-    const autoClose = setTimeout(closePopup, 6000);
+    let autoClose;
+    
+    if (extendedMessage) {
+      autoClose = setTimeout(closePopup, 600000);
+    } else {
+      autoClose = setTimeout(closePopup, 6000);
+    }
 
     // close button
     const closeBtn = popup.querySelector('.popup-close');

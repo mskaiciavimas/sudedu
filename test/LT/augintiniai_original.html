@@ -5666,6 +5666,7 @@ function getFirstRowOfTileType(number) {
     
 // Function to generate placement validity map and highlight valid tiles
 function generatePlacementMap(draggedObjectId) {
+    const start = performance.now(); 
     if (!gameAssetIndex || !userObjectAssets) {
         console.error("Game data not loaded");
         return null;
@@ -5954,7 +5955,8 @@ function generatePlacementMap(draggedObjectId) {
     }
 
 }
-
+    const end = performance.now();    // end timer
+    console.log(`Execution time: ${(end - start).toFixed(2)} ms`);
 return placementMap;
 }
 

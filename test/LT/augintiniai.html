@@ -3645,7 +3645,7 @@ async function fetchGameData() {
     
     // Schedule showing the message after 500ms
     showMessageTimeout = setTimeout(() => {
-        closer = messageToTheUser("Duomenys ieškomi duomenų bazėje. Procesas gali užtrukti kelias minutes.", false);
+        closer = messageToTheUser("Duomenys ieškomi duomenų bazėje. Procesas gali užtrukti kelias minutes.", false, true);
     }, 500);
 
     const gameContainer = document.getElementById("gameContainer");
@@ -3985,39 +3985,40 @@ function enableObjectDragging() {
                 const deltaY = Math.abs(moveEvent.clientY - startY);
                 
                 // Increase threshold to prevent accidental dragging on clicks
-                //if ((deltaX > 10 || deltaY > 10) && !dragStarted) {
-                if (!dragStarted) {
-                    hasMoved = true;
-                    const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
-                    if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10)) {
-                        messageToTheUser("Šį daiktą galėsi pajudinti tik nuėmęs nuo jo kitus!");
-                        cancelDrag(); // stop listening so it won’t repeat
-                        return;
+                if ((deltaX > 5 || deltaY > 5) && !dragStarted) {
+                    if (!dragStarted) {
+                        hasMoved = true;
+                        const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
+                        if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10)) {
+                            messageToTheUser("Šį daiktą galėsi pajudinti tik nuėmęs nuo jo kitus!");
+                            cancelDrag(); // stop listening so it won’t repeat
+                            return;
+                        }
+
+                        dragStarted = true;
+                        currentObject = obj;
+
+                        obj._placementMap = placementMap
+
+                        determineAndHighlightValidTiles(placementMap);
+
+                        const rect = obj.getBoundingClientRect();
+                        const parentRect = obj.parentElement.getBoundingClientRect();
+
+                        obj._originalCoords = getObjectCoordinates(obj.id)
+                        
+                        // Remove the temporary listeners
+                        document.removeEventListener('pointermove', moveHandler);
+                        
+                        // Start dragging with the original event position
+                        const syntheticEvent = {
+                            clientX: startX,
+                            clientY: startY,
+                            pointerType: e.pointerType,
+                            button: e.button
+                        };
+                        startDragging(syntheticEvent);
                     }
-
-                    dragStarted = true;
-                    currentObject = obj;
-
-                    obj._placementMap = placementMap
-
-                    determineAndHighlightValidTiles(placementMap);
-
-                    const rect = obj.getBoundingClientRect();
-                    const parentRect = obj.parentElement.getBoundingClientRect();
-
-                    obj._originalCoords = getObjectCoordinates(obj.id)
-                    
-                    // Remove the temporary listeners
-                    document.removeEventListener('pointermove', moveHandler);
-                    
-                    // Start dragging with the original event position
-                    const syntheticEvent = {
-                        clientX: startX,
-                        clientY: startY,
-                        pointerType: e.pointerType,
-                        button: e.button
-                    };
-                    startDragging(syntheticEvent);
                 }
             };
             
@@ -5667,6 +5668,7 @@ toggleEditSaveBtn.addEventListener("click", () => {
         if (allPets[0]) {
             displayPetStats(allPets[0].id);
         }
+        clearPlacementHighlights()
     }
 });
 

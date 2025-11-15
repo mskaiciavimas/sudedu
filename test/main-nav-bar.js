@@ -8,6 +8,97 @@ if (userData?.accType === "admin" && !window.location.href.includes("admin.html"
     window.location.href = "./admin.html";
 }
 
+// WAKING UP RENDER SERVER START
+
+let lastActive = Date.now();
+const limit = 15 * 60 * 1000; // 15 min
+
+function triggerMyFunction() {
+  wakeUpServer();
+}
+
+function activityDetected() {
+  const now = Date.now();
+
+  if (now - lastActive >= limit) {
+    triggerMyFunction();
+
+    // Prevent multiple alerts from back-to-back events
+    lastActive = now + limit;
+    return;
+  }
+
+  lastActive = now;
+}
+
+["click","mousemove","keydown","scroll","touchstart"].forEach(event => {
+  document.addEventListener(event, activityDetected);
+});
+
+async function wakeUpServer() {
+
+    if (!userData) return
+
+    let showMessageTimeout;
+    let closer;
+
+    const container = document.body;
+    if (container) {
+        Array.from(container.children).forEach(child => {
+            child.style.pointerEvents = "none";
+            child.style.opacity = "0.5";
+        });
+    }
+
+    // Schedule showing the message after 500ms
+    showMessageTimeout = setTimeout(() => {
+        closer = messageToTheUser(
+            "Laukiama žinutės iš serverio. Procesas gali užtrukti kelias minutes.",
+            false, true
+        );
+    }, 500);
+
+    try {
+        const response = await fetch(apiBase + 'auth/wake-up', { method: 'GET' });
+
+        if (!response) {
+            throw new Error('No response from server');
+        }
+
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        if (result.code !== 'OK') {
+            throw new Error('Unexpected response code');
+        }
+
+        return true;
+    } catch (error) {
+        console.error("Wake-up failed:", error);
+        messageToTheUser("Nepavyko susisiekti su serveriu. Praktikuotis vis dar galima, bet paskyros duomenys neprieinami ir užduočių rezultatai nebus išsaugoti!", 'error');
+        return false;
+    } finally {
+        if (container) {
+            Array.from(container.children).forEach(child => {
+                child.style.pointerEvents = "auto";
+                child.style.opacity = "1";
+            });
+        }
+
+        clearTimeout(showMessageTimeout);
+
+        // Close message if it was displayed
+        if (closer) {
+            setTimeout(() => closer(), 0);
+        }
+    }
+}
+
+// WAKING UP RENDER SERVER END
+
+
 document.addEventListener('DOMContentLoaded', function() {
     
     const navbar = document.getElementById('mainNavbar');
