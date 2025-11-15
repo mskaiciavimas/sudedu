@@ -1699,7 +1699,7 @@
   }
 
   .pet-stats-selection-button.active {
-    background: red;
+    background: linear-gradient(135deg, #3288AC, #286D8A);
     border: none;
     /*border: #286D8A 1px solid;*/
     color: #F5F5F7;
@@ -3934,30 +3934,25 @@ function startDragging(e) {
 function enablePetDragging() {
     const pets = document.querySelectorAll('.pet');
     pets.forEach(pet => {
+        // Prevent default browser drag on image/text
         pet.setAttribute('draggable', 'false');
         pet.style.userSelect = 'none';
         pet.style.touchAction = 'none';
         
-        // Remove old listeners
-        pet.removeEventListener('pointerdown', pet._petPointerDown);
-        pet.removeEventListener('pointerup', pet._petPointerUp);
-        
-        // Create new handler that checks multiTouchActive FIRST
-        pet._petPointerDown = function(e) {
-            console.log('Pet pointerdown, multiTouchActive:', multiTouchActive);
-            
-            // CRITICAL: Check multiTouchActive before doing anything
+        pet.addEventListener('pointerdown', function(e) {
+            // FIX: Ignore if multi-touch is active
             if (multiTouchActive) {
-                console.log('Blocked pet interaction - multiTouchActive');
                 e.preventDefault();
                 e.stopPropagation();
                 return;
             }
             
             if (e.touches?.length >= 2) return;
+            // Only allow left mouse or touch
             if (e.pointerType === "mouse" && e.button !== 0) return;
 
             pet.classList.add('dragging');
+            
             cancelMovement(this.id);
             e.preventDefault();
             
@@ -3976,38 +3971,34 @@ function enablePetDragging() {
             
             holdTimer = setInterval(() => {
                 const elapsed = Date.now() - holdStartTime;
+                const progress = Math.min(elapsed / 100, 1) * 100;
+                
                 if (elapsed >= 100) {
                     clearInterval(holdTimer);
                     startDragging(e);
                 }
             }, 10);
-        };
+        });
         
-        pet._petPointerUp = function(e) {
-            console.log('Pet pointerup, multiTouchActive:', multiTouchActive);
-            
-            // CRITICAL: Also check on pointerup
+        // Cancel hold if pointer is released early
+        pet.addEventListener('pointerup', function(e) {
+            // FIX: Ignore if multi-touch was recently active
             if (multiTouchActive) {
-                console.log('Blocked pet click - multiTouchActive');
                 e.preventDefault();
                 e.stopPropagation();
-                if (holdTimer) clearInterval(holdTimer);
-                pet.classList.remove('dragging');
                 return;
             }
             
             pet.classList.remove('dragging');
-            if (holdTimer) clearInterval(holdTimer);
-            
-            setObjectAnimation(pet, `${pet.id}-stands-idle`);
+            if (holdTimer) {
+                clearInterval(holdTimer);
+            }
+            setObjectAnimation(pet, `${pet.id}-stands-idle`)
             pet.actionTimer = setTimeout(() => {
                 managePetActions(pet);
                 pet.actionTimer = null;
             }, 1000);
-        };
-        
-        pet.addEventListener('pointerdown', pet._petPointerDown);
-        pet.addEventListener('pointerup', pet._petPointerUp);
+        });
     });
 }
 
@@ -4226,12 +4217,6 @@ function disableObjectDragging() {
         
         // Add normal mode handler (click for interaction only)
         obj._normalModeHandler = function(e) {
-            if (multiTouchActive) {
-                e.preventDefault();
-                e.stopPropagation();
-                return;
-            }
-            
             if (e.pointerType === "mouse" && e.button !== 0) return;
             
             e.preventDefault();
@@ -4250,16 +4235,6 @@ function disableObjectDragging() {
         };
         
         obj._normalModeUpHandler = function(e) {
-            if (multiTouchActive) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (obj._holdTimer) {
-                    clearTimeout(obj._holdTimer);
-                    obj._holdTimer = null;
-                }
-                return;
-            }
-            
             if (e.pointerType === "mouse" && e.button !== 0) return;
             
             // Clear the hold timer
@@ -11043,98 +11018,88 @@ function handleViewportZoom(e) {
 // ------------------ Mobile pinch zoom ------------------
 let initialPinchDistance = null;
 let initialPinchScale = 1;
-let initialPinchMidpoint = null; // Store initial midpoint
-let initialPinchRoomCoords = null; // Store initial room coordinates
 
-// ==================== MOBILE PINCH ZOOM ====================
 function getDistance(touches) {
     const dx = touches[0].clientX - touches[1].clientX;
     const dy = touches[0].clientY - touches[1].clientY;
-    return Math.sqrt(dx * dx + dy * dy);
+    return Math.sqrt(dx*dx + dy*dy);
 }
 
-function handleTouchStart(e) {
-    // Immediately set multiTouchActive when 2+ fingers detected
-    if (e.touches.length >= 2) {
-        multiTouchActive = true;
-        console.log('Multi-touch started');
-    }
+function getDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx*dx + dy*dy);
 }
 
 function handleTouchMove(e) {
-    if (e.touches.length === 2) {
-        e.preventDefault();
-        
-        const viewport = document.getElementById('viewport-container');
-        const rect = viewport.getBoundingClientRect();
-        const currentMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
-        const currentMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
+    if (e.touches.length === 2) { // ONLY two fingers
+        e.preventDefault(); // Prevent default pinch/scroll
         const currentDistance = getDistance(e.touches);
-        
-        // Initialize on first pinch movement
+
         if (!initialPinchDistance) {
             initialPinchDistance = currentDistance;
             initialPinchScale = viewportState.scale;
-            initialPinchMidpoint = { x: currentMidX, y: currentMidY };
-            
-            // CRITICAL: Store room coordinates at pinch start
-            initialPinchRoomCoords = {
-                x: (currentMidX - viewportState.x) / viewportState.scale,
-                y: (currentMidY - viewportState.y) / viewportState.scale
-            };
-            
-            console.log('Pinch initialized at', initialPinchMidpoint);
             return;
         }
 
-        // Calculate new scale
         const scaleFactor = currentDistance / initialPinchDistance;
         let newScale = initialPinchScale * scaleFactor;
-        newScale = Math.min(
-            Math.max(newScale, viewportState.minScale), 
-            viewportState.maxScale
-        );
+        newScale = Math.min(Math.max(newScale, viewportState.minScale), viewportState.maxScale);
 
-        // CRITICAL: Use stored initial room coordinates, not recalculated ones
-        viewportState.x = currentMidX - initialPinchRoomCoords.x * newScale;
-        viewportState.y = currentMidY - initialPinchRoomCoords.y * newScale;
+        const viewport = document.getElementById('viewport-container');
+        const rect = viewport.getBoundingClientRect();
+        
+        // FIX: Calculate midpoint relative to viewport
+        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        
+        // Convert to viewport-relative coordinates
+        const viewportMidX = midX - rect.left;
+        const viewportMidY = midY - rect.top;
+
+        // Calculate room coordinates at the pinch center
+        const roomX = (viewportMidX - viewportState.x) / viewportState.scale;
+        const roomY = (viewportMidY - viewportState.y) / viewportState.scale;
+
+        // Update position to zoom toward pinch center
+        viewportState.x = viewportMidX - roomX * newScale;
+        viewportState.y = viewportMidY - roomY * newScale;
         viewportState.scale = newScale;
 
         applyViewportTransform();
     }
 }
 
+let multiTouchCooldown = null;
+
 function handleTouchEnd(e) {
-    // Reset pinch state when fewer than 2 fingers
     if (e.touches.length < 2) {
         initialPinchDistance = null;
-        initialPinchMidpoint = null;
-        initialPinchRoomCoords = null;
-    }
-    
-    // Reset multiTouchActive only when ALL fingers lifted
-    // Add delay to prevent immediate clicks
-    if (e.touches.length === 0) {
-        console.log('All touches ended, scheduling reset');
-        setTimeout(() => {
-            multiTouchActive = false;
-            console.log('multiTouchActive reset to false');
-        }, 300); // Increased to 300ms for safety
+        
+        // If ALL touches are gone, schedule multiTouchActive reset with cooldown
+        if (e.touches.length === 0 && multiTouchActive) {
+            // Clear any existing cooldown
+            if (multiTouchCooldown) {
+                clearTimeout(multiTouchCooldown);
+            }
+            
+            // Add 200ms cooldown before allowing pet interactions again
+            multiTouchCooldown = setTimeout(() => {
+                multiTouchActive = false;
+                multiTouchCooldown = null;
+            }, 200);
+        }
     }
 }
 
-// ==================== VIEWPORT PANNING ====================
 function handleViewportPanStart(e) {
     const isTouchMultiFinger = e.touches?.length >= 2;
     const isMiddleClick = e.button === 1;
     const isSpacebarDrag = viewportState.spacePressed && e.button === 0;
 
     if (isMiddleClick || isSpacebarDrag || isTouchMultiFinger) {
-        if (isTouchMultiFinger) {
-            multiTouchActive = true;
-            console.log('Pan start: multiTouchActive set');
-        }
-        
+        if (isTouchMultiFinger) multiTouchActive = true; // mark multi-touch started
+
         e.preventDefault();
         e.stopPropagation();
         viewportState.isDragging = true;
@@ -11147,6 +11112,7 @@ function handleViewportPanStart(e) {
         viewportState.dragStartY = clientY - viewportState.y;
     }
 }
+
 
 function handleViewportPanMove(e) {
     if (!viewportState.isDragging) return;
@@ -11164,15 +11130,22 @@ function handleViewportPanEnd(e) {
     viewportState.isDragging = false;
     document.body.classList.remove('panning');
 
-    // Also schedule multiTouchActive reset here as backup
-    if (e?.type.startsWith('touch') && e.touches?.length === 0) {
-        setTimeout(() => {
-            multiTouchActive = false;
-            console.log('multiTouchActive reset from panEnd');
-        }, 300);
+    // If this was a touch event and no fingers remain, reset multiTouchActive with cooldown
+    if (e?.type.startsWith('touch')) {
+        if (e.touches?.length === 0 && multiTouchActive) {
+            // Clear any existing cooldown
+            if (multiTouchCooldown) {
+                clearTimeout(multiTouchCooldown);
+            }
+            
+            // Add 200ms cooldown
+            multiTouchCooldown = setTimeout(() => {
+                multiTouchActive = false;
+                multiTouchCooldown = null;
+            }, 200);
+        }
     }
 }
-
 
 // ------------------ Keyboard ------------------
 function handleKeyDown(e) {
