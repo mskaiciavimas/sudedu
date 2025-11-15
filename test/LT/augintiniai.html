@@ -1699,7 +1699,7 @@
   }
 
   .pet-stats-selection-button.active {
-    background: red;
+    background: linear-gradient(135deg, #3288AC, #286D8A);
     border: none;
     /*border: #286D8A 1px solid;*/
     color: #F5F5F7;
@@ -11025,6 +11025,11 @@ function handleViewportZoom(e) {
 // ------------------ Mobile pinch zoom ------------------
 let initialPinchDistance = null;
 let initialPinchScale = 1;
+let initialPinchX = 0;
+let initialPinchY = 0;
+let initialViewportX = 0;  // ADD THIS
+let initialViewportY = 0;  // ADD THIS
+let multiTouchCooldown = null;
 
 function getDistance(touches) {
     const dx = touches[0].clientX - touches[1].clientX;
@@ -11038,8 +11043,7 @@ function getDistance(touches) {
     return Math.sqrt(dx*dx + dy*dy);
 }
 
-let initialPinchX = 0;  // ADD THIS
-let initialPinchY = 0;  // ADD THIS
+
 
 function handleTouchMove(e) {
     if (e.touches.length === 2) {
@@ -11056,8 +11060,10 @@ function handleTouchMove(e) {
         if (!initialPinchDistance) {
             initialPinchDistance = currentDistance;
             initialPinchScale = viewportState.scale;
-            initialPinchX = midX;  // STORE INITIAL MIDPOINT
+            initialPinchX = midX;
             initialPinchY = midY;
+            initialViewportX = viewportState.x;  // STORE INITIAL VIEWPORT STATE
+            initialViewportY = viewportState.y;
             return;
         }
 
@@ -11065,9 +11071,9 @@ function handleTouchMove(e) {
         let newScale = initialPinchScale * scaleFactor;
         newScale = Math.min(Math.max(newScale, viewportState.minScale), viewportState.maxScale);
 
-        // Calculate the room point under the INITIAL pinch center
-        const roomX = (initialPinchX - viewportState.x) / initialPinchScale;
-        const roomY = (initialPinchY - viewportState.y) / initialPinchScale;
+        // Calculate the room point under the INITIAL pinch center using INITIAL viewport state
+        const roomX = (initialPinchX - initialViewportX) / initialPinchScale;
+        const roomY = (initialPinchY - initialViewportY) / initialPinchScale;
 
         // Keep that room point under the CURRENT pinch center
         viewportState.x = midX - roomX * newScale;
@@ -11078,13 +11084,14 @@ function handleTouchMove(e) {
     }
 }
 
-let multiTouchCooldown = null;
 
 function handleTouchEnd(e) {
     if (e.touches.length < 2) {
         initialPinchDistance = null;
         initialPinchX = 0;
         initialPinchY = 0;
+        initialViewportX = 0;  // RESET
+        initialViewportY = 0;  // RESET
     }
     
     // When ALL touches end after multi-touch
@@ -11112,7 +11119,7 @@ function handleTouchEnd(e) {
         multiTouchCooldown = setTimeout(() => {
             multiTouchActive = false;
             multiTouchCooldown = null;
-        }, 300); // Increased to 300ms for safety
+        }, 300);
     }
 }
 
