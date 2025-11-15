@@ -200,6 +200,10 @@
             outline: 2px solid red;
         }
 
+        .marked-for-deletion {
+            outline: 2px solid red;
+        }
+
         .pet-left {
         transform: scaleX(1);
         }
@@ -348,10 +352,10 @@
     /*border: #32ac93 1px solid;*/
 }
 
-
 #toggle-edit-save-btn,
 #cancel-edit-btn,
 #end-preview-button,
+#delete-selected-item-button,
 .pet-stats-selection-button.active,
 .pet-btn.active,
 .department-btn.active,
@@ -379,6 +383,7 @@
 #toggle-edit-save-btn::before,
 #cancel-edit-btn::before,
 #end-preview-button::before,
+#delete-selected-item-button::before,
 .pet-stats-selection-button.active::before,
 .pet-btn.active::before,
 .department-btn.active::before,
@@ -406,6 +411,7 @@
 #toggle-edit-save-btn::after,
 #cancel-edit-btn::after,
 #end-preview-button::after,
+#delete-selected-item-button::after,
 .pet-stats-selection-button.active::after,
 .pet-btn.active::after,
 .department-btn.active::after,
@@ -436,6 +442,7 @@
 #toggle-edit-save-btn:hover::before,
 #cancel-edit-btn:hover::before,
 #end-preview-button:hover::before,
+#delete-selected-item-button:hover::before,
 .pet-stats-selection-button.active:hover::before,
 .pet-btn.active:hover::before,
 .use-btn:hover::before,
@@ -629,10 +636,13 @@
 
         #button-container {
             margin-top: 1svh;
+            display: flex;
+            justify-content: space-between;
         }
 
         #toggle-edit-save-btn,
         #cancel-edit-btn,
+        #delete-selected-item-button,
         #end-preview-button {
             align-items: center;
             gap: 0.5rem;
@@ -654,10 +664,16 @@
         }
 
         #cancel-edit-btn,
-        #end-preview-button {
+        #end-preview-button,
+        #delete-selected-item-button {
             background: linear-gradient(135deg, #ff8073, #e74c3c);
             border: none;
             /*border: 1px solid #e74c3c;*/
+        }
+
+        #delete-selected-item-button:disabled {
+            background: #9ca3af;
+            opacity: 0.5;
         }
 
         .shop-header {
@@ -2835,9 +2851,15 @@
                 </div>
             </div>
             <div id="button-container">
+                <div>
                 <button id="toggle-edit-save-btn" class="edit">Perstatyti</button>
                 <button id="cancel-edit-btn" class="cancel hidden">Atšaukti</button>
                 <button id="end-preview-button" class="cancel hidden">Baigti peržiūrą</button>
+                </div>
+
+                <div>
+                <button id="delete-selected-item-button" class="cancel hidden" disabled>Trinti</button>
+                </div>
             </div>
             </div>
             </div>
@@ -3072,6 +3094,8 @@
             dragStartY: 0,
             spacePressed: false
         };
+
+        const topHalfClickBlockedItemClasses = ["bath-1"]
 
         let unitSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
         let gameAssetIndex = {};
@@ -3457,6 +3481,7 @@ function initGame() {
     renderRoomGrid();
     setPetAndObjectContainersToGridDimentions();
     renderRoomObjects();
+    blockTopHalfOfSelectedDivsClickEvents()
     renderPets();
     enablePetDragging();
     updateCoinAmounts(userMoney);
@@ -3843,7 +3868,8 @@ function enablePetDragging() {
 }
 
 function removeAllDeleteIcons() {
-    document.querySelectorAll('.delete-icon').forEach(icon => icon.remove());
+    document.querySelectorAll('.marked-for-deletion').forEach(element => element.classList.remove("marked-for-deletion"));
+    document.querySelector("#delete-selected-item-button").disabled = true;
 }
 
 function showDeleteIcon(element) {
@@ -3852,41 +3878,26 @@ function showDeleteIcon(element) {
     }
 
     removeAllDeleteIcons();
-    
-    const deleteIcon = document.createElement('div');
-    deleteIcon.className = 'delete-icon';
-    deleteIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 6 L6 18 M6 6 L18 18" stroke="#F5F5F7" stroke-width="2"/></svg>';
-    deleteIcon.style.cssText = `
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 25px;
-        height: 25px;
-        background: red;
-        color: #F5F5F7;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 12px;
-        z-index: 1000;
-        user-select: none;
-    `;
-    element.appendChild(deleteIcon);
+
+    element.classList.add("marked-for-deletion");
+    document.querySelector("#delete-selected-item-button").disabled = false;
 }
 
-function removeObjectByClickingDeleteIcon(element) {
-    const obj = element.parentNode
-    const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]["assetIndex"]]["placingIndex"]
-    if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10)) {
+function removeObjectsMarkedForRemoval() {
+    const objectToRemove = document.querySelector(".marked-for-deletion")
+    console.log(objectToRemove)
+    const objPlacingOrder = gameAssetIndex[userObjectAssets[objectToRemove.id]["assetIndex"]]["placingIndex"]
+    if (hasBlockingObjects(objectToRemove) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10)) {
         messageToTheUser("Šį daiktą galėsi išimti iš kambario tik nuėmęs nuo jo kitus!");
         return;
-    } else if (element && element.parentNode) {
-        element.parentNode.remove();
+    } else if (objectToRemove) {
+        objectToRemove.remove();
     }
 }
+
+document.querySelector("#delete-selected-item-button").addEventListener("click", () => {
+    removeObjectsMarkedForRemoval()
+});;
 
 function hasBlockingObjects(target) {
     const unitSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
@@ -4264,15 +4275,15 @@ document.addEventListener('pointerup', function(e) {
     
     // Hide delete icons when clicking elsewhere (only in edit mode)
     if (editing) {
-        if (!e.target.closest('.delete-icon')) {
+        // Ignore clicks on the delete button
+        if (!e.target.closest('.marked-for-deletion') && !e.target.closest('#delete-selected-item-button')) {
             const clickedObject = e.target.closest('.room-object');
             if (!clickedObject) {
                 removeAllDeleteIcons();
             }
-        } else {
-            removeObjectByClickingDeleteIcon(e.target.closest('.delete-icon'))
         }
     }
+
 });
 
 
@@ -5621,6 +5632,7 @@ function updateObjectPositionChanges() {
 
 const toggleEditSaveBtn = document.getElementById("toggle-edit-save-btn");
 const cancelEditBtn = document.getElementById("cancel-edit-btn");
+const deleteSelectedItemBtn = document.getElementById("delete-selected-item-button");
 
 let editing = false;
 
@@ -5631,6 +5643,7 @@ toggleEditSaveBtn.addEventListener("click", () => {
         toggleEditSaveBtn.classList.remove("edit");
         toggleEditSaveBtn.classList.add("save");
         cancelEditBtn.classList.remove("hidden");
+        deleteSelectedItemBtn.classList.remove("hidden");
         const petElements = document.querySelectorAll('.pet');
         petElements.forEach(pet => {
             pet.style.display = 'none';
@@ -5693,6 +5706,7 @@ function resetEditButtonToggle() {
     toggleEditSaveBtn.classList.remove("save");
     toggleEditSaveBtn.classList.add("edit");
     cancelEditBtn.classList.add("hidden");
+    deleteSelectedItemBtn.classList.add("hidden");
     editing = false;
 }
 
@@ -10850,6 +10864,50 @@ function initViewportControls() {
     applyViewportTransform();
 }
 
+
+function blockTopHalfOfSelectedDivsClickEvents() { //To prevent clicking of objects that take up some empty space, usually reserved for animation, click still goes to objects under, like a pet
+  // For each class in the list
+  topHalfClickBlockedItemClasses.forEach(className => {
+    // Find all elements with this class
+    const elements = document.querySelectorAll(`.${className}`);
+    
+    // Apply click blocking to each element
+    elements.forEach(div => {
+      // Create an invisible overlay for the bottom half only
+      const overlay = document.createElement('div');
+      overlay.style.position = 'absolute';
+      overlay.style.top = '50%';
+      overlay.style.left = '0';
+      overlay.style.right = '0';
+      overlay.style.bottom = '0';
+      overlay.style.pointerEvents = 'auto';
+      overlay.style.zIndex = '1';
+      
+      // Make the main div pass-through
+      div.style.pointerEvents = 'none';
+      
+      // Make children also pass-through
+      Array.from(div.children).forEach(child => {
+        child.style.pointerEvents = 'none';
+      });
+      
+      // Add the overlay
+      div.style.position = 'relative';
+      div.appendChild(overlay);
+      
+      // Forward events from overlay to the div
+      overlay.addEventListener('click', (e) => {
+        e.stopPropagation();
+        div.dispatchEvent(new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true,
+          clientX: e.clientX,
+          clientY: e.clientY
+        }));
+      });
+    });
+  });
+}
 
     </script>
 </body>
