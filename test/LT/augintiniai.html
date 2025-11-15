@@ -1705,7 +1705,7 @@
   }
 
   .pet-stats-selection-button.active {
-    background: linear-gradient(135deg, #3288AC, #286D8A);;
+    background: red;
     border: none;
     /*border: #286D8A 1px solid;*/
     color: #F5F5F7;
@@ -4131,45 +4131,58 @@ function enableObjectDragging() {
         
         // Mobile: use contextmenu for long press
         if (isMobile) {
-            obj._contextMenuHandler = function(e) {
-                e.preventDefault();
-                
-                if (multiTouchActive) return;
-                
-                if (navigator.vibrate) {
-                    navigator.vibrate(50);
-                }
-                
-                const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || 
-                                       gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
-                
-                if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || 
-                    objPlacingOrder === 9 || objPlacingOrder === 10 || objPlacingOrder === 15)) {
-                    messageToTheUser("Šį daiktą galėsi pajudinti tik nuėmęs nuo jo kitus!");
-                    return;
-                }
+    obj._pointerDownHandler = function(e) {
+        if (multiTouchActive) return;
 
-                const placementMap = generatePlacementMap(obj.id);
-                obj._placementMap = placementMap;
-                obj._originalCoords = getObjectCoordinates(obj.id);
-                obj._readyToDrag = true;
-                
-                determineAndHighlightValidTiles(placementMap);
-                obj.classList.add("dragging");
+        const startX = e.clientX;
+        const startY = e.clientY;
 
-                obj._editModeHandler({
-                    clientX: e.clientX,
-                    clientY: e.clientY,
-                    pointerType: "touch",
-                    button: 0,
-                    preventDefault: () => {},
-                    stopPropagation: () => {}
-                });
-                
-            };
-            
-            obj.addEventListener('contextmenu', obj._contextMenuHandler);
-        }
+        // Start a timer for long-press
+        obj._longPressTimeout = setTimeout(() => {
+            // Long press detected
+            if (navigator.vibrate) navigator.vibrate(30);
+
+            const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || 
+                                   gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
+
+            if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || 
+                objPlacingOrder === 9 || objPlacingOrder === 10 || objPlacingOrder === 15)) {
+                messageToTheUser("Šį daiktą galėsi pajudinti tik nuėmęs nuo jo kitus!");
+                return;
+            }
+
+            const placementMap = generatePlacementMap(obj.id);
+            obj._placementMap = placementMap;
+            obj._originalCoords = getObjectCoordinates(obj.id);
+            obj._readyToDrag = true;
+
+            determineAndHighlightValidTiles(placementMap);
+            obj.classList.add("dragging");
+
+            // Start dragging immediately
+            obj._editModeHandler({
+                clientX: e.clientX,
+                clientY: e.clientY,
+                pointerType: "touch",
+                button: 0,
+                preventDefault: () => {},
+                stopPropagation: () => {}
+            });
+        }, 500); // <--- hold duration in ms (500ms here)
+
+        const cancel = () => {
+            clearTimeout(obj._longPressTimeout);
+            document.removeEventListener('pointerup', cancel);
+            document.removeEventListener('pointermove', cancel);
+        };
+
+        document.addEventListener('pointerup', cancel);
+        document.addEventListener('pointermove', cancel);
+    };
+
+    obj.addEventListener('pointerdown', obj._pointerDownHandler);
+}
+
         
         obj._editModeHandler = function(e) {
             // IMMEDIATELY check for multi-touch
