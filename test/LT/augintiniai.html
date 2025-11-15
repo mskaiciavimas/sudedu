@@ -1699,7 +1699,7 @@
   }
 
   .pet-stats-selection-button.active {
-    background: lavender;
+    background: purple;
     border: none;
     /*border: #286D8A 1px solid;*/
     color: #F5F5F7;
@@ -4089,11 +4089,13 @@ function enableObjectDragging() {
     objects.forEach(obj => {
         obj.classList.add('room-object-edit');
         
+        // Remove any existing event listeners first
         obj.removeEventListener('pointerdown', obj._normalModeHandler);
         obj.removeEventListener('pointerdown', obj._editModeHandler);
         
+        // Create edit mode handler
         obj._editModeHandler = function(e) {
-            // IMMEDIATELY check for multi-touch
+            // IMMEDIATELY check for multi-touch - stop everything if true
             if (multiTouchActive) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -4108,13 +4110,9 @@ function enableObjectDragging() {
             
             if (e.pointerType === "mouse" && e.button !== 0) return;
 
-            // Prevent default browser long-press behavior
-            if (isMobile) {
-                e.preventDefault();
-            }
-            
             const placementMap = generatePlacementMap(obj.id);
             
+            e.preventDefault();
             e.stopPropagation();
             
             const startTime = Date.now();
@@ -4125,27 +4123,23 @@ function enableObjectDragging() {
             let dragStarted = false;
             let holdTimer = null;
             
-            // Store the hold timer on the object so we can cancel it externally
-            obj._holdTimer = null;
-            
             // Mobile: require hold before drag
             if (isMobile && e.pointerType === "touch") {
-                obj._holdTimer = setTimeout(() => {
-                    // Double-check multi-touch hasn't started
+                holdTimer = setTimeout(() => {
+                    // Double-check multi-touch hasn't started during the hold
                     if (multiTouchActive) {
-                        obj._holdTimer = null;
                         return;
                     }
                     
-                    // Vibrate on successful hold (after browser's default)
+                    // Vibrate on successful hold
                     if (navigator.vibrate) {
                         navigator.vibrate(50);
                     }
                     
+                    // Check blocking objects
                     const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
                     if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10 || objPlacingOrder === 15)) {
                         messageToTheUser("Šį daiktą galėsi pajudinti tik nuėmęs nuo jo kitus!");
-                        obj._holdTimer = null;
                         return;
                     }
 
@@ -4154,8 +4148,10 @@ function enableObjectDragging() {
                     obj._placementMap = placementMap;
                     obj._originalCoords = getObjectCoordinates(obj.id);
                     
+                    // Immediately show placement map
                     determineAndHighlightValidTiles(placementMap);
                     
+                    // Start dragging
                     const syntheticEvent = {
                         clientX: startX,
                         clientY: startY,
@@ -4163,12 +4159,11 @@ function enableObjectDragging() {
                         button: e.button
                     };
                     startDragging(syntheticEvent);
-                    obj._holdTimer = null;
-                }, 400); // Reduced to 400ms to fire before browser default
+                }, 500); // 500ms hold
             }
             
             const moveHandler = (moveEvent) => {
-                // Check if multi-touch started - cancel everything
+                // Check if multi-touch started during move
                 if (multiTouchActive) {
                     cancelDrag();
                     return;
@@ -4205,26 +4200,38 @@ function enableObjectDragging() {
                     startDragging(syntheticEvent);
                 }
                 
-                // Mobile: cancel hold if finger moves before hold completes
+                // Mobile: cancel hold if finger moves too much before hold completes
                 if (isMobile && (deltaX > 10 || deltaY > 10) && !dragStarted) {
+                    if (holdTimer) {
+                        clearTimeout(holdTimer);
+                        holdTimer = null;
+                    }
                     cancelDrag();
                 }
             };
             
             const upHandler = (upEvent) => {
+                // Check if multi-touch is active
                 if (multiTouchActive) {
-                    cancelDrag();
+                    if (holdTimer) {
+                        clearTimeout(holdTimer);
+                        holdTimer = null;
+                    }
+                    document.removeEventListener('pointermove', moveHandler);
+                    document.removeEventListener('pointerup', upHandler);
                     return;
                 }
                 
-                if (obj._holdTimer) {
-                    clearTimeout(obj._holdTimer);
-                    obj._holdTimer = null;
+                // Clear hold timer if still waiting
+                if (holdTimer) {
+                    clearTimeout(holdTimer);
+                    holdTimer = null;
                 }
                 
                 document.removeEventListener('pointermove', moveHandler);
                 document.removeEventListener('pointerup', upHandler);
                 
+                // Only show delete icon if no drag happened and not mobile (mobile uses hold)
                 if (!dragStarted && !isMobile) {
                     showDeleteIcon(obj);
                 }
@@ -4237,9 +4244,9 @@ function enableObjectDragging() {
             };
 
             const cancelDrag = () => {
-                if (obj._holdTimer) {
-                    clearTimeout(obj._holdTimer);
-                    obj._holdTimer = null;
+                if (holdTimer) {
+                    clearTimeout(holdTimer);
+                    holdTimer = null;
                 }
                 document.removeEventListener('pointermove', moveHandler);
                 document.removeEventListener('pointerup', upHandler);
@@ -4253,7 +4260,6 @@ function enableObjectDragging() {
         obj.addEventListener('pointerdown', obj._editModeHandler);
     });
 }
-
 // Disable object dragging for normal mode
 function disableObjectDragging() {
     // Remove all delete icons when exiting edit mode
@@ -4328,8 +4334,6 @@ function disableObjectDragging() {
 }
 
 // Global pointer move handler
-let rafId = null;
-
 document.addEventListener('pointermove', function(e) {
     // Handle viewport panning first
     if (viewportState.isDragging) {
@@ -4337,31 +4341,23 @@ document.addEventListener('pointermove', function(e) {
         return;
     }
     
-    // Then handle object dragging - use RAF to prevent lag
+    // Then handle object dragging - work in screen coordinates
     if (isDragging && currentObject) {
         e.preventDefault();
         
-        if (rafId) {
-            cancelAnimationFrame(rafId);
-        }
+        // Get viewport and scale wrapper positions
+        const viewport = document.getElementById('viewport-container');
+        const scaleWrapper = document.getElementById('scale-wrapper');
+        const viewportRect = viewport.getBoundingClientRect();
+        const scaleRect = scaleWrapper.getBoundingClientRect();
         
-        rafId = requestAnimationFrame(() => {
-            // Get viewport and scale wrapper positions
-            const viewport = document.getElementById('viewport-container');
-            const scaleWrapper = document.getElementById('scale-wrapper');
-            const viewportRect = viewport.getBoundingClientRect();
-            const scaleRect = scaleWrapper.getBoundingClientRect();
-            
-            // Mouse position relative to scale wrapper
-            const mouseXInScale = e.clientX - scaleRect.left;
-            const mouseYInScale = e.clientY - scaleRect.top;
-            
-            // Position the object
-            currentObject.style.left = (mouseXInScale - offsetX) + 'px';
-            currentObject.style.top = (mouseYInScale - offsetY) + 'px';
-            
-            rafId = null;
-        });
+        // Mouse position relative to scale wrapper (which contains the scaled content)
+        const mouseXInScale = e.clientX - scaleRect.left;
+        const mouseYInScale = e.clientY - scaleRect.top;
+        
+        // Position the object
+        currentObject.style.left = (mouseXInScale - offsetX) + 'px';
+        currentObject.style.top = (mouseYInScale - offsetY) + 'px';
     }
 });
 
@@ -11143,9 +11139,10 @@ function handleTouchMove(e) {
             return;
         }
 
-        // Deadzone
+        // Deadzone: Only zoom if distance changed significantly
         const distanceChange = Math.abs(currentDistance - initialPinchDistance);
         if (distanceChange < PINCH_DEADZONE) {
+            // Not pinching, just panning
             const deltaX = (midX - initialPinchX) / viewportState.scale;
             const deltaY = (midY - initialPinchY) / viewportState.scale;
             
@@ -11156,14 +11153,10 @@ function handleTouchMove(e) {
             return;
         }
 
-        // Smooth scale calculation with damping
+        // Beyond deadzone - do the zoom
         const scaleFactor = currentDistance / initialPinchDistance;
         let newScale = initialPinchScale * scaleFactor;
-        
-        // Apply smooth damping to prevent jumps
-        const dampingFactor = 0.15; // Lower = smoother but slower
-        const targetScale = Math.min(Math.max(newScale, viewportState.minScale), viewportState.maxScale);
-        newScale = viewportState.scale + (targetScale - viewportState.scale) * dampingFactor;
+        newScale = Math.min(Math.max(newScale, viewportState.minScale), viewportState.maxScale);
 
         const scaleChange = newScale / initialPinchScale;
         viewportState.x = initialViewportX * scaleChange + initialPinchX * (1 - scaleChange);
@@ -11217,17 +11210,9 @@ function handleViewportPanStart(e) {
     const isMiddleClick = e.button === 1;
     const isSpacebarDrag = viewportState.spacePressed && e.button === 0;
 
-    // Set multiTouchActive IMMEDIATELY and cancel all object hold timers
+    // Set multiTouchActive IMMEDIATELY on two-finger touch
     if (isTouchMultiFinger) {
         multiTouchActive = true;
-        
-        // Cancel all object hold timers
-        document.querySelectorAll('.room-object').forEach(obj => {
-            if (obj._holdTimer) {
-                clearTimeout(obj._holdTimer);
-                obj._holdTimer = null;
-            }
-        });
     }
 
     if (isMiddleClick || isSpacebarDrag || isTouchMultiFinger) {
