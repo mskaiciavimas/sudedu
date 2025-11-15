@@ -1705,7 +1705,7 @@
   }
 
   .pet-stats-selection-button.active {
-    background: red;
+    background: blue;
     border: none;
     /*border: #286D8A 1px solid;*/
     color: #F5F5F7;
@@ -3955,10 +3955,6 @@ function startDragging(e) {
     offsetY = e.clientY - objRect.top;
 }
 
-// Global pointer move handler
-let rafPending = false;
-let lastMoveEvent = null;
-
 document.addEventListener('pointermove', function(e) {
     if (viewportState.isDragging) {
         handleViewportPanMove(e);
@@ -3967,34 +3963,24 @@ document.addEventListener('pointermove', function(e) {
     
     if (isDragging && currentObject && !multiTouchActive) {
         e.preventDefault();
-        lastMoveEvent = e;
         
-        if (!rafPending) {
-            rafPending = true;
-            requestAnimationFrame(() => {
-                rafPending = false;
-                if (!currentObject || !lastMoveEvent) return;
-                
-                const evt = lastMoveEvent;
-                const scaleWrapper = document.getElementById('scale-wrapper');
-                const scaleRect = scaleWrapper.getBoundingClientRect();
-                
-                const newObjScreenX = evt.clientX - offsetX;
-                const newObjScreenY = evt.clientY - offsetY;
+        const scaleWrapper = document.getElementById('scale-wrapper');
+        const scaleRect = scaleWrapper.getBoundingClientRect();
+        
+        const newObjScreenX = e.clientX - offsetX;
+        const newObjScreenY = e.clientY - offsetY;
 
-                const originScreenX = scaleRect.left + (viewportState.x * viewportState.scale);
-                const originScreenY = scaleRect.top + (viewportState.y * viewportState.scale);
+        const originScreenX = scaleRect.left + (viewportState.x * viewportState.scale);
+        const originScreenY = scaleRect.top + (viewportState.y * viewportState.scale);
 
-                const newObjRelScreenX = newObjScreenX - originScreenX;
-                const newObjRelScreenY = newObjScreenY - originScreenY;
+        const newObjRelScreenX = newObjScreenX - originScreenX;
+        const newObjRelScreenY = newObjScreenY - originScreenY;
 
-                const newLocalX = newObjRelScreenX / viewportState.scale;
-                const newLocalY = newObjRelScreenY / viewportState.scale;
-                
-                currentObject.style.left = newLocalX + 'px';
-                currentObject.style.top = newLocalY + 'px';
-            });
-        }
+        const newLocalX = newObjRelScreenX / viewportState.scale;
+        const newLocalY = newObjRelScreenY / viewportState.scale;
+        
+        currentObject.style.left = newLocalX + 'px';
+        currentObject.style.top = newLocalY + 'px';
     }
 });
 
@@ -4170,57 +4156,110 @@ function enableObjectDragging() {
         // Mobile: long press to prepare for drag
         if (isMobile) {
             obj._touchStartHandler = function(e) {
-                if (e.touches.length !== 1) return;
-                if (multiTouchActive) return;
-                
-                const touch = e.touches[0];
-                const startX = touch.clientX;
-                const startY = touch.clientY;
-                let moved = false;
-                
-                const longPressTimer = setTimeout(() => {
-                    if (!moved && !multiTouchActive) {
-                        if (navigator.vibrate) navigator.vibrate(50);
-                        
-                        const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || 
-                                               gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
-                        
-                        if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || 
-                            objPlacingOrder === 9 || objPlacingOrder === 10 || objPlacingOrder === 15)) {
-                            messageToTheUser("Šį daiktą galėsi pajudinti tik nuėmęs nuo jo kitus!");
-                            return;
-                        }
+    if (e.touches.length !== 1) return;
+    if (multiTouchActive) return;
+    
+    const touch = e.touches[0];
+    const startX = touch.clientX;
+    const startY = touch.clientY;
+    let moved = false;
+    let longPressActivated = false;
+    
+    const longPressTimer = setTimeout(() => {
+        if (!moved && !multiTouchActive) {
+            longPressActivated = true;
+            
+            if (navigator.vibrate) navigator.vibrate(50);
+            
+            const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || 
+                                   gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
+            
+            if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || 
+                objPlacingOrder === 9 || objPlacingOrder === 10 || objPlacingOrder === 15)) {
+                messageToTheUser("Šį daiktą galėsi pajudinti tik nuėmęs nuo jo kitus!");
+                cleanup();
+                return;
+            }
 
-                        const placementMap = generatePlacementMap(obj.id);
-                        obj._placementMap = placementMap;
-                        obj._originalCoords = getObjectCoordinates(obj.id);
-                        obj._readyToDrag = true;
-                        
-                        determineAndHighlightValidTiles(placementMap);
-                        messageToTheUser("Dabar gali pajudinti daiktą", false);
-                    }
-                }, 500);
+            const placementMap = generatePlacementMap(obj.id);
+            obj._placementMap = placementMap;
+            obj._originalCoords = getObjectCoordinates(obj.id);
+            obj._readyToDrag = true;
+            
+            determineAndHighlightValidTiles(placementMap);
+            
+            // Start dragging immediately after long press
+            currentObject = obj;
+            
+            const objRect = obj.getBoundingClientRect();
+            offsetX = touch.clientX - objRect.left;
+            offsetY = touch.clientY - objRect.top;
+            
+            isDragging = true;
+            obj.classList.add('dragging');
+        }
+    }, 500);
+    
+    const moveCheck = (me) => {
+        if (!me.touches[0]) return;
+        const dx = Math.abs(me.touches[0].clientX - startX);
+        const dy = Math.abs(me.touches[0].clientY - startY);
+        
+        if (longPressActivated) {
+            // Already dragging, handle the move
+            if (isDragging && currentObject) {
+                const evt = {
+                    clientX: me.touches[0].clientX,
+                    clientY: me.touches[0].clientY
+                };
                 
-                const moveCheck = (me) => {
-                    const dx = Math.abs(me.touches[0].clientX - startX);
-                    const dy = Math.abs(me.touches[0].clientY - startY);
-                    if (dx > 10 || dy > 10) {
-                        moved = true;
+                requestAnimationFrame(() => {
+                    if (!currentObject) return;
+                    
+                    const scaleWrapper = document.getElementById('scale-wrapper');
+                    const scaleRect = scaleWrapper.getBoundingClientRect();
+                    
+                    const newObjScreenX = evt.clientX - offsetX;
+                    const newObjScreenY = evt.clientY - offsetY;
+
+                    const originScreenX = scaleRect.left + (viewportState.x * viewportState.scale);
+                    const originScreenY = scaleRect.top + (viewportState.y * viewportState.scale);
+
+                    const newObjRelScreenX = newObjScreenX - originScreenX;
+                    const newObjRelScreenY = newObjScreenY - originScreenY;
+
+                    const newLocalX = newObjRelScreenX / viewportState.scale;
+                    const newLocalY = newObjRelScreenY / viewportState.scale;
+                    
+                    currentObject.style.left = newLocalX + 'px';
+                    currentObject.style.top = newLocalY + 'px';
+                });
+                            }
+                        } else if (dx > 10 || dy > 10) {
+                            moved = true;
+                            clearTimeout(longPressTimer);
+                            cleanup();
+                        }
+                    };
+                    
+                    const cleanup = () => {
                         clearTimeout(longPressTimer);
-                    }
+                        obj.removeEventListener('touchmove', moveCheck);
+                        obj.removeEventListener('touchend', cleanupEnd);
+                        obj.removeEventListener('touchcancel', cleanup);
+                    };
+                    
+                    const cleanupEnd = () => {
+                        cleanup();
+                        if (longPressActivated && obj._readyToDrag) {
+                            obj._readyToDrag = false;
+                        }
+                    };
+                    
+                    obj.addEventListener('touchmove', moveCheck, { passive: false });
+                    obj.addEventListener('touchend', cleanupEnd);
+                    obj.addEventListener('touchcancel', cleanup);
                 };
-                
-                const cleanup = () => {
-                    clearTimeout(longPressTimer);
-                    obj.removeEventListener('touchmove', moveCheck);
-                    obj.removeEventListener('touchend', cleanup);
-                    obj.removeEventListener('touchcancel', cleanup);
-                };
-                
-                obj.addEventListener('touchmove', moveCheck, { passive: true });
-                obj.addEventListener('touchend', cleanup);
-                obj.addEventListener('touchcancel', cleanup);
-            };
             
             obj.addEventListener('touchstart', obj._touchStartHandler, { passive: true });
         }
@@ -11339,12 +11378,53 @@ function handleKeyUp(e) {
     }
 }
 
+function handleViewportPanStart(e) {
+    if (isDragging && currentObject) return;
+    
+    const isMiddleClick = e.button === 1;
+    const isSpacebarDrag = viewportState.spacePressed && e.button === 0;
+
+    if (isMiddleClick || isSpacebarDrag) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        viewportState.isDragging = true;
+        document.body.classList.add('panning');
+
+        viewportState.dragStartX = e.clientX - viewportState.x;
+        viewportState.dragStartY = e.clientY - viewportState.y;
+    }
+}
+
+function handleViewportPanMove(e) {
+    if (!viewportState.isDragging) return;
+    
+    e.preventDefault();
+
+    viewportState.x = e.clientX - viewportState.dragStartX;
+    viewportState.y = e.clientY - viewportState.dragStartY;
+
+    applyViewportTransform();
+}
+
+function handleViewportPanEnd(e) {
+    if (!viewportState.isDragging) return;
+    
+    viewportState.isDragging = false;
+    document.body.classList.remove('panning');
+}
+
 function initViewportControls() {
     const viewport = document.getElementById('viewport-container');
     if (!viewport) return;
 
     // Desktop zoom
     viewport.addEventListener('wheel', handleViewportZoom, { passive: false });
+
+    // Desktop panning (middle mouse or spacebar + drag)
+    viewport.addEventListener('pointerdown', handleViewportPanStart);
+    window.addEventListener('pointermove', handleViewportPanMove);
+    window.addEventListener('pointerup', handleViewportPanEnd);
 
     // Touch handling for pinch zoom
     viewport.addEventListener('touchstart', handleTouchInteraction, { passive: false });
