@@ -4155,7 +4155,17 @@ function enableObjectDragging() {
                 obj._readyToDrag = true;
                 
                 determineAndHighlightValidTiles(placementMap);
-                messageToTheUser("Dabar gali pajudinti daiktą", false);
+                obj.classList.add("dragging");
+
+                obj._editModeHandler({
+                    clientX: e.clientX,
+                    clientY: e.clientY,
+                    pointerType: "touch",
+                    button: 0,
+                    preventDefault: () => {},
+                    stopPropagation: () => {}
+                });
+                
             };
             
             obj.addEventListener('contextmenu', obj._contextMenuHandler);
@@ -4243,8 +4253,9 @@ function enableObjectDragging() {
                 document.removeEventListener('pointerup', upHandler);
                 
                 // Mobile: clear ready flag when touch ends
-                if (isMobile && !dragStarted) {
+                if (isMobile) {
                     obj._readyToDrag = false;
+                    obj.classList.remove("dragging");
                     clearPlacementHighlights();
                 }
                 
@@ -4277,6 +4288,7 @@ function enableObjectDragging() {
         obj.addEventListener('pointerdown', obj._editModeHandler);
     });
 }
+
 // Disable object dragging for normal mode
 function disableObjectDragging() {
     // Remove all delete icons when exiting edit mode
