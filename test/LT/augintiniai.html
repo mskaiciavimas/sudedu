@@ -1699,7 +1699,7 @@
   }
 
   .pet-stats-selection-button.active {
-    background: linear-gradient(135deg, #3288AC, #286D8A);
+    background: red;
     border: none;
     /*border: #286D8A 1px solid;*/
     color: #F5F5F7;
@@ -4344,6 +4344,13 @@ function findClosestWalkablePosition(walkMap, startRow, startCol, petWidth) {
 // Global pointer up handler
 document.addEventListener('pointerup', function(e) {
     if (e.pointerType === "mouse" && e.button !== 0) return;
+    
+    // ADD THIS CHECK AT THE VERY TOP
+    if (multiTouchActive) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
     
     // Clear any hold timer
     if (holdTimer) {
@@ -11031,14 +11038,26 @@ function getDistance(touches) {
     return Math.sqrt(dx*dx + dy*dy);
 }
 
+let initialPinchX = 0;  // ADD THIS
+let initialPinchY = 0;  // ADD THIS
+
 function handleTouchMove(e) {
-    if (e.touches.length === 2) { // ONLY two fingers
-        e.preventDefault(); // Prevent default pinch/scroll
+    if (e.touches.length === 2) {
+        e.preventDefault();
+        
         const currentDistance = getDistance(e.touches);
+        const viewport = document.getElementById('viewport-container');
+        const rect = viewport.getBoundingClientRect();
+        
+        // Calculate current midpoint
+        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
 
         if (!initialPinchDistance) {
             initialPinchDistance = currentDistance;
             initialPinchScale = viewportState.scale;
+            initialPinchX = midX;  // STORE INITIAL MIDPOINT
+            initialPinchY = midY;
             return;
         }
 
@@ -11046,24 +11065,13 @@ function handleTouchMove(e) {
         let newScale = initialPinchScale * scaleFactor;
         newScale = Math.min(Math.max(newScale, viewportState.minScale), viewportState.maxScale);
 
-        const viewport = document.getElementById('viewport-container');
-        const rect = viewport.getBoundingClientRect();
-        
-        // FIX: Calculate midpoint relative to viewport
-        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-        
-        // Convert to viewport-relative coordinates
-        const viewportMidX = midX - rect.left;
-        const viewportMidY = midY - rect.top;
+        // Calculate the room point under the INITIAL pinch center
+        const roomX = (initialPinchX - viewportState.x) / initialPinchScale;
+        const roomY = (initialPinchY - viewportState.y) / initialPinchScale;
 
-        // Calculate room coordinates at the pinch center
-        const roomX = (viewportMidX - viewportState.x) / viewportState.scale;
-        const roomY = (viewportMidY - viewportState.y) / viewportState.scale;
-
-        // Update position to zoom toward pinch center
-        viewportState.x = viewportMidX - roomX * newScale;
-        viewportState.y = viewportMidY - roomY * newScale;
+        // Keep that room point under the CURRENT pinch center
+        viewportState.x = midX - roomX * newScale;
+        viewportState.y = midY - roomY * newScale;
         viewportState.scale = newScale;
 
         applyViewportTransform();
@@ -11075,20 +11083,36 @@ let multiTouchCooldown = null;
 function handleTouchEnd(e) {
     if (e.touches.length < 2) {
         initialPinchDistance = null;
-        
-        // If ALL touches are gone, schedule multiTouchActive reset with cooldown
-        if (e.touches.length === 0 && multiTouchActive) {
-            // Clear any existing cooldown
-            if (multiTouchCooldown) {
-                clearTimeout(multiTouchCooldown);
-            }
-            
-            // Add 200ms cooldown before allowing pet interactions again
-            multiTouchCooldown = setTimeout(() => {
-                multiTouchActive = false;
-                multiTouchCooldown = null;
-            }, 200);
+        initialPinchX = 0;
+        initialPinchY = 0;
+    }
+    
+    // When ALL touches end after multi-touch
+    if (e.touches.length === 0 && multiTouchActive) {
+        // NUCLEAR OPTION: Clear everything
+        if (holdTimer) {
+            clearInterval(holdTimer);
+            holdTimer = null;
         }
+        
+        currentObject = null;
+        isDragging = false;
+        
+        // Remove dragging class from all objects
+        document.querySelectorAll('.dragging').forEach(el => {
+            el.classList.remove('dragging');
+        });
+        
+        // Clear any existing cooldown
+        if (multiTouchCooldown) {
+            clearTimeout(multiTouchCooldown);
+        }
+        
+        // Set cooldown before allowing interactions again
+        multiTouchCooldown = setTimeout(() => {
+            multiTouchActive = false;
+            multiTouchCooldown = null;
+        }, 300); // Increased to 300ms for safety
     }
 }
 
@@ -11130,19 +11154,30 @@ function handleViewportPanEnd(e) {
     viewportState.isDragging = false;
     document.body.classList.remove('panning');
 
-    // If this was a touch event and no fingers remain, reset multiTouchActive with cooldown
+    // If this was a touch event and no fingers remain
     if (e?.type.startsWith('touch')) {
         if (e.touches?.length === 0 && multiTouchActive) {
-            // Clear any existing cooldown
+            // NUCLEAR OPTION: Clear everything
+            if (holdTimer) {
+                clearInterval(holdTimer);
+                holdTimer = null;
+            }
+            
+            currentObject = null;
+            isDragging = false;
+            
+            document.querySelectorAll('.dragging').forEach(el => {
+                el.classList.remove('dragging');
+            });
+            
             if (multiTouchCooldown) {
                 clearTimeout(multiTouchCooldown);
             }
             
-            // Add 200ms cooldown
             multiTouchCooldown = setTimeout(() => {
                 multiTouchActive = false;
                 multiTouchCooldown = null;
-            }, 200);
+            }, 300);
         }
     }
 }
