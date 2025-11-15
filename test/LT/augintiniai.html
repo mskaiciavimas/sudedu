@@ -10976,6 +10976,7 @@ function displayReceivedMessages () {
 function applyViewportTransform() {
     const wrapper = document.getElementById('room-transform-wrapper');
     if (wrapper) {
+        wrapper.style.transformOrigin = `${-viewportState.x}px ${-viewportState.y}px`;
         wrapper.style.transform = `translate(${viewportState.x}px, ${viewportState.y}px) scale(${viewportState.scale})`;
     }
 }
