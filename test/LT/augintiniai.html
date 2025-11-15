@@ -1699,7 +1699,7 @@
   }
 
   .pet-stats-selection-button.active {
-    background: linear-gradient(135deg, #3288AC, #286D8A);
+    background: red;
     border: none;
     /*border: #286D8A 1px solid;*/
     color: #F5F5F7;
@@ -3920,16 +3920,10 @@ function startDragging(e) {
     isDragging = true;
     currentObject.classList.add('dragging');
 
-    // pointer position in pixels
-    const mouseX = e.clientX;
-    const mouseY = e.clientY;
-
-    // object's actual pixel position
+    // Store pixel offsets directly - no conversion needed
     const rect = currentObject.getBoundingClientRect();
-
-    // pixel offsets: where inside the element the pointer is
-    offsetX = mouseX - rect.left;
-    offsetY = mouseY - rect.top;
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
 }
 
 
@@ -4088,9 +4082,10 @@ function hasBlockingObjects(target) {
     return false;
 }
 
-// Enable object dragging for edit mode
 function enableObjectDragging() {
     const objects = document.querySelectorAll('.room-object');
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    
     objects.forEach(obj => {
         obj.classList.add('room-object-edit');
         
@@ -4100,10 +4095,6 @@ function enableObjectDragging() {
         
         // Create edit mode handler
         obj._editModeHandler = function(e) {
-
-            if (multiTouchActive) return;
-            if (e.touches?.length >= 2) return;
-
             if (e.pointerType === "mouse" && e.button !== 0) return;
 
             const placementMap = generatePlacementMap(obj.id);
@@ -4117,59 +4108,99 @@ function enableObjectDragging() {
             
             let hasMoved = false;
             let dragStarted = false;
+            let holdTimer = null;
+            
+            // Mobile: require hold before drag
+            if (isMobile && e.pointerType === "touch") {
+                holdTimer = setTimeout(() => {
+                    // Vibrate on successful hold
+                    if (navigator.vibrate) {
+                        navigator.vibrate(50);
+                    }
+                    
+                    // Check blocking objects
+                    const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
+                    if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10 || objPlacingOrder === 15)) {
+                        messageToTheUser("Šį daiktą galėsi pajudinti tik nuėmęs nuo jo kitus!");
+                        return;
+                    }
+
+                    dragStarted = true;
+                    currentObject = obj;
+                    obj._placementMap = placementMap;
+                    obj._originalCoords = getObjectCoordinates(obj.id);
+                    
+                    // Immediately show placement map
+                    determineAndHighlightValidTiles(placementMap);
+                    
+                    // Start dragging
+                    const syntheticEvent = {
+                        clientX: startX,
+                        clientY: startY,
+                        pointerType: e.pointerType,
+                        button: e.button
+                    };
+                    startDragging(syntheticEvent);
+                }, 500); // 500ms hold
+            }
             
             const moveHandler = (moveEvent) => {
                 const deltaX = Math.abs(moveEvent.clientX - startX);
                 const deltaY = Math.abs(moveEvent.clientY - startY);
                 
-                // Increase threshold to prevent accidental dragging on clicks
-                if ((deltaX > 5 || deltaY > 5) && !dragStarted) {
-                    if (!dragStarted) {
-                        hasMoved = true;
-                        const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
-                        if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10 || objPlacingOrder === 15)) {
-                            messageToTheUser("Šį daiktą galėsi pajudinti tik nuėmęs nuo jo kitus!");
-                            cancelDrag(); // stop listening so it won’t repeat
-                            return;
-                        }
-
-                        dragStarted = true;
-                        currentObject = obj;
-
-                        obj._placementMap = placementMap
-
-                        determineAndHighlightValidTiles(placementMap);
-
-                        const rect = obj.getBoundingClientRect();
-                        const parentRect = obj.parentElement.getBoundingClientRect();
-
-                        obj._originalCoords = getObjectCoordinates(obj.id)
-                        
-                        // Remove the temporary listeners
-                        document.removeEventListener('pointermove', moveHandler);
-                        
-                        // Start dragging with the original event position
-                        const syntheticEvent = {
-                            clientX: startX,
-                            clientY: startY,
-                            pointerType: e.pointerType,
-                            button: e.button
-                        };
-                        startDragging(syntheticEvent);
+                // Desktop: immediate drag on movement
+                if (!isMobile && (deltaX > 5 || deltaY > 5) && !dragStarted) {
+                    hasMoved = true;
+                    const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
+                    if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10 || objPlacingOrder === 15)) {
+                        messageToTheUser("Šį daiktą galėsi pajudinti tik nuėmęs nuo jo kitus!");
+                        cancelDrag();
+                        return;
                     }
+
+                    dragStarted = true;
+                    currentObject = obj;
+                    obj._placementMap = placementMap;
+                    obj._originalCoords = getObjectCoordinates(obj.id);
+                    
+                    determineAndHighlightValidTiles(placementMap);
+                    
+                    document.removeEventListener('pointermove', moveHandler);
+                    
+                    const syntheticEvent = {
+                        clientX: startX,
+                        clientY: startY,
+                        pointerType: e.pointerType,
+                        button: e.button
+                    };
+                    startDragging(syntheticEvent);
+                }
+                
+                // Mobile: cancel hold if finger moves too much before hold completes
+                if (isMobile && (deltaX > 10 || deltaY > 10) && !dragStarted) {
+                    if (holdTimer) {
+                        clearTimeout(holdTimer);
+                        holdTimer = null;
+                    }
+                    cancelDrag();
                 }
             };
             
             const upHandler = (upEvent) => {
+                // Clear hold timer if still waiting
+                if (holdTimer) {
+                    clearTimeout(holdTimer);
+                    holdTimer = null;
+                }
+                
                 document.removeEventListener('pointermove', moveHandler);
                 document.removeEventListener('pointerup', upHandler);
                 
-                // If no dragging started and it was a quick click, show delete icon
-                if (!dragStarted) {
+                // Only show delete icon if no drag happened and not mobile (mobile uses hold)
+                if (!dragStarted && !isMobile) {
                     showDeleteIcon(obj);
                 }
                 
-                // Reset currentObject if no drag was initiated
                 if (!isDragging) {
                     currentObject = null;
                 }
@@ -4178,6 +4209,10 @@ function enableObjectDragging() {
             };
 
             const cancelDrag = () => {
+                if (holdTimer) {
+                    clearTimeout(holdTimer);
+                    holdTimer = null;
+                }
                 document.removeEventListener('pointermove', moveHandler);
                 document.removeEventListener('pointerup', upHandler);
                 currentObject = null;
@@ -4272,17 +4307,23 @@ document.addEventListener('pointermove', function(e) {
         return;
     }
     
-    // Then handle object dragging
+    // Then handle object dragging - work in screen coordinates
     if (isDragging && currentObject) {
-        const roomCoords = screenToRoom(e.clientX, e.clientY);
+        e.preventDefault();
         
-        // Update object position in room coordinates
-        const newX = roomCoords.x - offsetX;
-        const newY = roomCoords.y - offsetY;
+        // Get viewport and scale wrapper positions
+        const viewport = document.getElementById('viewport-container');
+        const scaleWrapper = document.getElementById('scale-wrapper');
+        const viewportRect = viewport.getBoundingClientRect();
+        const scaleRect = scaleWrapper.getBoundingClientRect();
         
-        // Convert back to pixels for positioning
-        currentObject.style.left = newX + 'px';
-        currentObject.style.top = newY + 'px';
+        // Mouse position relative to scale wrapper (which contains the scaled content)
+        const mouseXInScale = e.clientX - scaleRect.left;
+        const mouseYInScale = e.clientY - scaleRect.top;
+        
+        // Position the object
+        currentObject.style.left = (mouseXInScale - offsetX) + 'px';
+        currentObject.style.top = (mouseYInScale - offsetY) + 'px';
     }
 });
 
@@ -11017,11 +11058,11 @@ function handleViewportZoom(e) {
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    const roomX = (mouseX - viewportState.x) / viewportState.scale;
-    const roomY = (mouseY - viewportState.y) / viewportState.scale;
+    const roomX = (mouseX / viewportState.scale - viewportState.x);
+    const roomY = (mouseY / viewportState.scale - viewportState.y);
 
-    viewportState.x = mouseX - roomX * newScale;
-    viewportState.y = mouseY - roomY * newScale;
+    viewportState.x = mouseX / newScale - roomX;
+    viewportState.y = mouseY / newScale - roomY;
     viewportState.scale = newScale;
 
     applyViewportTransform();
@@ -11034,14 +11075,8 @@ let initialPinchX = 0;
 let initialPinchY = 0;
 let initialViewportX = 0;
 let initialViewportY = 0;
-const PINCH_DEADZONE = 10; // ADD THIS - pixels of movement to ignore
+const PINCH_DEADZONE = 15; // Increased for better stability
 let multiTouchCooldown = null;
-
-function getDistance(touches) {
-    const dx = touches[0].clientX - touches[1].clientX;
-    const dy = touches[0].clientY - touches[1].clientY;
-    return Math.sqrt(dx*dx + dy*dy);
-}
 
 function getDistance(touches) {
     const dx = touches[0].clientX - touches[1].clientX;
@@ -11070,10 +11105,10 @@ function handleTouchMove(e) {
             return;
         }
 
-        // ADD DEADZONE: Only zoom if distance changed significantly
+        // Deadzone: Only zoom if distance changed significantly
         const distanceChange = Math.abs(currentDistance - initialPinchDistance);
         if (distanceChange < PINCH_DEADZONE) {
-            // Not pinching, just panning - update translate only
+            // Not pinching, just panning
             const deltaX = (midX - initialPinchX) / viewportState.scale;
             const deltaY = (midY - initialPinchY) / viewportState.scale;
             
@@ -11103,13 +11138,13 @@ function handleTouchEnd(e) {
         initialPinchDistance = null;
         initialPinchX = 0;
         initialPinchY = 0;
-        initialViewportX = 0;  // RESET
-        initialViewportY = 0;  // RESET
+        initialViewportX = 0;
+        initialViewportY = 0;
     }
     
     // When ALL touches end after multi-touch
     if (e.touches.length === 0 && multiTouchActive) {
-        // NUCLEAR OPTION: Clear everything
+        // Clear everything including object dragging
         if (holdTimer) {
             clearInterval(holdTimer);
             holdTimer = null;
@@ -11118,17 +11153,17 @@ function handleTouchEnd(e) {
         currentObject = null;
         isDragging = false;
         
-        // Remove dragging class from all objects
         document.querySelectorAll('.dragging').forEach(el => {
             el.classList.remove('dragging');
         });
         
-        // Clear any existing cooldown
+        // Clear placement highlights
+        clearPlacementHighlights();
+        
         if (multiTouchCooldown) {
             clearTimeout(multiTouchCooldown);
         }
         
-        // Set cooldown before allowing interactions again
         multiTouchCooldown = setTimeout(() => {
             multiTouchActive = false;
             multiTouchCooldown = null;
@@ -11152,7 +11187,6 @@ function handleViewportPanStart(e) {
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-        // Store scaled offset
         viewportState.dragStartX = clientX - viewportState.x * viewportState.scale;
         viewportState.dragStartY = clientY - viewportState.y * viewportState.scale;
     }
@@ -11164,7 +11198,6 @@ function handleViewportPanMove(e) {
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-    // Divide by scale to compensate for the scaled translate
     viewportState.x = (clientX - viewportState.dragStartX) / viewportState.scale;
     viewportState.y = (clientY - viewportState.dragStartY) / viewportState.scale;
 
@@ -11175,10 +11208,8 @@ function handleViewportPanEnd(e) {
     viewportState.isDragging = false;
     document.body.classList.remove('panning');
 
-    // If this was a touch event and no fingers remain
     if (e?.type.startsWith('touch')) {
         if (e.touches?.length === 0 && multiTouchActive) {
-            // NUCLEAR OPTION: Clear everything
             if (holdTimer) {
                 clearInterval(holdTimer);
                 holdTimer = null;
@@ -11190,6 +11221,9 @@ function handleViewportPanEnd(e) {
             document.querySelectorAll('.dragging').forEach(el => {
                 el.classList.remove('dragging');
             });
+            
+            // Clear placement highlights
+            clearPlacementHighlights();
             
             if (multiTouchCooldown) {
                 clearTimeout(multiTouchCooldown);
