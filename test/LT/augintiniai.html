@@ -1705,7 +1705,7 @@
   }
 
   .pet-stats-selection-button.active {
-    background: linear-gradient(135deg, #3288AC, #286D8A);
+    background: lavender;
     border: none;
     /*border: #286D8A 1px solid;*/
     color: #F5F5F7;
@@ -3086,401 +3086,454 @@
     </div>
     </div>
 
-<script src="../mental-arithmetic.js"></script>
-<script src="../main-nav-bar.js"></script>
-<script>
-    if (!userData || userData?.accType === "teacher") {
-        window.location.href = './';
-    }
+    <script src="../mental-arithmetic.js"></script>
+    <script src="../main-nav-bar.js"></script>
+    <script>
+        if (!userData || userData?.accType === "teacher") {
+            window.location.href = './';
+        }
 
-    let viewportState = {
-        scale: 1,
-        x: 10,
-        y: 10,
-        minScale: 0.5,
-        maxScale: 1,
-        isDragging: false,
-        dragStartX: 0,
-        dragStartY: 0,
-        spacePressed: false
-    };
+        let viewportState = {
+            scale: 1,
+            x: 10,
+            y: 10,
+            minScale: 0.5,
+            maxScale: 1,
+            isDragging: false,
+            dragStartX: 0,
+            dragStartY: 0,
+            spacePressed: false
+        };
 
-    if (window.innerWidth <= 768) {
-        viewportState.maxScale = 1.5
-    }
+        if (window.innerWidth <= 768) {
+            viewportState.maxScale = 1.5
+        }
 
-    const topHalfClickBlockedItemClasses = ["bath-1"]
+        const topHalfClickBlockedItemClasses = ["bath-1"]
 
-    let unitSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
-    let gameAssetIndex = {};
-    let userPetAssets = {};
-    let userMoney = 0;
-    let selectedConsumable = [];
-    let pendingPetActions = {};
-    let petControllers = {};
-    let petStatsList = '';
-    let taxesData = {}
-    let globalWalkabilityMap;
-    const taxPaymentPeriod = 14 //days
-    const taxGracePeriod = 2 //days;
-    const taxPrice = {
-        "waterTax": 20,
-        "electricityTax": 20
-    }
-    let petOnWalk = "";
-    const speciesTranslationDict = {
-        "cat": "katė"
-    }
-    const receivedMessages = [];
-    
-    // Multi-touch state management
-    let multiTouchActive = false;
+        let unitSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
+        let gameAssetIndex = {};
+        let userPetAssets = {};
+        let userMoney = 0;
+        let selectedConsumable = [];
+        let pendingPetActions = {};
+        let petControllers = {};
+        let petStatsList = '';
+        let taxesData = {}
+        let globalWalkabilityMap;
+        const taxPaymentPeriod = 14 //days
+        const taxGracePeriod = 2 //days;
+        const taxPrice = {
+            "waterTax": 20,
+            "electricityTax": 20
+        }
+        let petOnWalk = "";
+        const speciesTranslationDict = {
+            "cat": "katė"
+        }
+        const receivedMessages = [];
 
-    let touchStartTime = 0;
-    const LONG_PRESS_DURATION = 500; // ms for long press
-    let longPressTimer = null;
-    let touchStartPos = { x: 0, y: 0 };
-    const TOUCH_MOVE_THRESHOLD = 10; // pixels
+        const PINCH_DEADZONE = 15;
+        let lastPinchScale = 1;
+        let isPinching = false;
+        let multiTouchActive = false;
 
-    function convertUserPetAssetsDictToCompactList(data) {
-        let pets = Object.entries(data.pets).map(([p, v]) => [
-            p,
-            [
-                v.name,
-                Object.entries(v.skins).map(([s, d]) => [s, d.assetIndex, d.equiped])
-            ]
-        ]);
-        let supplies = Object.values(data.supplies).map(s => [s.assetIndex, s.quantity]);
-        return [pets, supplies];
-    }
+        function convertUserPetAssetsDictToCompactList(data) {
+            let pets = Object.entries(data.pets).map(([p, v]) => [
+                p,
+                [
+                    v.name, // real pet name
+                    Object.entries(v.skins).map(([s, d]) => [s, d.assetIndex, d.equiped])
+                ]
+            ]);
+            let supplies = Object.values(data.supplies).map(s => [s.assetIndex, s.quantity]);
+            return [pets, supplies];
+        }
 
-    function renderPets() {
-        const petContainer = document.getElementById("petContainer");
+        function renderPets() {
+            const petContainer = document.getElementById("petContainer");
 
-        if (!petContainer) return;
-        petContainer.innerHTML = '';
+            if (!petContainer) return;
+            petContainer.innerHTML = ''; // clear existing content
 
-        const pets = userPetAssets.pets;
+            const pets = userPetAssets.pets;
 
-        let itemsInUse = [];
+            let itemsInUse = [];
 
-        globalWalkabilityMap = generateWalkabilityMap();
+            globalWalkabilityMap = generateWalkabilityMap();
 
-        for (const petNumber in pets) {
-            const petDict = pets[petNumber];
-            const skins = petDict.skins;
-            let petCoords = getObjectCoordinates(petDict.id);
-            let petStaringPosTop;
-            let petStartingPosLeft;
-            
-            
-            const petSpecies = petNumber.split('-')[0]
-            const matchingBeds = Array.from(roomObjectsContainer.querySelectorAll("*")).filter(el => {
-                const classStr = el.className;
-                return classStr.includes("bed") && classStr.includes(petSpecies) && !classStr.includes("furniture-preview") && !itemsInUse.includes(el.id);
-            });
+            for (const petNumber in pets) {
+                const petDict = pets[petNumber];
+                const skins = petDict.skins;
+                let petCoords = getObjectCoordinates(petDict.id);
+                let petStaringPosTop;
+                let petStartingPosLeft;
+                
+                
+                const petSpecies = petNumber.split('-')[0]
+                const matchingBeds = Array.from(roomObjectsContainer.querySelectorAll("*")).filter(el => {
+                    const classStr = el.className; // full class string
+                    return classStr.includes("bed") && classStr.includes(petSpecies) && !classStr.includes("furniture-preview") && !itemsInUse.includes(el.id);
+                });
 
-            let equippedSkin = Object.values(skins).find(skin => skin.equiped);
-            
-            if (!equippedSkin) {
-                const firstSkinKey = Object.keys(skins)[0];
-                equippedSkin = skins[firstSkinKey];
-                equippedSkin.equiped = true;
-                sendPetAssetsUpdateToDatabase();
+                let equippedSkin = Object.values(skins).find(skin => skin.equiped);
+                
+                if (!equippedSkin) {
+                    const firstSkinKey = Object.keys(skins)[0];
+                    equippedSkin = skins[firstSkinKey];
+                    equippedSkin.equiped = true;
+                    sendPetAssetsUpdateToDatabase();
+                }
+
+                const petDiv = document.createElement('div');
+                const petClasses = gameAssetIndex[equippedSkin.assetIndex]["css-class"];
+                petDiv.id = petClasses.split(' ')[0];
+                petDiv.className = petClasses;
+                petContainer.appendChild(petDiv);
+                
+                if (matchingBeds.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * matchingBeds.length);
+                    object = matchingBeds[randomIndex];
+                    itemsInUse.push(object.id);
+                    
+                    let objectInteractivePart = gameAssetIndex[userObjectAssets[object.id]["assetIndex"]]["interactive-spot"];
+                    let objectCoords = getObjectCoordinates(object.id);
+                    [petStartingPosLeft, petStaringPosTop] = [objectCoords[0] + objectInteractivePart[0], objectCoords[1] - objectInteractivePart[1]];
+                } else {
+                    const pet = document.getElementById(petNumber);
+                    const validCoords = findValidPlacements(globalWalkabilityMap, pet);
+
+                    if (validCoords.length === 0) {
+                        return;
+                    }
+
+                    // Pick a random coordinate
+                    const randomIndex = Math.floor(Math.random() * validCoords.length);
+                    const randomCoord = validCoords[randomIndex];
+                    const petPos = getObjectCoordinates(pet.id)
+
+                    petStartingPosLeft = randomCoord[0];
+                    petStaringPosTop = randomCoord[1];
+                }
+
+
+                petDiv.style.top = `calc((${petStaringPosTop} * var(--unit-size)) - (var(--pet-size) - var(--unit-size)))`;
+                petDiv.style.left = `calc(${petStartingPosLeft} * var(--unit-size))`;
+
+                predictAndSetZIndex(petDiv);
+
+                setObjectAnimation(petDiv, `${petNumber}-sleeps`)
             }
 
-            const petDiv = document.createElement('div');
-            const petClasses = gameAssetIndex[equippedSkin.assetIndex]["css-class"];
-            petDiv.id = petClasses.split(' ')[0];
-            petDiv.className = petClasses;
-            petContainer.appendChild(petDiv);
-            
-            if (matchingBeds.length > 0) {
-                const randomIndex = Math.floor(Math.random() * matchingBeds.length);
-                object = matchingBeds[randomIndex];
-                itemsInUse.push(object.id);
-                
-                let objectInteractivePart = gameAssetIndex[userObjectAssets[object.id]["assetIndex"]]["interactive-spot"];
-                let objectCoords = getObjectCoordinates(object.id);
-                [petStartingPosLeft, petStaringPosTop] = [objectCoords[0] + objectInteractivePart[0], objectCoords[1] - objectInteractivePart[1]];
-            } else {
-                const pet = document.getElementById(petNumber);
-                const validCoords = findValidPlacements(globalWalkabilityMap, pet);
-
-                if (validCoords.length === 0) {
+            Object.entries(petStatsList).forEach(([petId, stats]) => {
+            if (userPetAssets.pets?.[petId]) {
+                const petSpecies = petId.split("-")[0];
+                const bonusStats = bonusFromDailySupplyItems();
+                const el = document.getElementById(petId);
+                if (!el) {
+                    console.warn(`Pet element not found in DOM: ${petId}`);
                     return;
                 }
 
-                const randomIndex = Math.floor(Math.random() * validCoords.length);
-                const randomCoord = validCoords[randomIndex];
-                const petPos = getObjectCoordinates(pet.id)
+                const currentTime = Math.floor(Date.now() / 1000 / 60);
+                const timeElapsed = currentTime - stats[3];
+                const statDecrease = Math.floor(timeElapsed * PET_STATS_EXPIRATION);
 
-                petStartingPosLeft = randomCoord[0];
-                petStaringPosTop = randomCoord[1];
-            }
+                const food = Math.max(bonusStats[petSpecies]?.food ?? 0, stats[0] - statDecrease);
+                const water = Math.max(bonusStats[petSpecies]?.water ?? 0, stats[1] - statDecrease);
+                const love = Math.max(bonusStats[petSpecies]?.love ?? 0, stats[2] - statDecrease);
+                const date = currentTime;
 
-
-            petDiv.style.top = `calc((${petStaringPosTop} * var(--unit-size)) - (var(--pet-size) - var(--unit-size)))`;
-            petDiv.style.left = `calc(${petStartingPosLeft} * var(--unit-size))`;
-
-            predictAndSetZIndex(petDiv);
-
-            setObjectAnimation(petDiv, `${petNumber}-sleeps`)
-        }
-
-        Object.entries(petStatsList).forEach(([petId, stats]) => {
-        if (userPetAssets.pets?.[petId]) {
-            const petSpecies = petId.split("-")[0];
-            const bonusStats = bonusFromDailySupplyItems();
-            const el = document.getElementById(petId);
-            if (!el) {
-                console.warn(`Pet element not found in DOM: ${petId}`);
-                return;
-            }
-
-            const currentTime = Math.floor(Date.now() / 1000 / 60);
-            const timeElapsed = currentTime - stats[3];
-            const statDecrease = Math.floor(timeElapsed * PET_STATS_EXPIRATION);
-
-            const food = Math.max(bonusStats[petSpecies]?.food ?? 0, stats[0] - statDecrease);
-            const water = Math.max(bonusStats[petSpecies]?.water ?? 0, stats[1] - statDecrease);
-            const love = Math.max(bonusStats[petSpecies]?.love ?? 0, stats[2] - statDecrease);
-            const date = currentTime;
-
-            el._stats = {
-                food: food,
-                water: water,
-                love: love,
-                date: currentTime,
-                foodNew: food,
-                waterNew: water,
-                loveNew: love,
-                };
-            }
-        });
-
-    
-        Object.keys(userPetAssets.pets || {}).forEach(petId => {
-            if (!document.getElementById(petId)._stats) {
-                document.getElementById(petId)._stats = {
-                    "food": 10,
-                    "water": 10,
-                    "love": 10,
-                    "date": Math.floor(Date.now() / 1000 / 60),
-                    "foodNew": 10,
-                    "waterNew": 10,
-                    "loveNew": 10,
+                el._stats = {
+                    food: food,
+                    water: water,
+                    love: love,
+                    date: currentTime,
+                    foodNew: food,
+                    waterNew: water,
+                    loveNew: love,
+                    };
                 }
+            });
 
-                sendPetStatsUpdateToDatabase(petId);
-            }
-        });
-
-        createPetButtons();
         
-        const allPets = document.querySelectorAll("#petContainer .pet");
-        if (allPets[0]) {
-            displayPetStats(allPets[0].id);
+            // Create default stats for any pets that exist but don't have stats yet
+            Object.keys(userPetAssets.pets || {}).forEach(petId => {
+                if (!document.getElementById(petId)._stats) {
+                    document.getElementById(petId)._stats = {
+                        "food": 10,
+                        "water": 10,
+                        "love": 10,
+                        "date": Math.floor(Date.now() / 1000 / 60),
+                        "foodNew": 10,
+                        "waterNew": 10,
+                        "loveNew": 10,
+                    }
+
+                    sendPetStatsUpdateToDatabase(petId);
+                }
+            });
+
+            createPetButtons();
+            
+            const allPets = document.querySelectorAll("#petContainer .pet");
+            if (allPets[0]) {
+                displayPetStats(allPets[0].id);
+            }
         }
-    }
 
-    let userObjectAssets = {};
+        let userObjectAssets = {};
 
-    const roomLayout = [
-      [4.31, ...Array(40).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.32],
-      ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2]),
-      [4.2, ...Array(40).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2],
-      ...Array(2).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
-      ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.2]),
-      ...Array(6).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2]),
-      ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.2]),
-      ...Array(10).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
-      [4.34, ...Array(24).fill(4.1), 4.32, ...Array(6).fill(6.0), 4.31, ...Array(8).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33],
-      ...Array(8).fill([...Array(25).fill(7.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(7.0), ...Array(42).fill(7.0)]),
-      [4.31, ...Array(24).fill(4.1), 4.42, ...Array(6).fill(6.0), 4.44, ...Array(8).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.32],
-      ...Array(12).fill([4.2, ...Array(24).fill(2.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2]),
-      [4.2, ...Array(24).fill(3.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2],
-      ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.2]),
-      ...Array(5).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2]),
-      ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.2]),
-      ...Array(13).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
-      [4.34, ...Array(40).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33],
-    ];
+        // 1.0 - floor
+        // 2.0 - wall
+        // 3.0 - boundary between wall and floor, 
+        // 4.1 - horizontal edge, 4.2 - vertical edge, 
+        // 4.31 - top left corner, 4.32 - top right corner, 4.33 - bottom right corner, 4.34 - bottom left corner, 
+        // 4.41 - T junction top, 4.42 - T junction right, 4.43 - T junction bottom, 4.44 - T junction left, 
+        // 4.51 - downward-facing wall end, 4.52 - left-facing wall end, 4.53 - upward-facing wall end, 4.54 - right-facing wall end
+        // 5.0 - threshold
+        // 6.0 - stairs
+        // 7.0 - void
 
-    const roomGrid = document.getElementById('roomGrid');
-    const ctx = roomGrid.getContext('2d');
-    const tileSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
 
-    function renderRoomGrid(offsetX = 0, offsetY = 0, scale = 1) {
-        const canvas = document.getElementById('roomGrid');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
+        //[4.3, ...Array(20).fill(4.1),4.4] - border with edges and horizontal line filled to set number (20)
+        //...Array(6).fill([4.2, ...Array(20).fill(2.0), 4.2]) - multiple rows of wall tiles with edges at the end 6 rows of 20 wall tiles and 2 borders at ends
+        
+        /*
+        const roomLayout = [
+          [4.3, ...Array(40).fill(4.1), 4.4],
+          ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2]),
+          [4.2, ...Array(40).fill(3.0), 4.2],
+          ...Array(20).fill([4.2, ...Array(40).fill(1.0), 4.2]),
+          [4.6, ...Array(40).fill(4.1), 4.5],
+        ];
+        */
 
-        const cols = roomLayout[0].length;
-        const rows = roomLayout.length;
+        const roomLayout = [
+          // Top part of floor 2
+          [4.31, ...Array(40).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.32],
+          ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2]),
+          [4.2, ...Array(40).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2],
+          ...Array(2).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
+
+          // Part at the door of floor 2
+          ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.2]),
+          ...Array(6).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2]),
+          ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.2]),
+
+          // Lower part of floor 2
+          ...Array(10).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
+
+          // Entrance to stairs floor 2
+          [4.34, ...Array(24).fill(4.1), 4.32, ...Array(6).fill(6.0), 4.31, ...Array(8).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33],
+          
+          // Stairs and void
+          ...Array(8).fill([...Array(25).fill(7.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(7.0), ...Array(42).fill(7.0)]),
+
+          // Stairs and wall of floor 1
+          [4.31, ...Array(24).fill(4.1), 4.42, ...Array(6).fill(6.0), 4.44, ...Array(8).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.32],
+
+          // Top part of floor 1, stairs and wall
+          ...Array(12).fill([4.2, ...Array(24).fill(2.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2]),
+        
+          // Top part of floor 1, stairs and boundary
+          [4.2, ...Array(24).fill(3.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2],
+
+          // Part at the door of floor 1
+          ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.2]),
+          ...Array(5).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2]),
+          ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.2]),
+
+          // Bottom part of floor 1
+          ...Array(13).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
+          [4.34, ...Array(40).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33],
+          
+        ];
+
+        const roomGrid = document.getElementById('roomGrid');
+        const ctx = roomGrid.getContext('2d');
         const tileSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
 
-        canvas.width = cols * tileSize;
-        canvas.height = rows * tileSize;
+        function renderRoomGrid(offsetX = 0, offsetY = 0, scale = 1) {
+            const canvas = document.getElementById('roomGrid');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.save();
-        ctx.translate(offsetX, offsetY);
-        ctx.scale(scale, scale);
+            const cols = roomLayout[0].length;
+            const rows = roomLayout.length;
+            const tileSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
 
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                const type = roomLayout[row][col];
-                const x = col * tileSize;
-                const y = row * tileSize;
+            // Set canvas size based on grid
+            canvas.width = cols * tileSize;
+            canvas.height = rows * tileSize;
 
-                let fillColor;
-                switch(type) {
-                    case 1.0: fillColor = '#DEB887'; break;
-                    case 2.0: fillColor = '#F0EAD6'; break;
-                    case 3.0: fillColor = '#B37B50'; break;
-                    case 4.1: case 4.2: 
-                    case 4.31: case 4.32:case 4.33: case 4.34: 
-                    case 4.41: case 4.42: case 4.43: case 4.44: 
-                    case 4.51: case 4.52: case 4.53: case 4.54: 
-                        fillColor = '#A77851'; break;
-                    case 5.0: fillColor = '#b8966c'; break;
-                    case 6.0: fillColor = "#5C4033"; break
-                    case 7.0: fillColor = "transparent"; break
-                    default: fillColor = '#fff';
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(offsetX, offsetY);
+            ctx.scale(scale, scale);
+
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const type = roomLayout[row][col];
+                    const x = col * tileSize;
+                    const y = row * tileSize;
+
+                    // Fill color
+                    let fillColor;
+                    switch(type) {
+                        case 1.0: fillColor = '#DEB887'; break; // floor
+                        case 2.0: fillColor = '#F0EAD6'; break; // wall
+                        case 3.0: fillColor = '#B37B50'; break; // boundary
+                        case 4.1: case 4.2: 
+                        case 4.31: case 4.32:case 4.33: case 4.34: 
+                        case 4.41: case 4.42: case 4.43: case 4.44: 
+                        case 4.51: case 4.52: case 4.53: case 4.54: 
+                            fillColor = '#A77851'; break; // edges
+                        case 5.0: fillColor = '#b8966c'; break;
+                        case 6.0: fillColor = "#5C4033"; break
+                        case 7.0: fillColor = "transparent"; break
+                        default: fillColor = '#fff';
+                    }
+                    ctx.fillStyle = fillColor;
+                    ctx.fillRect(x, y, tileSize, tileSize);
+
+                    // Define borders per tile type
+                    let sides = [false, false, false, false]; // [top, right, bottom, left]
+                    let strokeColor = '#000';
+                    let lineWidth = 1;
+
+                    switch(type) {
+                        case 1.0: // floor
+                            sides = [true, true, true, true];
+                            strokeColor = 'grey';
+                            lineWidth = 0.2;
+                            break;
+                        case 2.0: // wall - full thick border
+                            sides = [true, true, true, true];
+                            strokeColor = 'grey';
+                            lineWidth = 0.2;
+                            break;
+                        case 3.0: // boundary
+                            sides = [true, true, true, true];
+                            strokeColor = 'grey';
+                            lineWidth = 0.2;
+                            break;
+                        case 4.1: // horizontal edge
+                            sides = [true, false, true, false]; // top & bottom
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.2: // vertical edge
+                            sides = [false, true, false, true]; // left & right
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.31: // top-left corner
+                            sides = [true, false, false, true];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.32: // top-right corner
+                            sides = [true, true, false, false];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.33: // bottom-right corner
+                            sides = [false, true, true, false];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.34: // bottom-left corner
+                            sides = [false, false, true, true];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.41: // T junction top
+                            sides = [true, false, false, false];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.42: // T junction right
+                            sides = [false, true, false, false];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.43: // T junction bottom
+                            sides = [false, false, true, false];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.44: // T junction left
+                            sides = [false, false, false, true];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.51: // downward-facing end
+                            sides = [false, true, true, true];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.52: // left-facing wall end
+                            sides = [true, false, true, true];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.53: // upward-facing wall end
+                            sides = [true, true, false, true];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 4.54: // right-facing wall end
+                            sides = [true, true, true, false];
+                            strokeColor = '#000';
+                            lineWidth = 1;
+                            break;
+                        case 5.0: // floor / threshold
+                            sides = [true, true, true, true];
+                            strokeColor = 'black';
+                            lineWidth = 0.2;
+                            break;
+                        case 6.0: // right-facing wall end
+                            sides = [false, false, true, false];
+                            strokeColor = 'black';
+                            lineWidth = 1;
+                            break;
+                    }
+
+                    // Draw borders manually
+                    ctx.strokeStyle = strokeColor;
+                    ctx.lineWidth = lineWidth;
+                    if (sides[0]) { ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + tileSize, y); ctx.stroke(); } // top
+                    if (sides[1]) { ctx.beginPath(); ctx.moveTo(x + tileSize, y); ctx.lineTo(x + tileSize, y + tileSize); ctx.stroke(); } // right
+                    if (sides[2]) { ctx.beginPath(); ctx.moveTo(x, y + tileSize); ctx.lineTo(x + tileSize, y + tileSize); ctx.stroke(); } // bottom
+                    if (sides[3]) { ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + tileSize); ctx.stroke(); } // left
                 }
-                ctx.fillStyle = fillColor;
-                ctx.fillRect(x, y, tileSize, tileSize);
-
-                let sides = [false, false, false, false];
-                let strokeColor = '#000';
-                let lineWidth = 1;
-
-                switch(type) {
-                    case 1.0:
-                        sides = [true, true, true, true];
-                        strokeColor = 'grey';
-                        lineWidth = 0.2;
-                        break;
-                    case 2.0:
-                        sides = [true, true, true, true];
-                        strokeColor = 'grey';
-                        lineWidth = 0.2;
-                        break;
-                    case 3.0:
-                        sides = [true, true, true, true];
-                        strokeColor = 'grey';
-                        lineWidth = 0.2;
-                        break;
-                    case 4.1:
-                        sides = [true, false, true, false];
-                        strokeColor = '#000';
-                        lineWidth = 1;
-                        break;
-                    case 4.2:
-                        sides = [false, true, false, true];
-                        strokeColor = '#000';
-                        lineWidth = 1;
-                        break;
-                    case 4.31:
-                        sides = [true, false, false, true];
-                        strokeColor = '#000';
-                        lineWidth = 1;
-                        break;
-                    case 4.32:
-                        sides = [true, true, false, false];
-                        strokeColor = '#000';
-                        lineWidth = 1;
-                        break;
-                    case 4.33:
-                        sides = [false, true, true, false];
-                        strokeColor = '#000';
-                        lineWidth = 1;
-                        break;
-                    case 4.34:
-                        sides = [false, false, true, true];
-                        strokeColor = '#000';
-                        lineWidth = 1;
-                        break;
-                    case 4.41:
-                        sides = [true, false, false, false];
-                        strokeColor = '#000';
-                        lineWidth = 1;
-                        break;
-                    case 4.42:
-                        sides = [false, true, false, false];
-                        strokeColor = '#000';
-                        lineWidth = 1;
-                        break;
-                    case 4.43:
-                        sides = [false, false, true, false];
-                        strokeColor = '#000';
-                        lineWidth = 1;
-                        break;
-                    case 4.44:
-                        sides = [false, false, false, true];
-                        strokeColor = '#000';
-                        lineWidth = 1;
-                        break;
-                    case 4.51:
-                        sides = [false, true, true, true];
-                        strokeColor = '#000';
-                        lineWidth = 1;
-                        break;
-                    case 4.52:
-                        sides = [true, false, true, true];
-                        strokeColor = '#000';
-                        lineWidth = 1;
-                        break;
-                    case 4.53:
-                        sides = [true, true, false, true];
-                        strokeColor = '#000';
-                        lineWidth = 1;
-                        break;
-                    case 4.54:
-                        sides = [true, true, true, false];
-                        strokeColor = '#000';
-                        lineWidth = 1;
-                        break;
-                    case 5.0:
-                        sides = [true, true, true, true];
-                        strokeColor = 'black';
-                        lineWidth = 0.2;
-                        break;
-                    case 6.0:
-                        sides = [false, false, true, false];
-                        strokeColor = 'black';
-                        lineWidth = 1;
-                        break;
-                }
-
-                ctx.strokeStyle = strokeColor;
-                ctx.lineWidth = lineWidth;
-                if (sides[0]) { ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + tileSize, y); ctx.stroke(); }
-                if (sides[1]) { ctx.beginPath(); ctx.moveTo(x + tileSize, y); ctx.lineTo(x + tileSize, y + tileSize); ctx.stroke(); }
-                if (sides[2]) { ctx.beginPath(); ctx.moveTo(x, y + tileSize); ctx.lineTo(x + tileSize, y + tileSize); ctx.stroke(); }
-                if (sides[3]) { ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + tileSize); ctx.stroke(); }
             }
+
+            ctx.restore();
         }
 
-        ctx.restore();
-    }
 
 function resizeCanvas() {
     const canvas = document.getElementById('roomGrid');
     const container = canvas.parentElement;
 
+    // Calculate room dimensions
     const cols = roomLayout[0].length;
     const rows = roomLayout.length;
     const tileSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
     
+    // Set canvas to room size (not container size)
     canvas.width = cols * tileSize;
     canvas.height = rows * tileSize;
 
     renderRoomGrid(viewportState.x, viewportState.y, viewportState.scale);
 }
 
+// Call on load AFTER DOM is ready
 window.addEventListener('load', resizeCanvas);
+
+// Call on window resize
 window.addEventListener('resize', resizeCanvas);
 
         function setPetAndObjectContainersToGridDimentions() {
@@ -3493,6 +3546,7 @@ window.addEventListener('resize', resizeCanvas);
             const petContainer = document.getElementById('petContainer');
             const roomObjectsContainer = document.getElementById('roomObjectsContainer');
 
+            // Add 'px' to make it valid CSS
             roomContainer.style.width = width + "px";
             roomContainer.style.height = height + "px";
             
@@ -3503,6 +3557,7 @@ window.addEventListener('resize', resizeCanvas);
             roomObjectsContainer.style.height = height + "px";
         }
 
+// Function to render assets into the container
 function renderRoomObjects() {
     const roomObjectsContainer = document.querySelector("#roomObjectsContainer");
     roomObjectsContainer.innerHTML = '';
@@ -3540,6 +3595,7 @@ function toggleRoomDarknessBasedOnElectricityTax() {
         room.classList.add("dark");
         messageToTheUser("Nėra šviesos! Sumokėk elektros mokestį.")
     } else {
+        // only remove if it exists
         if (room.classList.contains("dark")) {
             room.classList.remove("dark");
         }
@@ -3581,11 +3637,11 @@ function initGame() {
 fetch("gameAssetIndex.json")
     .then(response => response.json())
     .then(data => {
-        gameAssetIndex = data;
-        return fetchGameData();
+        gameAssetIndex = data;      // assign JSON result
+        return fetchGameData();     // call your function next
     })
     .then(() => {
-        initGame();
+        initGame();                 // only runs after fetchGameData completes
         fetchMessageGiftsFromServer();
     })
     .catch(error => {
@@ -3599,6 +3655,7 @@ function parseGameData(dataFromServer) {
     petOnWalk = dataFromServer.petOnWalk;
     formatTaxesData(dataFromServer.taxes) 
     
+    // Parse pet stats from the new format
     petStatsList = JSON.parse(dataFromServer.petStats);
 
     function formatTaxesData(taxesDataFromTheServer) {
@@ -3606,8 +3663,10 @@ function parseGameData(dataFromServer) {
             taxesDataFromTheServer = JSON.parse(taxesDataFromTheServer);
         }
 
+        // Current time in days
         const currentTimeInDays = Date.now() / 1000 / 60 / 60 / 24;
 
+        // taxPaymentPeriod and taxGracePeriod are already in days
         if (!taxesDataFromTheServer || taxesDataFromTheServer.length === 0) {
             taxesData = {
                 "waterTax": {
@@ -3625,14 +3684,17 @@ function parseGameData(dataFromServer) {
 
         const [waterTaxDateInMinutes, electricityTaxDateInMinutes] = taxesDataFromTheServer;
 
+        // Convert server-provided dates from minutes to days
         const waterTaxDate = waterTaxDateInMinutes / 60 / 24;
         const electricityTaxDate = electricityTaxDateInMinutes / 60 / 24;
 
+        // Calculate due dates and grace periods in days
         const waterTaxDueDate = waterTaxDate + taxPaymentPeriod;
         const electricityTaxDueDate = electricityTaxDate + taxPaymentPeriod;
         const graceEndWater = waterTaxDueDate + taxGracePeriod;
         const graceEndElectricity = electricityTaxDueDate + taxGracePeriod;
 
+        // Determine if paid
         const waterPaid = currentTimeInDays <= graceEndWater;
         const electricityPaid = currentTimeInDays <= graceEndElectricity;
 
@@ -3665,6 +3727,7 @@ function parseGameData(dataFromServer) {
 
 
     function parseUserPetAssets(petAssets) {
+        // If server sends a JSON string, parse it
         if (typeof petAssets === "string") {
             petAssets = JSON.parse(petAssets);
         }
@@ -3706,6 +3769,7 @@ async function fetchGameData() {
     let showMessageTimeout;
     let closer;
     
+    // Schedule showing the message after 500ms
     showMessageTimeout = setTimeout(() => {
         closer = messageToTheUser("Duomenys ieškomi duomenų bazėje. Procesas gali užtrukti kelias minutes.", false, true);
     }, 500);
@@ -3717,6 +3781,7 @@ async function fetchGameData() {
     });
     
     try {
+        // ✅ Get fresh userData right before making the request
         const userData = JSON.parse(localStorage.getItem('userData'));
         
         if (!userData?.userId) {
@@ -3746,6 +3811,7 @@ async function fetchGameData() {
         messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
         console.error("Error fetching game data:", error);
     } finally {
+        // ✅ Re-enable container (moved to finally to always execute)
         Array.from(gameContainer.children).forEach(child => {
             child.style.pointerEvents = "auto";
             child.style.opacity = "1";
@@ -3768,6 +3834,7 @@ let holdStartTime = 0;
 let offsetX = 0;
 let offsetY = 0;
 
+// Object interactions
 const objectInteractions = {
     'pet': (obj) => displayPetTreatOptions(obj),
     'food-bowl': (obj) => displayFoodOptions(obj),
@@ -3778,9 +3845,10 @@ const objectInteractions = {
 };
 
 function toggleMusicPlayer(obj) {
-    const musicPlayerAutoOff = 4000;
+    const musicPlayerAutoOff = 4000; // milliseconds
     const pets = document.querySelectorAll('.pet');
 
+    // Helper to stop pets from dancing and manage actions
     const stopPetsDancing = () => {
         pets.forEach((pet) => {
             const firstAction = pendingPetActions[pet.id]?.[0];
@@ -3797,39 +3865,48 @@ function toggleMusicPlayer(obj) {
     };
 
     if (!obj.objectOn) {
+        // Turn ON
         obj.objectOn = true;
         setObjectAnimation(obj, "musicPlayerOn");
         initUserTriggeredAction("music", obj);
 
+        // Cancel any existing auto-off timer
         if (obj._autoOffTimer) {
             clearTimeout(obj._autoOffTimer);
         }
 
+        // Automatically turn off after delay
         obj._autoOffTimer = setTimeout(() => {
             obj._autoOffTimer = null;
 
-            if (!obj.objectOn) return;
+            if (!obj.objectOn) return; // Already turned off manually
 
             obj.objectOn = false;
             setObjectAnimation(obj, "musicPlayerOff");
 
+            // Pet handling (same as original)
             stopPetsDancing();
 
         }, musicPlayerAutoOff);
 
     } else {
+        // Turn OFF manually
         obj.objectOn = false;
         setObjectAnimation(obj, "musicPlayerOff");
 
+        // Cancel pending auto-off
         if (obj._autoOffTimer) {
             clearTimeout(obj._autoOffTimer);
             obj._autoOffTimer = null;
         }
 
+        // Pet handling (same as original)
         stopPetsDancing();
     }
 }
 
+
+// Disable right-click context menu and image highlighting in room container
 roomContainer.addEventListener('contextmenu', function(e) {
     e.preventDefault();
 });
@@ -3842,6 +3919,7 @@ roomContainer.addEventListener('dragstart', function(e) {
     e.preventDefault();
 });
 
+// Add CSS to prevent highlighting
 roomContainer.style.userSelect = 'none';
 roomContainer.style.webkitUserSelect = 'none';
 roomContainer.style.mozUserSelect = 'none';
@@ -3849,17 +3927,19 @@ roomContainer.style.mozUserSelect = 'none';
 function startDragging(e) {
     if (e.pointerType === "mouse" && e.button !== 0) return;
     if (viewportState.isDragging || viewportState.spacePressed) return;
-    if (multiTouchActive) return;
 
     isDragging = true;
     currentObject.classList.add('dragging');
 
+    // Get the object's current screen position
     const objRect = currentObject.getBoundingClientRect();
     
+    // Store offset in screen pixels
     offsetX = e.clientX - objRect.left;
     offsetY = e.clientY - objRect.top;
 }
 
+// Global pointer move handler
 document.addEventListener('pointermove', function(e) {
     if (viewportState.isDragging) {
         handleViewportPanMove(e);
@@ -3869,25 +3949,40 @@ document.addEventListener('pointermove', function(e) {
     if (isDragging && currentObject && !multiTouchActive) {
         e.preventDefault();
         
-        const translateWrapper = document.getElementById('room-transform-wrapper');
-        const translateRect = translateWrapper.getBoundingClientRect();
-        
-        const newLeft = (e.clientX - translateRect.left - offsetX);
-        const newTop = (e.clientY - translateRect.top - offsetY);
-        
-        currentObject.style.left = newLeft + 'px';
-        currentObject.style.top = newTop + 'px';
+        requestAnimationFrame(() => {
+            if (!currentObject) return;
+            
+            const scaleWrapper = document.getElementById('scale-wrapper');
+            const scaleRect = scaleWrapper.getBoundingClientRect();
+            
+            const newObjScreenX = e.clientX - offsetX;
+            const newObjScreenY = e.clientY - offsetY;
+
+            const originScreenX = scaleRect.left + (viewportState.x * viewportState.scale);
+            const originScreenY = scaleRect.top + (viewportState.y * viewportState.scale);
+
+            const newObjRelScreenX = newObjScreenX - originScreenX;
+            const newObjRelScreenY = newObjScreenY - originScreenY;
+
+            const newLocalX = newObjRelScreenX / viewportState.scale;
+            const newLocalY = newObjRelScreenY / viewportState.scale;
+            
+            currentObject.style.left = newLocalX + 'px';
+            currentObject.style.top = newLocalY + 'px';
+        });
     }
 });
 
 function enablePetDragging() {
     const pets = document.querySelectorAll('.pet');
     pets.forEach(pet => {
+        // Prevent default browser drag on image/text
         pet.setAttribute('draggable', 'false');
         pet.style.userSelect = 'none';
         pet.style.touchAction = 'none';
         
         pet.addEventListener('pointerdown', function(e) {
+            // FIX: Ignore if multi-touch is active
             if (multiTouchActive) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -3895,6 +3990,7 @@ function enablePetDragging() {
             }
             
             if (e.touches?.length >= 2) return;
+            // Only allow left mouse or touch
             if (e.pointerType === "mouse" && e.button !== 0) return;
 
             pet.classList.add('dragging');
@@ -3926,7 +4022,9 @@ function enablePetDragging() {
             }, 10);
         });
         
+        // Cancel hold if pointer is released early
         pet.addEventListener('pointerup', function(e) {
+            // FIX: Ignore if multi-touch was recently active
             if (multiTouchActive) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -3990,6 +4088,7 @@ function hasBlockingObjects(target) {
     const targetHeight = Math.ceil(target.offsetHeight / unitSize);
     const targetZ = parseInt(window.getComputedStyle(target).zIndex) || 0;
 
+    // Collect all tiles covered by this object
     const targetTiles = [];
     for (let dx = 0; dx < targetWidth; dx++) {
         for (let dy = 0; dy < targetHeight; dy++) {
@@ -3997,6 +4096,7 @@ function hasBlockingObjects(target) {
         }
     }
 
+    // Compare against all other objects
     const allObjects = document.querySelectorAll('.room-object');
     for (let other of allObjects) {
         if (other === target) continue;
@@ -4016,6 +4116,7 @@ function hasBlockingObjects(target) {
             }
         }
 
+        // ✅ Check if any tile overlaps
         for (let t of targetTiles) {
             for (let o of otherTiles) {
                 if (t[0] === o[0] && t[1] === o[1] && otherZ > targetZ) {
@@ -4034,12 +4135,15 @@ function enableObjectDragging() {
     objects.forEach(obj => {
         obj.classList.add('room-object-edit');
         
+        // Make sure it's NOT draggable (remove native drag)
         obj.setAttribute('draggable', 'false');
         
+        // Remove old listeners
         obj.removeEventListener('pointerdown', obj._normalModeHandler);
         obj.removeEventListener('pointerdown', obj._editModeHandler);
         obj.removeEventListener('contextmenu', obj._contextMenuHandler);
         
+        // Mobile: use contextmenu for long press
         if (isMobile) {
             obj._contextMenuHandler = function(e) {
                 e.preventDefault();
@@ -4072,6 +4176,7 @@ function enableObjectDragging() {
         }
         
         obj._editModeHandler = function(e) {
+            // IMMEDIATELY check for multi-touch
             if (multiTouchActive) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -4093,6 +4198,7 @@ function enableObjectDragging() {
             const startY = e.clientY;
             let dragStarted = false;
             
+            // Mobile: Check if object is ready to drag (from contextmenu)
             if (isMobile && !obj._readyToDrag) {
                 return;
             }
@@ -4106,9 +4212,11 @@ function enableObjectDragging() {
                 const deltaX = Math.abs(moveEvent.clientX - startX);
                 const deltaY = Math.abs(moveEvent.clientY - startY);
                 
+                // Start drag on any movement
                 if ((deltaX > 3 || deltaY > 3) && !dragStarted) {
                     dragStarted = true;
                     
+                    // Desktop: check blocking and show placement map
                     if (!isMobile) {
                         const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || 
                                                gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
@@ -4148,11 +4256,13 @@ function enableObjectDragging() {
                 document.removeEventListener('pointermove', moveHandler);
                 document.removeEventListener('pointerup', upHandler);
                 
+                // Mobile: clear ready flag when touch ends
                 if (isMobile && !dragStarted) {
                     obj._readyToDrag = false;
                     clearPlacementHighlights();
                 }
                 
+                // Desktop: show delete icon on click without drag
                 if (!dragStarted && !isMobile) {
                     showDeleteIcon(obj);
                 }
@@ -4181,18 +4291,22 @@ function enableObjectDragging() {
         obj.addEventListener('pointerdown', obj._editModeHandler);
     });
 }
-
+// Disable object dragging for normal mode
 function disableObjectDragging() {
+    // Remove all delete icons when exiting edit mode
     removeAllDeleteItemHighlights();
     
+    // Target both room objects AND pets
     const objects = document.querySelectorAll('.room-object, .pet');
     objects.forEach(obj => {
         obj.classList.remove('room-object-edit');
         
+        // Remove edit mode handler
         if (obj._editModeHandler) {
             obj.removeEventListener('pointerdown', obj._editModeHandler);
         }
         
+        // Remove any existing normal mode handler first
         if (obj._normalModeHandler) {
             obj.removeEventListener('pointerdown', obj._normalModeHandler);
         }
@@ -4203,6 +4317,7 @@ function disableObjectDragging() {
         let clickStartTime = 0;
         let wasLongHold = false;
         
+        // Add normal mode handler (click for interaction only)
         obj._normalModeHandler = function(e) {
             if (e.pointerType === "mouse" && e.button !== 0) return;
             
@@ -4212,30 +4327,35 @@ function disableObjectDragging() {
             clickStartTime = Date.now();
             wasLongHold = false;
             
+            // Check if this becomes a long hold (like your existing hold timer logic)
             const holdTimer = setTimeout(() => {
                 wasLongHold = true;
-            }, 1000);
+            }, 1000); // Same 1 second threshold as your drag logic
             
+            // Store timer reference to clear it later
             obj._holdTimer = holdTimer;
         };
         
         obj._normalModeUpHandler = function(e) {
             if (e.pointerType === "mouse" && e.button !== 0) return;
             
+            // Clear the hold timer
             if (obj._holdTimer) {
                 clearTimeout(obj._holdTimer);
                 obj._holdTimer = null;
             }
             
-            if (!wasLongHold && !isDragging && !editing && !multiTouchActive) {
+            // Only trigger interaction if it was a quick click, not a long hold
+            if (!wasLongHold && !isDragging && !editing && !multiTouchActive && (e.pointerType === 'mouse' || e.touches?.length === 0)) {
                 for (const cls of this.classList) {
                     if (objectInteractions[cls]) {
                         objectInteractions[cls](obj);
-                        break;
+                        break; // stop after the first match
                     }
                 }
             }
             
+            // Reset flags
             wasLongHold = false;
         };
         
@@ -4244,30 +4364,43 @@ function disableObjectDragging() {
     });
 }
 
+// Global pointer move handler - REVERTED TO DIRECT CALCULATION
 document.addEventListener('pointermove', function(e) {
+    // Handle viewport panning first
     if (viewportState.isDragging) {
         handleViewportPanMove(e);
         return;
     }
     
-    if (isDragging && currentObject && !multiTouchActive) {
+    // Handle object dragging - direct calculation, no RAF
+    if (isDragging && currentObject) {
         e.preventDefault();
         
         const scaleWrapper = document.getElementById('scale-wrapper');
         const scaleRect = scaleWrapper.getBoundingClientRect();
         
+        // --- CORRECTED COORDINATE LOGIC (Direct Update) ---
+
+        // 1. Calculate the new *screen* position of the object's top-left based on the mouse
+        //    (offsetX/Y were stored as screen pixels in startDragging)
         const newObjScreenX = e.clientX - offsetX;
         const newObjScreenY = e.clientY - offsetY;
 
+        // 2. Calculate the *screen* position of the panned/scaled origin
+        //    (i.e., the 0,0 point of the room-transform-wrapper)
         const originScreenX = scaleRect.left + (viewportState.x * viewportState.scale);
         const originScreenY = scaleRect.top + (viewportState.y * viewportState.scale);
 
+        // 3. Find the object's new position *relative* to that origin, still in *screen* pixels
         const newObjRelScreenX = newObjScreenX - originScreenX;
         const newObjRelScreenY = newObjScreenY - originScreenY;
 
+        // 4. Convert this relative screen position back to *local* coordinates
+        //    by dividing by the scale. This is the value style.left/top expects.
         const newLocalX = newObjRelScreenX / viewportState.scale;
         const newLocalY = newObjRelScreenY / viewportState.scale;
         
+        // 5. Set the style.left/top using the calculated local coordinates
         currentObject.style.left = newLocalX + 'px';
         currentObject.style.top = newLocalY + 'px';
     }
@@ -4297,9 +4430,11 @@ function checkPlacement(obj, placementMap, unitSize) {
 }
 
 function isBottomRowWalkable(walkMap, startRow, startCol, width) {
+    // Check if row is inside walkMap
     if (startRow < 0 || startRow >= walkMap.length) return false;
 
     for (let col = startCol; col < startCol + width; col++) {
+        // Check if column is inside walkMap
         if (col < 0 || col >= walkMap[0].length) return false;
 
         if (!walkMap[startRow][col]?.walkable) {
@@ -4328,15 +4463,18 @@ function findClosestWalkablePosition(walkMap, startRow, startCol, petWidth) {
     return closest;
 }
 
+// Global pointer up handler
 document.addEventListener('pointerup', function(e) {
     if (e.pointerType === "mouse" && e.button !== 0) return;
     
+    // ADD THIS CHECK AT THE VERY TOP
     if (multiTouchActive) {
         e.preventDefault();
         e.stopPropagation();
         return;
     }
     
+    // Clear any hold timer
     if (holdTimer) {
         clearInterval(holdTimer);
     }
@@ -4356,14 +4494,18 @@ document.addEventListener('pointerup', function(e) {
         const petWidthInTiles = Math.ceil(currentObject.offsetWidth / unitSize);
         const petHeightInTiles = Math.ceil(currentObject.offsetHeight / unitSize);
 
+        // Current tile coordinates (top-left of pet)
         let tileX = Math.round(parseInt(currentObject.style.left) / unitSize);
         let tileY = Math.round(parseInt(currentObject.style.top) / unitSize);
 
+        // The bottom row of the pet in tile coordinates
         let bottomRow = tileY + petHeightInTiles - 1;
 
+        // If bottom row not walkable, find closest position where **entire bottom row** is walkable
         if (!isBottomRowWalkable(globalWalkabilityMap, bottomRow, tileX, petWidthInTiles)) {
             const closest = findClosestWalkablePosition(globalWalkabilityMap, bottomRow, tileX, petWidthInTiles);
             if (closest) {
+                // Align pet so **bottom row** sits on walkable tiles
                 currentObject.style.left = closest.col * unitSize + 'px';
                 currentObject.style.top = (closest.row - petHeightInTiles + 1) * unitSize + 'px';
             } else {
@@ -4387,16 +4529,19 @@ document.addEventListener('pointerup', function(e) {
     isDragging = false;
     currentObject = null;
     } else if (currentObject && !editing && !multiTouchActive) {
+        // Only trigger interactions in normal mode and if we have a current object
         for (const cls of currentObject.classList) {
             if (objectInteractions[cls]) {
                 objectInteractions[cls](currentObject);
-                break;
+                break; // stop after first match
             }
         }
         currentObject = null;
     }
     
+    // Hide delete icons when clicking elsewhere (only in edit mode)
     if (editing) {
+        // Ignore clicks on the delete button
         if (!e.target.closest('.marked-for-deletion') && !e.target.closest('#delete-selected-item-button')) {
             const clickedObject = e.target.closest('.room-object');
             if (!clickedObject) {
@@ -4429,27 +4574,33 @@ function movePetToTile(pet, startCoord, endCoord) {
     });
 }
 
+// Helper: only bottom row must be walkable
 function canPlaceObjectAt(x, y, width, height, walkabilityMap) {
     width = Math.ceil(width / unitSize);
     height = Math.ceil(height / unitSize);
     
     const topRow = y - (height - 1);
 
+    // Check bounds first (entire object must fit in map vertically & horizontally)
     if (topRow < 0 || y >= walkabilityMap.length ||
         x < 0 || x + width - 1 >= walkabilityMap[0].length) {
         return false;
     }
 
+    // ✅ Only check bottom row for walkability
     for (let c = x; c < x + width; c++) {
         if (!walkabilityMap[y][c] || !walkabilityMap[y][c].walkable) {
             return false;
         }
     }
 
+    // Upper rows don't need to be walkable
     return true;
 }
 
+// Pathfinding function with bottom-left reference - FIXED
 function findPath(startCol, startRow, endCol, endRow, objectId) {
+    // Get object size in tiles
     const object = document.getElementById(objectId);
     if (!object) {
         console.error("Object not found:", objectId);
@@ -4461,13 +4612,16 @@ function findPath(startCol, startRow, endCol, endRow, objectId) {
     const unitSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
     const widthInTiles = Math.ceil(objWidth / unitSize);
 
+    // Generate walkability map
     const walkabilityMap = globalWalkabilityMap;
     
+    // Add safety check
     if (!walkabilityMap || walkabilityMap.length === 0) {
         console.error("Failed to generate walkability map");
         return null;
     }
 
+    // Validate start & end
     if (!canPlaceObjectAt(startCol, startRow, objWidth, objHeight, walkabilityMap)) {
         console.log("Start position is not valid for object bottom");
         return null;
@@ -4478,7 +4632,9 @@ function findPath(startCol, startRow, endCol, endRow, objectId) {
         return null;
     }
 
+    // Helper function to check if movement is allowed for the entire object
     function canMoveInDirection(fromCol, fromRow, dirIndex) {
+        // For each tile the object occupies at the current position
         for (let c = fromCol; c < fromCol + widthInTiles; c++) {
             if (c >= walkabilityMap[0].length || 
                 !walkabilityMap[fromRow] || 
@@ -4491,13 +4647,15 @@ function findPath(startCol, startRow, endCol, endRow, objectId) {
         return true;
     }
 
+    // Directions: up, right, down, left
     const directions = [
-        [0, -1],
-        [1, 0],
-        [0, 1],
-        [-1, 0]
+        [0, -1], // up (col, row - 1)
+        [1, 0],  // right (col + 1, row)
+        [0, 1],  // down (col, row + 1)
+        [-1, 0]  // left (col - 1, row)
     ];
 
+    // Track visited states for bottom-left corner
     const visited = Array(walkabilityMap.length).fill().map(
         () => Array(walkabilityMap[0].length).fill(false)
     );
@@ -4511,6 +4669,7 @@ function findPath(startCol, startRow, endCol, endRow, objectId) {
         for (let dirIndex = 0; dirIndex < directions.length; dirIndex++) {
             const [dc, dr] = directions[dirIndex];
             
+            // CHECK DIRECTIONAL MOVEMENT FIRST, before calculating new position
             if (!canMoveInDirection(col, row, dirIndex)) {
                 continue;
             }
@@ -4518,10 +4677,12 @@ function findPath(startCol, startRow, endCol, endRow, objectId) {
             const newCol = col + dc;
             const newRow = row + dr;
 
+            // Destination reached?
             if (newCol === endCol && newRow === endRow) {
                 return [...path, [newCol, newRow]];
             }
 
+            // Rest of your checks...
             if (newRow < 0 || newRow >= walkabilityMap.length ||
                 newCol < 0 || newCol >= walkabilityMap[0].length ||
                 visited[newRow][newCol]) {
@@ -4532,6 +4693,7 @@ function findPath(startCol, startRow, endCol, endRow, objectId) {
                 continue;
             }
 
+            // Valid move
             visited[newRow][newCol] = true;
             queue.push([newCol, newRow, [...path, [newCol, newRow]]]);
         }
@@ -4541,8 +4703,11 @@ function findPath(startCol, startRow, endCol, endRow, objectId) {
     return null;
 }
 
+// Global variable to track active movements
 const activeMovements = new Map();
 
+// Function to move an object along a path
+// Function to move an object along a path
 function moveObjectAlongPath(objectId, path, onComplete) {
     const speed = 150
     const object = document.getElementById(objectId);
@@ -4551,14 +4716,14 @@ function moveObjectAlongPath(objectId, path, onComplete) {
         return;
     }
 
-    cancelMovement(objectId);
+    cancelMovement(objectId); // Cancel any existing movement
 
     let currentStep = 0;
-    const movementId = Date.now() + Math.random();
+    const movementId = Date.now() + Math.random(); // Unique ID for this movement
     activeMovements.set(objectId, { 
         id: movementId, 
         interval: null,
-        cleanupTimeout: null
+        cleanupTimeout: null  // Track cleanup timeout too
     });
 
     function moveToNextStep() {
@@ -4577,15 +4742,21 @@ function moveObjectAlongPath(objectId, path, onComplete) {
         const deltaCol = col - prevCol;
         const deltaRow = row - prevRow;
 
+        // SOLUTION 1: Pre-adjust z-index BEFORE starting the transition
         typeof predictAndSetZIndex === 'function' && predictAndSetZIndex(object, col, row);
 
+        // Preserve your original animation logic exactly
         if (deltaRow > 0) {
+            // Moving down
             setObjectAnimation(object, `${objectId}-walks-downwards`);
         } else if (deltaRow < 0) {
+            // Moving up
             setObjectAnimation(object, `${objectId}-walks-upwards`);
         } else if (deltaCol !== 0) {
+            // Moving horizontally
             setObjectAnimation(object, `${objectId}-walks-sideways`);
             
+            // Set direction (sprite originally faces left)
             if (deltaCol < 0) {
                 object.classList.remove("pet-right");
                 object.classList.add("pet-left");
@@ -4595,6 +4766,8 @@ function moveObjectAlongPath(objectId, path, onComplete) {
             }
         }
 
+        // SOLUTION 2: Add a small delay before starting the visual transition
+        // This ensures z-index changes are processed first
         requestAnimationFrame(() => {
             object.style.transition = `top ${speed}ms linear, left ${speed}ms linear`;
             object.style.top = `calc((${row} * var(--unit-size)) - (var(--pet-size) - var(--unit-size)))`;
@@ -4604,6 +4777,7 @@ function moveObjectAlongPath(objectId, path, onComplete) {
         currentStep++;
         movement.interval = setTimeout(moveToNextStep, speed);
 
+        // Handle final step adjustments
         if (currentStep === path.length) {
             setTimeout(() => {
                 if (activeMovements.has(objectId) && activeMovements.get(objectId).id === movementId) {
@@ -4622,6 +4796,7 @@ function moveObjectAlongPath(objectId, path, onComplete) {
 
 function predictAndSetZIndex(movingObject = null, nextCol = null, nextRow = null) {
     
+    // Get all room objects (including pets)
     const allObjects = Array.from(document.querySelectorAll('.room-object, .pet'));
 
     let objectOccupiedTiles = {};
@@ -4629,11 +4804,13 @@ function predictAndSetZIndex(movingObject = null, nextCol = null, nextRow = null
     if (!movingObject) {
         const objects = document.querySelectorAll('.room-object');
         objects.forEach(obj => {
-            obj.style.zIndex = '';
+            obj.style.zIndex = ''; // removes inline z-index
         });
     }
 
+    // Build occupied tiles map
     allObjects.forEach(obj => {
+        // Check both userObjectAssets and furniturePreviewDict
         const assetSource = userObjectAssets[obj.id] || furniturePreviewDict[obj.id];
         
         if (assetSource) {
@@ -4643,6 +4820,7 @@ function predictAndSetZIndex(movingObject = null, nextCol = null, nextRow = null
             }
         }
         let coords = getObjectCoordinates(obj.id);
+        // Only apply prediction if we have a moving object
         if (movingObject && nextCol && nextRow) {
             if (obj.id === movingObject.id) {
                 coords = [nextCol, nextRow];
@@ -4657,7 +4835,6 @@ function predictAndSetZIndex(movingObject = null, nextCol = null, nextRow = null
     const requirePets = movingObject !== null;
     applyZIndexLogic(buildClusters(objectOccupiedTiles, requirePets), movingObject, nextRow);
 }
-
 
 function buildClusters(objectOccupiedTiles, requirePets = true) {
     const objectIds = Object.keys(objectOccupiedTiles);
@@ -10917,6 +11094,7 @@ function displayReceivedMessages () {
     }
 }
 
+// Apply translation + scale
 function applyViewportTransform() {
     const scaleWrapper = document.getElementById('scale-wrapper');
     const translateWrapper = document.getElementById('room-transform-wrapper');
@@ -10945,7 +11123,6 @@ function roomToScreen(roomX, roomY) {
 }
 
 // ------------------ Desktop zoom ------------------
-// Desktop wheel zoom
 function handleViewportZoom(e) {
     e.preventDefault();
 
@@ -10970,91 +11147,77 @@ function handleViewportZoom(e) {
     applyViewportTransform();
 }
 
-
-// Mobile pinch zoom
+// ------------------ Mobile pinch zoom ------------------
 let initialPinchDistance = null;
 let initialPinchScale = 1;
-let initialPinchCenter = { x: 0, y: 0 };
-let initialViewportState = { x: 0, y: 0, scale: 1 };
+let initialPinchX = 0;
+let initialPinchY = 0;
+let initialViewportX = 0;
+let initialViewportY = 0;
+let multiTouchCooldown = null;
 
-function getDistance(touch1, touch2) {
-    const dx = touch1.clientX - touch2.clientX;
-    const dy = touch1.clientY - touch2.clientY;
-    return Math.sqrt(dx * dx + dy * dy);
-}
-
-function getCenter(touch1, touch2) {
-    return {
-        x: (touch1.clientX + touch2.clientX) / 2,
-        y: (touch1.clientY + touch2.clientY) / 2
-    };
-}
-
-function handleTouchStart(e) {
-    if (e.touches.length === 2) {
-        multiTouchActive = true;
-        
-        // Clear any object drag states
-        if (holdTimer) {
-            clearInterval(holdTimer);
-            holdTimer = null;
-        }
-        if (currentObject) {
-            currentObject.classList.remove('dragging');
-            currentObject = null;
-        }
-        isDragging = false;
-        
-        // Clear all ready-to-drag states
-        document.querySelectorAll('.room-object').forEach(obj => {
-            obj._readyToDrag = false;
-        });
-        clearPlacementHighlights();
-        
-        const viewport = document.getElementById('viewport-container');
-        const rect = viewport.getBoundingClientRect();
-        
-        initialPinchDistance = getDistance(e.touches[0], e.touches[1]);
-        initialPinchScale = viewportState.scale;
-        const center = getCenter(e.touches[0], e.touches[1]);
-        initialPinchCenter = {
-            x: center.x - rect.left,
-            y: center.y - rect.top
-        };
-        initialViewportState = {
-            x: viewportState.x,
-            y: viewportState.y,
-            scale: viewportState.scale
-        };
-    }
+function getDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx*dx + dy*dy);
 }
 
 function handleTouchMove(e) {
-    if (e.touches.length === 2 && initialPinchDistance !== null) {
+    if (e.touches.length === 2) {
         e.preventDefault();
         
+        const currentDistance = getDistance(e.touches);
         const viewport = document.getElementById('viewport-container');
         const rect = viewport.getBoundingClientRect();
         
-        const currentDistance = getDistance(e.touches[0], e.touches[1]);
-        const currentCenter = getCenter(e.touches[0], e.touches[1]);
-        const centerX = currentCenter.x - rect.left;
-        const centerY = currentCenter.y - rect.top;
-        
-        // Calculate scale change
+        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
+
+        if (!initialPinchDistance) {
+            initialPinchDistance = currentDistance;
+            initialPinchScale = viewportState.scale;
+            initialPinchX = midX;
+            initialPinchY = midY;
+            initialViewportX = viewportState.x;
+            initialViewportY = viewportState.y;
+            lastPinchScale = 1;
+            isPinching = false;
+            return;
+        }
+
+        // Deadzone check
+        const distanceChange = Math.abs(currentDistance - initialPinchDistance);
+        if (distanceChange < PINCH_DEADZONE) {
+            // Just panning, no zoom
+            if (!isPinching) {
+                const deltaX = midX - initialPinchX;
+                const deltaY = midY - initialPinchY;
+                
+                viewportState.x = initialViewportX + deltaX;
+                viewportState.y = initialViewportY + deltaY;
+                
+                applyViewportTransform();
+            }
+            return;
+        }
+
+        // We're actually pinching now
+        isPinching = true;
+
+        // Calculate scale
         const scaleFactor = currentDistance / initialPinchDistance;
         let newScale = initialPinchScale * scaleFactor;
         newScale = Math.min(Math.max(newScale, viewportState.minScale), viewportState.maxScale);
-        
-        // Calculate the room coordinate at the pinch center
-        const roomX = (initialPinchCenter.x - initialViewportState.x) / initialViewportState.scale;
-        const roomY = (initialPinchCenter.y - initialViewportState.y) / initialViewportState.scale;
-        
-        // Apply new scale while keeping the room point under the pinch center
+
+        // Only update if scale actually changed meaningfully
+        if (Math.abs(newScale - lastPinchScale) < 0.001) return;
+        lastPinchScale = newScale;
+
+        const scaleChange = newScale / initialPinchScale;
+        viewportState.x = initialViewportX * scaleChange + initialPinchX * (1 - scaleChange);
+        viewportState.y = initialViewportY * scaleChange + initialPinchY * (1 - scaleChange);
         viewportState.scale = newScale;
-        viewportState.x = centerX - roomX * newScale;
-        viewportState.y = centerY - roomY * newScale;
-        
+
         applyViewportTransform();
     }
 }
@@ -11062,12 +11225,15 @@ function handleTouchMove(e) {
 function handleTouchEnd(e) {
     if (e.touches.length < 2) {
         initialPinchDistance = null;
-        initialPinchScale = 1;
+        initialPinchX = 0;
+        initialPinchY = 0;
+        initialViewportX = 0;
+        initialViewportY = 0;
+        isPinching = false;
+        lastPinchScale = 1;
     }
     
-    // When all touches end after multi-touch
     if (e.touches.length === 0 && multiTouchActive) {
-        // Clear everything
         if (holdTimer) {
             clearInterval(holdTimer);
             holdTimer = null;
@@ -11082,12 +11248,6 @@ function handleTouchEnd(e) {
         
         clearPlacementHighlights();
         
-        // Clear all ready-to-drag states on mobile
-        document.querySelectorAll('.room-object').forEach(obj => {
-            obj._readyToDrag = false;
-        });
-        
-        // Set cooldown to prevent immediate clicks
         if (multiTouchCooldown) {
             clearTimeout(multiTouchCooldown);
         }
@@ -11099,9 +11259,7 @@ function handleTouchEnd(e) {
     }
 }
 
-// Viewport panning (middle mouse button, spacebar, or 2-finger drag)
 function handleViewportPanStart(e) {
-    // Don't start pan if already dragging an object
     if (isDragging && currentObject) return;
     
     const isTouchMultiFinger = e.touches?.length >= 2;
@@ -11111,7 +11269,6 @@ function handleViewportPanStart(e) {
     if (isTouchMultiFinger) {
         multiTouchActive = true;
         
-        // Clear all object states
         if (holdTimer) {
             clearInterval(holdTimer);
             holdTimer = null;
@@ -11163,7 +11320,6 @@ function handleViewportPanEnd(e) {
     viewportState.isDragging = false;
     document.body.classList.remove('panning');
 
-    // Handle multi-touch end cleanup
     if (e?.type === 'touchend' && e.touches?.length === 0 && multiTouchActive) {
         if (holdTimer) {
             clearInterval(holdTimer);
@@ -11194,14 +11350,13 @@ function handleViewportPanEnd(e) {
     }
 }
 
-// Keyboard controls for spacebar pan mode
+// ------------------ Keyboard ------------------
 function handleKeyDown(e) {
     if (e.code === 'Space' && !viewportState.spacePressed) {
         e.preventDefault();
         viewportState.spacePressed = true;
         document.body.classList.add('pan-mode-active');
-        const indicator = document.getElementById('pan-mode-indicator');
-        if (indicator) indicator.classList.add('active');
+        document.getElementById('pan-mode-indicator')?.classList.add('active');
     }
 }
 
@@ -11210,28 +11365,20 @@ function handleKeyUp(e) {
         e.preventDefault();
         viewportState.spacePressed = false;
         document.body.classList.remove('pan-mode-active');
-        const indicator = document.getElementById('pan-mode-indicator');
-        if (indicator) indicator.classList.remove('active');
+        document.getElementById('pan-mode-indicator')?.classList.remove('active');
 
-        if (viewportState.isDragging) {
-            handleViewportPanEnd();
-        }
+        if (viewportState.isDragging) handleViewportPanEnd();
     }
 }
 
-// Initialize all viewport controls
 function initViewportControls() {
     const viewport = document.getElementById('viewport-container');
     if (!viewport) return;
 
-    // Remove any existing listeners to prevent duplicates
+    // Remove existing listeners
     viewport.removeEventListener('wheel', handleViewportZoom);
     viewport.removeEventListener('pointerdown', handleViewportPanStart);
     viewport.removeEventListener('touchstart', handleViewportPanStart);
-    viewport.removeEventListener('touchstart', handleTouchStart);
-    viewport.removeEventListener('touchmove', handleTouchMove);
-    viewport.removeEventListener('touchend', handleTouchEnd);
-    viewport.removeEventListener('contextmenu', preventContextMenu);
     
     window.removeEventListener('pointermove', handleViewportPanMove);
     window.removeEventListener('pointerup', handleViewportPanEnd);
@@ -11240,38 +11387,27 @@ function initViewportControls() {
     window.removeEventListener('keydown', handleKeyDown);
     window.removeEventListener('keyup', handleKeyUp);
 
-    // Desktop zoom with wheel
+    // Desktop zoom
     viewport.addEventListener('wheel', handleViewportZoom, { passive: false });
 
-    // Pan/drag with mouse or touch
+    // Pan
     viewport.addEventListener('pointerdown', handleViewportPanStart, { passive: false });
     viewport.addEventListener('touchstart', handleViewportPanStart, { passive: false });
 
-    // Global move/up handlers for panning
     window.addEventListener('pointermove', handleViewportPanMove, { passive: false });
     window.addEventListener('pointerup', handleViewportPanEnd);
     window.addEventListener('touchmove', handleViewportPanMove, { passive: false });
     window.addEventListener('touchend', handleViewportPanEnd);
 
-    // Mobile pinch zoom
-    viewport.addEventListener('touchstart', handleTouchStart, { passive: false });
-    viewport.addEventListener('touchmove', handleTouchMove, { passive: false });
-    viewport.addEventListener('touchend', handleTouchEnd);
-
-    // Keyboard controls
+    // Keyboard
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
 
     // Prevent context menu
-    function preventContextMenu(e) {
-        e.preventDefault();
-    }
-    viewport.addEventListener('contextmenu', preventContextMenu);
+    viewport.addEventListener('contextmenu', (e) => e.preventDefault());
 
-    // Initial transform
     applyViewportTransform();
 }
-
 
 function blockTopHalfOfSelectedDivsClickEvents() { //To prevent clicking of objects that take up some empty space, usually reserved for animation, click still goes to objects under, like a pet
   // For each class in the list
