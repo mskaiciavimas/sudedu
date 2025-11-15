@@ -442,7 +442,7 @@
 #toggle-edit-save-btn:hover::before,
 #cancel-edit-btn:hover::before,
 #end-preview-button:hover::before,
-#delete-selected-item-button:hover::before,
+#delete-selected-item-button:not(:disabled):hover::before,
 .pet-stats-selection-button.active:hover::before,
 .pet-btn.active:hover::before,
 .use-btn:hover::before,
@@ -674,6 +674,7 @@
         #delete-selected-item-button:disabled {
             background: #9ca3af;
             opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .shop-header {
@@ -3867,7 +3868,7 @@ function enablePetDragging() {
     });
 }
 
-function removeAllDeleteIcons() {
+function removeAllDeleteItemHighlights() {
     document.querySelectorAll('.marked-for-deletion').forEach(element => element.classList.remove("marked-for-deletion"));
     document.querySelector("#delete-selected-item-button").disabled = true;
 }
@@ -3877,7 +3878,7 @@ function showDeleteIcon(element) {
         return
     }
 
-    removeAllDeleteIcons();
+    removeAllDeleteItemHighlights();
 
     element.classList.add("marked-for-deletion");
     document.querySelector("#delete-selected-item-button").disabled = false;
@@ -3893,6 +3894,7 @@ function removeObjectsMarkedForRemoval() {
     } else if (objectToRemove) {
         objectToRemove.remove();
     }
+    removeAllDeleteItemHighlights()
 }
 
 document.querySelector("#delete-selected-item-button").addEventListener("click", () => {
@@ -4056,7 +4058,7 @@ function enableObjectDragging() {
 // Disable object dragging for normal mode
 function disableObjectDragging() {
     // Remove all delete icons when exiting edit mode
-    removeAllDeleteIcons();
+    removeAllDeleteItemHighlights();
     
     // Target both room objects AND pets
     const objects = document.querySelectorAll('.room-object, .pet');
@@ -4280,7 +4282,7 @@ document.addEventListener('pointerup', function(e) {
         if (!e.target.closest('.marked-for-deletion') && !e.target.closest('#delete-selected-item-button')) {
             const clickedObject = e.target.closest('.room-object');
             if (!clickedObject) {
-                removeAllDeleteIcons();
+                removeAllDeleteItemHighlights();
             }
         }
     }
