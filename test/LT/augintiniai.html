@@ -1705,7 +1705,7 @@
   }
 
   .pet-stats-selection-button.active {
-    background: red;
+    background: linear-gradient(135deg, #3288AC, #286D8A);;
     border: none;
     /*border: #286D8A 1px solid;*/
     color: #F5F5F7;
@@ -4130,20 +4130,24 @@ function enableObjectDragging() {
         obj.removeEventListener('contextmenu', obj._contextMenuHandler);
         
         // Mobile: use contextmenu for long press
-        if (isMobile) {
+if (isMobile) {
     obj._pointerDownHandler = function(e) {
         if (multiTouchActive) return;
 
         const startX = e.clientX;
         const startY = e.clientY;
+        const startTime = Date.now();
+        let longPressFired = false;
 
-        // Start a timer for long-press
+        // Start long-press timer
         obj._longPressTimeout = setTimeout(() => {
-            // Long press detected
+            longPressFired = true;
+            
+            // Long press detected - START DRAGGING
             if (navigator.vibrate) navigator.vibrate(30);
 
             const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || 
-                                   gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
+                                gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
 
             if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || 
                 objPlacingOrder === 9 || objPlacingOrder === 10 || objPlacingOrder === 15)) {
@@ -4159,7 +4163,6 @@ function enableObjectDragging() {
             determineAndHighlightValidTiles(placementMap);
             obj.classList.add("dragging");
 
-            // Start dragging immediately
             obj._editModeHandler({
                 clientX: e.clientX,
                 clientY: e.clientY,
@@ -4168,16 +4171,47 @@ function enableObjectDragging() {
                 preventDefault: () => {},
                 stopPropagation: () => {}
             });
-        }, 500); // <--- hold duration in ms (500ms here)
+        }, 100);
 
-        const cancel = () => {
-            clearTimeout(obj._longPressTimeout);
-            document.removeEventListener('pointerup', cancel);
-            document.removeEventListener('pointermove', cancel);
+        // Cancel on significant movement
+        const onMove = (ev) => {
+            const dx = Math.abs(ev.clientX - startX);
+            const dy = Math.abs(ev.clientY - startY);
+            if (dx > 5 || dy > 5) {
+                clearTimeout(obj._longPressTimeout);
+                cleanup();
+            }
         };
 
-        document.addEventListener('pointerup', cancel);
-        document.addEventListener('pointermove', cancel);
+        const onUp = (ev) => {
+            clearTimeout(obj._longPressTimeout);
+            
+            // Check if this was a quick tap (not a long press)
+            const duration = Date.now() - startTime;
+            const dx = Math.abs(ev.clientX - startX);
+            const dy = Math.abs(ev.clientY - startY);
+            
+            if (!longPressFired && duration < 300 && dx < 10 && dy < 10) {
+                // QUICK TAP - MARK FOR DELETION
+                if (navigator.vibrate) navigator.vibrate(20);
+                
+                // Toggle selection for deletion
+                obj.classList.toggle('marked-for-deletion');
+                
+                // Or call your deletion marking function:
+                // markObjectForDeletion(obj.id);
+            }
+            
+            cleanup();
+        };
+
+        const cleanup = () => {
+            document.removeEventListener('pointermove', onMove);
+            document.removeEventListener('pointerup', onUp);
+        };
+
+        document.addEventListener('pointermove', onMove);
+        document.addEventListener('pointerup', onUp);
     };
 
     obj.addEventListener('pointerdown', obj._pointerDownHandler);
