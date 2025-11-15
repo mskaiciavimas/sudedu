@@ -11005,12 +11005,14 @@ function handleViewportZoom(e) {
 
 // ------------------ Mobile pinch zoom ------------------
 let initialPinchDistance = null;
-let initialPinchScale = 1;
+let initialScale = 1;
+let lastMidX = null;
+let lastMidY = null;
 
-function getDistance(touches) {
-    const dx = touches[0].clientX - touches[1].clientX;
-    const dy = touches[0].clientY - touches[1].clientY;
-    return Math.sqrt(dx*dx + dy*dy);
+function getMidpoint(touches, rect) {
+    const x = (touches[0].clientX + touches[1].clientX) / 2 - rect.left;
+    const y = (touches[0].clientY + touches[1].clientY) / 2 - rect.top;
+    return { x, y };
 }
 
 function getDistance(touches) {
@@ -11020,38 +11022,54 @@ function getDistance(touches) {
 }
 
 function handleTouchMove(e) {
-    if (e.touches.length === 2) { // ONLY two fingers
-        e.preventDefault(); // Prevent default pinch/scroll
-        const currentDistance = getDistance(e.touches);
+    if (e.touches.length !== 2) return;
+    e.preventDefault();
 
-        if (!initialPinchDistance) {
-            initialPinchDistance = currentDistance;
-            initialPinchScale = viewportState.scale;
-            return;
-        }
+    const viewport = document.getElementById('viewport-container');
+    const rect = viewport.getBoundingClientRect();
 
-        const scaleFactor = currentDistance / initialPinchDistance;
-        let newScale = initialPinchScale * scaleFactor;
-        newScale = Math.min(Math.max(newScale, viewportState.minScale), viewportState.maxScale);
+    const mid = getMidpoint(e.touches, rect);
 
-        const viewport = document.getElementById('viewport-container');
-        const rect = viewport.getBoundingClientRect();
-        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
-        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
+    // --- 1) PAN with 2 fingers ---
+    if (lastMidX !== null && lastMidY !== null) {
+        const dx = mid.x - lastMidX;
+        const dy = mid.y - lastMidY;
 
-        const roomX = (midX - viewportState.x) / viewportState.scale;
-        const roomY = (midY - viewportState.y) / viewportState.scale;
-
-        viewportState.x = midX - roomX * newScale;
-        viewportState.y = midY - roomY * newScale;
-        viewportState.scale = newScale;
-
-        applyViewportTransform();
+        viewportState.x += dx;
+        viewportState.y += dy;
     }
+
+    lastMidX = mid.x;
+    lastMidY = mid.y;
+
+    // --- 2) PINCH ZOOM ---
+    const dist = getDistance(e.touches);
+
+    if (!initialPinchDistance) {
+        initialPinchDistance = dist;
+        initialScale = viewportState.scale;
+        return;
+    }
+
+    let newScale = initialScale * (dist / initialPinchDistance);
+    newScale = Math.min(Math.max(newScale, viewportState.minScale), viewportState.maxScale);
+
+    // Zoom around midpoint
+    const roomX = (mid.x - viewportState.x) / viewportState.scale;
+    const roomY = (mid.y - viewportState.y) / viewportState.scale;
+
+    viewportState.x = mid.x - roomX * newScale;
+    viewportState.y = mid.y - roomY * newScale;
+    viewportState.scale = newScale;
+
+    applyViewportTransform();
 }
 
-function handleTouchEnd(e) {
-    if (e.touches.length < 2) initialPinchDistance = null;
+function handleTouchEnd() {
+    if (event.touches.length < 2) {
+        initialPinchDistance = null;
+        lastMidX = lastMidY = null;
+    }
 }
 
 function handleViewportPanStart(e) {
