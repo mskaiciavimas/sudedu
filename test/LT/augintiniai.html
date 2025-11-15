@@ -1699,7 +1699,7 @@
   }
 
   .pet-stats-selection-button.active {
-    background: red;
+    background: linear-gradient(135deg, #3288AC, #286D8A);
     border: none;
     /*border: #286D8A 1px solid;*/
     color: #F5F5F7;
@@ -10976,7 +10976,6 @@ function displayReceivedMessages () {
 function applyViewportTransform() {
     const wrapper = document.getElementById('room-transform-wrapper');
     if (wrapper) {
-        wrapper.style.transformOrigin = `${-viewportState.x}px ${-viewportState.y}px`;
         wrapper.style.transform = `translate(${viewportState.x}px, ${viewportState.y}px) scale(${viewportState.scale})`;
     }
 }
@@ -11054,16 +11053,16 @@ function handleTouchMove(e) {
         const viewport = document.getElementById('viewport-container');
         const rect = viewport.getBoundingClientRect();
         
-        // Calculate current midpoint
-        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
-        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
+        // Calculate current midpoint in viewport coordinates
+        const currentMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+        const currentMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
 
         if (!initialPinchDistance) {
             initialPinchDistance = currentDistance;
             initialPinchScale = viewportState.scale;
-            initialPinchX = midX;
-            initialPinchY = midY;
-            initialViewportX = viewportState.x;  // STORE INITIAL VIEWPORT STATE
+            initialPinchX = currentMidX;
+            initialPinchY = currentMidY;
+            initialViewportX = viewportState.x;
             initialViewportY = viewportState.y;
             return;
         }
@@ -11072,13 +11071,13 @@ function handleTouchMove(e) {
         let newScale = initialPinchScale * scaleFactor;
         newScale = Math.min(Math.max(newScale, viewportState.minScale), viewportState.maxScale);
 
-        // Calculate the room point under the INITIAL pinch center using INITIAL viewport state
-        const roomX = (initialPinchX - initialViewportX) / initialPinchScale;
-        const roomY = (initialPinchY - initialViewportY) / initialPinchScale;
-
-        // Keep that room point under the CURRENT pinch center
-        viewportState.x = midX - roomX * newScale;
-        viewportState.y = midY - roomY * newScale;
+        // The actual scale change (might be clamped)
+        const actualScaleFactor = newScale / initialPinchScale;
+        
+        // Calculate new position to keep the initial pinch point fixed
+        // Formula: new_offset = initial_offset * scale_factor + pinch_point * (1 - scale_factor)
+        viewportState.x = initialViewportX * actualScaleFactor + initialPinchX * (1 - actualScaleFactor);
+        viewportState.y = initialViewportY * actualScaleFactor + initialPinchY * (1 - actualScaleFactor);
         viewportState.scale = newScale;
 
         applyViewportTransform();
