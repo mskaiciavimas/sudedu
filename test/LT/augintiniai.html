@@ -1699,7 +1699,7 @@
   }
 
   .pet-stats-selection-button.active {
-    background: red;
+    background: linear-gradient(135deg, #3288AC, #286D8A);
     border: none;
     /*border: #286D8A 1px solid;*/
     color: #F5F5F7;
@@ -11032,8 +11032,9 @@ let initialPinchDistance = null;
 let initialPinchScale = 1;
 let initialPinchX = 0;
 let initialPinchY = 0;
-let initialViewportX = 0;  // ADD THIS
-let initialViewportY = 0;  // ADD THIS
+let initialViewportX = 0;
+let initialViewportY = 0;
+const PINCH_DEADZONE = 10; // ADD THIS - pixels of movement to ignore
 let multiTouchCooldown = null;
 
 function getDistance(touches) {
@@ -11069,11 +11070,25 @@ function handleTouchMove(e) {
             return;
         }
 
+        // ADD DEADZONE: Only zoom if distance changed significantly
+        const distanceChange = Math.abs(currentDistance - initialPinchDistance);
+        if (distanceChange < PINCH_DEADZONE) {
+            // Not pinching, just panning - update translate only
+            const deltaX = (midX - initialPinchX) / viewportState.scale;
+            const deltaY = (midY - initialPinchY) / viewportState.scale;
+            
+            viewportState.x = initialViewportX + deltaX;
+            viewportState.y = initialViewportY + deltaY;
+            
+            applyViewportTransform();
+            return;
+        }
+
+        // Beyond deadzone - do the zoom
         const scaleFactor = currentDistance / initialPinchDistance;
         let newScale = initialPinchScale * scaleFactor;
         newScale = Math.min(Math.max(newScale, viewportState.minScale), viewportState.maxScale);
 
-        // Simple: scale from the pinch point
         const scaleChange = newScale / initialPinchScale;
         viewportState.x = initialViewportX * scaleChange + initialPinchX * (1 - scaleChange);
         viewportState.y = initialViewportY * scaleChange + initialPinchY * (1 - scaleChange);
@@ -11082,7 +11097,6 @@ function handleTouchMove(e) {
         applyViewportTransform();
     }
 }
-
 
 function handleTouchEnd(e) {
     if (e.touches.length < 2) {
@@ -11128,7 +11142,7 @@ function handleViewportPanStart(e) {
     const isSpacebarDrag = viewportState.spacePressed && e.button === 0;
 
     if (isMiddleClick || isSpacebarDrag || isTouchMultiFinger) {
-        if (isTouchMultiFinger) multiTouchActive = true; // mark multi-touch started
+        if (isTouchMultiFinger) multiTouchActive = true;
 
         e.preventDefault();
         e.stopPropagation();
@@ -11138,11 +11152,11 @@ function handleViewportPanStart(e) {
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-        viewportState.dragStartX = clientX - viewportState.x;
-        viewportState.dragStartY = clientY - viewportState.y;
+        // Store scaled offset
+        viewportState.dragStartX = clientX - viewportState.x * viewportState.scale;
+        viewportState.dragStartY = clientY - viewportState.y * viewportState.scale;
     }
 }
-
 
 function handleViewportPanMove(e) {
     if (!viewportState.isDragging) return;
@@ -11150,8 +11164,9 @@ function handleViewportPanMove(e) {
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-    viewportState.x = clientX - viewportState.dragStartX;
-    viewportState.y = clientY - viewportState.dragStartY;
+    // Divide by scale to compensate for the scaled translate
+    viewportState.x = (clientX - viewportState.dragStartX) / viewportState.scale;
+    viewportState.y = (clientY - viewportState.dragStartY) / viewportState.scale;
 
     applyViewportTransform();
 }
