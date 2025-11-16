@@ -284,6 +284,18 @@
             box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
             position: relative;
             overflow: hidden;
+            transition:
+                height 0.3s ease,
+                z-index 0.3s ease,
+                transform 0.3s ease,
+                margin 0.3s ease,
+                padding 0.3s ease;
+        }
+
+        #gameContainer.container-expanded {
+            position: absolute;
+            z-index: 9000;
+            height: calc(100% - (2 * 16px));
         }
 
         #gameContainer[hidden] {
@@ -619,6 +631,7 @@
             left: 0;
             right: 0;
             height: 80px;
+            max-height: 80px;
             border-top: 1px solid rgba(255, 255, 255, 0.2);
             width: 100%;
             z-index: 1000;
@@ -626,7 +639,13 @@
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border-right: 0;
+            transition: max-height 0.3s ease; /* smooth transition */
         }
+
+        .game-navigation.mobile.container-expanded {
+            max-height: 0;
+        }
+        
 
         .game-navigation.mobile .nav-items {
             display: flex;
@@ -778,8 +797,10 @@
             padding: 12px 16px;
             font-size: 1rem;
             border-radius: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             width: 100%;
             text-align: center;
             cursor: pointer;
@@ -792,10 +813,6 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1.5rem;
-        }
-
-        .object-sidebar-assets .shop-item  {
-            margin-top: 10px;
         }
  
         .food-options-container {
@@ -921,6 +938,11 @@
         .object-sidebar-assets .shop-item {
             padding-left: 15px;
             padding-right: 15px;
+            box-shadow: none;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .food-use-btn,
@@ -1694,6 +1716,17 @@
     flex-direction: column;
     gap: 10px;
     margin: 5px 0 2svh 0;
+    overflow: hidden;
+    max-height: 400px;
+    opacity: 1;
+    transition:
+        max-height 0.3s ease,
+        opacity 0.3s ease;
+  }
+
+  .pet-stats-bars.container-expanded  {
+    max-height: 0;
+    opacity: 0;
   }
 
   .stat-bar {
@@ -1886,6 +1919,37 @@
     padding: 10px 16px;
 }
 
+.viewport-control-btn {
+    background: transparent;
+    padding: 8px;
+}
+
+#toggle-expand-btn span svg path {
+    fill: #212529;
+    width: 100%;
+}
+
+#toggle-expand-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+#toggle-zoom-lock-btn svg path {
+    fill: #212529;
+}
+
+#toggle-zoom-lock-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+#toggle-expand-btn:active,
+#toggle-expand-btn:focus,
+#toggle-zoom-lock-btn:active,
+#toggle-zoom-lock-btn:focus {
+    outline: none;
+}
+
 #pet-asset-buttons,
 #shop-buttons {
   display: flex;
@@ -1907,6 +1971,17 @@
     width: 100%;
     flex-direction: row;
     justify-content: space-between;
+    overflow: hidden;
+    max-height: 200px; /* <- something larger than actual height */
+    opacity: 1;
+    transition:
+        max-height 0.3s ease,
+        opacity 0.3s ease;
+}
+
+#pet-buttons-outer.container-expanded {
+    max-height: 0;
+    opacity: 0;
 }
 
 .pet-on-walk-holder {
@@ -2114,27 +2189,14 @@
     display: block;
 }
 
-#toggle-zoom-lock-btn {
-    align-items: center;
-    gap: 0.5rem;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 1rem;
-    background: linear-gradient(135deg, #3288AC, #286D8A);
-    border: none;
-    margin-left: 0;
-    padding: 10px 16px;
-}
-
-#toggle-zoom-lock-btn.locked {
-    background: linear-gradient(135deg, #ff8073, #e74c3c);
-}
-
 .stats-and-upper-controls-holder {
     display: flex;
     justify-content: space-between;
     align-items: end;
+}
+
+.stats-and-upper-controls-holder.container-expanded  {
+    justify-content: end;
 }
 
 /* Sidebar wrapper */
@@ -2151,6 +2213,7 @@
     transition: transform 0.3s ease;
     transform: translateX(-335px);
     padding-left: 0;
+    z-index: 9999;
 }
 
 .sidebar {
@@ -2164,7 +2227,6 @@
     margin: 0;
     margin-top: 0;
     z-index: 10;
-    overflow-y: auto;
 }
 
 .sidebar-wrapper.open {
@@ -2181,6 +2243,31 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    height: 100%;
+}
+
+#dynamic-content,
+.edit-mode-object-sidebar {
+    height: 100%;
+    overflow: hidden;
+}
+
+.edit-mode-object-sidebar {
+    display: flex;
+    flex-direction: column;
+}
+
+.object-sidebar-assets {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.object-sidebar-categories-dropdown-holder {
+    margin-bottom: 15px;
+    flex: 0 1 auto;
 }
 
 /* Toggle tab - always visible */
@@ -2236,40 +2323,37 @@
 /* Mobile: collapsible sidebar */
 @media (max-width: 768px) {
     .sidebar-wrapper {
-        top: 14px;
-        height: calc(100% - 80px - 28px);
-        width: calc(100% - 34px);
-        transform: translateX(calc(-100% - 35px));
+        top: 95px;
+        height: calc(100% - 160px - 28px);
+        width: calc(100vw - 35px - 5px);
+        transform: translateX(calc(-100vw - 35px - 5px));
+        border-bottom-right-radius: 8px;
+        margin: 0;
+        margin-top: 0;
+    }
+
+    .sidebar-wrapper.container-expanded {
+        top: 5px;
+        height: calc(100% - 20px);
+        width: calc(100vw - 35px - 5px);
+        transform: translateX(calc(-100vw - 35px - 5px));
         border-bottom-right-radius: 8px;
         margin: 0;
         margin-top: 0;
     }
 
     .sidebar {
-        padding: 16px;
+        padding: 16px 16px 0 16px;
         height: 100%;
         border-bottom-right-radius: 8px;
         margin: 0;
         margin-top: 0;
     }
 
-    #object-sidebar-category-select {
-        padding: 12px 16px;
-        font-size: 1rem;
-        border-radius: 20px;
-        background: rgba(255, 255, 255, 0.8);
-        border: 1px solid rgba(255, 255, 255, 1);
-        width: 100%;
-        text-align: center;
-        cursor: pointer;
-    }
-
-    .object-sidebar-assets .shop-item {
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: none;
+    #gameContainer.container-expanded {
+        position: absolute;
+        z-index: 9999;
+        height: 100%;
     }
 }
 
@@ -2301,6 +2385,11 @@
         min-height: 0;
         height: calc(100% - 81px);
         overflow-y: scroll;
+    }
+
+    #content-outer-container.container-expanded {
+        min-height: 0;
+        height: 100%;
     }
 
     #pet-room-container {
@@ -2986,7 +3075,7 @@
         </div>
     </nav>
 
-            <!-- Sidebar Wrapper Structure -->
+    <!-- Sidebar Wrapper Structure -->
     <div class="sidebar-wrapper" id="sidebarWrapper">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-content" id="sidebarContent">
@@ -3060,7 +3149,20 @@
             </div>
 
             <div class="upper-controls-holder">
-                <button id="toggle-zoom-lock-btn" class="zoom-lock">🔓 Zoom</button> <!-- ADD THIS -->
+                <button id="toggle-zoom-lock-btn" class="viewport-control-btn">
+                    <span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                            <path d="M240-160h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM240-160v-400 400Zm0 80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h280v-80q0-83 58.5-141.5T720-920q83 0 141.5 58.5T920-720h-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80h120q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Z"/>
+                        </svg>
+                    </span>
+                </button>
+                <button id="toggle-expand-btn" class="viewport-control-btn" onclick="toggleRoomExpansion()">
+                    <span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                            <path d="M120-120v-320h80v184l504-504H520v-80h320v320h-80v-184L256-200h184v80H120Z"/>
+                        </svg>
+                    </span>
+                </button>
             </div>
             </div>
 
@@ -3328,7 +3430,8 @@
             spacePressed: false,
             lastMouseX: 0,
             lastMouseY: 0,
-            zoomLocked: false  // ADD THIS
+            zoomLocked: false,
+            closestTile: [0, 0]
         };
 
         if (window.innerWidth <= 768) {
@@ -4286,15 +4389,15 @@ function showDeleteIcon(element) {
 
 
 function removeObjectsMarkedForRemoval() {
+    const deletedIds = []; // ✅ store deleted object IDs
 
     const objectsToRemove = document.querySelectorAll(".marked-for-deletion");
-    if (objectsToRemove.length === 0) return;
+    if (objectsToRemove.length === 0) return deletedIds;
 
     const needsSecondCheck = [];
 
     // 1️⃣ FIRST PASS — DELETE WHAT CAN BE DELETED NOW
     for (const obj of objectsToRemove) {
-
         const assetData = userObjectAssets[obj.id];
         if (!assetData) continue;
 
@@ -4312,7 +4415,7 @@ function removeObjectsMarkedForRemoval() {
             // delete immediately
             const el = document.getElementById(obj.id);
             if (el) el.remove();
-            delete userObjectAssets[obj.id];
+            deletedIds.push(obj.id); // ✅ track deleted ID
         }
     }
 
@@ -4321,7 +4424,6 @@ function removeObjectsMarkedForRemoval() {
 
     // 3️⃣ SECOND PASS — RECHECK BLOCKED OBJECTS
     for (const obj of needsSecondCheck) {
-
         const assetData = userObjectAssets[obj.id];
         if (!assetData) continue;
 
@@ -4334,17 +4436,33 @@ function removeObjectsMarkedForRemoval() {
 
         if (hasBlockingObjects(obj) && !isExempt) {
             // still blocked → warn + blink
-            messageToTheUser("Šį daiktą galėsi išnešti tik nukėlęs nuo jo kitus!");
+            messageToTheUser("Šiuos daiktus galėsi išnešti tik nukėlęs nuo jų kitus!");
             obj.classList.add("blinking-warning");
             setTimeout(() => obj.classList.remove("blinking-warning"), 6000);
         } else {
             // becomes free → delete now
             const el = document.getElementById(obj.id);
             if (el) el.remove();
-            delete userObjectAssets[obj.id];
+            deletedIds.push(obj.id); // ✅ track deleted ID
         }
     }
+
+    deletedIds.forEach(id => {
+        let isStackable = gameAssetIndex[userObjectAssets[id].assetIndex].stackable
+
+        if (!isStackable) {
+            const useBtn = document.querySelector(`#${id}-use-btn`)
+            if (useBtn) {
+                useBtn.innerHTML = 'Naudoti';
+                useBtn.disabled = false;
+                useBtn.className = 'use-btn';
+            }
+        }
+    });
+
+
 }
+
 
 
 
@@ -6365,7 +6483,7 @@ toggleEditSaveBtn.addEventListener("click", () => {
         updateStatsBeforeRerunningInitGameAndRenderPets();
         enableObjectDragging();
         predictAndSetZIndex();
-        displaySidebar()
+        displaySidebar();
         renderObjectAssetsDropdown(sidebar=true);
         editing = true;
     } else {
@@ -6969,6 +7087,7 @@ window.addEventListener("resize", () => {
     updateStatsBeforeRerunningInitGameAndRenderPets();
     navigationResponsiveLayout();
     endPreview()
+    hideSidebar()
 
     if (document.getElementById("pet-room-container").classList.contains("active")) {
         initGame();
@@ -7398,12 +7517,16 @@ function renderShopCategoriesDropdown() {
         allOption.textContent = `Visi`;
         dropdown.appendChild(allOption);
 
-        for (const cat in categoryCounts) {
+        Object.keys(categoryCounts).sort((a, b) => {
+            const nameA = a.charAt(0).toUpperCase() + a.slice(1);
+            const nameB = b.charAt(0).toUpperCase() + b.slice(1);
+            return nameA.localeCompare(nameB);
+        }).forEach(cat => {
             const option = document.createElement('option');
             option.value = cat;
             option.textContent = `${cat.charAt(0).toUpperCase() + cat.slice(1)}`;
             dropdown.appendChild(option);
-        }
+        });
         
         // Restore the saved category selection if it exists
         if (shopState.category && Array.from(dropdown.options).some(opt => opt.value === shopState.category)) {
@@ -7621,6 +7744,8 @@ function previewFurniture (key) {
         document.querySelector("#end-preview-button").classList.remove("hidden")
         document.querySelector("#toggle-edit-save-btn").classList.add("hidden")
         document.querySelector("#cancel-edit-btn").classList.add("hidden")
+
+        centerViewportOnObject("furniture-preview")
 
         
     } else {
@@ -7980,7 +8105,11 @@ function renderObjectAssetsDropdown(sidebar=false) {
     dropdown.appendChild(allOption);
 
     // Add categories (sorted alphabetically for consistency)
-    Object.keys(categoryCounts).sort().forEach(cat => {
+    Object.keys(categoryCounts).sort((a, b) => {
+        const nameA = a.charAt(0).toUpperCase() + a.slice(1);
+        const nameB = b.charAt(0).toUpperCase() + b.slice(1);
+        return nameA.localeCompare(nameB);
+    }).forEach(cat => {
         const option = document.createElement('option');
         option.value = cat;
         option.textContent = `${cat.charAt(0).toUpperCase() + cat.slice(1)}`;
@@ -8250,8 +8379,9 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
         } else {
             btn.textContent = 'Naudoti';
             btn.disabled = false;
+        }
 
-            btn.addEventListener('click', () => {
+        btn.addEventListener('click', () => {
                 let tempDivId = renderSingleRoomObject(key);
 
                 userObjectAssets[tempDivId].position = getObjectCoordinates(tempDivId);
@@ -8309,7 +8439,6 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
                     }
                 }
             });
-        }
 
         if (asset.position && asset.position.length === 0) {
             const itemDeleteBtnHolder = document.createElement('div');
@@ -8369,7 +8498,11 @@ function findValidPosition(placementMap, assetId) {
     const objectWidth = Math.ceil(tempDiv.offsetWidth / unitSize);
     const objectHeight = Math.ceil(tempDiv.offsetHeight / unitSize);
 
-    // Search placement map for first fitting position
+    const [targetCol, targetRow] = viewportState.closestTile;
+    let closestPosition = null;
+    let minDistance = Infinity;
+
+    // Search placement map for fitting positions
     for (let row = 0; row < placementMap.length; row++) {
         for (let col = 0; col < placementMap[0].length; col++) {
             let fits = true;
@@ -8382,10 +8515,27 @@ function findValidPosition(placementMap, assetId) {
                 }
                 if (!fits) break;
             }
-            if (fits) return [col, row + objectHeight - 1];
+            
+            if (fits) {
+                // Calculate position (bottom-left corner like original)
+                const positionRow = row + objectHeight - 1;
+                const positionCol = col;
+                
+                // Calculate distance to target
+                const distance = Math.sqrt(
+                    Math.pow(positionCol - targetCol, 2) + 
+                    Math.pow(positionRow - targetRow, 2)
+                );
+                
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestPosition = [positionCol, positionRow];
+                }
+            }
         }
     }
-    return null;
+    
+    return closestPosition;
 }
 
 
@@ -11718,6 +11868,7 @@ function handleTouchMove(e) {
             initialPinchY = midY;
             initialViewportX = viewportState.x;
             initialViewportY = viewportState.y;
+            viewportState.closestTile = getRoomCenterCoordinatesClosestToViewportCenter();
             return;
         }
 
@@ -11729,6 +11880,7 @@ function handleTouchMove(e) {
             
             viewportState.x = initialViewportX + deltaX;
             viewportState.y = initialViewportY + deltaY;
+            viewportState.closestTile = getRoomCenterCoordinatesClosestToViewportCenter();
             
             applyViewportTransform();
             return;
@@ -11743,6 +11895,7 @@ function handleTouchMove(e) {
         viewportState.x = initialViewportX * scaleChange + initialPinchX * (1 - scaleChange);
         viewportState.y = initialViewportY * scaleChange + initialPinchY * (1 - scaleChange);
         viewportState.scale = newScale;
+        viewportState.closestTile = getRoomCenterCoordinatesClosestToViewportCenter();
 
         applyViewportTransform();
     }
@@ -11825,6 +11978,7 @@ function handleViewportPanStart(e) {
 
         viewportState.dragStartX = clientX - viewportState.x * viewportState.scale;
         viewportState.dragStartY = clientY - viewportState.y * viewportState.scale;
+        viewportState.closestTile = getRoomCenterCoordinatesClosestToViewportCenter();
     }
 }
 
@@ -11845,6 +11999,7 @@ function handleViewportPanMove(e) {
         if (Math.abs(deltaX) > 0 || Math.abs(deltaY) > 0) {
             viewportState.x += deltaX / viewportState.scale;
             viewportState.y += deltaY / viewportState.scale;
+            viewportState.closestTile = getRoomCenterCoordinatesClosestToViewportCenter();
             applyViewportTransform();
         }
         
@@ -11870,6 +12025,7 @@ function handleViewportPanMove(e) {
 
     viewportState.x = (clientX - viewportState.dragStartX) / viewportState.scale;
     viewportState.y = (clientY - viewportState.dragStartY) / viewportState.scale;
+    viewportState.closestTile = getRoomCenterCoordinatesClosestToViewportCenter();
 
     applyViewportTransform();
 }
@@ -12021,14 +12177,23 @@ toggleZoomLockBtn.addEventListener("click", () => {
 
 function updateZoomLockButton() {
     const btn = document.getElementById("toggle-zoom-lock-btn");
+
     if (viewportState.zoomLocked) {
-        btn.textContent = "🔒 Zoom";
+        btn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                <path d="M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm0-80h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM360-640h240v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80ZM240-160v-400 400Z"/>
+            </svg>`;
         btn.classList.add("locked");
     } else {
-        btn.textContent = "🔓 Zoom";
+        btn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                <path d="M240-160h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM240-160v-400 400Zm0 80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h280v-80q0-83 58.5-141.5T720-920q83 0 141.5 58.5T920-720h-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80h120q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Z"/>
+            </svg>`;
         btn.classList.remove("locked");
     }
 }
+
+
 
 // Sidebar functionality
 const sidebarWrapper = document.getElementById('sidebarWrapper');
@@ -12054,71 +12219,174 @@ function displaySidebar() {
     const sidebarWrapper = document.querySelector('.sidebar-wrapper');
     const width = sidebarWrapper.offsetWidth;
 
-    // Get computed transform from CSS
-    const computedTransform = getComputedStyle(sidebarWrapper).transform;
-
-    let translateX = 0;
-
-    if (computedTransform === 'none') {
-        translateX = 0;
-    } else if (computedTransform.includes('matrix')) {
-        // matrix(a, b, c, d, tx, ty) → tx is translateX
-        const parts = computedTransform.replace('matrix(', '').replace(')', '').split(',');
-        translateX = parseFloat(parts[4]);
-    } else if (computedTransform.includes('translateX')) {
-        const match = computedTransform.match(/translateX\(([-\d.]+)px\)/);
-        if (match) translateX = parseFloat(match[1]);
-    }
-    // If absolute value of translateX is larger than width, add 34
-    if (Math.abs(translateX) > width) {
-        translateX += 35;
-        sidebarWrapper.style.transform = `translateX(${translateX}px)`;
-    }
-
-    if (window.innerWidth > 768) {
-        openSidebar();
+    if (window.innerWidth <= 768) {
+        sidebarWrapper.style.transform = `translateX(${(width)*-1}px)`;
+    } else {
+        sidebarWrapper.style.transform = `translateX(0px)`;
     }
 }
 
 function hideSidebar() {
+    document.querySelector(".object-sidebar-assets").innerHTML = '';
+    document.querySelector("#object-sidebar-category-select").innerHTML = '';
+
     const sidebarWrapper = document.querySelector('.sidebar-wrapper');
     const width = sidebarWrapper.offsetWidth;
 
-    const computedTransform = getComputedStyle(sidebarWrapper).transform;
-    let translateX = 0;
-
-    if (computedTransform === 'none') {
-        translateX = 0;
-    } else if (computedTransform.includes('matrix3d')) {
-        const parts = computedTransform.replace('matrix3d(', '').replace(')', '').split(',');
-        translateX = parseFloat(parts[12]);
-    } else if (computedTransform.includes('matrix')) {
-        const parts = computedTransform.replace('matrix(', '').replace(')', '').split(',');
-        translateX = parseFloat(parts[4]);
-    } else if (computedTransform.includes('translateX')) {
-        const match = computedTransform.match(/translateX\(([-\d.]+)px\)/);
-        if (match) translateX = parseFloat(match[1]);
-    }
-
-    // Use tolerance instead of exact equality
-    if (Math.abs(Math.abs(translateX) - width) < 1) {
-        translateX = -(width + 35);
-        sidebarWrapper.style.transform = `translateX(${translateX}px)`;
-    }
+    sidebarWrapper.style.transform = `translateX(${(width+35)*-1}px)`;
 
     closeSidebar();
 }
-
 
 
 // Event listeners
 if (toggleTab) {
     toggleTab.addEventListener('click', toggleSidebar);
 }
+
 // Close sidebar on window resize if it becomes desktop size
 window.addEventListener('resize', () => {
-    closeSidebar();
+    hideSidebar()
 });
+
+
+function moveSidebarToEnableBackdropFilterEffect () {
+    const element = document.getElementById('sidebarWrapper');
+    const mobileParent = document.body;
+    const desktopParent = document.getElementById('gameContainer');
+
+    if (window.innerWidth < 768) {
+        mobileParent.appendChild(element);
+    } else {
+        desktopParent.appendChild(element);
+    }
+}
+
+// Run on load
+moveSidebarToEnableBackdropFilterEffect();
+
+// Run on resize
+window.addEventListener('resize', moveSidebarToEnableBackdropFilterEffect);
+
+
+function getRoomCenterCoordinatesClosestToViewportCenter() {
+  const viewport = document.getElementById('viewport-container');
+  const scaleWrapper = document.getElementById('scale-wrapper');
+  const transformWrapper = document.getElementById('room-transform-wrapper');
+  const roomContainer = document.getElementById('room-container');
+  
+  // Get viewport center
+  const viewportRect = viewport.getBoundingClientRect();
+  const viewportCenterX = viewportRect.width / 2;
+  const viewportCenterY = viewportRect.height / 2;
+  
+  // Extract transform values
+  const scaleMatch = scaleWrapper.style.transform.match(/scale\(([\d.]+)\)/);
+  const scale = scaleMatch ? parseFloat(scaleMatch[1]) : 1;
+  
+  const translateMatch = transformWrapper.style.transform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
+  const translateX = translateMatch ? parseFloat(translateMatch[1]) : 0;
+  const translateY = translateMatch ? parseFloat(translateMatch[2]) : 0;
+  
+  // Convert viewport center to room-container coordinates
+  // Reverse the transformations: undo scale, then undo translate
+  const roomX = (viewportCenterX / scale) - translateX;
+  const roomY = (viewportCenterY / scale) - translateY;
+  
+  // Get grid bounds dynamically from roomLayout
+  const gridHeight = roomLayout.length;
+  const gridWidth = roomLayout[0]?.length || 0;
+  
+  // Calculate grid units and clamp to bounds
+  const gridX = Math.max(0, Math.min(gridWidth - 1, Math.floor(roomX / unitSize)));
+  const gridY = Math.max(0, Math.min(gridHeight - 1, Math.floor(roomY / unitSize)));
+  
+  return [gridX, gridY]
+}
+
+function centerViewportOnObject(objectId) {
+  const viewport = document.getElementById('viewport-container');
+  const transformWrapper = document.getElementById('room-transform-wrapper');
+  const scaleWrapper = document.getElementById('scale-wrapper');
+  const object = document.getElementById(objectId);
+  
+  if (!object) return;
+  
+  // Get viewport dimensions
+  const viewportRect = viewport.getBoundingClientRect();
+  const viewportCenterX = viewportRect.width / 2;
+  const viewportCenterY = viewportRect.height / 2;
+  
+  // Extract current scale
+  const scaleMatch = scaleWrapper.style.transform.match(/scale\(([\d.]+)\)/);
+  const scale = scaleMatch ? parseFloat(scaleMatch[1]) : viewportState.scale;
+  
+  // Get object's position and center
+  const objectRect = object.getBoundingClientRect();
+  const roomContainerRect = document.getElementById('room-container').getBoundingClientRect();
+  
+  // Calculate object center relative to room-container (in room coordinates)
+  const objectCenterX = (objectRect.left - roomContainerRect.left) / scale + objectRect.width / (2 * scale);
+  const objectCenterY = (objectRect.top - roomContainerRect.top) / scale + objectRect.height / (2 * scale);
+  
+  // Calculate required translate to center object
+  const translateX = viewportCenterX / scale - objectCenterX;
+  const translateY = viewportCenterY / scale - objectCenterY;
+  
+  // Update viewportState and apply transform
+  viewportState.x = translateX;
+  viewportState.y = translateY;
+  
+  transformWrapper.style.transform = `translate(${translateX}px, ${translateY}px)`;
+}
+
+function toggleRoomExpansion() {
+    const containerExpanded = "container-expanded";
+
+    const game = document.querySelector("#gameContainer");
+    const petButtons = document.querySelector("#pet-buttons-outer");
+    const statsBars = document.querySelector(".pet-stats-bars");
+    const upperControls = document.querySelector(".stats-and-upper-controls-holder");
+    const expandBtnSpan = document.querySelector("#toggle-expand-btn span");
+    const gameNavigation = document.querySelector(".game-navigation");
+    const contentContainer = document.querySelector("#content-outer-container");
+    const sidebarWrapper = document.querySelector(".sidebar-wrapper");
+
+    const isExpanded = game.classList.contains(containerExpanded);
+
+    if (isExpanded) {
+        game.classList.remove(containerExpanded);
+        petButtons.classList.remove(containerExpanded);
+        statsBars.classList.remove(containerExpanded);
+        upperControls.classList.remove(containerExpanded);
+        gameNavigation.classList.remove(containerExpanded);
+        contentContainer.classList.remove(containerExpanded);
+        sidebarWrapper.classList.remove(containerExpanded);
+
+        expandBtnSpan.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                <path d="M120-120v-320h80v184l504-504H520v-80h320v320h-80v-184L256-200h184v80H120Z"/>
+            </svg>`;
+        if (!editing) {
+            hideSidebar();
+        }
+    } else {
+        displaySidebar();
+        game.classList.add(containerExpanded);
+        petButtons.classList.add(containerExpanded);
+        statsBars.classList.add(containerExpanded);
+        upperControls.classList.add(containerExpanded);
+        gameNavigation.classList.add(containerExpanded);
+        contentContainer.classList.add(containerExpanded);
+        sidebarWrapper.classList.add(containerExpanded);
+
+        expandBtnSpan.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                <path d="m136-80-56-56 264-264H160v-80h320v320h-80v-184L136-80Zm344-400v-320h80v184l264-264 56 56-264 264h184v80H480Z"/>
+            </svg>
+            `;
+    }
+}
 
 
 
