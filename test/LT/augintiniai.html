@@ -1729,7 +1729,7 @@
   }
 
   .pet-stats-selection-button.active {
-    background: red;
+    background: blue;
     border: none;
     /*border: #286D8A 1px solid;*/
     color: #F5F5F7;
@@ -4421,9 +4421,15 @@ function enableObjectDragging() {
         obj.removeEventListener('contextmenu', obj._contextMenuHandler);
         
         // Mobile: use contextmenu for long press
-    if (isTouchDevice) {
+// Around line 3847, replace the mobile touch handler:
+if (isTouchDevice) {
     obj._pointerDownHandler = function(e) {
-        if (multiTouchActive) return;
+        // ✅ CHECK IMMEDIATELY at the very start
+        if (multiTouchActive || e.touches?.length >= 2) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
 
         const startX = e.clientX;
         const startY = e.clientY;
@@ -4432,6 +4438,12 @@ function enableObjectDragging() {
 
         // Start long-press timer
         obj._longPressTimeout = setTimeout(() => {
+            // ✅ CHECK AGAIN before starting drag
+            if (multiTouchActive || document.querySelectorAll('touch').length >= 2) {
+                cleanup();
+                return;
+            }
+
             longPressFired = true;
             
             // Long press detected - START DRAGGING
@@ -4442,7 +4454,8 @@ function enableObjectDragging() {
 
             if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || 
                 objPlacingOrder === 9 || objPlacingOrder === 10 || objPlacingOrder === 15)) {
-                messageToTheUser("Šį daiktą galėsi pajudinti tik nuėmęs nuo jo kitus!");
+                messageToTheUser("Šį daikta galėsi pajudinti tik nuėmęs nuo jo kitus!");
+                cleanup();
                 return;
             }
 
@@ -4466,6 +4479,13 @@ function enableObjectDragging() {
 
         // Cancel on significant movement
         const onMove = (ev) => {
+            // ✅ CHECK during movement
+            if (multiTouchActive || ev.touches?.length >= 2) {
+                clearTimeout(obj._longPressTimeout);
+                cleanup();
+                return;
+            }
+
             const dx = Math.abs(ev.clientX - startX);
             const dy = Math.abs(ev.clientY - startY);
             if (dx > 5 || dy > 5) {
@@ -4475,6 +4495,12 @@ function enableObjectDragging() {
         };
 
         const onUp = (ev) => {
+            // ✅ CHECK on touch end
+            if (multiTouchActive) {
+                cleanup();
+                return;
+            }
+
             clearTimeout(obj._longPressTimeout);
             
             // Check if this was a quick tap (not a long press)
@@ -4495,14 +4521,18 @@ function enableObjectDragging() {
         const cleanup = () => {
             document.removeEventListener('pointermove', onMove);
             document.removeEventListener('pointerup', onUp);
+            document.removeEventListener('touchmove', onMove);
+            document.removeEventListener('touchend', onUp);
         };
 
-        document.addEventListener('pointermove', onMove);
+        document.addEventListener('pointermove', onMove, { passive: false });
         document.addEventListener('pointerup', onUp);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('touchend', onUp);
     };
 
-        obj.addEventListener('pointerdown', obj._pointerDownHandler);
-    }
+    obj.addEventListener('pointerdown', obj._pointerDownHandler);
+}
 
         
         obj._editModeHandler = function(e) {
@@ -11763,19 +11793,26 @@ function handleTouchEnd(e) {
 
 function handleViewportPanStart(e) {
     const isTouchMultiFinger = e.touches?.length >= 2;
-    const isMiddleClick = e.button === 1;
-    const isLeftClickWithSpace = viewportState.spacePressed && e.button === 0 && e.pointerType === "mouse";
-
-    // Set multiTouchActive IMMEDIATELY and clear all object states
+    
+    // ✅ SET THIS FIRST, before any other logic
     if (isTouchMultiFinger) {
         multiTouchActive = true;
+        e.preventDefault();
+        e.stopPropagation();
         
         // Clear all object ready states and highlights
         document.querySelectorAll('.room-object').forEach(obj => {
             obj._readyToDrag = false;
+            if (obj._longPressTimeout) {
+                clearTimeout(obj._longPressTimeout);
+                obj._longPressTimeout = null;
+            }
         });
         clearPlacementHighlights();
     }
+    
+    const isMiddleClick = e.button === 1;
+    const isLeftClickWithSpace = viewportState.spacePressed && e.button === 0 && e.pointerType === "mouse";
 
     if (isMiddleClick || isLeftClickWithSpace || isTouchMultiFinger) {
         e.preventDefault();
