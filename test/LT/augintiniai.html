@@ -4407,7 +4407,7 @@ function hasBlockingObjects(target) {
 
 function enableObjectDragging() {
     const objects = document.querySelectorAll('.room-object');
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     
     objects.forEach(obj => {
         obj.classList.add('room-object-edit');
@@ -4421,7 +4421,7 @@ function enableObjectDragging() {
         obj.removeEventListener('contextmenu', obj._contextMenuHandler);
         
         // Mobile: use contextmenu for long press
-    if (isMobile) {
+    if (isTouchDevice) {
     obj._pointerDownHandler = function(e) {
         if (multiTouchActive) return;
 
@@ -4524,16 +4524,18 @@ function enableObjectDragging() {
             e.preventDefault();
             e.stopPropagation();
 
-            const placementMap = generatePlacementMap(obj.id);
-            determineAndHighlightValidTiles(placementMap);
-            obj._placementMap = placementMap;
+            if (!isTouchDevice) {
+                const placementMap = generatePlacementMap(obj.id);
+                determineAndHighlightValidTiles(placementMap);
+                obj._placementMap = placementMap;
+            }
             
             const startX = e.clientX;
             const startY = e.clientY;
             let dragStarted = false;
             
             // Mobile: Check if object is ready to drag (from contextmenu)
-            if (isMobile && !obj._readyToDrag) {
+            if (isTouchDevice && !obj._readyToDrag) {
                 return;
             }
             
@@ -4554,7 +4556,7 @@ function enableObjectDragging() {
                     dragStarted = true;
                     
                     // Desktop: check blocking and show placement map
-                    if (!isMobile) {
+                    if (!isTouchDevice) {
                         const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || 
                                             gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
                         
@@ -4565,6 +4567,11 @@ function enableObjectDragging() {
                             return;
                         }
 
+                        if (isTouchDevice) {
+                            const placementMap = generatePlacementMap(obj.id);
+                            determineAndHighlightValidTiles(placementMap);
+                            obj._placementMap = placementMap;
+                        }
                         obj._originalCoords = getObjectCoordinates(obj.id);
                     }
                     
@@ -4593,13 +4600,13 @@ function enableObjectDragging() {
                 document.removeEventListener('pointerup', upHandler);
                 
                 // Mobile: clear ready flag when touch ends
-                if (isMobile) {
+                if (isTouchDevice) {
                     obj._readyToDrag = false;
                     obj.classList.remove("dragging");
                 }
                 
                 // Desktop: show delete icon on click without drag
-                if (!dragStarted && !isMobile) {
+                if (!dragStarted && !isTouchDevice) {
                     showDeleteIcon(obj);
                 }
                 
@@ -4614,7 +4621,7 @@ function enableObjectDragging() {
                 document.removeEventListener('pointermove', moveHandler);
                 document.removeEventListener('pointerup', upHandler);
                 currentObject = null;
-                if (isMobile) {
+                if (isTouchDevice) {
                     obj._readyToDrag = false;
                     clearPlacementHighlights();
                 }
@@ -12031,7 +12038,9 @@ function displaySidebar() {
         sidebarWrapper.style.transform = `translateX(${translateX}px)`;
     }
 
-    openSidebar();
+    if (window.innerWidth > 768) {
+        openSidebar();
+    }
 }
 
 function hideSidebar() {
