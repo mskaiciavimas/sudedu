@@ -1705,7 +1705,7 @@
   }
 
   .pet-stats-selection-button.active {
-    background: red;
+    background: linear-gradient(135deg, #3288AC, #286D8A);
     border: none;
     /*border: #286D8A 1px solid;*/
     color: #F5F5F7;
@@ -4115,44 +4115,94 @@ function hasBlockingObjects(target) {
     return false;
 }
 
-document.addEventListener("touchstart", (e) => {
-    if (e.touches.length > 1) {
-
+// Global multi-touch handler (uses only your existing code/vars)
+document.addEventListener("touchstart", function(e) {
+    // If a second finger appears
+    if (e.touches && e.touches.length > 1) {
+        // mark multi-touch active
         multiTouchActive = true;
 
-        if (isDragging && currentObject) {
+        // If nothing is being dragged, nothing to correct
+        if (!isDragging || !currentObject) {
+            return;
+        }
 
-            // Perform your placement check
-            const canPlace = checkPlacement(
-                currentObject,
-                currentObject._placementMap,
-                unitSize
-            );
+        // Prevent default so browser won't produce weird pointer events
+        e.preventDefault?.();
+        e.stopPropagation?.();
 
-            if (!canPlace && currentObject._originalCoords) {
-                currentObject.style.left =
-                    `calc(${currentObject._originalCoords[0]} * var(--unit-size))`;
-                currentObject.style.top =
-                    `calc((${currentObject._originalCoords[1] + 1} * var(--unit-size)) - ${currentObject.offsetHeight}px)`;
+        // Stop hold timer if active (your code uses holdTimer)
+        if (typeof holdTimer !== "undefined" && holdTimer) {
+            clearInterval(holdTimer);
+            holdTimer = null;
+        }
+
+        // Remove dragging class immediately
+        currentObject.classList.remove("dragging");
+
+        // PET logic (detect pet by class)
+        if (currentObject.classList.contains("pet")) {
+            // derive unit (use unitSize from your code)
+            const unit = unitSize;
+
+            const petWidthInTiles  = currentObject._widthTiles  || Math.ceil(currentObject.offsetWidth / unit);
+            const petHeightInTiles = currentObject._heightTiles || Math.ceil(currentObject.offsetHeight / unit);
+
+            const leftPx = parseInt(currentObject.style.left || currentObject.offsetLeft || 0, 10);
+            const topPx  = parseInt(currentObject.style.top  || currentObject.offsetTop  || 0, 10);
+
+            const tileX = Math.round(leftPx / unit);
+            const bottomRow = Math.round((topPx + currentObject.offsetHeight) / unit) - 1;
+
+            if (!isBottomRowWalkable(globalWalkabilityMap, bottomRow, tileX, petWidthInTiles)) {
+                const closest = findClosestWalkablePosition(globalWalkabilityMap, bottomRow, tileX, petWidthInTiles);
+                if (closest) {
+                    currentObject.style.left = (closest.col * unit) + 'px';
+                    currentObject.style.top  = ((closest.row - petHeightInTiles + 1) * unit) + 'px';
+                } else {
+                    messageToTheUser("Augintiniui nėra vietos vaikščioti!");
+                }
             }
 
-            // Clean up drag UI + state
-            clearPlacementHighlights();
-            removeAllDeleteItemHighlights();
-            currentObject.classList.remove("dragging");
-            currentObject._readyToDrag = false;
+            try { predictAndSetZIndex(currentObject); } catch (err) {}
+        } else {
+            // ITEM logic: snap & validate like your pointerup does
+            const unit = unitSize;
+            const left = parseInt(currentObject.style.left || currentObject.offsetLeft || 0, 10);
+            const top  = parseInt(currentObject.style.top  || currentObject.offsetTop  || 0, 10);
 
-            isDragging = false;
-            currentObject = null;
+            const snappedLeft = Math.round(left / unit) * unit;
+            const snappedTop  = Math.round((top + currentObject.offsetHeight) / unit) * unit - currentObject.offsetHeight;
+
+            currentObject.style.left = snappedLeft + 'px';
+            currentObject.style.top  = snappedTop + 'px';
+
+            if (editing && currentObject._placementMap) {
+                const canPlace = checkPlacement(currentObject, currentObject._placementMap, unit);
+                if (!canPlace && currentObject._originalCoords) {
+                    currentObject.style.left = `calc(${currentObject._originalCoords[0]} * var(--unit-size))`;
+                    currentObject.style.top  = `calc((${currentObject._originalCoords[1] + 1} * var(--unit-size)) - ${currentObject.offsetHeight}px)`;
+                }
+            }
         }
-    }
-});
 
-document.addEventListener("touchend", (e) => {
-    if (e.touches.length <= 1) {
+        // Common cleanup (same actions you use elsewhere)
+        clearPlacementHighlights();
+        removeAllDeleteItemHighlights();
+
+        isDragging = false;
+        currentObject = null;
+    }
+}, { passive: false });
+
+// Reset multiTouchActive when fingers lift
+document.addEventListener("touchend", function(e) {
+    // If now 0 or 1 touches remain, clear the flag
+    if (!e.touches || e.touches.length <= 1) {
         multiTouchActive = false;
     }
 });
+
 
 function enableObjectDragging() {
     const objects = document.querySelectorAll('.room-object');
