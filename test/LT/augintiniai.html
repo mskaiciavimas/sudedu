@@ -203,11 +203,11 @@
         .room-object.dragging {
             z-index: 1000 !important;
             cursor: grabbing;
-            outline: 2px solid red;
+            box-shadow: inset 0 0 0 2px red;
         }
 
         .marked-for-deletion {
-            outline: 2px solid red;
+            box-shadow: inset 0 0 0 2px red;
         }
 
         .pet-left {
@@ -1705,7 +1705,7 @@
   }
 
   .pet-stats-selection-button.active {
-    background: linear-gradient(135deg, #3288AC, #286D8A);;
+    background: red;
     border: none;
     /*border: #286D8A 1px solid;*/
     color: #F5F5F7;
@@ -4115,6 +4115,45 @@ function hasBlockingObjects(target) {
     return false;
 }
 
+document.addEventListener("touchstart", (e) => {
+    if (e.touches.length > 1) {
+
+        multiTouchActive = true;
+
+        if (isDragging && currentObject) {
+
+            // Perform your placement check
+            const canPlace = checkPlacement(
+                currentObject,
+                currentObject._placementMap,
+                unitSize
+            );
+
+            if (!canPlace && currentObject._originalCoords) {
+                currentObject.style.left =
+                    `calc(${currentObject._originalCoords[0]} * var(--unit-size))`;
+                currentObject.style.top =
+                    `calc((${currentObject._originalCoords[1] + 1} * var(--unit-size)) - ${currentObject.offsetHeight}px)`;
+            }
+
+            // Clean up drag UI + state
+            clearPlacementHighlights();
+            removeAllDeleteItemHighlights();
+            currentObject.classList.remove("dragging");
+            currentObject._readyToDrag = false;
+
+            isDragging = false;
+            currentObject = null;
+        }
+    }
+});
+
+document.addEventListener("touchend", (e) => {
+    if (e.touches.length <= 1) {
+        multiTouchActive = false;
+    }
+});
+
 function enableObjectDragging() {
     const objects = document.querySelectorAll('.room-object');
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
@@ -4250,14 +4289,19 @@ function enableObjectDragging() {
                 }
                 
                 
-                // Start drag on any movement
-                if (!dragStarted) {
+                const DRAG_THRESHOLD = 5; // pixels
+
+                const dx = Math.abs(moveEvent.clientX - startX);
+                const dy = Math.abs(moveEvent.clientY - startY);
+
+                // Only start dragging if movement exceeds threshold
+                if (!dragStarted && (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD)) {
                     dragStarted = true;
                     
                     // Desktop: check blocking and show placement map
                     if (!isMobile) {
                         const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || 
-                                               gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
+                                            gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
                         
                         if (hasBlockingObjects(obj) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || 
                             objPlacingOrder === 9 || objPlacingOrder === 10 || objPlacingOrder === 15)) {
