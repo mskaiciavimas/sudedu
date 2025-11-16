@@ -1729,7 +1729,7 @@
   }
 
   .pet-stats-selection-button.active {
-    background: linear-gradient(135deg, #3288AC, #286D8A);
+    background: red;
     border: none;
     /*border: #286D8A 1px solid;*/
     color: #F5F5F7;
@@ -12047,15 +12047,15 @@ function hideSidebar() {
     const sidebarWrapper = document.querySelector('.sidebar-wrapper');
     const width = sidebarWrapper.offsetWidth;
 
-    // Get computed transform from CSS
     const computedTransform = getComputedStyle(sidebarWrapper).transform;
-
     let translateX = 0;
 
     if (computedTransform === 'none') {
         translateX = 0;
+    } else if (computedTransform.includes('matrix3d')) {
+        const parts = computedTransform.replace('matrix3d(', '').replace(')', '').split(',');
+        translateX = parseFloat(parts[12]);
     } else if (computedTransform.includes('matrix')) {
-        // matrix(a, b, c, d, tx, ty) → tx is translateX
         const parts = computedTransform.replace('matrix(', '').replace(')', '').split(',');
         translateX = parseFloat(parts[4]);
     } else if (computedTransform.includes('translateX')) {
@@ -12063,14 +12063,15 @@ function hideSidebar() {
         if (match) translateX = parseFloat(match[1]);
     }
 
-    // If absolute value of translateX is larger than width, add 34
-    if (Math.abs(translateX) === width) {
-        translateX = (width + 35) * -1;
+    // Use tolerance instead of exact equality
+    if (Math.abs(Math.abs(translateX) - width) < 1) {
+        translateX = -(width + 35);
         sidebarWrapper.style.transform = `translateX(${translateX}px)`;
     }
 
     closeSidebar();
 }
+
 
 
 // Event listeners
