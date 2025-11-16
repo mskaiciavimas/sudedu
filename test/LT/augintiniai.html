@@ -282,6 +282,8 @@
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
         }
 
         #gameContainer[hidden] {
@@ -292,8 +294,8 @@
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             height: 100%;
-            width: 200px;
-            min-width: 200px;
+            width: 300px;
+            min-width: 300px;
             background: rgba(255, 255, 255, 0.1);
             border-right: 1px solid rgba(255, 255, 255, 0.15);
             border-top-left-radius: 20px;
@@ -621,7 +623,6 @@
             width: 100%;
             z-index: 1000;
             border-radius: 0;
-            background: #ffbf9c;
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border-right: 0;
@@ -773,6 +774,17 @@
             cursor: pointer;
         }
 
+        #object-sidebar-category-select {
+            padding: 12px 16px;
+            font-size: 1rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            text-align: center;
+            cursor: pointer;
+        }
+
         .shop-items,
         .object-assets,
         #pet-skins,
@@ -782,6 +794,9 @@
             gap: 1.5rem;
         }
 
+        .object-sidebar-assets .shop-item  {
+            margin-top: 10px;
+        }
  
         .food-options-container {
             display: flex;
@@ -897,6 +912,15 @@
             transition: all 0.2s;
             width: 60%;
             height: 40px;
+        }
+
+        .object-sidebar-assets .use-btn {
+            width: 150px;
+        }
+
+        .object-sidebar-assets .shop-item {
+            padding-left: 15px;
+            padding-right: 15px;
         }
 
         .food-use-btn,
@@ -1705,7 +1729,7 @@
   }
 
   .pet-stats-selection-button.active {
-    background: red;
+    background: linear-gradient(135deg, #3288AC, #286D8A);
     border: none;
     /*border: #286D8A 1px solid;*/
     color: #F5F5F7;
@@ -2023,6 +2047,16 @@
 
 /* GIFT CSS END */
 
+.blinking-warning {
+    animation: redYellowBlink 0.4s ease-in-out infinite;
+}
+
+@keyframes redYellowBlink {
+    0%   { outline: 2px solid red; }
+    50%  { outline: 2px solid yellow; }
+    100% { outline: 2px solid red; }
+}
+
 #viewport-container {
     min-height: 0;
     flex: 1 1 auto;
@@ -2080,6 +2114,164 @@
     display: block;
 }
 
+#toggle-zoom-lock-btn {
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1rem;
+    background: linear-gradient(135deg, #3288AC, #286D8A);
+    border: none;
+    margin-left: 0;
+    padding: 10px 16px;
+}
+
+#toggle-zoom-lock-btn.locked {
+    background: linear-gradient(135deg, #ff8073, #e74c3c);
+}
+
+.stats-and-upper-controls-holder {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+}
+
+/* Sidebar wrapper */
+
+
+/* Sidebar content */
+.sidebar-wrapper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: calc(100%);
+    width: 300px;
+    z-index: 100;
+    transition: transform 0.3s ease;
+    transform: translateX(-335px);
+    padding-left: 0;
+}
+
+.sidebar {
+    position: absolute;
+    width: 100%;
+    padding: 16px;
+    height: 100%;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.5);
+    margin: 0;
+    margin-top: 0;
+    z-index: 10;
+    overflow-y: auto;
+}
+
+.sidebar-wrapper.open {
+    transform: translateX(0) !important;
+}
+
+.sidebar-wrapper.open .toggle-tab svg {
+    transform: rotate(180deg);
+}
+
+.sidebar-content {
+    min-height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Toggle tab - always visible */
+.toggle-tab {
+    position: absolute;
+    right: -34px;
+    top: 0;
+    border: none;
+    width: 34px;
+    height: 62px;
+    border-radius: 0 20px 20px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.5);
+    padding: 0;
+    margin: 0;
+}
+
+.toggle-tab svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+}
+
+/* Overlay */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+}
+
+.overlay.active {
+    display: block;
+}
+
+@media (min-width: 769px) {
+    .toggle-tab {
+        display: none;
+    }
+}
+
+
+/* Mobile: collapsible sidebar */
+@media (max-width: 768px) {
+    .sidebar-wrapper {
+        top: 14px;
+        height: calc(100% - 80px - 28px);
+        width: calc(100% - 34px);
+        transform: translateX(calc(-100% - 35px));
+        border-bottom-right-radius: 8px;
+        margin: 0;
+        margin-top: 0;
+    }
+
+    .sidebar {
+        padding: 16px;
+        height: 100%;
+        border-bottom-right-radius: 8px;
+        margin: 0;
+        margin-top: 0;
+    }
+
+    #object-sidebar-category-select {
+        padding: 12px 16px;
+        font-size: 1rem;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 1);
+        width: 100%;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .object-sidebar-assets .shop-item {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: none;
+    }
+}
 
 @media (max-width: 1024px) {
     .nav-item {
@@ -2533,7 +2725,8 @@
 
     .pet-supply-tab,
     #shop-category-select,
-    #object-category-select {
+    #object-category-select,
+    #object-sidebar-category-select {
         font-size: 1.5rem;
     }
 
@@ -2762,7 +2955,6 @@
     </nav>
 
     <div id="gameContainer" class="" hidden>
-
     <nav class="game-navigation">
         <div class="nav-items">
             <button class="nav-item active" id="pet-room-button" data-target="pet-room-container">
@@ -2794,6 +2986,30 @@
         </div>
     </nav>
 
+            <!-- Sidebar Wrapper Structure -->
+    <div class="sidebar-wrapper" id="sidebarWrapper">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-content" id="sidebarContent">
+                <!-- YOUR CONTENT GOES HERE -->
+                <div id="dynamic-content">
+                    <div class="edit-mode-object-sidebar">
+                        <div class="object-sidebar-categories-dropdown-holder">
+                            <select id="object-sidebar-category-select"></select>
+                        </div>
+                        <div class="object-sidebar-assets">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <button class="toggle-tab" id="toggleTab" aria-label="Toggle sidebar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M9 18l6-6-6-6"/>
+            </svg>
+        </button>
+    </div>
+
     <div id="game-content" class="">
         <div id="content-outer-container" class="hide-scrollbar">
             <div id="pet-room-container" class="game-content-panel active">
@@ -2807,7 +3023,7 @@
             </div>
         
             </div>
-
+            <div class="stats-and-upper-controls-holder">
             <div class="pet-stats-bars">
                 <div class="stats-bar-outer">
                     <div class="stats-bar-icon">
@@ -2842,6 +3058,13 @@
                     </div>
                 </div>
             </div>
+
+            <div class="upper-controls-holder">
+                <button id="toggle-zoom-lock-btn" class="zoom-lock">🔓 Zoom</button> <!-- ADD THIS -->
+            </div>
+            </div>
+
+
             </div>
 
                 <div id="viewport-container">
@@ -3102,7 +3325,10 @@
             isDragging: false,
             dragStartX: 0,
             dragStartY: 0,
-            spacePressed: false
+            spacePressed: false,
+            lastMouseX: 0,
+            lastMouseY: 0,
+            zoomLocked: false  // ADD THIS
         };
 
         if (window.innerWidth <= 768) {
@@ -4031,33 +4257,96 @@ function enablePetDragging() {
 }
 
 function removeAllDeleteItemHighlights() {
-    document.querySelectorAll('.marked-for-deletion').forEach(element => element.classList.remove("marked-for-deletion"));
+    document.querySelectorAll('.marked-for-deletion').forEach(element => {
+        element.classList.remove('marked-for-deletion'); // remove the class
+    });
+    
     document.querySelector("#delete-selected-item-button").disabled = true;
 }
 
 function showDeleteIcon(element) {
+    if (!element) return;
+
+    // prevent marking anything if preview is active
     if (furniturePreviewDict["furniture-preview"].assetIndex) {
-        return
+        return;
     }
 
-    removeAllDeleteItemHighlights();
+    // toggle the class
+    if (element.classList.contains("marked-for-deletion")) {
+        element.classList.remove("marked-for-deletion");
+    } else {
+        element.classList.add("marked-for-deletion");
+    }
 
-    element.classList.add("marked-for-deletion");
-    document.querySelector("#delete-selected-item-button").disabled = false;
+    // enable/disable button based on how many are selected
+    const anySelected = document.querySelectorAll(".marked-for-deletion").length > 0;
+    document.querySelector("#delete-selected-item-button").disabled = !anySelected;
 }
+
 
 function removeObjectsMarkedForRemoval() {
-    const objectToRemove = document.querySelector(".marked-for-deletion")
-    console.log(objectToRemove)
-    const objPlacingOrder = gameAssetIndex[userObjectAssets[objectToRemove.id]["assetIndex"]]["placingIndex"]
-    if (hasBlockingObjects(objectToRemove) && !(objPlacingOrder === 5 || objPlacingOrder === 6 || objPlacingOrder === 9 || objPlacingOrder === 10 || objPlacingOrder === 15)) {
-        messageToTheUser("Šį daiktą galėsi išimti iš kambario tik nuėmęs nuo jo kitus!");
-        return;
-    } else if (objectToRemove) {
-        objectToRemove.remove();
+
+    const objectsToRemove = document.querySelectorAll(".marked-for-deletion");
+    if (objectsToRemove.length === 0) return;
+
+    const needsSecondCheck = [];
+
+    // 1️⃣ FIRST PASS — DELETE WHAT CAN BE DELETED NOW
+    for (const obj of objectsToRemove) {
+
+        const assetData = userObjectAssets[obj.id];
+        if (!assetData) continue;
+
+        const placingIndex = gameAssetIndex[assetData.assetIndex].placingIndex;
+
+        const isExempt =
+            placingIndex === 5 || placingIndex === 6 ||
+            placingIndex === 9 || placingIndex === 10 ||
+            placingIndex === 15;
+
+        if (hasBlockingObjects(obj) && !isExempt) {
+            // can't delete yet → save for second check
+            needsSecondCheck.push(obj);
+        } else {
+            // delete immediately
+            const el = document.getElementById(obj.id);
+            if (el) el.remove();
+            delete userObjectAssets[obj.id];
+        }
     }
-    removeAllDeleteItemHighlights()
+
+    // 2️⃣ Remove highlights from ALL objects
+    removeAllDeleteItemHighlights();
+
+    // 3️⃣ SECOND PASS — RECHECK BLOCKED OBJECTS
+    for (const obj of needsSecondCheck) {
+
+        const assetData = userObjectAssets[obj.id];
+        if (!assetData) continue;
+
+        const placingIndex = gameAssetIndex[assetData.assetIndex].placingIndex;
+
+        const isExempt =
+            placingIndex === 5 || placingIndex === 6 ||
+            placingIndex === 9 || placingIndex === 10 ||
+            placingIndex === 15;
+
+        if (hasBlockingObjects(obj) && !isExempt) {
+            // still blocked → warn + blink
+            messageToTheUser("Šį daiktą galėsi išnešti tik nukėlęs nuo jo kitus!");
+            obj.classList.add("blinking-warning");
+            setTimeout(() => obj.classList.remove("blinking-warning"), 6000);
+        } else {
+            // becomes free → delete now
+            const el = document.getElementById(obj.id);
+            if (el) el.remove();
+            delete userObjectAssets[obj.id];
+        }
+    }
 }
+
+
 
 document.querySelector("#delete-selected-item-button").addEventListener("click", () => {
     removeObjectsMarkedForRemoval()
@@ -4234,6 +4523,10 @@ function enableObjectDragging() {
 
             e.preventDefault();
             e.stopPropagation();
+
+            const placementMap = generatePlacementMap(obj.id);
+            determineAndHighlightValidTiles(placementMap);
+            obj._placementMap = placementMap;
             
             const startX = e.clientX;
             const startY = e.clientY;
@@ -4272,9 +4565,6 @@ function enableObjectDragging() {
                             return;
                         }
 
-                        const placementMap = generatePlacementMap(obj.id);
-                        determineAndHighlightValidTiles(placementMap);
-                        obj._placementMap = placementMap;
                         obj._originalCoords = getObjectCoordinates(obj.id);
                     }
                     
@@ -4296,6 +4586,8 @@ function enableObjectDragging() {
                     cancelDrag();
                     return;
                 }
+
+                clearPlacementHighlights();
                 
                 document.removeEventListener('pointermove', moveHandler);
                 document.removeEventListener('pointerup', upHandler);
@@ -4304,8 +4596,6 @@ function enableObjectDragging() {
                 if (isMobile) {
                     obj._readyToDrag = false;
                     obj.classList.remove("dragging");
-                    clearPlacementHighlights();
-                    removeAllDeleteItemHighlights();
                 }
                 
                 // Desktop: show delete icon on click without drag
@@ -4327,7 +4617,6 @@ function enableObjectDragging() {
                 if (isMobile) {
                     obj._readyToDrag = false;
                     clearPlacementHighlights();
-                    removeAllDeleteItemHighlights();
                 }
             };
             
@@ -4521,7 +4810,6 @@ function validateAndResetPosition(object) {
     object.style.left = snappedLeft + 'px';
     object.style.top = snappedTop + 'px';
     object.classList.remove('dragging');
-    removeAllDeleteItemHighlights();
 
     // Check if it's a pet
     if ([...object.classList].some(cls => cls.includes("pet"))) {
@@ -4589,7 +4877,6 @@ document.addEventListener('pointerup', function(e) {
     currentObject.style.left = snappedLeft + 'px';
     currentObject.style.top = snappedTop + 'px';
     currentObject.classList.remove('dragging');
-    removeAllDeleteItemHighlights();
 
     if ([...currentObject.classList].some(cls => cls.includes("pet"))) {
         const petWidthInTiles = Math.ceil(currentObject.offsetWidth / unitSize);
@@ -4639,19 +4926,6 @@ document.addEventListener('pointerup', function(e) {
         }
         currentObject = null;
     }
-    
-    // Hide delete icons when clicking elsewhere (only in edit mode)
-    if (editing) {
-        // Ignore clicks on the delete button
-        if (!e.target.closest('.marked-for-deletion') && !e.target.closest('#delete-selected-item-button')) {
-            const clickedObject = e.target.closest('.room-object');
-            if (!clickedObject) {
-                removeAllDeleteItemHighlights();
-                clearPlacementHighlights()
-            }
-        }
-    }
-
 });
 
 
@@ -5994,6 +6268,38 @@ function updateObjectPositionChanges() {
         }
     }
 
+    // Group stackable items by assetIndex
+    const stackableGroups = {};
+
+    for (const key in userObjectAssets) {
+        const asset = userObjectAssets[key];
+        const assetIndex = asset.assetIndex;
+        const item = gameAssetIndex[assetIndex];
+        if (!item) continue;
+
+        if (item.stackable) {
+            if (!stackableGroups[assetIndex]) {
+                stackableGroups[assetIndex] = [];
+            }
+            stackableGroups[assetIndex].push(key);
+        }
+    }
+
+    // Clean up excess unused stackable instances (keep only 1 unused per type)
+    for (const assetIndex in stackableGroups) {
+        const keys = stackableGroups[assetIndex];
+        const unusedKeys = keys.filter(k => 
+            !userObjectAssets[k].position || userObjectAssets[k].position.length === 0
+        );
+
+        // If more than 1 unused instance, delete extras (but always keep at least 1)
+        if (unusedKeys.length > 1) {
+            for (let i = 1; i < unusedKeys.length; i++) {
+                delete userObjectAssets[unusedKeys[i]];
+            }
+        }
+    }
+
     // Send updated objectAssets to database
     sendObjectAssetsUpdateToDatabase();
 }
@@ -6004,9 +6310,12 @@ const deleteSelectedItemBtn = document.getElementById("delete-selected-item-butt
 
 let editing = false;
 
+let preEditUserObjectAssets;
+
 toggleEditSaveBtn.addEventListener("click", () => {
     if (!editing) {
     // switch to Save mode
+        preEditUserObjectAssets = JSON.parse(JSON.stringify(userObjectAssets)); //deep copy
         toggleEditSaveBtn.textContent = "Išsaugoti";
         toggleEditSaveBtn.classList.remove("edit");
         toggleEditSaveBtn.classList.add("save");
@@ -6019,13 +6328,16 @@ toggleEditSaveBtn.addEventListener("click", () => {
         updateStatsBeforeRerunningInitGameAndRenderPets();
         enableObjectDragging();
         predictAndSetZIndex();
-    editing = true;
+        displaySidebar()
+        renderObjectAssetsDropdown(sidebar=true);
+        editing = true;
     } else {
         updateObjectPositionChanges();
         const petElements = document.querySelectorAll('.pet');
         petElements.forEach(pet => {
             predictAndSetZIndex(pet);
         });
+        preEditUserObjectAssets = JSON.parse(JSON.stringify(userObjectAssets));
         updateStatsBeforeRerunningInitGameAndRenderPets();
         renderPets();
         enablePetDragging();
@@ -6037,10 +6349,14 @@ toggleEditSaveBtn.addEventListener("click", () => {
         }
         clearPlacementHighlights()
         removeAllDeleteItemHighlights();
+        hideSidebar();
     }
 });
 
 cancelEditBtn.addEventListener("click", () => {
+    if (preEditUserObjectAssets) {
+        userObjectAssets = JSON.parse(JSON.stringify(preEditUserObjectAssets));
+    }
     renderRoomObjects();
     resetEditButtonToggle();
     updateStatsBeforeRerunningInitGameAndRenderPets();
@@ -6048,7 +6364,7 @@ cancelEditBtn.addEventListener("click", () => {
     enablePetDragging();
     clearPlacementHighlights()
     removeAllDeleteItemHighlights();
-
+    hideSidebar();
     predictAndSetZIndex();
     
     const allPets = document.querySelectorAll("#petContainer .pet");
@@ -7582,14 +7898,22 @@ toggle.addEventListener('change', () => {
     renderShopItems(selectedCategory, dept, activePetSupplyTab);
 });
 
-function renderObjectAssetsDropdown() {
-    const dropdown = document.getElementById('object-category-select');
-    const usageToggle = document.getElementById('object-usage-toggle'); // checkbox
-    const container = document.querySelector('.object-assets');
+function renderObjectAssetsDropdown(sidebar=false) {
+    let dropdown;
+    let usageToggle;
+    let container;
+    if (sidebar) {
+        dropdown = document.getElementById('object-sidebar-category-select');
+        container = document.querySelector('.object-sidebar-assets');
+    } else {
+        dropdown = document.getElementById('object-category-select');
+        usageToggle = document.getElementById('object-usage-toggle');
+        container = document.querySelector('.object-assets');
 
-    if (!dropdown || !container || !usageToggle) return;
+        if (!dropdown || !container || !usageToggle) return;
 
-    usageToggle.checked = false;
+        usageToggle.checked = false;
+    }
 
     // Gather categories from currently owned object assets
     const categoryCounts = {};
@@ -7627,22 +7951,37 @@ function renderObjectAssetsDropdown() {
     });
 
     // Initial render
-    renderObjectAssets('all', false);
+    renderObjectAssets('all', false, sidebar);
 
-    // Filter on dropdown change
-    dropdown.addEventListener('change', () => {
-        renderObjectAssets(dropdown.value, usageToggle.checked);
-    });
+    if (sidebar) {
+        // Filter on dropdown change
+        dropdown.addEventListener('change', () => {
+            renderObjectAssets(dropdown.value, false, sidebar);
+        });
 
-    // Filter on toggle change
-    usageToggle.addEventListener('change', () => {
-        renderObjectAssets(dropdown.value, usageToggle.checked);
-    });
+    } else {
+        // Filter on dropdown change
+        dropdown.addEventListener('change', () => {
+            renderObjectAssets(dropdown.value, usageToggle.checked, sidebar);
+        });
+
+        // Filter on toggle change
+        usageToggle.addEventListener('change', () => {
+            renderObjectAssets(dropdown.value, usageToggle.checked, sidebar);
+        });
+    }
 }
 
 
-function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
-    const container = document.querySelector('.object-assets');
+function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sidebar) {
+    let container;
+    
+    if (sidebar) {
+        container = document.querySelector('.object-sidebar-assets');
+    } else {
+        container = document.querySelector('.object-assets');
+    }
+
     if (!container) return;
 
     container.innerHTML = '';
@@ -7725,7 +8064,9 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
         if (usedCount > 0) {
             const countSpan = document.createElement('span');
             countSpan.className = 'item-quantity';
-            countSpan.textContent = `Naudojama: ${usedCount}`;
+            if (!sidebar) {
+                countSpan.textContent = `Naudojama: ${usedCount}`;
+            }
             descP.appendChild(countSpan);
         }
 
@@ -7733,10 +8074,12 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
         infoDiv.appendChild(descP);
 
         const btn = document.createElement('button');
+        btn.id = `${assetIndex}-use-btn`
         btn.className = 'use-btn';
         btn.textContent = 'Naudoti';
         btn.disabled = false;
 
+        //Render Stackable Items
         btn.addEventListener('click', () => {
             // Create a new instance for stackable items
             const newKey = `O${Object.keys(userObjectAssets).length + 1}`;
@@ -7744,31 +8087,40 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
 
             let tempDivId = renderSingleRoomObject(newKey);
 
-            document.querySelectorAll('.game-content-panel').forEach(p => p.classList.remove('active'));
-            document.getElementById('pet-room-container').classList.add('active');
+            if (!sidebar) {
+                document.querySelectorAll('.game-content-panel').forEach(p => p.classList.remove('active'));
+                document.getElementById('pet-room-container').classList.add('active');
 
-            const navButtons = document.querySelectorAll('.nav-item');
-            navButtons.forEach(btn => btn.classList.remove('active'));
-            navButtons[0].classList.add('active');
-            
+                const navButtons = document.querySelectorAll('.nav-item');
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                navButtons[0].classList.add('active');
+    
+                updateStatsBeforeRerunningInitGameAndRenderPets();
+                initGame();
+            }
+
             userObjectAssets[tempDivId].position = getObjectCoordinates(tempDivId);
-
-            updateStatsBeforeRerunningInitGameAndRenderPets();
-            initGame();
-
+        
             // Attempt to place the item at a valid position
             const placementMap = generatePlacementMap(tempDivId);
             const validPosition = findValidPosition(placementMap, tempDivId);
 
             if (validPosition) {
                 userObjectAssets[tempDivId].position = validPosition;
-                sendObjectAssetsUpdateToDatabase();
-                updateStatsBeforeRerunningInitGameAndRenderPets();
-                initGame();
+                if (!sidebar) {
+                    sendObjectAssetsUpdateToDatabase();
+                    updateStatsBeforeRerunningInitGameAndRenderPets();
+                    initGame();
+                } else {
+                    const tempDiv = document.getElementById(tempDivId)
+                    tempDiv.style.left = `calc(${validPosition[0]} * var(--unit-size))`;
+                    tempDiv.style.top = `calc((${validPosition[1] + 1} * var(--unit-size)) - ${tempDiv.offsetHeight}px)`;
+                    enableObjectDragging();
+                }
             } else {
                 userObjectAssets[tempDivId].position = [];
                 document.getElementById(tempDivId).remove();
-                delete userObjectAssets[tempDivId]; // Remove the failed instance
+                delete userObjectAssets[tempDivId];
                 if (gameAssetIndex[parseInt(assetIndex)].placingIndex === 13 || 
                     gameAssetIndex[parseInt(assetIndex)]["css-class"].includes("window-sill")) {
                     messageToTheUser("Nėra tinkamo dydžio lango arba jį užstoja kiti daiktai!");
@@ -7776,6 +8128,10 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
                     messageToTheUser("Nepakanka vietos!");
                 }
                 predictAndSetZIndex();
+            }
+
+            if (window.innerWidth <= 768) {
+                closeSidebar();
             }
         });
 
@@ -7795,9 +8151,11 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
                     });
                 });
             });
-            
-            itemDeleteBtnHolder.appendChild(deleteBtn);
-            previewDiv.appendChild(itemDeleteBtnHolder);
+
+            if (!sidebar) {
+                itemDeleteBtnHolder.appendChild(deleteBtn);
+                previewDiv.appendChild(itemDeleteBtnHolder);
+            }
         }
 
         previewHolder.appendChild(previewDiv);
@@ -7846,6 +8204,7 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
 
         const btn = document.createElement('button');
         btn.className = 'use-btn';
+        btn.id = `${key}-use-btn`
 
         if (asset.position && asset.position.length > 0) {
             btn.textContent = 'Naudojama';
@@ -7858,27 +8217,37 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
             btn.addEventListener('click', () => {
                 let tempDivId = renderSingleRoomObject(key);
 
-                document.querySelectorAll('.game-content-panel').forEach(p => p.classList.remove('active'));
-                document.getElementById('pet-room-container').classList.add('active');
-
-                const navButtons = document.querySelectorAll('.nav-item');
-                navButtons.forEach(btn => btn.classList.remove('active'));
-                navButtons[0].classList.add('active');
-                
                 userObjectAssets[tempDivId].position = getObjectCoordinates(tempDivId);
 
-                updateStatsBeforeRerunningInitGameAndRenderPets();
-                initGame();
 
+                if (!sidebar) {
+                    document.querySelectorAll('.game-content-panel').forEach(p => p.classList.remove('active'));
+                    document.getElementById('pet-room-container').classList.add('active');
+
+                    const navButtons = document.querySelectorAll('.nav-item');
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    navButtons[0].classList.add('active');
+                    
+                    updateStatsBeforeRerunningInitGameAndRenderPets();
+                    initGame();
+                }
+            
                 // Attempt to place the item at a valid position
                 const placementMap = generatePlacementMap(tempDivId);
                 const validPosition = findValidPosition(placementMap, tempDivId);
 
                 if (validPosition) {
                     userObjectAssets[tempDivId].position = validPosition;
-                    sendObjectAssetsUpdateToDatabase();
-                    updateStatsBeforeRerunningInitGameAndRenderPets();
-                    initGame();
+                    if (!sidebar) {
+                        sendObjectAssetsUpdateToDatabase();
+                        updateStatsBeforeRerunningInitGameAndRenderPets();
+                        initGame();
+                    } else {
+                        const tempDiv = document.getElementById(tempDivId)
+                        tempDiv.style.left = `calc(${validPosition[0]} * var(--unit-size))`;
+                        tempDiv.style.top = `calc((${validPosition[1] + 1} * var(--unit-size)) - ${tempDiv.offsetHeight}px)`;
+                        enableObjectDragging();
+                    }
                 } else {
                     userObjectAssets[tempDivId].position = [];
                     document.getElementById(tempDivId).remove();
@@ -7889,6 +8258,18 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
                         messageToTheUser("Nepakanka vietos!");
                     }
                     predictAndSetZIndex();
+                }
+
+                if (sidebar) {
+                    if (userObjectAssets[tempDivId].position && userObjectAssets[tempDivId].position.length > 0) {
+                        btn.textContent = 'Naudojama';
+                        btn.disabled = true;
+                        btn.className = 'use-btn used';
+                    } else {
+                        btn.textContent = 'Naudoti';
+                        btn.disabled = false;
+                        btn.className = 'use-btn';
+                    }
                 }
             });
         }
@@ -7904,8 +8285,10 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false) {
                 showCustomConfirm(`Ar tikrai nori išmestį šį daiktą? Jo susigrąžinti negalėsi.`, removeObjectFromUserAssets, key);
             });
             
-            itemDeleteBtnHolder.appendChild(deleteBtn);
-            previewDiv.appendChild(itemDeleteBtnHolder);
+            if (!sidebar) {
+                itemDeleteBtnHolder.appendChild(deleteBtn);
+                previewDiv.appendChild(itemDeleteBtnHolder);
+            }
         }
 
         previewHolder.appendChild(previewDiv);
@@ -11229,6 +11612,12 @@ function roomToScreen(roomX, roomY) {
 
 // ------------------ Desktop zoom ------------------
 function handleViewportZoom(e) {
+    // Check if zoom is locked
+    if (viewportState.zoomLocked) {
+        e.preventDefault();
+        return;
+    }
+    
     e.preventDefault();
 
     const delta = e.deltaY * -0.001;
@@ -11270,6 +11659,12 @@ function getDistance(touches) {
 
 function handleTouchMove(e) {
     if (e.touches.length === 2) {
+        // Check if zoom is locked
+        if (viewportState.zoomLocked) {
+            e.preventDefault();
+            return;
+        }
+        
         e.preventDefault();
         
         const currentDistance = getDistance(e.touches);
@@ -11316,7 +11711,6 @@ function handleTouchMove(e) {
     }
 }
 
-
 function handleTouchEnd(e) {
     if (e.touches.length < 2) {
         initialPinchDistance = null;
@@ -11348,7 +11742,6 @@ function handleTouchEnd(e) {
         
         // Clear placement highlights
         clearPlacementHighlights();
-        removeAllDeleteItemHighlights();
         
         if (multiTouchCooldown) {
             clearTimeout(multiTouchCooldown);
@@ -11364,7 +11757,7 @@ function handleTouchEnd(e) {
 function handleViewportPanStart(e) {
     const isTouchMultiFinger = e.touches?.length >= 2;
     const isMiddleClick = e.button === 1;
-    const isSpacebarDrag = viewportState.spacePressed && e.button === 0;
+    const isLeftClickWithSpace = viewportState.spacePressed && e.button === 0 && e.pointerType === "mouse";
 
     // Set multiTouchActive IMMEDIATELY and clear all object states
     if (isTouchMultiFinger) {
@@ -11377,7 +11770,7 @@ function handleViewportPanStart(e) {
         clearPlacementHighlights();
     }
 
-    if (isMiddleClick || isSpacebarDrag || isTouchMultiFinger) {
+    if (isMiddleClick || isLeftClickWithSpace || isTouchMultiFinger) {
         e.preventDefault();
         e.stopPropagation();
         viewportState.isDragging = true;
@@ -11392,7 +11785,41 @@ function handleViewportPanStart(e) {
 }
 
 function handleViewportPanMove(e) {
-    if (!viewportState.isDragging) return;
+    // Handle space + trackpad movement (no click needed)
+    if (viewportState.spacePressed && !viewportState.isDragging && e.pointerType !== "touch") {
+        // Initialize on first move after space is pressed
+        if (viewportState.lastMouseX === 0 && viewportState.lastMouseY === 0) {
+            viewportState.lastMouseX = e.clientX;
+            viewportState.lastMouseY = e.clientY;
+            return; // Skip the first move to avoid jump
+        }
+        
+        const deltaX = e.clientX - viewportState.lastMouseX;
+        const deltaY = e.clientY - viewportState.lastMouseY;
+        
+        // Only pan if there's actual movement
+        if (Math.abs(deltaX) > 0 || Math.abs(deltaY) > 0) {
+            viewportState.x += deltaX / viewportState.scale;
+            viewportState.y += deltaY / viewportState.scale;
+            applyViewportTransform();
+        }
+        
+        viewportState.lastMouseX = e.clientX;
+        viewportState.lastMouseY = e.clientY;
+        return;
+    }
+    
+    if (!viewportState.isDragging) {
+        // Update last mouse position even when not dragging
+        if (e.pointerType !== "touch") {
+            viewportState.lastMouseX = e.clientX;
+            viewportState.lastMouseY = e.clientY;
+        }
+        return;
+    }
+    
+    // Don't pan if we're dragging an object
+    if (isDragging && currentObject) return;
 
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -11428,7 +11855,6 @@ function handleViewportPanEnd(e) {
             
             // Clear placement highlights
             clearPlacementHighlights();
-            removeAllDeleteItemHighlights();
             
             if (multiTouchCooldown) {
                 clearTimeout(multiTouchCooldown);
@@ -11456,6 +11882,8 @@ function handleKeyUp(e) {
     if (e.code === 'Space') {
         e.preventDefault();
         viewportState.spacePressed = false;
+        viewportState.lastMouseX = 0;  // ADD THIS
+        viewportState.lastMouseY = 0;  // ADD THIS
         document.body.classList.remove('pan-mode-active');
         document.getElementById('pan-mode-indicator')?.classList.remove('active');
 
@@ -11539,6 +11967,112 @@ function blockTopHalfOfSelectedDivsClickEvents() { //To prevent clicking of obje
     });
   });
 }
+
+const toggleZoomLockBtn = document.getElementById("toggle-zoom-lock-btn");
+
+toggleZoomLockBtn.addEventListener("click", () => {
+    viewportState.zoomLocked = !viewportState.zoomLocked;
+    updateZoomLockButton();
+});
+
+function updateZoomLockButton() {
+    const btn = document.getElementById("toggle-zoom-lock-btn");
+    if (viewportState.zoomLocked) {
+        btn.textContent = "🔒 Zoom";
+        btn.classList.add("locked");
+    } else {
+        btn.textContent = "🔓 Zoom";
+        btn.classList.remove("locked");
+    }
+}
+
+// Sidebar functionality
+const sidebarWrapper = document.getElementById('sidebarWrapper');
+const toggleTab = document.getElementById('toggleTab');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+// Toggle sidebar function
+function toggleSidebar() {
+  sidebarWrapper.classList.toggle('open');
+}
+
+// Open sidebar function
+function openSidebar() {
+  sidebarWrapper.classList.add('open');
+}
+
+// Close sidebar function
+function closeSidebar() {
+    sidebarWrapper.classList.remove('open');
+}
+
+function displaySidebar() {
+    const sidebarWrapper = document.querySelector('.sidebar-wrapper');
+    const width = sidebarWrapper.offsetWidth;
+
+    // Get computed transform from CSS
+    const computedTransform = getComputedStyle(sidebarWrapper).transform;
+
+    let translateX = 0;
+
+    if (computedTransform === 'none') {
+        translateX = 0;
+    } else if (computedTransform.includes('matrix')) {
+        // matrix(a, b, c, d, tx, ty) → tx is translateX
+        const parts = computedTransform.replace('matrix(', '').replace(')', '').split(',');
+        translateX = parseFloat(parts[4]);
+    } else if (computedTransform.includes('translateX')) {
+        const match = computedTransform.match(/translateX\(([-\d.]+)px\)/);
+        if (match) translateX = parseFloat(match[1]);
+    }
+    // If absolute value of translateX is larger than width, add 34
+    if (Math.abs(translateX) > width) {
+        translateX += 35;
+        sidebarWrapper.style.transform = `translateX(${translateX}px)`;
+    }
+
+    openSidebar();
+}
+
+function hideSidebar() {
+    const sidebarWrapper = document.querySelector('.sidebar-wrapper');
+    const width = sidebarWrapper.offsetWidth;
+
+    // Get computed transform from CSS
+    const computedTransform = getComputedStyle(sidebarWrapper).transform;
+
+    let translateX = 0;
+
+    if (computedTransform === 'none') {
+        translateX = 0;
+    } else if (computedTransform.includes('matrix')) {
+        // matrix(a, b, c, d, tx, ty) → tx is translateX
+        const parts = computedTransform.replace('matrix(', '').replace(')', '').split(',');
+        translateX = parseFloat(parts[4]);
+    } else if (computedTransform.includes('translateX')) {
+        const match = computedTransform.match(/translateX\(([-\d.]+)px\)/);
+        if (match) translateX = parseFloat(match[1]);
+    }
+
+    // If absolute value of translateX is larger than width, add 34
+    if (Math.abs(translateX) === width) {
+        translateX = (width + 35) * -1;
+        sidebarWrapper.style.transform = `translateX(${translateX}px)`;
+    }
+
+    closeSidebar();
+}
+
+
+// Event listeners
+if (toggleTab) {
+    toggleTab.addEventListener('click', toggleSidebar);
+}
+// Close sidebar on window resize if it becomes desktop size
+window.addEventListener('resize', () => {
+    closeSidebar();
+});
+
 
 
 // FUNCTIONS TO HELP DEVELOPMENT START
