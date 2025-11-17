@@ -3,7 +3,7 @@
 
 <head>
 	<title>sudedu - užduotys</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
 	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -586,7 +586,9 @@
             font-weight: 800;
             text-transform: uppercase;
             font-size: 1.5rem;
-            margin-bottom: 10px;
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
         }
         
         #student-task-group-and-status-indicator {
@@ -858,20 +860,6 @@
         background: rgba(255, 255, 255, 0.15);
         }
 
-        #text-viewer {
-            width: 100%;
-            margin-top: 15px;
-            background-color: transparent;
-        }
-
-        .accordion-item {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px !important;
-            overflow: hidden;
-        }
 
 #student-task-student-knowledge-level,
 #student-task-student-performance-mean,
@@ -921,65 +909,6 @@
     flex-wrap: wrap;
     width: 100%;
     gap: 15px;
-}
-
-.accordion-button {
-    background-color: transparent;
-    border: none;
-    color: #212529;
-    margin: 0;
-    font-size: 1.5rem;
-    transition: background 0.3s ease;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-}
-
-/* Icon */
-.accordion-icon {
-    transition: transform 0.3s ease;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.accordion-button[aria-expanded="true"] .accordion-icon {
-    transform: rotate(180deg); /* + becomes × */
-}
-
-
-.accordion-input-button-holder {
-    display: flex;
-    align-items: center;
-    gap: 10px
-}
-
-/* Collapse animation */
-.accordion-collapse {
-    height: 0;
-    overflow: hidden;
-    border-top: none;
-}
-
-.accordion-collapse.show {
-    height: auto;
-}
-
-.accordion-body {
-    border-radius: 20px !important;
-    margin-bottom: 10px;
-    overflow: hidden;
-    padding: 0 20px;
-}
-
-.accordion-body {
-    margin-bottom: 0;
-}
-
-.accordion-header {
-    margin: 15px 0;
 }
 
 /* Form and button styles */
@@ -1718,6 +1647,67 @@
         line-height: 1.6;
     }
 
+    .student-name-id-holder {
+        display: inline-block;   /* or block if needed */
+        min-width: 0;
+        max-width: 100%;         /* stay within parent */
+        word-wrap: break-word;   /* wrap long text */
+        white-space: normal;     /* allow wrapping */
+        width: auto;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        flex: 1 1 auto;
+    }
+
+    .edit-name-button{
+        flex: 0 0 auto;
+        cursor: pointer;
+    }
+
+    .student-name-id-holder span {
+        display: inline;         /* keep inline for name and ID */
+    }
+
+    #student-name {
+        margin-right: 5px;
+        display: flex;
+        min-width: 0;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .student-name-field {
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 1.5rem;
+        border: none;
+        width: auto;
+        min-width: 3ch;
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 20px;
+        border: none;
+        padding: 0 8px;
+        max-width: 100%;
+        margin-right: 5px;
+        flex: 1 1 auto;
+    }
+
+    #student-id {
+        flex: 1 0 auto;
+        min-width: 0;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .student-name-field:focus,
+    .student-name-field:active {
+        border: none;
+        outline: none;
+    }
+
 
     @media (max-width: 1999px) {
         #teacher-message-line,
@@ -1861,14 +1851,6 @@
 
       .overlay.active {
         display: block;
-      }
-
-      .accordion-button {
-        font-size: 1.25rem;
-      }
-
-      .accordion-header {
-        margin: 10px 0;
       }
 
     .timer-input, .question-number-input {
@@ -2184,10 +2166,6 @@
                 align-items: center;
             }
 
-            .accordion-button {
-                font-size: 2rem;
-            }
-
             #view-text-id-input {
                 width: 200px;
                 font-size: 1.5rem;
@@ -2227,9 +2205,347 @@
     #student-statistics-completed-tasks {
         border-top: 1px solid rgba(255, 255, 255, 1);
     }
+
+    .student-name-field,
+    #student-task-student-name {
+        font-size: 2rem;
+    }
+
+    .edit-icon img {
+        height: 24px;
+        width: 24px;
+    }
     }
 
 
+    .txt-viewer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .txt-viewer-sticky-header {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 100;
+            border-bottom: 2px solid #e0e0e0;
+            padding: 20px;
+        }
+
+        .txt-viewer-selected-ids-container {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .txt-viewer-selected-ids-container.txt-viewer-visible {
+            display: block;
+        }
+
+        .txt-viewer-selected-ids-label {
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .txt-viewer-selected-ids-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .txt-viewer-selected-id-chip {
+            background: #1976d2;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .txt-viewer-selected-id-chip:hover {
+            background: #1565c0;
+        }
+
+        .txt-viewer-selected-id-chip .txt-viewer-remove {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .txt-viewer-search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+            margin-bottom: 15px;
+        }
+
+        .txt-viewer-search-input:focus {
+            outline: none;
+            border-color: #1976d2;
+        }
+
+        .txt-viewer-filters-section {
+            margin-bottom: 15px;
+        }
+
+        .txt-viewer-filter-group {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .txt-viewer-filter-header {
+            background: #f5f5f5;
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .txt-viewer-filter-header:hover {
+            background: #eeeeee;
+        }
+
+        .txt-viewer-filter-header-icon {
+            transition: transform 0.3s;
+        }
+
+        .txt-viewer-filter-header-icon.txt-viewer-collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .txt-viewer-filter-content {
+            padding: 12px 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            max-height: 500px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .txt-viewer-filter-content.txt-viewer-collapsed {
+            max-height: 0;
+            padding: 0 16px;
+        }
+
+        .txt-viewer-filter-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .txt-viewer-filter-option:hover {
+            background: #f5f5f5;
+        }
+
+        .txt-viewer-filter-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .txt-viewer-filter-option label {
+            cursor: pointer;
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .txt-viewer-texts-list {
+            padding: 20px;
+        }
+
+        .txt-viewer-text-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        .txt-viewer-text-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .txt-viewer-text-item-header {
+            padding: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fafafa;
+            transition: background 0.2s;
+        }
+
+        .txt-viewer-text-item-header:hover {
+            background: #f5f5f5;
+        }
+
+        .txt-viewer-text-item-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .txt-viewer-text-item-main {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .txt-viewer-text-item-info {
+            flex: 1;
+        }
+
+        .txt-viewer-text-item-id {
+            color: #1976d2;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .txt-viewer-text-item-title {
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .txt-viewer-text-item-expand-icon {
+            transition: transform 0.3s;
+            color: #666;
+        }
+
+        .txt-viewer-text-item-expand-icon.txt-viewer-expanded {
+            transform: rotate(180deg);
+        }
+
+        .txt-viewer-text-item-details {
+            padding: 0 16px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+        }
+
+        .txt-viewer-text-item-details.txt-viewer-expanded {
+            max-height: 2000px;
+            padding: 16px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .txt-viewer-text-detail-row {
+            margin-bottom: 16px;
+        }
+
+        .txt-viewer-text-detail-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .txt-viewer-text-detail-content {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .txt-viewer-text-section {
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 6px;
+        }
+
+        .txt-viewer-text-section-title {
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .txt-viewer-text-section-paragraph {
+            margin-bottom: 8px;
+        }
+
+        .txt-viewer-text-section-paragraph:last-child {
+            margin-bottom: 0;
+        }
+
+        .txt-viewer-no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .txt-viewer-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        .txt-viewer-badge-class {
+            background: #e1f5fe;
+            color: #01579b;
+        }
+
+        .txt-viewer-badge-type {
+            background: #f3e5f5;
+            color: #4a148c;
+        }
+
+        .txt-viewer-badge-difficulty {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        @media (max-width: 768px) {
+            .txt-viewer-sticky-header {
+                padding: 15px;
+            }
+
+            .txt-viewer-texts-list {
+                padding: 15px;
+            }
+
+            .txt-viewer-filter-content {
+                grid-template-columns: 1fr;
+            }
+
+            .txt-viewer-text-item-main {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
   
     </style>
 </head>
@@ -2670,6 +2986,7 @@
                             <div id="student-task-info-container-inner">
                                 <div class="task-info-holder">
                                     <div id="student-task-student-name"></div>
+                                    <div id="student-task-student-email"></div>
                                     <div class="student-statistic-top-section">
                                     <div id="student-task-student-knowledge-level"></div>
                                     <div id="student-task-student-performance-mean"></div>
@@ -2752,43 +3069,85 @@
                                 </div>
                             </div>
                         
-                        <div class="accordion" id="text-viewer">
-    <div class="accordion-item">
-        <h2 class="accordion-header" id="text-viewer-heading">
-            <button class="accordion-button collapsed" type="button" aria-expanded="false" aria-controls="collapseOne">
-            Tekstų naršyklė
-            <span class="accordion-icon">
-                <svg width="32" height="32" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </span>
-        </button>
 
-        </h2>
-        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="text-viewer-heading">
-            <div class="accordion-body">
-                <div class="accordion-input-button-holder">
-                    <input type="text" class="form-control" id="view-text-id-input" autocomplete="off" placeholder="Teksto ID" />
-                    <div class="">
-                        <button type="button" id="text-browser-button" onclick="passTextIdToTheLocatorFunction()">Ieškoti</button>
+<div class="txt-viewer-container">
+        <div class="txt-viewer-sticky-header">
+            <div class="txt-viewer-selected-ids-container" id="selectedIdsContainer">
+                <div class="txt-viewer-selected-ids-label">Pasirinkti tekstai:</div>
+                <div class="txt-viewer-selected-ids-list" id="selectedIdsList"></div>
+            </div>
+
+            <input 
+                type="text" 
+                class="txt-viewer-search-input" 
+                id="searchInput" 
+                placeholder="Ieškoti pagal ID, pavadinimą, autorių ar tekstą..."
+                autocomplete="off"
+            >
+
+            <div class="txt-viewer-filters-section">
+                <div class="txt-viewer-filter-group">
+                    <div class="txt-viewer-filter-header" onclick="toggleFilter('classFilter')">
+                        <span>Klasė</span>
+                        <span class="txt-viewer-filter-header-icon" id="classFilterIcon">▼</span>
+                    </div>
+                    <div class="txt-viewer-filter-content" id="classFilter">
+                        <div class="txt-viewer-filter-option">
+                            <input type="checkbox" id="class_1_2" checked onchange="applyFilters()">
+                            <label for="class_1_2">1-2 klasė</label>
+                        </div>
+                        <div class="txt-viewer-filter-option">
+                            <input type="checkbox" id="class_3_4" checked onchange="applyFilters()">
+                            <label for="class_3_4">3-4 klasė</label>
+                        </div>
                     </div>
                 </div>
-                <div class="col-12" id="text-message"></div>
 
-                <div class="row" id="text-container-row">
-                    <div class="col-12" id="text-id"></div>
-                    <div class="col-12" id="text-compatibility"></div>
-                    <div class="col-12" id="text-title"></div>
-                    <div class="col-12" id="text-author"></div>
-                    <div class="col-12" id="text-start"></div>
-                    <div class="col-12" id="text-middle"></div>
-                    <div class="col-12" id="text-end"></div>
-                    <div class="col-12" id="text-distractor"></div>
+                <div class="txt-viewer-filter-group">
+                    <div class="txt-viewer-filter-header" onclick="toggleFilter('taskTypeFilter')">
+                        <span>Užduoties tipas</span>
+                        <span class="txt-viewer-filter-header-icon" id="taskTypeFilterIcon">▼</span>
+                    </div>
+                    <div class="txt-viewer-filter-content" id="taskTypeFilter">
+                        <div class="txt-viewer-filter-option">
+                            <input type="checkbox" id="task_struktura" checked onchange="applyFilters()">
+                            <label for="task_struktura">Struktūros išdėstymas</label>
+                        </div>
+                        <div class="txt-viewer-filter-option">
+                            <input type="checkbox" id="task_komponavimas" checked onchange="applyFilters()">
+                            <label for="task_komponavimas">Turinio komponavimas</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="txt-viewer-filter-group">
+                    <div class="txt-viewer-filter-header" onclick="toggleFilter('difficultyFilter')">
+                        <span>Sudėtingumas</span>
+                        <span class="txt-viewer-filter-header-icon" id="difficultyFilterIcon">▼</span>
+                    </div>
+                    <div class="txt-viewer-filter-content" id="difficultyFilter">
+                        <div class="txt-viewer-filter-option">
+                            <input type="checkbox" id="diff_lengvas" checked onchange="applyFilters()">
+                            <label for="diff_lengvas">Lengvas</label>
+                        </div>
+                        <div class="txt-viewer-filter-option">
+                            <input type="checkbox" id="diff_vidutinis" checked onchange="applyFilters()">
+                            <label for="diff_vidutinis">Vidutinis</label>
+                        </div>
+                        <div class="txt-viewer-filter-option">
+                            <input type="checkbox" id="diff_sunkus" checked onchange="applyFilters()">
+                            <label for="diff_sunkus">Sunkus</label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <div class="txt-viewer-texts-list" id="textsList">
+            <div class="txt-viewer-no-results">Kraunama...</div>
+        </div>
     </div>
-</div>
+
                         </div>
                     </div>
                 </div>
@@ -2976,6 +3335,7 @@
         const newTaskOptions = document.getElementById('new-task-options-container');
         const studentTaskInfoContainer = document.getElementById('student-task-info-container');
         const studentTaskStudentName = document.getElementById('student-task-student-name');
+        const studentTaskStudentEmail = document.getElementById('student-task-student-email');
         const studentTaskGroup = document.getElementById('student-task-group');
 
         const studentTaskStatus = document.getElementById('student-task-status');
@@ -3347,6 +3707,7 @@
 
         function clearTaskInfoContainer() {
             studentTaskStudentName.innerHTML = '';
+            studentTaskStudentEmail.innerHTML = '';
             studentTaskGroup.innerHTML = '';
             studentScoreAnswerNumber.innerHTML = '';
             studentScoreMistakeNumber.innerHTML = '';
@@ -3475,6 +3836,10 @@
 function transformStudentStats(stats) {
   const result = {};
 
+    if (stats.d) {
+        studentStatisticsLastRecord = stats.d
+    }
+
   // Handle "c" as a list of percentages
   if (stats.c) {
     result.c = {
@@ -3525,6 +3890,7 @@ function transformStudentStats(stats) {
   return result;
 }
 
+let studentStatisticsLastRecord;
 
         function displayStudentStatistics(student, studentTasks) {
             const processedStudentStats = transformStudentStats(student[3]);
@@ -3623,7 +3989,15 @@ function transformStudentStats(stats) {
             }
 
         clearTaskInfoContainer();
-        studentTaskStudentName.innerHTML = `${student[1]} (ID: ${student[0]})`;
+        studentTaskStudentName.innerHTML = `
+            <span class="student-name-id-holder"><span id="student-name">${student[1]}</span><span id='student-id'>(ID: ${student[0]})</span></span>
+            <button class="edit-name-button" onclick="editStudentName('${student[0]}', this)">
+                <span class="edit-icon">
+                <img src="../images/icons/icon-edit.svg">
+                </span>
+            </button>
+            `;
+        studentTaskStudentEmail.innerHTML = student[4];
 
         const knowledgeOptions = [
             { value: -1, label: "Nustatykite lygį", hidden: true }, // placeholder, shown only if -1
@@ -3719,7 +4093,14 @@ function transformStudentStats(stats) {
         function generateMondayDates(count) {
             var dates = [];
             var today = new Date();
+
             var currentMonday = getPreviousMonday(today);
+
+            if (studentStatisticsLastRecord) {
+                var lastDataDate = new Date((studentStatisticsLastRecord) * 24 * 60 * 60 * 1000);
+                var lastDataMonday = getPreviousMonday(lastDataDate);
+                currentMonday = lastDataMonday;
+            }
             
             for (var i = 0; i < count; i++) {
                 dates.push(formatLithuanianDate(currentMonday));
@@ -4457,7 +4838,6 @@ function transformStudentStats(stats) {
             document.querySelector("#mistakes-summary-math").style.display = "none";
         }
 
-        console.log(document.querySelector("#summary-table-grammar").innerHTML)
         if (document.querySelector("#summary-table-grammar").innerHTML === "Klaidų nėra!" || document.querySelector("#summary-table-grammar").innerHTML === '') {
             document.querySelector("#mistakes-summary-grammar").style.display = "none";
         }
@@ -4544,7 +4924,16 @@ function transformStudentStats(stats) {
 
             const parsedTaskDescription = JSON.parse(currentTaskInstructions);
             const formattedTaskDescription = getOptionTextFromValues(parsedTaskDescription);
-            studentTaskStudentName.innerHTML = `${student[1]} (ID: ${student[0]})`;
+            studentTaskStudentName.innerHTML = `
+                <span class="student-name-id-holder"><span id="student-name">${student[1]}</span><span id='student-id'>(ID: ${student[0]})</span></span>
+                <button class="edit-name-button" onclick="editStudentName('${student[0]}', this)">
+                    <span class="edit-icon">
+                    <img src="../images/icons/icon-edit.svg">
+                    </span>
+                </button>
+                `;
+            studentTaskStudentEmail.innerHTML = student[2];
+
             studentTaskGroup.innerHTML = `Užduotis: ${task.group}`;
             teacherDispalyStudentTaskIndicator.style.backgroundColor = task.status ? greenCircleColorCode : redCircleColorCode;
             if (task.status) {
@@ -5004,7 +5393,7 @@ function transformStudentStats(stats) {
             studentName.classList.add('selected-option');
 
             // Display task info
-            displayStudentStatistics([student.id, student.nickname, student.knowledgeLvl, student.stats], student.tasks);
+            displayStudentStatistics([student.id, student.nickname, student.knowledgeLvl, student.stats, student.username], student.tasks);
 
             if (currentAction !== "new-task") {
                 openSidebar();
@@ -5049,7 +5438,7 @@ function transformStudentStats(stats) {
                 taskName.classList.add('selected-option');
 
                 // Display task info
-                displayTaskInfo([student.id, student.nickname], task);
+                displayTaskInfo([student.id, student.nickname, student.username], task);
 
                 if (currentAction !== "new-task") {
                     openSidebar();
@@ -5702,154 +6091,7 @@ function enableNewTaskContainer() {
     children.forEach(child => child.disabled = false);
 }
 
-function passTextIdToTheLocatorFunction() {
-    // Get the input value
-    const inputElement = document.getElementById('view-text-id-input');
-        const inputValue = inputElement.value;
-        
-    // Extract only the numeric part
-    const id = parseInt(inputValue.replace(/\D/g, '')) || 0;
-    textDatabaseEntryLocator(id)
-}
 
-async function textDatabaseEntryLocator(id) { 
-    id = Number(id)
-    document.querySelector("#text-message").innerHTML = ''
-    document.querySelector("#text-title").innerHTML = ''
-    document.querySelector("#text-author").innerHTML = ''
-    document.querySelector("#text-start").innerHTML = ''
-    document.querySelector("#text-middle").innerHTML = ''
-    document.querySelector("#text-end").innerHTML = ''
-    document.querySelector("#text-distractor").innerHTML = ''
-    document.querySelector("#text-compatibility").innerHTML = ''
-    document.querySelector("#text-id").innerHTML = ''
-
-    try {
-        // Fetch the JSON data (note: this path is relative to where the HTML is served)
-        const response = await fetch('../databases/sudedu_duomenu_baze.json');
-        if (!response.ok) {
-            throw new Error('Failed to load database');
-        }
-        
-        const data = await response.json();
-        
-        // Find the entry with matching ID
-        const entry = data.find(item => item.id === id);
-        
-        if (!entry) {
-            document.querySelector("#text-message").innerHTML = `Tekstas su ID${id} nerastas.`;
-            return
-        }
-
-        // Check if "komponavimas" or "struktura" exists in suitable-for
-        const suitableKeys = entry["suitable-for"] ? Object.keys(entry["suitable-for"]) : [];
-        const hasKomponavimasOrStruktura = suitableKeys.includes("komponavimas") || suitableKeys.includes("struktura");
-        if (!hasKomponavimasOrStruktura) {
-            document.querySelector("#text-message").innerHTML = `Tekstas su ID${id} nerastas.`;
-            return;
-        }
-
-        document.querySelector("#text-title").innerHTML = `<span id="text-subtitle">Pavadinimas:</span> ${entry.title}`
-        document.querySelector("#text-author").innerHTML = `<span id="text-subtitle">Autorius:</span> ${entry.author}`
-        const containerStart = document.querySelector("#text-start");
-        // Start with a subtitle
-        let htmlStart = `<span id="text-subtitle">Pradžia:</span>`;
-        // Add each item in its own div
-        entry.text.start.forEach(item => {
-            htmlStart += `<div class="text-individual-items">${item}</div>`;
-        });
-        containerStart.innerHTML = htmlStart;
-
-        const containerMiddle = document.querySelector("#text-middle");
-        // Start with a subtitle
-        let htmlMiddle = `<span id="text-subtitle">Ivykio raida:</span>`;
-        // Add each item in its own div
-        entry.text.middle.forEach(item => {
-            htmlMiddle += `<div class="text-individual-items">${item}</div>`;
-        });
-        containerMiddle.innerHTML = htmlMiddle;
-
-        const containerEnd = document.querySelector("#text-end");
-        // Start with a subtitle
-        let htmlEnd = `<span id="text-subtitle">Pabaiga:</span>`;
-        // Add each item in its own div
-        entry.text.end.forEach(item => {
-            htmlEnd += `<div class="text-individual-items">${item}</div>`;
-        });
-        containerEnd.innerHTML = htmlEnd;
-
-        const containerDistractor = document.querySelector("#text-distractor");
-        // Start with a subtitle
-        let htmlDistractor = `<span id="text-subtitle">Distraktorius:</span>`;
-        // Add each item in its own div
-        entry.text.distractor.forEach(item => {
-            htmlDistractor += `<div class="text-individual-items">${item}</div>`;
-        });
-        containerDistractor.innerHTML = htmlDistractor;
-
-        let compatibilityList = document.createElement('ul');
-        // Add class-choice items
-        if (entry["class-choice"].includes("1_2_klase")) {
-            let classListItem = document.createElement('li');
-            classListItem.textContent = "1-2 klasėms";
-            compatibilityList.appendChild(classListItem);
-        }
-
-        if (entry["class-choice"].includes("3_4_klase")) {
-            let classListItem = document.createElement('li');
-            classListItem.textContent = "3-4 klasėms";
-            compatibilityList.appendChild(classListItem);
-        }
-
-        // Add filtered suitable-for items with label replacements
-        if (entry["suitable-for"]) {
-            const labelMap = {
-                komponavimas: "turinio komponavimui",
-                struktura: "struktūros išdėstymui"
-            };
-
-            Object.entries(entry["suitable-for"]).forEach(([key, value]) => {
-                if (key === "komponavimas" || key === "struktura") {
-                    let suitableListItem = document.createElement('li');
-                    suitableListItem.textContent = `${labelMap[key]}: ${value}`;
-                    compatibilityList.appendChild(suitableListItem);
-                }
-            });
-        }
-
-        const textCompatibilityTitle = document.createElement('div');
-        textCompatibilityTitle.innerHTML = '<span id="text-subtitle">Tinkamumas:</span>';
-
-        const container = document.querySelector("#text-compatibility");
-        container.innerHTML = ""; // Clear previous content
-        container.appendChild(textCompatibilityTitle);
-        container.appendChild(compatibilityList);
-
-        document.querySelector("#text-id").innerHTML = `<span id="text-subtitle">Teksto ID:</span> ${entry.id}`
-
-
-        const accordionButton = document.querySelector('#text-viewer-heading button');
-        if (accordionButton.classList.contains('collapsed')) {
-            accordionButton.click();
-            
-            setTimeout(() => {
-                document.querySelector("#text-viewer").scrollIntoView({
-                    behavior: "smooth",
-                    block: "start"
-                });
-            }, 250);
-        } else {
-            document.querySelector("#text-viewer").scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-        }
-    } catch (error) {
-        console.error('Error retrieving data:', error);
-        messageToTheUser(`Nepavyko pasiekti duomenų. Bandykite vėl vėliau`);
-        return null;
-    }
-}
 
 document.addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
@@ -6027,28 +6269,6 @@ document.addEventListener('DOMContentLoaded', () => {
         hideConfirmationButtons();
     });
 
-     const accordionButtons = document.querySelectorAll(".accordion-button");
-
-    accordionButtons.forEach(button => {
-        button.addEventListener("click", () => {
-            const collapse = button.parentElement.nextElementSibling;
-            const expanded = button.getAttribute("aria-expanded") === "true";
-
-            // Close all others (exclusive mode like Bootstrap)
-            document.querySelectorAll(".accordion-collapse").forEach(el => {
-                el.classList.remove("show");
-                el.previousElementSibling.querySelector(".accordion-button").classList.add("collapsed");
-                el.previousElementSibling.querySelector(".accordion-button").setAttribute("aria-expanded", "false");
-            });
-
-            if (!expanded) {
-                collapse.classList.add("show");
-                button.classList.remove("collapsed");
-                button.setAttribute("aria-expanded", "true");
-            }
-        });
-    });
-
     document.getElementById("view-text-id-input").addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
       event.preventDefault(); // stops form submission/reload
@@ -6123,6 +6343,152 @@ function displayFrequentMistakes () {
                 document.querySelector("#summary-table-grammar").style.height = "200px";
         }
     }
+
+function editStudentName(studentId, buttonEl) {
+    const studentNameSpan = document.getElementById('student-name');
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = studentNameSpan.textContent;
+    input.maxLength = 30;
+    input.className = 'student-name-field';
+
+    studentNameSpan.replaceWith(input);
+    input.focus();
+
+    input.addEventListener('input', () => {
+        input.style.width = Math.max(input.value.length + 1.5) + 'ch';
+    });
+
+    input.dispatchEvent(new Event('input'));
+
+    buttonEl.innerHTML = '<span class="edit-icon"><img src="../images/icons/icon-check-black.svg"></span>';
+    buttonEl.setAttribute('onclick', `saveStudentName('${studentId}', this)`);
+}
+
+// Add this function to your script section in uzduotys.html
+
+async function saveStudentName(studentId, buttonEl) {
+    const input = document.querySelector('.student-name-field');
+    const newName = input.value.trim();
+    
+    // Validation
+    if (newName.length === 0) {
+        messageToTheUser("Vardas negali būti tuščias!");
+        // Revert to edit mode
+        editStudentName(studentId, buttonEl);
+        return;
+    }
+    
+    if (newName.length > 30) {
+        messageToTheUser("Maksimalus vardo ilgis yra 30 simbolių.");
+        return;
+    }
+    
+    // Find the student in studentList
+    const student = studentList.find(s => s.id === parseInt(studentId));
+    if (!student) {
+        messageToTheUser("Mokinys nerastas!");
+        return;
+    }
+    
+    // Check if name actually changed
+    if (newName === student.nickname) {
+        // No change, just revert to display mode
+        const span = document.createElement('span');
+        span.id = 'student-name';
+        span.textContent = newName;
+        input.replaceWith(span);
+        
+        buttonEl.innerHTML = '<span class="edit-icon"><img src="../images/icons/icon-edit.svg"></span>';
+        buttonEl.setAttribute('onclick', `editStudentName('${studentId}', this)`);
+        return;
+    }
+    
+    // Disable button during save
+    buttonEl.disabled = true;
+    input.disabled = true;
+    
+    try {
+        const response = await apiFetch(apiBase + 'students/update-nickname', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                studentId: parseInt(studentId),
+                nickname: newName
+            })
+        });
+        
+        if (!response) {
+            return;
+        }
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.message === "Nickname updated successfully") {
+            // Update the student in studentList
+            student.nickname = newName;
+            
+            // Update all instances in the UI
+            updateStudentNameInUI(studentId, newName);
+            
+            messageToTheUser("Vardas sėkmingai atnaujintas!", false);
+        }
+        
+    } catch (error) {
+        console.error('Error updating student name:', error);
+        if (error.message === "Unauthorized") {
+            clearUserData();
+            window.location.href = "prisijungimas";
+        } else {
+            messageToTheUser('Nepavyko atnaujinti vardo. Bandykite vėl vėliau.');
+        }
+    } finally {
+        // Revert to display mode
+        const span = document.createElement('span');
+        span.id = 'student-name';
+        span.textContent = newName;
+        input.replaceWith(span);
+        
+        buttonEl.disabled = false;
+        buttonEl.innerHTML = '<span class="edit-icon"><img src="../images/icons/icon-edit.svg"></span>';
+        buttonEl.setAttribute('onclick', `editStudentName('${studentId}', this)`);
+    }
+}
+
+function updateStudentNameInUI(studentId, newName) {
+    // Update in the student list sidebar
+    const studentListItems = document.querySelectorAll('.student-name');
+    studentListItems.forEach(item => {
+        const text = item.textContent;
+        // Match pattern: "number. oldName (ID: studentId)"
+        const regex = new RegExp(`(\\d+\\.\\s+).+?\\(ID:\\s*${studentId}\\)`);
+        if (regex.test(text)) {
+            const match = text.match(/^(\d+\.)\s+/);
+            if (match) {
+                item.textContent = `${match[1]} ${newName} (ID: ${studentId})`;
+            }
+        }
+    });
+    
+    // Update in the main display area if this student is currently selected
+    const displayedStudentId = document.getElementById('student-id');
+    if (displayedStudentId && displayedStudentId.textContent.includes(studentId)) {
+        const studentNameSpan = document.getElementById('student-name');
+        if (studentNameSpan) {
+            studentNameSpan.textContent = newName;
+        }
+    }
+}
+
+
    
 function updateButtonLayout() {
   const container = document.getElementById('action-buttons-container');
@@ -6202,6 +6568,289 @@ function addHideScrollbarForTouch() {
 window.addEventListener('load', addHideScrollbarForTouch);
 window.addEventListener('resize', addHideScrollbarForTouch);
 
+
+// TEXT VIEWER START
+
+// Global variables
+        let allTexts = [];
+        let selectedIds = [];
+        let isSelectionModeEnabled = true; // Change this to true to enable selection mode
+        let expandedTextIds = new Set();
+
+        // Initialize
+        async function init() {
+            try {
+                const response = await fetch('../databases/sudedu_duomenu_baze.json');
+                allTexts = await response.json();
+                
+                // Set up search input listener
+                document.getElementById('searchInput').addEventListener('input', applyFilters);
+                
+                // Update selection mode visibility
+                updateSelectionModeVisibility();
+                
+                // Initial render
+                applyFilters();
+            } catch (error) {
+                console.error('Error loading texts:', error);
+                document.getElementById('textsList').innerHTML = 
+                    '<div class="no-results">Klaida įkeliant tekstus</div>';
+            }
+        }
+
+        function toggleFilter(filterId) {
+            const content = document.getElementById(filterId);
+            const icon = document.getElementById(filterId + 'Icon');
+            
+            content.classList.toggle('txt-viewer-collapsed');
+            icon.classList.toggle('txt-viewer-collapsed');
+        }
+
+        function updateSelectionModeVisibility() {
+            const container = document.getElementById('selectedIdsContainer');
+            if (isSelectionModeEnabled && selectedIds.length > 0) {
+                container.classList.add('txt-viewer-visible');
+                updateSelectedIdsDisplay();
+            } else {
+                container.classList.remove('txt-viewer-visible');
+            }
+        }
+
+        function updateSelectedIdsDisplay() {
+            const list = document.getElementById('selectedIdsList');
+            list.innerHTML = selectedIds.map(id => `
+                <div class="txt-viewer-selected-id-chip" onclick="scrollToText(${id})">
+                    <span>ID: ${id}</span>
+                    <span class="txt-viewer-remove" onclick="event.stopPropagation(); removeSelectedId(${id})">×</span>
+                </div>
+            `).join('');
+        }
+
+        function removeSelectedId(id) {
+            selectedIds = selectedIds.filter(selectedId => selectedId !== id);
+            const checkbox = document.querySelector(`input[data-text-id="${id}"]`);
+            if (checkbox) checkbox.checked = false;
+            updateSelectionModeVisibility();
+        }
+
+        function toggleTextSelection(id, checked) {
+            if (checked) {
+                if (!selectedIds.includes(id)) {
+                    selectedIds.push(id);
+                }
+            } else {
+                selectedIds = selectedIds.filter(selectedId => selectedId !== id);
+            }
+            updateSelectionModeVisibility();
+        }
+
+        function scrollToText(id) {
+            const text = allTexts.find(t => t.id === id);
+            if (!text) return;
+
+            // Adjust filters to show this text
+            const classValue = text['class-choice'][0];
+            const strukturaDiff = text['suitable-for'].struktura;
+            const komponavimasDiff = text['suitable-for'].komponavimas;
+
+            // Set class filter
+            if (classValue === '1_2_klase') {
+                document.getElementById('class_1_2').checked = true;
+            } else if (classValue === '3_4_klase') {
+                document.getElementById('class_3_4').checked = true;
+            }
+
+            // Set task type filters (enable both to ensure text is visible)
+            document.getElementById('task_struktura').checked = true;
+            document.getElementById('task_komponavimas').checked = true;
+
+            // Set difficulty filters
+            document.getElementById('diff_lengvas').checked = true;
+            document.getElementById('diff_vidutinis').checked = true;
+            document.getElementById('diff_sunkus').checked = true;
+
+            // Clear search to ensure text is visible
+            document.getElementById('searchInput').value = '';
+
+            // Reapply filters
+            applyFilters();
+
+            // Wait for render and scroll
+            setTimeout(() => {
+                const element = document.getElementById(`text-item-${id}`);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Expand if not expanded
+                    if (!expandedTextIds.has(id)) {
+                        toggleTextExpand(id);
+                    }
+                    
+                    // Highlight effect
+                    element.style.boxShadow = '0 0 0 3px #1976d2';
+                    setTimeout(() => {
+                        element.style.boxShadow = '';
+                    }, 2000);
+                }
+            }, 100);
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            // Get checked filters
+            const classFilters = {
+                '1_2_klase': document.getElementById('class_1_2').checked,
+                '3_4_klase': document.getElementById('class_3_4').checked
+            };
+
+            const taskTypes = {
+                struktura: document.getElementById('task_struktura').checked,
+                komponavimas: document.getElementById('task_komponavimas').checked
+            };
+
+            const difficulties = {
+                lengvas: document.getElementById('diff_lengvas').checked,
+                vidutinis: document.getElementById('diff_vidutinis').checked,
+                sunkus: document.getElementById('diff_sunkus').checked
+            };
+
+            // Filter texts
+            const filteredTexts = allTexts.filter(text => {
+                // Class filter
+                const textClass = text['class-choice'][0];
+                if (!classFilters[textClass]) return false;
+
+                // Task type and difficulty filter
+                const strukturaDiff = text['suitable-for'].struktura;
+                const komponavimasDiff = text['suitable-for'].komponavimas;
+                
+                const strukturaMatch = taskTypes.struktura && difficulties[strukturaDiff];
+                const komponavimasMatch = taskTypes.komponavimas && difficulties[komponavimasDiff];
+                
+                if (!strukturaMatch && !komponavimasMatch) return false;
+
+                // Search filter
+                if (searchTerm) {
+                    const searchableText = [
+                        text.id.toString(),
+                        text.title,
+                        text.author,
+                        ...text.text.start,
+                        ...text.text.middle,
+                        ...text.text.end,
+                        ...text.text.distractor
+                    ].join(' ').toLowerCase();
+
+                    if (!searchableText.includes(searchTerm)) return false;
+                }
+
+                return true;
+            });
+
+            renderTexts(filteredTexts);
+        }
+
+        function renderTexts(texts) {
+            const container = document.getElementById('textsList');
+            
+            if (texts.length === 0) {
+                container.innerHTML = '<div class="txt-viewer-no-results">Tekstų nerasta</div>';
+                return;
+            }
+
+            container.innerHTML = texts.map(text => {
+                const isExpanded = expandedTextIds.has(text.id);
+                const isSelected = selectedIds.includes(text.id);
+                
+                return `
+                    <div class="txt-viewer-text-item" id="text-item-${text.id}">
+                        <div class="txt-viewer-text-item-header" onclick="toggleTextExpand(${text.id})">
+                            ${isSelectionModeEnabled ? `
+                                <input 
+                                    type="checkbox" 
+                                    class="txt-viewer-text-item-checkbox" 
+                                    data-text-id="${text.id}"
+                                    ${isSelected ? 'checked' : ''}
+                                    onclick="event.stopPropagation(); toggleTextSelection(${text.id}, this.checked)"
+                                >
+                            ` : ''}
+                            <div class="txt-viewer-text-item-main">
+                                <div class="txt-viewer-text-item-info">
+                                    <div class="txt-viewer-text-item-id">ID: ${text.id}</div>
+                                    <div class="txt-viewer-text-item-title">${text.title}</div>
+                                </div>
+                                <div class="txt-viewer-text-item-expand-icon ${isExpanded ? 'txt-viewer-expanded' : ''}">▼</div>
+                            </div>
+                        </div>
+                        <div class="txt-viewer-text-item-details ${isExpanded ? 'txt-viewer-expanded' : ''}" id="text-details-${text.id}">
+                            ${renderTextDetails(text)}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderTextDetails(text) {
+            return `
+                <div class="text-detail-row">
+                    <div class="text-detail-label">Informacija</div>
+                    <div class="text-detail-content">
+                        <span class="badge badge-class">${text['class-choice'][0].replace('_', '-').replace('klase', 'klasė')}</span>
+                        <span class="badge badge-type">${text.type}</span>
+                        <span class="badge badge-difficulty">Struktūra: ${text['suitable-for'].struktura}</span>
+                        <span class="badge badge-difficulty">Komponavimas: ${text['suitable-for'].komponavimas}</span>
+                    </div>
+                </div>
+
+                <div class="text-detail-row">
+                    <div class="text-detail-label">Autorius</div>
+                    <div class="text-detail-content">${text.author}</div>
+                </div>
+
+                ${text.text.start.length > 0 ? `
+                    <div class="text-section">
+                        <div class="text-section-title">Pradžia</div>
+                        ${text.text.start.map(p => `<div class="text-section-paragraph">${p}</div>`).join('')}
+                    </div>
+                ` : ''}
+
+                ${text.text.middle.length > 0 ? `
+                    <div class="text-section">
+                        <div class="text-section-title">Vidurys</div>
+                        ${text.text.middle.map(p => `<div class="text-section-paragraph">${p}</div>`).join('')}
+                    </div>
+                ` : ''}
+
+                ${text.text.end.length > 0 ? `
+                    <div class="text-section">
+                        <div class="text-section-title">Pabaiga</div>
+                        ${text.text.end.map(p => `<div class="text-section-paragraph">${p}</div>`).join('')}
+                    </div>
+                ` : ''}
+
+                ${text.text.distractor.length > 0 ? `
+                    <div class="text-section">
+                        <div class="text-section-title">Distraktorius</div>
+                        ${text.text.distractor.map(p => `<div class="text-section-paragraph">${p}</div>`).join('')}
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        function toggleTextExpand(id) {
+            if (expandedTextIds.has(id)) {
+                expandedTextIds.delete(id);
+            } else {
+                expandedTextIds.add(id);
+            }
+            applyFilters();
+        }
+
+        // Initialize on load
+        init();
+
+// TEXT VIEWER END
 
 	</script>
 </body>

@@ -945,6 +945,10 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
+        .object-sidebar-assets .shop-item.in-use {
+            display: none;
+        }
+
         .food-use-btn,
         .treat-use-btn {
             align-items: center;
@@ -1866,16 +1870,6 @@
     outline: none;
 }
 
-.edit-name-button {
-    background-color: transparent;
-    padding: 8px;
-}
-
-.edit-icon img {
-    height: 18px;
-    width: 18px;
-}
-
 .pet-delete-btn {
     width: 90px;
     background: transparent;
@@ -1998,7 +1992,7 @@
     position: absolute;
     top: -14px;
     right: -14px;
-    z-index: 9999;
+    z-index: 9000;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2213,7 +2207,7 @@
     transition: transform 0.3s ease;
     transform: translateX(-335px);
     padding-left: 0;
-    z-index: 9999;
+    z-index: 9000;
 }
 
 .sidebar {
@@ -2352,7 +2346,7 @@
 
     #gameContainer.container-expanded {
         position: absolute;
-        z-index: 9999;
+        z-index: 9000;
         height: 100%;
     }
 }
@@ -3442,6 +3436,8 @@
 
         let unitSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
         let gameAssetIndex = {};
+        let roomLayoutNumber;
+        let roomLayout;
         let userPetAssets = {};
         let userMoney = 0;
         let selectedConsumable = [];
@@ -3634,52 +3630,58 @@
         ];
         */
 
-        const roomLayout = [
-          // Top part of floor 2
-          [4.31, ...Array(40).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.32],
-          ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2]),
-          [4.2, ...Array(40).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2],
-          ...Array(2).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
+        const roomLayoutLibrary = {
+            1: [
+                // Top part of floor 2
+                [4.31, ...Array(40).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.32],
+                ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2]),
+                [4.2, ...Array(40).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2],
+                ...Array(2).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
 
-          // Part at the door of floor 2
-          ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.2]),
-          ...Array(6).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2]),
-          ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.2]),
+                // Part at the door of floor 2
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.2]),
+                ...Array(6).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2]),
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.2]),
 
-          // Lower part of floor 2
-          ...Array(10).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
+                // Lower part of floor 2
+                ...Array(10).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
 
-          // Entrance to stairs floor 2
-          [4.34, ...Array(24).fill(4.1), 4.32, ...Array(6).fill(6.0), 4.31, ...Array(8).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33],
-          
-          // Stairs and void
-          ...Array(8).fill([...Array(25).fill(7.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(7.0), ...Array(42).fill(7.0)]),
+                // Entrance to stairs floor 2
+                [4.34, ...Array(24).fill(4.1), 4.32, ...Array(6).fill(6.0), 4.31, ...Array(8).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33],
+                
+                // Stairs and void
+                ...Array(8).fill([...Array(25).fill(7.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(7.0), ...Array(42).fill(7.0)]),
 
-          // Stairs and wall of floor 1
-          [4.31, ...Array(24).fill(4.1), 4.42, ...Array(6).fill(6.0), 4.44, ...Array(8).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.32],
+                // Stairs and wall of floor 1
+                [4.31, ...Array(24).fill(4.1), 4.42, ...Array(6).fill(6.0), 4.44, ...Array(8).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.32],
 
-          // Top part of floor 1, stairs and wall
-          ...Array(12).fill([4.2, ...Array(24).fill(2.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2]),
-        
-          // Top part of floor 1, stairs and boundary
-          [4.2, ...Array(24).fill(3.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2],
+                // Top part of floor 1, stairs and wall
+                ...Array(12).fill([4.2, ...Array(24).fill(2.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2]),
+                
+                // Top part of floor 1, stairs and boundary
+                [4.2, ...Array(24).fill(3.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2],
 
-          // Part at the door of floor 1
-          ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.2]),
-          ...Array(5).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2]),
-          ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.2]),
+                // Part at the door of floor 1
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.2]),
+                ...Array(5).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2]),
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.2]),
 
-          // Bottom part of floor 1
-          ...Array(13).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
-          [4.34, ...Array(40).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33],
-          
-        ];
+                // Bottom part of floor 1
+                ...Array(13).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
+                [4.34, ...Array(40).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33],
+            ]
+        }
 
         const roomGrid = document.getElementById('roomGrid');
         const ctx = roomGrid.getContext('2d');
         const tileSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
 
-        function renderRoomGrid(offsetX = 0, offsetY = 0, scale = 1) {
+        async function renderRoomGrid(offsetX = 0, offsetY = 0, scale = 1) {
+            if (!roomLayoutNumber) return
+            roomLayout = roomLayoutLibrary[roomLayoutNumber];
+
+            resizeCanvas();
+
             const canvas = document.getElementById('roomGrid');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
@@ -3851,12 +3853,7 @@ function resizeCanvas() {
     // Set canvas to room size (not container size)
     canvas.width = cols * tileSize;
     canvas.height = rows * tileSize;
-
-    renderRoomGrid(viewportState.x, viewportState.y, viewportState.scale);
 }
-
-// Call on load AFTER DOM is ready
-window.addEventListener('load', resizeCanvas);
 
 // Call on window resize
 window.addEventListener('resize', resizeCanvas);
@@ -3927,9 +3924,9 @@ function toggleRoomDarknessBasedOnElectricityTax() {
     }
 }
 
-function initGame() {
-    adjustUnitSizeForSmallScreens(roomLayout);
-    renderRoomGrid();
+async function initGame() {
+    adjustUnitSizeForSmallScreens();
+    await renderRoomGrid();
     setPetAndObjectContainersToGridDimentions();
     renderRoomObjects();
     blockTopHalfOfSelectedDivsClickEvents()
@@ -3978,6 +3975,7 @@ function parseGameData(dataFromServer) {
     userPetAssets = parseUserPetAssets(dataFromServer.petAssets);
     userMoney = Number(dataFromServer.money);
     petOnWalk = dataFromServer.petOnWalk;
+    roomLayoutNumber = dataFromServer.roomLayout
     formatTaxesData(dataFromServer.taxes) 
     
     // Parse pet stats from the new format
@@ -4130,6 +4128,7 @@ async function fetchGameData() {
         }
 
         const result = await response.json();
+
         parseGameData(result);
 
     } catch (error) {
@@ -4451,12 +4450,18 @@ function removeObjectsMarkedForRemoval() {
         let isStackable = gameAssetIndex[userObjectAssets[id].assetIndex].stackable
 
         if (!isStackable) {
-            const useBtn = document.querySelector(`#${id}-use-btn`)
+            const itemCard = document.querySelector(`#${id}-item-card`)
+            if (itemCard) {
+            
+            itemCard.classList.remove("in-use");
+            const useBtn = itemCard.querySelector(`#${id}-use-btn`)
+            
             if (useBtn) {
                 useBtn.innerHTML = 'Naudoti';
                 useBtn.disabled = false;
                 useBtn.className = 'use-btn';
             }
+        }
         }
     });
 
@@ -4783,7 +4788,6 @@ if (isTouchDevice) {
     });
 }
 
-// Disable object dragging for normal mode
 function disableObjectDragging() {
     // Remove all delete icons when exiting edit mode
     removeAllDeleteItemHighlights();
@@ -4793,10 +4797,26 @@ function disableObjectDragging() {
     objects.forEach(obj => {
         obj.classList.remove('room-object-edit');
         
-        // Remove edit mode handler
+        // ✅ CRITICAL FIX: Remove ALL edit mode handlers
         if (obj._editModeHandler) {
             obj.removeEventListener('pointerdown', obj._editModeHandler);
+            delete obj._editModeHandler; // Clean up the reference
         }
+        
+        // ✅ ADD: Remove touch-specific handlers for mobile
+        if (obj._pointerDownHandler) {
+            obj.removeEventListener('pointerdown', obj._pointerDownHandler);
+            delete obj._pointerDownHandler;
+        }
+        
+        // ✅ ADD: Clear any pending long-press timeouts
+        if (obj._longPressTimeout) {
+            clearTimeout(obj._longPressTimeout);
+            delete obj._longPressTimeout;
+        }
+        
+        // ✅ ADD: Clear ready-to-drag flag
+        delete obj._readyToDrag;
         
         // Remove any existing normal mode handler first
         if (obj._normalModeHandler) {
@@ -7111,9 +7131,7 @@ window.addEventListener("resize", () => {
 // NAVIGATION END
 
 
-function adjustUnitSizeForSmallScreens(roomLayout) {
-    if (!roomLayout || !roomLayout[0]) return;
-
+function adjustUnitSizeForSmallScreens() {
     const numTiles = 42; // number of columns
     const screenWidth = window.innerWidth;
 
@@ -7732,7 +7750,7 @@ function previewFurniture (key) {
     if (validPosition) {
         furniturePreviewDict["furniture-preview"].position = validPosition;
         updateStatsBeforeRerunningInitGameAndRenderPets();
-        adjustUnitSizeForSmallScreens(roomLayout);
+        adjustUnitSizeForSmallScreens();
         renderRoomGrid();
         setPetAndObjectContainersToGridDimentions();
         renderRoomObjects();
@@ -8283,6 +8301,10 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
                     tempDiv.style.top = `calc((${validPosition[1] + 1} * var(--unit-size)) - ${tempDiv.offsetHeight}px)`;
                     enableObjectDragging();
                 }
+                console.log()
+                if (!isObjectVisibleInViewport(tempDivId)) {
+                    centerViewportOnObject(tempDivId)
+                }
             } else {
                 userObjectAssets[tempDivId].position = [];
                 document.getElementById(tempDivId).remove();
@@ -8346,6 +8368,7 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
 
         const itemDiv = document.createElement('div');
         itemDiv.className = `shop-item ${item.category.join(' ')}`;
+        itemDiv.id = `${key}-item-card`
 
         const previewDiv = document.createElement('div');
         previewDiv.className = `item-preview ${item['css-class']}`;
@@ -8376,6 +8399,7 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
             btn.textContent = 'Naudojama';
             btn.disabled = true;
             btn.className = 'use-btn used';
+            itemDiv.classList.add("in-use");
         } else {
             btn.textContent = 'Naudoti';
             btn.disabled = false;
@@ -8415,6 +8439,10 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
                         tempDiv.style.top = `calc((${validPosition[1] + 1} * var(--unit-size)) - ${tempDiv.offsetHeight}px)`;
                         enableObjectDragging();
                     }
+
+                    if (!isObjectVisibleInViewport(tempDivId)) {
+                        centerViewportOnObject(tempDivId)
+                    }
                 } else {
                     userObjectAssets[tempDivId].position = [];
                     document.getElementById(tempDivId).remove();
@@ -8426,6 +8454,8 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
                     }
                     predictAndSetZIndex();
                 }
+
+                itemDiv.classList.add("in-use");
 
                 if (sidebar) {
                     if (userObjectAssets[tempDivId].position && userObjectAssets[tempDivId].position.length > 0) {
@@ -12268,12 +12298,10 @@ moveSidebarToEnableBackdropFilterEffect();
 // Run on resize
 window.addEventListener('resize', moveSidebarToEnableBackdropFilterEffect);
 
-
 function getRoomCenterCoordinatesClosestToViewportCenter() {
   const viewport = document.getElementById('viewport-container');
   const scaleWrapper = document.getElementById('scale-wrapper');
   const transformWrapper = document.getElementById('room-transform-wrapper');
-  const roomContainer = document.getElementById('room-container');
   
   // Get viewport center
   const viewportRect = viewport.getBoundingClientRect();
@@ -12289,19 +12317,62 @@ function getRoomCenterCoordinatesClosestToViewportCenter() {
   const translateY = translateMatch ? parseFloat(translateMatch[2]) : 0;
   
   // Convert viewport center to room-container coordinates
-  // Reverse the transformations: undo scale, then undo translate
   const roomX = (viewportCenterX / scale) - translateX;
   const roomY = (viewportCenterY / scale) - translateY;
   
-  // Get grid bounds dynamically from roomLayout
+  // Get grid bounds
   const gridHeight = roomLayout.length;
   const gridWidth = roomLayout[0]?.length || 0;
   
-  // Calculate grid units and clamp to bounds
-  const gridX = Math.max(0, Math.min(gridWidth - 1, Math.floor(roomX / unitSize)));
-  const gridY = Math.max(0, Math.min(gridHeight - 1, Math.floor(roomY / unitSize)));
+  // Calculate center tile
+  let gridX = Math.max(0, Math.min(gridWidth - 1, Math.floor(roomX / unitSize)));
+  let gridY = Math.max(0, Math.min(gridHeight - 1, Math.floor(roomY / unitSize)));
   
-  return [gridX, gridY]
+  // Valid tile types for placement
+  const validTypes = new Set([1.0, 2.0, 3.0]);
+  
+  // Move left until we hit an invalid tile or edge
+  let leftX = gridX;
+  while (leftX > 0) {
+    const tileType = roomLayout[gridY][leftX - 1];
+    const type = tileType?.type ?? tileType;
+    if (!validTypes.has(type)) break;
+    leftX--;
+  }
+  
+  // Move up until we hit an invalid tile or edge
+  let topY = gridY;
+  while (topY > 0) {
+    const tileType = roomLayout[topY - 1][leftX];
+    const type = tileType?.type ?? tileType;
+    if (!validTypes.has(type)) break;
+    topY--;
+  }
+  
+  return [leftX, topY];
+}
+
+function isObjectVisibleInViewport(objectId) {
+  const viewport = document.getElementById('viewport-container');
+  const object = document.getElementById(objectId);
+  
+  if (!viewport || !object) return false;
+  
+  // Get viewport bounds
+  const viewportRect = viewport.getBoundingClientRect();
+  
+  // Get object bounds (already transformed)
+  const objectRect = object.getBoundingClientRect();
+  
+  // Check if rectangles overlap
+  const isVisible = !(
+    objectRect.right < viewportRect.left ||    // Object is left of viewport
+    objectRect.left > viewportRect.right ||    // Object is right of viewport
+    objectRect.bottom < viewportRect.top ||    // Object is above viewport
+    objectRect.top > viewportRect.bottom       // Object is below viewport
+  );
+  
+  return isVisible;
 }
 
 function centerViewportOnObject(objectId) {
@@ -12338,6 +12409,9 @@ function centerViewportOnObject(objectId) {
   viewportState.y = translateY;
   
   transformWrapper.style.transform = `translate(${translateX}px, ${translateY}px)`;
+  
+  // Update closest tile after viewport moves
+  viewportState.closestTile = getRoomCenterCoordinatesClosestToViewportCenter();
 }
 
 function toggleRoomExpansion() {
