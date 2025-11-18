@@ -1,3 +1,38 @@
+let controller = {
+  language: '',
+  mode: '',
+	currentMistakes: [],
+	totalMistakes: [],
+	mistakesTracker: 0,
+  classChoice: '',
+	modeChoice: '',
+	modeChoice2: '',
+  modeChoice3: [],
+  modeChoice4: '',
+  modeChoice5: '',
+  modeChoice6: '',
+  modeChoice7: '',
+  modeChoice8: '',
+  task: null,
+  setTaskDuration: '',
+  taskCompleted: false,
+  taskRecorded: false,
+  modeChoiceLtDifficulty: '',
+  questionFrequency: 0,
+  timerLimit: 0,
+  questionNumber: 0,
+	selectedNumbers: [],
+  withRemainder: false,
+	randomSelection: [],
+	combinations: [],
+	equation: '',
+  equation2: '',
+  result: ['', '', '', '', ''],
+	answeredQuestionTracker: 0,
+  correctAnswersTracker: 0,
+  questionsStopped: false
+}
+
 const PET_STATS_EXPIRATION = 0.0035 // EXPIRE FULLY IN 48 hrs
 
 const animationStepsAndDurationNumberDict = {
@@ -59,42 +94,6 @@ const animationStepsAndDurationNumberDict = {
             "bath-1-filled": [6 ,1],
             "bath-1-with-pet": [6 ,1]
         }
-
-
-let controller = {
-  language: '',
-  mode: '',
-	currentMistakes: [],
-	totalMistakes: [],
-	mistakesTracker: 0,
-  classChoice: '',
-	modeChoice: '',
-	modeChoice2: '',
-  modeChoice3: [],
-  modeChoice4: '',
-  modeChoice5: '',
-  modeChoice6: '',
-  modeChoice7: '',
-  modeChoice8: '',
-  task: null,
-  setTaskDuration: '',
-  taskCompleted: false,
-  taskRecorded: false,
-  modeChoiceLtDifficulty: '',
-  questionFrequency: 0,
-  timerLimit: 0,
-  questionNumber: 0,
-	selectedNumbers: [],
-  withRemainder: false,
-	randomSelection: [],
-	combinations: [],
-	equation: '',
-  equation2: '',
-  result: ['', '', '', '', ''],
-	answeredQuestionTracker: 0,
-  correctAnswersTracker: 0,
-  questionsStopped: false
-}
 
 function resetControllerTaskSettings () {
   controller.mode = '',
@@ -159,7 +158,7 @@ if (document.querySelector("#stop-button-span")) {
 
       let aditionalFinalMessage = null;
 
-      if (userData && controller.taskCompleted && !controller.taskRecorded) {
+      if (userData && userData.accType === "student" && controller.taskCompleted && !controller.taskRecorded) {
         aditionalFinalMessage = await sendSetTaskResultsToDatabase();
         setPetOnWalkActionAfterQuestionsCompleted();
       }
@@ -463,7 +462,7 @@ async function formatFinalMessageForGrammar() {
 
     let aditionalFinalMessage = null
 
-    if (userData && controller.taskCompleted && !controller.taskRecorded) {
+    if (userData && userData.accType === "student" && controller.taskCompleted && !controller.taskRecorded) {
       aditionalFinalMessage = await sendSetTaskResultsToDatabase();
       setPetOnWalkActionAfterQuestionsCompleted();
     }
@@ -534,7 +533,7 @@ async function formatFinalMessageForTextcomprehension() {
 
       let aditionalFinalMessage = null
 
-      if (userData && controller.taskCompleted && !controller.taskRecorded) {
+      if (userData && userData.accType === "student" && controller.taskCompleted && !controller.taskRecorded) {
         aditionalFinalMessage = await sendSetTaskResultsToDatabase();
         setPetOnWalkActionAfterQuestionsCompleted();
       }
@@ -2923,8 +2922,8 @@ function startQuestionsTimer () {
 };
 
 function startQuestionsNumber () {
-
 	controller = JSON.parse(localStorage.getItem('controller'));
+
 	if (controller.task) { 
 	  controller.questionNumber = parseInt(controller.setTaskDuration);
 	} else {

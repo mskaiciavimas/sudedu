@@ -1376,13 +1376,6 @@ body.popup-active {
                                 </select>
                             </div>
 
-                            <div class="class_choice_div">
-                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="class_choice" id="class_choice" style="display: none;">
-                                    <option value="C75">1-2 KLASĖ</option>
-                                    <option value="C76">3-4 KLASĖ</option>
-                                </select>
-                            </div>
-
                             <div class="mode_choice_8_div">
                                 <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_8" id="mode_choice_8" style="display: none;">
                                     <option value="C49">TEKSTO SUPRATIMĄ</option>
@@ -1399,15 +1392,19 @@ body.popup-active {
                                 </div>
                             </div>
 
+                            <div class="class_choice_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="class_choice" id="class_choice" style="display: none;">
+                                    <option value="C75">1-2 KLASĖ</option>
+                                    <option value="C76">3-4 KLASĖ</option>
+                                </select>
+                            </div>
+
                             <div class="mode_choice_10_div">
                                 <div class="col-12 d-flex justify-content-center align-items-center mode_choice_10_div text-center" id="mode_choice_10_div">
                                     <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_10" id="mode_choice_10" style="display: none;">
                                         <option value="C58">LENGVAS</option>
-                                        <option value="C80">LENGVAS SU DISTRAKTORIUMI</option>
                                         <option value="C59">VIDUTINIS</option>
-                                        <option value="C81">VIDUTINIS SU DISTRAKTORIUMI</option>
                                         <option value="C60">SUNKUS</option>
-                                        <option value="C82">SUNKUS SU DISTRAKTORIUMI</option>
                                     </select>
                                 </div>
                             </div>
@@ -1478,6 +1475,15 @@ body.popup-active {
                                         <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_13" id="mode_choice_13" style="display: none;">
                                             <option value="3">RETESNI ATVEJAI</option>
                                             <option value="1">DAŽNESNI ATVEJAI</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mode_choice_14_div">
+                                    <div class="col-12 d-flex justify-content-center align-items-center mode_choice_14_div text-center" id="mode_choice_14_div">
+                                        <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_14" id="mode_choice_14" style="display: none;">
+                                            <option value="C80">BE DISTRAKTORIAUS</option>
+                                            <option value="C81">SU DISTRAKTORIUMI</option>
                                         </select>
                                     </div>
                                 </div>
@@ -1680,29 +1686,31 @@ body.popup-active {
 					anyChecked = true;
 				}
 				});
-			if ((modeChoice8Value === "rasyba" && anyChecked) || modeChoice8Value !== "rasyba") {
-				modeChoice8Selection = modeChoice8Element.value;
-				modeChoice9Selection = modeChoice9Element.value;
-				modeChoice12Selection = modeChoice12Element.value;
-				modeChoice13Selection = modeChoice13Element.value;
-				classChoiceSelection = classChoiceElement.value;
+                if ((modeChoice8Value === "rasyba" && anyChecked) || modeChoice8Value !== "rasyba") {
+                    modeChoice8Selection = modeChoice8Element.value;
+                    modeChoice9Selection = modeChoice9Element.value;
+                    modeChoice12Selection = modeChoice12Element.value;
+                    modeChoice13Selection = modeChoice13Element.value;
+                    modeChoice14Selection = modeChoice14Element.value;
+                    classChoiceSelection = classChoiceElement.value;
 
-				controller.classChoice = classChoiceSelection;
-				controller.modeChoice1 = modeChoice8Selection;
-				
-				controller.modeChoice2 = modeChoice9Selection;
+                    controller.classChoice = classChoiceSelection;
+                    controller.modeChoice1 = modeChoice8Selection;
+                    controller.modeChoice2 = modeChoice9Selection;
+                    controller.modeChoice6 = modeChoice14Selection;
+                    controller.modeChoice7 = "C82";
 
-				controller.modeChoice3 = getSelectedRasybaConditions();
-				controller.modeChoice5 = modeChoice12Selection;
-				controller.result = ['', '', '', '', ''];
-				controller.modeChoiceLtDifficulty = document.getElementById('mode_choice_10').value;
-				if (controller.classChoice === "C75") {
-					controller.questionFrequency = Number(modeChoice13Selection);
-				} else {
-					controller.questionFrequency = 1;
-				}
-			}
-		}
+                    controller.modeChoice3 = getSelectedRasybaConditions();
+                    controller.modeChoice5 = modeChoice12Selection;
+                    controller.result = ['', '', '', '', ''];
+                    controller.modeChoiceLtDifficulty = document.getElementById('mode_choice_10').value;
+                    if (controller.classChoice === "C75") {
+                        controller.questionFrequency = Number(modeChoice13Selection);
+                    } else {
+                        controller.questionFrequency = 1;
+                    }
+                }
+            }
         	controller.modeChoice4 = modeChoice4Element.value
 			localStorage.setItem('controller', JSON.stringify(controller))
 

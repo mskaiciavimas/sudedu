@@ -220,6 +220,7 @@
         #task-group-sorting {
             width: 100%;
             background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border-radius: 20px;
@@ -247,9 +248,8 @@
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             flex: 1 0 60svh;
             display: flex;
@@ -378,6 +378,8 @@
         #mode_choice_9,
         #mode_choice_10,
         #mode_choice_13,
+        #mode_choice_14,
+        #mode_choice_15,
         #class_choice {
             width: 100%;
             box-sizing: border-box;
@@ -774,7 +776,7 @@
             text-decoration: underline;
             margin-top: 20px;
             padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid rgba(255, 255, 255, 0.3);
         }
 
         .student-statistics-subtitle {
@@ -892,7 +894,7 @@
 #student-statistics-completed-tasks {
     margin-top: 20px;
     padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
     text-transform: uppercase;
     font-weight: 600;
     font-size: 1.25rem;
@@ -932,27 +934,6 @@
 #task-list-title-for-students {
     font-weight: 700;
 }
-
-        #view-text-id-input {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: none;
-            color: #212529;
-            width: 100px;
-            height: 35px;
-            padding: 5px 5px 5px 15px;
-            margin: 0;
-            font-size: 1rem;
-            height: 39px;
-        }
-
-        #view-text-id-input:focus,
-        #view-text-id-input:active {
-            outline: none;
-            border: none;
-        }
 
         @keyframes shake {
         0% { margin-left: 0rem; }
@@ -994,56 +975,6 @@
             font-weight: bold;
         }
 
-        #text-browser-button {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            /*border: 1px solid #286D8A;*/
-            background: linear-gradient(135deg, #3288AC, #286D8A);
-            font-size: 1rem;
-            color: #F5F5F7;
-            padding: 8px 16px;
-            border-radius: 20px;
-            margin: 0;
-            cursor: pointer;
-            letter-spacing: 0.01em;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            /*box-shadow: 
-                0 1px 2px rgba(0, 0, 0, 0.2),
-                0 4px 12px rgba(50, 136, 172, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);*/
-        }
-
-        #text-browser-button:hover::before {
-            background: rgba(255, 255, 255, 0.15);
-            }
-
-
-        #text-browser-button::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 20px;
-            padding: 1px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            pointer-events: none;
-            }
-
-
-        #text-browser-button::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
-            border-radius: 20px;
-            pointer-events: none;
-            transition: background 0.3s ease;
-            }
 
         #student-tasks-list-outer-container {
             background: rgba(255, 255, 255, 0.15);
@@ -1057,38 +988,6 @@
             flex-direction: column;
         }
 
-        .text-viewer-heading {
-            margin-bottom: 0;
-        }
-
-        #text-container-row {
-            margin-top: 10px;
-        }
-
-        #text-subtitle {
-            font-weight: bold;
-        }
-
-        #text-compatibility ul {
-            margin-left: 0;
-            margin-top: 5px;
-            margin-bottom: 5px;
-            padding-left: 25px;
-        }
-
-        .text-individual-items {
-            background: rgba(255, 255, 255, 0.5);
-            margin: 5px 0;
-            white-space: pre-line;
-        }
-        
-        .text-comprehenstion-text-id {
-            cursor: pointer;
-        }
-
-        .text-comprehenstion-text-id:hover {
-            text-decoration: underline;
-        }
 
            .container {
       display: flex;
@@ -1895,11 +1794,11 @@
     }
 
     .student-statistics-title {
-        border-top: 1px solid rgba(255, 255, 255, 1);
+        border-top: 2px solid rgba(255, 255, 255, 1);
     }
 
     #student-statistics-completed-tasks {
-        border-top: 1px solid rgba(255, 255, 255, 1);
+        border-top: 2px solid rgba(255, 255, 255, 1);
         font-size: 1.15rem;
     }
 
@@ -1968,6 +1867,8 @@
             #mode_choice_9,
             #mode_choice_10,
             #mode_choice_13,
+            #mode_choice_14,
+            #mode_choice_15,
             #class_choice {
                 font-size: 1.1rem;
             }
@@ -2166,11 +2067,6 @@
                 align-items: center;
             }
 
-            #view-text-id-input {
-                width: 200px;
-                font-size: 1.5rem;
-            }
-
             #text-browser-button {
                 font-size: 1.5rem;
             }
@@ -2199,11 +2095,11 @@
             }
 
     .student-statistics-title {
-        border-top: 1px solid rgba(255, 255, 255, 1);
+        border-top: 2px solid rgba(255, 255, 255, 1);
     }
 
     #student-statistics-completed-tasks {
-        border-top: 1px solid rgba(255, 255, 255, 1);
+        border-top: 2px solid rgba(255, 255, 255, 1);
     }
 
     .student-name-field,
@@ -2218,335 +2114,461 @@
     }
 
 
-    .txt-viewer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
+.txt-browser-wrapper {
+    max-width: 1200px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 16px;
+    width: 100%;
+}
 
-        .txt-viewer-sticky-header {
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 100;
-            border-bottom: 2px solid #e0e0e0;
-            padding: 20px;
-        }
+.txt-browser-main-header {
+    background: rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    transition: background 0.2s;
+}
 
-        .txt-viewer-selected-ids-container {
-            background: #e3f2fd;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            display: none;
-        }
+.txt-browser-main-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin: 0;
+}
 
-        .txt-viewer-selected-ids-container.txt-viewer-visible {
-            display: block;
-        }
+.txt-browser-main-icon {
+    transition: transform 0.3s;
+    font-size: 1.5rem;
+    display: flex;
+}
 
-        .txt-viewer-selected-ids-label {
-            font-weight: 600;
-            color: #1976d2;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
+.txt-browser-main-icon svg {
+    height: 30px;
+    width: 30px;
+}
 
-        .txt-viewer-selected-ids-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
+.txt-browser-main-icon:not(.collapsed) {
+    transform: rotate(180deg);
+}
 
-        .txt-viewer-selected-id-chip {
-            background: #1976d2;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 16px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
 
-        .txt-viewer-selected-id-chip:hover {
-            background: #1565c0;
-        }
+.txt-browser-content {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: none;
+    width: 100%; /* Prevent width changes */
+}
 
-        .txt-viewer-selected-id-chip .txt-viewer-remove {
-            font-weight: bold;
-            font-size: 16px;
-        }
+.txt-browser-content.expanded {
+    display: block;
+}
 
-        .txt-viewer-search-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.2s;
-            margin-bottom: 15px;
-        }
+.txt-viewer-container {
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
 
-        .txt-viewer-search-input:focus {
-            outline: none;
-            border-color: #1976d2;
-        }
+.txt-viewer-sticky-header {
+    z-index: 100;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 15px;
+    flex: 0 0 auto;
+}
 
-        .txt-viewer-filters-section {
-            margin-bottom: 15px;
-        }
+.txt-viewer-selected-ids-container {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 12px;
+    display: none;
+    height: 90px;
+    min-height: 90px;
+    overflow-y: auto;
+}
 
-        .txt-viewer-filter-group {
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            overflow: hidden;
-        }
+.txt-viewer-selected-ids-container-outer {
+    margin: 15px;
+}
 
-        .txt-viewer-filter-header {
-            background: #f5f5f5;
-            padding: 12px 16px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            user-select: none;
-            transition: background 0.2s;
-        }
+.txt-viewer-selected-ids-container.txt-viewer-visible {
+    display: block;
+}
 
-        .txt-viewer-filter-header:hover {
-            background: #eeeeee;
-        }
+.txt-viewer-selected-ids-label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 14px;
+    text-transform: uppercase;
+}
 
-        .txt-viewer-filter-header-icon {
-            transition: transform 0.3s;
-        }
+.txt-viewer-selected-ids-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
 
-        .txt-viewer-filter-header-icon.txt-viewer-collapsed {
-            transform: rotate(-90deg);
-        }
+.txt-viewer-selected-id-chip {
+    background: #3288AC;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
 
-        .txt-viewer-filter-content {
-            padding: 12px 16px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            max-height: 500px;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
 
-        .txt-viewer-filter-content.txt-viewer-collapsed {
-            max-height: 0;
-            padding: 0 16px;
-        }
+.txt-viewer-selected-id-chip .txt-viewer-remove {
+    font-weight: bold;
+    font-size: 16px;
+}
 
-        .txt-viewer-filter-option {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            padding: 6px;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
+.txt-viewer-search-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    font-size: 16px;
+    transition: border-color 0.2s;
+    margin-bottom: 15px;
+}
 
-        .txt-viewer-filter-option:hover {
-            background: #f5f5f5;
-        }
+.txt-viewer-search-input:focus,
+.txt-viewer-search-input:active {
+    outline: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
 
-        .txt-viewer-filter-option input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
+/* Unified filters section */
+.txt-viewer-all-filters-wrapper {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    overflow: hidden;
+}
 
-        .txt-viewer-filter-option label {
-            cursor: pointer;
-            font-size: 14px;
-            flex: 1;
-        }
+.txt-viewer-all-filters-header {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    user-select: none;
+    transition: background 0.2s;
+}
 
-        .txt-viewer-texts-list {
-            padding: 20px;
-        }
+.txt-viewer-all-filters-icon svg {
+    height: 24px;
+    width: 24px;
+}
 
-        .txt-viewer-text-item {
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            overflow: hidden;
-            transition: box-shadow 0.2s;
-        }
+.txt-viewer-all-filters-icon {
+    transition: transform 0.3s;
+    display: flex;
+}
 
-        .txt-viewer-text-item:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
+.txt-viewer-all-filters-icon.txt-viewer-collapsed {
+    transform: rotate(-180deg);
+}
 
-        .txt-viewer-text-item-header {
-            padding: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: #fafafa;
-            transition: background 0.2s;
-        }
+.txt-viewer-all-filters-content {
+    max-height: 500px;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+    padding: 16px;
+    display: flex;
+    flex-wrap: wrap;
+}
 
-        .txt-viewer-text-item-header:hover {
-            background: #f5f5f5;
-        }
+.txt-viewer-all-filters-content.txt-viewer-collapsed {
+    max-height: 0;
+    padding: 0 16px;
+}
 
-        .txt-viewer-text-item-checkbox {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
+.txt-viewer-filter-group {
+    margin-bottom: 15px;
+    flex: 1 1 auto;
+}
 
-        .txt-viewer-text-item-main {
-            flex: 1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-        }
+.txt-viewer-filter-group:last-child {
+    margin-bottom: 0;
+}
 
-        .txt-viewer-text-item-info {
-            flex: 1;
-        }
+.txt-viewer-filter-label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-        .txt-viewer-text-item-id {
-            color: #1976d2;
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 4px;
-        }
+.txt-viewer-filter-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
-        .txt-viewer-text-item-title {
-            font-weight: 500;
-            font-size: 16px;
-        }
+.txt-viewer-filter-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
 
-        .txt-viewer-text-item-expand-icon {
-            transition: transform 0.3s;
-            color: #666;
-        }
+.txt-viewer-filter-option:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
 
-        .txt-viewer-text-item-expand-icon.txt-viewer-expanded {
-            transform: rotate(180deg);
-        }
+.txt-viewer-filter-option input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
 
-        .txt-viewer-text-item-details {
-            padding: 0 16px;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
-        }
+.txt-viewer-filter-option label {
+    cursor: pointer;
+    font-size: 14px;
+    flex: 1;
+}
 
-        .txt-viewer-text-item-details.txt-viewer-expanded {
-            max-height: 2000px;
-            padding: 16px;
-            border-top: 1px solid #e0e0e0;
-        }
+.txt-viewer-texts-list {
+    padding: 15px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
+}
 
-        .txt-viewer-text-detail-row {
-            margin-bottom: 16px;
-        }
+.txt-viewer-text-item {
+    margin-bottom: 12px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 20px;
+}
 
-        .txt-viewer-text-detail-label {
-            font-weight: 600;
-            color: #666;
-            font-size: 13px;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+.text-item-expanded {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
 
-        .txt-viewer-text-detail-content {
-            font-size: 15px;
-            line-height: 1.6;
-        }
+.txt-viewer-text-item-header {
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.2s;
+}
 
-        .txt-viewer-text-section {
-            margin-bottom: 12px;
-            padding: 12px;
-            background: #f9f9f9;
-            border-radius: 6px;
-        }
+.txt-viewer-text-item-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
 
-        .txt-viewer-text-section-title {
-            font-weight: 600;
-            color: #1976d2;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
+.txt-viewer-text-item-main {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
 
-        .txt-viewer-text-section-paragraph {
-            margin-bottom: 8px;
-        }
+.txt-viewer-text-item-info {
+    flex: 1;
+}
 
-        .txt-viewer-text-section-paragraph:last-child {
-            margin-bottom: 0;
-        }
+.txt-viewer-text-item-id {
+    color: #3288AC;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
 
-        .txt-viewer-no-results {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-            font-size: 16px;
-        }
+.txt-viewer-text-item-title {
+    font-weight: 500;
+    font-size: 16px;
+}
 
-        .txt-viewer-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-right: 6px;
-            margin-bottom: 6px;
-        }
+.txt-viewer-text-item-expand-icon {
+    transition: transform 0.3s;
+    color: #666;
+    display: flex;
+}
 
-        .txt-viewer-badge-class {
-            background: #e1f5fe;
-            color: #01579b;
-        }
+.txt-viewer-text-item-expand-icon svg {
+    height: 24px;
+    width: 24px;
+}
 
-        .txt-viewer-badge-type {
-            background: #f3e5f5;
-            color: #4a148c;
-        }
+.txt-viewer-text-item-expand-icon.txt-viewer-expanded {
+    transform: rotate(180deg);
+}
 
-        .txt-viewer-badge-difficulty {
-            background: #fff3e0;
-            color: #e65100;
-        }
+.txt-viewer-text-item-details {
+    padding: 0 16px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+}
 
-        @media (max-width: 768px) {
-            .txt-viewer-sticky-header {
-                padding: 15px;
-            }
+.txt-viewer-text-item-details.txt-viewer-expanded {
+    max-height: 2000px;
+    padding: 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    flex: 1 1 auto;
+    overflow: auto;
+}
 
-            .txt-viewer-texts-list {
-                padding: 15px;
-            }
+.text-detail-row {
+    margin-bottom: 16px;
+}
 
-            .txt-viewer-filter-content {
-                grid-template-columns: 1fr;
-            }
+.text-detail-label {
+    font-weight: 600;
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-            .txt-viewer-text-item-main {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-  
+.text-detail-content {
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.text-section {
+    margin-bottom: 12px;
+}
+
+.text-section-title {
+    font-weight: 600;
+    color: #3288AC;
+    font-size: 14px;
+}
+
+.text-section-paragraph {
+    margin-bottom: 8px;
+    white-space: pre-line;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    padding: 5px 10px;
+}
+
+.text-section-paragraph:last-child {
+    margin-bottom: 0;
+}
+
+.txt-viewer-no-results {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-size: 16px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 6px;
+    margin-bottom: 6px;
+}
+
+.badge-class-lower {
+    background: #e1f5fe;
+    color: #A0C58F;
+}
+
+.badge-class-higher {
+    background: #e1f5fe;
+    color: #01579b;
+}
+
+.badge-struktura {
+    background: #f3e5f5;
+    color: #4a148c;
+}
+
+.badge-komponavimas {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+@media (max-width: 768px) {
+    .txt-viewer-sticky-header {
+        padding: 15px;
+    }
+
+    .txt-viewer-texts-list {
+        padding: 15px;
+    }
+
+    .txt-viewer-filter-options {
+        grid-template-columns: 1fr;
+    }
+
+
+    .txt-viewer-search-input,
+    .txt-viewer-all-filters-wrapper,
+    .txt-viewer-selected-ids-container,
+    .txt-viewer-text-item {
+        background: rgba(255, 255, 255, 0);
+        border: 1px solid rgba(255, 255, 255, 1);
+    }
+
+    .txt-viewer-sticky-header {
+        border-bottom: 2px solid rgba(255, 255, 255, 1);
+    }
+
+    .txt-viewer-texts-list {
+        border-top: 2px solid rgba(255, 255, 255, 1);
+    }
+
+    .text-section-paragraph {
+        background: rgba(255, 255, 255, 1);
+        border: 1px solid rgba(255, 255, 255, 1);
+    }
+
+    .txt-browser-main-header {
+        background: rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        padding: 15px;
+    }
+
+    .txt-browser-main-title {
+        font-size: 1.25rem;
+    }
+}
     </style>
 </head>
 
@@ -2819,13 +2841,6 @@
                                 </select>
                             </div>
 
-                            <div class="class_choice_div">
-                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="class_choice" id="class_choice" style="display: none;">
-                                    <option value="C75">1-2 KLASĖ</option>
-                                    <option value="C76">3-4 KLASĖ</option>
-                                </select>
-                            </div>
-
                             <div class="mode_choice_8_div">
                                 <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_8" id="mode_choice_8" style="display: none;">
                                     <option value="C49">TEKSTO SUPRATIMĄ</option>
@@ -2842,15 +2857,28 @@
                                 </div>
                             </div>
 
+                            <div class="mode_choice_15_div">
+                                <div class="col-12 d-flex justify-content-center align-items-center mode_choice_15_div text-center" id="mode_choice_15_div">
+                                    <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_15" id="mode_choice_15" style="display: none;">
+                                        <option value="C82">ATSITIKTINIAI TEKSTAI</option>
+                                        <option value="C84">PARINKTI TEKSTUS</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="class_choice_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="class_choice" id="class_choice" style="display: none;">
+                                    <option value="C75">1-2 KLASĖ</option>
+                                    <option value="C76">3-4 KLASĖ</option>
+                                </select>
+                            </div>
+
                             <div class="mode_choice_10_div">
                                 <div class="col-12 d-flex justify-content-center align-items-center mode_choice_10_div text-center" id="mode_choice_10_div">
                                     <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_10" id="mode_choice_10" style="display: none;">
                                         <option value="C58">LENGVAS</option>
-                                        <option value="C80">LENGVAS SU DISTRAKTORIUMI</option>
                                         <option value="C59">VIDUTINIS</option>
-                                        <option value="C81">VIDUTINIS SU DISTRAKTORIUMI</option>
                                         <option value="C60">SUNKUS</option>
-                                        <option value="C82">SUNKUS SU DISTRAKTORIUMI</option>
                                     </select>
                                 </div>
                             </div>
@@ -2923,6 +2951,15 @@
                                             <option value="1">DAŽNESNI ATVEJAI</option>
                                         </select>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div class="mode_choice_14_div">
+                                <div class="col-12 d-flex justify-content-center align-items-center mode_choice_14_div text-center" id="mode_choice_14_div">
+                                    <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_14" id="mode_choice_14" style="display: none;">
+                                        <option value="C80">BE DISTRAKTORIAUS</option>
+                                        <option value="C81">SU DISTRAKTORIUMI</option>
+                                    </select>
                                 </div>
                             </div>
 
@@ -3068,87 +3105,106 @@
                                     </div>
                                 </div>
                             </div>
-                        
+                        </div>
 
-<div class="txt-viewer-container">
-        <div class="txt-viewer-sticky-header">
-            <div class="txt-viewer-selected-ids-container" id="selectedIdsContainer">
-                <div class="txt-viewer-selected-ids-label">Pasirinkti tekstai:</div>
-                <div class="txt-viewer-selected-ids-list" id="selectedIdsList"></div>
-            </div>
 
-            <input 
-                type="text" 
-                class="txt-viewer-search-input" 
-                id="searchInput" 
-                placeholder="Ieškoti pagal ID, pavadinimą, autorių ar tekstą..."
-                autocomplete="off"
-            >
-
-            <div class="txt-viewer-filters-section">
-                <div class="txt-viewer-filter-group">
-                    <div class="txt-viewer-filter-header" onclick="toggleFilter('classFilter')">
-                        <span>Klasė</span>
-                        <span class="txt-viewer-filter-header-icon" id="classFilterIcon">▼</span>
-                    </div>
-                    <div class="txt-viewer-filter-content" id="classFilter">
-                        <div class="txt-viewer-filter-option">
-                            <input type="checkbox" id="class_1_2" checked onchange="applyFilters()">
-                            <label for="class_1_2">1-2 klasė</label>
-                        </div>
-                        <div class="txt-viewer-filter-option">
-                            <input type="checkbox" id="class_3_4" checked onchange="applyFilters()">
-                            <label for="class_3_4">3-4 klasė</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="txt-viewer-filter-group">
-                    <div class="txt-viewer-filter-header" onclick="toggleFilter('taskTypeFilter')">
-                        <span>Užduoties tipas</span>
-                        <span class="txt-viewer-filter-header-icon" id="taskTypeFilterIcon">▼</span>
-                    </div>
-                    <div class="txt-viewer-filter-content" id="taskTypeFilter">
-                        <div class="txt-viewer-filter-option">
-                            <input type="checkbox" id="task_struktura" checked onchange="applyFilters()">
-                            <label for="task_struktura">Struktūros išdėstymas</label>
-                        </div>
-                        <div class="txt-viewer-filter-option">
-                            <input type="checkbox" id="task_komponavimas" checked onchange="applyFilters()">
-                            <label for="task_komponavimas">Turinio komponavimas</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="txt-viewer-filter-group">
-                    <div class="txt-viewer-filter-header" onclick="toggleFilter('difficultyFilter')">
-                        <span>Sudėtingumas</span>
-                        <span class="txt-viewer-filter-header-icon" id="difficultyFilterIcon">▼</span>
-                    </div>
-                    <div class="txt-viewer-filter-content" id="difficultyFilter">
-                        <div class="txt-viewer-filter-option">
-                            <input type="checkbox" id="diff_lengvas" checked onchange="applyFilters()">
-                            <label for="diff_lengvas">Lengvas</label>
-                        </div>
-                        <div class="txt-viewer-filter-option">
-                            <input type="checkbox" id="diff_vidutinis" checked onchange="applyFilters()">
-                            <label for="diff_vidutinis">Vidutinis</label>
-                        </div>
-                        <div class="txt-viewer-filter-option">
-                            <input type="checkbox" id="diff_sunkus" checked onchange="applyFilters()">
-                            <label for="diff_sunkus">Sunkus</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        <div class="txt-browser-wrapper">
+        <div class="txt-browser-main-header" id="mainBrowserHeader">
+            <h2 class="txt-browser-main-title">Tekstų Naršyklė</h2>
+            <span class="txt-browser-main-icon collapsed" id="mainBrowserIcon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor">
+                    <path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"/>
+                </svg>
+            </span>
         </div>
+        
+        <div class="txt-browser-content" id="mainBrowserContent">
+            <div>
+            <div class="txt-viewer-container">
+                <div class="txt-viewer-sticky-header">
+                    <input 
+                        type="text" 
+                        class="txt-viewer-search-input" 
+                        id="searchInput" 
+                        placeholder="Ieškoti pagal ID, pavadinimą, autorių ar tekstą..."
+                        autocomplete="off"
+                    >
 
-        <div class="txt-viewer-texts-list" id="textsList">
-            <div class="txt-viewer-no-results">Kraunama...</div>
+                    <div class="txt-viewer-all-filters-wrapper">
+                        <div class="txt-viewer-all-filters-header" id="allFiltersHeader">
+                            <span>Filtrai</span>
+                            <span class="txt-viewer-all-filters-icon" id="allFiltersIcon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor">
+                                <path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"/>
+                            </svg>                            
+                        </span>
+                        </div>
+                        <div class="txt-viewer-all-filters-content txt-viewer-collapsed" id="allFiltersContent">
+                            <div class="txt-viewer-filter-group">
+                                <div class="txt-viewer-filter-label">Klasė</div>
+                                <div class="txt-viewer-filter-options">
+                                    <div class="txt-viewer-filter-option">
+                                        <input type="checkbox" id="class_1_2" checked onchange="applyFilters()">
+                                        <label for="class_1_2">1-2 klasė</label>
+                                    </div>
+                                    <div class="txt-viewer-filter-option">
+                                        <input type="checkbox" id="class_3_4" checked onchange="applyFilters()">
+                                        <label for="class_3_4">3-4 klasė</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="txt-viewer-filter-group">
+                                <div class="txt-viewer-filter-label">Užduoties tipas</div>
+                                <div class="txt-viewer-filter-options">
+                                    <div class="txt-viewer-filter-option">
+                                        <input type="checkbox" id="task_struktura" checked onchange="applyFilters()">
+                                        <label for="task_struktura">Struktūros išdėstymas</label>
+                                    </div>
+                                    <div class="txt-viewer-filter-option">
+                                        <input type="checkbox" id="task_komponavimas" checked onchange="applyFilters()">
+                                        <label for="task_komponavimas">Turinio komponavimas</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="txt-viewer-filter-group">
+                                <div class="txt-viewer-filter-label">Sudėtingumas</div>
+                                <div class="txt-viewer-filter-options">
+                                    <div class="txt-viewer-filter-option">
+                                        <input type="checkbox" id="diff_lengvas" checked onchange="applyFilters()">
+                                        <label for="diff_lengvas">Lengvas</label>
+                                    </div>
+                                    <div class="txt-viewer-filter-option">
+                                        <input type="checkbox" id="diff_vidutinis" checked onchange="applyFilters()">
+                                        <label for="diff_vidutinis">Vidutinis</label>
+                                    </div>
+                                    <div class="txt-viewer-filter-option">
+                                        <input type="checkbox" id="diff_sunkus" checked onchange="applyFilters()">
+                                        <label for="diff_sunkus">Sunkus</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="txt-viewer-selected-ids-container-outer">
+                <div class="txt-viewer-selected-ids-container hide-scrollbar scroll-indicators" id="selectedIdsContainer">
+                    <div class="txt-viewer-selected-ids-label">Pasirinkti tekstai:</div>
+                    <div class="txt-viewer-selected-ids-list" id="selectedIdsList"></div>
+                </div>
+                </div>
+
+                <div class="txt-viewer-texts-list" id="textsList">
+                    <div class="txt-viewer-no-results">Kraunama...</div>
+                </div>
+            </div>
+            </div>
         </div>
     </div>
 
-                        </div>
+
                     </div>
                 </div>
             </aside>
@@ -3294,9 +3350,9 @@
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="../mental-arithmetic.js"></script>
 	<script src="../mental-arithmetic-combinations.js"></script>
-    <script src="matematika_options.js"></script>
     <script src="../parameter_dictionary.js"></script>
     <script src="../main-nav-bar.js"></script>
+    <script src="matematika_options.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 	<script>
@@ -5682,6 +5738,16 @@ let studentStatisticsLastRecord;
             document.querySelectorAll('.student-checkbox').forEach(checkbox => {
             checkbox.style.visibility = 'visible';
 
+            const modeChoice15Selection = document.getElementById('mode_choice_15').value;
+
+            if (modeChoice15Selection === "C82") {
+                isSelectionModeEnabled = false;
+            } else if (modeChoice15Selection === "C84") {
+                isSelectionModeEnabled = true;
+            }
+
+            refilterTexts();
+
             const taskGroup = document.querySelector('#task-group-sorting');
             const groupName = document.querySelector('#group_name');
 
@@ -5699,6 +5765,9 @@ let studentStatisticsLastRecord;
         });
             newTaskOptions.style.display = 'none';
             dropdown.disabled = false;
+            toggleMainBrowser(closeMainBrowser=true);
+            isSelectionModeEnabled = false;
+            refilterTexts();
         }
     }
 
@@ -5906,6 +5975,9 @@ let studentStatisticsLastRecord;
 
             const modeChoiceLtDifficulty = document.getElementById('mode_choice_10').value;
 
+            const modeChoice14Selection = document.getElementById('mode_choice_14').value;
+            const modeChoice15Selection = document.getElementById('mode_choice_15').value;
+
             let questionFrequency;
             if (classChoice === "C75") {
                 let modeChoice13Selection = document.querySelector('#mode_choice_13').value;
@@ -5915,19 +5987,26 @@ let studentStatisticsLastRecord;
             }
             
             if (modeChoice1 === "C49") {
-                task = [
-                    mode, classChoiceSelection, modeChoice1, modeChoice2,
-                    modeChoiceLtDifficulty
-                ];
+                if (modeChoice15Selection === "C82") {
+                    task = [
+                        mode, modeChoice1, modeChoice2, modeChoice14Selection, modeChoice15Selection, classChoiceSelection, modeChoiceLtDifficulty
+                    ];
+                    taskDuration = [modeChoice4, durationType]
+                } else if (modeChoice15Selection === "C84") {
+                    task = [
+                        mode, modeChoice1, modeChoice2, modeChoice14Selection, modeChoice15Selection
+                    ];
+                    taskDuration = ["C40", selectedIds]
+                }
             } else if (modeChoice1 === "C83") {
                 if (modeChoice2 === "C50") {
                     task = [
                         mode, classChoiceSelection, modeChoice1, modeChoice2, modeChoice3,
                         modeChoice5, questionFrequency
                     ];
+                    taskDuration = [modeChoice4, durationType]
                 }
             }
-            taskDuration = [modeChoice4, durationType]
         }
 
         const normalizedTask = JSON.stringify(task);
@@ -5993,7 +6072,7 @@ let studentStatisticsLastRecord;
 			}
 
 			var checkbox = document.getElementById("remainder-input");
-
+console.log(parsedCurrentTaskInstructions)
             controller.language = "LT";
             if (parsedCurrentTaskInstructions[0] === "math") {
                 controller.mode = 'math';
@@ -6016,21 +6095,28 @@ let studentStatisticsLastRecord;
 
                 controller.modeChoice4 = currentTaskDuration[0];
                 controller.setTaskDuration = currentTaskDuration[1];
-
             } else if (parsedCurrentTaskInstructions[0] === "lang") {
                 controller.mode = 'lang';
-                if (parsedCurrentTaskInstructions[2] === "C49") {
-                    controller.classChoice = parsedCurrentTaskInstructions[1];
-                    controller.modeChoice1 = parsedCurrentTaskInstructions[2];
-                    controller.modeChoice2 = parsedCurrentTaskInstructions[3];
-                    controller.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[4];
+                if (parsedCurrentTaskInstructions[1] === "C49") {
+                    controller.modeChoice1 = parsedCurrentTaskInstructions[1];
+                    controller.modeChoice2 = parsedCurrentTaskInstructions[2];
+                    controller.modeChoice6 = parsedCurrentTaskInstructions[3];
+                    controller.modeChoice7 = parsedCurrentTaskInstructions[4];
+
+                    if (controller.modeChoice7 === "C82") {
+                        controller.classChoice = parsedCurrentTaskInstructions[5];
+                        controller.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[6];
+                        controller.modeChoice4 = currentTaskDuration[0];
+                        controller.setTaskDuration = currentTaskDuration[1];
+                    } else if (controller.modeChoice7 === "C84") {
+                        controller.modeChoice4 = currentTaskDuration[0];
+                        controller.modeChoice8 = currentTaskDuration[1];
+                        controller.setTaskDuration = controller.modeChoice8.length;
+                    }
 
                     controller.task = ["setTask", currentTaskId];
                     controller.taskCompleted = false;
                     controller.taskRecorded = false;
-                    
-                    controller.modeChoice4 = currentTaskDuration[0];
-                    controller.setTaskDuration = currentTaskDuration[1];
 
                 } else if (parsedCurrentTaskInstructions[2] === "C83") {
                     if (parsedCurrentTaskInstructions[3] === "C50") {
@@ -6268,13 +6354,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         hideConfirmationButtons();
     });
-
-    document.getElementById("view-text-id-input").addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-      event.preventDefault(); // stops form submission/reload
-      passTextIdToTheLocatorFunction();
-    }
-  });
 });
 
 function incrementValue(inputId, min, max) {
@@ -6570,45 +6649,149 @@ window.addEventListener('resize', addHideScrollbarForTouch);
 
 
 // TEXT VIEWER START
-
-// Global variables
+        // Global variables
+        let prefilteredTexts = [];
         let allTexts = [];
         let selectedIds = [];
-        let isSelectionModeEnabled = true; // Change this to true to enable selection mode
+        let isSelectionModeEnabled = false;
         let expandedTextIds = new Set();
+        let isMainBrowserExpanded = false;
 
-        // Initialize
-        async function init() {
+        async function initTxtViewer() {
             try {
                 const response = await fetch('../databases/sudedu_duomenu_baze.json');
-                allTexts = await response.json();
-                
-                // Set up search input listener
+                prefilteredTexts = await response.json();
+
+                // Apply initial filtering
+                refilterTexts();
+
+                // Attach listeners once
                 document.getElementById('searchInput').addEventListener('input', applyFilters);
-                
-                // Update selection mode visibility
+                document.getElementById('mainBrowserHeader').addEventListener('click', () => toggleMainBrowser(false));
+                document.getElementById('allFiltersHeader').addEventListener('click', () => toggleAllFilters(false));
+
+                // Dropdown change triggers re-filtering only
+                document.getElementById('mode_choice_9').addEventListener('change', () => {
+                    refilterTexts();
+                    applyFilters();
+                });
+
                 updateSelectionModeVisibility();
-                
-                // Initial render
                 applyFilters();
-            } catch (error) {
-                console.error('Error loading texts:', error);
-                document.getElementById('textsList').innerHTML = 
-                    '<div class="no-results">Klaida įkeliant tekstus</div>';
+
+            } catch (err) {
+                console.error('Error loading texts:', err);
+                document.getElementById('textsList').innerHTML =
+                    '<div class="txt-viewer-no-results">Klaida įkeliant tekstus</div>';
             }
         }
 
-        function toggleFilter(filterId) {
-            const content = document.getElementById(filterId);
-            const icon = document.getElementById(filterId + 'Icon');
+        function refilterTexts() {
+            if (!prefilteredTexts.length) return;
+
+            if (isSelectionModeEnabled) {
+                const mode = document.getElementById('mode_choice_9').value;
+
+                allTexts = prefilteredTexts.filter(entry => {
+                    const s = entry['suitable-for'];
+                    if (!s) return false;
+                    if (mode === 'C51') return s.komponavimas;
+                    if (mode === 'C52') return s.struktura;
+                    return false;
+                });
+
+            } else {
+                allTexts = prefilteredTexts.filter(entry => {
+                    const s = entry['suitable-for'];
+                    return s && (s.komponavimas || s.struktura);
+                });
+            }
+
+            selectedIds = [];
+            updateSelectionModeVisibility();
+            updateSelectedIdsDisplay();
+            applyFilters();
+        }
+
+function toggleMainBrowser(closeMainBrowser=false) {
+    const content = document.getElementById('mainBrowserContent');
+    const icon = document.getElementById('mainBrowserIcon');
+    const viewer = document.querySelector(".txt-viewer-container");
+    isMainBrowserExpanded = !isMainBrowserExpanded;
+
+    if (isMainBrowserExpanded && !closeMainBrowser) {
+        viewer.style.height = `${parseFloat(getComputedStyle(document.querySelector('.left-side-bar')).height)}px`;
+        
+        // Measure height first
+        content.style.display = 'block';
+        content.style.height = 'auto';
+        const height = content.offsetHeight;
+        content.style.height = '0px';
+        
+        // Trigger animation
+        requestAnimationFrame(() => {
+            content.classList.add('expanded');
+            content.style.height = height + 'px';
+            icon.classList.remove('collapsed');
+        });
+        
+        // Scroll to bottom when expanded
+        content.addEventListener('transitionend', () => {
+            if (isMainBrowserExpanded) {
+                content.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        }, { once: true });
+        
+    } else {
+        // Set current height explicitly
+        content.style.height = content.scrollHeight + 'px';
+        icon.classList.add('collapsed');
+        
+        // Next frame, animate to 0
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                content.classList.remove('expanded');
+                content.style.height = '0px';
+            });
+        });
+        
+        content.addEventListener('transitionend', () => {
+            if (!isMainBrowserExpanded) {
+                content.style.display = 'none';
+            }
+        }, { once: true });
+        
+        viewer.style.height = '';
+    }
+}
+
+
+        function toggleAllFilters(closeFilters=false) {
+            const content = document.getElementById('allFiltersContent');
+            const icon = document.getElementById('allFiltersIcon');
+            const mainBrowser = document.getElementById('mainBrowserContent');
+            const isExpanding = content.classList.contains('txt-viewer-collapsed');
             
-            content.classList.toggle('txt-viewer-collapsed');
-            icon.classList.toggle('txt-viewer-collapsed');
+            if (closeFilters) {
+                if (!content.classList.contains('txt-viewer-collapsed')) {
+                    content.classList.add('txt-viewer-collapsed');
+                    icon.classList.add('txt-viewer-collapsed');
+                } 
+            } else {
+                content.classList.toggle('txt-viewer-collapsed');
+                icon.classList.toggle('txt-viewer-collapsed');
+            }
+            
+            if (isExpanding) {
+                content.addEventListener('transitionend', () => {
+                    mainBrowser.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }, { once: true });
+            }
         }
 
         function updateSelectionModeVisibility() {
             const container = document.getElementById('selectedIdsContainer');
-            if (isSelectionModeEnabled && selectedIds.length > 0) {
+            if (isSelectionModeEnabled) {
                 container.classList.add('txt-viewer-visible');
                 updateSelectedIdsDisplay();
             } else {
@@ -6621,7 +6804,6 @@ window.addEventListener('resize', addHideScrollbarForTouch);
             list.innerHTML = selectedIds.map(id => `
                 <div class="txt-viewer-selected-id-chip" onclick="scrollToText(${id})">
                     <span>ID: ${id}</span>
-                    <span class="txt-viewer-remove" onclick="event.stopPropagation(); removeSelectedId(${id})">×</span>
                 </div>
             `).join('');
         }
@@ -6648,45 +6830,32 @@ window.addEventListener('resize', addHideScrollbarForTouch);
             const text = allTexts.find(t => t.id === id);
             if (!text) return;
 
-            // Adjust filters to show this text
             const classValue = text['class-choice'][0];
-            const strukturaDiff = text['suitable-for'].struktura;
-            const komponavimasDiff = text['suitable-for'].komponavimas;
-
-            // Set class filter
+            
             if (classValue === '1_2_klase') {
                 document.getElementById('class_1_2').checked = true;
             } else if (classValue === '3_4_klase') {
                 document.getElementById('class_3_4').checked = true;
             }
 
-            // Set task type filters (enable both to ensure text is visible)
             document.getElementById('task_struktura').checked = true;
             document.getElementById('task_komponavimas').checked = true;
-
-            // Set difficulty filters
             document.getElementById('diff_lengvas').checked = true;
             document.getElementById('diff_vidutinis').checked = true;
             document.getElementById('diff_sunkus').checked = true;
-
-            // Clear search to ensure text is visible
             document.getElementById('searchInput').value = '';
 
-            // Reapply filters
             applyFilters();
 
-            // Wait for render and scroll
             setTimeout(() => {
                 const element = document.getElementById(`text-item-${id}`);
                 if (element) {
                     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     
-                    // Expand if not expanded
                     if (!expandedTextIds.has(id)) {
                         toggleTextExpand(id);
                     }
-                    
-                    // Highlight effect
+
                     element.style.boxShadow = '0 0 0 3px #1976d2';
                     setTimeout(() => {
                         element.style.boxShadow = '';
@@ -6695,10 +6864,54 @@ window.addEventListener('resize', addHideScrollbarForTouch);
             }, 100);
         }
 
+        // Public function to open browser and navigate to text
+        function openTextBrowser(textId) {
+            // Open main browser if closed
+            if (!isMainBrowserExpanded) {
+                toggleMainBrowser();
+            }
+
+            // Wait for browser to expand, then navigate
+            setTimeout(() => {
+                document.getElementById('searchInput').value = textId.toString();
+                applyFilters();
+
+                setTimeout(() => {
+                    const element = document.getElementById(`text-item-${textId}`);
+                    if (element) {
+                        if (!expandedTextIds.has(textId)) {
+                            toggleTextExpand(textId);
+                        }
+
+                        setTimeout(() => {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            
+                            // Scroll parent to bottom of text browser
+                            setTimeout(() => {
+                                const browserWrapper = document.querySelector('.txt-browser-wrapper');
+                                const rect = browserWrapper.getBoundingClientRect();
+                                window.scrollTo({
+                                    top: window.scrollY + rect.bottom - window.innerHeight,
+                                    behavior: 'smooth'
+                                });
+                            }, 400);
+
+                            element.style.boxShadow = '0 0 0 3px #1976d2';
+                            setTimeout(() => {
+                                element.style.boxShadow = '';
+                            }, 2000);
+                        }, 100);
+                    }
+                }, 100);
+            }, 300);
+        }
+
         function applyFilters() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            
-            // Get checked filters
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            // Check if search term is only a number
+            const isNumericSearch = /^\d+$/.test(searchTerm);
+
             const classFilters = {
                 '1_2_klase': document.getElementById('class_1_2').checked,
                 '3_4_klase': document.getElementById('class_3_4').checked
@@ -6715,22 +6928,23 @@ window.addEventListener('resize', addHideScrollbarForTouch);
                 sunkus: document.getElementById('diff_sunkus').checked
             };
 
-            // Filter texts
             const filteredTexts = allTexts.filter(text => {
-                // Class filter
+                // If numeric search, match ID exactly
+                if (isNumericSearch) {
+                    return text.id.toString() === searchTerm;
+                }
+
                 const textClass = text['class-choice'][0];
                 if (!classFilters[textClass]) return false;
 
-                // Task type and difficulty filter
                 const strukturaDiff = text['suitable-for'].struktura;
                 const komponavimasDiff = text['suitable-for'].komponavimas;
-                
+
                 const strukturaMatch = taskTypes.struktura && difficulties[strukturaDiff];
                 const komponavimasMatch = taskTypes.komponavimas && difficulties[komponavimasDiff];
-                
+
                 if (!strukturaMatch && !komponavimasMatch) return false;
 
-                // Search filter
                 if (searchTerm) {
                     const searchableText = [
                         text.id.toString(),
@@ -6753,7 +6967,7 @@ window.addEventListener('resize', addHideScrollbarForTouch);
 
         function renderTexts(texts) {
             const container = document.getElementById('textsList');
-            
+
             if (texts.length === 0) {
                 container.innerHTML = '<div class="txt-viewer-no-results">Tekstų nerasta</div>';
                 return;
@@ -6762,28 +6976,25 @@ window.addEventListener('resize', addHideScrollbarForTouch);
             container.innerHTML = texts.map(text => {
                 const isExpanded = expandedTextIds.has(text.id);
                 const isSelected = selectedIds.includes(text.id);
-                
+
                 return `
-                    <div class="txt-viewer-text-item" id="text-item-${text.id}">
-                        <div class="txt-viewer-text-item-header" onclick="toggleTextExpand(${text.id})">
+                    <div class="txt-viewer-text-item ${isExpanded ? 'text-item-expanded' : ''}" id="text-item-${text.id}">
+                        <div class="txt-viewer-text-item-header">
                             ${isSelectionModeEnabled ? `
-                                <input 
-                                    type="checkbox" 
-                                    class="txt-viewer-text-item-checkbox" 
-                                    data-text-id="${text.id}"
-                                    ${isSelected ? 'checked' : ''}
-                                    onclick="event.stopPropagation(); toggleTextSelection(${text.id}, this.checked)"
-                                >
+                                <input type="checkbox" class="txt-viewer-text-item-checkbox" data-text-id="${text.id}" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleTextSelection(${text.id}, this.checked)">
                             ` : ''}
-                            <div class="txt-viewer-text-item-main">
+                            <div class="txt-viewer-text-item-main" onclick="toggleTextExpand(${text.id})">
                                 <div class="txt-viewer-text-item-info">
                                     <div class="txt-viewer-text-item-id">ID: ${text.id}</div>
                                     <div class="txt-viewer-text-item-title">${text.title}</div>
                                 </div>
-                                <div class="txt-viewer-text-item-expand-icon ${isExpanded ? 'txt-viewer-expanded' : ''}">▼</div>
+                                <div class="txt-viewer-text-item-expand-icon ${isExpanded ? 'txt-viewer-expanded' : ''}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor">
+                                <path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"/>
+                                </svg>
+                                </div>
                             </div>
                         </div>
-                        <div class="txt-viewer-text-item-details ${isExpanded ? 'txt-viewer-expanded' : ''}" id="text-details-${text.id}">
+                        <div class="hide-scrollbar txt-viewer-text-item-details ${isExpanded ? 'txt-viewer-expanded scroll-indicators' : ''}" id="text-details-${text.id}">
                             ${renderTextDetails(text)}
                         </div>
                     </div>
@@ -6791,66 +7002,135 @@ window.addEventListener('resize', addHideScrollbarForTouch);
             }).join('');
         }
 
-        function renderTextDetails(text) {
-            return `
-                <div class="text-detail-row">
-                    <div class="text-detail-label">Informacija</div>
-                    <div class="text-detail-content">
-                        <span class="badge badge-class">${text['class-choice'][0].replace('_', '-').replace('klase', 'klasė')}</span>
-                        <span class="badge badge-type">${text.type}</span>
-                        <span class="badge badge-difficulty">Struktūra: ${text['suitable-for'].struktura}</span>
-                        <span class="badge badge-difficulty">Komponavimas: ${text['suitable-for'].komponavimas}</span>
-                    </div>
-                </div>
+function renderTextDetails(text) {
+    // Classes
+    const lowerClasses = text['class-choice']
+        .filter(cls => cls.startsWith('1') || cls.startsWith('2'))
+        .map(cls => cls.replace(/_(?=[^_]+$)/, ' ').replace('_', '-').replace('klase', 'klasė'))
+        .join(', ');
 
-                <div class="text-detail-row">
-                    <div class="text-detail-label">Autorius</div>
-                    <div class="text-detail-content">${text.author}</div>
-                </div>
+    const higherClasses = text['class-choice']
+        .filter(cls => cls.startsWith('3') || cls.startsWith('4'))
+        .map(cls => cls.replace(/_(?=[^_]+$)/, ' ').replace('_', '-').replace('klase', 'klasė'))
+        .join(', ');
 
-                ${text.text.start.length > 0 ? `
-                    <div class="text-section">
-                        <div class="text-section-title">Pradžia</div>
-                        ${text.text.start.map(p => `<div class="text-section-paragraph">${p}</div>`).join('')}
-                    </div>
-                ` : ''}
+    // Determine which sections exist
+    const startEmpty = !text.text.start || text.text.start.length === 0;
+    const middleEmpty = !text.text.middle || text.text.middle.length === 0;
+    const endEmpty = !text.text.end || text.text.end.length === 0;
 
-                ${text.text.middle.length > 0 ? `
-                    <div class="text-section">
-                        <div class="text-section-title">Vidurys</div>
-                        ${text.text.middle.map(p => `<div class="text-section-paragraph">${p}</div>`).join('')}
-                    </div>
-                ` : ''}
+    // Build sections
+    let textSections = '';
 
-                ${text.text.end.length > 0 ? `
-                    <div class="text-section">
-                        <div class="text-section-title">Pabaiga</div>
-                        ${text.text.end.map(p => `<div class="text-section-paragraph">${p}</div>`).join('')}
-                    </div>
-                ` : ''}
+    if (!startEmpty && !middleEmpty && !endEmpty) {
+        // All sections exist → keep separate
+        textSections += `
+        <div class="text-section">
+            <div class="text-section-title">Pradžia</div>
+            ${text.text.start.map(p => `<div class="text-section-paragraph">${p}</div>`).join('')}
+        </div>
+        <div class="text-section">
+            <div class="text-section-title">Įvykio raida</div>
+            ${text.text.middle.map(p => `<div class="text-section-paragraph">${p}</div>`).join('')}
+        </div>
+        <div class="text-section">
+            <div class="text-section-title">Pabaiga</div>
+            ${text.text.end.map(p => `<div class="text-section-paragraph">${p}</div>`).join('')}
+        </div>`;
+    } else {
+        // Some sections missing → combine non-empty into "Tekstas"
+        const combinedText = [
+            ...(text.text.start || []),
+            ...(text.text.middle || []),
+            ...(text.text.end || [])
+        ].filter(p => p && p.trim() !== '')
+         .join(' ');
 
-                ${text.text.distractor.length > 0 ? `
-                    <div class="text-section">
-                        <div class="text-section-title">Distraktorius</div>
-                        ${text.text.distractor.map(p => `<div class="text-section-paragraph">${p}</div>`).join('')}
-                    </div>
-                ` : ''}
-            `;
+        if (combinedText) {
+            textSections += `
+            <div class="text-section">
+                <div class="text-section-title">Tekstas</div>
+                <div class="text-section-paragraph">${combinedText}</div>
+            </div>`;
         }
+    }
+
+    // Distractor section
+    const distractorSection = (text.text.distractor && text.text.distractor.length > 0)
+        ? `<div class="text-section">
+               <div class="text-section-title">Distraktorius</div>
+               ${text.text.distractor.map(p => `<div class="text-section-paragraph">${p}</div>`).join('')}
+           </div>`
+        : '';
+
+    // Build full HTML maintaining "row" structure
+    return `
+    <div class="text-detail-row">
+        <div class="text-detail-content">
+            ${lowerClasses ? `<span class="badge badge-class-lower">${lowerClasses}</span>` : ''}
+            ${higherClasses ? `<span class="badge badge-class-higher">${higherClasses}</span>` : ''}
+
+            ${text['suitable-for'].struktura ? `<span class="badge badge-struktura">Struktūros išdėstymas: ${text['suitable-for'].struktura}</span>` : ''}
+            ${text['suitable-for'].komponavimas ? `<span class="badge badge-komponavimas">Turinio komponavimas: ${text['suitable-for'].komponavimas}</span>` : ''}
+        </div>
+    </div>
+
+    <div class="text-detail-row">
+        <div class="text-detail-content">
+            ${textSections}
+        </div>
+    </div>
+
+    ${distractorSection ? `
+    <div class="text-detail-row">
+        <div class="text-detail-content">
+            ${distractorSection}
+        </div>
+    </div>` : ''}
+
+    <div class="text-detail-row">
+        <div class="text-detail-label">Autorius</div>
+        <div class="text-detail-content">${text.author}</div>
+    </div>
+    `;
+}
+
+
 
         function toggleTextExpand(id) {
             if (expandedTextIds.has(id)) {
                 expandedTextIds.delete(id);
             } else {
+                toggleAllFilters(closeFilters=true);
                 expandedTextIds.add(id);
+
+                setTimeout(() => {
+                    const element = document.getElementById(`text-item-${id}`);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        
+                        if (!expandedTextIds.has(id)) {
+                            toggleTextExpand(id);
+                        }
+
+                        element.style.boxShadow = '0 0 0 3px #286D8A';
+                        setTimeout(() => {
+                            element.style.boxShadow = '';
+                        }, 2000);
+                    }
+                }, 100);
             }
+
             applyFilters();
         }
 
-        // Initialize on load
-        init();
+        // Make openTextBrowser globally accessible
+        window.openTextBrowser = openTextBrowser;
 
-// TEXT VIEWER END
+        // Initialize on load
+        initTxtViewer();
+        // TEXT VIEWER END
+
 
 	</script>
 </body>

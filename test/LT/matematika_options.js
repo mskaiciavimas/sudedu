@@ -14,6 +14,7 @@ let modeChoice7Element = document.querySelector('#mode_choice_7');
 let timerInputDiv = document.querySelector('#timer-input-div');
 let questionNumberInputDiv = document.querySelector('#question-number-input-div');
 let modeChoice4Element = document.querySelector('#mode_choice_4');
+let timerQuestionNumberDiv = document.querySelector('.timer-question-number-div');
 
 let classChoiceElement = document.querySelector('#class_choice');
 let modeChoice8Element = document.querySelector('#mode_choice_8');
@@ -22,9 +23,15 @@ let modeChoice10Element = document.querySelector('#mode_choice_10');
 let modeChoice11DivElement = document.querySelector('#mode_choice_11_div');
 let modeChoice12Element = document.querySelector('#mode_choice_12');
 let modeChoice13Element = document.querySelector('#mode_choice_13');
+let modeChoice14Element = document.querySelector('#mode_choice_14');
 let rasybaOptionsLabelTextGaluneElement = document.querySelector('#rasyba-options-label-text-galune');
 
+const isTeacher = window.location.pathname === "/LT/uzduotys.html" && userData && userData.accType === "teacher"
+let modeChoice15Element = null;
 
+if (isTeacher) {
+    modeChoice15Element = document.querySelector('#mode_choice_15');
+}
 
     function toggleVisibility(element, isVisible) {
         if (isVisible) {
@@ -57,6 +64,9 @@ let rasybaOptionsLabelTextGaluneElement = document.querySelector('#rasyba-option
             toggleVisibility(modeChoice8Element, true);
             toggleVisibility(modeChoice9Element, true);
             toggleVisibility(modeChoice10Element, true);
+            toggleVisibility(modeChoice14Element, true);
+
+            if (modeChoice15Element) toggleVisibility(modeChoice15Element, true);
 
             let changeEvent = new Event('change');
             modeChoice8Element.value = 'C49';
@@ -72,6 +82,10 @@ let rasybaOptionsLabelTextGaluneElement = document.querySelector('#rasyba-option
             toggleVisibility(modeChoice8Element, false);
             toggleVisibility(modeChoice9Element, false);
             toggleVisibility(modeChoice10Element, false);
+            toggleVisibility(modeChoice14Element, false);
+
+            if (modeChoice15Element) toggleVisibility(modeChoice15Element, false);
+
             toggleVisibility(modeChoice11DivElement, false);
             toggleVisibility(modeChoice12Element, false);
             toggleVisibility(modeChoice13Element, false);
@@ -406,6 +420,8 @@ function handleModeChoice8Change() {
 
 if (modeChoice8Selection === "C83") {
     toggleVisibility(modeChoice10Element, false);
+    toggleVisibility(modeChoice14Element, false);
+    if (modeChoice15Element) toggleVisibility(modeChoice15Element, false);
     modeChoice9Element.innerHTML += '<option value="C50">RAŠYBĄ</option>';
     toggleVisibility(modeChoice11DivElement, true);
     if (classChoiceSelection === "C75") {
@@ -419,6 +435,8 @@ if (modeChoice8Selection === "C83") {
     }
 } else if (modeChoice8Selection === "C49") {
     toggleVisibility(modeChoice10Element, true);
+    toggleVisibility(modeChoice14Element, true);
+    if (modeChoice15Element) toggleVisibility(modeChoice15Element, true);
     toggleVisibility(modeChoice11DivElement, false);
     toggleVisibility(modeChoice13Element, false);
     modeChoice9Element.innerHTML += '<option value="C51">TURINIO KOMPONAVIMĄ</option>';
@@ -429,6 +447,29 @@ if (modeChoice8Selection === "C83") {
 
 modeChoice8Element.addEventListener('change', handleModeChoice8Change);
 classChoiceElement.addEventListener('change', handleModeChoice8Change);
+
+function handleModeChoice15Change () {
+        let modeChoice15Selection = modeChoice15Element.value;
+
+        if (modeChoice15Selection === "C82") {
+            toggleVisibility(classChoiceElement, true);
+            toggleVisibility(modeChoice10Element, true);
+            toggleVisibility(modeChoice4Element, true);
+            toggleVisibility(timerQuestionNumberDiv, true);
+            isSelectionModeEnabled = false;
+            refilterTexts();
+        } else if (modeChoice15Selection === "C84") {
+            toggleVisibility(classChoiceElement, false);
+            toggleVisibility(modeChoice10Element, false);
+            toggleVisibility(modeChoice4Element, false);
+            toggleVisibility(timerQuestionNumberDiv, false);
+            messageToTheUser("Pasirinkite norimus tekstus tekstų naršyklėje.", false)
+            isSelectionModeEnabled = true;
+            refilterTexts();
+        }
+    }
+
+if (modeChoice15Element) modeChoice15Element.addEventListener('change', handleModeChoice15Change);
 
 
 function handleClassChoiceChange() {

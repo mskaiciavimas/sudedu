@@ -9795,22 +9795,32 @@ function displayFoodOptions(obj) {
                 const minusBtn = document.createElement('button');
                 minusBtn.className = 'control-btn';
                 minusBtn.textContent = '−';
-                minusBtn.onmousedown = () => startHold(quantityInput.id, 1, supply.quantity, false, updateQuantity);
+                minusBtn.onmousedown = () => startHold(quantityInput.id, 1, supply.quantity, false, () => updateQuantity(quantityInput));
                 minusBtn.onmouseup = minusBtn.onmouseleave = stopHold;
-                minusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, supply.quantity, false, updateQuantity); };
+                minusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, supply.quantity, false, () => updateQuantity(quantityInput)); };
                 minusBtn.ontouchend = minusBtn.ontouchcancel = stopHold;
 
                 const plusBtn = document.createElement('button');
                 plusBtn.className = 'control-btn';
                 plusBtn.textContent = '+';
-                plusBtn.onmousedown = () => startHold(quantityInput.id, 1, supply.quantity, true, updateQuantity);
+                plusBtn.onmousedown = () => startHold(quantityInput.id, 1, supply.quantity, true, () => updateQuantity(quantityInput));
                 plusBtn.onmouseup = plusBtn.onmouseleave = stopHold;
-                plusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, supply.quantity, true, updateQuantity); };
+                plusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, supply.quantity, true, () => updateQuantity(quantityInput)); };
                 plusBtn.ontouchend = plusBtn.ontouchcancel = stopHold;
 
                 quantityInputHolder.appendChild(minusBtn);
                 quantityInputHolder.appendChild(quantityInput);
                 quantityInputHolder.appendChild(plusBtn);
+
+                function updateQuantity(input) {
+                    if (!input) input = quantityInput;
+                    let value = parseInt(input.value, 10);
+                    const min = parseInt(input.min, 10);
+                    const max = parseInt(input.max, 10);
+                    if (isNaN(value) || value < min) value = min;
+                    if (value > max) value = max;
+                    input.value = value;
+                }
 
                 const quantAndBtnHolder = document.createElement('div');
                 quantAndBtnHolder.className = 'food-item-quant-btn-holder';
@@ -9827,10 +9837,6 @@ function displayFoodOptions(obj) {
                     updateQuantity(quantityInput);
                 });
                 quantityInput.addEventListener('change', () => updateQuantity(quantityInput));
-
-                function updateQuantity(input) {
-                    console.log('Selected quantity:', input.value);
-                }
 
                 itemDiv.appendChild(previewAndTextHolder);
                 itemDiv.appendChild(quantAndBtnHolder);
@@ -10013,7 +10019,13 @@ function displayPetTreatOptions(obj) {
                 quantityInput.addEventListener('change', () => updateQuantity(quantityInput));
 
                 function updateQuantity(input) {
-                    console.log('Selected quantity:', input.value);
+                    if (!input) input = quantityInput;
+                    let value = parseInt(input.value, 10);
+                    const min = parseInt(input.min, 10);
+                    const max = parseInt(input.max, 10);
+                    if (isNaN(value) || value < min) value = min;
+                    if (value > max) value = max;
+                    input.value = value;
                 }
             }
 

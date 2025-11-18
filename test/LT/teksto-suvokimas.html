@@ -1043,13 +1043,17 @@ window.onload = function () {
 
 
   let jsonFiles = [];
+  let jsonFile;
 
-	// Define an array of URLs for the JSON files you want to fetch
-	if (controller.classChoice === "C75") {
-		jsonFile = '../databases/1_2_klase_teksto_suvokimas.json';
-	} else if (controller.classChoice === "C76") {
-		jsonFile = '../databases/3_4_klase_teksto_suvokimas.json';
-	}
+	if (controller.modeChoice7 === "C82") {
+    if (controller.classChoice === "C75") {
+      jsonFile = '../databases/1_2_klase_teksto_suvokimas.json';
+    } else if (controller.classChoice === "C76") {
+      jsonFile = '../databases/3_4_klase_teksto_suvokimas.json';
+    }
+  } else if (controller.modeChoice7 === "C84") {
+    jsonFile = '../databases/sudedu_duomenu_baze.json';
+  }
 
   fetch(jsonFile)
       .then(response => {
@@ -1084,20 +1088,32 @@ window.onload = function () {
     var tempTextLibrary = Array.from(textDatabase);
 
     if (controller.modeChoice2 === "C51") {
-      filteredTextLibrary = tempTextLibrary.filter(entry =>
-      entry['suitable-for']?.[parameterDictionary["C51"]["parameter"]]?.includes(parameterDictionary[controller.modeChoiceLtDifficulty]["parameter"])
-    );
-      answersField.style.display = "block";
-    } else if (controller.modeChoice2 === "C52") {
-      filteredTextLibrary = tempTextLibrary.filter(entry =>
-      entry['suitable-for']?.['struktura']?.includes(parameterDictionary[controller.modeChoiceLtDifficulty]["parameter"])
-    );
-      answersFieldStart.style.display = "block";
-      answersFieldMiddle.style.display = "block";
-      answersFieldEnd.style.display = "block";
+        if (controller.modeChoice7 === "C82") {
+          filteredTextLibrary = tempTextLibrary.filter(entry =>
+          entry['suitable-for']?.[parameterDictionary["C51"]["parameter"]]?.includes(parameterDictionary[controller.modeChoiceLtDifficulty]["parameter"])
+          );
+        } else if (controller.modeChoice7 === "C84") {
+          filteredTextLibrary = tempTextLibrary.filter(entry =>
+              controller.modeChoice8.includes(entry.id)
+          );
+        }
+        answersField.style.display = "block";
+      } else if (controller.modeChoice2 === "C52") {
+        if (controller.modeChoice7 === "C82") {
+          filteredTextLibrary = tempTextLibrary.filter(entry =>
+          entry['suitable-for']?.['struktura']?.includes(parameterDictionary[controller.modeChoiceLtDifficulty]["parameter"])
+          );
+        } else if (controller.modeChoice7 === "C84") {
+          filteredTextLibrary = tempTextLibrary.filter(entry =>
+              controller.modeChoice8.includes(entry.id)
+          );
+        }
+        answersFieldStart.style.display = "block";
+        answersFieldMiddle.style.display = "block";
+        answersFieldEnd.style.display = "block";
+      }
     }
-    }
-
+  
     helpBtn.disabled = true;
 
     // Function to shuffle the array of sentences
@@ -1146,7 +1162,6 @@ window.onload = function () {
         mistakesSummary[currentTextId][`${textIncidenceCount}`] = 0;
       }
 
-
       const originalTitle = selectedItem.title;
       const fullText = [...selectedItem.text.start, ...selectedItem.text.middle, ...selectedItem.text.end];
       const paragraphAuthor = selectedItem.author;
@@ -1156,19 +1171,20 @@ window.onload = function () {
       authorDiv.innerHTML = paragraphAuthor;
 
       let combinedItems = [];
+ 
       if (controller.modeChoice2 === "C51") {
-        if (controller.modeChoiceLtDifficulty === "C58" || controller.modeChoiceLtDifficulty === "C59" || controller.modeChoiceLtDifficulty === "C60") {
+        if (controller.modeChoice6 === "C80") {
           orderedSentences = splitParagraphToSentences(fullText);
           combinedItems = [originalTitle, ...orderedSentences];
-        } else if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+        } else if (controller.modeChoice6 === "C81") {
           orderedSentences = splitParagraphToSentences(fullText);
           distractorSentences = splitParagraphToSentences(selectedItem.text.distractor);
           combinedItems = [originalTitle, ...orderedSentences, ...distractorSentences];
         }
       } else if (controller.modeChoice2 === "C52") {
-        if (controller.modeChoiceLtDifficulty === "C58" || controller.modeChoiceLtDifficulty === "C59" || controller.modeChoiceLtDifficulty === "C60") {
+        if (controller.modeChoice6 === "C80") {
           combinedItems = [...fullText, ...[originalTitle]];
-        } else if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+        } else if (controller.modeChoice6 === "C81") {
           distractorItems = selectedItem.text.distractor;
           combinedItems = [...fullText, ...distractorItems, ...[originalTitle]];
         }

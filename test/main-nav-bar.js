@@ -198,8 +198,10 @@ if (userData) {
     document.querySelector(".main-nav-log-in-btn")?.style.setProperty('display', 'none');
     document.querySelector(".main-nav-mobile-log-in-btn")?.style.setProperty('display', 'none');
     if (userData.accType === "teacher") {
-        const augintiniaiLink = document.querySelector('.main-nav-link[href="augintiniai.html"]');
-        augintiniaiLink?.style.setProperty('display', 'none');
+        const augintiniaiLinkDesktop = document.querySelector('.main-nav-link[href="augintiniai.html"]');
+        augintiniaiLinkDesktop?.style.setProperty('display', 'none');
+        const augintiniaiLinkMobile = document.querySelector('.main-nav-mobile-link[href="augintiniai.html"]');
+        augintiniaiLinkMobile?.style.setProperty('display', 'none');
     }
 } else {
     document.querySelector(".main-nav-log-out-btn")?.style.setProperty('display', 'none');

@@ -316,19 +316,23 @@ const parameterDictionary = {
         "decodedParameterText": "EASTERN EUROPE VERSION"
     },
     "C80": {
-        "parameter": "lengvas",
-        "decodedParameterText": "LENGVAS SU DISTRAKTORIUMI"
+        "parameter": "beDis",
+        "decodedParameterText": "BE DISTRAKTORIAUS"
     },
     "C81": {
-        "parameter": "vidutinis",
-        "decodedParameterText": "VIDUTINIS SU DISTRAKTORIUMI"
+        "parameter": "sudDis",
+        "decodedParameterText": "SU DISTRAKTORIUMI"
     },
     "C82": {
-        "parameter": "sunkus",
-        "decodedParameterText": "SUNKUS SU DISTRAKTORIUMI"
+        "parameter": "randomTexts",
+        "decodedParameterText": "ATSITIKTINIAI TEKSTAI"
     },
     "C83": {
         "parameter": "gramatika",
         "decodedParameterText": "GRAMATIKA"
+    },
+    "C84": {
+        "parameter": "selectedTexts",
+        "decodedParameterText": "PARINKTI TEKSTAI"
     },
 }
