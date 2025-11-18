@@ -1495,53 +1495,29 @@ body.popup-active {
                                     <option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>
                                 </select>
                             </div>
-
-                            <div class="timer-question-number-div">
-                            <div class="timer-input-div" id="timer-input-div" style="display: none;">
-                                <div class="input-group">
+                                <div class="timer-question-number-div">
+                                <div class="timer-input-div" id="timer-input-div" style="display: none;">
+                                    <div class="input-group">
                                     <div class="input-wrapper">
-                                        <button class="control-btn" 
-                                                onmousedown="startHold('timer-input', 1, 60, false)"
-                                                onmouseup="stopHold()"
-                                                onmouseleave="stopHold()"
-                                                ontouchstart="event.preventDefault(); startHold('timer-input', 1, 60, false)"
-                                                ontouchend="stopHold()"
-                                                ontouchcancel="stopHold()">−</button>
+                                        <button class="control-btn timer-minus">−</button>
                                         <input type="number" class="timer-input" id="timer-input" min="1" max="60" step="1" value="5" readonly>
-                                        <button class="control-btn" 
-                                                onmousedown="startHold('timer-input', 1, 60, true)"
-                                                onmouseup="stopHold()"
-                                                onmouseleave="stopHold()"
-                                                ontouchstart="event.preventDefault(); startHold('timer-input', 1, 60, true)"
-                                                ontouchend="stopHold()"
-                                                ontouchcancel="stopHold()">+</button>
+                                        <button class="control-btn timer-plus">+</button>
                                     </div>
                                     <h3 class="timer-choice-label">minutes</h3>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="question-number-input-div" id="question-number-input-div">
-                                <div class="input-group">
+
+                                <div class="question-number-input-div" id="question-number-input-div">
+                                    <div class="input-group">
                                     <div class="input-wrapper">
-                                        <button class="control-btn" 
-                                                onmousedown="startHold('question-number-input', 1, 200, false)"
-                                                onmouseup="stopHold()"
-                                                onmouseleave="stopHold()"
-                                                ontouchstart="event.preventDefault(); startHold('question-number-input', 1, 200, false)"
-                                                ontouchend="stopHold()"
-                                                ontouchcancel="stopHold()">−</button>
+                                        <button class="control-btn question-minus">−</button>
                                         <input type="number" class="question-number-input" id="question-number-input" min="1" max="200" step="1" value="20" readonly>
-                                        <button class="control-btn" 
-                                                onmousedown="startHold('question-number-input', 1, 200, true)"
-                                                onmouseup="stopHold()"
-                                                onmouseleave="stopHold()"
-                                                ontouchstart="event.preventDefault(); startHold('question-number-input', 1, 200, true)"
-                                                ontouchend="stopHold()"
-                                                ontouchcancel="stopHold()">+</button>
+                                        <button class="control-btn question-plus">+</button>
                                     </div>
                                     <h3 class="answer-number-label">veiksmų</h3>
+                                    </div>
                                 </div>
-                            </div>
-                            </div>
+                                </div>
                         </div>
                     </div>
 				</div>
@@ -1825,7 +1801,7 @@ function showClassPopup() {
     });
 
     // Next button click
-    nextButton.addEventListener('click', function() {
+    nextButton.addEventListener('click', async function() {
         if (selectedClass !== null && selectedClass !== undefined) {
             // Set localStorage with selected class and expiration
             setClassLocalStorage(selectedClass);
@@ -1842,7 +1818,7 @@ function showClassPopup() {
             popup.classList.remove('active');
             document.body.classList.remove('popup-active');
 
-            displayPersonalChl();
+            await displayPersonalChl();
         }
     });
 }
@@ -1999,10 +1975,10 @@ const personalChlDict = {
                 `[["math","C3","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","5"]]`
             ],
             "text-comp": [
-                `[["lang","C75","C49","C51","C58"], ["C40","1"]]`
+                `[["lang","C49","C51", "C80", "C82", "C75","C58"], ["C40","1"]]`
             ],
             "grammar": [
-                `[["lang","C75","C83","C50",{"C67":[]},"C73",3], ["C40","1"]]`
+                `[["lang","C83","C50","C75",{"C67":[]},"C73",3], ["C40","1"]]`
             ]
         },
         "11-12": {
@@ -2012,10 +1988,10 @@ const personalChlDict = {
                 `[["math","C3","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`
             ],
             "text-comp": [
-                `[["lang","C75","C49","C51","C58"], ["C40","1"]]`
+                `[["lang","C49","C51", "C80", "C82", "C75","C58"], ["C40","1"]]`
             ],
             "grammar": [
-                `[["lang","C75","C83","C50",{"C67":[]},"C73",3], ["C40","1"]]`
+                `[["lang","C83","C50","C75",{"C67":[]},"C73",3], ["C40","1"]]`
             ]
         },
         "1-2": {
@@ -2028,10 +2004,10 @@ const personalChlDict = {
                 `[["math","C3","C8","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
             ],
             "text-comp": [
-                `[["lang","C75","C49","C51","C58"], ["C40","1"]]`
+                `[["lang","C49","C51", "C80", "C82", "C75","C58"], ["C40","1"]]`
             ],
             "grammar": [
-                `[["lang","C75","C83","C50",{"C67":[]},"C73",3], ["C40","1"]]`
+                `[["lang","C83","C50","C75",{"C67":[]},"C73",3], ["C40","1"]]`
             ]
         },
         "3-8": {
@@ -2047,10 +2023,10 @@ const personalChlDict = {
                 `[["math","C3","C10","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`
             ],
             "text-comp": [
-                `[["lang","C75","C49","C51","C58"], ["C40","1"]]`
+                `[["lang","C49","C51", "C80", "C82", "C75","C58"], ["C40","1"]]`
             ],
             "grammar": [
-                `[["lang","C75","C83","C50",{"C67":[]},"C73",3], ["C40","1"]]`
+                `[["lang","C83","C50","C75",{"C67":[]},"C73",3], ["C40","1"]]`
             ]
         }
     },
@@ -2075,10 +2051,10 @@ const personalChlDict = {
                 `[["math","C3","C10","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
             ],
             "text-comp": [
-                `[["lang","C75","C49","C51","C58"], ["C40","1"]]`
+                `[["lang","C49","C51", "C80", "C82", "C75","C58"], ["C40","1"]]`
             ],
             "grammar": [
-                `[["lang","C75","C83","C50",{"C67":[]},"C73",3], ["C40","1"]]`
+                `[["lang","C83","C50","C75",{"C67":[]},"C73",3], ["C40","1"]]`
             ]
         },
         "11-12": {
@@ -2093,13 +2069,13 @@ const personalChlDict = {
                 `[["math","C3","C17","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
             ],
             "text-comp": [
-                `[["lang","C75","C49","C51","C58"], ["C40","2"]]`,
-                `[["lang","C75","C49","C52","C58"], ["C40","1"]]`,
-                `[["lang","C75","C49","C51","C80"], ["C40","1"]]`,
-                `[["lang","C75","C49","C52","C80"], ["C40","1"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C75","C58"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C80", "C82", "C75","C58"], ["C40","1"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C75","C58"], ["C40","1"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C75","C58"], ["C40","1"]]`,
             ],
             "grammar": [
-                `[["lang","C75","C83","C50",{"C61":[],"C67":[],"C68":[]},"C73",3], ["C40","3"]]`
+                `[["lang","C83","C50","C75",{"C61":[],"C67":[],"C68":[]},"C73",3], ["C40","3"]]`
             ]
         },
         "1-2": {
@@ -2116,15 +2092,15 @@ const personalChlDict = {
                 `[["math","C3","C8","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","40"]]`,              
             ],
             "text-comp": [
-                `[["lang","C75","C49","C51","C58"], ["C40","3"]]`,
-                `[["lang","C75","C49","C52","C58"], ["C40","2"]]`,
-                `[["lang","C75","C49","C51","C80"], ["C40","2"]]`,
-                `[["lang","C75","C49","C52","C80"], ["C40","1"]]`,
-                `[["lang","C75","C49","C51","C59"], ["C40","1"]]`,
-                `[["lang","C75","C49","C52","C59"], ["C40","1"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C75","C58"], ["C40","3"]]`,
+                `[["lang","C49","C52", "C80", "C82", "C75","C58"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C75","C58"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C75","C58"], ["C40","1"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C75","C59"], ["C40","1"]]`,
+                `[["lang","C49","C52", "C80", "C82", "C75","C59"], ["C40","1"]]`,
             ],
             "grammar": [
-                `[["lang","C75","C83","C50",{"C61":[],"C67":[],"C68":[]},"C73",3], ["C40","5"]]`
+                `[["lang","C83","C50","C75",{"C61":[],"C67":[],"C68":[]},"C73",3], ["C40","5"]]`
             ]
         },
         "3-8": {
@@ -2158,16 +2134,16 @@ const personalChlDict = {
                 `[["math","C3","C12","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
             ],
             "text-comp": [
-                `[["lang","C75","C49","C51","C58"], ["C40","4"]]`,
-                `[["lang","C75","C49","C51","C80"], ["C40","3"]]`,
-                `[["lang","C75","C49","C52","C80"], ["C40","2"]]`,
-                `[["lang","C75","C49","C51","C59"], ["C40","2"]]`,
-                `[["lang","C75","C49","C52","C59"], ["C40","2"]]`,
-                `[["lang","C75","C49","C51","C81"], ["C40","1"]]`,
-                `[["lang","C75","C49","C52","C81"], ["C40","1"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C75","C58"], ["C40","4"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C75","C58"], ["C40","3"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C75","C58"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C75","C59"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C80", "C82", "C75","C59"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C75","C59"], ["C40","1"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C75","C59"], ["C40","1"]]`,
             ],
             "grammar": [
-                `[["lang","C75","C83","C50",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C73",3], ["C40","5"]]`
+                `[["lang","C83","C50","C75",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C73",3], ["C40","5"]]`
             ]
         }
     },
@@ -2214,13 +2190,13 @@ const personalChlDict = {
                 `[["math","C4","C18","","C42","C45","C47",["2","5"],false,"C79"], ["C40","20"]]`,
             ],
             "text-comp": [
-                `[["lang","C75","C49","C51","C59"], ["C40","2"]]`,
-                `[["lang","C75","C49","C52","C59"], ["C40","2"]]`,
-                `[["lang","C75","C49","C51","C81"], ["C40","1"]]`,
-                `[["lang","C75","C49","C52","C81"], ["C40","1"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C75","C59"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C80", "C82", "C75","C59"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C75","C59"], ["C40","1"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C75","C59"], ["C40","1"]]`,
             ],
             "grammar": [
-                `[["lang","C75","C83","C50",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C73",3], ["C40","5"]]`
+                `[["lang","C83","C50","C75",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C73",3], ["C40","5"]]`
             ]
         },
         "11-12": {
@@ -2233,15 +2209,15 @@ const personalChlDict = {
                 `[["math","C7","C33","","C41","C45","C47",["1","1"],false,"C79"], ["C40","30"]]`,
             ],
             "text-comp": [
-                `[["lang","C75","C49","C51","C59"], ["C40","3"]]`,
-                `[["lang","C75","C49","C52","C59"], ["C40","2"]]`,
-                `[["lang","C75","C49","C51","C81"], ["C40","2"]]`,
-                `[["lang","C75","C49","C52","C81"], ["C40","2"]]`,
-                `[["lang","C75","C49","C51","C60"], ["C40","1"]]`,
-                `[["lang","C75","C49","C51","C82"], ["C40","1"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C75","C59"], ["C40","3"]]`,
+                `[["lang","C49","C52", "C80", "C82", "C75","C59"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C75","C59"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C75","C59"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C75","C60"], ["C40","1"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C75","C60"], ["C40","1"]]`,
             ],
             "grammar": [
-                `[["lang","C75","C83","C50",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C73",3], ["C40","10"]]`
+                `[["lang","C83","C50","C75",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C73",3], ["C40","10"]]`
             ]
         },
         "1-2": {
@@ -2260,16 +2236,15 @@ const personalChlDict = {
                 `[["math","C7","C33","","C41","C45","C47",["1","1"],false,"C79"], ["C40","30"]]`,
             ],
             "text-comp": [
-                `[["lang","C75","C49","C51","C59"], ["C40","2"]]`,
-                `[["lang","C75","C49","C51","C81"], ["C40","2"]]`,
-                `[["lang","C75","C49","C52","C81"], ["C40","2"]]`,
-                `[["lang","C75","C49","C51","C60"], ["C40","1"]]`,
-                `[["lang","C75","C49","C52","C60"], ["C40","1"]]`,
-                `[["lang","C75","C49","C51","C82"], ["C40","1"]]`,
-                `[["lang","C75","C49","C52","C82"], ["C40","1"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C75","C59"], ["C40","3"]]`,
+                `[["lang","C49","C52", "C80", "C82", "C75","C59"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C75","C59"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C75","C59"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C75","C60"], ["C40","1"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C75","C60"], ["C40","1"]]`,
             ],
             "grammar": [
-                `[["lang","C75","C83","C50",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C73",1], ["C40","10"]]`
+                `[["lang","C83","C50","C75",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C73",1], ["C40","10"]]`
             ]
         },
         "3-8": {
@@ -2285,15 +2260,15 @@ const personalChlDict = {
                 `[["math","C3","C13","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","5"]]`,
             ],
             "text-comp": [
-                `[["lang","C75","C49","C51","C81"], ["C40","2"]]`,
-                `[["lang","C75","C49","C52","C81"], ["C40","2"]]`,
-                `[["lang","C75","C49","C51","C60"], ["C40","2"]]`,
-                `[["lang","C75","C49","C52","C60"], ["C40","2"]]`,
-                `[["lang","C75","C49","C51","C82"], ["C40","2"]]`,
-                `[["lang","C75","C49","C52","C82"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C75","C59"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C75","C59"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C75","C60"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C80", "C82", "C75","C60"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C75","C60"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C75","C60"], ["C40","2"]]`,
             ],
             "grammar": [
-                `[["lang","C75","C83","C50",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C73",1], ["C40","10"]]`
+                `[["lang","C83","C50","C75",{"C61":[],"C66":["2kl"],"C67":[],"C68":[]},"C73",1], ["C40","10"]]`
             ]
         }
     },
@@ -2317,15 +2292,15 @@ const personalChlDict = {
                 `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","5"]]`,
             ],
             "text-comp": [
-                `[["lang","C76","C49","C51","C58"], ["C40","2"]]`,
-                `[["lang","C76","C49","C52","C58"], ["C40","2"]]`,
-                `[["lang","C76","C49","C51","C80"], ["C40","1"]]`,
-                `[["lang","C76","C49","C52","C80"], ["C40","1"]]`,
-                `[["lang","C76","C49","C51","C59"], ["C40","1"]]`,
-                `[["lang","C76","C49","C52","C59"], ["C40","1"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C76","C58"], ["C40","3"]]`,
+                `[["lang","C49","C52", "C80", "C82", "C76","C58"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C58"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C58"], ["C40","1"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C76","C59"], ["C40","1"]]`,
+                `[["lang","C49","C52", "C80", "C82", "C76","C59"], ["C40","1"]]`,
             ],
             "grammar": [
-                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C72":[]},"C73",1], ["C40","10"]]`,
+                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C72":[]},"C73",1], ["C40","10"]]`,
             ]
         },
         "11-12": {
@@ -2344,15 +2319,15 @@ const personalChlDict = {
                 `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
             ],
             "text-comp": [
-                `[["lang","C76","C49","C51","C58"], ["C40","3"]]`,
-                `[["lang","C76","C49","C51","C80"], ["C40","2"]]`,
-                `[["lang","C76","C49","C52","C80"], ["C40","2"]]`,
-                `[["lang","C76","C49","C51","C59"], ["C40","2"]]`,
-                `[["lang","C76","C49","C52","C81"], ["C40","1"]]`,
-                `[["lang","C76","C49","C51","C81"], ["C40","1"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C58"], ["C40","3"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C58"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C76","C59"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C80", "C82", "C76","C59"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","1"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","1"]]`,
             ],
             "grammar": [
-                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C72":[]},"C73",1], ["C40","10"]]`,
+                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C72":[]},"C73",1], ["C40","10"]]`,
             ]
         },
         "1-2": {
@@ -2378,14 +2353,14 @@ const personalChlDict = {
                 `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
             ],
             "text-comp": [
-                `[["lang","C76","C49","C51","C80"], ["C40","3"]]`,
-                `[["lang","C76","C49","C52","C80"], ["C40","3"]]`,
-                `[["lang","C76","C49","C51","C81"], ["C40","2"]]`,
-                `[["lang","C76","C49","C52","C81"], ["C40","2"]]`,
-                `[["lang","C76","C49","C52","C82"], ["C40","1"]]`
+                `[["lang","C49","C51", "C81", "C82", "C76","C58"], ["C40","3"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C58"], ["C40","3"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C60"], ["C40","1"]]`
             ],
             "grammar": [
-                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","10"]]`
+                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","10"]]`
             ]
         },
         "3-8": {
@@ -2402,13 +2377,13 @@ const personalChlDict = {
                 `[["math","C7","C35","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
             ],
             "text-comp": [
-                `[["lang","C76","C49","C51","C81"], ["C40","2"]]`,
-                `[["lang","C76","C49","C52","C81"], ["C40","3"]]`,
-                `[["lang","C76","C49","C51","C82"], ["C40","1"]]`,
-                `[["lang","C76","C49","C52","C82"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","3"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","1"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C60"], ["C40","2"]]`,
             ],
             "grammar": [
-                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","15"]]`            ]
+                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","15"]]`            ]
         }
     },
     4: {
@@ -2429,14 +2404,13 @@ const personalChlDict = {
                 `[["math","C6","C29","","C41","C45","C47",["1","1"],false,"C79"], ["C40","20"]]`,
             ],
             "text-comp": [
-                `[["lang","C76","C49","C51","C59"], ["C40","2"]]`,
-                `[["lang","C76","C49","C52","C59"], ["C40","2"]]`,
-                `[["lang","C76","C49","C51","C81"], ["C40","1"]]`,
-                `[["lang","C76","C49","C52","C81"], ["C40","1"]]`,
-
+                `[["lang","C49","C51", "C80", "C82", "C76","C59"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C80", "C82", "C76","C59"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","1"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","1"]]`,
             ],
             "grammar": [
-                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C72":[]},"C73",1], ["C40","15"]]`,
+                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C72":[]},"C73",1], ["C40","15"]]`,
             ]
         },
         "11-12": {
@@ -2453,15 +2427,15 @@ const personalChlDict = {
                 `[["math","C4","C26","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
             ],
             "text-comp": [
-                `[["lang","C76","C49","C51","C59"], ["C40","3"]]`,
-                `[["lang","C76","C49","C52","C59"], ["C40","2"]]`,
-                `[["lang","C76","C49","C51","C81"], ["C40","2"]]`,
-                `[["lang","C76","C49","C52","C81"], ["C40","2"]]`,
-                `[["lang","C76","C49","C51","C60"], ["C40","1"]]`,
-                `[["lang","C76","C49","C51","C82"], ["C40","1"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C76","C59"], ["C40","3"]]`,
+                `[["lang","C49","C52", "C80", "C82", "C76","C59"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C76","C60"], ["C40","1"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C60"], ["C40","1"]]`,
             ],
             "grammar": [
-                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C73",1], ["C40","20"]]`,
+                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C73",1], ["C40","20"]]`,
             ]
         },
         "1-2": {
@@ -2481,16 +2455,15 @@ const personalChlDict = {
                 `[["math","C3","C15","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","5"]]`,
             ],
             "text-comp": [
-                `[["lang","C76","C49","C51","C59"], ["C40","2"]]`,
-                `[["lang","C76","C49","C51","C81"], ["C40","2"]]`,
-                `[["lang","C76","C49","C52","C81"], ["C40","2"]]`,
-                `[["lang","C76","C49","C51","C60"], ["C40","1"]]`,
-                `[["lang","C76","C49","C52","C60"], ["C40","1"]]`,
-                `[["lang","C76","C49","C51","C82"], ["C40","1"]]`,
-                `[["lang","C76","C49","C52","C82"], ["C40","1"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C76","C59"], ["C40","3"]]`,
+                `[["lang","C49","C52", "C80", "C82", "C76","C59"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C76","C60"], ["C40","1"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","1"]]`,
             ],
             "grammar": [
-                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","20"]]`,
+                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","20"]]`,
             ]
         },
         "3-8": {
@@ -2510,15 +2483,15 @@ const personalChlDict = {
                 `[["math","C3","C15","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","5"]]`,
             ],
             "text-comp": [
-                `[["lang","C76","C49","C51","C81"], ["C40","2"]]`,
-                `[["lang","C76","C49","C52","C81"], ["C40","2"]]`,
-                `[["lang","C76","C49","C51","C60"], ["C40","2"]]`,
-                `[["lang","C76","C49","C52","C60"], ["C40","2"]]`,
-                `[["lang","C76","C49","C51","C82"], ["C40","2"]]`,
-                `[["lang","C76","C49","C52","C82"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C80", "C82", "C76","C60"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C80", "C82", "C76","C60"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C60"], ["C40","2"]]`,
             ],
             "grammar": [
-                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","20"]]`
+                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","20"]]`
             ]
         }
     },
@@ -2540,14 +2513,13 @@ const personalChlDict = {
                 `[["math","C6","C29","","C41","C45","C47",["1","1"],false,"C79"], ["C40","25"]]`,
             ],
             "text-comp": [
-                `[["lang","C76","C49","C51","C81"], ["C40","3"]]`,
-                `[["lang","C76","C49","C52","C81"], ["C40","3"]]`,
-                `[["lang","C76","C49","C51","C82"], ["C40","2"]]`,
-                `[["lang","C76","C49","C52","C82"], ["C40","2"]]`,
-
+                `[["lang","C49","C51", "C80", "C82", "C76","C59"], ["C40","3"]]`,
+                `[["lang","C49","C52", "C80", "C82", "C76","C59"], ["C40","3"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","2"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","2"]]`,
             ],
             "grammar": [
-                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","30"]]`
+                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","30"]]`
             ]
         },
         "11-12": {
@@ -2567,13 +2539,13 @@ const personalChlDict = {
                 `[["math","C5","C26","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
             ],
             "text-comp": [
-                `[["lang","C76","C49","C51","C81"], ["C40","3"]]`,
-                `[["lang","C76","C49","C52","C81"], ["C40","3"]]`,
-                `[["lang","C76","C49","C51","C82"], ["C40","2"]]`,
-                `[["lang","C76","C49","C52","C82"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","3"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","3"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","2"]]`,
             ],
             "grammar": [
-                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","30"]]`
+                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","30"]]`
             ]
         },
         "1-2": {
@@ -2596,13 +2568,13 @@ const personalChlDict = {
                 `[["math","C5","C26","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
             ],
             "text-comp": [
-                `[["lang","C76","C49","C51","C81"], ["C40","3"]]`,
-                `[["lang","C76","C49","C52","C81"], ["C40","3"]]`,
-                `[["lang","C76","C49","C51","C82"], ["C40","2"]]`,
-                `[["lang","C76","C49","C52","C82"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","3"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","3"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","2"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","2"]]`,
             ],
             "grammar": [
-                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","30"]]`
+                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","30"]]`
             ]
         },
         "3-8": {
@@ -2625,13 +2597,13 @@ const personalChlDict = {
                 `[["math","C5","C26","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
             ],
             "text-comp": [
-                `[["lang","C76","C49","C51","C81"], ["C40","4"]]`,
-                `[["lang","C76","C49","C52","C81"], ["C40","4"]]`,
-                `[["lang","C76","C49","C51","C82"], ["C40","3"]]`,
-                `[["lang","C76","C49","C52","C82"], ["C40","3"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","4"]]`,
+                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","4"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","3"]]`,
+                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","3"]]`,
             ],
             "grammar": [
-                `[["lang","C76","C83","C50",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","30"]]`
+                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":["4kl"],"C68":[],"C69":[],"C70":[],"C71":[],"C72":[]},"C74",1], ["C40","30"]]`
             ]
         }
     }
@@ -2660,7 +2632,7 @@ function getLithuanianSchoolPeriod(date = new Date(), periods = [
     return "unknown";
 }
 
-function displayPersonalChl() {
+async function displayPersonalChl() {
     const displayArea = document.getElementById('chlDisplayArea');
     const indicatorsContainer = document.getElementById('chlIndicators');
     const prevBtn = document.getElementById('chlNavPrev');
@@ -2701,7 +2673,7 @@ function displayPersonalChl() {
     });
 
     // Create content for each challenge
-    challenges.forEach((challenge, index) => {
+    for (const [index, challenge] of challenges.entries()) {
         const filteredInfo = challenge.chlInfo.filter(item =>
             !item.includes('KLASĖ') &&
             !item.includes('KOMBINACIJOS') &&
@@ -2763,7 +2735,12 @@ function displayPersonalChl() {
             let numberOfQuestions = challenge.duration[1];
             let earningsDisplay = "";
 
+
             if (answeringMode === "C39" || challenge.chl[2] === "C83") {
+                let potentialEarnings = await calculateTasksPerCorrectAnswerPoints(challenge.chl);
+                if (potentialEarnings) {
+                    potentialEarnings = Number((potentialEarnings * personalChlCoinBonusMultiplier).toFixed(2))
+                }
                 earningsDisplay = `
                     <div class="earnings-estimation-outer">
                         <button class="earnings-estimation-display info-button"
@@ -2776,7 +2753,7 @@ function displayPersonalChl() {
                                 <span class="coin-icon">
                                         <img src="../images/icons/icon-sudedu-coin.png">
                                 </span>
-                                <span class="coin-amount">${Number((calculateTasksPerCorrectAnswerPoints(challenge.chl, challenge)*personalChlCoinBonusMultiplier).toFixed(2))}</span>
+                                <span class="coin-amount">${potentialEarnings}</span>
                                 </span>
                                 <div class="info-icon">
                                 <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 256 256" xml:space="preserve">
@@ -2791,6 +2768,10 @@ function displayPersonalChl() {
                     </div>
                     `;
             } else if (answeringMode === "C40") {
+                let potentialEarnings = await calculateTasksPerCorrectAnswerPoints(challenge.chl);
+                if (potentialEarnings) {
+                    potentialEarnings = Number((potentialEarnings * numberOfQuestions * personalChlCoinBonusMultiplier).toFixed(2));
+                }
                 earningsDisplay = `
                     <div class="earnings-estimation-outer">
                         <button class="earnings-estimation-display info-button"
@@ -2803,7 +2784,7 @@ function displayPersonalChl() {
                                 <span class="coin-icon">
                                         <img src="../images/icons/icon-sudedu-coin.png">
                                 </span>
-                                <span class="coin-amount">${Number((calculateTasksPerCorrectAnswerPoints(challenge.chl) * numberOfQuestions * personalChlCoinBonusMultiplier).toFixed(2))}</span>
+                                <span class="coin-amount">${potentialEarnings}</span>
                                 </span>
                                 <div class="info-icon">
                                 <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 256 256" xml:space="preserve">
@@ -2827,7 +2808,7 @@ function displayPersonalChl() {
         content.appendChild(infoDivHolder);
         content.appendChild(completeButtonDiv);
         displayArea.appendChild(content);
-    });
+    }
 
     function switchToChallenge(index) {
         activeIndex = index;
@@ -2896,11 +2877,14 @@ function completePersonalChlTask(challengeInfo, challengeDuration) {
 
     } else if (parsedCurrentTaskInstructions[0] === "lang") {
         controller.mode = 'lang';
-        if (parsedCurrentTaskInstructions[2] === "C49") {
-            controller.classChoice = parsedCurrentTaskInstructions[1];
-            controller.modeChoice1 = parsedCurrentTaskInstructions[2];
-            controller.modeChoice2 = parsedCurrentTaskInstructions[3];
-            controller.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[4];
+        if (parsedCurrentTaskInstructions[1] === "C49") {
+            console.log(parsedCurrentTaskInstructions)
+            controller.modeChoice1 = parsedCurrentTaskInstructions[1];
+            controller.modeChoice2 = parsedCurrentTaskInstructions[2];
+            controller.modeChoice6 = parsedCurrentTaskInstructions[3];
+            controller.modeChoice7 = parsedCurrentTaskInstructions[4];
+            controller.classChoice = parsedCurrentTaskInstructions[5];
+            controller.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[6];
 
             controller.task = ["personalChl", null];
             controller.taskCompleted = false;
@@ -2909,11 +2893,11 @@ function completePersonalChlTask(challengeInfo, challengeDuration) {
             controller.modeChoice4 = currentTaskDuration[0];
             controller.setTaskDuration = currentTaskDuration[1];
 
-        } else if (parsedCurrentTaskInstructions[2] === "C83") {
-            if (parsedCurrentTaskInstructions[3] === "C50") {
-                controller.classChoice = parsedCurrentTaskInstructions[1];
-                controller.modeChoice1 = parsedCurrentTaskInstructions[2];
-                controller.modeChoice2 = parsedCurrentTaskInstructions[3];
+        } else if (parsedCurrentTaskInstructions[1] === "C83") {
+            if (parsedCurrentTaskInstructions[2] === "C50") {
+                controller.modeChoice1 = parsedCurrentTaskInstructions[1];
+                controller.modeChoice2 = parsedCurrentTaskInstructions[2];
+                controller.classChoice = parsedCurrentTaskInstructions[3];
                 controller.modeChoice3 = parsedCurrentTaskInstructions[4];
                 controller.modeChoice5 = parsedCurrentTaskInstructions[5];
                 controller.questionFrequency = parsedCurrentTaskInstructions[6];
@@ -3025,11 +3009,11 @@ observer.observe(document.getElementById('new-task-options-container-inner'), { 
 window.addEventListener('resize', checkWrap);
 window.addEventListener('load', checkWrap);
 
-function handleKnowledgeLvlStatus () {
+async function handleKnowledgeLvlStatus () {
     const knowledgeLvlStatus = getClassLocalStorage();
     console.log()
     if ((userData && userData.knowledgeLvl) || (knowledgeLvlStatus !== null && knowledgeLvlStatus !== undefined)) {
-        displayPersonalChl();
+        await displayPersonalChl();
     } else {
         showClassPopup();
     }

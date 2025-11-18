@@ -891,7 +891,7 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
   let statType = 'c'; // default to consistency
 
   // Calculate points and coins
-  pointsEarned = calculateTasksPerCorrectAnswerPoints("controller");
+  pointsEarned = await calculateTasksPerCorrectAnswerPoints("controller");
   pointsEarned = pointsEarned * controller.correctAnswersTracker
   if (coinMultiplier) {
     coinsEarned = pointsEarned * coinMultiplier;
@@ -2954,154 +2954,204 @@ function startQuestionsNumber () {
 	redirectToQuestions();
 }
 
-        function getOptionTextFromValues(taskInfo, taskDuration) {
-            function determineQuestionNumberTimeLabelEnding(type, string) {
-                if (type === "C39") {
-                    durationTypeTag = ''
-                    if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
-                        durationTypeTag = 'MINUTĘ';
-                    } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
-                        durationTypeTag = 'MINUTES';
-                    } else if (parseInt(string) >= 10 ) {
-                        durationTypeTag = 'MINUČIŲ';
-                    }
-                    return ("PRAKTIKUOTIS " + string + " " + durationTypeTag)  
-                } else {
-                    if (values[0] === "math") {
-                    durationTypeTag = ''
-                    if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
-                        durationTypeTag = 'VEIKSMĄ';
-                    } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
-                        durationTypeTag = 'VEIKSMUS';
-                    } else if (parseInt(string) >= 10 ) {
-                        durationTypeTag = 'VEIKSMŲ';
-                    }
-                    return ("ATLIKTI " + string + " " + durationTypeTag)  
-                } else if (values[0] === "lang") {
-                    if (values[2] === "C49") {
-                        if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
-                            durationTypeTag = 'TEKSTĄ';
-                        } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
-                            durationTypeTag = 'TEKSTUS';
-                        } else if (parseInt(string) >= 10 ) {
-                            durationTypeTag = 'TEKSTŲ';
-                        }
-                        return ("SUDĖLIOTI " + string + " " + durationTypeTag)  
-                    } else if (values[2] === "C83") {
-                        if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
-                            durationTypeTag = 'SAKINYS';
-                        } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
-                            durationTypeTag = 'SAKINIAI';
-                        } else if (parseInt(string) >= 10 ) {
-                            durationTypeTag = 'SAKINIŲ';
-                        }
-                        return (string + " " + durationTypeTag)  
-                    }
+function getOptionTextFromValues(values, taskDuration, forTeacher = false) {
+    // Helper function to get the Lithuanian plural form based on number
+    function getLithuanianPlural(number, forms) {
+        const num = parseInt(number);
+        const lastDigit = parseInt(number.toString().slice(-1));
+        
+        if (num === 1 || (lastDigit === 1 && num !== 11)) {
+            return forms[0]; // singular
+        } else if ((num > 1 && num < 10) || (num > 20 && lastDigit !== 0)) {
+            return forms[1]; // plural (2-9)
+        } else if (num >= 10) {
+            return forms[2]; // plural (10+)
+        }
+        return forms[2];
+    }
 
-                }
+    function determineQuestionNumberTimeLabelEnding(type, string) {
+        
+        if (type === "C39") {
+            const forms = ['MINUTĘ', 'MINUTES', 'MINUČIŲ'];
+            const durationTypeTag = getLithuanianPlural(string, forms);
+            return `PRAKTIKUOTIS ${string} ${durationTypeTag}`;
+        }
+        
+        if (values[0] === "math") {
+            const forms = ['VEIKSMĄ', 'VEIKSMUS', 'VEIKSMŲ'];
+            const durationTypeTag = getLithuanianPlural(string, forms);
+            return `ATLIKTI ${string} ${durationTypeTag}`;
+        }
+        
+        if (values[0] === "lang") {
+            if (values[1] === "C49") {
+                const forms = ['TEKSTĄ', 'TEKSTUS', 'TEKSTŲ'];
+                const durationTypeTag = getLithuanianPlural(string, forms);
+                return `SUDĖLIOTI ${string} ${durationTypeTag}`;
             }
-            }
- 
-            values = taskInfo;
-            currentTaskDuration = taskDuration;
-            result = []
-            final_results = []
-            if (values[0] === "math") {
-            result.push(parameterDictionary[values[1]]["decodedParameterText"])
-            result.push(parameterDictionary[values[2]]["decodedParameterText"])
-            result.push(parameterDictionary[values[3]]?.["decodedParameterText"] || "")
-            result.push(parameterDictionary[values[4]]["decodedParameterText"])
-            if (values[4] === "C42") {
-                if (values[1] === "C1") {
-                    result.push("NEŽINOMAS DĖMUO")
-                } else if (values[1] === "C2") {
-                    if (values[5] === "C43") {
-                        result.push("NEŽINOMAS TURINYS")
-                    } else if (values[5] === "C44") {
-                        result.push("NEŽINOMAS ATĖMINYS")
-                    } 
-                } else if (values[1] === "C3") {
-                    result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS")
-                } else if (values[1] === "C4") {
-                    result.push("NEŽINOMAS DAUGINAMASIS")
-                } else if (values[1] === "C5") {
-                    if (values[5] === "C45") {
-                        result.push("NEŽINOMAS DALINYS")
-                    } else if (values[5] === "C46") {
-                        result.push("NEŽINOMAS DALIKLIS")
-                    }
-                } else if (values[1] === "C6") {
-                    result.push("NEŽINOMAS DAUGINAMASIS / DALINYS / DALIKLIS")
-                } else if (values[1] === "C7") {
-                    result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS / DAUGINAMASIS / DALINYS / DALIKLIS")
-                }
-            } else {
-                result.push(parameterDictionary[values[5]]["decodedParameterText"])
-            }
-
-            result.push(parameterDictionary[values[6]]["decodedParameterText"])
-            result.push(values[7])
-            result.push(values[8] ? "DALYBA SU LIEKANA" : "DALYBA BE LIEKANOS")
-            result.push(values[9])
-
-            final_results.push(result[0])
-
-            if (result[0] === "SUDĖTIS" || result[0] === "ATIMTIS" || result[0] === "SUDĖTIS IR ATIMTIS") {
-                final_results.push(result[1])
-                final_results.push(result[2])
-                final_results.push(result[3])
-                if (result[4] === "SKAITINĖ LYGYBĖ") {
-                    final_results.push(result[5])  
-                } else if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
-                    final_results.push(result[4])  
-                }
-                final_results.push(result[5])
-                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1]))
-            } else if (result[0] === "DAUGYBA") {
-                final_results.push(result[1])
-                if (result[1] === "DAUGYBOS LENTELĖ") {
-                final_results.push(`NUO ${result[6][0]} IKI ${result[6][1]}`)
-                }
-                final_results.push(result[3])
-                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
-                    final_results.push(result[5])    
-                }
-                final_results.push(result[5])
-                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1]))    
-            } else if (result[0] === "DALYBA" || result[0] === "DAUGYBA IR DALYBA") {
-                final_results.push(result[1])
-                if (result[1] === "DAUGYBOS LENTELĖ") {
-                final_results.push(`NUO ${result[6][0]} IKI ${result[6][1]}`)
-                }
-                final_results.push(result[7])
-                final_results.push(result[3])
-                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
-                    final_results.push(result[4])    
-                }
-                final_results.push(result[5])
-                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1]))    
-            } else if (result[0] === "ĮVAIRŪS VEIKSMAI") {
-                final_results.push(result[1])
-                final_results.push(result[3])
-                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
-                    final_results.push(result[4])    
-                }
-                final_results.push(result[5]) 
-                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1]))       
-            }
-        } else if (values[0] === "lang") {
-            result.push(parameterDictionary[values[1]]["decodedParameterText"])
-            result.push(parameterDictionary[values[2]]["decodedParameterText"])
             
-            result.push(parameterDictionary[values[3]]["decodedParameterText"])  
+            if (values[1] === "C83") {
+                const forms = ['SAKINYS', 'SAKINIAI', 'SAKINIŲ'];
+                const durationTypeTag = getLithuanianPlural(string, forms);
+                return `${string} ${durationTypeTag}`;
+            }
+        }
+    }
 
-            if (values[3]  === "C50") {
-                let outerLiItem = document.createElement('li');
+    // Map operation codes to unknown component text
+    const unknownComponentMap = {
+        'C1': 'NEŽINOMAS DĖMUO',
+        'C2': {
+            'C43': 'NEŽINOMAS TURINYS',
+            'C44': 'NEŽINOMAS ATĖMINYS'
+        },
+        'C3': 'NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS',
+        'C4': 'NEŽINOMAS DAUGINAMASIS',
+        'C5': {
+            'C45': 'NEŽINOMAS DALINYS',
+            'C46': 'NEŽINOMAS DALIKLIS'
+        },
+        'C6': 'NEŽINOMAS DAUGINAMASIS / DALINYS / DALIKLIS',
+        'C7': 'NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS / DAUGINAMASIS / DALINYS / DALIKLIS'
+    };
+
+    function getUnknownComponent(operationType, subType) {
+        const mapping = unknownComponentMap[operationType];
+        return typeof mapping === 'object' ? mapping[subType] : mapping;
+    }
+
+    const result = [];
+    const final_results = [];
+
+    if (values[0] === "math") {
+        result.push(parameterDictionary[values[1]]["decodedParameterText"]);
+        result.push(parameterDictionary[values[2]]["decodedParameterText"]);
+        result.push(parameterDictionary[values[3]]?.["decodedParameterText"] || "");
+        result.push(parameterDictionary[values[4]]["decodedParameterText"]);
+        
+        if (values[4] === "C42") {
+            result.push(getUnknownComponent(values[1], values[5]));
+        } else {
+            result.push(parameterDictionary[values[5]]["decodedParameterText"]);
+        }
+
+        result.push(parameterDictionary[values[6]]["decodedParameterText"]);
+        result.push(values[7]);
+        result.push(values[8] ? "DALYBA SU LIEKANA" : "DALYBA BE LIEKANOS");
+        result.push(values[9]);
+
+        final_results.push(result[0]);
+
+        if (result[0] === "SUDĖTIS" || result[0] === "ATIMTIS" || result[0] === "SUDĖTIS IR ATIMTIS") {
+            final_results.push(result[1]);
+            final_results.push(result[2]);
+            final_results.push(result[3]);
+            if (result[4] === "SKAITINĖ LYGYBĖ") {
+                final_results.push(result[5]);
+            } else if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+                final_results.push(result[4]);
+            }
+            final_results.push(result[5]);
+            final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+        } else if (result[0] === "DAUGYBA") {
+            final_results.push(result[1]);
+            if (result[1] === "DAUGYBOS LENTELĖ") {
+                final_results.push(`NUO ${result[6][0]} IKI ${result[6][1]}`);
+            }
+            final_results.push(result[3]);
+            if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+                final_results.push(result[5]);
+            }
+            final_results.push(result[5]);
+            final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+        } else if (result[0] === "DALYBA" || result[0] === "DAUGYBA IR DALYBA") {
+            final_results.push(result[1]);
+            if (result[1] === "DAUGYBOS LENTELĖ") {
+                final_results.push(`NUO ${result[6][0]} IKI ${result[6][1]}`);
+            }
+            final_results.push(result[7]);
+            final_results.push(result[3]);
+            if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+                final_results.push(result[4]);
+            }
+            final_results.push(result[5]);
+            final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+        } else if (result[0] === "ĮVAIRŪS VEIKSMAI") {
+            final_results.push(result[1]);
+            final_results.push(result[3]);
+            if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+                final_results.push(result[4]);
+            }
+            final_results.push(result[5]);
+            final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+        }
+    } else if (values[0] === "lang") {
+        result.push(parameterDictionary[values[1]]["decodedParameterText"]);
+        result.push(parameterDictionary[values[2]]["decodedParameterText"]);
+        result.push(parameterDictionary[values[3]]["decodedParameterText"]);
+
+        if (values[3] === "C50") {
+            const outerLiItem = document.createElement('li');
+            outerLiItem.textContent = "RAŠYBOS NUSTATYMAI:";
+
+            const grammarParamsList = document.createElement('ul');
+            grammarParamsList.classList.add('grammar-params-list');
+
+            Object.keys(values[4]).forEach(key => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = parameterDictionary[key]["decodedParameterText"];
+                grammarParamsList.appendChild(listItem);
+            });
+
+            outerLiItem.appendChild(grammarParamsList);
+            result.push(outerLiItem.outerHTML);
+            result.push(parameterDictionary[values[5]]["decodedParameterText"]);
+            result.push(values[6] === 1 ? "DAŽNESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI" : "RETESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI");
+        }
+
+        final_results.push(result[0]);
+        final_results.push(result[1]);
+
+        if (result[0] === "TEKSTO SUPRATIMAS") {
+            if (values[4] === "C82") {
+                if (forTeacher) {
+                    result.push(parameterDictionary[values[5]]["decodedParameterText"]);
+                    result.push(parameterDictionary[values[6]]["decodedParameterText"]);
+                    result.push(parameterDictionary[values[4]]["decodedParameterText"]);
+                    final_results.push(parameterDictionary[values[5]]["decodedParameterText"]);
+                    final_results.push(parameterDictionary[values[6]]["decodedParameterText"]);
+                    final_results.push(parameterDictionary[values[4]]["decodedParameterText"]);
+                } else {
+                    result.push(parameterDictionary[values[6]]["decodedParameterText"]);
+                    final_results.push(parameterDictionary[values[5]]["decodedParameterText"]);
+                    final_results.push(parameterDictionary[values[6]]["decodedParameterText"]);
+                }
+                final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+            } else if (values[4] === "C84") {
+                if (forTeacher) {
+                    final_results.push(parameterDictionary[values[4]]["decodedParameterText"]);
+
+                    const outerDiv = document.createElement("div");
+                    outerDiv.classList = "selected-text-task-info-for-teachers-list";
+
+                    const htmlItems = taskDuration[1]
+                        .map(id => `<span class="selected-text-task-info-for-teachers-item" id="${id}" onclick="openTextBrowser('${id}')">ID: ${id}</span>`)
+                        .join(", ");
+
+                    outerDiv.innerHTML = htmlItems;
+                    final_results.push(outerDiv.outerHTML);
+                } else {
+                    final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1].length.toString()));
+                }
+            }
+        } else if (result[0] === "GRAMATIKA") {
+          final_results.push(result[2]);
+          if (result[1] === "RAŠYBA") {
+            let outerLiItem = document.createElement('li');
                 outerLiItem.textContent = "RAŠYBOS NUSTATYMAI:"; // Add a label for the outer <li>
-
                 let grammarParamsList = document.createElement('ul');
                 grammarParamsList.classList.add('grammar-params-list');
-                
                 Object.keys(values[4]).forEach(key => {
                     let listItem = document.createElement('li');
                     listItem.innerHTML = parameterDictionary[key]["decodedParameterText"]; // Use innerHTML instead of textContent
@@ -3110,10 +3160,8 @@ function startQuestionsNumber () {
 
                 outerLiItem.appendChild(grammarParamsList);
 
-
                 // Store as an HTML string
                 result.push(outerLiItem.outerHTML);
-
                 result.push(parameterDictionary[values[5]]["decodedParameterText"])
 
                 if (values[6] === 1) {
@@ -3121,31 +3169,22 @@ function startQuestionsNumber () {
                 } else {
                     result.push("RETESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
                 }
-            }
-
-            final_results.push(result[0])
-            final_results.push(result[1])
-            final_results.push(result[2])
-            if (result[1] === "TEKSTO SUPRATIMAS") {
-                final_results.push(parameterDictionary[values[4]]["decodedParameterText"])
-                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1])) 
-            } else if (result[1] === "GRAMATIKA") {
-                if (result[2] === "RAŠYBA") {
-                    final_results.push(result[3])
+            
+            final_results.push(result[3]);
+            if (result[2] === "3-4 KLASĖ") {
+                if ("C62" in values[4] || "C63" in values[4] || "C64" in values[4] || "C65" in values[4]) {
+                    final_results.push(result[4]);
                 }
-
-                if (result[0] === "3-4 KLASĖ") {
-                    if ("C62" in values[4] || "C63" in values[4] || "C64" in values[4] || "C65" in values[4]) {
-                            final_results.push(result[4])
-                        } 
-                    } else {
-                        final_results.push(result[5])
-                    }
-                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1])) 
+            } else {
+                final_results.push(result[5]);
             }
-        }
-            return final_results;
-        }
+            final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+          }
+      }
+    }
+    
+    return final_results;
+}
 
 //TASK INFO COLLECTION START
 
@@ -3552,289 +3591,271 @@ const pointWeights = {
     "C58": {"values": [2.0, 1.25, 1.15, 1.15, 0.95, 0.95], "label": "teksto supratimas lengvas"},
     "C59": {"values": [2.0, 1.75, 1.75, 1.5, 1.5, 1.25], "label": "teksto supratimas vidutinis"},
     "C60": {"values": [2.0, 2.0, 2.0, 1.75, 1.75, 1.5], "label": "teksto supratimas sunkus"},
-    "C80": {"values": [2.0, 1.35, 1.35, 1.15, 1.15, 1.0], "label": "teksto supratimas lengvas su distraktorium"},
-    "C81": {"values": [2.0, 2.0, 2.0, 1.85, 1.85, 1.65], "label": "teksto supratimas vidutinis su distraktorium"},
-    "C82": {"values": [2.0, 2.0, 2.0, 2.0, 2.0, 1.85], "label": "teksto supratimas sunkus su distraktorium"},
-    "C83": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "gramatika"}
+    "C80": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "be distraktoriaus"},
+    "C81": {"values": [2.0, 2.0, 2.0, 1.85, 1.85, 1.65], "label": "su distraktoriumi"},
 }
 
 const personalChlCoinBonusMultiplier = 1.1;
 
-function calculateTasksPerCorrectAnswerPoints (type) {
-    const userClass = userData?.knowledgeLvl;
+async function calculateTasksPerCorrectAnswerPoints(type, selectedTextInfo = null) {
+    // Helper to get task weight
+    const getTaskWeight = (task) => {
+        const taskWeightArray = pointWeights[task]?.values;
+        return taskWeightArray ? taskWeightArray[taskInfoTemp.userClass] : 1;
+    };
 
-    if (!userClass) {
-      return
-    }
+    // Special handling for C18
+    const getC18Weight = (multSelection) => {
+        if (!Array.isArray(multSelection) || multSelection.length < 2) return 1;
+        const nums = multSelection.map(x => parseInt(x, 10));
+        if (nums.some(isNaN)) return 1;
+        const [first, second] = nums;
+        if (second === 1) return pointWeights.DL1?.values[taskInfoTemp.userClass] ?? 1;
+        if (second === 2) return pointWeights.DL2?.values[taskInfoTemp.userClass] ?? 1;
+        if (first === 10 && second === 10) return pointWeights.DL10?.values[taskInfoTemp.userClass] ?? 1;
+        return pointWeights.DLALL?.values[taskInfoTemp.userClass] ?? 1;
+    };
+
+    const userClass = userData?.knowledgeLvl;
+    if (!userClass) return;
 
     let taskInfoTemp = {
-        "userClass": userClass,
-        "lang": false,
-        "math": false,
-        "C1": false,
-        "C2": false,
-        "C3": false,
-        "C4": false,
-        "C5": false,
-        "C6": false,
-        "C7": false,
-        "C8": false,
-        "C9": false,
-        "C10": false,
-        "C11": false,
-        "C12": false,
-        "C13": false,
-        "C14": false,
-        "C15": false,
-        "C16": false,
-        "C17": false,
-        "C18": false,
-        "C19": false,
-        "C20": false,
-        "C21": false,
-        "C22": false,
-        "C23": false,
-        "C24": false,
-        "C25": false,
-        "C26": false,
-        "C27": false,
-        "C28": false,
-        "C29": false,
-        "C30": false,
-        "C31": false,
-        "C32": false,
-        "C33": false,
-        "C34": false,
-        "C35": false,
-        "C36": false,
-        "C37": false,
-        "C38": false,
-        "C41": false,
-        "C42": false,
-        "C47": false,
-        "C48": false,
-        "C49": false,
-        "C50": false,
-        "C51": false,
-        "C52": false,
-        "C58": false,
-        "C59": false,
-        "C60": false,
-        "C75": false,
-        "C76": false,
-        "C77": false,
-        "C80": false,
-        "C81": false,
-        "C82": false,
-        "C83": false,
-        "remainder": false,
+        userClass,
+        lang: false,
+        math: false,
+        C1: false, C2: false, C3: false, C4: false, C5: false,
+        C6: false, C7: false, C8: false, C9: false, C10: false,
+        C11: false, C12: false, C13: false, C14: false, C15: false,
+        C16: false, C17: false, C18: false, C19: false, C20: false,
+        C21: false, C22: false, C23: false, C24: false, C25: false,
+        C26: false, C27: false, C28: false, C29: false, C30: false,
+        C31: false, C32: false, C33: false, C34: false, C35: false,
+        C36: false, C37: false, C38: false, C41: false, C42: false,
+        C47: false, C48: false, C49: false, C50: false, C51: false,
+        C52: false, C58: false, C59: false, C60: false, C75: false,
+        C76: false, C77: false, C80: false, C81: false,
+        remainder: false,
         "mult-table-selection": [],
         "correct-ans": 0,
         "total-ans": 0
     };
 
     let total = pointWeights.base?.values[taskInfoTemp.userClass] ?? 1;
-
     const skipTasks = ['C47', 'C48', 'userClass'];
 
     if (type === "controller") {
-      // Mark C-flags from controller values
-      for (let key in controller) {
-          const val = controller[key];
-          if (taskInfoTemp.hasOwnProperty(val)) {
-              taskInfoTemp[val] = true;
-          }
-      }
-
-      if (controller.withRemainder) {
-          taskInfoTemp.remainder = true;
-      }
-
-      if (controller.modeChoice2 === "C18") {
-          taskInfoTemp["mult-table-selection"] = controller.selectedNumbers || [];
-      }
-
-      if (controller.mode === "lang") {
-          taskInfoTemp["C47"] = false;
-          taskInfoTemp["C48"] = false;
-          taskInfoTemp["remainder"] = false;
-      } else if (controller.mode === "math") {
-          taskInfoTemp["C49"] = false;
-          taskInfoTemp["C50"] = false;
-          taskInfoTemp["C51"] = false;
-          taskInfoTemp["C52"] = false;
-          taskInfoTemp["C58"] = false;
-          taskInfoTemp["C59"] = false;
-          taskInfoTemp["C60"] = false;
-          taskInfoTemp["C75"] = false;
-          taskInfoTemp["C76"] = false;
-          taskInfoTemp["C80"] = false;
-          taskInfoTemp["C81"] = false;
-          taskInfoTemp["C82"] = false;
-          taskInfoTemp["C83"] = false;
-      }
-
-    // Helper to get task weight
-    const getTaskWeight = (task) => {
-        const taskWeightArray = pointWeights[task]?.values;
-        return taskWeightArray ? taskWeightArray[taskInfoTemp.userClass] : 1;
-    };
-
-    // Special handling for C18
-    const getC18Weight = (multSelection) => {
-        if (!Array.isArray(multSelection) || multSelection.length < 2) return 1;
-        const nums = multSelection.map(x => parseInt(x, 10));
-        if (nums.some(isNaN)) return 1;
-        const [first, second] = nums;
-        if (second === 1) return pointWeights.DL1?.values[taskInfoTemp.userClass] ?? 1;
-        if (second === 2) return pointWeights.DL2?.values[taskInfoTemp.userClass] ?? 1;
-        if (first === 10 && second === 10) return pointWeights.DL10?.values[taskInfoTemp.userClass] ?? 1;
-        return pointWeights.DLALL?.values[taskInfoTemp.userClass] ?? 1;
-    };
-
-    Object.keys(taskInfoTemp).forEach(task => {
-        if (!taskInfoTemp[task] || skipTasks.includes(task)) return;
-
-        let weight = getTaskWeight(task);
-
-        if (task === 'C18') {
-            weight *= getC18Weight(taskInfoTemp['mult-table-selection']);
+        for (let key in controller) {
+            const val = controller[key];
+            if (taskInfoTemp.hasOwnProperty(val)) taskInfoTemp[val] = true;
         }
 
-        total *= weight;
-    });
+        if (controller.withRemainder) taskInfoTemp.remainder = true;
+        if (controller.modeChoice2 === "C18") taskInfoTemp["mult-table-selection"] = controller.selectedNumbers || [];
 
-  } else {
-    const parsedCurrentTaskInstructions = type;
+        if (controller.mode === "lang") {
+            taskInfoTemp.C47 = false;
+            taskInfoTemp.C48 = false;
+            taskInfoTemp.remainder = false;
+        } else if (controller.mode === "math") {
+            ["C49","C50","C51","C52","C58","C59","C60","C75","C76","C80","C81"].forEach(k => taskInfoTemp[k] = false);
+        }
 
-    let tempController = {}
-    if (parsedCurrentTaskInstructions[0] === "math") {
-        tempController.mode = 'math';
-        tempController.modeChoice1 = parsedCurrentTaskInstructions[1];
-        tempController.modeChoice2 = parsedCurrentTaskInstructions[2];
-        tempController.modeChoice3 = parsedCurrentTaskInstructions[3];
-        tempController.modeChoice5 = parsedCurrentTaskInstructions[4];
-        tempController.modeChoice6 = parsedCurrentTaskInstructions[5];
-        tempController.modeChoice7 = parsedCurrentTaskInstructions[6];
-        tempController.selectedNumbers = parsedCurrentTaskInstructions[7];
-        tempController.withRemainder = parsedCurrentTaskInstructions[8];
-        tempController.modeChoice8 = parsedCurrentTaskInstructions[9];
+        Object.keys(taskInfoTemp).forEach(task => {
+            if (!taskInfoTemp[task] || skipTasks.includes(task)) return;
+            let weight = getTaskWeight(task);
+            if (task === 'C18') weight *= getC18Weight(taskInfoTemp['mult-table-selection']);
+            total *= weight;
+        });
 
-    } else if (parsedCurrentTaskInstructions[0] === "lang") {
-        tempController.mode = 'lang';
-        if (parsedCurrentTaskInstructions[2] === "C49") {
-            tempController.classChoice = parsedCurrentTaskInstructions[1];
-            tempController.modeChoice1 = parsedCurrentTaskInstructions[2];
-            tempController.modeChoice2 = parsedCurrentTaskInstructions[3];
-            tempController.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[4];
+        return Number(total.toFixed(2));
 
-        } else if (parsedCurrentTaskInstructions[2] === "C83") {
-            if (parsedCurrentTaskInstructions[3] === "C50") {
-                tempController.classChoice = parsedCurrentTaskInstructions[1];
-                tempController.modeChoice1 = parsedCurrentTaskInstructions[2];
-                tempController.modeChoice2 = parsedCurrentTaskInstructions[3];
-                tempController.modeChoice3 = parsedCurrentTaskInstructions[4];
-                tempController.modeChoice5 = parsedCurrentTaskInstructions[5];
-                tempController.questionFrequency = parsedCurrentTaskInstructions[6];
+    } else if (type === "selectedTexts") {
+        const [taskSettings, textIds] = selectedTextInfo;
+        const textCompType = taskSettings[2];
+
+        const response = await fetch("../databases/sudedu_duomenu_baze.json");
+        const textDatabase = await response.json();
+
+        const textInfoList = buildList(textDatabase, textIds, textCompType);
+
+        for (const info of textInfoList) {
+            let tempController = {};
+            const classChoice = info[0];
+            const difficulty = info[1];
+
+            tempController.modeChoice1 = taskSettings[1];
+            tempController.modeChoice2 = taskSettings[2];
+            tempController.modeChoice6 = taskSettings[3];
+            tempController.classChoice = classChoice;
+            tempController.modeChoiceLtDifficulty = difficulty;
+
+            for (let key in tempController) {
+                const val = tempController[key];
+                if (taskInfoTemp.hasOwnProperty(val)) taskInfoTemp[val] = true;
+            }
+
+            taskInfoTemp.C47 = false;
+            taskInfoTemp.C48 = false;
+            taskInfoTemp.remainder = false;
+            taskInfoTemp["mult-table-selection"] = false;
+
+            Object.keys(taskInfoTemp).forEach(task => {
+                if (!taskInfoTemp[task] || skipTasks.includes(task)) return;
+                const weight = getTaskWeight(task);
+                total *= weight;
+            });
+        }
+
+        return Number(total.toFixed(2));
+
+    } else {
+        const parsedCurrentTaskInstructions = type;
+        let tempController = {};
+
+        if (parsedCurrentTaskInstructions[0] === "math") {
+            tempController.mode = 'math';
+            tempController.modeChoice1 = parsedCurrentTaskInstructions[1];
+            tempController.modeChoice2 = parsedCurrentTaskInstructions[2];
+            tempController.modeChoice3 = parsedCurrentTaskInstructions[3];
+            tempController.modeChoice5 = parsedCurrentTaskInstructions[4];
+            tempController.modeChoice6 = parsedCurrentTaskInstructions[5];
+            tempController.modeChoice7 = parsedCurrentTaskInstructions[6];
+            tempController.selectedNumbers = parsedCurrentTaskInstructions[7];
+            tempController.withRemainder = parsedCurrentTaskInstructions[8];
+            tempController.modeChoice8 = parsedCurrentTaskInstructions[9];
+        } else if (parsedCurrentTaskInstructions[0] === "lang") {
+            tempController.mode = 'lang';
+            if (parsedCurrentTaskInstructions[1] === "C49") {
+                tempController.modeChoice1 = parsedCurrentTaskInstructions[1];
+                tempController.modeChoice2 = parsedCurrentTaskInstructions[2];
+                tempController.modeChoice6 = parsedCurrentTaskInstructions[3];
+                tempController.classChoice = parsedCurrentTaskInstructions[5];
+                tempController.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[6];
+            } else if (parsedCurrentTaskInstructions[1] === "C83") {
+                if (parsedCurrentTaskInstructions[2] === "C50") {
+                    tempController.classChoice = parsedCurrentTaskInstructions[1];
+                    tempController.modeChoice1 = parsedCurrentTaskInstructions[2];
+                    tempController.modeChoice2 = parsedCurrentTaskInstructions[3];
+                    tempController.modeChoice3 = parsedCurrentTaskInstructions[4];
+                    tempController.modeChoice5 = parsedCurrentTaskInstructions[5];
+                    tempController.questionFrequency = parsedCurrentTaskInstructions[6];
+                }
             }
         }
-      }
 
-      // Mark C-flags from controller values
-      for (let key in tempController) {
-          const val = tempController[key];
-          if (taskInfoTemp.hasOwnProperty(val)) {
-              taskInfoTemp[val] = true;
-          }
-      }
-
-      if (tempController.withRemainder) {
-          taskInfoTemp.remainder = true;
-      }
-
-      if (tempController.modeChoice2 === "C18") {
-          taskInfoTemp["mult-table-selection"] = tempController.selectedNumbers || [];
-      }
-
-      if (tempController.mode === "lang") {
-          taskInfoTemp["C47"] = false;
-          taskInfoTemp["C48"] = false;
-          taskInfoTemp["remainder"] = false;
-      } else if (tempController.mode === "math") {
-          taskInfoTemp["C49"] = false;
-          taskInfoTemp["C50"] = false;
-          taskInfoTemp["C51"] = false;
-          taskInfoTemp["C52"] = false;
-          taskInfoTemp["C58"] = false;
-          taskInfoTemp["C59"] = false;
-          taskInfoTemp["C60"] = false;
-          taskInfoTemp["C75"] = false;
-          taskInfoTemp["C76"] = false;
-          taskInfoTemp["C80"] = false;
-          taskInfoTemp["C81"] = false;
-          taskInfoTemp["C82"] = false;
-      }
-
-    // Helper to get task weight
-    const getTaskWeight = (task) => {
-        const taskWeightArray = pointWeights[task]?.values;
-        return taskWeightArray ? taskWeightArray[taskInfoTemp.userClass] : 1;
-    };
-
-    // Special handling for C18
-    const getC18Weight = (multSelection) => {
-        if (!Array.isArray(multSelection) || multSelection.length < 2) return 1;
-        const nums = multSelection.map(x => parseInt(x, 10));
-        if (nums.some(isNaN)) return 1;
-        const [first, second] = nums;
-        if (second === 1) return pointWeights.DL1?.values[taskInfoTemp.userClass] ?? 1;
-        if (second === 2) return pointWeights.DL2?.values[taskInfoTemp.userClass] ?? 1;
-        if (first === 10 && second === 10) return pointWeights.DL10?.values[taskInfoTemp.userClass] ?? 1;
-        return pointWeights.DLALL?.values[taskInfoTemp.userClass] ?? 1;
-    };
-
-    Object.keys(taskInfoTemp).forEach(task => {
-        if (!taskInfoTemp[task] || skipTasks.includes(task)) return;
-        let weight = getTaskWeight(task);
-
-        if (task === 'C18') {
-            weight *= getC18Weight(taskInfoTemp['mult-table-selection']);
+        for (let key in tempController) {
+            const val = tempController[key];
+            if (taskInfoTemp.hasOwnProperty(val)) taskInfoTemp[val] = true;
         }
 
-        total *= weight;
-    });
+        if (tempController.withRemainder) taskInfoTemp.remainder = true;
+        if (tempController.modeChoice2 === "C18") taskInfoTemp["mult-table-selection"] = tempController.selectedNumbers || [];
+
+        if (tempController.mode === "lang") {
+            taskInfoTemp.C47 = false;
+            taskInfoTemp.C48 = false;
+            taskInfoTemp.remainder = false;
+            taskInfoTemp["mult-table-selection"] = false;
+        } else if (tempController.mode === "math") {
+            ["C49","C50","C51","C52","C58","C59","C60","C75","C76","C80","C81"].forEach(k => taskInfoTemp[k] = false);
+        }
+
+        Object.keys(taskInfoTemp).forEach(task => {
+            if (!taskInfoTemp[task] || skipTasks.includes(task)) return;
+            let weight = getTaskWeight(task);
+            if (task === 'C18') weight *= getC18Weight(taskInfoTemp['mult-table-selection']);
+            total *= weight;
+        });
+
+        return Number(total.toFixed(2));
+    }
+
+    function buildList(textDatabase, textIds, textCompType) {
+        const result = [];
+
+        for (const id of textIds) {
+            const entry = textDatabase.find(x => x.id === id);
+            if (!entry) continue;
+
+            const out = [];
+
+            const classes = entry["class-choice"] ?? [];
+            let classCode = null;
+            const has12 = classes.includes("1_2_klase");
+            const has34 = classes.includes("3_4_klase");
+            if (has12 && !has34) classCode = "C75";
+            else if (has34 || (has12 && has34)) classCode = "C76";
+            out.push(classCode);
+
+            let complexityValue = null;
+            if (textCompType === "C51") complexityValue = entry["suitable-for"]?.komponavimas ?? null;
+            else if (textCompType === "C52") complexityValue = entry["suitable-for"]?.struktura ?? null;
+            if (!complexityValue) continue;
+
+            let complexityCode = null;
+            if (complexityValue === "lengvas") complexityCode = "C58";
+            else if (complexityValue === "vidutinis") complexityCode = "C59";
+            else if (complexityValue === "sunkus") complexityCode = "C60";
+            if (!complexityCode) continue;
+
+            out.push(complexityCode);
+            result.push(out);
+        }
+
+        return result;
+    }
 }
 
-  total = Number(total.toFixed(2));
-  return total;
-}
 
+async function displayCustomTaskPotentialEarnings() {
+    const coinAmountEl = document.querySelector(".custom-coin-amount");
+    const coinAmountValueEl = coinAmountEl?.querySelector(".coin-amount");
+    const earningsHolder = document.querySelector(".custom-earnings-iki-holder");
 
-function displayCustomTaskPotentialEarnings () {
-  if (controller.modeChoice4 === "C39" || controller.modeChoice1 === "C83") {
-    document.querySelector(".custom-earnings-iki-holder").innerHTML = 'x';
-    const el = document.querySelector(".custom-coin-amount .coin-amount");
-    if (el) el.innerHTML = calculateTasksPerCorrectAnswerPoints("controller");
-    document.querySelector(".custom-coin-amount").onclick = function() {
-      openObjectPopup(
-        infoMessages['coin-amount-custom-timer'].content,
-        infoMessages['coin-amount-custom-timer'].title,
-        infoMessages['coin-amount-custom-timer'].subtitle
-      );
+    // Helper to attach click/touch listener safely
+    const attachCoinPopup = (messageKey) => {
+        if (!coinAmountEl) return;
+
+        // Make element interactive on touch devices
+        coinAmountEl.style.cursor = "pointer";
+        coinAmountEl.setAttribute("tabindex", "0");
+
+        // Remove any old listeners by cloning
+        const newEl = coinAmountEl.cloneNode(true);
+        coinAmountEl.replaceWith(newEl);
+
+        const handleClick = () => {
+            const info = infoMessages[messageKey];
+            if (!info) return;
+            openObjectPopup(info.content, info.title, info.subtitle);
+        };
+
+        newEl.addEventListener("click", handleClick);
+        newEl.addEventListener("touchend", handleClick);
     };
-  } else if (controller.modeChoice4 === "C40") {
-    const el = document.querySelector(".custom-coin-amount .coin-amount");
-    document.querySelector(".custom-coin-amount").onclick = function() {
-      openObjectPopup(
-        infoMessages['coin-amount-custom-question-number'].content,
-        infoMessages['coin-amount-custom-question-number'].title,
-        infoMessages['coin-amount-custom-question-number'].subtitle
-      );
-    };
-    document.querySelector(".custom-earnings-iki-holder").innerHTML = 'IKI';
-    if (el) el.innerHTML = Number((calculateTasksPerCorrectAnswerPoints("controller") * parseInt(questionNumberInputElement.value)).toFixed(2));
-  }
+
+    if (controller.modeChoice4 === "C39" || controller.modeChoice1 === "C83") {
+        if (earningsHolder) earningsHolder.innerHTML = 'x';
+        if (coinAmountValueEl) {
+            coinAmountValueEl.innerHTML = await calculateTasksPerCorrectAnswerPoints("controller");
+        }
+
+        attachCoinPopup('coin-amount-custom-timer');
+
+    } else if (controller.modeChoice4 === "C40") {
+        if (earningsHolder) earningsHolder.innerHTML = 'IKI';
+
+        let potentialEarnings = await calculateTasksPerCorrectAnswerPoints("controller");
+        const questionNumber = parseInt(questionNumberInputElement.value) || 1;
+
+        if (potentialEarnings && coinAmountValueEl) {
+            coinAmountValueEl.innerHTML = Number((potentialEarnings * questionNumber).toFixed(2));
+        }
+
+        attachCoinPopup('coin-amount-custom-question-number');
+    }
 }
+
 
 // POINTS CALCULATION END
 function initScrollIndicators() {

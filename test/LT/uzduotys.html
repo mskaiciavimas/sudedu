@@ -1607,6 +1607,15 @@
         outline: none;
     }
 
+    .selected-text-task-info-for-teachers-item {
+        text-transform: uppercase;
+        cursor: pointer;
+    }
+
+    .selected-text-task-info-for-teachers-item:hover {
+        text-decoration: underline;
+    }
+
 
     @media (max-width: 1999px) {
         #teacher-message-line,
@@ -3438,210 +3447,6 @@
         enableNewTaskContainer();
         document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
 
-
-        function getOptionTextFromValues(values, forTeacher=false) {
-        console.log(values)
-            function determineQuestionNumberTimeLabelEnding(type, string) {
-                if (type === "C39") {
-                    durationTypeTag = ''
-                    if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
-                        durationTypeTag = 'MINUTĘ';
-                    } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
-                        durationTypeTag = 'MINUTES';
-                    } else if (parseInt(string) >= 10 ) {
-                        durationTypeTag = 'MINUČIŲ';
-                    }
-                    return ("PRAKTIKUOTIS " + string + " " + durationTypeTag)  
-                } else {
-                    if (values[0] === "math") {
-                    durationTypeTag = ''
-                    if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
-                        durationTypeTag = 'VEIKSMĄ';
-                    } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
-                        durationTypeTag = 'VEIKSMUS';
-                    } else if (parseInt(string) >= 10 ) {
-                        durationTypeTag = 'VEIKSMŲ';
-                    }
-                    return ("ATLIKTI " + string + " " + durationTypeTag)  
-                } else if (values[0] === "lang") {
-                    if (values[2] === "C49") {
-                        if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
-                            durationTypeTag = 'TEKSTĄ';
-                        } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
-                            durationTypeTag = 'TEKSTUS';
-                        } else if (parseInt(string) >= 10 ) {
-                            durationTypeTag = 'TEKSTŲ';
-                        }
-                        return ("SUDĖLIOTI " + string + " " + durationTypeTag)  
-                    } else if (values[2] === "C83") {
-                        if (parseInt(string) === 1 || parseInt(string.slice(-1)[0]) === 1 && parseInt(string) !== 11) {
-                            durationTypeTag = 'SAKINYS';
-                        } else if ((parseInt(string) > 1 && parseInt(string) < 10) || (parseInt(string) > 20 && parseInt(string.slice(-1)[0]) !== 0)) {
-                            durationTypeTag = 'SAKINIAI';
-                        } else if (parseInt(string) >= 10 ) {
-                            durationTypeTag = 'SAKINIŲ';
-                        }
-                        return (string + " " + durationTypeTag)  
-                    }
-
-                }
-            }
-            }
- 
-            result = []
-            final_results = []
-            if (values[0] === "math") {
-            result.push(parameterDictionary[values[1]]["decodedParameterText"])
-            result.push(parameterDictionary[values[2]]["decodedParameterText"])
-            result.push(parameterDictionary[values[3]]?.["decodedParameterText"] || "")
-            result.push(parameterDictionary[values[4]]["decodedParameterText"])
-            if (values[4] === "C42") {
-                if (values[1] === "C1") {
-                    result.push("NEŽINOMAS DĖMUO")
-                } else if (values[1] === "C2") {
-                    if (values[5] === "C43") {
-                        result.push("NEŽINOMAS TURINYS")
-                    } else if (values[5] === "C44") {
-                        result.push("NEŽINOMAS ATĖMINYS")
-                    } 
-                } else if (values[1] === "C3") {
-                    result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS")
-                } else if (values[1] === "C4") {
-                    result.push("NEŽINOMAS DAUGINAMASIS")
-                } else if (values[1] === "C5") {
-                    if (values[5] === "C45") {
-                        result.push("NEŽINOMAS DALINYS")
-                    } else if (values[5] === "C46") {
-                        result.push("NEŽINOMAS DALIKLIS")
-                    }
-                } else if (values[1] === "C6") {
-                    result.push("NEŽINOMAS DAUGINAMASIS / DALINYS / DALIKLIS")
-                } else if (values[1] === "C7") {
-                    result.push("NEŽINOMAS DĖMUO / TURINYS / ATĖMINYS / DAUGINAMASIS / DALINYS / DALIKLIS")
-                }
-            } else {
-                result.push(parameterDictionary[values[5]]["decodedParameterText"])
-            }
-
-            result.push(parameterDictionary[values[6]]["decodedParameterText"])
-            result.push(values[7])
-            result.push(values[8] ? "DALYBA SU LIEKANA" : "DALYBA BE LIEKANOS")
-            result.push(values[9])
-
-            final_results.push(result[0])
-
-            if (result[0] === "SUDĖTIS" || result[0] === "ATIMTIS" || result[0] === "SUDĖTIS IR ATIMTIS") {
-                final_results.push(result[1])
-                final_results.push(result[2])
-                final_results.push(result[3])
-                if (result[4] === "SKAITINĖ LYGYBĖ") {
-                    final_results.push(result[5])  
-                } else if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
-                    final_results.push(result[4])  
-                }
-                final_results.push(result[5])
-                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1]))
-            } else if (result[0] === "DAUGYBA") {
-                final_results.push(result[1])
-                if (result[1] === "DAUGYBOS LENTELĖ") {
-                final_results.push(`NUO ${result[6][0]} IKI ${result[6][1]}`)
-                }
-                final_results.push(result[3])
-                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
-                    final_results.push(result[5])    
-                }
-                final_results.push(result[5])
-                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1]))    
-            } else if (result[0] === "DALYBA" || result[0] === "DAUGYBA IR DALYBA") {
-                final_results.push(result[1])
-                if (result[1] === "DAUGYBOS LENTELĖ") {
-                final_results.push(`NUO ${result[6][0]} IKI ${result[6][1]}`)
-                }
-                final_results.push(result[7])
-                final_results.push(result[3])
-                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
-                    final_results.push(result[4])    
-                }
-                final_results.push(result[5])
-                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1]))    
-            } else if (result[0] === "ĮVAIRŪS VEIKSMAI") {
-                final_results.push(result[1])
-                final_results.push(result[3])
-                if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
-                    final_results.push(result[4])    
-                }
-                final_results.push(result[5]) 
-                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1]))       
-            }
-        } else if (values[0] === "lang") {
-            result.push(parameterDictionary[values[1]]["decodedParameterText"])
-            result.push(parameterDictionary[values[2]]["decodedParameterText"])
-            
-            result.push(parameterDictionary[values[3]]["decodedParameterText"])  
-
-            console.log(result)
-            if (values[3]  === "C50") {
-                let outerLiItem = document.createElement('li');
-                outerLiItem.textContent = "RAŠYBOS NUSTATYMAI:"; // Add a label for the outer <li>
-
-                let grammarParamsList = document.createElement('ul');
-                grammarParamsList.classList.add('grammar-params-list');
-                
-                Object.keys(values[4]).forEach(key => {
-                    let listItem = document.createElement('li');
-                    listItem.innerHTML = parameterDictionary[key]["decodedParameterText"]; // Use innerHTML instead of textContent
-                    grammarParamsList.appendChild(listItem);
-                });
-
-                outerLiItem.appendChild(grammarParamsList);
-
-
-                // Store as an HTML string
-                result.push(outerLiItem.outerHTML);
-
-                result.push(parameterDictionary[values[5]]["decodedParameterText"])
-
-                if (values[6] === 1) {
-                    result.push("DAŽNESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
-                } else {
-                    result.push("RETESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
-                }
-            }
-
-            final_results.push(result[0])
-            final_results.push(result[1])
-            if (result[0] === "TEKSTO SUPRATIMAS") {
-                console.log("forTeacher", forTeacher)
-                if (forTeacher) {
-                    result.push(parameterDictionary[values[5]]["decodedParameterText"])
-                    result.push(parameterDictionary[values[6]]["decodedParameterText"])
-
-                    final_results.push(parameterDictionary[values[5]]["decodedParameterText"])
-                    final_results.push(parameterDictionary[values[6]]["decodedParameterText"])
-                }
-
-                console.log(currentTaskDuration)
-                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1])) 
-                console.log(final_results)
-            } else if (result[1] === "GRAMATIKA") {
-                final_results.push(result[2])
-                if (result[2] === "RAŠYBA") {
-                    final_results.push(result[3])
-                }
-
-                if (result[0] === "3-4 KLASĖ") {
-                    if ("C62" in values[4] || "C63" in values[4] || "C64" in values[4] || "C65" in values[4]) {
-                            final_results.push(result[4])
-                        } 
-                    } else {
-                        final_results.push(result[5])
-                    }
-                final_results.push(determineQuestionNumberTimeLabelEnding(currentTaskDuration[0], currentTaskDuration[1])) 
-            }
-        }
-            return final_results;
-        }
-
         function toggleStudentListLabel() {
             showingSelectAllCheckbox = !showingSelectAllCheckbox
             const dropdown = document.getElementById("task-group-sorting");
@@ -4106,7 +3911,6 @@ let studentStatisticsLastRecord;
         // Event listener to update when changed
         knowledgeSelect.addEventListener("change", async (e) => {
             const newValue = parseInt(e.target.value, 10);
-            console.log(student)
             if (newValue !== student[2]) {
                 try {
                     const response = await apiFetch(apiBase + `students/knowledge-level`, {
@@ -4991,7 +4795,7 @@ let studentStatisticsLastRecord;
             currentTaskDuration = JSON.parse(task.duration);
 
             const parsedTaskDescription = JSON.parse(currentTaskInstructions);
-            const formattedTaskDescription = getOptionTextFromValues(parsedTaskDescription, forTeacher=true);
+            const formattedTaskDescription = getOptionTextFromValues(parsedTaskDescription, currentTaskDuration, forTeacher=true);
             studentTaskStudentName.innerHTML = `
                 <span class="student-name-id-holder"><span id="student-name">${student[1]}</span><span id='student-id'>(ID: ${student[0]})</span></span>
                 <button class="edit-name-button" onclick="editStudentName('${student[0]}', this)">
@@ -5119,7 +4923,7 @@ let studentStatisticsLastRecord;
 
         }
 
-        function displayStudentTaskInfo(task) {
+        async function displayStudentTaskInfo(task) {
             clearTaskInfoContainerForStudents()
             document.querySelector('.task-info-holder-student').style.display = "flex";
             currentTaskId = task.assignmentId
@@ -5128,7 +4932,7 @@ let studentStatisticsLastRecord;
 
             currentTaskDuration = JSON.parse(task.duration);
 
-            const formattedTaskDescription = getOptionTextFromValues(parsedTaskDescription);
+            const formattedTaskDescription = getOptionTextFromValues(parsedTaskDescription, currentTaskDuration);
 
             studentTaskGroupForStudent.innerHTML = `Užduotis: ${task.group}`;
 
@@ -5150,7 +4954,12 @@ let studentStatisticsLastRecord;
                 answeringMode = currentTaskDuration[0]
                 numberOfQuestions = currentTaskDuration[1]
 
+                let potentialEarnings;
                 if (answeringMode === "C39" || parsedTaskDescription[2] === "C83") {
+                    potentialEarnings = await calculateTasksPerCorrectAnswerPoints(JSON.parse(task.taskInstructions));
+                    if (potentialEarnings) {
+                        potentialEarnings = Number(potentialEarnings.toFixed(2))
+                    }
                     earningsDiplay = `
                         <div class="earnings-estimation-outer">
                             <button class="earnings-estimation-display info-button"
@@ -5163,7 +4972,7 @@ let studentStatisticsLastRecord;
                                     <span class="coin-icon">
                                             <img src="../images/icons/icon-sudedu-coin.png">
                                     </span>
-                                    <span class="coin-amount">${Number((calculateTasksPerCorrectAnswerPoints(task.taskInstructions)).toFixed(2))}</span>
+                                    <span class="coin-amount">${potentialEarnings}</span>
                                     </span>
                                     <div 
                                         class="info-icon"
@@ -5180,6 +4989,18 @@ let studentStatisticsLastRecord;
                         </div>
                         `
                 } else if (answeringMode === "C40") {
+                    let parsedTaskInfo = JSON.parse(task.taskInstructions)
+                    if (parsedTaskInfo[0] === "lang" && parsedTaskInfo[1] === "C49" && parsedTaskInfo[4] === "C84") {
+                        potentialEarnings = await calculateTasksPerCorrectAnswerPoints("selectedTexts", selectedTextInfo=[parsedTaskInfo,numberOfQuestions]);
+                        if (potentialEarnings) {
+                            potentialEarnings = Number(potentialEarnings.toFixed(2))
+                        }
+                    } else {
+                        potentialEarnings = await calculateTasksPerCorrectAnswerPoints(JSON.parse(task.taskInstructions));
+                        if (potentialEarnings) {
+                            potentialEarnings = Number((potentialEarnings * numberOfQuestions).toFixed(2))
+                        }
+                    }
                     earningsDiplay = `
                         <div class="earnings-estimation-outer">
                             <button class="earnings-estimation-display info-button"
@@ -5192,7 +5013,7 @@ let studentStatisticsLastRecord;
                                     <span class="coin-icon">
                                             <img src="../images/icons/icon-sudedu-coin.png">
                                     </span>
-                                    <span class="coin-amount">${Number((calculateTasksPerCorrectAnswerPoints(task.taskInstructions) * numberOfQuestions).toFixed(2))}</span>
+                                    <span class="coin-amount">${potentialEarnings}</span>
                                     </span>
                                     <div 
                                         class="info-icon"
@@ -6013,7 +5834,7 @@ let studentStatisticsLastRecord;
             } else if (modeChoice1 === "C83") {
                 if (modeChoice2 === "C50") {
                     task = [
-                        mode, classChoiceSelection, modeChoice1, modeChoice2, modeChoice3,
+                        mode, modeChoice1, modeChoice2, classChoiceSelection, modeChoice3,
                         modeChoice5, questionFrequency
                     ];
                     taskDuration = [modeChoice4, durationType]
@@ -6130,11 +5951,11 @@ console.log(parsedCurrentTaskInstructions)
                     controller.taskCompleted = false;
                     controller.taskRecorded = false;
 
-                } else if (parsedCurrentTaskInstructions[2] === "C83") {
-                    if (parsedCurrentTaskInstructions[3] === "C50") {
-                        controller.classChoice = parsedCurrentTaskInstructions[1];
-                        controller.modeChoice1 = parsedCurrentTaskInstructions[2];
-                        controller.modeChoice2 = parsedCurrentTaskInstructions[3];
+                } else if (parsedCurrentTaskInstructions[1] === "C83") {
+                    if (parsedCurrentTaskInstructions[2] === "C50") {
+                        controller.modeChoice1 = parsedCurrentTaskInstructions[1];
+                        controller.modeChoice2 = parsedCurrentTaskInstructions[2];
+                        controller.classChoice = parsedCurrentTaskInstructions[3];
                         controller.modeChoice3 = parsedCurrentTaskInstructions[4];
                         controller.modeChoice5 = parsedCurrentTaskInstructions[5];
                         controller.questionFrequency = parsedCurrentTaskInstructions[6];
@@ -6154,11 +5975,11 @@ console.log(parsedCurrentTaskInstructions)
     }
 
     if (userData) {
-                    console.log(userData.accType)
-
         if (userData.accType === 'teacher') {
             teacherGUI.style.display = 'flex';
             fetchDataForTeachers();
+            initTxtViewer();
+            window.openTextBrowser = openTextBrowser;
         } else if (userData.accType === 'student') {
             studentGUI.style.display = 'flex';
             fetchDataForStudents();
@@ -6661,361 +6482,207 @@ window.addEventListener('resize', addHideScrollbarForTouch);
 
 
 // TEXT VIEWER START
-        // Global variables
-        let prefilteredTexts = [];
-        let allTexts = [];
-        let selectedIds = [];
-        let isSelectionModeEnabled = false;
-        let expandedTextIds = new Set();
-        let isMainBrowserExpanded = false;
+// Global variables
+let prefilteredTexts = [];
+let allTexts = [];
+let selectedIds = [];
+let isSelectionModeEnabled = false;
+let expandedTextIds = new Set();
+let isMainBrowserExpanded = false;
 
-        async function initTxtViewer() {
-            try {
-                const response = await fetch('../databases/sudedu_duomenu_baze.json');
-                prefilteredTexts = await response.json();
+// Cache for pre-processed search data
+let textSearchCache = new Map();
 
-                // Apply initial filtering
-                refilterTexts();
+// Debounce timer
+let searchDebounceTimer = null;
 
-                // Attach listeners once
-                document.getElementById('searchInput').addEventListener('input', applyFilters);
-                document.getElementById('mainBrowserHeader').addEventListener('click', () => toggleMainBrowser(false));
-                document.getElementById('allFiltersHeader').addEventListener('click', () => toggleAllFilters(false));
+async function initTxtViewer() {
+    try {
+        const response = await fetch('../databases/sudedu_duomenu_baze.json');
+        prefilteredTexts = await response.json();
 
-                // Dropdown change triggers re-filtering only
-                document.getElementById('mode_choice_9').addEventListener('change', () => {
-                    refilterTexts();
-                    applyFilters();
-                });
+        // Apply initial filtering
+        refilterTexts();
 
-                updateSelectionModeVisibility();
+        // Attach listeners with debouncing for search
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
                 applyFilters();
+            }, 150); // 150ms debounce
+        });
 
-            } catch (err) {
-                console.error('Error loading texts:', err);
-                document.getElementById('textsList').innerHTML =
-                    '<div class="txt-viewer-no-results">Klaida įkeliant tekstus</div>';
-            }
-        }
+        document.getElementById('mainBrowserHeader').addEventListener('click', () => toggleMainBrowser(false));
+        document.getElementById('allFiltersHeader').addEventListener('click', () => toggleAllFilters(false));
 
-        function refilterTexts() {
-            if (!prefilteredTexts.length) return;
-
-            if (isSelectionModeEnabled) {
-                const mode = document.getElementById('mode_choice_9').value;
-
-                allTexts = prefilteredTexts.filter(entry => {
-                    const s = entry['suitable-for'];
-                    if (!s) return false;
-                    if (mode === 'C51') return s.komponavimas;
-                    if (mode === 'C52') return s.struktura;
-                    return false;
-                });
-
-            } else {
-                allTexts = prefilteredTexts.filter(entry => {
-                    const s = entry['suitable-for'];
-                    return s && (s.komponavimas || s.struktura);
-                });
-            }
-
-            selectedIds = [];
-            updateSelectionModeVisibility();
-            updateSelectedIdsDisplay();
+        // Dropdown change triggers re-filtering only
+        document.getElementById('mode_choice_9').addEventListener('change', () => {
+            refilterTexts();
             applyFilters();
-        }
-
-function toggleMainBrowser(closeMainBrowser=false) {
-    const content = document.getElementById('mainBrowserContent');
-    const icon = document.getElementById('mainBrowserIcon');
-    const viewer = document.querySelector(".txt-viewer-container");
-    isMainBrowserExpanded = !isMainBrowserExpanded;
-
-    if (isMainBrowserExpanded && !closeMainBrowser) {
-        viewer.style.height = `${parseFloat(getComputedStyle(document.querySelector('.left-side-bar')).height)}px`;
-        
-        // Measure height first
-        content.style.display = 'block';
-        content.style.height = 'auto';
-        const height = content.offsetHeight;
-        content.style.height = '0px';
-        
-        // Trigger animation
-        requestAnimationFrame(() => {
-            content.classList.add('expanded');
-            content.style.height = height + 'px';
-            icon.classList.remove('collapsed');
         });
-        
-        // Scroll to bottom when expanded
-        content.addEventListener('transitionend', () => {
-            if (isMainBrowserExpanded) {
-                content.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            }
-        }, { once: true });
-        
-    } else {
-        // Set current height explicitly
-        content.style.height = content.scrollHeight + 'px';
-        icon.classList.add('collapsed');
-        
-        // Next frame, animate to 0
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                content.classList.remove('expanded');
-                content.style.height = '0px';
-            });
-        });
-        
-        content.addEventListener('transitionend', () => {
-            if (!isMainBrowserExpanded) {
-                content.style.display = 'none';
-            }
-        }, { once: true });
-        
-        viewer.style.height = '';
+
+        updateSelectionModeVisibility();
+        applyFilters();
+
+    } catch (err) {
+        console.error('Error loading texts:', err);
+        document.getElementById('textsList').innerHTML =
+            '<div class="txt-viewer-no-results">Klaida įkeliant tekstus</div>';
     }
 }
 
+function refilterTexts() {
+    if (!prefilteredTexts.length) return;
 
-        function toggleAllFilters(closeFilters=false) {
-            const content = document.getElementById('allFiltersContent');
-            const icon = document.getElementById('allFiltersIcon');
-            const mainBrowser = document.getElementById('mainBrowserContent');
-            const isExpanding = content.classList.contains('txt-viewer-collapsed');
-            
-            if (closeFilters) {
-                if (!content.classList.contains('txt-viewer-collapsed')) {
-                    content.classList.add('txt-viewer-collapsed');
-                    icon.classList.add('txt-viewer-collapsed');
-                } 
-            } else {
-                content.classList.toggle('txt-viewer-collapsed');
-                icon.classList.toggle('txt-viewer-collapsed');
-            }
-            
-            if (isExpanding) {
-                content.addEventListener('transitionend', () => {
-                    mainBrowser.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                }, { once: true });
-            }
+    if (isSelectionModeEnabled) {
+        const mode = document.getElementById('mode_choice_9').value;
+
+        allTexts = prefilteredTexts.filter(entry => {
+            const s = entry['suitable-for'];
+            if (!s) return false;
+            if (mode === 'C51') return s.komponavimas;
+            if (mode === 'C52') return s.struktura;
+            return false;
+        });
+
+    } else {
+        allTexts = prefilteredTexts.filter(entry => {
+            const s = entry['suitable-for'];
+            return s && (s.komponavimas || s.struktura);
+        });
+    }
+
+    // Rebuild search cache when allTexts changes
+    buildSearchCache();
+
+    selectedIds = [];
+    updateSelectionModeVisibility();
+    updateSelectedIdsDisplay();
+    applyFilters();
+}
+
+// Pre-build searchable text for each item
+function buildSearchCache() {
+    textSearchCache.clear();
+    
+    allTexts.forEach(text => {
+        const searchableText = [
+            text.id.toString(),
+            text.title,
+            text.author,
+            ...text.text.start,
+            ...text.text.middle,
+            ...text.text.end,
+            ...text.text.distractor
+        ].join(' ').toLowerCase();
+        
+        textSearchCache.set(text.id, searchableText);
+    });
+}
+
+function applyFilters() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+
+    // Check if search term is only a number
+    const isNumericSearch = /^\d+$/.test(searchTerm);
+
+    // Cache DOM queries
+    const classFilters = {
+        '1_2_klase': document.getElementById('class_1_2').checked,
+        '3_4_klase': document.getElementById('class_3_4').checked
+    };
+
+    const taskTypes = {
+        struktura: document.getElementById('task_struktura').checked,
+        komponavimas: document.getElementById('task_komponavimas').checked
+    };
+
+    const difficulties = {
+        lengvas: document.getElementById('diff_lengvas').checked,
+        vidutinis: document.getElementById('diff_vidutinis').checked,
+        sunkus: document.getElementById('diff_sunkus').checked
+    };
+
+    const filteredTexts = allTexts.filter(text => {
+        // If numeric search, match ID exactly - early exit
+        if (isNumericSearch) {
+            return text.id.toString() === searchTerm;
         }
 
-        function updateSelectionModeVisibility() {
-            const container = document.getElementById('selectedIdsContainer');
-            if (isSelectionModeEnabled) {
-                container.classList.add('txt-viewer-visible');
-                updateSelectedIdsDisplay();
-            } else {
-                container.classList.remove('txt-viewer-visible');
-            }
+        const textClass = text['class-choice'][0];
+        if (!classFilters[textClass]) return false;
+
+        const strukturaDiff = text['suitable-for'].struktura;
+        const komponavimasDiff = text['suitable-for'].komponavimas;
+
+        const strukturaMatch = taskTypes.struktura && difficulties[strukturaDiff];
+        const komponavimasMatch = taskTypes.komponavimas && difficulties[komponavimasDiff];
+
+        if (!strukturaMatch && !komponavimasMatch) return false;
+
+        // Use cached searchable text
+        if (searchTerm) {
+            const searchableText = textSearchCache.get(text.id);
+            if (!searchableText || !searchableText.includes(searchTerm)) return false;
         }
 
-        function updateSelectedIdsDisplay() {
-            const list = document.getElementById('selectedIdsList');
-            list.innerHTML = selectedIds.map(id => `
-                <div class="txt-viewer-selected-id-chip" onclick="scrollToText(${id})">
-                    <span>ID: ${id}</span>
-                </div>
-            `).join('');
-        }
+        return true;
+    });
 
-        function removeSelectedId(id) {
-            selectedIds = selectedIds.filter(selectedId => selectedId !== id);
-            const checkbox = document.querySelector(`input[data-text-id="${id}"]`);
-            if (checkbox) checkbox.checked = false;
-            updateSelectionModeVisibility();
-        }
+    renderTexts(filteredTexts);
+}
 
-        function toggleTextSelection(id, checked) {
-            if (checked) {
-                if (!selectedIds.includes(id)) {
-                    selectedIds.push(id);
-                }
-            } else {
-                selectedIds = selectedIds.filter(selectedId => selectedId !== id);
-            }
-            updateSelectionModeVisibility();
-        }
+function renderTexts(texts) {
+    const container = document.getElementById('textsList');
 
-        function scrollToText(id) {
-            const text = allTexts.find(t => t.id === id);
-            if (!text) return;
+    if (texts.length === 0) {
+        container.innerHTML = '<div class="txt-viewer-no-results">Tekstų nerasta</div>';
+        return;
+    }
 
-            const classValue = text['class-choice'][0];
-            
-            if (classValue === '1_2_klase') {
-                document.getElementById('class_1_2').checked = true;
-            } else if (classValue === '3_4_klase') {
-                document.getElementById('class_3_4').checked = true;
-            }
+    // Use DocumentFragment for better performance
+    const fragment = document.createDocumentFragment();
+    const tempDiv = document.createElement('div');
+    
+    // Build HTML string (faster than creating elements one by one)
+    tempDiv.innerHTML = texts.map(text => {
+        const isExpanded = expandedTextIds.has(text.id);
+        const isSelected = selectedIds.includes(text.id);
 
-            document.getElementById('task_struktura').checked = true;
-            document.getElementById('task_komponavimas').checked = true;
-            document.getElementById('diff_lengvas').checked = true;
-            document.getElementById('diff_vidutinis').checked = true;
-            document.getElementById('diff_sunkus').checked = true;
-            document.getElementById('searchInput').value = '';
-
-            applyFilters();
-
-            setTimeout(() => {
-                const element = document.getElementById(`text-item-${id}`);
-                if (element) {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    
-                    if (!expandedTextIds.has(id)) {
-                        toggleTextExpand(id);
-                    }
-
-                    element.style.boxShadow = '0 0 0 3px #1976d2';
-                    setTimeout(() => {
-                        element.style.boxShadow = '';
-                    }, 2000);
-                }
-            }, 100);
-        }
-
-        // Public function to open browser and navigate to text
-        function openTextBrowser(textId) {
-            // Open main browser if closed
-            if (!isMainBrowserExpanded) {
-                toggleMainBrowser();
-            }
-
-            // Wait for browser to expand, then navigate
-            setTimeout(() => {
-                document.getElementById('searchInput').value = textId.toString();
-                applyFilters();
-
-                setTimeout(() => {
-                    const element = document.getElementById(`text-item-${textId}`);
-                    if (element) {
-                        if (!expandedTextIds.has(textId)) {
-                            toggleTextExpand(textId);
-                        }
-
-                        setTimeout(() => {
-                            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            
-                            // Scroll parent to bottom of text browser
-                            setTimeout(() => {
-                                const browserWrapper = document.querySelector('.txt-browser-wrapper');
-                                const rect = browserWrapper.getBoundingClientRect();
-                                window.scrollTo({
-                                    top: window.scrollY + rect.bottom - window.innerHeight,
-                                    behavior: 'smooth'
-                                });
-                            }, 400);
-
-                            element.style.boxShadow = '0 0 0 3px #1976d2';
-                            setTimeout(() => {
-                                element.style.boxShadow = '';
-                            }, 2000);
-                        }, 100);
-                    }
-                }, 100);
-            }, 300);
-        }
-
-        function applyFilters() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-
-            // Check if search term is only a number
-            const isNumericSearch = /^\d+$/.test(searchTerm);
-
-            const classFilters = {
-                '1_2_klase': document.getElementById('class_1_2').checked,
-                '3_4_klase': document.getElementById('class_3_4').checked
-            };
-
-            const taskTypes = {
-                struktura: document.getElementById('task_struktura').checked,
-                komponavimas: document.getElementById('task_komponavimas').checked
-            };
-
-            const difficulties = {
-                lengvas: document.getElementById('diff_lengvas').checked,
-                vidutinis: document.getElementById('diff_vidutinis').checked,
-                sunkus: document.getElementById('diff_sunkus').checked
-            };
-
-            const filteredTexts = allTexts.filter(text => {
-                // If numeric search, match ID exactly
-                if (isNumericSearch) {
-                    return text.id.toString() === searchTerm;
-                }
-
-                const textClass = text['class-choice'][0];
-                if (!classFilters[textClass]) return false;
-
-                const strukturaDiff = text['suitable-for'].struktura;
-                const komponavimasDiff = text['suitable-for'].komponavimas;
-
-                const strukturaMatch = taskTypes.struktura && difficulties[strukturaDiff];
-                const komponavimasMatch = taskTypes.komponavimas && difficulties[komponavimasDiff];
-
-                if (!strukturaMatch && !komponavimasMatch) return false;
-
-                if (searchTerm) {
-                    const searchableText = [
-                        text.id.toString(),
-                        text.title,
-                        text.author,
-                        ...text.text.start,
-                        ...text.text.middle,
-                        ...text.text.end,
-                        ...text.text.distractor
-                    ].join(' ').toLowerCase();
-
-                    if (!searchableText.includes(searchTerm)) return false;
-                }
-
-                return true;
-            });
-
-            renderTexts(filteredTexts);
-        }
-
-        function renderTexts(texts) {
-            const container = document.getElementById('textsList');
-
-            if (texts.length === 0) {
-                container.innerHTML = '<div class="txt-viewer-no-results">Tekstų nerasta</div>';
-                return;
-            }
-
-            container.innerHTML = texts.map(text => {
-                const isExpanded = expandedTextIds.has(text.id);
-                const isSelected = selectedIds.includes(text.id);
-
-                return `
-                    <div class="txt-viewer-text-item ${isExpanded ? 'text-item-expanded' : ''}" id="text-item-${text.id}">
-                        <div class="txt-viewer-text-item-header">
-                            ${isSelectionModeEnabled ? `
-                                <input type="checkbox" class="txt-viewer-text-item-checkbox" data-text-id="${text.id}" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleTextSelection(${text.id}, this.checked)">
-                            ` : ''}
-                            <div class="txt-viewer-text-item-main" onclick="toggleTextExpand(${text.id})">
-                                <div class="txt-viewer-text-item-info">
-                                    <div class="txt-viewer-text-item-id">ID: ${text.id}</div>
-                                    <div class="txt-viewer-text-item-title">${text.title}</div>
-                                </div>
-                                <div class="txt-viewer-text-item-expand-icon ${isExpanded ? 'txt-viewer-expanded' : ''}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor">
-                                <path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"/>
-                                </svg>
-                                </div>
-                            </div>
+        return `
+            <div class="txt-viewer-text-item ${isExpanded ? 'text-item-expanded' : ''}" id="text-item-${text.id}">
+                <div class="txt-viewer-text-item-header">
+                    ${isSelectionModeEnabled ? `
+                        <input type="checkbox" class="txt-viewer-text-item-checkbox" data-text-id="${text.id}" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleTextSelection(${text.id}, this.checked)">
+                    ` : ''}
+                    <div class="txt-viewer-text-item-main" onclick="toggleTextExpand(${text.id})">
+                        <div class="txt-viewer-text-item-info">
+                            <div class="txt-viewer-text-item-id">ID: ${text.id}</div>
+                            <div class="txt-viewer-text-item-title">${text.title}</div>
                         </div>
-                        <div class="hide-scrollbar txt-viewer-text-item-details ${isExpanded ? 'txt-viewer-expanded scroll-indicators' : ''}" id="text-details-${text.id}">
-                            ${renderTextDetails(text)}
+                        <div class="txt-viewer-text-item-expand-icon ${isExpanded ? 'txt-viewer-expanded' : ''}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor">
+                        <path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"/>
+                        </svg>
                         </div>
                     </div>
-                `;
-            }).join('');
-        }
+                </div>
+                <div class="hide-scrollbar txt-viewer-text-item-details ${isExpanded ? 'txt-viewer-expanded scroll-indicators' : ''}" id="text-details-${text.id}">
+                    ${isExpanded ? renderTextDetails(text) : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // Replace all content at once
+    container.innerHTML = '';
+    while (tempDiv.firstChild) {
+        container.appendChild(tempDiv.firstChild);
+    }
+}
 
 function renderTextDetails(text) {
-    // Classes
+    // Classes - cache the replace operations
     const lowerClasses = text['class-choice']
         .filter(cls => cls.startsWith('1') || cls.startsWith('2'))
         .map(cls => cls.replace(/_(?=[^_]+$)/, ' ').replace('_', '-').replace('klase', 'klasė'))
@@ -7035,7 +6702,6 @@ function renderTextDetails(text) {
     let textSections = '';
 
     if (!startEmpty && !middleEmpty && !endEmpty) {
-        // All sections exist → keep separate
         textSections += `
         <div class="text-section">
             <div class="text-section-title">Pradžia</div>
@@ -7050,7 +6716,6 @@ function renderTextDetails(text) {
             ${text.text.end.map(p => `<div class="text-section-paragraph">${p}</div>`).join('')}
         </div>`;
     } else {
-        // Some sections missing → combine non-empty into "Tekstas"
         const combinedText = [
             ...(text.text.start || []),
             ...(text.text.middle || []),
@@ -7067,7 +6732,6 @@ function renderTextDetails(text) {
         }
     }
 
-    // Distractor section
     const distractorSection = (text.text.distractor && text.text.distractor.length > 0)
         ? `<div class="text-section">
                <div class="text-section-title">Distraktorius</div>
@@ -7075,7 +6739,6 @@ function renderTextDetails(text) {
            </div>`
         : '';
 
-    // Build full HTML maintaining "row" structure
     return `
     <div class="text-detail-row">
         <div class="text-detail-content">
@@ -7107,42 +6770,220 @@ function renderTextDetails(text) {
     `;
 }
 
+function toggleMainBrowser(closeMainBrowser=false) {
+    const content = document.getElementById('mainBrowserContent');
+    const icon = document.getElementById('mainBrowserIcon');
+    const viewer = document.querySelector(".txt-viewer-container");
+    isMainBrowserExpanded = !isMainBrowserExpanded;
 
+    if (isMainBrowserExpanded && !closeMainBrowser) {
+        viewer.style.height = `${parseFloat(getComputedStyle(document.querySelector('.left-side-bar')).height)}px`;
+        
+        content.style.display = 'block';
+        content.style.height = 'auto';
+        const height = content.offsetHeight;
+        content.style.height = '0px';
+        
+        requestAnimationFrame(() => {
+            content.classList.add('expanded');
+            content.style.height = height + 'px';
+            icon.classList.remove('collapsed');
+        });
+        
+        content.addEventListener('transitionend', () => {
+            if (isMainBrowserExpanded) {
+                content.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        }, { once: true });
+        
+    } else {
+        content.style.height = content.scrollHeight + 'px';
+        icon.classList.add('collapsed');
+        
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                content.classList.remove('expanded');
+                content.style.height = '0px';
+            });
+        });
+        
+        content.addEventListener('transitionend', () => {
+            if (!isMainBrowserExpanded) {
+                content.style.display = 'none';
+            }
+        }, { once: true });
+        
+        viewer.style.height = '';
+    }
+}
 
-        function toggleTextExpand(id) {
-            if (expandedTextIds.has(id)) {
-                expandedTextIds.delete(id);
-            } else {
-                toggleAllFilters(closeFilters=true);
-                expandedTextIds.add(id);
+function toggleAllFilters(closeFilters=false) {
+    const content = document.getElementById('allFiltersContent');
+    const icon = document.getElementById('allFiltersIcon');
+    const mainBrowser = document.getElementById('mainBrowserContent');
+    const isExpanding = content.classList.contains('txt-viewer-collapsed');
+    
+    if (closeFilters) {
+        if (!content.classList.contains('txt-viewer-collapsed')) {
+            content.classList.add('txt-viewer-collapsed');
+            icon.classList.add('txt-viewer-collapsed');
+        } 
+    } else {
+        content.classList.toggle('txt-viewer-collapsed');
+        icon.classList.toggle('txt-viewer-collapsed');
+    }
+    
+    if (isExpanding) {
+        content.addEventListener('transitionend', () => {
+            mainBrowser.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }, { once: true });
+    }
+}
 
-                setTimeout(() => {
-                    const element = document.getElementById(`text-item-${id}`);
-                    if (element) {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        
-                        if (!expandedTextIds.has(id)) {
-                            toggleTextExpand(id);
-                        }
+function updateSelectionModeVisibility() {
+    const container = document.getElementById('selectedIdsContainer');
+    if (isSelectionModeEnabled) {
+        container.classList.add('txt-viewer-visible');
+        updateSelectedIdsDisplay();
+    } else {
+        container.classList.remove('txt-viewer-visible');
+    }
+}
 
-                        element.style.boxShadow = '0 0 0 3px #286D8A';
-                        setTimeout(() => {
-                            element.style.boxShadow = '';
-                        }, 2000);
-                    }
-                }, 100);
+function updateSelectedIdsDisplay() {
+    const list = document.getElementById('selectedIdsList');
+    list.innerHTML = selectedIds.map(id => `
+        <div class="txt-viewer-selected-id-chip" onclick="scrollToText(${id})">
+            <span>ID: ${id}</span>
+        </div>
+    `).join('');
+}
+
+function removeSelectedId(id) {
+    selectedIds = selectedIds.filter(selectedId => selectedId !== id);
+    const checkbox = document.querySelector(`input[data-text-id="${id}"]`);
+    if (checkbox) checkbox.checked = false;
+    updateSelectionModeVisibility();
+}
+
+function toggleTextSelection(id, checked) {
+    if (checked) {
+        if (!selectedIds.includes(id)) {
+            selectedIds.push(id);
+        }
+    } else {
+        selectedIds = selectedIds.filter(selectedId => selectedId !== id);
+    }
+    updateSelectionModeVisibility();
+}
+
+function scrollToText(id) {
+    const text = allTexts.find(t => t.id === id);
+    if (!text) return;
+
+    const classValue = text['class-choice'][0];
+    
+    if (classValue === '1_2_klase') {
+        document.getElementById('class_1_2').checked = true;
+    } else if (classValue === '3_4_klase') {
+        document.getElementById('class_3_4').checked = true;
+    }
+
+    document.getElementById('task_struktura').checked = true;
+    document.getElementById('task_komponavimas').checked = true;
+    document.getElementById('diff_lengvas').checked = true;
+    document.getElementById('diff_vidutinis').checked = true;
+    document.getElementById('diff_sunkus').checked = true;
+    document.getElementById('searchInput').value = '';
+
+    applyFilters();
+
+    setTimeout(() => {
+        const element = document.getElementById(`text-item-${id}`);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            if (!expandedTextIds.has(id)) {
+                toggleTextExpand(id);
             }
 
-            applyFilters();
+            element.style.boxShadow = '0 0 0 3px #1976d2';
+            setTimeout(() => {
+                element.style.boxShadow = '';
+            }, 2000);
         }
+    }, 100);
+}
 
-        // Make openTextBrowser globally accessible
-        window.openTextBrowser = openTextBrowser;
+function openTextBrowser(textId) {
+    if (!isMainBrowserExpanded) {
+        toggleMainBrowser();
+    }
 
-        // Initialize on load
-        initTxtViewer();
-        // TEXT VIEWER END
+    setTimeout(() => {
+        document.getElementById('searchInput').value = textId.toString();
+        applyFilters();
 
+        setTimeout(() => {
+            const element = document.getElementById(`text-item-${textId}`);
+            if (element) {
+                if (!element.classList.contains("text-item-expanded")) {
+                    setTimeout(() => {
+                        if (!expandedTextIds.has(textId)) {
+                            const rerenderedElement = document.querySelector(`#text-item-${textId} .txt-viewer-text-item-main:not(.text-item-expanded)`);
+                            if (rerenderedElement) {
+                                rerenderedElement.click();
+                            }
+                        }
+                    }, 100);
+                } else {
+                    setTimeout(() => {
+                        const element = document.getElementById(`text-item-${textId}`);
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            
+                            if (!expandedTextIds.has(textId)) {
+                                toggleTextExpand(textId);
+                            }
+
+                            element.style.boxShadow = '0 0 0 3px #286D8A';
+                            setTimeout(() => {
+                                element.style.boxShadow = '';
+                            }, 2000);
+                        }
+                    }, 100);
+                }
+            }
+        }, 100);
+    }, 300);
+}
+
+function toggleTextExpand(id) {
+    if (expandedTextIds.has(id)) {
+        expandedTextIds.delete(id);
+    } else {
+        toggleAllFilters(true);
+        expandedTextIds.add(id);
+
+        setTimeout(() => {
+            const element = document.getElementById(`text-item-${id}`);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                if (!expandedTextIds.has(id)) {
+                    toggleTextExpand(id);
+                }
+
+                element.style.boxShadow = '0 0 0 3px #286D8A';
+                setTimeout(() => {
+                    element.style.boxShadow = '';
+                }, 2000);
+            }
+        }, 100);
+    }
+
+    applyFilters();
+}
 
 	</script>
 </body>

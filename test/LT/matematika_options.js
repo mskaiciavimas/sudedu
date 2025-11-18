@@ -722,63 +722,97 @@ function setLabelEndingForQuestionNumber () {
 	}
 }
 }
+// Configuration
+const HOLD_CONFIG = {
+    initialSpeed: 200,
+    minSpeed: 50,
+    speedMultiplier: 0.9,
+    initialDelay: 300,
+    vibration: true,
+    vibrationDuration: 10 // milliseconds
+};
+
+// Shared state for hold operations
 let holdInterval = null;
 let holdTimeout = null;
-let holdSpeed = 200; // Initial speed in ms
-const minSpeed = 50; // Fastest speed in ms
-const speedIncrease = 0.9; // Multiplier to speed up (lower = faster)
+let currentSpeed = HOLD_CONFIG.initialSpeed;
 
-function incrementValue(inputId, min, max) {
+// Value change functions
+function incrementValue(inputId, min, max, shouldVibrate = false) {
     const input = document.getElementById(inputId);
     let value = parseInt(input.value) || min;
     if (value < max) {
         input.value = value + 1;
+        if (shouldVibrate) {
+            triggerVibration();
+        }
     }
-    setLabelEndingForDuration();
-    setLabelEndingForQuestionNumber();
+    updateLabels();
 }
 
-function decrementValue(inputId, min, max) {
+function decrementValue(inputId, min, max, shouldVibrate = false) {
     const input = document.getElementById(inputId);
     let value = parseInt(input.value) || min;
     if (value > min) {
         input.value = value - 1;
+        if (shouldVibrate) {
+            triggerVibration();
+        }
     }
-    setLabelEndingForDuration();
-    setLabelEndingForQuestionNumber();
+    updateLabels();
 }
 
+function triggerVibration() {
+    if (HOLD_CONFIG.vibration && navigator.vibrate) {
+        navigator.vibrate(HOLD_CONFIG.vibrationDuration);
+    }
+}
+
+function updateLabels() {
+    if (typeof setLabelEndingForDuration === 'function') {
+        setLabelEndingForDuration();
+    }
+    if (typeof setLabelEndingForQuestionNumber === 'function') {
+        setLabelEndingForQuestionNumber();
+    }
+}
+
+// Hold button logic with acceleration
 function startHold(inputId, min, max, isIncrement) {
-    // First immediate action
+    // Immediate first action WITH vibration (single click)
     if (isIncrement) {
-        incrementValue(inputId, min, max);
+        incrementValue(inputId, min, max, true);
     } else {
-        decrementValue(inputId, min, max);
+        decrementValue(inputId, min, max, true);
     }
     
-    holdSpeed = 200; // Reset speed
+    currentSpeed = HOLD_CONFIG.initialSpeed;
     
-    // Wait a bit before starting the interval
+    // Wait before starting continuous changes
     holdTimeout = setTimeout(() => {
         const repeat = () => {
+            // No vibration during hold
             if (isIncrement) {
-                incrementValue(inputId, min, max);
+                incrementValue(inputId, min, max, false);
             } else {
-                decrementValue(inputId, min, max);
+                decrementValue(inputId, min, max, false);
             }
             
-            // Speed up gradually
-            if (holdSpeed > minSpeed) {
-                holdSpeed = Math.max(minSpeed, holdSpeed * speedIncrease);
+            // Accelerate: reduce interval time
+            if (currentSpeed > HOLD_CONFIG.minSpeed) {
+                currentSpeed = Math.max(
+                    HOLD_CONFIG.minSpeed, 
+                    currentSpeed * HOLD_CONFIG.speedMultiplier
+                );
             }
             
-            // Clear and restart with new speed
+            // Restart interval with new speed
             clearInterval(holdInterval);
-            holdInterval = setInterval(repeat, holdSpeed);
+            holdInterval = setInterval(repeat, currentSpeed);
         };
         
-        holdInterval = setInterval(repeat, holdSpeed);
-    }, 300); // Initial delay before repeating
+        holdInterval = setInterval(repeat, currentSpeed);
+    }, HOLD_CONFIG.initialDelay);
 }
 
 function stopHold() {
@@ -786,10 +820,10 @@ function stopHold() {
     clearInterval(holdInterval);
     holdInterval = null;
     holdTimeout = null;
-    holdSpeed = 200;
+    currentSpeed = HOLD_CONFIG.initialSpeed;
 }
 
-// Validate input on change
+// Validate number inputs
 document.querySelectorAll('input[type="number"]').forEach(input => {
     input.addEventListener('change', function() {
         const min = parseInt(this.min);
@@ -801,26 +835,106 @@ document.querySelectorAll('input[type="number"]').forEach(input => {
         } else if (value > max) {
             this.value = max;
         }
-
-        setLabelEndingForDuration();
-        setLabelEndingForQuestionNumber();
+        
+        updateLabels();
     });
 });
 
-
+// Update controller for custom tasks (if not on uzduotys.html)
 if (!window.location.pathname.endsWith('uzduotys.html')) {
-    document.addEventListener("change", function(event) {
-    if (event.target.matches("input[type='checkbox'], select")) {
-        updateControllerCustomTaskChoices();
-    }
+    document.addEventListener('change', function(event) {
+        if (event.target.matches("input[type='checkbox'], select")) {
+            if (typeof updateControllerCustomTaskChoices === 'function') {
+                updateControllerCustomTaskChoices();
+            }
+        }
     });
 
-    document.addEventListener("click", function (event) {
-    if (event.target.classList.contains("control-btn")) {
-        updateControllerCustomTaskChoices();
-    }
+    document.addEventListener('click', function(event) {
+        if (event.target.classList.contains('control-btn')) {
+            if (typeof updateControllerCustomTaskChoices === 'function') {
+                updateControllerCustomTaskChoices();
+            }
+        }
     });
 }
+
+// Setup hold button with acceleration
+function setupHoldButton(buttonSelector, inputId, min, max, increment = true) {
+    const button = document.querySelector(buttonSelector);
+    if (!button) return;
+
+    let localInterval = null;
+    let localTimeout = null;
+    let localSpeed = HOLD_CONFIG.initialSpeed;
+
+    const changeValue = () => {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+
+        let val = parseInt(input.value) || 0;
+        val = increment ? Math.min(val + 1, max) : Math.max(val - 1, min);
+        input.value = val;
+
+        updateLabels();
+        
+        if (typeof displayCustomTaskPotentialEarnings === 'function') {
+            displayCustomTaskPotentialEarnings();
+        }
+    };
+
+    const startHoldLocal = (e) => {
+        e.preventDefault();
+        
+        changeValue(); // Immediate first change
+        triggerVibration(); // Vibrate only on initial click
+        localSpeed = HOLD_CONFIG.initialSpeed;
+        
+        localTimeout = setTimeout(() => {
+            const repeat = () => {
+                changeValue(); // No vibration during hold
+                
+                // Accelerate
+                if (localSpeed > HOLD_CONFIG.minSpeed) {
+                    localSpeed = Math.max(
+                        HOLD_CONFIG.minSpeed,
+                        localSpeed * HOLD_CONFIG.speedMultiplier
+                    );
+                }
+                
+                // Restart with new speed
+                clearInterval(localInterval);
+                localInterval = setInterval(repeat, localSpeed);
+            };
+            
+            localInterval = setInterval(repeat, localSpeed);
+        }, HOLD_CONFIG.initialDelay);
+    };
+
+    const stopHoldLocal = () => {
+        clearTimeout(localTimeout);
+        clearInterval(localInterval);
+        localInterval = null;
+        localTimeout = null;
+        localSpeed = HOLD_CONFIG.initialSpeed;
+    };
+
+    // Mouse events
+    button.addEventListener('mousedown', startHoldLocal);
+    button.addEventListener('mouseup', stopHoldLocal);
+    button.addEventListener('mouseleave', stopHoldLocal);
+    
+    // Touch events
+    button.addEventListener('touchstart', startHoldLocal);
+    button.addEventListener('touchend', stopHoldLocal);
+    button.addEventListener('touchcancel', stopHoldLocal);
+}
+
+// Initialize hold buttons
+setupHoldButton('.timer-minus', 'timer-input', 1, 60, false);
+setupHoldButton('.timer-plus', 'timer-input', 1, 60, true);
+setupHoldButton('.question-minus', 'question-number-input', 1, 200, false);
+setupHoldButton('.question-plus', 'question-number-input', 1, 200, true);
 
 
 function updateControllerCustomTaskChoices () {
@@ -877,30 +991,20 @@ function updateControllerCustomTaskChoices () {
         modeChoice9Selection = modeChoice9Element.value;
         modeChoice12Selection = modeChoice12Element.value;
         modeChoice13Selection = modeChoice13Element.value;
+        modeChoice14Selection = modeChoice14Element.value;
         classChoiceSelection = classChoiceElement.value;
 
         controller.classChoice = classChoiceSelection;
-        if (modeChoice8Selection === "C49") {
-            controller.modeChoice1 = "C49";
-        } else if (modeChoice8Selection === "C83") {
-            controller.modeChoice1 = "C83";
-        }
 
-        if (modeChoice9Selection === "C53") {
-            controller.modeChoice2 = "1";
-        } else if (modeChoice9Selection === "C54") {
-            controller.modeChoice2 = "2";
-        } else if (modeChoice9Selection === "C55") {
-            controller.modeChoice2 = "3";
-        } else if (modeChoice9Selection === "C56") {
-            controller.modeChoice2 = "4";
-        } else if (modeChoice9Selection === "C57") {
-            controller.modeChoice2 = "5";
-        } else {
-            controller.modeChoice2 = modeChoice9Selection;
-        }
+        controller.modeChoice1 = modeChoice8Selection
+       
+        controller.modeChoice2 = modeChoice9Selection;
+        
         controller.modeChoice3 = getSelectedRasybaConditions();
         controller.modeChoice5 = modeChoice12Selection;
+
+        controller.modeChoice6 = modeChoice14Selection;
+
         controller.result = ['', '', '', '', ''];
         controller.modeChoiceLtDifficulty = document.getElementById('mode_choice_10').value;
         if (controller.classChoice === "C75") {
