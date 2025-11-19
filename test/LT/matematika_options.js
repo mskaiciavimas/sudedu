@@ -26,10 +26,10 @@ let modeChoice13Element = document.querySelector('#mode_choice_13');
 let modeChoice14Element = document.querySelector('#mode_choice_14');
 let rasybaOptionsLabelTextGaluneElement = document.querySelector('#rasyba-options-label-text-galune');
 
-const isTeacher = window.location.pathname === "/LT/uzduotys.html" && userData && userData.accType === "teacher"
+const isTeacher = userData && userData.accType === "teacher"
 let modeChoice15Element = null;
 
-if (isTeacher) {
+if (isTeacher && window.location.pathname.includes("uzduotys.html")) {
     modeChoice15Element = document.querySelector('#mode_choice_15');
 }
 
