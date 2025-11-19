@@ -704,17 +704,80 @@
         }
 
         .shop-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-        }
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+}
+
+.shop-header.compact .collapsible-content {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    margin-bottom: 0;
+}
+
+.shop-header.compact .header-main {
+    padding: 12px 20px;
+}
+
+.header-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    transition: padding 0.3s ease;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.expand-toggle {
+    background: rgba(50, 172, 147, 0.2);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    padding: 0;
+    margin: 0;
+}
+
+.expand-toggle:hover {
+    background: rgba(50, 172, 147, 0.3);
+    transform: scale(1.1);
+}
+
+.expand-toggle svg {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+}
+
+.shop-header.compact .expand-toggle svg {
+    transform: rotate(180deg);
+}
+
+.collapsible-content {
+    max-height: 500px;
+    overflow: hidden;
+    opacity: 1;
+    transition: max-height 0.3s ease, opacity 0.3s ease, margin-bottom 0.3s ease;
+    padding: 0 30px 20px;
+}
 
         .shop-header h2 {
             color: #212529;
@@ -813,6 +876,11 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1.5rem;
+        }
+
+        .shop-items {
+            height: 100%;
+            overflow-y: auto;
         }
  
         .food-options-container {
@@ -916,6 +984,7 @@
             justify-content: space-between;
             display: flex;
             flex-direction: column;
+            max-height: 320px;
         }
 
         .purchase-btn,
@@ -1078,6 +1147,7 @@
         #taxes-container,
         #pet-asset-container {
             padding: 30px;
+            height: 100%;
         }
 
         .department-btn.active,
@@ -2423,6 +2493,28 @@
     .shop-categories-dropdown select {
         padding: 8px 8px;
     }
+
+     .shop-header.compact .header-main {
+        padding: 10px 15px;
+    }
+    
+    .header-main {
+        padding: 15px 20px;
+    }
+    
+    .collapsible-content {
+        padding: 0 20px 15px;
+    }
+    
+    .expand-toggle {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .expand-toggle svg {
+        width: 18px;
+        height: 18px;
+    }
 }
 
 @media (max-width: 578px) {
@@ -3194,84 +3286,92 @@
             </div>
 
       <div id="shop-container" class="game-content-panel">
-        <div class="shop-header">
-            <h2>Parduotuvė</h2>
+    <div class="shop-header" id="shopHeader">
+        <div class="header-main">
+            <div class="header-left">
+                <button class="expand-toggle" id="expandToggle">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 15l-6-6-6 6"/>
+                    </svg>
+                </button>
+                <h2>Parduotuvė</h2>
+            </div>
             <div class="coin-display">
                 <span class="coin-icon">
-                        <img src="../images/icons/icon-sudedu-coin.png">
+                    <img src="../images/icons/icon-sudedu-coin.png">
                 </span>
                 <span class="coin-amount"></span>
             </div>
         </div>
         
-        <div class="shop-departments">
-            <button class="department-btn">
-                <span class="department-icon">
+        <div class="collapsible-content" id="collapsibleContent">
+            <div class="shop-departments">
+                <button class="department-btn">
                     <span class="department-icon">
-                        <img src="../images/icons/icon-pet-supplies.svg">
+                        <span class="department-icon">
+                            <img src="../images/icons/icon-pet-supplies.svg">
+                        </span>
                     </span>
-                </span>
-                <span class="department-label">Reikmenys</span>
-            </button>
-            
-            <button class="department-btn">
-                <span class="department-icon">
-                    <span class="nav-icon">
-                        <img src="../images/icons/icon-furniture.svg">
+                    <span class="department-label">Reikmenys</span>
+                </button>
+                
+                <button class="department-btn">
+                    <span class="department-icon">
+                        <span class="nav-icon">
+                            <img src="../images/icons/icon-furniture.svg">
+                        </span>
                     </span>
-                </span>
-                <span class="department-label">Baldai</span>
-            </button>
-            <button class="department-btn">
-                <span class="department-icon">
-                    <span class="nav-icon">
-                        <img src="../images/icons/icon-animals.svg">
+                    <span class="department-label">Baldai</span>
+                </button>
+                <button class="department-btn">
+                    <span class="department-icon">
+                        <span class="nav-icon">
+                            <img src="../images/icons/icon-animals.svg">
+                        </span>
                     </span>
-                </span>
-                <span class="department-label">Gyvūnėliai</span>
-            </button>
-            
-        </div>
+                    <span class="department-label">Gyvūnėliai</span>
+                </button>
+            </div>
 
-        <div id="shop-buttons">
-        <!-- Pet list (only shown for Maistas) -->
-        <div id="pet-list-shop" class="pet-list hidden"></div>
+            <div id="shop-buttons">
+                <!-- Pet list (only shown for Maistas) -->
+                <div id="pet-list-shop" class="pet-list hidden"></div>
 
-        <!-- Maistas tabs (only shown for Maistas) -->
-        <div id="pet-supplies-tabs" class="pet-supplies-tabs hidden">
-            <button class="pet-supply-tab active" data-type="supplies">
-                <span class="department-icon">
-                    <img src="../images/icons/icon-pet-food.svg">
-                </span>
-                <span class="tab-label">Maistas</span>
-            </button>
-            <button class="pet-supply-tab" data-type="skins">
-                <span class="department-icon">
-                    <img src="../images/icons/icon-pet-skins.svg">
-                </span>
-                <span class="tab-label">Išvaizda</span>
-            </button>
-        </div>
-        </div>
+                <!-- Maistas tabs (only shown for Maistas) -->
+                <div id="pet-supplies-tabs" class="pet-supplies-tabs hidden">
+                    <button class="pet-supply-tab active" data-type="supplies">
+                        <span class="department-icon">
+                            <img src="../images/icons/icon-pet-food.svg">
+                        </span>
+                        <span class="tab-label">Maistas</span>
+                    </button>
+                    <button class="pet-supply-tab" data-type="skins">
+                        <span class="department-icon">
+                            <img src="../images/icons/icon-pet-skins.svg">
+                        </span>
+                        <span class="tab-label">Išvaizda</span>
+                    </button>
+                </div>
+            </div>
 
-        <div class="shop-categories-dropdown">
             <div class="categories-dropdown-holder">
                 <select id="shop-category-select"></select>
             
-            <div class="shop-not-owned-holder">
-                <label class="switch"><input type="checkbox" id="shop-not-owned-toggle" class="shop-not-owned-toggle">
-                    <span class="switch-slider">
-                        <span class="switch-text switch-text-shop">
-                            NETURIU
+                <div class="shop-not-owned-holder">
+                    <label class="switch"><input type="checkbox" id="shop-not-owned-toggle" class="shop-not-owned-toggle">
+                        <span class="switch-slider">
+                            <span class="switch-text switch-text-shop">
+                                NETURIU
+                            </span>
                         </span>
-                    </span>
-                </label>
+                    </label>
+                </div>
             </div>
-
-            </div>
-            <div class="shop-items" id="shop-items"></div>
         </div>
     </div>
+    
+    <div class="shop-items" id="shop-items"></div>
+</div>
 
     <div id="pet-asset-container" class="game-content-panel">
                 <div class="shop-header">
@@ -3962,8 +4062,8 @@ fetch("gameAssetIndex.json")
         gameAssetIndex = data;      // assign JSON result
         return fetchGameData();     // call your function next
     })
-    .then(() => {
-        initGame();                 // only runs after fetchGameData completes
+    .then(async () => {
+        await initGame();                 // only runs after fetchGameData completes
         fetchMessageGiftsFromServer();
     })
     .catch(error => {
@@ -3971,7 +4071,6 @@ fetch("gameAssetIndex.json")
     });
 
 function parseGameData(dataFromServer) {
-    console.log(dataFromServer)
     userObjectAssets = formatObjectAssets(dataFromServer.objectAssets);
     userPetAssets = parseUserPetAssets(dataFromServer.petAssets);
     userMoney = Number(dataFromServer.money);
@@ -7104,14 +7203,14 @@ function navigationResponsiveLayout() {
 }
 
 // Recalculate on resize
-window.addEventListener("resize", () => {
+window.addEventListener("resize", async () => {
     updateStatsBeforeRerunningInitGameAndRenderPets();
     navigationResponsiveLayout();
     endPreview()
     hideSidebar()
 
     if (document.getElementById("pet-room-container").classList.contains("active")) {
-        initGame();
+        await initGame();
         document.querySelector("#end-preview-button").classList.add("hidden")
         resetEditButtonToggle();
     }
@@ -7696,10 +7795,10 @@ let furniturePreviewDict = {
     }
 }
 
-document.querySelector("#end-preview-button").addEventListener("click", () => {
+document.querySelector("#end-preview-button").addEventListener("click", async () => {
     endPreview();
     updateStatsBeforeRerunningInitGameAndRenderPets();
-    initGame();
+    await initGame();
 });;
 
 function endPreview() {
@@ -7727,7 +7826,7 @@ function endPreview() {
     }
 }
 
-function previewFurniture (key) {
+async function previewFurniture (key) {
     
     let tempDivId = renderTemporaryRoomObject(key);
 
@@ -7743,7 +7842,7 @@ function previewFurniture (key) {
 
     updateStatsBeforeRerunningInitGameAndRenderPets();
     
-    initGame();
+    await initGame();
     const placementMap = generatePlacementMap(tempDivId);
 
     const validPosition = findValidPosition(placementMap, tempDivId);
@@ -7763,6 +7862,7 @@ function previewFurniture (key) {
         document.querySelector("#end-preview-button").classList.remove("hidden")
         document.querySelector("#toggle-edit-save-btn").classList.add("hidden")
         document.querySelector("#cancel-edit-btn").classList.add("hidden")
+        hideSidebar();
 
         centerViewportOnObject("furniture-preview")
 
@@ -8265,7 +8365,7 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
         btn.disabled = false;
 
         //Render Stackable Items
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
             // Create a new instance for stackable items
             const newKey = `O${Object.keys(userObjectAssets).length + 1}`;
             userObjectAssets[newKey] = { assetIndex: parseInt(assetIndex), position: [] };
@@ -8281,7 +8381,7 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
                 navButtons[0].classList.add('active');
     
                 updateStatsBeforeRerunningInitGameAndRenderPets();
-                initGame();
+                await initGame();
             }
 
             userObjectAssets[tempDivId].position = getObjectCoordinates(tempDivId);
@@ -8295,7 +8395,7 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
                 if (!sidebar) {
                     sendObjectAssetsUpdateToDatabase();
                     updateStatsBeforeRerunningInitGameAndRenderPets();
-                    initGame();
+                    await initGame();
                 } else {
                     const tempDiv = document.getElementById(tempDivId)
                     tempDiv.style.left = `calc(${validPosition[0]} * var(--unit-size))`;
@@ -8337,6 +8437,7 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
                     // Delete all instances of this stackable item
                     keys.forEach(key => {
                         removeObjectFromUserAssets(key);
+                        renderShopCategoriesDropdown();
                     });
                 });
             });
@@ -8406,70 +8507,70 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
             btn.disabled = false;
         }
 
-        btn.addEventListener('click', () => {
-                let tempDivId = renderSingleRoomObject(key);
+        btn.addEventListener('click', async () => {
+            let tempDivId = renderSingleRoomObject(key);
 
-                userObjectAssets[tempDivId].position = getObjectCoordinates(tempDivId);
+            userObjectAssets[tempDivId].position = getObjectCoordinates(tempDivId);
 
 
+            if (!sidebar) {
+                document.querySelectorAll('.game-content-panel').forEach(p => p.classList.remove('active'));
+                document.getElementById('pet-room-container').classList.add('active');
+
+                const navButtons = document.querySelectorAll('.nav-item');
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                navButtons[0].classList.add('active');
+                
+                updateStatsBeforeRerunningInitGameAndRenderPets();
+                await initGame();
+            }
+        
+            // Attempt to place the item at a valid position
+            const placementMap = generatePlacementMap(tempDivId);
+            const validPosition = findValidPosition(placementMap, tempDivId);
+
+            if (validPosition) {
+                userObjectAssets[tempDivId].position = validPosition;
                 if (!sidebar) {
-                    document.querySelectorAll('.game-content-panel').forEach(p => p.classList.remove('active'));
-                    document.getElementById('pet-room-container').classList.add('active');
-
-                    const navButtons = document.querySelectorAll('.nav-item');
-                    navButtons.forEach(btn => btn.classList.remove('active'));
-                    navButtons[0].classList.add('active');
-                    
+                    sendObjectAssetsUpdateToDatabase();
                     updateStatsBeforeRerunningInitGameAndRenderPets();
-                    initGame();
-                }
-            
-                // Attempt to place the item at a valid position
-                const placementMap = generatePlacementMap(tempDivId);
-                const validPosition = findValidPosition(placementMap, tempDivId);
-
-                if (validPosition) {
-                    userObjectAssets[tempDivId].position = validPosition;
-                    if (!sidebar) {
-                        sendObjectAssetsUpdateToDatabase();
-                        updateStatsBeforeRerunningInitGameAndRenderPets();
-                        initGame();
-                    } else {
-                        const tempDiv = document.getElementById(tempDivId)
-                        tempDiv.style.left = `calc(${validPosition[0]} * var(--unit-size))`;
-                        tempDiv.style.top = `calc((${validPosition[1] + 1} * var(--unit-size)) - ${tempDiv.offsetHeight}px)`;
-                        enableObjectDragging();
-                    }
-
-                    if (!isObjectVisibleInViewport(tempDivId)) {
-                        centerViewportOnObject(tempDivId)
-                    }
+                    await initGame();
                 } else {
-                    userObjectAssets[tempDivId].position = [];
-                    document.getElementById(tempDivId).remove();
-                    if (gameAssetIndex[userObjectAssets[tempDivId].assetIndex].placingIndex === 13 || 
-                        gameAssetIndex[userObjectAssets[tempDivId].assetIndex]["css-class"].includes("window-sill")) {
-                        messageToTheUser("Nėra tinkamo dydžio lango arba jį užstoja kiti daiktai!");
-                    } else {
-                        messageToTheUser("Nepakanka vietos!");
-                    }
-                    predictAndSetZIndex();
+                    const tempDiv = document.getElementById(tempDivId)
+                    tempDiv.style.left = `calc(${validPosition[0]} * var(--unit-size))`;
+                    tempDiv.style.top = `calc((${validPosition[1] + 1} * var(--unit-size)) - ${tempDiv.offsetHeight}px)`;
+                    enableObjectDragging();
                 }
 
-                itemDiv.classList.add("in-use");
-
-                if (sidebar) {
-                    if (userObjectAssets[tempDivId].position && userObjectAssets[tempDivId].position.length > 0) {
-                        btn.textContent = 'Naudojama';
-                        btn.disabled = true;
-                        btn.className = 'use-btn used';
-                    } else {
-                        btn.textContent = 'Naudoti';
-                        btn.disabled = false;
-                        btn.className = 'use-btn';
-                    }
+                if (!isObjectVisibleInViewport(tempDivId)) {
+                    centerViewportOnObject(tempDivId)
                 }
-            });
+            } else {
+                userObjectAssets[tempDivId].position = [];
+                document.getElementById(tempDivId).remove();
+                if (gameAssetIndex[userObjectAssets[tempDivId].assetIndex].placingIndex === 13 || 
+                    gameAssetIndex[userObjectAssets[tempDivId].assetIndex]["css-class"].includes("window-sill")) {
+                    messageToTheUser("Nėra tinkamo dydžio lango arba jį užstoja kiti daiktai!");
+                } else {
+                    messageToTheUser("Nepakanka vietos!");
+                }
+                predictAndSetZIndex();
+            }
+
+            itemDiv.classList.add("in-use");
+
+            if (sidebar) {
+                if (userObjectAssets[tempDivId].position && userObjectAssets[tempDivId].position.length > 0) {
+                    btn.textContent = 'Naudojama';
+                    btn.disabled = true;
+                    btn.className = 'use-btn used';
+                } else {
+                    btn.textContent = 'Naudoti';
+                    btn.disabled = false;
+                    btn.className = 'use-btn';
+                }
+            }
+        });
 
         if (asset.position && asset.position.length === 0) {
             const itemDeleteBtnHolder = document.createElement('div');
@@ -8530,24 +8631,75 @@ function findValidPosition(placementMap, assetId) {
     const objectHeight = Math.ceil(tempDiv.offsetHeight / unitSize);
 
     const [targetCol, targetRow] = viewportState.closestTile;
-    let closestPosition = null;
-    let minDistance = Infinity;
+    
+    // Valid tile types for rooms
+    const validTypes = new Set([1.0, 2.0, 3.0]);
+    
+    // Helper to check if tile is valid
+    const isValidTile = (x, y) => {
+        if (x < 0 || x >= roomLayout[0].length || y < 0 || y >= roomLayout.length) return false;
+        const tileType = roomLayout[y][x];
+        const type = tileType?.type ?? tileType;
+        return validTypes.has(type);
+    };
+    
+    // Find all tiles in the room containing the target position using flood-fill
+    const roomTiles = new Set();
+    if (isValidTile(targetCol, targetRow)) {
+        const visited = new Set();
+        const queue = [[targetCol, targetRow]];
+        visited.add(`${targetCol},${targetRow}`);
+        
+        while (queue.length > 0) {
+            const [x, y] = queue.shift();
+            roomTiles.add(`${x},${y}`);
+            
+            // Check 4 adjacent cells
+            const neighbors = [[x-1, y], [x+1, y], [x, y-1], [x, y+1]];
+            for (const [nx, ny] of neighbors) {
+                const key = `${nx},${ny}`;
+                if (!visited.has(key) && isValidTile(nx, ny)) {
+                    visited.add(key);
+                    queue.push([nx, ny]);
+                }
+            }
+        }
+    }
+    
+    // Helper to check if object fits at position
+    const checkFit = (row, col) => {
+        for (let y = 0; y < objectHeight; y++) {
+            for (let x = 0; x < objectWidth; x++) {
+                if (!placementMap[row + y] || !placementMap[row + y][col + x]?.canPlace) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+    
+    // Helper to check if position is in the target room
+    const isInTargetRoom = (col, row) => {
+        // Check if any part of the object footprint is in the target room
+        for (let y = 0; y < objectHeight; y++) {
+            for (let x = 0; x < objectWidth; x++) {
+                if (roomTiles.has(`${col + x},${row + y}`)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+    
+    let closestInRoom = null;
+    let closestGlobal = null;
+    let minDistanceInRoom = Infinity;
+    let minDistanceGlobal = Infinity;
 
     // Search placement map for fitting positions
     for (let row = 0; row < placementMap.length; row++) {
         for (let col = 0; col < placementMap[0].length; col++) {
-            let fits = true;
-            for (let y = 0; y < objectHeight; y++) {
-                for (let x = 0; x < objectWidth; x++) {
-                    if (!placementMap[row + y] || !placementMap[row + y][col + x]?.canPlace) {
-                        fits = false;
-                        break;
-                    }
-                }
-                if (!fits) break;
-            }
-            
-            if (fits) {
+            if (checkFit(row, col)) {
                 // Calculate position (bottom-left corner like original)
                 const positionRow = row + objectHeight - 1;
                 const positionCol = col;
@@ -8558,15 +8710,25 @@ function findValidPosition(placementMap, assetId) {
                     Math.pow(positionRow - targetRow, 2)
                 );
                 
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestPosition = [positionCol, positionRow];
+                // Check if in target room
+                if (roomTiles.size > 0 && isInTargetRoom(col, row)) {
+                    if (distance < minDistanceInRoom) {
+                        minDistanceInRoom = distance;
+                        closestInRoom = [positionCol, positionRow];
+                    }
+                }
+                
+                // Track global closest as backup
+                if (distance < minDistanceGlobal) {
+                    minDistanceGlobal = distance;
+                    closestGlobal = [positionCol, positionRow];
                 }
             }
         }
     }
     
-    return closestPosition;
+    // Prefer position in target room, fall back to global closest
+    return closestInRoom || closestGlobal;
 }
 
 
@@ -11505,7 +11667,6 @@ function savePetName(petId, buttonEl) {
 function changePetName(petId, newName) {
   userPetAssets["pets"][petId].name = newName;
   sendPetAssetsUpdateToDatabase();
-  initGame();
 }
 
 
@@ -11599,6 +11760,56 @@ document.querySelectorAll('input.purchase-quantity').forEach(input => {
         else if (value > max) this.value = max;
 
     });
+});
+
+// Shop header collapse functionality
+function initShopHeaderCollapse() {
+    const shopHeader = document.getElementById('shopHeader');
+    const shopItems = document.getElementById('shop-items');
+    const expandToggle = document.getElementById('expandToggle');
+    const scrollableContainer = document.getElementById('shop-items');
+    
+    if (!shopHeader || !shopItems || !expandToggle) return;
+    
+    let lastScrollTop = 0;
+    let isManuallyExpanded = false;
+
+    scrollableContainer.addEventListener('scroll', () => {
+        if (isManuallyExpanded) return; // Don't auto-collapse if manually expanded
+        
+        const scrollTop = shopItems.scrollTop;
+        
+        if (scrollTop > 100 && scrollTop > lastScrollTop) {
+            // Scrolling down
+            shopHeader.classList.add('compact');
+        } else if (scrollTop < 50) {
+            // Near top
+            shopHeader.classList.remove('compact');
+        }
+        
+        lastScrollTop = scrollTop;
+    });
+
+    // Manual toggle
+    expandToggle.addEventListener('click', () => {
+        const isCompact = shopHeader.classList.toggle('compact');
+        isManuallyExpanded = !isCompact;
+        
+        // Reset manual flag after 5 seconds
+        if (isManuallyExpanded) {
+            setTimeout(() => {
+                isManuallyExpanded = false;
+            }, 5000);
+        }
+    });
+}
+
+// Initialize when shop is opened
+document.addEventListener('DOMContentLoaded', () => {
+    // Wait for elements to be ready
+    setTimeout(() => {
+        initShopHeaderCollapse();
+    }, 100);
 });
 
 window.onload = function () {

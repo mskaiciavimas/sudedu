@@ -2735,8 +2735,7 @@ async function displayPersonalChl() {
             let numberOfQuestions = challenge.duration[1];
             let earningsDisplay = "";
 
-
-            if (answeringMode === "C39" || challenge.chl[2] === "C83") {
+            if (answeringMode === "C39" || challenge.chl[1] === "C83") {
                 let potentialEarnings = await calculateTasksPerCorrectAnswerPoints(challenge.chl);
                 if (potentialEarnings) {
                     potentialEarnings = Number((potentialEarnings * personalChlCoinBonusMultiplier).toFixed(2))
