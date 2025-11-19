@@ -1,5 +1,5 @@
 // refresh-token.js
-const apiBase = 'http://localhost:5000/';
+const apiBase = 'https://new-sudedu-server-test.onrender.com/';
 
 // Helper to get login page path dynamically
 function getLoginPage() {

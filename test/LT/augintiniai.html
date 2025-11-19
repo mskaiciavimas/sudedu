@@ -8059,6 +8059,8 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
             btn.className = 'purchase-btn';
             btn.textContent = 'Pirkti';
 
+            
+
             let quantityInput = null;
 
             if (!item.oneOfKind) {
@@ -8127,10 +8129,9 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
             priceAndQuantDiv.appendChild(priceDiv);
             infoDiv.appendChild(priceAndQuantDiv);
 
-            btn.addEventListener('click', async () => {
+            btn.addEventListener('click', () => {
                 const quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
-                await handlePurchase(item, assetIndex, quantity, selectedCategory, btn);
-                renderObjectAssetsDropdown();
+                handlePurchase(item, assetIndex, quantity, selectedCategory, btn);
             });
 
             if (previewButton && !(ownedIndexes.has(assetIndex) && item.oneOfKind)) {
@@ -8177,49 +8178,6 @@ toggle.addEventListener('change', () => {
     if (activeDepartment === 'Maistas' || activeDepartment === 'Reikmenys') dept = 'pet-supplies';
     renderShopItems(selectedCategory, dept, activePetSupplyTab);
 });
-
-function rerenderObjectAssetListIfNoItemsInSelectedCategory(sidebar = false) {
-    // Select correct dropdown
-    const dropdown = sidebar
-        ? document.getElementById('object-sidebar-category-select')
-        : document.getElementById('object-category-select');
-
-    function thereAreItemsInSelectedCategory () {
-        if (!dropdown) return false;
-
-        const selected = dropdown.value;
-
-        if (selected === 'all') {
-            return Object.values(userObjectAssets).some(asset =>
-                asset && asset.assetIndex != null
-            );
-        }
-
-        for (const key in userObjectAssets) {
-            const asset = userObjectAssets[key];
-            if (!asset || asset.assetIndex == null) continue;
-
-            const item = gameAssetIndex[asset.assetIndex];
-            if (!item || !item.category) continue;
-
-            if (item.category.includes(selected)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    if (thereAreItemsInSelectedCategory) {
-        if (sidebar) {
-            renderObjectAssetsDropdown(sidebar=true)
-        } else {
-            renderObjectAssetsDropdown();
-        }
-    }
-}
-
-
 
 function renderObjectAssetsDropdown(sidebar=false) {
     let dropdown;
@@ -8479,9 +8437,8 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
                     // Delete all instances of this stackable item
                     keys.forEach(key => {
                         removeObjectFromUserAssets(key);
+                        renderShopCategoriesDropdown();
                     });
-                    rerenderObjectAssetListIfNoItemsInSelectedCategory();
-                    renderShopCategoriesDropdown();
                 });
             });
 
@@ -8583,7 +8540,6 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
                     tempDiv.style.left = `calc(${validPosition[0]} * var(--unit-size))`;
                     tempDiv.style.top = `calc((${validPosition[1] + 1} * var(--unit-size)) - ${tempDiv.offsetHeight}px)`;
                     enableObjectDragging();
-                    rerenderObjectAssetListIfNoItemsInSelectedCategory(sidebar=true);
                 }
 
                 if (!isObjectVisibleInViewport(tempDivId)) {
