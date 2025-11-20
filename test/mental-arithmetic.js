@@ -33,6 +33,7 @@ let controller = {
   questionsStopped: false
 }
 
+const LONG_TERM_RECORDING_ENABLED = true;
 const PET_STATS_EXPIRATION = 0.0035 // EXPIRE FULLY IN 48 hrs
 
 const animationStepsAndDurationNumberDict = {
@@ -621,6 +622,7 @@ async function sendSetTaskResultsToDatabase() {
       }
 
       if (requestSuccess) {
+        recordTaskToLongTerm();
         clearTimeout(showMessageTimeout);
         if (closer) {
           setTimeout(() => closer(), 0);
@@ -664,8 +666,6 @@ async function sendSetTaskResultsToDatabase() {
           messageToTheUser("An error has occurred. Results were not saved. Please try again later.")
         }
       }
-
-      sendTaskInfoToStatisticsDatabase();
     } else if (controller.task[0] === "weekChl") {
 
       const answered = controller.answeredQuestionTracker || 0;
@@ -738,6 +738,7 @@ async function sendSetTaskResultsToDatabase() {
         [requestSuccess, pointsEarned, coinsEarned] = await updateStudentPointsAndStatistics(coinMultiplier=personalChlCoinBonusMultiplier);
 
         if (requestSuccess) {
+          recordTaskToLongTerm();
           clearTimeout(showMessageTimeout);
           if (closer) {
             setTimeout(() => closer(), 0);
@@ -781,13 +782,12 @@ async function sendSetTaskResultsToDatabase() {
             messageToTheUser("An error has occurred. Results were not saved. Please try again later.")
           }
         }
-
-        sendTaskInfoToStatisticsDatabase();
       }
     } else {
       [requestSuccess, pointsEarned, coinsEarned] = await updateStudentPointsAndStatistics();
 
       if (requestSuccess) {
+        recordTaskToLongTerm();
         clearTimeout(showMessageTimeout);
         if (closer) {
           setTimeout(() => closer(), 0);
@@ -830,7 +830,6 @@ async function sendSetTaskResultsToDatabase() {
           messageToTheUser("An error has occurred. Results were not saved. Please try again later.")
         }
       }
-      sendTaskInfoToStatisticsDatabase();
     }
 
     if (controller.task && controller.task[0] !== "weekChl") {
@@ -2747,6 +2746,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
 
 let timerDisplay = document.querySelector("#timer");
 let timerInterval = 0;
+let elapsedTime = 0;
 
 function startTimer() {
   // Check if start time is stored in local storage
@@ -2763,7 +2763,7 @@ function startTimer() {
 
   function updateTimer() {
     let currentTime = new Date().getTime();
-    let elapsedTime = currentTime - startTime;
+    elapsedTime = currentTime - startTime;
 
     // Calculate hours, minutes, and seconds
     var hours = Math.floor(elapsedTime / 3600000);
@@ -2784,6 +2784,8 @@ function startTimer() {
         }
       }
   }
+
+  
 
   updateTimer();
 
@@ -3136,7 +3138,7 @@ function getOptionTextFromValues(values, taskDuration, forTeacher = false) {
                     outerDiv.classList = "selected-text-task-info-for-teachers-list";
 
                     const htmlItems = taskDuration[1]
-                        .map(id => `<span class="selected-text-task-info-for-teachers-item" id="${id}" onclick="openTextBrowser('${id}')">ID: ${id}</span>`)
+                        .map(id => `<span class="selected-text-task-info-for-teachers-item" id="${id}" onclick="openTextBrowser(${id})">ID: ${id}</span>`)
                         .join(", ");
 
                     outerDiv.innerHTML = htmlItems;
@@ -3188,175 +3190,354 @@ function getOptionTextFromValues(values, taskDuration, forTeacher = false) {
 
 //TASK INFO COLLECTION START
 
-async function sendTaskInfoToStatisticsDatabase() {
-    // Restore controller
+async function recordTaskToLongTerm() {
+  if (!LONG_TERM_RECORDING_ENABLED) {
+    return;
+  }
 
-    return 
+  const recordsList = await controllerToTask();
 
-    if (!controller) {
-        const storedController = localStorage.getItem("controller");
-        if (storedController) {
-            try {
-                controller = JSON.parse(storedController);
-            } catch {
-                controller = {};
+  try {
+    const response = await apiFetch(apiBase + 'students/long-term', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        studentId: userData.userId,
+        records: recordsList
+      })
+    });
+
+    if (!response) return;
+
+    if (response.ok) {
+      console.log('Completed task recorded successfully');
+      return true;
+    } else {
+      console.error(`Failed to record task: ${response.status}`);
+      return false;
+    }
+  } catch (err) {
+    console.error('Error recording completed task:', err);
+    return false;
+  }
+}
+
+async function controllerToTask() {
+    const correctAnswers = controller.correctAnswersTracker;
+    const mistakes = controller.mistakesTracker;
+
+    const totalAnswers = controller.answeredQuestionTracker;
+    const mode = controller.mode;
+    let recordsList = [];
+    let task = [];
+
+    if (mode === "math") {
+        const modeChoice3Value = controller.modeChoice3 ? "C37" : "C38";
+        
+        task = [
+            mode,
+            controller.modeChoice1,
+            controller.modeChoice2,
+            modeChoice3Value,
+            controller.modeChoice5,
+            controller.modeChoice6,
+            controller.modeChoice7,
+            controller.selectedNumbers,
+            controller.withRemainder,
+            controller.modeChoice8
+        ];
+        
+        console.log(elapsedTime)
+        const answerRate = Number((totalAnswers / (elapsedTime / 1000 / 60)).toFixed(1));
+
+        recordsList = [{
+            taskInfo: task,
+            correct: correctAnswers,
+            mistakes: mistakes,
+            totalAnswers: totalAnswers,
+            answerRate: answerRate
+        }];
+        
+    } else if (mode === "lang") {
+        if (controller.modeChoice1 === "C49") {
+            if (controller.modeChoice7 === "C82") {
+                task = [
+                    mode,
+                    controller.modeChoice1,
+                    controller.modeChoice2,
+                    controller.modeChoice6,
+                    "C82",
+                    controller.classChoice,
+                    controller.modeChoiceLtDifficulty
+                ];
+                
+                const answerRate = Number((totalAnswers / (elapsedTime / 1000 / 60)).toFixed(1));
+                recordsList = [{
+                    taskInfo: task,
+                    correct: correctAnswers,
+                    mistakes: mistakes,
+                    totalAnswers: totalAnswers,
+                    answerRate: answerRate
+                }];
+                
+            } else if (controller.modeChoice7 === "C84") {
+                // Process C84 selected texts
+                recordsList = await processSelectedTexts();
+            }
+            
+        } else if (controller.modeChoice1 === "C83") {
+            if (controller.modeChoice2 === "C50") {
+                task = [
+                    mode,
+                    controller.modeChoice1,
+                    controller.modeChoice2,
+                    controller.classChoice,
+                    controller.modeChoice3,
+                    controller.modeChoice5,
+                    controller.questionFrequency
+                ];
+                
+                const answerRate = Number((totalAnswers / (elapsedTime / 1000 / 60)).toFixed(1));
+                recordsList = [{
+                    taskInfo: task,
+                    correct: correctAnswers,
+                    mistakes: mistakes,
+                    totalAnswers: totalAnswers,
+                    answerRate: answerRate
+                }];
             }
         }
     }
 
-    // Prepare results
-    const resultsData = [
-        [controller.answeredQuestionTracker || 0, controller.mistakesTracker || 0],
-        controller.currentMistakes || []
-    ];
-
-    // Task info template
-    let taskInfo = {
-        "userClass": -1,
-        "lang": false,
-        "math": false,
-        "C1": false,
-        "C2": false,
-        "C3": false,
-        "C4": false,
-        "C5": false,
-        "C6": false,
-        "C7": false,
-        "C8": false,
-        "C9": false,
-        "C10": false,
-        "C11": false,
-        "C12": false,
-        "C13": false,
-        "C14": false,
-        "C15": false,
-        "C16": false,
-        "C17": false,
-        "C18": false,
-        "C19": false,
-        "C20": false,
-        "C21": false,
-        "C22": false,
-        "C23": false,
-        "C24": false,
-        "C25": false,
-        "C26": false,
-        "C27": false,
-        "C28": false,
-        "C29": false,
-        "C30": false,
-        "C31": false,
-        "C32": false,
-        "C33": false,
-        "C34": false,
-        "C35": false,
-        "C36": false,
-        "C37": false,
-        "C38": false,
-        "C41": false,
-        "C42": false,
-        "C47": false,
-        "C48": false,
-        "C49": false,
-        "C50": false,
-        "C51": false,
-        "C52": false,
-        "C58": false,
-        "C59": false,
-        "C60": false,
-        "C75": false,
-        "C76": false,
-        "C77": false,
-        "C80": false,
-        "C81": false,
-        "C82": false,
-        "remainder": false,
-        "mult-table-selection": [],
-        "correct-ans": 0,
-        "total-ans": 0
-    };
-
-    // Restore user class
-    const storedClass = localStorage.getItem("userClassV2");
-    if (storedClass) {
-        try {
-            taskInfo.userClass = JSON.parse(storedClass).value;
-        } catch {
-            taskInfo.userClass = -1;
-        }
-    }
-
-    // Mark C-flags from controller values
-    for (let key in controller) {
-        const val = controller[key];
-        if (taskInfo.hasOwnProperty(val)) {
-            taskInfo[val] = true;
-        }
-    }
-
-    if (controller.withRemainder) {
-        taskInfo.remainder = true;
-    }
-
-    if (controller.modeChoice2 === "C18") {
-        taskInfo["mult-table-selection"] = controller.selectedNumbers || [];
-    }
-
-    // Calculate correctness
-    let correctAnswers = 0;
-    let totalAnswers = 0;
-
-    if (controller.mode === "lang") {
-        if (controller.modeChoice1 === "C49") {
-            let totalTexts = 0;
-            let textsWithoutError = 0;
-            resultsData[1].forEach(([outerKey, value]) => {
-                totalTexts++;
-                if (value === 0) textsWithoutError++;
-            });
-            correctAnswers = textsWithoutError;
-            totalAnswers = totalTexts;
-        } else if (controller.modeChoice1 === "C50") {
-            correctAnswers = resultsData[0][0] - resultsData[0][1];
-            totalAnswers = resultsData[0][0];
-        }
-        taskInfo["C47"] = false;
-        taskInfo["C48"] = false;
-        taskInfo["remainder"] = false;
-    } else if (controller.mode === "math") {
-        correctAnswers = resultsData[0][0] - resultsData[0][1];
-        totalAnswers = resultsData[0][0];
-        taskInfo["C49"] = false;
-        taskInfo["C50"] = false;
-        taskInfo["C51"] = false;
-        taskInfo["C52"] = false;
-        taskInfo["C58"] = false;
-        taskInfo["C59"] = false;
-        taskInfo["C60"] = false;
-        taskInfo["C75"] = false;
-        taskInfo["C76"] = false;
-        taskInfo["C80"] = false;
-        taskInfo["C81"] = false;
-        taskInfo["C82"] = false;
-    }
-
-    taskInfo["correct-ans"] = correctAnswers;
-    taskInfo["total-ans"] = totalAnswers;
-
-    // Send to server
-    //https://sudedu-server.onrender.com/record
-   try {
-        const response = await fetch("https://sudedu-task-info-server.onrender.com/record", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(taskInfo)
-        });
-    } catch (error) {
-        console.error("Error saving task results:", error);
-    }
+    console.log(recordsList)
+    return recordsList;
 }
 
-//TASK INFO COLLECTION END
+async function processSelectedTexts() {
+    console.log(timeTakenForEachText)
+    const validTextTimes = Object.entries(timeTakenForEachText).filter(([textId, times]) => {
+        return times.startTime !== undefined && times.endTime !== undefined;
+    });
+    console.log(validTextTimes)
+    if (validTextTimes.length === 0) {
+        return [];
+    }
+
+    // Load the text database
+    let textLibrary;
+    try {
+        const response = await fetch('../databases/sudedu_duomenu_baze.json');
+        textLibrary = await response.json();
+    } catch (error) {
+        console.error('Error loading text database:', error);
+        return [];
+    }
+    console.log(controller.currentMistakes)
+    // Create a map of mistakes by textId
+    const mistakesByText = {};
+    controller.currentMistakes.forEach(([textId, mistakeCount]) => {
+        mistakesByText[textId] = mistakeCount;
+    });
+
+    console.log(mistakesByText)
+    // Process each text and group by difficulty AND class
+    const groupedByDifficultyAndClass = {};
+    
+    validTextTimes.forEach(([textId, times]) => {
+        const numericTextId = parseInt(textId);
+        const text = textLibrary.find(entry => entry.id === numericTextId);
+        
+        if (!text) {
+            console.warn(`Text with id ${textId} not found in database`);
+            return;
+        }
+
+        // Determine class level
+        let classLevel = null;
+        const classChoiceArray = text['class-choice'];
+        
+        if (classChoiceArray && Array.isArray(classChoiceArray)) {
+            // If both are present, take 3_4_klase
+            if (classChoiceArray.includes('3_4_klase')) {
+                classLevel = 'C76'; // 3_4_klase
+            } else if (classChoiceArray.includes('1_2_klase')) {
+                classLevel = 'C75'; // 1_2_klase
+            }
+        }
+
+        if (!classLevel) {
+            console.warn(`Could not determine class level for text ${textId}`);
+            return;
+        }
+
+        // Determine difficulty level based on modeChoice2
+        let difficultyLevel = null;
+
+        if (controller.modeChoice2 === "C51") {
+            // Komponavimas
+            const suitableFor = text['suitable-for']?.['komponavimas'];
+            if (suitableFor) {
+                // Find matching difficulty
+                for (const [code, info] of Object.entries(parameterDictionary)) {
+                    if (info.parameter && suitableFor.includes(info.parameter)) {
+                        difficultyLevel = code;
+                        break;
+                    }
+                }
+            }
+        } else if (controller.modeChoice2 === "C52") {
+            // Struktura
+            const suitableFor = text['suitable-for']?.['struktura'];
+            if (suitableFor) {
+                // Find matching difficulty
+                for (const [code, info] of Object.entries(parameterDictionary)) {
+                    if (info.parameter && suitableFor.includes(info.parameter)) {
+                        difficultyLevel = code;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!difficultyLevel) {
+            console.warn(`Could not determine difficulty for text ${textId}`);
+            return;
+        }
+
+        // Create group key combining class and difficulty
+        const groupKey = `${classLevel}_${difficultyLevel}`;
+
+        // Initialize group if it doesn't exist
+        if (!groupedByDifficultyAndClass[groupKey]) {
+            groupedByDifficultyAndClass[groupKey] = {
+                classLevel: classLevel,
+                difficultyLevel: difficultyLevel,
+                texts: [],
+                totalTime: 0
+            };
+        }
+
+        // Add text to group
+        const textMistakes = mistakesByText[textId] || 0;
+        const textTime = times.endTime - times.startTime;
+        
+        groupedByDifficultyAndClass[groupKey].texts.push({
+            id: textId,
+            mistakes: textMistakes,
+            time: textTime
+        });
+        groupedByDifficultyAndClass[groupKey].totalTime += textTime;
+    });
+
+    console.log(groupedByDifficultyAndClass)
+
+    // Create records for each difficulty + class group
+    const recordsList = [];
+
+    for (const [groupKey, group] of Object.entries(groupedByDifficultyAndClass)) {
+        const totalTexts = group.texts.length;
+        const correctAnswers = group.texts.filter(t => t.mistakes === 0).length;
+        const totalMistakes = group.texts.reduce((sum, t) => sum + t.mistakes, 0);
+        const totalTimeMinutes = group.totalTime / 1000 / 60;
+        const answerRate = Number((totalTexts / totalTimeMinutes).toFixed(1));
+
+        const task = [
+            "lang",
+            controller.modeChoice1,      // "C49"
+            controller.modeChoice2,      // "C51" or "C52"
+            controller.modeChoice6,      // e.g., "C80"
+            "C82",                       // Changed from C84 to C82
+            group.classLevel,            // "C75" or "C76"
+            group.difficultyLevel        // e.g., "C58", "C59", etc.
+        ];
+
+        recordsList.push({
+            taskInfo: task,
+            correct: correctAnswers,
+            mistakes: totalMistakes,
+            totalAnswers: totalTexts,
+            answerRate: answerRate
+        });
+    }
+
+    return recordsList;
+}
+
+// Cache for task averages - shared across all students for same task
+const taskAverageCache = new Map();
+const retrievedInfoCache = {};
+
+// Frontend function to fetch task stats with caching
+async function fetchTaskStats(studentId, taskInfo) {
+  try {
+    const taskInfoString = JSON.stringify(taskInfo);
+    const cacheKey = taskInfoString;
+
+    // Initialize per-student cache if needed
+    retrievedInfoCache[studentId] ??= {};
+
+    // Return fully cached task data if available
+    if (retrievedInfoCache[studentId][cacheKey]) {
+      console.log('Using fully cached data for student', studentId);
+      return retrievedInfoCache[studentId][cacheKey];
+    }
+
+    // Check if averages are already cached
+    const cachedAverage = taskAverageCache.get(cacheKey);
+
+    // Build URL with optional skipAverages flag
+    const url = `${apiBase}students/task-stats/${studentId}?taskInfo=${encodeURIComponent(taskInfoString)}`
+      + (cachedAverage ? `&skipAverages=true` : `&skipAverages=false`);
+
+    // Fetch student data (and possibly averages)
+    const response = await apiFetch(url, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    if (!response || !response.ok) {
+      console.error('Failed to fetch task stats');
+      return null;
+    }
+
+    const data = await response.json();
+
+    // If averages were already cached, apply them to the response
+    if (cachedAverage) {
+      console.log('Using cached average data for task');
+      data.averageDates = cachedAverage.averageDates;
+      data.averageMistakeFrequency = cachedAverage.averageMistakeFrequency;
+      data.averageAnswerRate = cachedAverage.averageAnswerRate;
+    } else {
+      // First fetch - cache the averages
+      console.log('Caching average data for task');
+      taskAverageCache.set(cacheKey, {
+        averageDates: data.averageDates,
+        averageMistakeFrequency: data.averageMistakeFrequency,
+        averageAnswerRate: data.averageAnswerRate
+      });
+    }
+
+    // Cache the complete data for this student
+    retrievedInfoCache[studentId][cacheKey] = data;
+
+    return data;
+
+  } catch (error) {
+    messageToTheUser("Nepavyko pasiekti duomenų. Bandykite vėl vėliau.");
+    console.error('Error fetching task stats:', error);
+    return null;
+  }
+}
+
+
+// Clear cache when needed
+function clearTaskAverageCache() {
+    taskAverageCache.clear();
+    console.log('Cleared all task average cache');
+}
 
 function messageToTheUser(message, errorMessage=true, extendedMessage=false) {
     // Remove any existing popup
@@ -3592,7 +3773,7 @@ const pointWeights = {
     "C59": {"values": [2.0, 1.75, 1.75, 1.5, 1.5, 1.25], "label": "teksto supratimas vidutinis"},
     "C60": {"values": [2.0, 2.0, 2.0, 1.75, 1.75, 1.5], "label": "teksto supratimas sunkus"},
     "C80": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "be distraktoriaus"},
-    "C81": {"values": [2.0, 2.0, 2.0, 1.85, 1.85, 1.65], "label": "su distraktoriumi"},
+    "C81": {"values": [1.25, 1.25, 1.25, 1.2, 1.2, 1.2], "label": "su distraktoriumi"},
 }
 
 const personalChlCoinBonusMultiplier = 1.1;
@@ -3678,7 +3859,11 @@ async function calculateTasksPerCorrectAnswerPoints(type, selectedTextInfo = nul
 
         const textInfoList = buildList(textDatabase, textIds, textCompType);
 
+        let customTextsTotal = 0;
+
         for (const info of textInfoList) {
+            let perTextTotal = pointWeights.base?.values[taskInfoTemp.userClass] ?? 1;
+
             let tempController = {};
             const classChoice = info[0];
             const difficulty = info[1];
@@ -3702,11 +3887,13 @@ async function calculateTasksPerCorrectAnswerPoints(type, selectedTextInfo = nul
             Object.keys(taskInfoTemp).forEach(task => {
                 if (!taskInfoTemp[task] || skipTasks.includes(task)) return;
                 const weight = getTaskWeight(task);
-                total *= weight;
+                perTextTotal *= weight;
             });
+
+            customTextsTotal += perTextTotal
         }
 
-        return Number(total.toFixed(2));
+        return Number(customTextsTotal.toFixed(2));
 
     } else {
         const parsedCurrentTaskInstructions = type;

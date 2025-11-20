@@ -89,6 +89,7 @@ if (isTeacher && window.location.pathname.includes("uzduotys.html")) {
             toggleVisibility(modeChoice11DivElement, false);
             toggleVisibility(modeChoice12Element, false);
             toggleVisibility(modeChoice13Element, false);
+            toggleVisibility(timerQuestionNumberDiv, true);
         }
     }
 
@@ -407,18 +408,14 @@ checkbox.addEventListener('change', updateModeChoice7);
 function handleModeChoice8Change() { 
     let classChoiceSelection = classChoiceElement.value;
     let modeChoice8Selection = modeChoice8Element.value;
-    let modeChoice9Selection = modeChoice9Element.value;
+    let modeChoice15Selection;
+    if (modeChoice15Element) {
+        modeChoice15Selection = modeChoice15Element.value;
+    }
     modeChoice9Element.innerHTML = "";
 
-    function toggleVisibility(element, isVisible) {
-    if (isVisible) {
-        element.style.display = 'block';
-    } else {
-        element.style.display = 'none';
-    }
-}
-
 if (modeChoice8Selection === "C83") {
+    toggleVisibility(timerQuestionNumberDiv, true);
     toggleVisibility(modeChoice10Element, false);
     toggleVisibility(modeChoice14Element, false);
     if (modeChoice15Element) toggleVisibility(modeChoice15Element, false);
@@ -441,7 +438,11 @@ if (modeChoice8Selection === "C83") {
     toggleVisibility(modeChoice13Element, false);
     modeChoice9Element.innerHTML += '<option value="C51">TURINIO KOMPONAVIMĄ</option>';
     modeChoice9Element.innerHTML += '<option value="C52">STRUKTŪROS IŠDĖSTYMĄ</option>';
-
+    if (modeChoice15Selection === "C82") {
+        toggleVisibility(timerQuestionNumberDiv, true);
+    } else if (modeChoice15Selection === "C84") {
+        toggleVisibility(timerQuestionNumberDiv, false);
+    }
 }
 }
 
@@ -966,6 +967,8 @@ function updateControllerCustomTaskChoices () {
             controller.modeChoice3 = true;
         } else if (modeChoice3Selection === "C38") {
             controller.modeChoice3 = false;
+        } else {
+            controller.modeChoice3 = true;
         }
         controller.modeChoice5 = modeChoice5Selection;
         controller.modeChoice6 = modeChoice6Selection;

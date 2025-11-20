@@ -1643,7 +1643,9 @@ body.popup-active {
 					controller.modeChoice3 = true;
 				} else if (modeChoice3Selection === "C38") {
 					controller.modeChoice3 = false;
-				}
+				} else {
+                    controller.modeChoice3 = true;
+                }
 				controller.modeChoice5 = modeChoice5Selection;
 				controller.modeChoice6 = modeChoice6Selection;
 				controller.modeChoice7 = modeChoice7Selection;
@@ -2860,6 +2862,8 @@ function completePersonalChlTask(challengeInfo, challengeDuration) {
             controller.modeChoice3 = true;
         } else if (parsedCurrentTaskInstructions[3] === "C38") {
             controller.modeChoice3 = false;
+        } else {
+            controller.modeChoice3 = true;
         }
         controller.modeChoice5 = parsedCurrentTaskInstructions[4];
         controller.modeChoice6 = parsedCurrentTaskInstructions[5];

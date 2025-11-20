@@ -921,7 +921,11 @@
 
 #student-statistics-komponavimas-completed-texts ol,
 #text-comprehension-mistakes-summary ol {
-    margin: 5px 0;
+    margin: 0 0 5px 0;
+}
+
+#student-statistics-komponavimas-completed-texts:not(:empty) {
+    margin-top: 5px;
 }
 
 
@@ -1114,6 +1118,7 @@
 
 .teacher-action-btn,
 .confirm-btn,
+.new-search-btn,
 .cancel-btn {
     flex: 1;
 }
@@ -1121,6 +1126,7 @@
 .teacher-action-btn,
 .student-action-btn,
 .confirm-btn,
+.new-search-btn,
 .cancel-btn {
   position: relative;
   display: flex;
@@ -1149,6 +1155,7 @@
 .teacher-action-btn::before,
 .student-action-btn::before,
 .confirm-btn::before,
+.new-search-btn::before,
 .cancel-btn::before {
   content: '';
   position: absolute;
@@ -1162,6 +1169,7 @@
 .teacher-action-btn::after,
 .student-action-btn::after,
 .confirm-btn::after,
+.new-search-btn::after,
 .cancel-btn::after {
   content: '';
   position: absolute;
@@ -1178,6 +1186,7 @@
 .teacher-action-btn:hover::before,
 .student-action-btn:hover::before,
 .confirm-btn:hover::before,
+.new-search-btn:hover::before,
 .cancel-btn:hover::before {
   background: rgba(255, 255, 255, 0.15);
 }
@@ -1189,6 +1198,12 @@
     /*border: 1px solid #32ac93;*/
 }
 
+.new-search-btn {
+    background: linear-gradient(135deg, #3288AC, #286D8A);
+    border: none;
+    /*border: 1px solid #32ac93;*/
+}
+
 .cancel-btn {
     background: linear-gradient(135deg, #ff8073, #e74c3c);
     border: none;
@@ -1196,11 +1211,25 @@
 }
 
 #confirm-button:disabled,
+#new-search-button:disabled,
+#new-search-button:disabled,
 #cancel-button:disabled,
 #new-task-button:disabled,
 #delete-task-button:disabled,
 #delete-student-button:disabled {
-    opacity: 0.7;
+    opacity: 0.6;
+    background: linear-gradient(135deg, #95a5a6, #aeb4b5);
+    cursor: not-allowed;   
+}
+
+button:disabled.teacher-action-btn::before,
+button:disabled.student-action-btn::before,
+button:disabled.confirm-btn::before,
+button:disabled.new-search-btn::before,
+button:disabled.new-search-btn::before,
+button:disabled.cancel-btn::before {
+    background: transparent !important;
+    pointer-events: none; /* ensures no interaction with pseudo-element */
 }
 
 #confirmation-buttons-container {
@@ -1658,7 +1687,7 @@
             }
 
             .teacher-button-holder {
-                width: 90%;
+                width: 92%;
             }
 
             #action-buttons-container, 
@@ -1771,9 +1800,8 @@
     }
 
     #complete-task-button {
-            padding: 10px 16px;
-            margin-top: 10px;
-        }
+        padding: 10px 16px;
+    }
 
     #summary-table-frequent-mistakes table {
         border-color: transparent;
@@ -1962,6 +1990,7 @@
         #add-teacher,
         #change-teacher,
         #confirm-button,
+        #new-search-button,
         #cancel-button,
         #frequent-mistakes-btn,
         .display-summary-button {
@@ -2050,7 +2079,7 @@
             }
 
             .teacher-button-holder {
-                width: 90%;
+                width: 92%;
             }
 
             #action-buttons-container, 
@@ -2122,6 +2151,10 @@
     }
     }
 
+.text-comprehenstion-text-id:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
 
 .txt-browser-wrapper {
     max-width: 1200px;
@@ -2704,6 +2737,10 @@
                         <button id="delete-student-button" class="teacher-action-btn" data-action="delete-student">
                             <span id="delete-student-button-label"  class="btn-label"><span>Šalinti</span><span>mokinius</span></span>
                         </button>
+
+                        <button id="browse-task-history-button" class="teacher-action-btn" data-action="browse-history">
+                            <span id="browse-task-history-label"  class="btn-label"><span>Rezultatų</span><span>istorija</span></span>
+                        </button>
                     </div>
                     
                     <!-- Confirmation buttons (hidden by default) -->
@@ -2711,8 +2748,11 @@
                         <button id="confirm-button" class="confirm-btn">
                             <span id="confirm-label">Patvirtinti</span>
                         </button>
+                        <button id="new-search-button" class="new-search-btn"  style="display: none;" disabled>
+                            <span id="new-search-label">Nauja paieška</span>
+                        </button>
                         <button id="cancel-button" class="cancel-btn">
-                            <span>Atšaukti</span>
+                            <span id="cancel-label">Atšaukti</span>
                         </button>
                     </div>
                 </div>
@@ -2730,7 +2770,7 @@
                         <div class="align-items-center justify-content-start" id="student-list-title-container">
                             <div>Mokinių sąrašas:</div>
                         </div>
-                        <button type="button" id="expand-student-info-button" style="margin-left: auto;" onclick="toggleTaskVisibility()">&#x2212;</button>
+                        <button type="button" id="expand-student-info-button" style="margin-left: auto;">&#x2212;</button>
                     </div>
                     <div id="student-list-container">
                     <div id="student-list"></div>
@@ -3023,6 +3063,31 @@
                                         </div>
                                         <h3 class="answer-number-label">veiksmų</h3>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="student-task-history-container" style="display: none;">
+                            <div class="task-history-container">
+                                <div class="task-history-controls">
+                                    <div class="task-history-metrics" id="taskHistoryMetrics">
+                                        <!-- Buttons will be added dynamically -->
+                                    </div>
+                                    
+                                    <div class="task-history-date-selector">
+                                        <div class="task-history-date-group">
+                                            <label class="task-history-date-label">Pradžios data</label>
+                                            <input type="date" class="task-history-date-input" id="taskHistoryStartDate">
+                                        </div>
+                                        <div class="task-history-date-group">
+                                            <label class="task-history-date-label">Pabaigos data</label>
+                                            <input type="date" class="task-history-date-input" id="taskHistoryEndDate">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="task-history-chart-wrapper">
+                                    <canvas id="taskHistoryChart"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -3383,6 +3448,7 @@
         let addingNewTask = false;
         let deletingTask = false;
         let deletingStudent = false;
+        let browsingHistory = false;
         let showingSelectAllCheckbox = false;
         let taskContainerVisible = true;
         let changingTeacher = false;
@@ -3420,6 +3486,8 @@
         const deleteStudentButton = document.getElementById('delete-student-button');
         const confirmDeleteStudentButton = document.getElementById('confirm-delete-student-button');
 
+        const taskHistoryBrowserButton = document.getElementById('browse-task-history-button');
+
         const studentListTitle = document.getElementById('student-list-title-container');
         const studentListSelectAllCheckbox = document.getElementById('student-list-header-checkbox-container');
         const selectAllCheckbox = document.getElementById('select-all-checkbox');
@@ -3450,7 +3518,7 @@
         function toggleStudentListLabel() {
             showingSelectAllCheckbox = !showingSelectAllCheckbox
             const dropdown = document.getElementById("task-group-sorting");
-            if (showingSelectAllCheckbox) {
+            if (showingSelectAllCheckbox && ! browsingHistory) {
                 studentListTitle.style.display = "none"
                 studentListSelectAllCheckbox.style.display = "flex"
                 selectAllCheckbox.checked = false
@@ -3790,18 +3858,18 @@ let studentStatisticsLastRecord;
                             mathTasks[0][1] += result[0][1];
                             mathTasks[1].push(...result[1]);
                         } else if (taskDesc[0] === "lang") {
-                            if (taskDesc[2] === "C83") {
+                            if (taskDesc[1] === "C83") {
                                 // Process grammar tasks
                                 grammarTasks[0][0] += result[0][0];
                                 grammarTasks[0][1] += result[0][1];
                                 grammarTasks[1].push(...result[1]);
-                            } else if (taskDesc[2] === "C49") {
-                                if (taskDesc[3] === "C51") {
+                            } else if (taskDesc[1] === "C49") {
+                                if (taskDesc[2] === "C51") {
                                     // Process komponavimas tasks
                                     komponavimasTasks[0][0] += result[0][0];
                                     komponavimasTasks[0][1] += result[0][1];
                                     komponavimasTasks[1].push([[...result[1]], task.completionDate.split("T")[0]]);
-                                } else if (taskDesc[3] === "C52") {
+                                } else if (taskDesc[2] === "C52") {
                                     // Process isdestymas tasks
                                     isdestymasTasks[0][0] += result[0][0];
                                     isdestymasTasks[0][1] += result[0][1];
@@ -3834,9 +3902,7 @@ let studentStatisticsLastRecord;
                         try {
                             const taskDesc = JSON.parse(task.taskDescription);
                             // Check for different possible category locations
-                            return taskDesc[0] === category || 
-                                taskDesc[2] === category || 
-                                taskDesc[3] === category;
+                            return taskDesc.some(item => item === category);
                         } catch (e) {
                             console.error("Error parsing taskDescription:", e);
                             return false;
@@ -4660,7 +4726,6 @@ let studentStatisticsLastRecord;
 
         const categorizedStudentTasks = processStudentTasks(studentTasks)
 
-
         if (countTaskStatuses(studentTasks, "math").completed > 0)
             studentStatisticsMathDiv.style.display = "block";
             mistakeFrequency = Math.round(categorizedStudentTasks.math[0][1]/categorizedStudentTasks.math[0][0]*100)
@@ -4763,7 +4828,7 @@ let studentStatisticsLastRecord;
 
                 textIdSpan.addEventListener("click", () => {
                     const id = event.currentTarget.dataset.textId;
-                    textDatabaseEntryLocator(id);
+                    openTextBrowser(id);
                 });
 
                 li.appendChild(textIdSpan);
@@ -4816,7 +4881,7 @@ let studentStatisticsLastRecord;
                 const score = parsedTaskResult[0]
                 const textComprehensionrResults = parsedTaskResult[1]
 
-                if (JSON.parse(task.taskDescription)[2] === "C49") {
+                if (JSON.parse(task.taskDescription)[1] === "C49") {
                     const ul = document.createElement("ol");
                     const textComprehensionTextsTitle = document.createElement("div");
                     textComprehensionTextsTitle.innerHTML = "Sudėlioti tekstai:";
@@ -4844,7 +4909,7 @@ let studentStatisticsLastRecord;
 
                         textIdSpan.addEventListener("click", () => {
                             const id = event.currentTarget.dataset.textId;
-                            textDatabaseEntryLocator(id);
+                            openTextBrowser(id);
                         });
 
                         ul.appendChild(li);
@@ -4862,18 +4927,18 @@ let studentStatisticsLastRecord;
                     studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Atlikti veiksmai:</span> ${score[0]}`;
                     studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
                 } else if (parsedTaskDescription[0] === "lang") {
-                    if (parsedTaskDescription[2] === "C83") {
-                        if (parsedTaskDescription[3] === "C50") {
+                    if (parsedTaskDescription[1] === "C83") {
+                        if (parsedTaskDescription[2] === "C50") {
                             studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Įrašytos raidės:</span> ${score[0]}`;
                             studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
                         }
-                    } else if (parsedTaskDescription[2] === "C49") {
+                    } else if (parsedTaskDescription[1] === "C49") {
                         studentScoreAnswerNumber.innerHTML = `<span class="task-info-subtitle">Sudėliotų tekstų skaičius:</span> ${score[0]}`;
                         studentScoreMistakeNumber.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
                     }
                 }
 
-                if (taskInfo[0] === "math" || (taskInfo[0] === "lang" && taskInfo[2] === "C83")) {
+                if (taskInfo[0] === "math" || (taskInfo[0] === "lang" && taskInfo[1] === "C83")) {
                     let mistakesList = [];
                     mistakesList = JSON.parse(task.result)[1]
                     if (mistakesList.length > 0) {
@@ -4884,7 +4949,7 @@ let studentStatisticsLastRecord;
                 if (parsedTaskDescription[0] === "math") {
                     document.querySelector("#mistakes-summary-math").style.display = "block";
                     document.querySelector("#mistakes-summary-grammar").style.display = "none";
-                } else if (parsedTaskDescription[0] === "lang" && parsedTaskDescription[2] === "C83") {
+                } else if (parsedTaskDescription[0] === "lang" && parsedTaskDescription[1] === "C83") {
                     document.querySelector("#mistakes-summary-math").style.display = "none";
                     document.querySelector("#mistakes-summary-grammar").style.display = "block";
                 } else {
@@ -4955,7 +5020,7 @@ let studentStatisticsLastRecord;
                 numberOfQuestions = currentTaskDuration[1]
 
                 let potentialEarnings;
-                if (answeringMode === "C39" || parsedTaskDescription[2] === "C83") {
+                if (answeringMode === "C39" || parsedTaskDescription[1] === "C83") {
                     potentialEarnings = await calculateTasksPerCorrectAnswerPoints(JSON.parse(task.taskInstructions));
                     if (potentialEarnings) {
                         potentialEarnings = Number(potentialEarnings.toFixed(2))
@@ -5049,16 +5114,16 @@ let studentStatisticsLastRecord;
                     studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Atlikti veiksmai:</span> ${score[0]}`;
                     studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Klaidos</span>: ${score[1]}`;
                 } else if (parsedTaskDescription[0] === "lang") {
-                    if (parsedTaskDescription[2] === "C83") {
+                    if (parsedTaskDescription[1] === "C83") {
                         studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Irašytos raidės:</span> ${score[0]}`;
                         studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
-                    } else if (parsedTaskDescription[2] === "C49") {
+                    } else if (parsedTaskDescription[1] === "C49") {
                         studentScoreAnswerNumberForStudent.innerHTML = `<span class="task-info-subtitle">Sudėliotų tekstų skaičius:</span> ${score[0]}`;
                         studentScoreMistakeNumberForStudent.innerHTML = `<span class="task-info-subtitle">Klaidos:</span> ${score[1]}`;
                     }
                 }
 
-                if (taskInfo[0] === "math" || (taskInfo[0] === "lang" && taskInfo[2] === "C83")) {
+                if (taskInfo[0] === "math" || (taskInfo[0] === "lang" && taskInfo[1] === "C83")) {
                     let mistakesList = [];
                     mistakesList = JSON.parse(task.result)[1]
 
@@ -5070,7 +5135,7 @@ let studentStatisticsLastRecord;
                 if (parsedTaskDescription[0] === "math") {
                     document.querySelector("#mistakes-summary-math-for-student").style.display = "block";
                     document.querySelector("#mistakes-summary-grammar-for-student").style.display = "none";
-                } else if (parsedTaskDescription[0] === "lang" && parsedTaskDescription[2] === "C83") {
+                } else if (parsedTaskDescription[0] === "lang" && parsedTaskDescription[1] === "C83") {
                     document.querySelector("#mistakes-summary-math-for-student").style.display = "none";
                     document.querySelector("#mistakes-summary-grammar-for-student").style.display = "block";
                 } else {
@@ -5085,7 +5150,7 @@ let studentStatisticsLastRecord;
                     document.querySelector("#mistakes-summary-grammar-for-student").style.display = "none";
                 }
 
-                if (taskInfo[0] === "math" || (taskInfo[0] === "lang" && taskInfo[2] === "C83")) {
+                if (taskInfo[0] === "math" || (taskInfo[0] === "lang" && taskInfo[1] === "C83")) {
                     let mistakesList = [];
                     mistakesList = JSON.parse(task.result)[1]
                     if (mistakesList.length > 0) {
@@ -5263,14 +5328,27 @@ let studentStatisticsLastRecord;
         studentName.classList.add('student-name');
         studentName.classList.add('selection-option');
         studentName.style.cursor = 'pointer';
+        studentName.dataset.studentId = student.id
         studentName.innerHTML = `${studentIndex + 1}. ${student.nickname} (ID: ${student.id})`;
 
-        studentName.addEventListener('click', () => {
+        studentName.addEventListener('click', async () => {
             if (document.querySelector(`#tasks-${student.id}`).style.display === "none") {
-                document.querySelector(`#tasks-${student.id}`).style.display = "block";
+                if (!browsingHistory) {
+                    document.querySelector(`#tasks-${student.id}`).style.display = "block";
+                } else {
+                    if (taskHistoryCurrentTask) {
+                        await retrieveTaskHistoryInformation(student.id, taskHistoryCurrentTask)
+                    }
+                }
             } else {
-                if (studentName.classList.contains("selected-option"))
-                document.querySelector(`#tasks-${student.id}`).style.display = "none";
+                if (!browsingHistory) {
+                    if (studentName.classList.contains("selected-option"))
+                    document.querySelector(`#tasks-${student.id}`).style.display = "none";
+                } else {
+                    if (taskHistoryCurrentTask) {
+                        await retrieveTaskHistoryInformation(student.id, taskHistoryCurrentTask);
+                    }
+                }
             }
 
             // Remove 'selected-option' class from all task names
@@ -5287,6 +5365,13 @@ let studentStatisticsLastRecord;
             if (currentAction !== "new-task") {
                 openSidebar();
             }
+
+            toggleMainBrowser(true);
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+            });
         });
 
         // Student-level task status circles
@@ -5332,6 +5417,13 @@ let studentStatisticsLastRecord;
                 if (currentAction !== "new-task") {
                     openSidebar();
                 }
+
+                toggleMainBrowser(true);
+                const sidebar = document.querySelector('.sidebar');
+                sidebar.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+                });
             });
 
             // Task status circle
@@ -5371,6 +5463,10 @@ let studentStatisticsLastRecord;
     }
 }
 
+        document.getElementById('expand-student-info-button').addEventListener('click', () => {
+            if (browsingHistory) return;
+            toggleTaskVisibility();
+        });
 
 
         function toggleTaskVisibility() {
@@ -5460,6 +5556,7 @@ let studentStatisticsLastRecord;
             newTaskButton.disabled = true
             deleteTaskButton.disabled = true
             deleteStudentButton.disabled = true
+            taskHistoryBrowserButton.disabled = true
 
             try {
                 const response = await apiFetch(apiBase + 'students', {
@@ -5501,6 +5598,7 @@ let studentStatisticsLastRecord;
                 newTaskButton.disabled = false
                 deleteTaskButton.disabled = false
                 deleteStudentButton.disabled = false
+                taskHistoryBrowserButton.disabled = false
             }
         }
 
@@ -5571,7 +5669,19 @@ let studentStatisticsLastRecord;
             document.querySelectorAll('.student-checkbox').forEach(checkbox => {
             checkbox.style.visibility = 'visible';
 
-            const modeChoice15Selection = document.getElementById('mode_choice_15').value;
+            const modeChoice15Element = document.getElementById('mode_choice_15');
+
+            if (modeChoice15Element && modeChoice15Element.options.length < 2) {
+                modeChoice15Element.innerHTML = '';
+                modeChoice15Element.innerHTML += '<option value="C82">ATSITIKTINIAI TEKSTAI</option>'
+                modeChoice15Element.innerHTML += '<option value="C84">PARINKTI TEKSTUS</option>'
+            }
+
+            let changeEvent = new Event('change');
+            modeChoice15Element.value = 'C82';
+            modeChoice15Element.dispatchEvent(changeEvent);
+
+            const modeChoice15Selection = modeChoice15Element.value;
 
             if (modeChoice15Selection === "C82") {
                 isSelectionModeEnabled = false;
@@ -5585,8 +5695,18 @@ let studentStatisticsLastRecord;
             const groupName = document.querySelector('#group_name');
 
             openSidebar();
+
+            toggleMainBrowser(true);
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+            });
         });
             newTaskOptions.style.display = 'flex';
+            document.querySelector("#group_name").style.display = "block";
+            document.querySelector("#mode_choice_4").style.display = "block";
+            document.querySelector(".timer-question-number-div").style.display = "block";
 
         } else {
             taskContainerVisible = false;
@@ -5602,6 +5722,84 @@ let studentStatisticsLastRecord;
             isSelectionModeEnabled = false;
             refilterTexts();
         }
+    }
+
+    function toggleBrowseHistory() {
+        browsingHistory = !browsingHistory
+        toggleStudentListLabel();
+        const dropdown = document.getElementById("task-group-sorting");
+        if (browsingHistory) {
+            // Set the selected option to "Visos užduočių grupės"
+            dropdown.value = "Visos užduočių grupės";
+            // Manually trigger the change event
+            dropdown.dispatchEvent(new Event("change"));
+            dropdown.disabled = true;
+            
+            taskContainerVisible = true;
+            toggleTaskVisibility();
+
+            document.querySelector(".txt-browser-wrapper").style.display = 'none'; 
+            studentTaskInfoContainer.style.display = 'none'; 
+            document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+            checkbox.style.visibility = 'hidden';
+
+            const modeChoice15Element = document.getElementById('mode_choice_15');
+
+            if (modeChoice15Element && modeChoice15Element.options.length > 1) {
+                modeChoice15Element.innerHTML = '';
+                modeChoice15Element.innerHTML += '<option value="C82">ATSITIKTINIAI TEKSTAI</option>'
+            }
+
+            let changeEvent = new Event('change');
+            modeChoice15Element.value = 'C82';
+            modeChoice15Element.dispatchEvent(changeEvent);
+
+            openSidebar();
+
+            toggleMainBrowser(true);
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+            });
+        });
+            newTaskOptions.style.display = 'flex';
+            document.querySelector("#group_name").style.display = "none";
+            document.querySelector("#mode_choice_4").style.display = "none";
+            document.querySelector(".timer-question-number-div").style.display = "none";
+
+        } else {
+            taskHistoryCurrentTask = null;
+            taskContainerVisible = false;
+            toggleTaskVisibility();
+            document.querySelector(".txt-browser-wrapper").style.display = 'block'; 
+            studentTaskInfoContainer.style.display = 'flex'; 
+            document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+                checkbox.style.visibility = 'hidden';
+                checkbox.checked = false;
+            });
+            newTaskOptions.style.display = 'none';
+            document.querySelector("#student-task-history-container").style.display = "none";
+            dropdown.disabled = false;
+            toggleMainBrowser(closeMainBrowser=true);
+            isSelectionModeEnabled = false;
+            refilterTexts();
+        }
+    }
+
+    document.getElementById("new-search-button").addEventListener("click", () => {
+        startNewTaskHistorySearch();
+    });
+
+    function startNewTaskHistorySearch () {
+        enableConfirmationButtons();
+        enableTeacherControlPannel();
+        enableNewTaskContainer();
+
+        document.getElementById('confirm-button').disabled = false;
+        document.getElementById("new-search-button").disabled = true;
+        newTaskOptions.style.display = 'flex';
+        document.querySelector("#student-task-history-container").style.display = "none";
     }
 
     function toggleDeleteTask() {
@@ -5768,6 +5966,8 @@ let studentStatisticsLastRecord;
             durationType = questionNumberInput;
         }
 
+        if (modeChoice3 === "") modeChoice3 = "C37"
+
         const modeChoiceElementSelection = document.querySelector('#mode_choice').value;
         let task = [];
         let taskDuration = [];
@@ -5905,7 +6105,6 @@ let studentStatisticsLastRecord;
 			}
 
 			var checkbox = document.getElementById("remainder-input");
-console.log(parsedCurrentTaskInstructions)
             controller.language = "LT";
             if (parsedCurrentTaskInstructions[0] === "math") {
                 controller.mode = 'math';
@@ -5971,8 +6170,554 @@ console.log(parsedCurrentTaskInstructions)
             }
 
 			localStorage.setItem('controller', JSON.stringify(controller))
+
             startQuestions();
     }
+
+    function arraysEqual(a, b) {
+        if (!Array.isArray(a) || !Array.isArray(b)) return false;
+        if (a.length !== b.length) return false;
+
+        for (let i = 0; i < a.length; i++) {
+            const valA = a[i];
+            const valB = b[i];
+
+            // If elements are arrays/objects, compare recursively
+            const bothArrays = Array.isArray(valA) && Array.isArray(valB);
+            const bothObjects = valA && valB && typeof valA === 'object' && typeof valB === 'object';
+
+            if (bothArrays && !arraysEqual(valA, valB)) return false;
+            else if (bothObjects && JSON.stringify(valA) !== JSON.stringify(valB)) return false;
+            else if (!bothArrays && !bothObjects && valA !== valB) return false;
+        }
+
+        return true;
+    }
+
+
+    let taskHistoryCurrentTask = null;
+    
+    async function setTaskHistoryQuery() {
+        let modeChoice1 = document.getElementById('mode_choice_1').value
+        let modeChoice2 = document.getElementById('mode_choice_2').value
+        let modeChoice3 = document.getElementById('mode_choice_3').value
+        const modeChoice4 = document.getElementById('mode_choice_4').value
+        let modeChoice5 = document.getElementById('mode_choice_5').value
+        const modeChoice6 = document.getElementById('mode_choice_6').value
+        const modeChoice7 = document.getElementById('mode_choice_7').value
+        const classChoiceSelection = document.querySelector('#class_choice').value;
+        const timerInput = document.getElementById('timer-input').value
+        const questionNumberInput = document.getElementById('question-number-input').value
+        const remainderInput = document.getElementById('remainder-input').checked
+
+        const selectedNumberElement = document.querySelector('#selected_number');
+        const selectedNumber2Element = document.querySelector('#selected_number_2');
+        let selectedNumbers = [selectedNumberElement.value, selectedNumber2Element.value].sort();
+
+        let modeChoiceSelection = document.querySelector('#mode_choice').value;
+        let mode = modeChoiceSelection;
+
+        if (modeChoice3 === "") modeChoice3 = "C37"
+
+        const modeChoiceElementSelection = document.querySelector('#mode_choice').value;
+        
+        let task = [];
+
+        if (mode === "math") {
+            task = [
+                mode, modeChoice1, modeChoice2, modeChoice3, 
+                modeChoice5, modeChoice6, modeChoice7, selectedNumbers, 
+                remainderInput, "C79"
+            ];
+        } else if (mode === "lang") {
+            const classChoiceSelection = document.querySelector('#class_choice').value;
+            classChoice = classChoiceSelection;
+
+            let modeChoice8Selection = document.querySelector('#mode_choice_8').value;
+            modeChoice1 = modeChoice8Selection;
+
+            const modeChoice9Selection = document.querySelector('#mode_choice_9').value;
+
+            modeChoice2 = modeChoice9Selection;
+
+            const selectedOptions = getSelectedRasybaConditions();
+
+            const sortedModeChoice3 = Object.fromEntries(
+            Object.entries(selectedOptions).sort(([a], [b]) => {
+                const numA = parseInt(a.slice(1));
+                const numB = parseInt(b.slice(1));
+                return numA - numB;
+            })
+            );
+
+            modeChoice3 = sortedModeChoice3;
+
+            const modeChoice12Selection = document.querySelector('#mode_choice_12').value;
+            modeChoice5 = modeChoice12Selection;
+
+            const modeChoiceLtDifficulty = document.getElementById('mode_choice_10').value;
+
+            const modeChoice14Selection = document.getElementById('mode_choice_14').value;
+            const modeChoice15Selection = document.getElementById('mode_choice_15').value;
+
+            let questionFrequency;
+            if (classChoice === "C75") {
+                let modeChoice13Selection = document.querySelector('#mode_choice_13').value;
+                questionFrequency = Number(modeChoice13Selection);
+            } else {
+                questionFrequency = 1;
+            }
+            
+            if (modeChoice1 === "C49") {
+                task = [
+                    mode, modeChoice1, modeChoice2, modeChoice14Selection, modeChoice15Selection, classChoiceSelection, modeChoiceLtDifficulty
+                ];
+            } else if (modeChoice1 === "C83") {
+                if (modeChoice2 === "C50") {
+                    task = [
+                        mode, modeChoice1, modeChoice2, classChoiceSelection, modeChoice3,
+                        modeChoice5, questionFrequency
+                    ];
+                }
+            }
+        }
+
+        if (taskHistoryCurrentTask) {
+        if (!arraysEqual(taskHistoryCurrentTask, task)) {
+            clearTaskAverageCache();
+            taskHistoryCurrentTask = JSON.parse(JSON.stringify(task));
+        }
+        } else {
+            taskHistoryCurrentTask = JSON.parse(JSON.stringify(task));
+        }
+
+        let selectedStudent = document.querySelector(".outer-student-list-entry-item .student-name.selected-option");
+        if (!selectedStudent) {
+            selectedStudent = document.querySelector(".outer-student-list-entry-item .student-name");
+        }
+
+        const selectedStudentId = Number(selectedStudent.dataset.studentId)
+
+        retrieveTaskHistoryInformation(selectedStudentId, task);
+    }
+
+    async function retrieveTaskHistoryInformation (studentId, task) {
+        disableNewTaskContainer();
+        disableTeacherControlPannel();
+        disableConfirmationButtons();
+        document.querySelectorAll(".student-name").forEach(el => {
+            el.style.pointerEvents = "none"; // stops clicks
+            el.style.opacity = "0.7";        // visual cue
+            el.style.cursor = "default";     // change cursor
+        });
+
+        let retrievedDataInstance = await fetchTaskStats(studentId, task);
+
+        if (retrievedDataInstance) {
+            enableConfirmationButtons();
+            enableTeacherControlPannel();
+            document.getElementById("task-group-sorting").disabled = true;
+            enableNewTaskContainer();
+            document.querySelector(`.student-name[data-student-id="${studentId}"]`).classList.add("selected-option");;
+
+            document.querySelectorAll(".student-name").forEach(el => {
+                el.style.pointerEvents = "auto"; // restore clicks
+                el.style.opacity = "1";
+                el.style.cursor = "pointer";
+            });
+
+            initTaskHistoryGraph(retrievedDataInstance);
+            document.getElementById('confirm-button').disabled = true;
+            newTaskOptions.style.display = 'none';
+            document.querySelector("#student-task-history-container").style.display = "flex";
+            document.getElementById("new-search-button").disabled = false;
+        } else {
+            toggleBrowseHistory();
+            taskContainerVisible = true;
+            toggleTaskVisibility();
+            hideConfirmationButtons();
+            document.getElementById("task-group-sorting").disabled = true;
+            fetchDataForTeachers();
+        }
+    }
+
+    async function displayRetrievedTaskHistoryData () {
+        return
+    }
+
+    // TASK HISTORY GRAPH START
+
+    // Graph state management
+        const taskHistoryState = {
+            selectedMetrics: ['mistakeFrequency'], // Default: show mistake frequency
+            startDate: null,
+            endDate: null,
+            chart: null,
+            rawData: null
+        };
+
+        // Available metrics configuration
+        const taskHistoryMetrics = [
+            {
+                id: 'mistakeFrequency',
+                label: 'Klaidų dažnis',
+                color: '#ef4444',
+                yAxisID: 'y-percent',
+                isPercent: true
+            },
+            {
+                id: 'answerRate',
+                label: 'Atsakymų greitis',
+                color: '#3b82f6',
+                yAxisID: 'y-rate',
+                isPercent: false
+            }
+        ];
+
+        // Initialize metric buttons
+        function initTaskHistoryButtons() {
+            const container = document.getElementById('taskHistoryMetrics');
+            container.innerHTML = '';
+
+            taskHistoryMetrics.forEach(metric => {
+                const btn = document.createElement('button');
+                btn.className = 'task-history-btn-metric';
+                btn.textContent = metric.label;
+                btn.setAttribute('data-metric-id', metric.id);
+                
+                if (taskHistoryState.selectedMetrics.includes(metric.id)) {
+                    btn.classList.add('active');
+                }
+
+                btn.onclick = () => toggleTaskHistoryMetric(metric.id);
+                container.appendChild(btn);
+            });
+        }
+
+        // Toggle metric selection
+        function toggleTaskHistoryMetric(metricId) {
+            const index = taskHistoryState.selectedMetrics.indexOf(metricId);
+            
+            if (index !== -1) {
+                taskHistoryState.selectedMetrics.splice(index, 1);
+            } else {
+                taskHistoryState.selectedMetrics.push(metricId);
+            }
+
+            updateTaskHistoryButtons();
+            renderTaskHistoryGraph();
+        }
+
+        // Update button states
+        function updateTaskHistoryButtons() {
+            const buttons = document.querySelectorAll('.task-history-btn-metric');
+            buttons.forEach(btn => {
+                const metricId = btn.getAttribute('data-metric-id');
+                if (taskHistoryState.selectedMetrics.includes(metricId)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialize date inputs
+        function initTaskHistoryDateInputs(data) {
+            if (!data || !data.studentDates || data.studentDates.length === 0) {
+                return;
+            }
+
+            const startInput = document.getElementById('taskHistoryStartDate');
+            const endInput = document.getElementById('taskHistoryEndDate');
+
+            const minDate = data.studentDates[0];
+            const maxDate = data.studentDates[data.studentDates.length - 1];
+
+            // Set default range if not already set
+            if (!taskHistoryState.startDate) {
+                taskHistoryState.startDate = minDate;
+            }
+            if (!taskHistoryState.endDate) {
+                taskHistoryState.endDate = maxDate;
+            }
+
+            startInput.value = taskHistoryState.startDate;
+            endInput.value = taskHistoryState.endDate;
+
+            startInput.onchange = (e) => {
+                taskHistoryState.startDate = e.target.value;
+                renderTaskHistoryGraph();
+            };
+
+            endInput.onchange = (e) => {
+                taskHistoryState.endDate = e.target.value;
+                renderTaskHistoryGraph();
+            };
+        }
+
+        // Filter data by date range
+        function filterTaskHistoryData(data) {
+            if (!taskHistoryState.startDate || !taskHistoryState.endDate) {
+                return data;
+            }
+
+            const start = new Date(taskHistoryState.startDate);
+            const end = new Date(taskHistoryState.endDate);
+
+            // Filter student data
+            const filteredStudentIndices = [];
+            const filteredStudentDates = [];
+            const filteredMistakeFreq = [];
+            const filteredAnswerRate = [];
+
+            data.studentDates.forEach((date, i) => {
+                const d = new Date(date);
+                if (d >= start && d <= end) {
+                    filteredStudentIndices.push(i);
+                    filteredStudentDates.push(date);
+                    filteredMistakeFreq.push(data.mistakeFrequency[i]);
+                    filteredAnswerRate.push(data.answerRate[i]);
+                }
+            });
+
+            // Filter average data
+            const filteredAverageIndices = [];
+            const filteredAverageDates = [];
+            const filteredAvgMistakeFreq = [];
+            const filteredAvgAnswerRate = [];
+
+            data.averageDates.forEach((date, i) => {
+                const d = new Date(date);
+                if (d >= start && d <= end) {
+                    filteredAverageIndices.push(i);
+                    filteredAverageDates.push(date);
+                    filteredAvgMistakeFreq.push(data.averageMistakeFrequency[i]);
+                    filteredAvgAnswerRate.push(data.averageAnswerRate[i]);
+                }
+            });
+
+            return {
+                studentDates: filteredStudentDates,
+                mistakeFrequency: filteredMistakeFreq,
+                answerRate: filteredAnswerRate,
+                averageDates: filteredAverageDates,
+                averageMistakeFrequency: filteredAvgMistakeFreq,
+                averageAnswerRate: filteredAvgAnswerRate
+            };
+        }
+
+        // Generate nice x-axis labels
+        function generateXAxisLabels(dates) {
+            if (!dates || dates.length === 0) return [];
+
+            const sortedDates = [...dates].sort();
+            const firstDate = new Date(sortedDates[0]);
+            const lastDate = new Date(sortedDates[sortedDates.length - 1]);
+            const daysDiff = Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24));
+
+            let interval;
+            if (daysDiff <= 7) {
+                interval = 1; // Daily
+            } else if (daysDiff <= 30) {
+                interval = 3; // Every 3 days
+            } else if (daysDiff <= 90) {
+                interval = 7; // Weekly
+            } else if (daysDiff <= 180) {
+                interval = 14; // Bi-weekly
+            } else {
+                interval = 30; // Monthly
+            }
+
+            const labels = [];
+            const currentDate = new Date(firstDate);
+            
+            while (currentDate <= lastDate) {
+                labels.push(currentDate.toISOString().split('T')[0]);
+                currentDate.setDate(currentDate.getDate() + interval);
+            }
+
+            return labels;
+        }
+
+        // Render the graph
+        function renderTaskHistoryGraph() {
+            if (taskHistoryState.chart) {
+                taskHistoryState.chart.destroy();
+                taskHistoryState.chart = null;
+            }
+
+            if (!taskHistoryState.rawData) {
+                document.querySelector('.task-history-chart-wrapper').innerHTML = 
+                    '<div class="task-history-empty">Nėra duomenų</div>';
+                return;
+            }
+
+            const filteredData = filterTaskHistoryData(taskHistoryState.rawData);
+
+            if (filteredData.studentDates.length === 0) {
+                document.querySelector('.task-history-chart-wrapper').innerHTML = 
+                    '<div class="task-history-empty">Nėra duomenų pasirinktam laikotarpiui</div>';
+                return;
+            }
+
+            // Ensure canvas exists
+            let canvas = document.getElementById('taskHistoryChart');
+            if (!canvas) {
+                document.querySelector('.task-history-chart-wrapper').innerHTML = 
+                    '<canvas id="taskHistoryChart"></canvas>';
+                canvas = document.getElementById('taskHistoryChart');
+            }
+
+            const datasets = [];
+
+            // Add student data
+            taskHistoryState.selectedMetrics.forEach(metricId => {
+                const metric = taskHistoryMetrics.find(m => m.id === metricId);
+                if (!metric) return;
+
+                const dataKey = metricId;
+                const studentData = filteredData[dataKey];
+
+                if (studentData && studentData.length > 0) {
+                    datasets.push({
+                        label: metric.label,
+                        data: filteredData.studentDates.map((date, i) => ({
+                            x: date,
+                            y: studentData[i]
+                        })),
+                        borderColor: metric.color,
+                        backgroundColor: metric.color + '20',
+                        borderWidth: 3,
+                        tension: 0.3,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        yAxisID: metric.yAxisID
+                    });
+
+                    // Add average line
+                    const avgDataKey = 'average' + metricId.charAt(0).toUpperCase() + metricId.slice(1);
+                    const avgData = filteredData[avgDataKey];
+
+                    if (avgData && avgData.length > 0) {
+                        datasets.push({
+                            label: metric.label + ' (klasės vid.)',
+                            data: filteredData.averageDates.map((date, i) => ({
+                                x: date,
+                                y: avgData[i]
+                            })),
+                            borderColor: metric.color,
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.3,
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+                            yAxisID: metric.yAxisID,
+                            opacity: 0.6
+                        });
+                    }
+                }
+            });
+
+            const allDates = [...new Set([...filteredData.studentDates, ...filteredData.averageDates])].sort();
+            const xLabels = generateXAxisLabels(allDates);
+
+            const yAxes = {};
+
+            // Add percentage axis if needed
+            if (taskHistoryState.selectedMetrics.includes('mistakeFrequency')) {
+                yAxes['y-percent'] = {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    min: 0,
+                    max: 100,
+                    ticks: {
+                        callback: (value) => value + '%',
+                        color: '#666'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    border: { display: false }
+                };
+            }
+
+            // Add rate axis if needed
+            if (taskHistoryState.selectedMetrics.includes('answerRate')) {
+                yAxes['y-rate'] = {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    min: 0,
+                    ticks: {
+                        callback: (value) => value.toFixed(1),
+                        color: '#666'
+                    },
+                    grid: {
+                        drawOnChartArea: !taskHistoryState.selectedMetrics.includes('mistakeFrequency'),
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    border: { display: false }
+                };
+            }
+
+            const ctx = canvas.getContext('2d');
+            taskHistoryState.chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: xLabels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    const yAxisId = context.dataset.yAxisID;
+                                    if (yAxisId === 'y-percent') {
+                                        label += context.parsed.y + '%';
+                                    } else {
+                                        label += context.parsed.y.toFixed(1);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: yAxes
+                }
+            });
+        }
+
+        // Main initialization function
+        function initTaskHistoryGraph(data) {
+            taskHistoryState.rawData = data;
+            initTaskHistoryButtons();
+            initTaskHistoryDateInputs(data);
+            renderTaskHistoryGraph();
+        }
+
+    // TASK HISTORY GRAPH END
+    
 
     if (userData) {
         if (userData.accType === 'teacher') {
@@ -6119,29 +6864,44 @@ function showConfirmationButtons(action) {
     
     // Update confirm button label based on action
     const confirmLabel = document.getElementById('confirm-label');
+    const cancelLabel = document.getElementById('cancel-label');
+
     switch(action) {
         case 'new-task':
             confirmLabel.textContent = 'Sukurti užduotį';
+            cancelLabel.textContent = 'Atšaukti';
             toggleAddNewTask();
             break;
         case 'delete-task':
             confirmLabel.textContent = 'Trinti užduotis';
+            cancelLabel.textContent = 'Atšaukti';
             toggleDeleteTask();
             break;
         case 'delete-student':
             confirmLabel.textContent = 'Šalinti mokinius';
+            cancelLabel.textContent = 'Atšaukti';
             toggleDeleteStudent();
+            break;
+        case 'browse-history':
+            confirmLabel.textContent = 'Ieškoti';
+            cancelLabel.textContent = 'Uždaryti istoriją';
+            toggleBrowseHistory();
             break;
     }
     
     document.getElementById('action-buttons-container').style.display = 'none';
     document.getElementById('confirmation-buttons-container').style.display = 'flex';
+    if (action === "browse-history") {
+        document.getElementById('new-search-button').style.display = 'flex';
+    }
 }
 
 function hideConfirmationButtons() {
     document.getElementById('confirm-button').disabled = false;
     document.getElementById('cancel-button').disabled = false;
     document.getElementById('confirmation-buttons-container').style.display = 'none';
+    document.getElementById('new-search-button').disabled = false;
+    document.getElementById('new-search-button').style.display = 'none';
     document.getElementById('action-buttons-container').style.display = 'flex';
     currentAction = null;
 }
@@ -6149,6 +6909,13 @@ function hideConfirmationButtons() {
 function disableConfirmationButtons() {
     document.getElementById('confirm-button').disabled = true;
     document.getElementById('cancel-button').disabled = true;
+    document.getElementById('new-search-button').disabled = true;
+}
+
+function enableConfirmationButtons() {
+    document.getElementById('confirm-button').disabled = false;
+    document.getElementById('cancel-button').disabled = false;
+    document.getElementById('new-search-button').disabled = false;
 }
 
 // Set up button click handlers
@@ -6165,6 +6932,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('delete-student-button').addEventListener('click', () => {
         showConfirmationButtons('delete-student');
     });
+
+     document.getElementById('browse-task-history-button').addEventListener('click', () => {
+        showConfirmationButtons('browse-history');
+    });
     
     // Confirmation buttons
     document.getElementById('confirm-button').addEventListener('click', () => {
@@ -6174,6 +6945,8 @@ document.addEventListener('DOMContentLoaded', () => {
             deleteSelectedTasks();
         } else if (currentAction === 'delete-student') {
             deleteStudents();
+        } else if (currentAction === 'browse-history') {
+            setTaskHistoryQuery();
         }
     });
     
@@ -6184,6 +6957,8 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleDeleteTask();
         } else if (currentAction === 'delete-student') {
             toggleDeleteStudent();
+        } else if (currentAction === 'browse-history') {
+            toggleBrowseHistory();
         }
         hideConfirmationButtons();
     });
@@ -6795,7 +7570,6 @@ function toggleMainBrowser(closeMainBrowser=false) {
                 content.scrollIntoView({ behavior: 'smooth', block: 'end' });
             }
         }, { once: true });
-        
     } else {
         content.style.height = content.scrollHeight + 'px';
         icon.classList.add('collapsed');
@@ -6814,6 +7588,8 @@ function toggleMainBrowser(closeMainBrowser=false) {
         }, { once: true });
         
         viewer.style.height = '';
+
+        isMainBrowserExpanded = false;
     }
 }
 
@@ -6916,6 +7692,7 @@ function scrollToText(id) {
 }
 
 function openTextBrowser(textId) {
+    console.log(isMainBrowserExpanded)
     if (!isMainBrowserExpanded) {
         toggleMainBrowser();
     }
@@ -6953,6 +7730,8 @@ function openTextBrowser(textId) {
                         }
                     }, 100);
                 }
+            } else {
+                messageToTheUser("Tekstas nerastas!")
             }
         }, 100);
     }, 300);

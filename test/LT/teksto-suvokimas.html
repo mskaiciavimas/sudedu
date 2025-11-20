@@ -1083,6 +1083,7 @@ window.onload = function () {
     let answeredTexts = [];
     let firstTimeChecking = true;
     window.mistakesSummary = {};
+    window.timeTakenForEachText = {};
 
     function generateFilteredTextLibrary() {
     var tempTextLibrary = Array.from(textDatabase);
@@ -1158,6 +1159,19 @@ window.onload = function () {
 
       if (!mistakesSummary[currentTextId]) {
         mistakesSummary[currentTextId] = {};
+      }
+
+      let currentTime;
+      if (localStorage.getItem("elapsedTime")) {
+        currentTime = localStorage.getItem("elapsedTime")
+      }
+
+      if (!timeTakenForEachText[currentTextId]) {
+        timeTakenForEachText[currentTextId] = {};
+      }
+
+      if (timeTakenForEachText[currentTextId]) {
+        timeTakenForEachText[currentTextId]["startTime"] = elapsedTime;
       }
 
       textIncidenceCount = answeredTexts.filter(id => id === currentTextId).length;
@@ -1356,6 +1370,10 @@ window.onload = function () {
       }
 
       if (allFieldsCorrect) {
+        if (timeTakenForEachText[currentTextId]) {
+          timeTakenForEachText[currentTextId]["endTime"] = elapsedTime;
+        }
+
         controller.answeredQuestionTracker++;
 
         if (firstTimeChecking) {

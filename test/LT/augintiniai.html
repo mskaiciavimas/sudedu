@@ -85,6 +85,9 @@
             -webkit-user-select: none;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+        }
+
+        *:not(#shop-container *):not(#pet-asset-container *):not(#furniture-container *):not(#taxes-container *) {
             box-sizing: border-box;
         }
 
@@ -703,11 +706,11 @@
             cursor: not-allowed;
         }
 
-        .shop-header {
+.shop-header {
     position: sticky;
     top: 0;
     z-index: 9999;
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -724,25 +727,29 @@
 }
 
 .shop-header.compact .header-main {
-    padding: 12px 20px;
+    padding: 10px 15px;
 }
 
 .header-main {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 30px;
+    padding: 20px;
     transition: padding 0.3s ease;
+    cursor: pointer;
 }
 
 .header-left {
     display: flex;
     align-items: center;
-    gap: 15px;
+}
+
+.header-left h2 {
+    margin: 0 !important;
 }
 
 .expand-toggle {
-    background: rgba(50, 172, 147, 0.2);
+    background: transparent;
     border: none;
     width: 36px;
     height: 36px;
@@ -754,11 +761,6 @@
     transition: all 0.3s ease;
     padding: 0;
     margin: 0;
-}
-
-.expand-toggle:hover {
-    background: rgba(50, 172, 147, 0.3);
-    transform: scale(1.1);
 }
 
 .expand-toggle svg {
@@ -776,7 +778,7 @@
     overflow: hidden;
     opacity: 1;
     transition: max-height 0.3s ease, opacity 0.3s ease, margin-bottom 0.3s ease;
-    padding: 0 30px 20px;
+    padding: 0 20px 20px;
 }
 
         .shop-header h2 {
@@ -845,7 +847,8 @@
         }
 
         .shop-categories-dropdown select,
-        #pet-category-select {
+        #pet-category-select,
+        #shop-category-select {
             padding: 12px 16px;
             font-size: 1rem;
             border-radius: 20px;
@@ -869,18 +872,22 @@
             cursor: pointer;
         }
 
-        .shop-items,
-        .object-assets,
-        #pet-skins,
-        #pet-supplies {
+        .shop-items:not(:empty),
+        .object-assets:not(:empty),
+        #pet-skins:not(:empty),
+        #pet-supplies:not(:empty) {
+            height: 100%;
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1.5rem;
+            overflow-y: auto;
+            padding-bottom: 30px;
         }
 
         .shop-items {
             height: 100%;
             overflow-y: auto;
+            box-sizing: content-box !important;
         }
  
         .food-options-container {
@@ -1146,8 +1153,14 @@
         #shop-container,
         #taxes-container,
         #pet-asset-container {
-            padding: 30px;
+            padding: 30px 30px 0 30px;
             height: 100%;
+            overflow: hidden;
+        }
+
+        .tax-section-inner-holder {
+            height: 100%;
+            overflow: auto;
         }
 
         .department-btn.active,
@@ -1194,11 +1207,6 @@
             gap: 6px;
             margin-top: 12px;
         }
-
-        .categories-dropdown-holder {
-            margin-bottom: 28px;
-        }
-
 
         @keyframes draw {
         0% {
@@ -1375,6 +1383,7 @@
 
         .tax-info {
             margin-top: 20px;
+            margin-bottom: 30px;
         }
 
         #days-remaining-water,
@@ -1421,17 +1430,23 @@
             justify-content: center;
         }
 
-        .shop-departments,
-        .pet-asset-supply-tabs {
+        .shop-departments {
             display: flex;
             margin-bottom: 16px;
             gap: 10px;
             flex-wrap: wrap;
         }
 
+        .pet-asset-supply-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
         .pet-supplies-tabs {
             display: flex;
-            margin-bottom: 20px;
+            flex-direction: column;
             gap: 10px;
             flex-wrap: wrap;
         }
@@ -1491,7 +1506,6 @@
             flex: 1 1 auto;
             display: flex;
             flex-direction: row;
-            margin-bottom: 16px;
             gap: 10px;
         }
 
@@ -2021,6 +2035,7 @@
   justify-content: space-between;
   align-items: flex-end;
   gap: 10px;
+  margin-bottom: 16px;
 }
 
 .categories-dropdown-holder {
@@ -2377,6 +2392,12 @@
     display: block;
 }
 
+
+.shop-header.compact .collapsible-content{
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
 @media (min-width: 769px) {
     .toggle-tab {
         display: none;
@@ -2461,12 +2482,13 @@
     }
 
     .game-content-panel.mobile {
-        padding: 15px 10px !important;
+        padding: 15px 15px 0 15px !important;
     }
 
-    .shop-header {
-        padding: 20px;
+    .shop-items:not(:empty), .object-assets:not(:empty), #pet-skins:not(:empty), #pet-supplies:not(:empty) {
+        padding-bottom: 15px;
     }
+
 
     #game-panel {
         margin: 0;
@@ -2499,11 +2521,11 @@
     }
     
     .header-main {
-        padding: 15px 20px;
+        padding: 10px 15px;
     }
     
     .collapsible-content {
-        padding: 0 20px 15px;
+        padding: 0 15px 10px 15px;
     }
     
     .expand-toggle {
@@ -2607,7 +2629,11 @@
   #pet-buttons {
     margin-left: 4px;
   }
-    
+
+    .expand-toggle {
+        width: 20px;
+        height: 32px;
+    }
 }
 
 
@@ -3374,9 +3400,19 @@
 </div>
 
     <div id="pet-asset-container" class="game-content-panel">
-                <div class="shop-header">
-                    <h2>Augintiniai</h2>
-                </div>
+    <div class="shop-header" id="petAssetHeader">
+        <div class="header-main">
+            <div class="header-left">
+                <button class="expand-toggle" id="petAssetExpandToggle">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 15l-6-6-6 6"/>
+                    </svg>
+                </button>
+                <h2>Augintiniai</h2>
+            </div>
+        </div>
+        
+        <div class="collapsible-content" id="petAssetCollapsibleContent">
                 
 
                 <div id="pet-asset-buttons">
@@ -3401,26 +3437,33 @@
                 <div class="categories-dropdown-holder">
                         <select id="pet-category-select" style="display: none;"></select>
                 </div>
+                    </div>
+                </div>
                 <div id="pet-skins"></div>
                 <div id="pet-supplies">
                     <div id="pet-supplies-items"></div>
                 </div>
                 <div class="pet-categories-dropdown"></div>
-    </div>
+        </div> 
+    
 
             <div id="taxes-container" class="game-content-panel">
             
-                <div class="taxes-header">
-                <div class="shop-header">
-                    <h2>Mokesčiai</h2>
+            <div class="shop-header" id="taxesHeader">
+                <div class="header-main">
+                    <div class="header-left">
+                        <h2>Mokesciai</h2>
+                    </div>
                     <div class="coin-display">
-                    <span class="coin-icon">
+                        <span class="coin-icon">
                             <img src="../images/icons/icon-sudedu-coin.png">
-                    </span>
-                    <span class="coin-amount"></span>
+                        </span>
+                        <span class="coin-amount"></span>
+                    </div>
                 </div>
+            
                 </div>
-                </div>
+                <div class="tax-section-inner-holder hide-scrollbar">
                 <div class="tax-records">
                     <h3>Mokesčių sąrašas</h3>
                     <div class="records-list">
@@ -3475,14 +3518,25 @@
                         </div>
                     </div>
                 </div>
+                </div>
 
 
             </div>
 
             <div id="furniture-container" class="game-content-panel">
-                <div class="shop-header">
-                    <h2>Baldai</h2>
+            <div class="shop-header" id="furnitureHeader">
+                <div class="header-main">
+                    <div class="header-left">
+                        <button class="expand-toggle" id="furnitureExpandToggle">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 15l-6-6-6 6"/>
+                            </svg>
+                        </button>
+                        <h2>Baldai</h2>
+                    </div>
                 </div>
+                
+                <div class="collapsible-content" id="furnitureCollapsibleContent">
                 <div class="shop-categories-dropdown">
                     <div class="categories-dropdown-holder">
                         <select id="object-category-select"></select>
@@ -3496,13 +3550,15 @@
                             </label>
                         </div>
                     </div>
+                    </div>
+                    </div>
+                    </div>
                     <div class="object-assets">
 
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     </div>
 
     <script src="../mental-arithmetic.js"></script>
@@ -3958,7 +4014,7 @@ function resizeCanvas() {
 // Call on window resize
 window.addEventListener('resize', resizeCanvas);
 
-        function setPetAndObjectContainersToGridDimentions() {
+        async function setPetAndObjectContainersToGridDimentions() {
             const roomGrid = document.getElementById('roomGrid');
 
             const width = roomGrid.offsetWidth;
@@ -4026,8 +4082,9 @@ function toggleRoomDarknessBasedOnElectricityTax() {
 
 async function initGame() {
     adjustUnitSizeForSmallScreens();
+    await new Promise(resolve => requestAnimationFrame(resolve));
     await renderRoomGrid();
-    setPetAndObjectContainersToGridDimentions();
+    await setPetAndObjectContainersToGridDimentions();
     renderRoomObjects();
     blockTopHalfOfSelectedDivsClickEvents()
     renderPets();
@@ -4514,7 +4571,8 @@ function removeObjectsMarkedForRemoval() {
             // delete immediately
             const el = document.getElementById(obj.id);
             if (el) el.remove();
-            deletedIds.push(obj.id); // ✅ track deleted ID
+            userObjectAssets[obj.id].position = [];
+            deletedIds.push(obj.id);
         }
     }
 
@@ -4542,6 +4600,7 @@ function removeObjectsMarkedForRemoval() {
             // becomes free → delete now
             const el = document.getElementById(obj.id);
             if (el) el.remove();
+            userObjectAssets[obj.id].position = [];
             deletedIds.push(obj.id); // ✅ track deleted ID
         }
     }
@@ -4565,7 +4624,7 @@ function removeObjectsMarkedForRemoval() {
         }
     });
 
-
+    rerenderObjectAssetListIfNoItemsInSelectedCategory(sidebar=true)
 }
 
 
@@ -5109,10 +5168,11 @@ function validateAndResetPosition(object) {
 
     clearPlacementHighlights();
 
-    // Check if editing mode and validate object placement
-    if (editing && object._placementMap) {
+    // ✅ IMPROVED: Always validate placement for objects in edit mode
+    if (editing && object._placementMap && object._originalCoords) {
         const canPlace = checkPlacement(object, object._placementMap, unitSize);
         if (!canPlace) {
+            // Revert to original position
             object.style.left = `calc(${object._originalCoords[0]} * var(--unit-size))`;
             object.style.top = `calc((${object._originalCoords[1] + 1} * var(--unit-size)) - ${object.offsetHeight}px)`;
         }
@@ -7851,8 +7911,9 @@ async function previewFurniture (key) {
         furniturePreviewDict["furniture-preview"].position = validPosition;
         updateStatsBeforeRerunningInitGameAndRenderPets();
         adjustUnitSizeForSmallScreens();
+        await new Promise(resolve => requestAnimationFrame(resolve));
         renderRoomGrid();
-        setPetAndObjectContainersToGridDimentions();
+        await setPetAndObjectContainersToGridDimentions();
         renderRoomObjects();
         toggleRoomDarknessBasedOnElectricityTax();
         predictAndSetZIndex();
@@ -8059,8 +8120,6 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
             btn.className = 'purchase-btn';
             btn.textContent = 'Pirkti';
 
-            
-
             let quantityInput = null;
 
             if (!item.oneOfKind) {
@@ -8129,9 +8188,10 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
             priceAndQuantDiv.appendChild(priceDiv);
             infoDiv.appendChild(priceAndQuantDiv);
 
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', async () => {
                 const quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
-                handlePurchase(item, assetIndex, quantity, selectedCategory, btn);
+                await handlePurchase(item, assetIndex, quantity, selectedCategory, btn);
+                renderObjectAssetsDropdown();
             });
 
             if (previewButton && !(ownedIndexes.has(assetIndex) && item.oneOfKind)) {
@@ -8179,6 +8239,130 @@ toggle.addEventListener('change', () => {
     renderShopItems(selectedCategory, dept, activePetSupplyTab);
 });
 
+function rerenderObjectAssetListIfNoItemsInSelectedCategory(sidebar=false) {
+    // Select correct dropdown
+    const dropdown = sidebar
+        ? document.getElementById('object-sidebar-category-select')
+        : document.getElementById('object-category-select');
+
+    function thereAreItemsInSelectedCategory () {
+        if (!dropdown) return false;
+
+        const selected = dropdown.value;
+
+        if (selected === 'all') {
+            return Object.values(userObjectAssets).some(asset => {
+                if (!asset || asset.assetIndex != null === false) return false;
+
+                // NEW: sidebar only counts items not placed anywhere
+                if (sidebar && asset.position && asset.position.length !== 0) return false;
+
+                return true;
+            });
+        }
+
+        for (const key in userObjectAssets) {
+            const asset = userObjectAssets[key];
+            if (!asset || asset.assetIndex == null) continue;
+
+            // NEW: sidebar only counts items with no position
+            if (sidebar && asset.position && asset.position.length !== 0) continue;
+
+            const item = gameAssetIndex[asset.assetIndex];
+            if (!item || !item.category) continue;
+
+            if (item.category.includes(selected)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    if (!thereAreItemsInSelectedCategory()) {
+        if (sidebar) {
+            renderObjectAssetsDropdown(sidebar);
+        } else {
+            renderObjectAssetsDropdown();
+        }
+    } else {
+        if (sidebar) {
+            let dropdown = document.getElementById('object-sidebar-category-select');
+            if (dropdown) {
+                renderObjectAssets(dropdown.value, false, true);
+            }
+        } else {
+            let dropdown = document.getElementById('object-category-select');
+            usageToggle = document.getElementById('object-usage-toggle');
+            
+            if (dropdown && usageToggle) {
+                renderObjectAssets(dropdown.value, usageToggle.checked, false);
+            }
+        }
+    }
+
+    updateObjectAssetDropdown(sidebar);
+}
+
+function updateObjectAssetDropdown(sidebar = false) {
+    let dropdown;
+    if (sidebar) {
+        dropdown = document.getElementById('object-sidebar-category-select');
+    } else {
+        dropdown = document.getElementById('object-category-select');
+    }
+
+    if (!dropdown) return;
+
+    const currentValue = dropdown.value; // Save currently selected option
+
+    // Gather categories from currently owned object assets
+    const categoryCounts = {};
+
+    for (const key in userObjectAssets) {
+        const asset = userObjectAssets[key];
+        if (!asset || asset.assetIndex == null) continue;
+
+        // Sidebar only counts assets with empty position
+        if (sidebar && asset.position && asset.position.length !== 0) continue;
+
+        const item = gameAssetIndex[asset.assetIndex];
+        if (!item || !item.category) continue;
+
+        item.category.forEach(cat => {
+            categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+        });
+    }
+
+    // Clear existing options
+    dropdown.innerHTML = '';
+
+    // Add "All" option
+    const allOption = document.createElement('option');
+    allOption.value = 'all';
+    allOption.textContent = `Visi`;
+    dropdown.appendChild(allOption);
+
+    // Add categories (sorted alphabetically)
+    Object.keys(categoryCounts).sort((a, b) => {
+        const nameA = a.charAt(0).toUpperCase() + a.slice(1);
+        const nameB = b.charAt(0).toUpperCase() + b.slice(1);
+        return nameA.localeCompare(nameB);
+    }).forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = `${cat.charAt(0).toUpperCase() + cat.slice(1)}`;
+        dropdown.appendChild(option);
+    });
+
+    // Restore previously selected option if it exists, else default to 'all'
+    if (Array.from(dropdown.options).some(opt => opt.value === currentValue)) {
+        dropdown.value = currentValue;
+    } else {
+        dropdown.value = 'all';
+    }
+}
+
 function renderObjectAssetsDropdown(sidebar=false) {
     let dropdown;
     let usageToggle;
@@ -8203,6 +8387,9 @@ function renderObjectAssetsDropdown(sidebar=false) {
     for (const key in userObjectAssets) {
         const asset = userObjectAssets[key];
         if (!asset || asset.assetIndex == null) continue;
+
+        // If sidebar, only count assets with empty position
+        if (sidebar && asset.position && asset.position.length !== 0) continue;
 
         const item = gameAssetIndex[asset.assetIndex];
         if (!item || !item.category) continue;
@@ -8256,6 +8443,7 @@ function renderObjectAssetsDropdown(sidebar=false) {
         });
     }
 }
+
 
 
 function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sidebar) {
@@ -8400,9 +8588,13 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
                     const tempDiv = document.getElementById(tempDivId)
                     tempDiv.style.left = `calc(${validPosition[0]} * var(--unit-size))`;
                     tempDiv.style.top = `calc((${validPosition[1] + 1} * var(--unit-size)) - ${tempDiv.offsetHeight}px)`;
-                    enableObjectDragging();
+                    
+                    setTimeout(() => {
+                        disableObjectDragging();
+                        enableObjectDragging();
+                    }, 50);
                 }
-                console.log()
+
                 if (!isObjectVisibleInViewport(tempDivId)) {
                     centerViewportOnObject(tempDivId)
                 }
@@ -8433,12 +8625,13 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
             deleteBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 6 L6 18 M6 6 L18 18" stroke="#F5F5F7" stroke-width="2"/></svg>';
 
             deleteBtn.addEventListener('click', () => {
-                showCustomConfirm(`Ar tikrai nori išmestį šį daiktą? Jo susigrąžinti negalėsi.`, () => {
+                showCustomConfirm(`Ar tikrai nori išmestį šį daiktą? Jo susigrąžinti negalėsi.`, async () => {
                     // Delete all instances of this stackable item
-                    keys.forEach(key => {
-                        removeObjectFromUserAssets(key);
-                        renderShopCategoriesDropdown();
-                    });
+                    for (const key of keys) {
+                        await removeObjectFromUserAssets(key);
+                    }
+                    rerenderObjectAssetListIfNoItemsInSelectedCategory();
+                    renderShopCategoriesDropdown();
                 });
             });
 
@@ -8539,7 +8732,11 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
                     const tempDiv = document.getElementById(tempDivId)
                     tempDiv.style.left = `calc(${validPosition[0]} * var(--unit-size))`;
                     tempDiv.style.top = `calc((${validPosition[1] + 1} * var(--unit-size)) - ${tempDiv.offsetHeight}px)`;
-                    enableObjectDragging();
+                    rerenderObjectAssetListIfNoItemsInSelectedCategory(sidebar=true);
+                    setTimeout(() => {
+                        disableObjectDragging();
+                        enableObjectDragging();
+                    }, 50);
                 }
 
                 if (!isObjectVisibleInViewport(tempDivId)) {
@@ -8603,7 +8800,7 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
 function removeObjectFromUserAssets(assetKey) {
     delete userObjectAssets[assetKey];
     sendObjectAssetsUpdateToDatabase();
-    renderObjectAssets('all', false);
+    rerenderObjectAssetListIfNoItemsInSelectedCategory();
 }
 
 // Render a single object in the room
@@ -11762,53 +11959,293 @@ document.querySelectorAll('input.purchase-quantity').forEach(input => {
     });
 });
 
-// Shop header collapse functionality
 function initShopHeaderCollapse() {
     const shopHeader = document.getElementById('shopHeader');
+    const shopHeaderMain = document.querySelector('.header-main');
     const shopItems = document.getElementById('shop-items');
     const expandToggle = document.getElementById('expandToggle');
-    const scrollableContainer = document.getElementById('shop-items');
-    
-    if (!shopHeader || !shopItems || !expandToggle) return;
-    
-    let lastScrollTop = 0;
-    let isManuallyExpanded = false;
 
-    scrollableContainer.addEventListener('scroll', () => {
-        if (isManuallyExpanded) return; // Don't auto-collapse if manually expanded
-        
+    if (!shopHeader || !shopItems || !expandToggle) return;
+
+    let isManuallyExpanded = false;
+    let lastScrollTop = 0;
+    let userScrolling = false;
+
+    const expandThreshold = 50;
+
+    function handleScroll() {
+        if (!userScrolling || isManuallyExpanded) return;
+
         const scrollTop = shopItems.scrollTop;
-        
-        if (scrollTop > 100 && scrollTop > lastScrollTop) {
-            // Scrolling down
+        const scrollingDown = scrollTop > lastScrollTop;
+        const scrollingUp = scrollTop < lastScrollTop;
+
+        const headerIsCompact = shopHeader.classList.contains('compact');
+
+        if (scrollingDown && !headerIsCompact) {
             shopHeader.classList.add('compact');
-        } else if (scrollTop < 50) {
-            // Near top
+        } else if (scrollingUp && scrollTop < expandThreshold && headerIsCompact) {
             shopHeader.classList.remove('compact');
         }
-        
+
         lastScrollTop = scrollTop;
+    }
+
+    // Scroll container user events
+    shopItems.addEventListener('wheel', () => { 
+        userScrolling = true; 
+        handleScroll();
+        requestAnimationFrame(() => userScrolling = false);
     });
 
+    shopItems.addEventListener('touchstart', () => { userScrolling = true; });
+    shopItems.addEventListener('touchmove', () => { userScrolling = true; handleScroll(); });
+    shopItems.addEventListener('touchend', () => { userScrolling = false; });
+
+    shopItems.addEventListener('scroll', handleScroll);
+
     // Manual toggle
-    expandToggle.addEventListener('click', () => {
+    shopHeaderMain.addEventListener('click', () => {
         const isCompact = shopHeader.classList.toggle('compact');
         isManuallyExpanded = !isCompact;
-        
-        // Reset manual flag after 5 seconds
         if (isManuallyExpanded) {
-            setTimeout(() => {
-                isManuallyExpanded = false;
-            }, 5000);
+            setTimeout(() => { isManuallyExpanded = false; }, 5000);
         }
+    });
+
+    // Header inputs/buttons/toggles
+    shopHeader.querySelectorAll('button, input[type="checkbox"], input[type="radio"], input[type="range"]').forEach(el => {
+        el.addEventListener('click', () => {
+            shopItems.scrollTop = 0;
+        });
+    });
+
+    // Dropdowns (<select>) trigger scroll on change
+    shopHeader.querySelectorAll('select').forEach(el => {
+        el.addEventListener('change', () => {
+            shopItems.scrollTop = 0;
+        });
+    });
+
+    // Proxy scroll from header (wheel)
+    shopHeader.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        userScrolling = true;
+        shopItems.scrollTop += e.deltaY;
+        handleScroll();
+        requestAnimationFrame(() => userScrolling = false);
+    });
+
+    // Proxy scroll from header (touch)
+    let lastTouchY = null;
+    shopHeader.addEventListener('touchstart', (e) => {
+        lastTouchY = e.touches[0].clientY;
+        userScrolling = true;
+    });
+    shopHeader.addEventListener('touchmove', (e) => {
+        if (lastTouchY === null) return;
+        const currentY = e.touches[0].clientY;
+        const deltaY = lastTouchY - currentY;
+        shopItems.scrollTop += deltaY;
+        lastTouchY = currentY;
+        userScrolling = true;
+        handleScroll();
+        e.preventDefault();
+    });
+    shopHeader.addEventListener('touchend', () => {
+        lastTouchY = null;
+        userScrolling = false;
     });
 }
 
-// Initialize when shop is opened
+function initPetAssetHeaderCollapse() {
+    const header = document.getElementById('petAssetHeader');
+    const headerMain = header?.querySelector('.header-main');
+    const container = document.getElementById('pet-supplies') || document.getElementById('pet-skins');
+    const expandToggle = document.getElementById('petAssetExpandToggle');
+
+    if (!header || !container || !expandToggle) return;
+
+    let isManuallyExpanded = false;
+    let lastScrollTop = 0;
+    let userScrolling = false;
+    const expandThreshold = 50;
+
+    function handleScroll() {
+        if (!userScrolling || isManuallyExpanded) return;
+        const scrollTop = container.scrollTop;
+        const scrollingDown = scrollTop > lastScrollTop;
+        const scrollingUp = scrollTop < lastScrollTop;
+        const headerIsCompact = header.classList.contains('compact');
+
+        if (scrollingDown && !headerIsCompact) {
+            header.classList.add('compact');
+        } else if (scrollingUp && scrollTop < expandThreshold && headerIsCompact) {
+            header.classList.remove('compact');
+        }
+        lastScrollTop = scrollTop;
+    }
+
+    container.addEventListener('wheel', () => { 
+        userScrolling = true; 
+        handleScroll();
+        requestAnimationFrame(() => userScrolling = false);
+    });
+
+    container.addEventListener('touchstart', () => { userScrolling = true; });
+    container.addEventListener('touchmove', () => { userScrolling = true; handleScroll(); });
+    container.addEventListener('touchend', () => { userScrolling = false; });
+    container.addEventListener('scroll', handleScroll);
+
+    headerMain?.addEventListener('click', () => {
+        const isCompact = header.classList.toggle('compact');
+        isManuallyExpanded = true;
+        if (isManuallyExpanded) {
+            setTimeout(() => { isManuallyExpanded = false; }, 3000);
+        }
+    });
+
+    header.querySelectorAll('button, input, select').forEach(el => {
+        el.addEventListener('click', () => { container.scrollTop = 0; });
+        if (el.tagName === 'SELECT') {
+            el.addEventListener('change', () => { container.scrollTop = 0; });
+        }
+    });
+
+    header.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        userScrolling = true;
+        container.scrollTop += e.deltaY;
+        handleScroll();
+        requestAnimationFrame(() => userScrolling = false);
+    });
+}
+
+function initFurnitureHeaderCollapse() {
+    const header = document.getElementById('furnitureHeader');
+    const headerMain = header?.querySelector('.header-main');
+    const container = document.querySelector('.object-assets');
+    const expandToggle = document.getElementById('furnitureExpandToggle');
+
+    if (!header || !container || !expandToggle) return;
+
+    let isManuallyExpanded = false;
+    let lastScrollTop = 0;
+    let userScrolling = false;
+    const expandThreshold = 50;
+
+    function handleScroll() {
+        if (!userScrolling || isManuallyExpanded) return;
+        const scrollTop = container.scrollTop;
+        const scrollingDown = scrollTop > lastScrollTop;
+        const scrollingUp = scrollTop < lastScrollTop;
+        const headerIsCompact = header.classList.contains('compact');
+
+        if (scrollingDown && !headerIsCompact) {
+            header.classList.add('compact');
+        } else if (scrollingUp && scrollTop < expandThreshold && headerIsCompact) {
+            header.classList.remove('compact');
+        }
+        lastScrollTop = scrollTop;
+    }
+
+    container.addEventListener('wheel', () => { 
+        userScrolling = true; 
+        handleScroll();
+        requestAnimationFrame(() => userScrolling = false);
+    });
+
+    container.addEventListener('touchstart', () => { userScrolling = true; });
+    container.addEventListener('touchmove', () => { userScrolling = true; handleScroll(); });
+    container.addEventListener('touchend', () => { userScrolling = false; });
+    container.addEventListener('scroll', handleScroll);
+
+    headerMain?.addEventListener('click', () => {
+        const isCompact = header.classList.toggle('compact');
+        isManuallyExpanded = true;
+        if (isManuallyExpanded) {
+            setTimeout(() => { isManuallyExpanded = false; }, 3000);
+        }
+    });
+
+    header.querySelectorAll('button, input, select').forEach(el => {
+        el.addEventListener('click', () => { container.scrollTop = 0; });
+        if (el.tagName === 'SELECT') {
+            el.addEventListener('change', () => { container.scrollTop = 0; });
+        }
+    });
+
+    header.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        userScrolling = true;
+        container.scrollTop += e.deltaY;
+        handleScroll();
+        requestAnimationFrame(() => userScrolling = false);
+    });
+}
+
+function initTaxesHeaderCollapse() {
+    const header = document.getElementById('taxesHeader');
+    const headerMain = header?.querySelector('.header-main');
+    const container = document.querySelector('.tax-records');
+    const expandToggle = document.getElementById('taxesExpandToggle');
+
+    if (!header || !container || !expandToggle) return;
+
+    let isManuallyExpanded = false;
+    let lastScrollTop = 0;
+    let userScrolling = false;
+    const expandThreshold = 50;
+
+    function handleScroll() {
+        if (!userScrolling || isManuallyExpanded) return;
+        const scrollTop = container.scrollTop;
+        const scrollingDown = scrollTop > lastScrollTop;
+        const scrollingUp = scrollTop < lastScrollTop;
+        const headerIsCompact = header.classList.contains('compact');
+
+        if (scrollingDown && !headerIsCompact) {
+            header.classList.add('compact');
+        } else if (scrollingUp && scrollTop < expandThreshold && headerIsCompact) {
+            header.classList.remove('compact');
+        }
+        lastScrollTop = scrollTop;
+    }
+
+    container.addEventListener('wheel', () => { 
+        userScrolling = true; 
+        handleScroll();
+        requestAnimationFrame(() => userScrolling = false);
+    });
+
+    container.addEventListener('touchstart', () => { userScrolling = true; });
+    container.addEventListener('touchmove', () => { userScrolling = true; handleScroll(); });
+    container.addEventListener('touchend', () => { userScrolling = false; });
+    container.addEventListener('scroll', handleScroll);
+
+    headerMain?.addEventListener('click', () => {
+        const isCompact = header.classList.toggle('compact');
+        isManuallyExpanded = true;
+        if (isManuallyExpanded) {
+            setTimeout(() => { isManuallyExpanded = false; }, 3000);
+        }
+    });
+
+    header.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        userScrolling = true;
+        container.scrollTop += e.deltaY;
+        handleScroll();
+        requestAnimationFrame(() => userScrolling = false);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Wait for elements to be ready
     setTimeout(() => {
         initShopHeaderCollapse();
+        initPetAssetHeaderCollapse();
+        initFurnitureHeaderCollapse();
+        initTaxesHeaderCollapse();
     }, 100);
 });
 
@@ -12162,6 +12599,10 @@ function handleTouchEnd(e) {
         initialPinchY = 0;
         initialViewportX = 0;
         initialViewportY = 0;
+    }
+
+    if (isDragging && currentObject) {
+        validateAndResetPosition(currentObject);
     }
     
     // When ALL touches end after multi-touch
