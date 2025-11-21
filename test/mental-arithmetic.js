@@ -2525,7 +2525,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
                     throw new Error(`Invalid wordId structure: ${JSON.stringify(wordId)}`);
                 }
 
-                const entry = sudedu_duomenu_baze.find(item => item.id === wordId[0]);
+                const entry = sudedu_duomenu_baze[wordId[0].toString()];
                 if (!entry) {
                     if (userData.accType === "teacher") {
                       if (resultsContainer) {
@@ -3346,8 +3346,7 @@ async function processSelectedTexts() {
     const groupedByDifficultyAndClass = {};
     
     validTextTimes.forEach(([textId, times]) => {
-        const numericTextId = parseInt(textId);
-        const text = textLibrary.find(entry => entry.id === numericTextId);
+        const text = textLibrary[textId.toString()];
         
         if (!text) {
             console.warn(`Text with id ${textId} not found in database`);
@@ -3356,13 +3355,13 @@ async function processSelectedTexts() {
 
         // Determine class level
         let classLevel = null;
-        const classChoiceArray = text['class-choice'];
+        const classChoiceArray = text["class"];
         
         if (classChoiceArray && Array.isArray(classChoiceArray)) {
             // If both are present, take 3_4_klase
-            if (classChoiceArray.includes('3_4_klase')) {
+            if (classChoiceArray.includes("C76")) {
                 classLevel = 'C76'; // 3_4_klase
-            } else if (classChoiceArray.includes('1_2_klase')) {
+            } else if (classChoiceArray.includes("C75")) {
                 classLevel = 'C75'; // 1_2_klase
             }
         }
@@ -3376,28 +3375,14 @@ async function processSelectedTexts() {
         let difficultyLevel = null;
 
         if (controller.modeChoice2 === "C51") {
-            // Komponavimas
-            const suitableFor = text['suitable-for']?.['komponavimas'];
-            if (suitableFor) {
-                // Find matching difficulty
-                for (const [code, info] of Object.entries(parameterDictionary)) {
-                    if (info.parameter && suitableFor.includes(info.parameter)) {
-                        difficultyLevel = code;
-                        break;
-                    }
-                }
-            }
+          const difficultyCode = text["SF"]?.["C51"];
+          if (difficultyCode && ["C58", "C59", "C60"].includes(difficultyCode)) {
+              difficultyLevel = difficultyCode;
+          }
         } else if (controller.modeChoice2 === "C52") {
-            // Struktura
-            const suitableFor = text['suitable-for']?.['struktura'];
-            if (suitableFor) {
-                // Find matching difficulty
-                for (const [code, info] of Object.entries(parameterDictionary)) {
-                    if (info.parameter && suitableFor.includes(info.parameter)) {
-                        difficultyLevel = code;
-                        break;
-                    }
-                }
+            const difficultyCode = text["SF"]?.["C52"];
+            if (difficultyCode && ["C58", "C59", "C60"].includes(difficultyCode)) {
+                difficultyLevel = difficultyCode;
             }
         }
 
@@ -3679,37 +3664,33 @@ function closeObjectPopup () {
 //OBJECT POP UP END
 
 
-function showCustomConfirm(text, onConfirm, item=null) {
-      const modal = document.getElementById('customConfirmModal');
-      const modalText = document.getElementById('customModalText');
-      const yesBtn = document.getElementById('customConfirmYes');
-      const noBtn = document.getElementById('customConfirmNo');
+function showCustomConfirm(text, onConfirm, args = []) {
+    const modal = document.getElementById('customConfirmModal');
+    const modalText = document.getElementById('customModalText');
+    const yesBtn = document.getElementById('customConfirmYes');
+    const noBtn = document.getElementById('customConfirmNo');
 
-      // Set text
-      modalText.textContent = text;
+    // Set text
+    modalText.innerHTML = text;
 
-      // Show modal
-      modal.style.display = 'flex';
+    // Show modal
+    modal.style.display = 'flex';
 
-      // Remove previous click handlers
-      yesBtn.onclick = null;
-      noBtn.onclick = null;
+    // Remove previous click handlers
+    yesBtn.onclick = null;
+    noBtn.onclick = null;
 
-      // Yes click
-      yesBtn.onclick = () => {
-          if (item !== undefined && item !== null) {
-            onConfirm(item);
-          } else {
-            onConfirm();
-          }
-          modal.style.display = 'none';
-      };
+    // Yes click
+    yesBtn.onclick = () => {
+        onConfirm(...args); // spread array as multiple arguments
+        modal.style.display = 'none';
+    };
 
-      // No click
-      noBtn.onclick = () => {
-          modal.style.display = 'none';
-      };
-  }
+    // No click
+    noBtn.onclick = () => {
+        modal.style.display = 'none';
+    };
+}
 
 
 // POINTS CALCULATION START
@@ -3958,39 +3939,34 @@ async function calculateTasksPerCorrectAnswerPoints(type, selectedTextInfo = nul
     }
 
     function buildList(textDatabase, textIds, textCompType) {
-        const result = [];
+    const result = [];
 
-        for (const id of textIds) {
-            const entry = textDatabase.find(x => x.id === id);
-            if (!entry) continue;
+      for (const id of textIds) {
+          const entry = textDatabase[id.toString()]; // <-- direct lookup
+          if (!entry) continue;
 
-            const out = [];
+          const out = [];
 
-            const classes = entry["class-choice"] ?? [];
-            let classCode = null;
-            const has12 = classes.includes("1_2_klase");
-            const has34 = classes.includes("3_4_klase");
-            if (has12 && !has34) classCode = "C75";
-            else if (has34 || (has12 && has34)) classCode = "C76";
-            out.push(classCode);
+          const classes = entry["class"] ?? [];
+          let classCode = null;
+          const has12 = classes.includes("C75");
+          const has34 = classes.includes("C76");
+          if (has12 && !has34) classCode = "C75";
+          else if (has34 || (has12 && has34)) classCode = "C76";
+          out.push(classCode);
 
-            let complexityValue = null;
-            if (textCompType === "C51") complexityValue = entry["suitable-for"]?.komponavimas ?? null;
-            else if (textCompType === "C52") complexityValue = entry["suitable-for"]?.struktura ?? null;
-            if (!complexityValue) continue;
+          let complexityCode = null;
+          if (textCompType === "C51") complexityCode = entry["SF"]?.C51 ?? null;
+          else if (textCompType === "C52") complexityCode = entry["SF"]?.C52 ?? null;
 
-            let complexityCode = null;
-            if (complexityValue === "lengvas") complexityCode = "C58";
-            else if (complexityValue === "vidutinis") complexityCode = "C59";
-            else if (complexityValue === "sunkus") complexityCode = "C60";
-            if (!complexityCode) continue;
+          // Validate it's a known difficulty level
+          if (!["C58", "C59", "C60"].includes(complexityCode)) continue;
 
-            out.push(complexityCode);
-            result.push(out);
-        }
+          out.push(complexityCode);
+      }
 
-        return result;
-    }
+      return result;
+  }
 }
 
 

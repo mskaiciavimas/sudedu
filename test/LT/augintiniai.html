@@ -803,6 +803,17 @@
             color: #92400e;
         }
 
+        .coin-display-delete-confirm {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            padding: 2px 8px 2px 4px;
+            border-radius: 15px;
+            font-weight: 600;
+            color: #92400e;
+        }
+
         .coin-icon {
             display: flex;
             justify-content: center;
@@ -1086,7 +1097,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
-            min-height: 40px;
+            min-height: 30px;
             min-width: 60%;
             font-size: 1rem;
             text-align: center;
@@ -1220,10 +1231,10 @@
         .tick {
             fill: none;
             stroke: #F5F5F7;
-            stroke-width: 4;
+            stroke-width: 3;
             stroke-linecap: round;
             stroke-linejoin: round;
-            stroke-dasharray: 24; /* length of path */
+            stroke-dasharray: 24;
             stroke-dashoffset: 24;
         }
 
@@ -1887,7 +1898,6 @@
   padding: 20px 30px;
   border-radius: 10px;
   text-align: center;
-  max-width: 300px;
   width: 80%;
 }
 
@@ -2397,6 +2407,74 @@
     padding-top: 0;
     padding-bottom: 0;
 }
+
+.purchase-btn-hold {
+  --progress: #3288AC;
+  --duration: 1600ms;
+
+  padding: 12px 24px;
+  border: 0;
+  outline: none;
+  user-select: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.purchase-btn-hold > span:first-child {
+  position: relative;
+  z-index: 3;
+  backface-visibility: hidden;
+  transition: transform 0.3s, opacity 0.2s;
+}
+
+/* Background layer for press effect */
+.purchase-btn-hold::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  transition: transform 0.3s;
+  background: var(--background, transparent);
+}
+
+/* SVG stroke - FIXED: Hide initially */
+.purchase-btn-hold svg rect {
+  stroke-dasharray: 0;
+  stroke-dashoffset: 0;
+  transition: none;
+  opacity: 0; /* Hidden by default */
+}
+
+/* SVG stroke */
+.purchase-btn-hold svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Press effect */
+.purchase-btn-hold:active:not(.success)::before {
+  transform: scaleX(0.95) scaleY(0.84);
+}
+
+/* Process animation - FIXED: Show stroke and sync timing */
+.purchase-btn-hold.process svg rect {
+  opacity: 1;
+  stroke-dashoffset: 0;
+}
+
 
 @media (min-width: 769px) {
     .toggle-tab {
@@ -3452,7 +3530,7 @@
             <div class="shop-header" id="taxesHeader">
                 <div class="header-main">
                     <div class="header-left">
-                        <h2>Mokesciai</h2>
+                        <h2>Mokesčiai</h2>
                     </div>
                     <div class="coin-display">
                         <span class="coin-icon">
@@ -6416,10 +6494,8 @@ function changeCatFacingDirection(pet, direction) {
 }
 
 async function sendObjectAssetsUpdateToDatabase() {
-    // Store original state for rollback
     const originalObjectAssets = JSON.parse(JSON.stringify(userObjectAssets));
     
-    // Convert dictionary to array of arrays and stringify
     let objectAssetsString = JSON.stringify(
         Object.values(userObjectAssets).map(entry => [entry.assetIndex, entry.position])
     );
@@ -6434,22 +6510,18 @@ async function sendObjectAssetsUpdateToDatabase() {
         });
 
         if (!response) {
-            return;
+            return false;
         }
 
         if (response.ok && response.status === 204) {
-            // Success - add tick animation
-            document.querySelector('.some-purchase-element')?.classList.add('tick-svg');
             return true;
         } else {
-            // Failed response - revert local state
             userObjectAssets = originalObjectAssets;
             messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
             console.error(`Failed to update object assets: ${response.status}`);
             return false;
         }
     } catch (error) {
-        // Network error - revert local state
         userObjectAssets = originalObjectAssets;
         messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
         console.log('Error sending Objects Asset position update:', error);
@@ -6458,10 +6530,8 @@ async function sendObjectAssetsUpdateToDatabase() {
 }
 
 async function sendPetAssetsUpdateToDatabase() {
-    // Store original state for rollback
     const originalPetAssets = JSON.parse(JSON.stringify(userPetAssets));
     
-    // Convert dictionary to array of arrays and stringify
     let petAssetsString = JSON.stringify(convertUserPetAssetsDictToCompactList(userPetAssets));
 
     try {
@@ -6474,22 +6544,18 @@ async function sendPetAssetsUpdateToDatabase() {
         });
 
         if (!response) {
-            return;
+            return false;
         }
 
         if (response.ok && response.status === 204) {
-            // Success - add tick animation
-            document.querySelector('.some-purchase-element')?.classList.add('tick-svg');
             return true;
         } else {
-            // Failed response - revert local state
             userPetAssets = originalPetAssets;
             messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
             console.error(`Failed to update pet assets: ${response.status}`);
             return false;
         }
     } catch (error) {
-        // Network error - revert local state
         userPetAssets = originalPetAssets;
         messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
         console.log('Error sending Pet Asset update:', error);
@@ -6497,45 +6563,44 @@ async function sendPetAssetsUpdateToDatabase() {
     }
 }
 
-async function sendMoneyUpdateToDatabase() {
-    // Store original state for rollback
-    const originalMoney = userMoney;
-    
+async function sendMoneyTransactionToDatabase(amount, type = 'subtract') {
     try {
-        const response = await apiFetch(apiBase + 'petGame/money', {
+        const response = await apiFetch(apiBase + 'petGame/transaction', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ studentId: userData.userId, money: userMoney })
+            body: JSON.stringify({ 
+                studentId: userData.userId, 
+                amount: amount,
+                type: type 
+            })
         });
 
         if (!response) {
-            return;
+            return false;
         }
 
         if (response.ok && response.status === 204) {
-            // Success - update UI and add tick animation
-            updateCoinAmounts(userMoney);
-            document.querySelector('.some-purchase-element')?.classList.add('tick-svg');
             return true;
+        } else if (response.status === 400) {
+            const data = await response.json();
+            if (data.error === 'insufficient_funds') {
+                messageToTheUser("Nepakanka pingų!", 'error');
+            }
+            return false;
         } else {
-            // Failed response - revert local state
-            userMoney = originalMoney;
-            console.error(`Failed to update money: ${response.status}`);
             return false;
         }
     } catch (error) {
-        // Network error - revert local state
-        userMoney = originalMoney;
-        console.log('Error sending Money update:', error);
+        console.log('Error sending money transaction:', error);
         return false;
     }
 }
 
 function updateCoinAmounts(money) {
     document.querySelectorAll('.coin-amount').forEach(span => {
-        span.textContent = money;
+        span.textContent = money.toFixed(1);
     });
 }
 
@@ -7176,6 +7241,13 @@ const contentPanels = document.querySelectorAll('.game-content-panel');
 navButtons.forEach((button) => {
     button.addEventListener('click', () => {
         const targetId = button.dataset.target;
+
+        const previouslyActivePanel = document.querySelector(".game-content-panel.active");
+        const previousId = previouslyActivePanel ? previouslyActivePanel.id : null;
+
+        if (previousId === "pet-room-container" && targetId !== "pet-room-container") {
+            document.getElementById('cancel-edit-btn').click();
+        }
         
         // Remove active class from all buttons and panels
         navButtons.forEach(btn => btn.classList.remove('active'));
@@ -7192,8 +7264,6 @@ navButtons.forEach((button) => {
             selectedConsumable = [];
             clearPlacementHighlights();
         }
-
-        document.getElementById('cancel-edit-btn').click();
 
         // Trigger rendering depending on the panel
         if (targetId === 'furniture-container') {
@@ -7326,6 +7396,13 @@ let shopState = {
 
 async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn) {
     updateShopState();
+
+    const buttons = document.querySelectorAll('.purchase-btn');
+
+    buttons.forEach(btn => {
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+    });
     
     const itemDetails = gameAssetIndex[assetIndex];
     
@@ -7337,9 +7414,9 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
     // Calculate total cost
     const totalCost = itemDetails.cost * quantity;
     
-    // Check if user has enough money
+    // Check if user has enough money (local check first)
     if (userMoney < totalCost) {
-        messageToTheUser("Nepakanka pingų!", 'error');
+        messageToTheUser("Nepakanka pinų!", 'error');
         return;
     }
     
@@ -7348,59 +7425,43 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
     const originalObjectAssets = JSON.parse(JSON.stringify(userObjectAssets));
     const originalPetAssets = JSON.parse(JSON.stringify(userPetAssets));
     
-    // Deduct money from user (optimistic update)
-    userMoney -= totalCost;
-    
     // Save current state before making changes (for shop restoration)
     const currentState = {...shopState};
     
-    let assetUpdateNeeded = false;
+    // Build the new assets BEFORE any server calls
+    let newAssets = {};
+    let assetType = null; // 'pet' or 'object'
     
     if (item.petAsset) {
+        assetType = 'pet';
         const cssClasses = itemDetails['css-class'].split(' ');
         const isSkin = cssClasses.includes('skin');
         
         if (isSkin) {
-            // Handle skin assets
-            const petType = cssClasses[0]; // First class is the pet type (e.g., 'cat-1', 'dog-1')
+            const petType = cssClasses[0];
             
-            // Initialize pets structure if it doesn't exist
-            if (!userPetAssets.pets) {
-                userPetAssets.pets = {};
-            }
-            
-            // Initialize pet type if it doesn't exist
+            if (!userPetAssets.pets) userPetAssets.pets = {};
             if (!userPetAssets.pets[petType]) {
                 userPetAssets.pets[petType] = { 
                     skins: {},
                     name: item.petName
                 };
             }
-            
-            // Initialize skins object if it doesn't exist
             if (!userPetAssets.pets[petType].skins) {
                 userPetAssets.pets[petType].skins = {};
             }
             
-            // Generate new skin key
             const existingSkins = Object.keys(userPetAssets.pets[petType].skins);
             const skinNumber = existingSkins.length + 1;
             const newSkinKey = `${petType}-${skinNumber}`;
             
-            // Add the skin (skins are always unique, so no quantity stacking)
             userPetAssets.pets[petType].skins[newSkinKey] = {
                 assetIndex: assetIndex,
-                equiped: false // New skins start as not equipped
+                equiped: false
             };
-            
         } else {
-            // Handle supply assets
-            // Initialize supplies structure if it doesn't exist
-            if (!userPetAssets.supplies) {
-                userPetAssets.supplies = {};
-            }
+            if (!userPetAssets.supplies) userPetAssets.supplies = {};
             
-            // Check if item is stackable and already exists
             if (itemDetails.stackable) {
                 let existingSupplyKey = null;
                 for (const key in userPetAssets.supplies) {
@@ -7411,10 +7472,8 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
                 }
                 
                 if (existingSupplyKey) {
-                    // Stack with existing supply
                     userPetAssets.supplies[existingSupplyKey].quantity += quantity;
                 } else {
-                    // Create new supply entry
                     const newSupplyKey = `S${Object.keys(userPetAssets.supplies).length + 1}`;
                     userPetAssets.supplies[newSupplyKey] = {
                         assetIndex: assetIndex,
@@ -7422,7 +7481,6 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
                     };
                 }
             } else {
-                // Non-stackable items get separate entries
                 for (let i = 0; i < quantity; i++) {
                     const newSupplyKey = `S${Object.keys(userPetAssets.supplies).length + 1}`;
                     userPetAssets.supplies[newSupplyKey] = {
@@ -7432,10 +7490,8 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
                 }
             }
         }
-        assetUpdateNeeded = true;
-        
     } else {
-        // Object assets (unchanged from your original code)
+        assetType = 'object';
         if (item.oneOfKind) {
             const newKey = `O${Object.keys(userObjectAssets).length + 1}`;
             userObjectAssets[newKey] = { assetIndex, position: [] };
@@ -7445,58 +7501,74 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
                 userObjectAssets[newKey] = { assetIndex, position: [] };
             }
         }
-        assetUpdateNeeded = true;
     }
     
     try {
-        // First, update money on server
-        const moneyUpdateSuccess = await sendMoneyUpdateToDatabase();
+        // 1. Deduct money from server
+        const moneySuccess = await sendMoneyTransactionToDatabase(totalCost, 'subtract');
         
-        if (!moneyUpdateSuccess) {
+        if (!moneySuccess) {
             // Revert all changes
             userMoney = originalMoney;
             userObjectAssets = originalObjectAssets;
             userPetAssets = originalPetAssets;
+
+            buttons.forEach(btn => {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            });
+            
             messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
-            console.log('Purchase failed - money update failed');
             return;
         }
         
-        // If assets were added, update them on server
-        if (assetUpdateNeeded) {
-            let assetUpdateSuccess = false;
-            
-            if (item.petAsset) {
-                assetUpdateSuccess = await sendPetAssetsUpdateToDatabase();
-                const isPet = itemDetails["pet"] === true;
-                if (isPet) {
-                    updateStatsBeforeRerunningInitGameAndRenderPets();
-                    renderPets();
-                    enablePetDragging();
-                    createPetButtons();
-                }
-            } else {
-                assetUpdateSuccess = await sendObjectAssetsUpdateToDatabase();
+        // 2. Update local money only after server confirms
+        userMoney -= totalCost;
+        updateCoinAmounts(userMoney);
+        
+        // 3. Update assets on server
+        let assetUpdateSuccess = false;
+        if (assetType === 'pet') {
+            assetUpdateSuccess = await sendPetAssetsUpdateToDatabase();
+            const isPet = itemDetails["pet"] === true;
+            if (assetUpdateSuccess && isPet) {
+                updateStatsBeforeRerunningInitGameAndRenderPets();
+                renderPets();
+                enablePetDragging();
+                createPetButtons();
             }
-            
-            if (!assetUpdateSuccess) {
-                // Asset update failed, but money was already deducted on server
-                console.error('Critical error: Money deducted but asset update failed');
-                
-                // Attempt to revert money on server
-                userMoney = originalMoney;
-                await sendMoneyUpdateToDatabase();
-                
-                // Revert local asset state
-                userObjectAssets = originalObjectAssets;
-                userPetAssets = originalPetAssets;
-                
-                messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
-                return;
-            }
+        } else {
+            assetUpdateSuccess = await sendObjectAssetsUpdateToDatabase();
         }
         
-        // Success! Add your original animation logic
+        if (!assetUpdateSuccess) {
+            // Asset update failed - revert everything including money
+            console.error('Critical error: Money deducted but asset update failed');
+            
+            // Try to refund money on server
+            await sendMoneyTransactionToDatabase(totalCost, 'add');
+            
+            // Revert local state
+            userMoney = originalMoney;
+            userObjectAssets = originalObjectAssets;
+            userPetAssets = originalPetAssets;
+            updateCoinAmounts(userMoney);
+
+            buttons.forEach(btn => {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            });
+
+            messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
+            return;
+        }
+
+        buttons.forEach(btn => {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        });
+
+        // Success! Add animation
         btn.innerHTML = '<svg class="tick-svg" viewBox="0 0 24 24" width="24" height="24"><path class="tick" d="M4 12l6 6 10-10"></path></svg>';
         const tick = btn.querySelector('.tick');
         requestAnimationFrame(() => {
@@ -7507,20 +7579,23 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
             b.disabled = true;
         });
         
-        // Remove it after animation finishes (e.g. 300ms)
         setTimeout(() => {
-            // Restore the shop state after purchase
             restoreShopState(currentState);
         }, 500);
         
     } catch (error) {
-        // Network error or other unexpected error
         console.error('Purchase error:', error);
         
         // Revert all local changes
         userMoney = originalMoney;
         userObjectAssets = originalObjectAssets;
         userPetAssets = originalPetAssets;
+        updateCoinAmounts(userMoney);
+
+        buttons.forEach(btn => {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        });
         
         messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
     }
@@ -8116,101 +8191,91 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
         }
 
         if (canPurchase) {
-            const btn = document.createElement('button');
-            btn.className = 'purchase-btn';
-            btn.textContent = 'Pirkti';
+    let quantityInput = null;
 
-            let quantityInput = null;
+    // Create button
+    const btn = createHoldPurchaseButton(item, assetIndex, selectedCategory, quantityInput);
 
-            if (!item.oneOfKind) {
-                const quantityInputHolder = document.createElement('div');
-                quantityInputHolder.className = 'purchase-quantity-holder input-wrapper';
+    if (!item.oneOfKind) {
+        const quantityInputHolder = document.createElement('div');
+        quantityInputHolder.className = 'purchase-quantity-holder input-wrapper';
 
-                // Quantity input
-                quantityInput = document.createElement('input');
-                quantityInput.type = 'number';
-                quantityInput.min = 1;
-                quantityInput.max = 999;
-                quantityInput.step = 1;
-                quantityInput.value = 1;
-                quantityInput.className = 'purchase-quantity';
-                quantityInput.id = `purchase-qty-${key}`;
-                quantityInput.readOnly = true;
+        quantityInput = document.createElement('input');
+        quantityInput.type = 'number';
+        quantityInput.min = 1;
+        quantityInput.max = 999;
+        quantityInput.step = 1;
+        quantityInput.value = 1;
+        quantityInput.className = 'purchase-quantity';
+        quantityInput.id = `purchase-qty-${key}`;
+        quantityInput.readOnly = true;
 
-                // Price update function
-                const updatePrice = () => {
-                    const qty = parseInt(quantityInput.value, 10) || 1;
-                    priceSpan.textContent = item.cost * qty;
-                };
+        const updatePrice = () => {
+            const qty = parseInt(quantityInput.value, 10) || 1;
+            priceSpan.textContent = item.cost * qty;
+        };
 
-                // Buttons
-                const minusBtn = document.createElement('button');
-                minusBtn.className = 'control-btn';
-                minusBtn.textContent = '−';
-                minusBtn.onmousedown = () => startHold(quantityInput.id, 1, 999, false, updatePrice);
-                minusBtn.onmouseup = minusBtn.onmouseleave = stopHold;
-                minusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, false, updatePrice); };
-                minusBtn.ontouchend = minusBtn.ontouchcancel = stopHold;
+        const minusBtn = document.createElement('button');
+        minusBtn.className = 'control-btn';
+        minusBtn.textContent = '−';
+        minusBtn.onmousedown = () => startHold(quantityInput.id, 1, 999, false, updatePrice);
+        minusBtn.onmouseup = minusBtn.onmouseleave = stopHold;
+        minusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, false, updatePrice); };
+        minusBtn.ontouchend = minusBtn.ontouchcancel = stopHold;
 
-                const plusBtn = document.createElement('button');
-                plusBtn.className = 'control-btn';
-                plusBtn.textContent = '+';
-                plusBtn.onmousedown = () => startHold(quantityInput.id, 1, 999, true, updatePrice);
-                plusBtn.onmouseup = plusBtn.onmouseleave = stopHold;
-                plusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, true, updatePrice); };
-                plusBtn.ontouchend = plusBtn.ontouchcancel = stopHold;
+        const plusBtn = document.createElement('button');
+        plusBtn.className = 'control-btn';
+        plusBtn.textContent = '+';
+        plusBtn.onmousedown = () => startHold(quantityInput.id, 1, 999, true, updatePrice);
+        plusBtn.onmouseup = plusBtn.onmouseleave = stopHold;
+        plusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, true, updatePrice); };
+        plusBtn.ontouchend = plusBtn.ontouchcancel = stopHold;
 
-                // Append elements
-                quantityInputHolder.appendChild(minusBtn);
-                quantityInputHolder.appendChild(quantityInput);
-                quantityInputHolder.appendChild(plusBtn);
-                priceAndQuantDiv.appendChild(quantityInputHolder);
+        quantityInputHolder.appendChild(minusBtn);
+        quantityInputHolder.appendChild(quantityInput);
+        quantityInputHolder.appendChild(plusBtn);
+        priceAndQuantDiv.appendChild(quantityInputHolder);
 
-                // Optional: manual input (if readOnly removed later)
-                quantityInput.addEventListener('input', updatePrice);
-                quantityInput.addEventListener('change', updatePrice);
-            }
+        quantityInput.addEventListener('input', updatePrice);
+        quantityInput.addEventListener('change', updatePrice);
+    }
 
-            if (ownedIndexes.has(assetIndex)) {
-                if (item.oneOfKind) {
-                    itemDiv.classList.add('owned');
-                    btn.classList.add('owned');
-                    btn.textContent = 'Nupirkta';
-                    btn.disabled = true;
+    if (ownedIndexes.has(assetIndex) && item.oneOfKind) {
+        itemDiv.classList.add('owned');
+        btn.classList.add('owned');
+        btn.textContent = 'Nupirkta';
+        btn.disabled = true;
 
-                    const ownedBadge = document.createElement('div');
-                    ownedBadge.className = 'owned-badge';
-                    ownedBadge.innerHTML = '<span class="owned-badge-icon"><img src="../images/icons/icon-check.svg"></span>';
-                    previewHolder.appendChild(ownedBadge);
-                }
-            }
+        const ownedBadge = document.createElement('div');
+        ownedBadge.className = 'owned-badge';
+        ownedBadge.innerHTML = '<span class="owned-badge-icon"><img src="../images/icons/icon-check.svg"></span>';
+        previewHolder.appendChild(ownedBadge);
+    }
 
-            priceAndQuantDiv.appendChild(priceDiv);
-            infoDiv.appendChild(priceAndQuantDiv);
+    priceAndQuantDiv.appendChild(priceDiv);
+    infoDiv.appendChild(priceAndQuantDiv);
 
-            btn.addEventListener('click', async () => {
-                const quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
-                await handlePurchase(item, assetIndex, quantity, selectedCategory, btn);
-                renderObjectAssetsDropdown();
-            });
+    if (previewButton && !(ownedIndexes.has(assetIndex) && item.oneOfKind)) {
+        previewHolder.appendChild(previewButton);
+    }
 
-            if (previewButton && !(ownedIndexes.has(assetIndex) && item.oneOfKind)) {
-                previewHolder.appendChild(previewButton);
-            }
-            itemDiv.appendChild(previewHolder);
-            itemDiv.appendChild(infoDiv);
-            itemDiv.appendChild(btn);
-        } else {
-            const requiresDiv = document.createElement('div');
-            requiresDiv.className = 'item-requires';
-            requiresDiv.textContent = 'Reikalinga: ' + unmetRequirements.join(', ');
-            if (previewButton && !(ownedIndexes.has(assetIndex) && item.oneOfKind)) {
-                itemDiv.appendChild(previewButton);
-            }
-            itemDiv.appendChild(previewHolder);
-            itemDiv.appendChild(infoDiv);
-            itemDiv.appendChild(requiresDiv);
-        }
+    itemDiv.appendChild(previewHolder);
+    itemDiv.appendChild(infoDiv);
+    itemDiv.appendChild(btn);
+
+} else {
+    const requiresDiv = document.createElement('div');
+    requiresDiv.className = 'item-requires';
+    requiresDiv.textContent = 'Reikalinga: ' + unmetRequirements.join(', ');
+
+    if (previewButton && !(ownedIndexes.has(assetIndex) && item.oneOfKind)) {
+        itemDiv.appendChild(previewButton);
+    }
+
+    itemDiv.appendChild(previewHolder);
+    itemDiv.appendChild(infoDiv);
+    itemDiv.appendChild(requiresDiv);
+}
 
         shopContainer.appendChild(itemDiv);
     }
@@ -8225,6 +8290,87 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
 
     scalePreview();
 }
+
+const HOLD_DURATION_MS = 1600; // hold duration
+const DYNAMIC_BTN_CLASS = 'purchase-btn-hold'; // unique class
+
+function createHoldPurchaseButton(item, assetIndex, selectedCategory, quantityInput) {
+    const btn = document.createElement('button');
+    btn.className = `purchase-btn ${DYNAMIC_BTN_CLASS}`;
+    
+    // Add text content
+    const textSpan = document.createElement('span');
+    textSpan.textContent = 'Pirkti';
+    btn.appendChild(textSpan);
+
+    // Add responsive SVG with <rect>
+    btn.innerHTML += `
+        <svg class="btn-svg" viewBox="0 0 120 40" preserveAspectRatio="none">
+            <rect x="1%" y="2" width="98%" height="36px" rx="10" ry="18"
+                fill="none" stroke="var(--progress)" stroke-width="4"></rect>
+        </svg>
+    `;
+
+    const svgRect = btn.querySelector('svg rect');
+
+    // Dynamically calculate perimeter
+    function updateStroke() {
+        const width = btn.offsetWidth;
+        const height = btn.offsetHeight;
+        const perimeter = 2 * (width + height);
+        
+        // Remove transition first
+        svgRect.style.transition = 'none';
+        svgRect.style.strokeDasharray = perimeter;
+        svgRect.style.strokeDashoffset = perimeter;
+        
+        // Force reflow
+        svgRect.offsetHeight;
+    }
+    updateStroke();
+    window.addEventListener('resize', updateStroke);
+
+    // Hold logic
+    let holdTimeout;
+
+    function startHold() {
+        // Reset state without transition
+        updateStroke();
+        
+        btn.classList.add('process');
+
+        // Use requestAnimationFrame to ensure reset happened before animating
+        requestAnimationFrame(() => {
+            // Animate stroke
+            svgRect.style.transition = `stroke-dashoffset ${HOLD_DURATION_MS}ms linear`;
+            svgRect.style.strokeDashoffset = '0';
+        });
+
+        holdTimeout = setTimeout(async () => {
+            btn.classList.remove('process');
+            btn.classList.add('success');
+
+            const quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
+            await handlePurchase(item, assetIndex, quantity, selectedCategory, btn);
+        }, HOLD_DURATION_MS-600);
+    }
+
+    function cancelHold() {
+        clearTimeout(holdTimeout);
+        btn.classList.remove('process');
+        updateStroke();
+    }
+
+    btn.addEventListener('mousedown', startHold);
+    btn.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(); });
+    btn.addEventListener('mouseup', cancelHold);
+    btn.addEventListener('mouseleave', cancelHold);
+    btn.addEventListener('touchend', cancelHold);
+    btn.addEventListener('touchcancel', cancelHold);
+
+    return btn;
+}
+
 
 // Toggle functionality for unpurchased only
 const toggle = document.getElementById('shop-not-owned-toggle');
@@ -8625,11 +8771,30 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
             deleteBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 6 L6 18 M6 6 L18 18" stroke="#F5F5F7" stroke-width="2"/></svg>';
 
             deleteBtn.addEventListener('click', () => {
-                showCustomConfirm(`Ar tikrai nori išmestį šį daiktą? Jo susigrąžinti negalėsi.`, async () => {
-                    // Delete all instances of this stackable item
-                    for (const key of keys) {
-                        await removeObjectFromUserAssets(key);
+                const refund = Math.round(gameAssetIndex[userObjectAssets[keys[0]]["assetIndex"]].cost / 2 * 10) / 10;
+                showCustomConfirm(`Ar tikrai nori parduoti šį daiktą? Už jį atgausi tik pusę kainos: 
+                    <div class="coin-display-delete-confirm">
+                        <span class="coin-icon">
+                            <img src="../images/icons/icon-sudedu-coin.png">
+                        </span>
+                        <span class="coin-amount">${refund}</span>
+                    </div>`, async () => {
+                    
+                    const sucess = await Promise.all(
+                        keys.map(key => removeObjectFromUserAssets(key))
+                    )
+
+                    if (sucess) {
+                        const moneySuccess = await sendMoneyTransactionToDatabase(refund, 'add');
+                    
+                        if (!moneySuccess) {
+                            return;
+                        }
+                        
+                        userMoney += refund;
+                        updateCoinAmounts(userMoney);
                     }
+
                     rerenderObjectAssetListIfNoItemsInSelectedCategory();
                     renderShopCategoriesDropdown();
                 });
@@ -8777,7 +8942,15 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
             deleteBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 6 L6 18 M6 6 L18 18" stroke="#F5F5F7" stroke-width="2"/></svg>';
 
             deleteBtn.addEventListener('click', () => {
-                showCustomConfirm(`Ar tikrai nori išmestį šį daiktą? Jo susigrąžinti negalėsi.`, removeObjectFromUserAssets, key);
+                const itemPrice = Math.round(gameAssetIndex[userObjectAssets[key]["assetIndex"]].cost / 2 * 10) / 10;
+                showCustomConfirm(`Ar tikrai nori parduoti šį daiktą? Už jį atgausi tik pusę kainos: 
+                <div class="coin-display-delete-confirm">
+                    <span class="coin-icon">
+                        <img src="../images/icons/icon-sudedu-coin.png">
+                    </span>
+                    <span class="coin-amount">${itemPrice}</span>
+                </div>`, 
+                removeObjectFromUserAssets, [key, itemPrice]);
             });
             
             if (!sidebar) {
@@ -8797,9 +8970,20 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
     scalePreview();
 }
 
-function removeObjectFromUserAssets(assetKey) {
+async function removeObjectFromUserAssets(assetKey, refund=null) {
     delete userObjectAssets[assetKey];
-    sendObjectAssetsUpdateToDatabase();
+    let success = await sendObjectAssetsUpdateToDatabase();
+    if (success && refund) {
+        console.log(refund)
+        const moneySuccess = await sendMoneyTransactionToDatabase(refund, 'add');
+    
+        if (!moneySuccess) {
+            return;
+        }
+        
+        userMoney += refund;
+        updateCoinAmounts(userMoney);
+    }
     rerenderObjectAssetListIfNoItemsInSelectedCategory();
 }
 
@@ -9445,7 +9629,7 @@ function renderPetListForPetSection() {
         deleteBtn.className = 'pet-delete-btn';
         deleteBtn.textContent = 'Atiduoti';
         deleteBtn.addEventListener('click', () => {
-            showCustomConfirm("Ar tikrai nori atiduoti šį augintinį į gyvunėlių namus? Jo susigrąžinti negalėsi.", deletePetConfirmed, petType);
+            showCustomConfirm("Ar tikrai nori atiduoti šį augintinį į gyvunėlių namus? Jo susigrąžinti negalėsi.", deletePetConfirmed, [petType]);
         });
 
         const petSectionPetButtonContainer = document.createElement('div');
@@ -9456,34 +9640,6 @@ function renderPetListForPetSection() {
         
         container.appendChild(petSectionPetButtonContainer);
     }
-}
-
-function showCustomConfirm(text, onConfirm, item) {
-    const modal = document.getElementById('customConfirmModal');
-    const modalText = document.getElementById('customModalText');
-    const yesBtn = document.getElementById('customConfirmYes');
-    const noBtn = document.getElementById('customConfirmNo');
-
-    // Set text
-    modalText.textContent = text;
-
-    // Show modal
-    modal.style.display = 'flex';
-
-    // Remove previous click handlers
-    yesBtn.onclick = null;
-    noBtn.onclick = null;
-
-    // Yes click
-    yesBtn.onclick = () => {
-        onConfirm(item);
-        modal.style.display = 'none';
-    };
-
-    // No click
-    noBtn.onclick = () => {
-        modal.style.display = 'none';
-    };
 }
 
 function deletePetConfirmed(petId) {
@@ -11727,27 +11883,25 @@ function renderTaxesSection() {
 
 async function payTax(taxType) {
     const originalMoney = userMoney;
-
-    // Calculate total cost
     const totalCost = taxPrice[taxType];
     
     // Check if user has enough money
     if (userMoney < totalCost) {
-        messageToTheUser("Nepakanka pingų!", 'error');
+        messageToTheUser("Nepakanka pinų!", 'error');
         return;
     }
 
-    userMoney -= totalCost;
-
-    const moneyUpdateSuccess = await sendMoneyUpdateToDatabase();
-        
-    if (!moneyUpdateSuccess) {
-        // Revert all changes
-        userMoney = originalMoney;
+    // Deduct money from server first
+    const moneySuccess = await sendMoneyTransactionToDatabase(totalCost, 'subtract');
+    
+    if (!moneySuccess) {
         messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
-        console.log('Purchase failed - money update failed');
         return;
     }
+    
+    // Update local money only after server confirms
+    userMoney -= totalCost;
+    updateCoinAmounts(userMoney);
 
     const currentTime = Math.floor(Date.now() / 1000 / 60);
     
@@ -11759,11 +11913,19 @@ async function payTax(taxType) {
     const taxesArray = [taxesData.waterTax.date, taxesData.electricityTax.date];
     
     // Send to server
-    sendTaxUpdate(taxesArray);
-    
-    // Re-render the taxes section
-    renderTaxesSection();
-    taxesNavChoiceIndicator();
+    try {
+        await sendTaxUpdate(taxesArray);
+        
+        // Re-render the taxes section
+        renderTaxesSection();
+        taxesNavChoiceIndicator();
+    } catch (error) {
+        // Tax update failed - try to refund
+        await sendMoneyTransactionToDatabase(totalCost, 'add');
+        userMoney = originalMoney;
+        updateCoinAmounts(userMoney);
+        messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
+    }
 }
 
 async function sendTaxUpdate(taxesArray) {
@@ -11974,7 +12136,7 @@ function initShopHeaderCollapse() {
     const expandThreshold = 50;
 
     function handleScroll() {
-        if (!userScrolling || isManuallyExpanded) return;
+        if (!userScrolling) return;
 
         const scrollTop = shopItems.scrollTop;
         const scrollingDown = scrollTop > lastScrollTop;
@@ -11985,7 +12147,7 @@ function initShopHeaderCollapse() {
         if (scrollingDown && !headerIsCompact) {
             shopHeader.classList.add('compact');
         } else if (scrollingUp && scrollTop < expandThreshold && headerIsCompact) {
-            shopHeader.classList.remove('compact');
+            //shopHeader.classList.remove('compact');
         }
 
         lastScrollTop = scrollTop;

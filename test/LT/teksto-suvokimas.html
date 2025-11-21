@@ -1041,8 +1041,6 @@ window.onload = function () {
     document.querySelector(".help-and-check-button-holder").style.display = "none"
   }
 
-
-  let jsonFiles = [];
   let jsonFile;
 
 	if (controller.modeChoice7 === "C82") {
@@ -1086,27 +1084,27 @@ window.onload = function () {
     window.timeTakenForEachText = {};
 
     function generateFilteredTextLibrary() {
-    var tempTextLibrary = Array.from(textDatabase);
+    var tempTextLibrary = Object.entries(textDatabase);
 
     if (controller.modeChoice2 === "C51") {
-        if (controller.modeChoice7 === "C82") {
-          filteredTextLibrary = tempTextLibrary.filter(entry =>
-          entry['suitable-for']?.[parameterDictionary["C51"]["parameter"]]?.includes(parameterDictionary[controller.modeChoiceLtDifficulty]["parameter"])
-          );
-        } else if (controller.modeChoice7 === "C84") {
-          filteredTextLibrary = tempTextLibrary.filter(entry =>
-              controller.modeChoice8.includes(entry.id)
-          );
-        }
+      if (controller.modeChoice7 === "C82") {
+        filteredTextLibrary = tempTextLibrary.filter(([id, entry]) =>
+        entry["SF"]?.["C51"] === controller.modeChoiceLtDifficulty
+        );
+      } else if (controller.modeChoice7 === "C84") {
+        filteredTextLibrary = tempTextLibrary.filter(([id, entry]) =>
+            controller.modeChoice8.includes(parseInt(id))
+        );
+      }
         answersField.style.display = "block";
       } else if (controller.modeChoice2 === "C52") {
         if (controller.modeChoice7 === "C82") {
-          filteredTextLibrary = tempTextLibrary.filter(entry =>
-          entry['suitable-for']?.['struktura']?.includes(parameterDictionary[controller.modeChoiceLtDifficulty]["parameter"])
+          filteredTextLibrary = tempTextLibrary.filter(([id, entry]) =>
+          entry["SF"]?.["C52"] === controller.modeChoiceLtDifficulty
           );
         } else if (controller.modeChoice7 === "C84") {
-          filteredTextLibrary = tempTextLibrary.filter(entry =>
-              controller.modeChoice8.includes(entry.id)
+          filteredTextLibrary = tempTextLibrary.filter(([id, entry]) =>
+              controller.modeChoice8.includes(parseInt(id))
           );
         }
         answersFieldStart.style.display = "block";
@@ -1135,7 +1133,8 @@ window.onload = function () {
     const randomIndex = Math.floor(Math.random() * filteredTextLibrary.length);
     
     // Remove the selected item from the array and return it
-    const selectedItem = filteredTextLibrary.splice(randomIndex, 1)[0];
+    const [id, entry] = filteredTextLibrary.splice(randomIndex, 1)[0];
+    const selectedItem = { id, ...entry };
     
     return selectedItem;
     }

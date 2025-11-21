@@ -1,0 +1,2669 @@
+<!DOCTYPE html>
+<html lang="lt">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+	<title>sudedu - rašyba</title>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+	<link rel="stylesheet" href="../main-nav-bar.css">
+    <link rel="stylesheet" type="text/css" href="../index.css">
+	<link id="questionsStyleSheet" rel="stylesheet" type="text/css" href="">
+	<link rel="stylesheet" type="text/css" href="../summary.css">
+	<link rel="stylesheet" href="../pet-game-pets.css">
+
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-96Q83PW8XY"></script>
+	<script>
+	//window.dataLayer = window.dataLayer || [];
+	//function gtag(){dataLayer.push(arguments);}
+	//gtag('js', new Date());
+
+	//gtag('config', 'G-96Q83PW8XY');
+	</script>	
+	<script src="../refresh-token.js"></script>
+		
+	<style>
+        * {
+          -webkit-user-select: none;
+          -webkit-tap-highlight-color: transparent;
+          user-select: none;
+          box-sizing: border-box;
+          -webkit-user-drag: none;
+          user-drag: none;
+        }
+
+      	html {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: linear-gradient(to top, #ffbf9c, #ffbf92, #ffbf89, #ffbf7e, #ffc074);
+            width: 100vw;
+            height: 100svh;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'SFpro', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .main-nav-mobile-btn {
+            width: auto;
+            height: auto;
+        }
+
+        .container {
+            flex: 1;
+            max-height: calc(100% - 80px - 16px - 16px);
+			height: calc(100% - 80px - 16px - 16px);
+            min-height: calc(100% - 80px - 16px - 16px);
+            width: calc(100% - (2 * 16px));
+            display: flex;
+            justify-content: start;
+            background: rgba(255, 255, 255, 0.08);
+            margin: 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+            flex-direction: column;
+            padding: 20px;
+        }
+
+		.container.keyboard-open {
+			max-height: 100%;
+			min-height: 100%;
+		}
+
+	:root {
+		--font-size: 26px; /* Set the base font size */
+	}
+
+	.field {
+		padding: 10px 20px;
+		counter-reset: div-counter;
+	}
+
+	span:focus,
+	span:active {
+		border: none;
+		outline: none;
+	}
+
+	#field-for-text {
+		width: 100%;
+		max-height: 100%;
+		background: rgba(255, 255, 255, 0.4);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		backdrop-filter: blur(10px);
+		border-radius: 25px;
+		display: flex;
+		flex-direction: column;
+		justify-content: start;
+	}
+
+	#field-for-text-outer {
+		flex: 1 1 auto;
+		width: 100%;
+		max-height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+		overflow-y: auto;
+	}
+
+	.field-for-text-outer-holder {
+		flex: 1;
+		height: 100%;
+		flex-direction: column;
+		overflow: hidden;
+		background: rgba(255, 255, 255, 0.15);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 25px;
+		padding: 15px;
+		display: flex;
+		justify-content: start;
+		align-items: start;
+		position: relative;
+	}
+
+	#increase-no-of-sentences,
+	#decrease-no-of-sentences {
+		background: transparent;
+		border: none;
+		font-size: 2rem;
+		color: rgba(255, 255, 255, 0.4);
+		cursor: pointer;
+		padding: 0;
+		font-weight: 800;
+	}
+
+	#decrease-no-of-sentences {
+		margin-right: 2.5px;
+	}
+
+	.sakiniai {
+		padding-top: 5px;
+		padding-bottom: 5px;
+		font-size: var(--font-size);
+		color: #212529;
+		counter-increment: div-counter;
+		position: relative;
+		margin-bottom: 10px;
+		line-height: 1.5;
+	}
+
+	.sakiniai::before {
+		content: counter(div-counter) ". "; /* Display the number */
+	}
+
+	textarea {
+		resize: none;          /* disable manual resize */
+		overflow-x: auto;      /* allow horizontal scroll */
+		overflow-y: hidden;    /* hide vertical scroll */
+		white-space: nowrap;   /* prevent wrapping to next line */
+		line-height: var(--input-size-full);
+		padding: 0;  
+		scrollbar-width: none;    /* Firefox */    
+		outline: none;
+		border: none;             
+		border-bottom: 2px solid #212529;
+		color: #212529; 
+		min-width: 0.5ch;
+		background: transparent;
+		font-size: var(--font-size);  
+		height: calc(var(--font-size) * 1.211538462);
+		margin-bottom: calc(var(--font-size) / -3.75);
+		text-align: center;
+		font-family: 'SFpro', sans-serif;
+	}
+
+	.pulse {
+	position: relative;
+	border-radius: 25px;
+	overflow: hidden;
+	}
+
+	.pulse::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	border-radius: 25px;
+	background: rgba(182, 200, 103, 0);
+	animation: pulse 600ms ease-in-out forwards;
+	z-index: -1;
+	}
+
+	@keyframes pulse {
+	0% {
+		background: rgba(182, 200, 103, 0);
+	}
+	50% {
+		background: rgba(182, 200, 103, 0.6);
+	}
+	100% {
+		background: rgba(182, 200, 103, 0);
+	}
+	}
+
+	.pulse-wrong {
+	position: relative;
+	border-radius: 25px;
+	overflow: hidden;
+	}
+
+	.pulse-wrong::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	border-radius: 25px;
+	background: rgba(182, 200, 103, 0);
+	animation: pulse-wrong  600ms ease-in-out forwards;
+	z-index: -1;
+	}
+
+	@keyframes pulse-wrong {
+	0% {
+		background: rgba(182, 200, 103, 0);
+	}
+	50% {
+		background: rgba(213, 126, 126, 0.4);
+	}
+	100% {
+		background: rgba(182, 200, 103, 0);
+	}
+	}
+
+	input:disabled {
+		user-select: none; /* Prevent text selection */
+		pointer-events: none; /* Ensure the input is not interactable */
+	}	
+
+	.question-word-span.middle {
+		margin-left: 5px;
+	}
+
+	.correct-answer {
+		color: #32ac93;
+		text-shadow: 0.5px 0.5px 0.5px rgba(0, 0, 0, 0.7);
+		caret-color: black;
+	}
+
+	.wrong-answer {
+		color: #D57E7C;
+		text-shadow: 0.5px 0.5px 0.5px rgba(0, 0, 0, 0.7);
+		caret-color: black;
+	}
+
+	@keyframes blink {
+		0%, 50%, 100% { color: #D57E7C; }
+		25%, 75% { color: #FFEE00; }
+	}
+
+	.current-focus-parent .wrong-answer {
+		animation: blink 2s infinite;
+	}
+	.row {
+		width: 100%;
+	}
+
+	.button-outer-holder {
+		display: flex;
+		justify-content: space-between;
+		padding-top: 10px;
+	}
+
+	.check-next-question-row {
+		display: flex;
+		gap: 10px;
+	}
+
+	.check-help-show-answers-button-holder {
+		display: flex;
+		gap: 10px;
+	}
+
+	#stopButton,
+	#check-answers,
+	#next-question,
+	#show-answers,
+	.summary-button {
+		position: relative;
+		background: linear-gradient(135deg, #3288AC, #286D8A);
+		border: none;
+		/* border: 1px solid #286D8A; */
+		color: #F5F5F7;
+		display: flex;
+		align-items: center;
+		padding: 12px 18px 12px 18px;
+		border-radius: 20px;
+		cursor: pointer;
+		font-size: 1rem;
+		letter-spacing: 0.01em;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		margin: 0;
+		justify-content: center;
+		min-width: 10vw;
+	}
+
+	.summary-button {
+		margin-top: 15px;
+	}
+
+	#stopButton::before,
+	#check-answers::before,
+	#next-question::before,
+	#show-answers::before,
+	.summary-button::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+		border-radius: 20px;
+		pointer-events: none;
+		transition: background 0.3s ease;
+	}
+
+	#stopButton {
+		width: 6vw;
+		min-width: 75px;
+		height: 42.5px;
+		border-radius: 100px;
+		font-size: 2rem;
+	}
+
+	#stopButton::after,
+	#check-answers::after,
+	#next-question::after,
+	#show-answers::after,
+	.summary-button::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: 20px;
+		padding: 1px;
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+		-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+		-webkit-mask-composite: xor;
+		mask-composite: exclude;
+		pointer-events: none;
+	}
+
+	#stopButton:hover::before,
+	#check-answers:hover::before,
+	#next-question:hover::before,
+	#show-answers:hover::before,
+	.summary-button:hover::before {
+		background: rgba(255, 255, 255, 0.15);
+	}
+
+	#stopButton:focus,
+	#check-answers:focus,
+	#next-question:focus,
+	#show-answers:focus,
+	.summary-button:focus,
+	#stopButton:active,
+	#check-answers:active,
+	#next-question:active,
+	#show-answers:active,
+	.summary-button:active {
+		outline: none;
+	}
+
+	#next-question {
+		display: none;
+	}
+
+	.pagalba-span,
+	.pagalba-span-perm {
+		color: gray;
+		font-size: calc(var(--font-size)*0.8);
+	}
+
+.reset-button-div {
+  display: flex;
+  justify-content: flex-end;
+  z-index: 3;
+}
+
+.stop-button-div {
+  display: flex;
+  justify-content: flex-start;
+  z-index: 3;
+}
+
+.reset-button:hover,
+.reset-button:active,
+.reset-button:focus {
+  background-color: #32ac93;
+  border-color: #32ac93;
+  color: black;
+}
+
+.stop-button:hover,
+.stop-button:active,
+.stop-button:focus {
+  background-color: #32ac93;
+  border-color: #32ac93;
+  color: black;
+}
+
+#restart-reset-button-row {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.col-2 {
+	padding: 0;
+}
+
+.tracker-timer-holder {
+	padding: 0 15px;
+	margin-bottom: 10px;
+}
+
+.trackers-row {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.trackers-holder,
+.timer-holder {
+	display: flex;
+	flex: 0 0 auto;
+	white-space: nowrap;
+	align-items: start;
+}
+
+.pet-on-walk-holder {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.timer-holder {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: end;
+	gap: 5px;
+}
+
+#mistake-tracker,
+#answer-tracker,
+#timer {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+#answer-tracker:not(:empty) {
+    margin-bottom: 5px;
+}
+
+.help-toggle-holder {
+	display: flex;
+	align-items: center;
+}
+
+.switch {
+	display: flex;
+}
+
+#help-toggle {
+	height: 0 !important;
+	width: 0 !important;
+	visibility: hidden;
+	margin: 0 !important;
+}
+
+#help-toggle + span {
+	cursor: pointer;
+	width: 96px;
+	height: 30px;
+	background: grey;
+	display: inline-block;
+	border-radius: 30px;
+	position: relative;
+	vertical-align: middle;
+	transition: 0.3s;
+}
+
+#help-toggle + span:after {
+	content: '';
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	width: 24px;
+	height: 24px;
+	background: #F5F5F7;
+	border-radius: 50%;
+	transition: 0.3s;
+}
+
+#help-toggle:checked + span:after {
+	left: calc(100% - 5px);
+	transform: translateX(-100%);
+}
+
+.switch-text {
+	color: #F5F5F7;
+	padding-right: 7px;
+}
+
+#help-toggle:checked + span {
+	background: linear-gradient(135deg, #3288AC, #286D8A);
+	width: 60px;
+}
+
+#help-toggle:checked + .switch-slider .switch-text {
+	display: none;
+}
+
+#help-toggle + .switch-slider {
+	display: flex !important;
+	justify-content: end;
+	align-items: center;
+}
+
+#field-for-final-message {
+    color: black;
+    font-size: 4rem;
+    text-align: center;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#fireworks-div {
+  position: absolute;
+  top: 5%;
+  right: 5%;
+  max-height: 300px;
+  width: 250px;
+  z-index: 1000;
+}
+
+.grammar-view-selector {
+	position: relative;
+	border: none;
+	border-radius: 4px;
+	background-color: transparent;
+	text-align: center;
+	font-weight: bold;
+	z-index: 10;
+	pointer-events: auto;
+	font-size: 1.25rem;
+}
+
+.material-symbols-rounded {
+    font-size: 2rem;
+    font-weight: 300;
+}
+
+#hidden-input {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+	width: 1px;
+	height: 1px;
+	z-index: -1;
+}
+
+@media (max-width: 767px) {
+	#next-question,
+	#show-answers {
+		width: 20vw;
+	}
+
+	#check-answers{
+		width: 20vw;
+	}
+
+	.container {
+		width: 100%;
+		max-height: calc(100% - 80px);
+		min-height: calc(100% - 80px);
+		margin: 0;
+		background: transparent;
+		border: none;
+		border-radius: 0;
+		padding: 15px;
+	}
+
+	:root {
+        --font-size: 22px; /* Smaller font size for tablets */
+    }
+
+	#field-for-final-message {
+		font-size: 3rem;
+	}
+
+	#fireworks-div {
+    	width: 200px;
+		bottom: -25%;
+  	}
+}
+
+@media (max-width: 575px) {
+	#check-answers,
+	#show-answers,
+	#next-question {
+		width: 30vw;
+	}
+	:root {
+        --font-size: 22px; /* Smaller font size for tablets */
+    }
+
+	#field-for-final-message {
+		font-size: 2rem;
+	}
+	.stop-button {
+		width: 4.25rem;
+		height: 4.25rem;
+	}
+
+	.reset-button {
+		width: 4.25rem;
+		height: 4.25rem;
+	}
+
+	#fireworks-div {
+    	width: 150px;
+		bottom: 60%;
+  	}
+
+	.field-for-text-outer-holder {
+		padding: 0;
+		border: none;
+	}
+
+	#field-for-text {
+		background: transparent;
+    	border: none;
+	}
+
+	.grammar-view-selector {
+		font-size: 1rem;
+	}
+
+	#sentence-number-selector {
+		margin: 5px 0 0 20px;
+	}
+
+	#increase-no-of-sentences,
+	#decrease-no-of-sentences {
+		font-size: 1.75rem;
+	}
+}
+
+	@media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)  {
+		:root {
+        	--font-size: 32px; /* Smaller font size for tablets */
+    	}
+
+		.container {
+          width: 100%;
+          max-height: calc(100% - 100px);
+          min-height: calc(100% - 100px);
+          margin: 0;
+          background: transparent;
+          border: none;
+          border-radius: 0;
+          padding: 30px;
+      }
+		
+		.stop-button {
+			height: 6rem;
+			width: 6rem;
+		}
+
+		.reset-button {
+			height: 6rem;
+			width: 6rem;	
+		}
+
+		.material-symbols-rounded {
+			font-size: 2.75rem;
+		}
+
+		#stopButton {
+		  width: 10vw;
+          min-width: 90px;
+          height: 51.5px;
+          border-radius: 100px;
+          font-size: 2rem;
+		}
+
+		.summary-button {
+			font-size: 1.5rem;
+		}
+
+		.question-submit-button {
+			font-size: 1.5rem;
+		}
+
+		h3 {
+			font-size: 2rem;
+		}
+
+		#mistake-tracker,
+		#answer-tracker,
+		#timer {
+          font-size: 1.5rem;
+        }
+
+		#check-answers,
+		#next-question {
+			font-size: 1.5rem;
+			width: 25vw;
+		}
+
+		table * {
+			font-size: 1.5rem;
+		}
+
+		.grammar-view-selector {
+			font-size: 1.5rem;
+		}
+
+		th,
+		td {
+			background-color: rgba(255, 255, 255, 0.2);
+		}
+
+		#help-toggle + span {
+			width: 132px;
+			height: 36px;
+		}
+
+		#help-toggle + span:after {
+			content: '';
+			position: absolute;
+			top: 4px;
+			left: 4px;
+			width: 28px;
+			height: 28px;
+			background: #F5F5F7;
+			border-radius: 50%;
+			transition: 0.3s;
+		}
+
+		#help-toggle:checked + span:after {
+			left: calc(100% - 5px);
+			transform: translateX(-100%);
+		}
+
+		.switch-text {
+			color: #F5F5F7;
+			padding-right: 10px;
+			font-size: 1.45rem;
+		}
+
+		#help-toggle:checked + span {
+			background: linear-gradient(135deg, #3288AC, #286D8A);
+			width: 70px;
+		}
+
+	}
+	</style>
+</head>
+
+<body>
+	<div id="customConfirmModal" class="modal">
+		<div class="modal-content">
+			<p id="customModalText"></p>
+			<div class="modal-buttons">
+			<button id="customConfirmYes" class="btn-confirm">Taip</button>
+			<button id="customConfirmNo" class="btn-cancel">Ne</button>
+			</div>
+		</div>
+	</div>
+
+	<div id="object-popup" class="object-popup-overlay" style="display:none;">
+    <div class="object-popup-panel">
+        <button class="object-popup-close">&times;</button>
+        <div class="title-subtitle-inline-button-wrapper">
+        <div class="object-popup-title-subtitle-wrapper">
+        <div class="object-popup-title" id="object-popup-title"></div>
+        <div class="object-popup-subtitle" id="object-popup-subtitle"></div>
+        </div>
+        </div>
+        <div class="object-popup-content" id="object-popup-content">
+        <!-- Dynamic content goes here -->
+        </div>
+    </div>
+    </div>
+
+	<nav class="main-navbar" id="mainNavbar">
+		<div class="main-nav-container">
+			<!-- Logo -->
+			<a href="#" class="main-nav-logo">
+				<div class="main-nav-logo-icon">
+					<img id="sudedu-main-nav-bar-logo" src="../images/sudedu_logo.png" alt="sudEdu">
+				</div>
+			</a>
+
+			<!-- Desktop Navigation -->
+			<div class="main-nav-links invisible">
+				<a class="main-nav-back-btn" id="desktopBackBtn">
+					<span class="main-nav-back-icon">←</span>
+					<div class="main-nav-back-text">
+						<span class="main-nav-back-label">Grįžti</span>
+						<span class="main-nav-back-title">Atgal</span>
+					</div>
+				</a>
+			</div>
+
+			<!-- Mobile Navigation -->
+			<div class="main-nav-mobile-btn simplified">
+				<a class="main-nav-back-btn" id="mobileBackBtn">
+					<span class="main-nav-back-icon">←</span>
+					<div class="main-nav-back-text">
+						<span class="main-nav-back-label">Grįžti</span>
+						<span class="main-nav-back-title">Atgal</span>
+					</div>
+				</a>
+			</div>
+		</div>
+	</nav>
+
+		<div class="container" style="display: flex; flex-direction: column; justify-content: space-between;">
+				<div class="tracker-timer-holder">
+		<div class="trackers-row">
+			<div class="trackers-holder">
+			<div class="trackers">
+					<div>
+						<h3 id="answer-tracker"></h3>
+					</div>
+					<div>
+						<h3 id="mistake-tracker"></h3>
+					</div>
+			</div>
+		</div>
+		<div class="pet-on-walk-holder">
+        	<div id="pet-on-walk"></div>
+      	</div>
+		<div class="timer-holder">
+			<div id="timer"></div>
+
+			<div class="help-toggle-holder">
+				<label class="switch"><input type="checkbox" id="help-toggle" class="help-toggle" checked>
+					<span class="switch-slider">
+						<span class="switch-text switch-text-object">
+							Pagalba
+						</span>
+					</span>
+				</label>
+			</div>
+		</div>
+		</div>
+		</div>
+		
+		<div class="field-for-text-outer-holder">
+			<div id="fireworks-div" class="image-container fireworks-div"></div>
+			<div id="sentence-number-selector-holder">
+				<div id="sentence-number-selector">
+					<button id="decrease-no-of-sentences">−</button>
+					<button id="increase-no-of-sentences">+</button>
+				</div>
+			</div>
+
+			<div id="field-for-text-outer">
+			<div id="field-for-text" style="position: relative;" class="field">
+				<textarea id="hidden-input" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-current-id=""></textarea>
+				<div id="field-for-sentences"></div>
+				<div id="field-for-final-message"></div>
+				<div id="restart-reset-button-row" class="row justify-content-center align-items-center" style="display: none;">
+					<div class="col-12 submit-button-div d-flex justify-content-center align-items-center">
+						<div id="reset-mistake-buttons" class="col-12 d-flex justify-content-center align-items-center">
+							<div class="col-12 d-flex position-relative justify-content-center align-items-center">
+								<div class="d-flex justify-content-end align-items-center summary-div">
+									<button class="summary-button">Klaidos</button>
+								</div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div class="button-outer-holder">
+
+			<div class="stop-reset-button-div">
+				<div class="stop-button-div">
+					<button id="stopButton" class="stop-button"><span id="stop-button-span"
+							class="material-symbols-rounded">close</span></button>
+				</div>
+			</div>
+
+			<div class="check-help-show-answers-button-holder">
+			<div class="row justify-content-center align-items-center">
+				<div class="col-12 d-flex justify-content-end align-items-center">
+			<button id="show-answers" class="" style="visibility: hidden;">Atsakymai</button>
+			</div>
+			</div>
+			<div class="check-next-question-row">
+			<div class="check-button-holder">
+				<button id="check-answers" class="">Tikrinti</button>
+				<button id="next-question" class="">Toliau</button>
+			</div>
+			</div>
+			</div>
+	</div>
+	</div>
+  	<script src="../main-nav-bar.js"></script>
+	<script src="../parameter_dictionary.js"></script>
+	<script src="../mental-arithmetic.js"></script>
+
+	<script>
+
+window.onload = function () {
+    if (!localStorage.getItem('controller')) {
+        window.location.href = "./";
+    } else {
+      controller = JSON.parse(localStorage.getItem('controller')) 
+      if (controller.mode !== "lang" || controller.modeChoice2 !== "C50") {
+		window.location.href = "./";
+	} else {
+		styleGrammarPage();
+	}
+    }
+  }
+
+  controller = JSON.parse(localStorage.getItem('controller'))
+
+window.answerTrackerElement = document.querySelector('#answer-tracker');
+window.stopButtonSpanElement = document.querySelector('#stop-button-span');
+window.resetMistakeButtonsElement = document.querySelector('#restart-reset-button-row');
+
+window.stopQuestionsCloseActions = function () {
+	controller.questionsStopped = true;
+	clearInterval(timerInterval);
+	stopButtonSpanElement.innerHTML = "refresh";
+	document.getElementById('check-answers').disabled = true;
+	document.getElementById('check-answers').style.display = "inline-block";
+	document.getElementById('help-toggle').disabled = true;
+	document.getElementById('next-question').style.display = "none";
+	document.getElementById('show-answers').style.visibility = "hidden";
+	document.querySelector('.help-toggle-holder').style.visibility = "hidden";
+
+	document.querySelectorAll('.question-input').forEach(input => {
+		input.disabled = true;
+	});
+
+	resetMistakeButtonsElement.style.display = "flex";
+	localStorage.setItem("elapsedTime", timerDisplay.textContent);
+	localStorage.setItem('controller', JSON.stringify(controller))
+	formatFinalMessageForGrammar();
+}
+
+  let jsonFiles = [];
+
+	// Define an array of URLs for the JSON files you want to fetch
+	if (controller.classChoice === "C75") {
+		jsonFiles = ['../databases/1_2_klase_rasyba.json'];
+	} else if (controller.classChoice === "C76") {
+		jsonFiles = ['../databases/3_4_klase_rasyba.json'];
+	}
+	Promise.all(jsonFiles.map(file => fetch(file).then(response => {
+		if(!response.ok) {
+			throw new Error(`Network error while fetching ${file}`);
+		}
+		return response.json();
+	}).catch(error => {
+		console.error('Error:', error);
+		return null; // Return null or empty object in case of error
+	}))).then(([sentenceLibrary]) => {
+
+		let questionsToDisplay = 1;
+		let sakiniai = [];
+		window.atsakymai = {};
+		let questionId = 1;
+		window.mistakeRecords = {};
+		let firstTimeChecking = true;
+    	let currentAnswerAttempts = 0;
+		const maximumQuestionFrequencyPerWord = controller.questionFrequency;
+		let allowAdjacentEndlessWords;
+		let allModified = false;
+		if (controller.modeChoice5 === "C73") {
+			allowAdjacentEndlessWords = false;
+		} else if (controller.modeChoice5 === "C74") {
+			allowAdjacentEndlessWords = true;
+		}
+		let allAnswersCorrect = false;
+		const hiddenInput = document.getElementById('hidden-input');
+
+		if(sentenceLibrary) {
+			const codedConditions = controller.modeChoice3
+			let conditions = {}
+
+			Object.entries(codedConditions).forEach(([key, value]) => {
+				let decodedKey = parameterDictionary[key]["parameter"];
+				conditions[decodedKey] = value;
+			});
+
+			const categoriesToCheck = ["prv", "bdv", "vks", "dkt", "įsi-r", "įvr", "skt"]
+			const categoriesThatNeedEndings = ["prv", "bdv", "vks", "dkt", "fsc-gal"]
+			const categoryMatchingRules = {
+				// Default case: category matches only itself
+				"default": [],
+				// Allow certain categories to match each other (e.g., įvr matches įvr)
+				"bdv": ["prv"],
+				"vks": [],
+				"dkt": [],
+				"fsc-gal": ["dkt"],
+				"fsc-con": ["prv", "bdv", "vks", "dkt", "įvr", "skt", "įsi-r"],
+				"fsc-vow": ["prv", "bdv", "vks", "dkt", "įvr", "skt", "įsi-r"],
+				"prv": ["bdv"],
+				"įvr": [],
+				"skt": [],
+				"įsi-r": ["prv", "bdv", "vks", "dkt"],
+				"prš": ["prv", "bdv", "vks", "dkt"],
+				"prs": ["prv", "bdv", "vks", "dkt"],
+				"asim": ["prv", "bdv", "vks", "dkt"],
+				"md": ["prv", "bdv", "vks", "dkt"],
+			};
+			const subCategoryMatchingRules = {
+				"dkt": {
+					// Default case: category matches only itself
+					"default": [],
+					// Allow certain categories to match each other (e.g., įvr matches įvr)
+					"v": ["k", "n", "g", "įn", "vt", "š"],
+					"k": ["v", "n", "g", "įn", "vt", "š"],
+					"n": ["v", "k", "g", "įn", "vt", "š"],
+					"g": ["v", "k", "n", "įn", "vt", "š"],
+					"įn": ["v", "k", "n", "g", "vt", "š"],
+					"vt": ["v", "k", "n", "g", "įn", "š"],
+					"š": ["v", "k", "n", "g", "įn", "vt"],
+				},
+				"bdv": {
+					// Default case: category matches only itself
+					"default": [],
+					// Allow certain categories to match each other (e.g., įvr matches įvr)
+					"v": ["k", "n", "g", "įn", "vt", "š"],
+					"k": ["v", "n", "g", "įn", "vt", "š"],
+					"n": ["v", "k", "g", "įn", "vt", "š"],
+					"g": ["v", "k", "n", "įn", "vt", "š"],
+					"įn": ["v", "k", "n", "g", "vt", "š"],
+					"vt": ["v", "k", "n", "g", "įn", "š"],
+				},
+				"vks": {
+					// Default case: category matches only itself
+					"default": [],
+					"būs-l": [],
+					"es-l": [],
+					"b-k-l": [],
+					"b-d-l": []
+				},
+				"įsi-r": {
+					"1kl": ["2kl", "3kl", "4kl"],
+					"2kl": ["1kl", "3kl", "4kl"],
+					"3kl": ["1kl", "2kl", "4kl"],
+					"4kl": ["1kl", "2kl", "3kl"],
+				}
+			}
+			const subCategoriesToCheck = {
+				"dkt": ["v", "k", "n", "g", "įn", "vt", "š"],
+				"bdv": ["v", "k", "n", "g", "įn", "vt"],
+				"vks": ["būs-l", "es-l", "b-k-l", "b-d-l"],
+				"įsi-r": ["1kl", "2kl", "3kl", "4kl"]
+			}
+
+			function getAllowedMatchingCategories(category, rules) {
+					// Check if category is an array or a single string
+					if (Array.isArray(category)) {
+							// If category is an array, iterate over the array
+							return category.reduce((acc, cat) => {
+									if (rules[cat] && rules[cat].length > 0) {
+											return [...acc, ...[cat], ...rules[cat]];
+									} else {
+											return [...acc, cat];
+									}
+							}, []);
+					} else {
+							// If category is a single string, handle as before
+							if (rules[category] && rules[category].length > 0) {
+									return [...[category], ...rules[category]];
+							} else {
+									return [category];
+							}
+					}
+			}
+
+			function checkCategories(wordInfo, categoriesToCheck, allowedPairs) {
+				function ensureStrings(array) {
+					return array.map(item => {
+						if(typeof item === "object" && Array.isArray(item)) {
+							return item.map(innerItem => innerItem.toString()); // Flatten nested lists into strings
+						} else if(typeof item === "object") {
+							return JSON.stringify(item); // Handle generic objects
+						} else {
+							return item.toString(); // Convert primitives to strings
+						}
+					}).flat(); // Flatten the result in case of nested arrays
+				}
+				allowedPairs = ensureStrings(allowedPairs)
+				// Loop through each category to check
+				for(let category of categoriesToCheck) {
+					// If the category is in allowedPairs, we skip the check
+					if(allowedPairs.includes(category)) {
+						continue;
+					}
+					// If the value for the current category is not false, return false
+					if(wordInfo[category] !== false) {
+						return false;
+					}
+				}
+				// If all checks pass, return true
+				return true;
+			}
+
+			function shuffleArray(array) {
+				for(let i = array.length - 1; i > 0; i--) {
+					const j = Math.floor(Math.random() * (i + 1)); // Random index
+					[array[i], array[j]] = [array[j], array[i]]; // Swap elements
+				}
+			}
+
+			let tempfilteredSentenceLibrary = [];
+			let filteredSentenceLibrary = []
+
+			function filterSentenceLibrary() {
+				filteredSentenceLibrary = sentenceLibrary.filter(entry => Object.entries(conditions).some(([key, values]) => {
+					if(!(key in entry.metadata)) {
+						return false; // Key must exist in metadata
+					}
+					if(values.length === 0) {
+						return true; // Key existence alone satisfies the condition
+					}
+					return values.some(value => entry.metadata[key].includes(value)); // At least one value must match
+				}));
+				tempfilteredSentenceLibrary = [...filteredSentenceLibrary];
+				shuffleArray(tempfilteredSentenceLibrary);
+			}
+
+			let noOfQuestionsGeneratedPerRound = 5 * Object.keys(conditions).length;
+
+			function assembleAndFormatSentences() {
+				sakiniai = [];
+				while(sakiniai.length < noOfQuestionsGeneratedPerRound) {
+					for(const [condition, subcondition] of Object.entries(conditions)) {
+						if(tempfilteredSentenceLibrary.length === 0) {
+							tempfilteredSentenceLibrary = [...filteredSentenceLibrary];
+							shuffleArray(tempfilteredSentenceLibrary);
+						}
+						for(let i = 0; i < tempfilteredSentenceLibrary.length; i++) {
+							const sentence = tempfilteredSentenceLibrary[i];
+							const metadata = sentence.metadata;
+							// Check if the condition key exists in metadata
+							if(metadata.hasOwnProperty(condition)) {
+								const metadataValues = metadata[condition];
+								// If subcondition is empty, or at least one required value matches metadata values
+								if(subcondition.length === 0 || subcondition.some(value => metadataValues.includes(value))) {
+									tempfilteredSentenceLibrary.splice(i, 1);
+									const sentenceLength = sentence["sentence"].length;
+									let questionQuota = Math.floor(sentenceLength / maximumQuestionFrequencyPerWord);
+									let wordsThatCanBeUsedForQuestions = {};
+									let wordsOneMustBeUsed = {};
+									// Loop through sentence and process word information
+									sentence["sentence"].map(([wordData, id]) => {
+										const [beforePunctuation, word, afterPunctuation, wordInfo] = wordData
+										if(wordInfo) {
+											let matchesCondition = false;
+											let matchesSubCondition = false;
+											// Check if the condition key exists in the wordInfo
+											if(!!wordInfo[condition]) {
+												// If subcondition is empty, match all, otherwise check for matching values
+												if(subcondition.length === 0 || subcondition.some(value => {
+														if(!(subcondition[0] === undefined)) {
+															return true;
+														}
+														return false;
+													})) {
+													matchesCondition = true;
+												}
+												if(matchesCondition) {
+													if(checkCategories(wordInfo, categoriesToCheck, getAllowedMatchingCategories(condition, categoryMatchingRules))) {
+														if (!(subcondition[0] === undefined)) {
+														if(checkCategories(wordInfo, subCategoriesToCheck[condition], getAllowedMatchingCategories(subcondition, subCategoryMatchingRules[condition]))) {
+															if (
+																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
+																			!categoriesThatNeedEndings.includes(condition)
+																	) {
+																			const isNounOrAdjective = (condition === "dkt") ||  (condition === "bdv");
+																			const isVerb = condition === "vks";
+
+																			const nounCondition = isNounOrAdjective && (
+																					(wordInfo["vns"] === true && wordInfo["dgs"] !== false) ||
+																					(wordInfo["vns"] === false && wordInfo["dgs"] !== true)
+																			);
+
+																			const verbCondition = isVerb && (
+																					wordInfo["dalc"] === false
+																			);
+
+																			if (((isNounOrAdjective && wordInfo["dalc"] === false)|| !isVerb) || nounCondition || verbCondition) {
+																					wordsOneMustBeUsed[word] = condition;
+																			}
+																	}
+														}
+													} else {
+														if (
+																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
+																			!categoriesThatNeedEndings.includes(condition)
+																	) {
+																			const isNounOrAdjective = (condition === "dkt") ||  (condition === "bdv");
+																			const isVerb = condition === "vks";
+
+																			const nounCondition = isNounOrAdjective && (
+																					(wordInfo["vns"] === true && wordInfo["dgs"] !== false) ||
+																					(wordInfo["vns"] === false && wordInfo["dgs"] !== true)
+																			);
+
+																			const verbCondition = isVerb && (
+																					wordInfo["dalc"] === false
+																			);
+
+																			if (((isNounOrAdjective && wordInfo["dalc"] === false)|| !isVerb) || nounCondition || verbCondition) {
+																wordsOneMustBeUsed[word] =  condition;
+																}
+															}
+													}
+												}
+												} else {
+													// Check remaining conditions
+													for(const [otherCondition, otherSubconditions] of Object.entries(conditions)) {
+														if(otherCondition === condition) continue;
+														if(!!wordInfo[otherCondition]) {
+															let otherMatchesCondition = false;
+															if(otherSubconditions.length === 0 || otherSubconditions.some(value => {
+																	return !!wordInfo[value];
+																})) {
+																otherMatchesCondition = true;
+															}
+															if(otherMatchesCondition) {
+																if(checkCategories(wordInfo, categoriesToCheck, getAllowedMatchingCategories(otherCondition, categoryMatchingRules))) {
+																	if (!(otherSubconditions[0] === undefined)) {
+																	if(checkCategories(wordInfo, subCategoriesToCheck[otherCondition], getAllowedMatchingCategories(otherSubconditions, subCategoryMatchingRules[otherCondition]))) {
+																		if (
+																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
+																			!categoriesThatNeedEndings.includes(otherCondition)
+																	) {
+																			const isNounOrAdjective = (otherCondition === "dkt") ||  (otherCondition === "bdv");
+																			const isVerb = otherCondition === "vks";
+
+																			const nounCondition = isNounOrAdjective && (
+																					(wordInfo["vns"] === true && wordInfo["dgs"] !== false) ||
+																					(wordInfo["vns"] === false && wordInfo["dgs"] !== true)
+																			);
+
+																			const verbCondition = isVerb && (
+																					wordInfo["dalc"] === false
+																			);
+
+																			if (((isNounOrAdjective && wordInfo["dalc"] === false)|| !isVerb) || nounCondition || verbCondition) {
+																		wordsThatCanBeUsedForQuestions[word] =  otherCondition;
+																		break;
+																			}
+															}
+																	}
+																} else {
+																	if (
+																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
+																			!categoriesThatNeedEndings.includes(otherCondition)
+																	) {
+																			const isNounOrAdjective = (otherCondition === "dkt") ||  (otherCondition === "bdv");
+																			const isVerb = otherCondition === "vks";
+
+																			const nounCondition = isNounOrAdjective && (
+																					(wordInfo["vns"] === true && wordInfo["dgs"] !== false) ||
+																					(wordInfo["vns"] === false && wordInfo["dgs"] !== true)
+																			);
+
+																			const verbCondition = isVerb && (
+																					wordInfo["dalc"] === false
+																			);
+
+																			if (((isNounOrAdjective && wordInfo["dalc"] === false)|| !isVerb) || nounCondition || verbCondition) {
+																	wordsThatCanBeUsedForQuestions[word] =  otherCondition;
+																	break;
+															}
+														}
+																}
+																}
+															}
+														}
+													}
+												}
+											} else {
+												for(const [otherCondition, otherSubconditions] of Object.entries(conditions)) {
+													if(otherCondition === condition) {
+														continue
+													} else {
+														if(wordInfo[otherCondition] === true) {
+															let otherMatchesCondition = false;
+															if(otherSubconditions.length === 0 || otherSubconditions.some(value => {
+																	return wordInfo[value] === true;
+																})) {
+																otherMatchesCondition = true;
+															}
+															if(otherMatchesCondition) {
+																if(checkCategories(wordInfo, categoriesToCheck, getAllowedMatchingCategories(otherCondition, categoryMatchingRules))) {
+																	if (!(otherSubconditions[0] === undefined)) {
+																	if(checkCategories(wordInfo, subCategoriesToCheck[otherCondition], getAllowedMatchingCategories(otherSubconditions, subCategoryMatchingRules[otherCondition]))) {
+																		if (
+																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
+																			!categoriesThatNeedEndings.includes(otherCondition)
+																	) {
+																			const isNounOrAdjective = (otherCondition === "dkt") ||  (otherCondition === "bdv");
+																			const isVerb = otherCondition === "vks";
+
+																			const nounCondition = isNounOrAdjective && (
+																					(wordInfo["vns"] === true && wordInfo["dgs"] !== false) ||
+																					(wordInfo["vns"] === false && wordInfo["dgs"] !== true)
+																			);
+
+																			const verbCondition = isVerb && (
+																					wordInfo["dalc"] === false
+																			);
+
+																			if (((isNounOrAdjective && wordInfo["dalc"] === false)|| !isVerb) || nounCondition || verbCondition) {
+																		wordsThatCanBeUsedForQuestions[word] =  otherCondition;
+																		break;
+																			}
+															}
+																	}
+																} else {
+																	if (
+																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
+																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
+																			!categoriesThatNeedEndings.includes(otherCondition)
+																	) {
+																			const isNounOrAdjective = (otherCondition === "dkt") ||  (otherCondition === "bdv");
+																			const isVerb = otherCondition === "vks";
+
+																			const nounCondition = isNounOrAdjective && (
+																					(wordInfo["vns"] === true && wordInfo["dgs"] !== false) ||
+																					(wordInfo["vns"] === false && wordInfo["dgs"] !== true)
+																			);
+
+																			const verbCondition = isVerb && (
+																					wordInfo["dalc"] === false
+																			);
+
+																			if (((isNounOrAdjective && wordInfo["dalc"] === false)|| !isVerb) || nounCondition || verbCondition) {
+																	wordsThatCanBeUsedForQuestions[word] =  otherCondition;
+																	break;
+																			}
+																	}
+																}
+															}
+															}
+														}
+													}
+												}
+											}
+										}
+									});
+									// Randomly select words that must be used and other words for the question
+									let wordsToBeUsed = {};
+									if (Object.keys(wordsOneMustBeUsed).length > 0) {
+										let randomWord = Object.keys(wordsOneMustBeUsed)[Math.floor(Math.random() * Object.keys(wordsOneMustBeUsed).length)];
+										wordsToBeUsed[randomWord] = wordsOneMustBeUsed[randomWord];
+										delete wordsOneMustBeUsed[randomWord];
+									}
+									let combinedWordsThatCanBeUsed = Object.assign({}, wordsOneMustBeUsed, wordsThatCanBeUsedForQuestions);
+									while (Object.keys(wordsToBeUsed).length < questionQuota && (Object.keys(combinedWordsThatCanBeUsed).length > 0)) {
+										let randomWord = Object.keys(combinedWordsThatCanBeUsed)[Math.floor(Math.random() * Object.keys(combinedWordsThatCanBeUsed).length)];
+										wordsToBeUsed[randomWord] = combinedWordsThatCanBeUsed[randomWord];
+										delete combinedWordsThatCanBeUsed[randomWord];
+									}
+									
+									if (Object.keys(wordsToBeUsed).length === 0) {
+											continue;
+									} else {
+									// Now loop through the sentence again and build the final formatted sentence
+									
+									const formattedSentence = sentence["sentence"].reduce((acc, [wordData, id]) => {
+										const [beforePunctuation, word, afterPunctuation, wordInfo] = wordData;
+										if (word in wordsToBeUsed) {
+											let pagalbaText = "";
+											let valuesToShow = [];
+											if (categoriesThatNeedEndings.includes(wordsToBeUsed[word])) {
+												if ((controller.classChoice === "C76" && wordInfo["gal-s"]) || (controller.classChoice === "C75" && wordInfo["fsc-gal"])) {
+													if (controller.classChoice === "C76") {
+													const pagalbaIndex = {
+															"vns": "vns.",
+															"dgs": "dgs.",
+															"1-a": "Ia.",
+															"2-a": "IIa.",
+															"3-a": "IIIa.",
+															"es-l": "es.l.",
+															"b-k-l": "būt.k.l.",
+															"b-d-l": "būt.d.l.",
+															"būs-l": "būs.l.",
+															"vyr-g": "vyr.g.",
+															"mot-g": "mot.g.",
+													};
+
+													// Assuming wordInfo is provided, e.g., wordInfo = { "vks": true, "dkt": false, "bdv": false }
+													if (wordInfo["vks"] === true) {
+														if (wordInfo["3-a"] === true) {
+															valuesToCheck = ["es-l", "b-k-l", "b-d-l", "būs-l", "3-a"];
+														} else {
+															valuesToCheck = ["es-l", "b-k-l", "b-d-l", "būs-l", "vns", "dgs", "1-a", "2-a", "3-a"];
+														}
+															valuesToCheck.forEach(value => {
+																	if (wordInfo[value]) {  // If wordInfo has the specific value set to true
+																			valuesToShow.push(pagalbaIndex[value]);
+																	}
+															});
+													} else if (wordInfo["dkt"] === true || wordInfo["bdv"] === true) {
+															valuesToCheck = ["vns", "dgs"];
+															valuesToCheck.forEach(value => {
+																	if (wordInfo[value]) {  // If wordInfo has the specific value set to true
+																			valuesToShow.push(pagalbaIndex[value]);
+																	}
+															});
+															if (valuesToShow.length === 2) {
+																valuesToShow = ["vns.?", "dgs.?"]
+															}
+															if (wordInfo["prv"] === true) {
+																valuesToShow = valuesToShow.map(item => {
+																// Check if the item does not already end with '?'
+																if (!item.endsWith('?')) {
+																	return item + '?';
+																}
+																return item;
+															});
+																valuesToShow.push("prv.?")
+															}
+															if (wordInfo['vyr-g']) {
+																valuesToShow.push(pagalbaIndex["vyr-g"]);
+															}
+															if (wordInfo['mot-g']) {
+																valuesToShow.push(pagalbaIndex["mot-g"]);
+															}
+													}
+													} else if (controller.classChoice === "C75") {
+														if (wordInfo['g'] === true) {
+															valuesToShow.push("ką vieną?")
+														} else if (wordInfo['k'] === true) {
+															valuesToShow.push("ko daug?")
+														} else if (wordInfo['vt'] === true) {
+															valuesToShow.push("kur?")
+														}
+													}
+
+												// Join the results into a single string separated by commas
+												const valuesToShowString = valuesToShow.join(', ');
+												formattedWord = [`${beforePunctuation}<span class="question-word-span end" style="display: inline; white-space: nowrap;">${wordInfo["gal-c"][0][0][0]}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" id="id-${questionId}" class="question-input end" maxlength="6"></textarea> <span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
+												atsakymai[`id-${questionId}`] = {};
+												atsakymai[`id-${questionId}`]["klausimas"] = [wordInfo["gal-c"][0][0][0], '']
+												atsakymai[`id-${questionId}`]["atsakymas"] = [wordInfo["gal-c"][0][1]];
+												atsakymai[`id-${questionId}`]["kl-grupe"] = wordsToBeUsed[word];
+												atsakymai[`id-${questionId}`]["zodzio-id"] = id;
+												questionId++;
+												
+												}
+											
+											} 
+											
+											if ((controller.classChoice === "C75" && (wordsToBeUsed[word] === "fsc-con" || wordsToBeUsed[word] === "fsc-vow")) ||
+												(controller.classChoice === "C76" && wordsToBeUsed[word] === "fsc-vow")
+											) {
+												removedLetterOptionIndex = {
+													"k": ["k", "g"],
+													"g": ["k", "g"],
+													"p": ["p", "b"],
+													"b": ["p", "b"],
+													"t": ["t", "d"],
+													"d": ["t", "d"],
+													"ž": ["ž", "š"],
+													"z": ["z", "s"],
+													"s": ["z", "s"],
+													"š": ["ž", "š"],
+													"e": ["e", "ė"],
+													"ė": ["e", "ė"],
+													"i": ["i", "y"],
+													"y": ["i", "y"],
+													"u": ["u", "ū"],
+													"ū": ["u", "ū"],
+												}
+												var combinations = wordInfo[`${wordsToBeUsed[word]}-c`];
+												if (combinations && combinations.length > 0) {
+														let randomIndex = Math.floor(Math.random() * combinations.length);
+														let randomElement = combinations[randomIndex];
+														if (randomElement[1][0].toLowerCase() in removedLetterOptionIndex) {
+															valuesToShow = removedLetterOptionIndex[randomElement[1][0].toLowerCase()];
+														}
+														const valuesToShowString = valuesToShow.join('/');
+														if (wordsToBeUsed[word] === "fsc-vow") {
+															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="6" id="id-${questionId}" class="question-input middle"></textarea>${randomElement[2][0]}<span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
+														} else if (wordsToBeUsed[word] === "fsc-con" ) {
+															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="6" id="id-${questionId}" class="question-input middle"></textarea>${randomElement[2][0]}<span class="pagalba-span-perm">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];															
+														}
+														atsakymai[`id-${questionId}`] = {};
+														atsakymai[`id-${questionId}`]["klausimas"] = [randomElement[0][0], randomElement[2][0]]
+														atsakymai[`id-${questionId}`]["atsakymas"] = [randomElement[1]];
+														atsakymai[`id-${questionId}`]["kl-grupe"] = wordsToBeUsed[word];
+														atsakymai[`id-${questionId}`]["zodzio-id"] = id;
+														questionId++;
+													}
+											} else {
+												var combinations = wordInfo[`${wordsToBeUsed[word]}-c`];
+												if (combinations && combinations.length > 0) {
+														let randomIndex = Math.floor(Math.random() * combinations.length);
+														let randomElement = combinations[randomIndex];
+														formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="6" id="id-${questionId}" class="question-input middle"></textarea><span class="pagalba-div"></span>${randomElement[2][0]}${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
+														atsakymai[`id-${questionId}`] = {};
+														atsakymai[`id-${questionId}`]["klausimas"] = [randomElement[0][0], randomElement[2][0]]
+														atsakymai[`id-${questionId}`]["atsakymas"] = [randomElement[1]];
+														atsakymai[`id-${questionId}`]["kl-grupe"] = wordsToBeUsed[word];
+														atsakymai[`id-${questionId}`]["zodzio-id"] = id;
+														questionId++;
+														
+												}
+										}
+									 } else {
+										formattedWord = [`${beforePunctuation}${word}${afterPunctuation}`, "none"];
+										}
+										if (allowAdjacentEndlessWords) {
+											acc.push(formattedWord)
+										} else {
+											if (acc.length > 0) {
+											if ((formattedWord[1] === "bdv" || formattedWord[1] ==="dkt") && (acc[acc.length - 1][1] === "bdv" || acc[acc.length - 1][1] === "dkt") && acc[acc.length - 1][3] === false) {
+												if (Math.random() <= 0.5) {
+													var temp = acc[acc.length - 1][0]
+													acc[acc.length - 1][0] = acc[acc.length - 1][2]
+													acc[acc.length - 1][2] = temp
+													if (acc.length >= 3) {
+													if (acc[acc.length - 2][3] === true) {
+														var temp2 = acc[acc.length - 2][0]
+														acc[acc.length - 2][0] = acc[acc.length - 2][2]
+														acc[acc.length - 2][2] = temp2	
+													}
+													acc.push(formattedWord)
+												} else {
+													acc.push(formattedWord)
+												}
+											 } else {
+													// This code will run the other 50% of the time
+													var temp = formattedWord[0]
+													formattedWord[0] = formattedWord[2]
+													formattedWord[2] = temp
+													formattedWord[3] = true
+													acc.push(formattedWord)
+												}
+											} else {
+												acc.push(formattedWord)
+											}
+										} else {
+											acc.push(formattedWord)
+										}
+
+										}
+										return acc;
+									}, [])
+									const output = `<div class="sakiniai">${formattedSentence.map(item => item[0]).join(' ')}</div>`;
+									sakiniai.push(output);
+									break; // Stop processing further sentences once one has been added
+								}
+							}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (controller.modeChoice4 === "C40") {
+			answerTrackerElement.innerHTML =`Atlikta: ${controller.randomSelection[2] || 0}/${controller.questionNumber}`;
+		}
+
+		// Function to get allowed matching categories
+
+		function preserveFocusDuring(fn) {
+		const previouslyFocused = document.activeElement !== document.body ? document.activeElement : null;
+		fn(); // run your main logic
+		if (previouslyFocused) {
+			previouslyFocused.focus(); // restore focus
+		} else {
+			document.activeElement.blur(); // ensure nothing is focused
+		}
+		}
+
+		document.getElementById('increase-no-of-sentences').addEventListener('click', () => {
+		preserveFocusDuring(() => {
+			const inputs = Array.from(document.querySelectorAll('.question-input'));
+			const anyNotEmpty = inputs.some(input => input.value.trim() !== '');
+			if (!firstTimeChecking || anyNotEmpty) {
+			messageToTheUser("Sakinių skaičių galima pakeisti tik prieš įrašant raides.");
+			return;
+			}
+			if (questionsToDisplay < 5) {
+			questionsToDisplay++;
+			displaySentences();
+			document.getElementById('help-toggle').checked = false;
+			helpToggle();
+			} else {
+			focusFirstInput();
+			}
+		});
+		});
+
+		document.getElementById('decrease-no-of-sentences').addEventListener('click', () => {
+		preserveFocusDuring(() => {
+			const inputs = Array.from(document.querySelectorAll('.question-input'));
+			const anyNotEmpty = inputs.some(input => input.value.trim() !== '');
+			if (!firstTimeChecking || anyNotEmpty) {
+			messageToTheUser("Sakinių skaičių galima pakeisti tik prieš įrašant raides.");
+			return;
+			}
+			if (questionsToDisplay > 1) {
+			questionsToDisplay--;
+			displaySentences();
+			document.getElementById('help-toggle').checked = false;
+			helpToggle();
+			} else {
+			focusFirstInput();
+			}
+		});
+		});
+
+		function displaySentences() {
+			styleGrammarPage();
+			document.getElementById('help-toggle').checked = true;
+			allAnswersCorrect = false;
+			currentAnswerAttempts = 0;
+			document.getElementById('check-answers').disabled = false;
+			document.getElementById('show-answers').style.visibility = "hidden";
+			document.getElementById('field-for-final-message').innerHTML = '';
+
+			if (controller.randomSelection.length === 0 || ((controller.randomSelection.length !== 0 && 5 > controller.randomSelection[0].length) && 5 > sakiniai.length)) {
+				controller.randomSelection[0] = [];
+				controller.randomSelection[1] = {};
+				localStorage.setItem("controller", JSON.stringify(controller));
+				assembleAndFormatSentences();
+			}
+
+			if (controller.modeChoice4 === "C40") {
+				if (!controller.randomSelection[2]) {
+					controller.randomSelection[2] = 0;
+				}
+				if ((controller.questionNumber - controller.randomSelection[2]) < questionsToDisplay) {
+					questionsToDisplay = controller.questionNumber - controller.randomSelection[2];
+				}
+			}
+
+			let subSakiniai = [];
+			if (controller.randomSelection.length === 0 || controller.randomSelection[0].length < 5) {
+
+				if (controller.randomSelection[0]) {
+					subSakiniai.push(...controller.randomSelection[0]);
+				}
+
+				// Select random unique indices
+				const selectedIndices = new Set();
+				while (selectedIndices.size < (5 - subSakiniai.length)) {
+					const randomIndex = Math.floor(Math.random() * sakiniai.length);
+					selectedIndices.add(randomIndex);
+				}
+
+				// Sort indices in descending order to avoid modifying the list while iterating
+				const sortedIndices = Array.from(selectedIndices).sort((a, b) => b - a);
+
+				// Store selected items in subSakiniai
+				for (const index of sortedIndices) {
+					subSakiniai.push(sakiniai[index]);
+				}
+
+				// Create the remaining sentences by filtering out the selected ones
+				const remainingSakiniai = sakiniai.filter((_, index) => !selectedIndices.has(index));
+				sakiniai = remainingSakiniai;
+
+				controller.randomSelection[0] = subSakiniai;
+				controller.randomSelection[1] = atsakymai;
+				localStorage.setItem("controller", JSON.stringify(controller));
+			} else {
+				subSakiniai = controller.randomSelection[0];
+				atsakymai = controller.randomSelection[1]
+			}
+
+			// Set the inner HTML of the text container
+			document.getElementById("field-for-sentences").innerHTML = subSakiniai.slice(0, questionsToDisplay).join('');
+
+			// Restrict input to Lithuanian letters and spaces for the question inputs
+			document.querySelectorAll('.question-input').forEach(input => {
+				input.addEventListener('input', function () {
+					// Replace any character that isn't a Lithuanian letter or space
+					this.value = this.value.replace(/[^a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ\s]/g, '');
+				});
+			});
+			document.querySelectorAll('input, textarea').forEach(input => {
+				input.setAttribute('spellcheck', 'false');
+				input.addEventListener('input', () => resizeInput(input));
+				resizeInput(input);
+			});
+
+			focusFirstInput();
+
+			document.querySelectorAll('.question-input').forEach(input => {
+				// Add event listener to remove 'wrong-answer' class on focus
+				input.addEventListener('focus', () => {
+					if (input.classList.contains('wrong-answer')) {
+						input.value = ''; // clear the input
+						resizeInput(input); // keep width consistent
+					}
+					input.classList.remove('wrong-answer');
+				});
+			});
+
+			setupDynamicListeners();
+
+		}
+
+		function toggleHelpButton() {
+			const helpToggle = document.getElementById("help-toggle");
+			if (helpToggle.checked) {
+				helpToggle.checked = false;
+			} else {
+				helpToggle.checked = true;
+			}
+	
+			const pagalbaSpans = document.querySelectorAll(".pagalba-span");
+
+			let isAnySpanNonEmpty = Array.from(pagalbaSpans).some(span => span.innerHTML.trim() !== "");
+
+			helpToggle.style.disabled = isAnySpanNonEmpty ? "visible" : "hidden";
+		}
+
+
+		function initiateTheProgram() {
+			if (!controller.questionsStopped) {
+				filterSentenceLibrary();
+				displaySentences();
+				toggleHelpButton();
+				helpToggle();
+
+				if (!controller.questionsStopped) {
+				if (controller.modeChoice4 === "C39") {
+					countDown();
+				} else if (controller.modeChoice4 === "C40") {
+					startTimer();
+				}
+				}
+			} else {
+				formatFinalMessageForGrammar();
+			}
+		}
+
+
+		initiateTheProgram();
+
+		function resizeInput(inputElement) {
+			// Create a temporary span element to measure the width of the input text
+			const span = document.createElement('span');
+			const style = window.getComputedStyle(inputElement);
+
+			// Set the span to match the input's styling (same font, padding, etc.)
+			span.style.font = style.font;
+			span.style.padding = style.padding;
+			span.style.margin = style.margin;
+			span.style.whiteSpace = 'nowrap'; // Make sure the text does not wrap
+
+			// Set the span's text to the input's current value
+			span.textContent = inputElement.value || inputElement.placeholder;
+
+			// Append the span to the document (it will be invisible)
+			document.body.appendChild(span);
+
+			// Get the width of the span and update the input width
+			const width = span.getBoundingClientRect().width;
+
+			// Remove the temporary span from the document
+			document.body.removeChild(span);
+
+				
+			if (inputElement.value === '') {
+				inputElement.style.width = `1.5ch`; // Dynamic width based on placeholder
+			} else {
+				inputElement.style.width = `${width}px`;
+			}
+
+			alignTextareaVertically(inputElement)
+	}
+
+function alignTextareaVertically(inputElement) {
+    // Reset transform first
+    inputElement.style.transform = 'translateY(0)';
+    
+    // Force reflow
+    void inputElement.offsetHeight;
+    
+    const parent = inputElement.closest('.question-word-span');
+    if (!parent) return;
+    
+    // Create reference span for baseline alignment
+    const testSpan = document.createElement('span');
+    testSpan.textContent = 'X';
+    testSpan.style.visibility = 'hidden';
+    testSpan.style.display = 'inline';
+    parent.appendChild(testSpan);
+    
+    // Measure and align
+    const testRect = testSpan.getBoundingClientRect();
+    const textareaRect = inputElement.getBoundingClientRect();
+    const offset = testRect.bottom - textareaRect.bottom;
+    
+    if (Math.abs(offset) > 0.5) {
+        inputElement.style.transform = `translateY(${offset}px)`;
+    }
+    
+    testSpan.remove();
+}
+
+// Function to set up listeners for all inputs
+function setupDynamicListeners() {
+	const inputs = document.querySelectorAll('.question-input');
+	const checkAnswersButton = document.getElementById('check-answers');
+
+	inputs.forEach(input => {
+		// --- Define handlers once per input ---
+		const handleInput = () => {
+			const wrongInputs = document.querySelectorAll('.wrong-answer');
+			allModified = !(wrongInputs && wrongInputs.length > 0);
+		};
+
+		const handleParentClick = (e) => {
+			if (e.target !== input) {
+				const container = document.querySelector('#field-for-text-outer');
+				focusWithKeyboardAdjustment(input, container);
+			}
+		};
+
+		const handleMouseDown = (e) => {
+			if (document.activeElement !== input) {
+				e.preventDefault();
+				const container = document.querySelector('#field-for-text-outer');
+				focusWithKeyboardAdjustment(input, container);
+			}
+		};
+
+		const handleTouchStart = (e) => {
+			if (document.activeElement !== input) {
+				e.preventDefault();
+				const container = document.querySelector('#field-for-text-outer');
+				focusWithKeyboardAdjustment(input, container);
+			}
+		};
+
+		// --- Remove old listeners if they exist ---
+		input.removeEventListener('input', input._handleInput);
+		input.removeEventListener('mousedown', input._handleMouseDown);
+		input.removeEventListener('touchstart', input._handleTouchStart);
+		if (input.parentElement) {
+			input.parentElement.removeEventListener('click', input._handleParentClick);
+		}
+
+		// --- Attach new listeners ---
+		input.addEventListener('input', handleInput);
+		input.addEventListener('mousedown', handleMouseDown);
+		input.addEventListener('touchstart', handleTouchStart, { passive: false });
+		if (input.parentElement) {
+			input.parentElement.addEventListener('click', handleParentClick);
+		}
+
+		// --- Store handlers for future cleanup ---
+		input._handleInput = handleInput;
+		input._handleMouseDown = handleMouseDown;
+		input._handleTouchStart = handleTouchStart;
+		input._handleParentClick = handleParentClick;
+	});
+}
+
+function getOffsetTopWithinContainer(el, container) {
+	let offset = 0;
+	while (el && el !== container) {
+		offset += el.offsetTop;
+		el = el.offsetParent;
+	}
+	return offset;
+}
+
+function focusWithKeyboardAdjustment(element, container) {
+	if (!element || !container) return;
+
+	const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+		|| ('ontouchstart' in window)
+		|| (navigator.maxTouchPoints > 0);
+
+	element.focus({ preventScroll: true });
+
+	function centerElement() {
+		const elementTop = getOffsetTopWithinContainer(element, container);
+		const targetScrollTop = elementTop - (container.clientHeight / 2) + (element.offsetHeight / 2);
+
+		container.scrollTo({
+			top: targetScrollTop,
+			behavior: 'smooth'
+		});
+	}
+
+	requestAnimationFrame(centerElement);
+	if (isMobile) {
+		setTimeout(centerElement, 300);
+		setTimeout(centerElement, 500);
+	}
+}
+
+
+
+function recordGrammarMistakes (inputId, userInput) {
+	if (!mistakeRecords[inputId]) {
+		mistakeRecords[inputId] = {};
+		mistakeRecords[inputId] = {
+		"mistakesCounter": 0,
+		"wrongAnswer": []
+		};
+	}
+	mistakeRecords[inputId]["mistakesCounter"]+=1
+	if (mistakeRecords[inputId]["wrongAnswer"].length < 3) {
+		mistakeRecords[inputId]["wrongAnswer"].push(userInput);
+	}
+}
+
+function checkAnswers() {
+    const inputs = document.querySelectorAll('.question-input');
+    const NumberOfQuestionsInRound = inputs.length;
+    const nextQuestionButton = document.getElementById('next-question');
+    const checkAnswersButton = document.getElementById('check-answers');
+    let answersCorrect = true;
+    let allFilled = true; // Check if all fields are filled
+
+	focusFirstInput();
+
+    inputs.forEach(input => {
+        let inputValue = input.value.trim().toLowerCase();
+        if (inputValue === "") {
+            allFilled = false; // Mark as not all filled
+            return;
+        }
+    });
+
+	if (!allFilled) {
+		messageToTheUser("Įrašyk visas raides!");
+		return
+	}
+
+	if (!allModified) {
+		messageToTheUser("Pataisyk visas klaidas!")
+		return
+	}
+
+	inputs.forEach(input => {
+		const inputId = input.id;
+		let inputValue = input.value.trim();
+
+		// Strip input value of spaces before comparing with the dictionary
+		inputValue = inputValue.replace(/\s+/g, '');
+
+		// Compare the stripped value with the corresponding value from atsakymai
+		if (atsakymai[inputId] && atsakymai[inputId]["atsakymas"] && atsakymai[inputId]["atsakymas"].some(answerArray => {
+			return answerArray.some(answer => inputValue === answer.replace(/\s+/g, ''));
+		})) {
+			input.classList.add('correct-answer');
+			input.classList.remove('wrong-answer');
+			input.disabled = true;
+			if (firstTimeChecking) {
+				controller.correctAnswersTracker++;
+			}
+		} else {
+			input.classList.add('wrong-answer');
+			input.classList.remove('correct-answer');
+			answersCorrect = false;
+			controller.mistakesTracker++;
+			localStorage.setItem("controller", JSON.stringify(controller));
+			recordGrammarMistakes(input.id, inputValue);
+		}
+
+
+		// Show "Next Question" button only if all answers are correct
+		nextQuestionButton.style.display = answersCorrect ? "flex" : "none";
+		checkAnswersButton.style.display = answersCorrect ? "none" : "flex";
+	});
+
+	if (firstTimeChecking) {
+		controller.answeredQuestionTracker += NumberOfQuestionsInRound;
+		document.getElementById('mistake-tracker').innerHTML = `Teisingai: ${controller.correctAnswersTracker}/${controller.answeredQuestionTracker}`;
+		localStorage.setItem('controller', JSON.stringify(controller));
+	}
+
+	if (answersCorrect) {
+		allAnswersCorrect = true;
+
+		controller.randomSelection[0].splice(0, questionsToDisplay);
+
+		if (controller.randomSelection[2] === undefined || controller.randomSelection[2] === null) {
+			controller.randomSelection[2] = 0;
+		}
+
+		controller.randomSelection[2] = controller.randomSelection[2] + questionsToDisplay;
+
+		if (controller.modeChoice4 === "C40") {
+			answerTrackerElement.innerHTML = `Atlikta: ${controller.randomSelection[2]}/${controller.questionNumber}`;
+		}
+
+		localStorage.setItem("controller", JSON.stringify(controller));
+
+		var container = document.querySelector('.field-for-text-outer-holder');
+		container.classList.add('pulse')
+		setTimeout(function() {
+			container.classList.remove('pulse');
+		}, 800);
+	} else {
+		currentAnswerAttempts += 1;
+		allModified = false;
+
+		var container = document.querySelector('.field-for-text-outer-holder');
+		container.classList.add('pulse-wrong')
+		setTimeout(function() {
+			container.classList.remove('pulse-wrong');
+		}, 800);
+
+		const wrongInput = document.querySelector(".wrong-answer")
+		const wrongInputParent = wrongInput.parentElement;
+		focusCentered(wrongInputParent);
+		document.querySelectorAll('.current-focus-parent').forEach(el => {
+			el.classList.remove('current-focus-parent');
+		});
+		wrongInputParent.classList.add('current-focus-parent');
+
+		setTimeout(() => {
+			hiddenInput.focus({ preventScroll: true });
+			hiddenInput.dataset.currentId = wrongInput.id;
+		}, 400);
+	}
+
+	document.querySelectorAll('.question-word-span textarea').forEach(textarea => {
+        alignTextareaVertically(textarea);
+    });
+
+	firstTimeChecking = false;
+
+	if (currentAnswerAttempts >= 3) {
+		if (!answersCorrect) {
+			document.getElementById('show-answers').style.visibility = "visible";
+		} else {
+			document.getElementById('show-answers').style.visibility = "hidden";
+		}
+	}
+}
+
+function showAnswers() {
+  const inputs = document.querySelectorAll('.question-input');
+  
+  // Iterate over each input field
+  inputs.forEach(input => {
+    const inputId = input.id;
+    
+    // Ensure that the answer exists in the atsakymai object
+    if (atsakymai[inputId]) {
+      // Set the value of the input field to the correct answer, stripping spaces
+      input.value = atsakymai[inputId]["atsakymas"][0][0].replace(/\s+/g, '');
+      resizeInput(input);
+    }
+  });
+
+  allModified = true;
+  checkAnswers();
+}
+
+function helpToggle() {
+	const elements = document.querySelectorAll('.pagalba-span');
+    
+    // Loop through each element and toggle the display property
+    elements.forEach(element => {
+        if (element.style.display === 'none') {
+            element.style.display = 'inline-block'; // Set display to flex if it's none
+        } else {
+            element.style.display = 'none'; // Set display to none if it's not none
+        }
+    });
+	focusFirstInput();
+}
+
+
+			function nextQuestion() {
+				if (controller.modeChoice4 === "C40") {
+					if (controller.randomSelection[2] === controller.questionNumber) {
+						localStorage.setItem("elapsedTime", timerDisplay.textContent);
+						controller.taskCompleted = true;
+						formatFinalMessageForGrammar();
+						controller.questionsStopped = true;
+						localStorage.setItem('controller', JSON.stringify(controller));
+					}
+				}
+				
+				if (!controller.questionsStopped) {
+					displaySentences()
+					toggleHelpButton();
+					document.getElementById('check-answers').style.display = "flex"
+					nextQuestionButton.style.display = "none";
+					document.querySelectorAll('.pagalba-span').forEach(element => {
+					element.style.display = 'none';
+					});
+					firstTimeChecking = true;
+				}
+			}
+
+			function stopQuestions() {
+				if (stopButtonSpanElement.innerHTML === "close") {
+					showCustomConfirm("Ar tikrai nori sustabdyti užduotį?", stopQuestionsCloseActions);
+				} else if (stopButtonSpanElement.innerHTML === "refresh") {
+					stopButtonSpanElement.innerHTML = "close";
+					controller.questionsStopped = false;
+					if (localStorage.getItem("startTime")) {
+					localStorage.removeItem("startTime");
+					};
+					if (localStorage.getItem("remainingTime")) {
+					localStorage.removeItem("remainingTime");
+					};
+					document.getElementById('check-answers').disabled = false;
+					document.getElementById('help-toggle').disabled = false;
+
+					document.getElementById('check-answers').style.display = "inline-block";
+					document.getElementById('check-answers').style.visibility = "visible";
+					document.querySelector('.help-toggle-holder').style.visibility = "visible";
+
+					document.querySelectorAll('.question-input').forEach(input => {
+						input.disabled = false;
+					});
+
+					window.mistakeRecords = {};
+
+					document.getElementById('mistake-tracker').innerHTML = `Teisingai: 0/0`;
+					controller.randomSelection[2] = 0;
+					if (controller.modeChoice4 === "C40") {
+						answerTrackerElement.innerHTML = `Atlikta: ${controller.randomSelection[2]}/${controller.questionNumber}`;
+					}
+					firstTimeChecking = true;
+					controller.randomSelection = [];
+					controller.currentMistakes = [];
+					controller.mistakesTracker = 0;
+					controller.answeredQuestionTracker = 0;
+					controller.correctAnswersTracker = 0;
+					atsakymai = {};
+					questionId = 1;
+					resetMistakeButtonsElement.style.display = "none";
+
+					controller.taskCompleted = false;
+	    			controller.taskRecorded = false;
+
+					restartPetOnWalkActions();
+
+					localStorage.setItem('controller', JSON.stringify(controller));
+					initiateTheProgram();
+				}
+			}
+
+			function focusFirstInput() {
+				const inputs = document.querySelectorAll('.question-input');
+				for (const input of inputs) {
+					if (input.value.trim() === '') {
+						input.focus();
+						return;
+					}
+				}
+				hiddenInput.focus({ preventScroll: true });
+			}
+
+function enableEnterNavigation() {
+    // Ensure the event listener is added only once
+    document.removeEventListener('keydown', handleEnterKey);
+    document.addEventListener('keydown', handleEnterKey);
+	document.addEventListener('focusin', (event) => {
+		const target = event.target;
+
+		if (target.classList.contains('question-input')) {
+			hiddenInput.dataset.currentId = "";
+			hiddenInput.value = ''
+		}
+	});
+
+	document.addEventListener('click', (event) => {
+		if (!event.isTrusted) return;
+		hiddenInput.dataset.currentId = "";
+		hiddenInput.value = ''
+		document.querySelectorAll('.current-focus-parent').forEach(el => {
+			el.classList.remove('current-focus-parent');
+		});
+	});
+
+	document.addEventListener('touchstart', (event) => {
+		if (!event.isTrusted) return;
+		hiddenInput.dataset.currentId = "";
+		hiddenInput.value = ''
+		document.querySelectorAll('.current-focus-parent').forEach(el => {
+			el.classList.remove('current-focus-parent');
+		});
+	});
+	
+	hiddenInput.addEventListener('keydown', handleEnterKey);
+	hiddenInput.addEventListener('input', handleHiddenInputChange);
+}
+
+function handleEnterKey(event) {
+    const letterPattern = /^[a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ]$/;
+    const inputs = Array.from(document.querySelectorAll('.question-input'));
+    const wrongInput = inputs.find(input => input.classList.contains('wrong-answer'));
+
+    const checkAnswersButton = document.getElementById('check-answers');
+    const nextQuestionBtn = document.getElementById('next-question');
+
+    // Handle letter keys (desktop only)
+    if (letterPattern.test(event.key) && wrongInput && hiddenInput.dataset.currentId === wrongInput.id) {
+        event.preventDefault();
+        
+        if (document.activeElement !== wrongInput) {
+            hiddenInput.blur();
+            wrongInput.focus();
+        }
+        
+        wrongInput.value += event.key;
+        wrongInput.dispatchEvent(new Event('input', { bubbles: true }));
+        resizeInput(wrongInput);
+        return;
+    }
+
+    // Handle Enter key only
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+
+    if (!inputs.length) return;
+
+    // Handle wrong answers
+    if (wrongInput) {
+        const parentDiv = wrongInput.parentElement;
+
+        if (hiddenInput.dataset.currentId === wrongInput.id) {
+            focusCentered(wrongInput);
+        } else {
+            focusCentered(parentDiv);
+			document.querySelectorAll('.current-focus-parent').forEach(el => {
+				el.classList.remove('current-focus-parent');
+			});
+			parentDiv.classList.add('current-focus-parent');
+            setTimeout(() => {
+				hiddenInput.focus({ preventScroll: true });
+				hiddenInput.dataset.currentId = wrongInput.id;
+			}, 400);
+        }
+        return;
+    }
+
+    // Focus first empty input if exists
+    const emptyInput = inputs.find(input => !input.value.trim());
+    if (emptyInput) {
+        focusCentered(emptyInput);
+        return;
+    }
+
+    // Check if all inputs are correct
+    const allCorrect = inputs.every(input => input.classList.contains('correct-answer'));
+
+    if (allCorrect) {
+        if (nextQuestionBtn) nextQuestionBtn.click();
+    } else {
+        if (checkAnswersButton) checkAnswersButton.click();
+    }
+}
+
+
+function handleHiddenInputChange(event) {
+    const inputs = Array.from(document.querySelectorAll('.question-input'));
+    const wrongInput = inputs.find(input => input.classList.contains('wrong-answer'));
+    
+    if (wrongInput && hiddenInput.dataset.currentId === wrongInput.id) {
+        const newValue = hiddenInput.value;
+        
+        if (newValue) {
+            // Transfer the input to wrong input
+			wrongInput.focus();
+            wrongInput.value += newValue;
+            wrongInput.dispatchEvent(new Event('input', { bubbles: true }));
+            resizeInput(wrongInput);
+            
+            // Clear hidden input
+            hiddenInput.value = '';
+        }
+    }
+}
+
+
+function focusCentered(element) {
+	if (!element) return;
+
+	const container = document.querySelector('#field-for-text-outer');
+	if (!container) return;
+
+	// Detect if mobile device
+	const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+	                ('ontouchstart' in window) ||
+	                (navigator.maxTouchPoints > 0);
+
+	// Determine if we're focusing a textarea or its parent
+	const isTextarea = element.tagName.toLowerCase() === 'textarea';
+	
+	// Focus behavior: textareas focus without scroll
+	if (isTextarea) {
+		element.focus({ preventScroll: true });
+	} else {
+		// If focusing a parent div, position hidden input at where the element will be after scroll
+		const rect = element.getBoundingClientRect();
+		const containerRect = container.getBoundingClientRect();
+		const targetScrollTop = container.scrollTop + rect.top - containerRect.top - (container.clientHeight / 2) + (element.offsetHeight / 2);
+		
+		// Position hidden input at the center of viewport (where element will be after scroll)
+		hiddenInput.style.top = (targetScrollTop + container.clientHeight / 2) + 'px';
+		hiddenInput.style.left = '50%';
+	}
+
+	// Function to perform the scroll
+	function performScroll() {
+		// Get fresh measurements
+		const rect = element.getBoundingClientRect();
+		const containerRect = container.getBoundingClientRect();
+
+		// Current scroll position plus element offset within container
+		const targetScrollTop = container.scrollTop + rect.top - containerRect.top - (container.clientHeight / 2) + (element.offsetHeight / 2);
+
+		// Always try smooth scroll first
+		const supportsSmooth = 'scrollBehavior' in document.documentElement.style;
+		
+		if (supportsSmooth) {
+			container.scrollTo({
+				top: targetScrollTop,
+				behavior: 'smooth'
+			});
+		} else {
+			// Fallback: instant scroll if smooth not supported
+			container.scrollTop = targetScrollTop;
+		}
+	}
+
+	// Use requestAnimationFrame to ensure layout is updated before scrolling
+	requestAnimationFrame(() => {
+		performScroll();
+		
+		// On mobile, perform a second scroll after keyboard settles
+		if (isMobile && isTextarea) {
+			setTimeout(performScroll, 100);
+		}
+	});
+}
+
+// Call the function after rendering the inputs and button
+enableEnterNavigation();
+
+// Add event listener to the button
+nextQuestionButton = document.getElementById('next-question')
+
+document.getElementById('check-answers').addEventListener('click', checkAnswers);
+document.getElementById('next-question').addEventListener('click', nextQuestion);
+document.getElementById('show-answers').addEventListener('click', showAnswers);
+document.getElementById('help-toggle').addEventListener('change', helpToggle);
+
+const stopButtonElement = document.querySelector('.stop-button');
+stopButtonElement.addEventListener("click", stopQuestions)
+
+if (controller.questionsStopped) {
+	if (localStorage.getItem("elapsedTime") !== null) {
+		timerDisplay.textContent = localStorage.getItem("elapsedTime");
+	} else {
+		timerDisplay.textContent = "00:00:00";
+	}
+}
+
+document.getElementById('mistake-tracker').innerHTML = `Teisingai: ${controller.correctAnswersTracker}/${controller.answeredQuestionTracker}`;
+
+const mistakesButtonElement = document.querySelector('.summary-button');
+mistakesButtonElement.addEventListener("click", () => {
+	localStorage.setItem("elapsedTime", timerDisplay.textContent);
+})
+mistakesButtonElement.addEventListener("click", displaylatestMistakes);
+
+
+function displaylatestMistakes() {
+	document.querySelector("#restart-reset-button-row").style.display = "none"
+	document.querySelector("#field-for-final-message").style.display = "flex";
+	document.querySelector("#field-for-final-message").style.height = "100%";
+	document.querySelector("#field-for-final-message").innerHTML = `
+		<div id="frequent-mistakes-container" style="flex-direction: column; justify-content: space-between;">
+			<div id="mistakes-summary-math">
+			<div class="summary-table-frequent-mistakes-outer-div">
+				<div id="summary-table-outer-div" class="">
+					<div class="table-container" id="table-container-math">
+						<div id="summary-table-frequent-mistakes"></div>
+					</div>
+				</div>
+				</div>
+			</div>
+		</div>
+	`
+	
+	generateSummaryTable('current', null, null, "summary-table-frequent-mistakes");
+
+	if (
+		document.querySelector("#summary-table-frequent-mistakes") &&
+		document.querySelector("#summary-table-frequent-mistakes").innerHTML === "Klaidų nėra!"
+	) {
+		document.getElementById('field-for-final-message').style.height = "auto";
+		document.querySelector(".table-container").style.justifyContent = "center";
+	} else {
+		document.getElementById('field-for-final-message').style.height = "100%";
+		document.querySelector(".table-container").style.justifyContent = "start";
+	}
+
+	document.querySelector("#restart-reset-button-row").style.display = "none";
+}
+
+
+function detectMobileKeyboard() {
+  // Check if device is mobile
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                   ('ontouchstart' in window) ||
+                   (navigator.maxTouchPoints > 0);
+  
+  if (!isMobile) {
+    return; // Don't set up listeners on desktop
+  }
+  
+  let isKeyboardOpen = false;
+  let lastHeight = window.innerHeight;
+  let lastVisualHeight = window.visualViewport?.height || window.innerHeight;
+  let resizeTimeout = null;
+  
+  // Threshold: 150px works well for most devices
+  // Mobile keyboards are typically 250-350px tall
+  const THRESHOLD = 150;
+  
+  function handleVisualViewportResize() {
+    clearTimeout(resizeTimeout);
+    
+    resizeTimeout = setTimeout(() => {
+      const currentHeight = window.visualViewport.height;
+      const heightDiff = lastVisualHeight - currentHeight;
+      
+      // Keyboard likely opened
+      if (heightDiff > THRESHOLD && !isKeyboardOpen) {
+        isKeyboardOpen = true;
+        if (typeof onShow === 'function') {
+          onShow({
+            keyboardHeight: heightDiff,
+            viewportHeight: currentHeight,
+            method: 'visualViewport'
+          });
+        }
+      }
+      // Keyboard likely closed
+      else if (heightDiff < -THRESHOLD && isKeyboardOpen) {
+        isKeyboardOpen = false;
+        if (typeof onHide === 'function') {
+          onHide({
+            viewportHeight: currentHeight,
+            method: 'visualViewport'
+          });
+        }
+      }
+      
+      lastVisualHeight = currentHeight;
+    }, 100);
+  }
+  
+  function handleWindowResize() {
+    clearTimeout(resizeTimeout);
+    
+    resizeTimeout = setTimeout(() => {
+      const currentHeight = window.innerHeight;
+      const heightDiff = lastHeight - currentHeight;
+      
+      // Only trigger if Visual Viewport API is not available
+      if (!window.visualViewport) {
+        if (heightDiff > THRESHOLD && !isKeyboardOpen) {
+          isKeyboardOpen = true;
+          if (typeof onShow === 'function') {
+            onShow({
+              keyboardHeight: heightDiff,
+              viewportHeight: currentHeight,
+              method: 'windowResize'
+            });
+          }
+        }
+        else if (heightDiff < -THRESHOLD && isKeyboardOpen) {
+          isKeyboardOpen = false;
+          if (typeof onHide === 'function') {
+            onHide({
+              viewportHeight: currentHeight,
+              method: 'windowResize'
+            });
+          }
+        }
+      }
+      
+      lastHeight = currentHeight;
+    }, 100);
+  }
+  
+  function detectKeyboardByViewport() {
+    if (window.visualViewport) {
+      const heightDiff = window.innerHeight - window.visualViewport.height;
+      return heightDiff > THRESHOLD;
+    }
+    return false;
+  }
+  
+  function handleFocusIn(e) {
+    const target = e.target;
+    const isInput = target.tagName === 'INPUT' || 
+                    target.tagName === 'TEXTAREA' || 
+                    target.isContentEditable;
+    
+    if (isInput) {
+      // Give keyboard time to appear
+      setTimeout(() => {
+        if (!isKeyboardOpen && detectKeyboardByViewport()) {
+          isKeyboardOpen = true;
+          if (typeof onShow === 'function') {
+            onShow({
+              method: 'focusIn',
+              element: target
+            });
+          }
+        }
+      }, 300);
+    }
+  }
+  
+  function handleFocusOut(e) {
+    const target = e.target;
+    const isInput = target.tagName === 'INPUT' || 
+                    target.tagName === 'TEXTAREA' || 
+                    target.isContentEditable;
+    
+    if (isInput) {
+      // Give keyboard time to disappear
+      setTimeout(() => {
+        // Check if another input was focused
+        const activeEl = document.activeElement;
+        const stillFocused = activeEl.tagName === 'INPUT' || 
+                           activeEl.tagName === 'TEXTAREA' || 
+                           activeEl.isContentEditable;
+        
+        if (!stillFocused && isKeyboardOpen && !detectKeyboardByViewport()) {
+          isKeyboardOpen = false;
+          if (typeof onHide === 'function') {
+            onHide({
+              method: 'focusOut',
+              element: target
+            });
+          }
+        }
+      }, 300);
+    }
+  }
+  
+  function handleOrientationChange() {
+    // Reset height references on orientation change
+    setTimeout(() => {
+      lastHeight = window.innerHeight;
+      lastVisualHeight = window.visualViewport?.height || window.innerHeight;
+      isKeyboardOpen = false;
+    }, 500);
+  }
+  
+  // Set up listeners
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', handleVisualViewportResize);
+  }
+  
+  window.addEventListener('resize', handleWindowResize);
+  document.addEventListener('focusin', handleFocusIn);
+  document.addEventListener('focusout', handleFocusOut);
+  
+  if (window.screen?.orientation) {
+    window.screen.orientation.addEventListener('change', handleOrientationChange);
+  }
+  
+  // Return cleanup function
+  return function cleanup() {
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', handleVisualViewportResize);
+    }
+    window.removeEventListener('resize', handleWindowResize);
+    document.removeEventListener('focusin', handleFocusIn);
+    document.removeEventListener('focusout', handleFocusOut);
+    if (window.screen?.orientation) {
+      window.screen.orientation.removeEventListener('change', handleOrientationChange);
+    }
+    clearTimeout(resizeTimeout);
+  };
+}
+
+// Usage:
+// 1. Define your callback functions globally or in accessible scope:
+function onShow(info) {
+	const navbar = document.querySelector('#mainNavbar');
+	const container = document.querySelector('.container');
+	container.classList.add('keyboard-open');
+	navbar.classList.add('keyboard-open');
+}
+
+function onHide(info) {
+  	const navbar = document.querySelector('#mainNavbar');
+	const container = document.querySelector('.container');
+	container.classList.remove('keyboard-open');
+    navbar.classList.remove('keyboard-open');
+}
+
+// 2. Initialize the detector (only runs on mobile devices):
+const cleanup = detectMobileKeyboard();
+
+// 3. Optional: cleanup when needed
+// if (cleanup) cleanup();
+
+
+	}).catch(error => {
+		console.error('Error in fetching multiple JSON files:', error);
+	});
+
+	</script>
+</body>
+
+</html>

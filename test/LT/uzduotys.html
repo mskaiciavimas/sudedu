@@ -3182,7 +3182,7 @@ button:disabled.cancel-btn::before {
                         </div>
 
 
-                        <div class="txt-browser-wrapper">
+    <div class="txt-browser-wrapper">
         <div class="txt-browser-main-header" id="mainBrowserHeader">
             <h2 class="txt-browser-main-title">Tekstų Naršyklė</h2>
             <span class="txt-browser-main-icon collapsed" id="mainBrowserIcon">
@@ -4826,9 +4826,11 @@ let studentStatisticsLastRecord;
                 completionDataSpan.innerHTML = ` (${date})`;
                 textIdSpan.dataset.textId = textId;
 
-                textIdSpan.addEventListener("click", () => {
-                    const id = event.currentTarget.dataset.textId;
-                    openTextBrowser(id);
+                textIdSpan.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    const id = e.currentTarget.dataset.textId;
+                    openTextBrowser(Number(id));
                 });
 
                 li.appendChild(textIdSpan);
@@ -4909,7 +4911,7 @@ let studentStatisticsLastRecord;
 
                         textIdSpan.addEventListener("click", () => {
                             const id = event.currentTarget.dataset.textId;
-                            openTextBrowser(id);
+                            openTextBrowser(Number(id));
                         });
 
                         ul.appendChild(li);
@@ -7258,7 +7260,7 @@ window.addEventListener('resize', addHideScrollbarForTouch);
 
 // TEXT VIEWER START
 // Global variables
-let prefilteredTexts = [];
+let prefilteredTexts = {}; // now an object keyed by id
 let allTexts = [];
 let selectedIds = [];
 let isSelectionModeEnabled = false;
@@ -7270,6 +7272,14 @@ let textSearchCache = new Map();
 
 // Debounce timer
 let searchDebounceTimer = null;
+
+// Lazy loading variables
+let filteredTexts = [];
+let renderedItems = new Set();
+let itemHeight = 60; // Approximate collapsed item height
+let expandedItemHeight = 400; // Approximate expanded item height
+let containerObserver = null;
+let itemObservers = new Map();
 
 async function initTxtViewer() {
     try {
@@ -7297,6 +7307,9 @@ async function initTxtViewer() {
             applyFilters();
         });
 
+        // Setup scroll observer for lazy loading BEFORE applying filters
+        setupLazyLoading();
+
         updateSelectionModeVisibility();
         applyFilters();
 
@@ -7308,23 +7321,25 @@ async function initTxtViewer() {
 }
 
 function refilterTexts() {
-    if (!prefilteredTexts.length) return;
+    const textArray = Object.entries(prefilteredTexts).map(([id, entry]) => ({ ...entry, id: parseInt(id) }));
+
+    if (!textArray.length) return;
 
     if (isSelectionModeEnabled) {
         const mode = document.getElementById('mode_choice_9').value;
 
-        allTexts = prefilteredTexts.filter(entry => {
-            const s = entry['suitable-for'];
+        allTexts = textArray.filter(entry => {
+            const s = entry["SF"];
             if (!s) return false;
-            if (mode === 'C51') return s.komponavimas;
-            if (mode === 'C52') return s.struktura;
+            if (mode === 'C51') return s.C51;
+            if (mode === 'C52') return s.C52;
             return false;
         });
 
     } else {
-        allTexts = prefilteredTexts.filter(entry => {
-            const s = entry['suitable-for'];
-            return s && (s.komponavimas || s.struktura);
+        allTexts = textArray.filter(entry => {
+            const s = entry["SF"];
+            return s && (s.C51 || s.C52);
         });
     }
 
@@ -7340,63 +7355,56 @@ function refilterTexts() {
 // Pre-build searchable text for each item
 function buildSearchCache() {
     textSearchCache.clear();
-    
+
     allTexts.forEach(text => {
         const searchableText = [
             text.id.toString(),
             text.title,
             text.author,
-            ...text.text.start,
-            ...text.text.middle,
-            ...text.text.end,
-            ...text.text.distractor
+            ...(text.text.start || []),
+            ...(text.text.middle || []),
+            ...(text.text.end || []),
+            ...(text.text.distractor || [])
         ].join(' ').toLowerCase();
-        
+
         textSearchCache.set(text.id, searchableText);
     });
 }
 
 function applyFilters() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-
-    // Check if search term is only a number
     const isNumericSearch = /^\d+$/.test(searchTerm);
 
-    // Cache DOM queries
     const classFilters = {
-        '1_2_klase': document.getElementById('class_1_2').checked,
-        '3_4_klase': document.getElementById('class_3_4').checked
+        'C75': document.getElementById('class_1_2').checked,
+        'C76': document.getElementById('class_3_4').checked
     };
 
     const taskTypes = {
-        struktura: document.getElementById('task_struktura').checked,
-        komponavimas: document.getElementById('task_komponavimas').checked
+        'C52': document.getElementById('task_struktura').checked,
+        'C51': document.getElementById('task_komponavimas').checked
     };
 
     const difficulties = {
-        lengvas: document.getElementById('diff_lengvas').checked,
-        vidutinis: document.getElementById('diff_vidutinis').checked,
-        sunkus: document.getElementById('diff_sunkus').checked
+        'C58': document.getElementById('diff_lengvas').checked,
+        'C59': document.getElementById('diff_vidutinis').checked,
+        'C60': document.getElementById('diff_sunkus').checked
     };
 
-    const filteredTexts = allTexts.filter(text => {
-        // If numeric search, match ID exactly - early exit
-        if (isNumericSearch) {
-            return text.id.toString() === searchTerm;
-        }
+    filteredTexts = allTexts.filter(text => {
+        if (isNumericSearch) return text.id.toString() === searchTerm;
 
-        const textClass = text['class-choice'][0];
+        const textClass = text['class'][0];
         if (!classFilters[textClass]) return false;
 
-        const strukturaDiff = text['suitable-for'].struktura;
-        const komponavimasDiff = text['suitable-for'].komponavimas;
+        const strukturaDiff = text['SF']['C52'];
+        const komponavimasDiff = text['SF']['C51'];
 
-        const strukturaMatch = taskTypes.struktura && difficulties[strukturaDiff];
-        const komponavimasMatch = taskTypes.komponavimas && difficulties[komponavimasDiff];
+        const strukturaMatch = taskTypes['C52'] && difficulties[strukturaDiff];
+        const komponavimasMatch = taskTypes['C51'] && difficulties[komponavimasDiff];
 
         if (!strukturaMatch && !komponavimasMatch) return false;
 
-        // Use cached searchable text
         if (searchTerm) {
             const searchableText = textSearchCache.get(text.id);
             if (!searchableText || !searchableText.includes(searchTerm)) return false;
@@ -7408,64 +7416,134 @@ function applyFilters() {
     renderTexts(filteredTexts);
 }
 
+function setupLazyLoading() {
+    const container = document.getElementById('textsList');
+    
+    // Intersection Observer for the container
+    const observerOptions = {
+        root: null,
+        rootMargin: '200px', // Load items 200px before they enter viewport
+        threshold: 0
+    };
+
+    containerObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const textId = parseInt(entry.target.dataset.textId);
+                if (!renderedItems.has(textId)) {
+                    renderItemContent(textId);
+                }
+            }
+        });
+    }, observerOptions);
+}
+
 function renderTexts(texts) {
     const container = document.getElementById('textsList');
+    
+    // Clean up old observers
+    itemObservers.forEach(observer => observer.disconnect());
+    itemObservers.clear();
+    renderedItems.clear();
 
     if (texts.length === 0) {
         container.innerHTML = '<div class="txt-viewer-no-results">Tekstų nerasta</div>';
         return;
     }
 
-    // Use DocumentFragment for better performance
-    const fragment = document.createDocumentFragment();
-    const tempDiv = document.createElement('div');
-    
-    // Build HTML string (faster than creating elements one by one)
-    tempDiv.innerHTML = texts.map(text => {
-        const isExpanded = expandedTextIds.has(text.id);
-        const isSelected = selectedIds.includes(text.id);
+    // Make sure observer exists
+    if (!containerObserver) {
+        setupLazyLoading();
+    }
 
-        return `
-            <div class="txt-viewer-text-item ${isExpanded ? 'text-item-expanded' : ''}" id="text-item-${text.id}">
-                <div class="txt-viewer-text-item-header">
-                    ${isSelectionModeEnabled ? `
-                        <input type="checkbox" class="txt-viewer-text-item-checkbox" data-text-id="${text.id}" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleTextSelection(${text.id}, this.checked)">
-                    ` : ''}
-                    <div class="txt-viewer-text-item-main" onclick="toggleTextExpand(${text.id})">
-                        <div class="txt-viewer-text-item-info">
-                            <div class="txt-viewer-text-item-id">ID: ${text.id}</div>
-                            <div class="txt-viewer-text-item-title">${text.title}</div>
-                        </div>
-                        <div class="txt-viewer-text-item-expand-icon ${isExpanded ? 'txt-viewer-expanded' : ''}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor">
-                        <path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"/>
-                        </svg>
-                        </div>
+    // Create placeholder items with proper height
+    const fragment = document.createDocumentFragment();
+    
+    texts.forEach(text => {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'txt-viewer-text-item-placeholder';
+        placeholder.dataset.textId = text.id;
+        placeholder.style.minHeight = expandedTextIds.has(text.id) ? `${expandedItemHeight}px` : `${itemHeight}px`;
+        
+        fragment.appendChild(placeholder);
+        
+        // Observe this placeholder
+        if (containerObserver) {
+            containerObserver.observe(placeholder);
+        }
+    });
+
+    container.innerHTML = '';
+    container.appendChild(fragment);
+}
+
+function renderItemContent(textId) {
+    const text = filteredTexts.find(t => t.id === textId);
+    if (!text) return;
+
+    // IMPORTANT: Only select placeholders within the textsList container
+    const container = document.getElementById('textsList');
+    if (!container) return;
+    
+    const placeholder = container.querySelector(`[data-text-id="${textId}"]`);
+    if (!placeholder || !placeholder.classList.contains('txt-viewer-text-item-placeholder')) return;
+
+    const isExpanded = expandedTextIds.has(text.id);
+    const isSelected = selectedIds.includes(text.id);
+
+    const itemHtml = `
+        <div class="txt-viewer-text-item ${isExpanded ? 'text-item-expanded' : ''}" id="text-item-${text.id}">
+            <div class="txt-viewer-text-item-header">
+                ${isSelectionModeEnabled ? `
+                    <input type="checkbox" class="txt-viewer-text-item-checkbox" data-text-id="${text.id}" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleTextSelection(${text.id}, this.checked)">
+                ` : ''}
+                <div class="txt-viewer-text-item-main" onclick="toggleTextExpand(${text.id})">
+                    <div class="txt-viewer-text-item-info">
+                        <div class="txt-viewer-text-item-id">ID: ${text.id}</div>
+                        <div class="txt-viewer-text-item-title">${text.title}</div>
+                    </div>
+                    <div class="txt-viewer-text-item-expand-icon ${isExpanded ? 'txt-viewer-expanded' : ''}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor">
+                    <path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"/>
+                    </svg>
                     </div>
                 </div>
-                <div class="hide-scrollbar txt-viewer-text-item-details ${isExpanded ? 'txt-viewer-expanded scroll-indicators' : ''}" id="text-details-${text.id}">
-                    ${isExpanded ? renderTextDetails(text) : ''}
-                </div>
             </div>
-        `;
-    }).join('');
+            <div class="hide-scrollbar txt-viewer-text-item-details ${isExpanded ? 'txt-viewer-expanded scroll-indicators' : ''}" id="text-details-${text.id}">
+                ${isExpanded ? renderTextDetails(text) : ''}
+            </div>
+        </div>
+    `;
 
-    // Replace all content at once
-    container.innerHTML = '';
-    while (tempDiv.firstChild) {
-        container.appendChild(tempDiv.firstChild);
-    }
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = itemHtml;
+    const newItem = tempDiv.firstElementChild;
+
+    placeholder.replaceWith(newItem);
+    renderedItems.add(textId);
 }
 
 function renderTextDetails(text) {
+    // Map difficulty codes to display names
+    const difficultyMap = {
+        'C58': 'Lengvas',
+        'C59': 'Vidutinis', 
+        'C60': 'Sunkus'
+    };
+
     // Classes - cache the replace operations
-    const lowerClasses = text['class-choice']
-        .filter(cls => cls.startsWith('1') || cls.startsWith('2'))
-        .map(cls => cls.replace(/_(?=[^_]+$)/, ' ').replace('_', '-').replace('klase', 'klasė'))
+    const classMap = {
+        'C75': '1-2 klasė',
+        'C76': '3-4 klasė'
+    };
+
+    const lowerClasses = text["class"]
+        .filter(cls => cls === 'C75')
+        .map(cls => classMap[cls])
         .join(', ');
 
-    const higherClasses = text['class-choice']
-        .filter(cls => cls.startsWith('3') || cls.startsWith('4'))
-        .map(cls => cls.replace(/_(?=[^_]+$)/, ' ').replace('_', '-').replace('klase', 'klasė'))
+    const higherClasses = text["class"]
+        .filter(cls => cls === 'C76')
+        .map(cls => classMap[cls])
         .join(', ');
 
     // Determine which sections exist
@@ -7520,8 +7598,8 @@ function renderTextDetails(text) {
             ${lowerClasses ? `<span class="badge badge-class-lower">${lowerClasses}</span>` : ''}
             ${higherClasses ? `<span class="badge badge-class-higher">${higherClasses}</span>` : ''}
 
-            ${text['suitable-for'].struktura ? `<span class="badge badge-struktura">Struktūros išdėstymas: ${text['suitable-for'].struktura}</span>` : ''}
-            ${text['suitable-for'].komponavimas ? `<span class="badge badge-komponavimas">Turinio komponavimas: ${text['suitable-for'].komponavimas}</span>` : ''}
+            ${text['SF']["C52"] ? `<span class="badge badge-struktura">Struktūros išdėstymas: ${difficultyMap[text['SF']["C52"]]}</span>` : ''}
+            ${text['SF']["C51"] ? `<span class="badge badge-komponavimas">Turinio komponavimas: ${difficultyMap[text['SF']["C51"]]}</span>` : ''}
         </div>
     </div>
 
@@ -7657,11 +7735,11 @@ function scrollToText(id) {
     const text = allTexts.find(t => t.id === id);
     if (!text) return;
 
-    const classValue = text['class-choice'][0];
+    const classValue = text['class'][0];
     
-    if (classValue === '1_2_klase') {
+    if (classValue === 'C75') {
         document.getElementById('class_1_2').checked = true;
-    } else if (classValue === '3_4_klase') {
+    } else if (classValue === 'C76') {
         document.getElementById('class_3_4').checked = true;
     }
 
@@ -7675,24 +7753,38 @@ function scrollToText(id) {
     applyFilters();
 
     setTimeout(() => {
-        const element = document.getElementById(`text-item-${id}`);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            
-            if (!expandedTextIds.has(id)) {
-                toggleTextExpand(id);
-            }
+        ensureItemRendered(id, () => {
+            const element = document.getElementById(`text-item-${id}`);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                if (!expandedTextIds.has(id)) {
+                    toggleTextExpand(id);
+                }
 
-            element.style.boxShadow = '0 0 0 3px #1976d2';
-            setTimeout(() => {
-                element.style.boxShadow = '';
-            }, 2000);
-        }
+                element.style.boxShadow = '0 0 0 3px #1976d2';
+                setTimeout(() => {
+                    element.style.boxShadow = '';
+                }, 2000);
+            }
+        });
     }, 100);
 }
 
+function ensureItemRendered(textId, callback) {
+    if (renderedItems.has(textId)) {
+        callback();
+        return;
+    }
+
+    // Force render the item
+    renderItemContent(textId);
+    
+    // Wait a bit for DOM update
+    setTimeout(callback, 50);
+}
+
 function openTextBrowser(textId) {
-    console.log(isMainBrowserExpanded)
     if (!isMainBrowserExpanded) {
         toggleMainBrowser();
     }
@@ -7702,37 +7794,26 @@ function openTextBrowser(textId) {
         applyFilters();
 
         setTimeout(() => {
-            const element = document.getElementById(`text-item-${textId}`);
-            if (element) {
-                if (!element.classList.contains("text-item-expanded")) {
-                    setTimeout(() => {
-                        if (!expandedTextIds.has(textId)) {
-                            const rerenderedElement = document.querySelector(`#text-item-${textId} .txt-viewer-text-item-main:not(.text-item-expanded)`);
-                            if (rerenderedElement) {
-                                rerenderedElement.click();
-                            }
-                        }
-                    }, 100);
-                } else {
-                    setTimeout(() => {
-                        const element = document.getElementById(`text-item-${textId}`);
-                        if (element) {
-                            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            
+            ensureItemRendered(textId, () => {
+                const element = document.getElementById(`text-item-${textId}`);
+                if (element) {
+                    if (!element.classList.contains("text-item-expanded")) {
+                        setTimeout(() => {
                             if (!expandedTextIds.has(textId)) {
                                 toggleTextExpand(textId);
                             }
-
-                            element.style.boxShadow = '0 0 0 3px #286D8A';
-                            setTimeout(() => {
-                                element.style.boxShadow = '';
-                            }, 2000);
-                        }
-                    }, 100);
+                        }, 100);
+                    } else {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        element.style.boxShadow = '0 0 0 3px #286D8A';
+                        setTimeout(() => {
+                            element.style.boxShadow = '';
+                        }, 2000);
+                    }
+                } else {
+                    messageToTheUser("Tekstas nerastas!");
                 }
-            } else {
-                messageToTheUser("Tekstas nerastas!")
-            }
+            });
         }, 100);
     }, 300);
 }
@@ -7745,19 +7826,16 @@ function toggleTextExpand(id) {
         expandedTextIds.add(id);
 
         setTimeout(() => {
-            const element = document.getElementById(`text-item-${id}`);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                if (!expandedTextIds.has(id)) {
-                    toggleTextExpand(id);
+            ensureItemRendered(id, () => {
+                const element = document.getElementById(`text-item-${id}`);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    element.style.boxShadow = '0 0 0 3px #286D8A';
+                    setTimeout(() => {
+                        element.style.boxShadow = '';
+                    }, 2000);
                 }
-
-                element.style.boxShadow = '0 0 0 3px #286D8A';
-                setTimeout(() => {
-                    element.style.boxShadow = '';
-                }, 2000);
-            }
+            });
         }, 100);
     }
 
