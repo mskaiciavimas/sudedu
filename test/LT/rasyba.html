@@ -1684,6 +1684,7 @@ async function prepareSentencesWrapper(sessionSeed, passNumber = 0, targetFormat
 				"būs-l": "būs.l.",
 				"vyr-g": "vyr.g.",
 				"mot-g": "mot.g.",
+				"prv": "prv.",
 			};
 
 
@@ -1709,7 +1710,7 @@ async function prepareSentencesWrapper(sessionSeed, passNumber = 0, targetFormat
 					}
 
 					if (wordLinguisticInfo[word].includes("prv")) {
-						valuesToShow.push(`pagalbaIndex["prv"]?`);
+						valuesToShow.push("prv.?");
 					}
 
 					if (wordLinguisticInfo[word].includes("vyr-g") && wordLinguisticInfo[word].includes("mot-g")) {
@@ -2373,7 +2374,7 @@ function helpToggle() {
 				}
 			}
 
-			function stopQuestions() {
+			async function stopQuestions() {
 				if (stopButtonSpanElement.innerHTML === "close") {
 					showCustomConfirm("Ar tikrai nori sustabdyti užduotį?", stopQuestionsCloseActions);
 				} else if (stopButtonSpanElement.innerHTML === "refresh") {
@@ -2419,7 +2420,8 @@ function helpToggle() {
 					restartPetOnWalkActions();
 
 					localStorage.setItem('controller', JSON.stringify(controller));
-					initiateTheProgram();
+					await initiateTheProgram();
+					adjustFieldForTexts();
 				}
 			}
 
