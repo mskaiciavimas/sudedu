@@ -573,7 +573,7 @@ function getSelectedRasybaConditions() {
   
     // Function to sync the specific checkboxes related to "GALŪNĖS"
     const syncRelatedCheckboxes = (isChecked) => {
-      const relatedCheckboxes = document.querySelectorAll('input[value=\'{"C62": []}\'], input[value=\'{"C63": [], "C64": []}\'], input[value=\'{"C65": []}\']');
+      const relatedCheckboxes = document.querySelectorAll('input[value=\'{"C62": []}\'], input[value=\'{"C63": []\'], input[value=\'{"C65": []}\']');
   
       // Loop through each related checkbox and update its checked status
       relatedCheckboxes.forEach(checkbox => {

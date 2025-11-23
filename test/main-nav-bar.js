@@ -247,21 +247,22 @@ function setLanguage(lang) {
 }
 
 function backToPreviousPage() {
-    // Get the previous page filename
-    const previousPage = document.referrer.split('/').pop() || 'index.html';
+    let previousPage = document.referrer.split('/').pop() || 'index.html';
+
+    // Strip query params (fixes your issue)
+    previousPage = previousPage.split('?')[0];
+
     const targetPages = ['index.html', 'uzduotys.html', 'klase.html'];
 
     if (targetPages.includes(previousPage)) {
-        // Use relative path instead of absolute
         let url = previousPage;
 
-        // Append query parameter to indicate "came from back"
         const separator = url.includes('?') ? '&' : '?';
         url += `${separator}fromBack=true`;
 
-        // Navigate to previous page
         window.location.href = url;
     } else {
         window.location.href = 'index.html';
     }
 }
+

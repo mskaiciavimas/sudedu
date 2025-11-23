@@ -102,7 +102,6 @@
 
 	#field-for-text {
 		width: 100%;
-		max-height: 100%;
 		background: rgba(255, 255, 255, 0.4);
 		border: 1px solid rgba(255, 255, 255, 0.2);
 		backdrop-filter: blur(10px);
@@ -115,7 +114,6 @@
 	#field-for-text-outer {
 		flex: 1 1 auto;
 		width: 100%;
-		max-height: 100%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -162,6 +160,7 @@
 		position: relative;
 		margin-bottom: 10px;
 		line-height: 1.5;
+		white-space: pre-wrap;
 	}
 
 	.sakiniai::before {
@@ -255,10 +254,6 @@
 		user-select: none; /* Prevent text selection */
 		pointer-events: none; /* Ensure the input is not interactable */
 	}	
-
-	.question-word-span.middle {
-		margin-left: 5px;
-	}
 
 	.correct-answer {
 		color: #32ac93;
@@ -982,9 +977,19 @@ window.stopQuestionsCloseActions = function () {
 
 	// Define an array of URLs for the JSON files you want to fetch
 	if (controller.classChoice === "C75") {
-		jsonFiles = ['../databases/1_2_klase_rasyba.json'];
+		jsonFiles = [
+			'../databases/1_2_klase_gramatika_tekstai.json',
+			'../databases/rasyba_suitable_words.json',
+			'../databases/rasyba_suitable_words_patterns.json',
+			'../databases/rasyba_suitable_words_linguistic_info.json'
+		];
 	} else if (controller.classChoice === "C76") {
-		jsonFiles = ['../databases/3_4_klase_rasyba.json'];
+		jsonFiles = [
+			'../databases/3_4_klase_gramatika_tekstai.json',
+			'../databases/rasyba_suitable_words.json',
+			'../databases/rasyba_suitable_words_patterns.json',
+			'../databases/rasyba_suitable_words_linguistic_info.json'
+		];
 	}
 	Promise.all(jsonFiles.map(file => fetch(file).then(response => {
 		if(!response.ok) {
@@ -994,10 +999,15 @@ window.stopQuestionsCloseActions = function () {
 	}).catch(error => {
 		console.error('Error:', error);
 		return null; // Return null or empty object in case of error
-	}))).then(([sentenceLibrary]) => {
+	}))).then(([textsForGrammar, suitableWords, suitableWordPatterns, wordLinguisticInfo]) => {
 
+		const MIN_SENTENCE_CHARACTER_NUMBER_FOR_GRADES_0_to_1 = 45;
+		const MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_0_to_1 = 3;
+		const MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_2_to_5 = 4;
+		const PRIORITIZED_TASK_CATEGORIES = ["C66-C76", "C66-C75", "C64"]
 		let questionsToDisplay = 1;
 		let sakiniai = [];
+		let sakiniaiAndAtsakymai = [];
 		window.atsakymai = {};
 		let questionId = 1;
 		window.mistakeRecords = {};
@@ -1013,593 +1023,721 @@ window.stopQuestionsCloseActions = function () {
 		}
 		let allAnswersCorrect = false;
 		const hiddenInput = document.getElementById('hidden-input');
+		let userInPreSchool = userData && userData.knowledgeLvl === 0;
+		let userInFirstGrade = userData && userData.knowledgeLvl === 1;
+		let userInSecondGrade = userData && userData.knowledgeLvl === 2;
+		let userInThirdGrade = userData && userData.knowledgeLvl === 3;
+		let userInFourthGrade = userData && userData.knowledgeLvl === 4;
+		let userInHigherGrade = userData && userData.knowledgeLvl === 5;
 
-		if(sentenceLibrary) {
-			const codedConditions = controller.modeChoice3
-			let conditions = {}
+		const codedConditions = controller.modeChoice3
+		let conditions = []
+		let globalFormattedSentenceCounter = 0;
+		const categories = new Map();
+		const items = new Map();
+		let currentSeed = controller.modeChoice8;
 
-			Object.entries(codedConditions).forEach(([key, value]) => {
-				let decodedKey = parameterDictionary[key]["parameter"];
-				conditions[decodedKey] = value;
-			});
+		let currentPassNumber = 0;
 
-			const categoriesToCheck = ["prv", "bdv", "vks", "dkt", "įsi-r", "įvr", "skt"]
-			const categoriesThatNeedEndings = ["prv", "bdv", "vks", "dkt", "fsc-gal"]
-			const categoryMatchingRules = {
-				// Default case: category matches only itself
-				"default": [],
-				// Allow certain categories to match each other (e.g., įvr matches įvr)
-				"bdv": ["prv"],
-				"vks": [],
-				"dkt": [],
-				"fsc-gal": ["dkt"],
-				"fsc-con": ["prv", "bdv", "vks", "dkt", "įvr", "skt", "įsi-r"],
-				"fsc-vow": ["prv", "bdv", "vks", "dkt", "įvr", "skt", "įsi-r"],
-				"prv": ["bdv"],
-				"įvr": [],
-				"skt": [],
-				"įsi-r": ["prv", "bdv", "vks", "dkt"],
-				"prš": ["prv", "bdv", "vks", "dkt"],
-				"prs": ["prv", "bdv", "vks", "dkt"],
-				"asim": ["prv", "bdv", "vks", "dkt"],
-				"md": ["prv", "bdv", "vks", "dkt"],
+		const precomputedWordPatterns = {};
+
+		for (const [word, wordsPattern] of Object.entries(suitableWords)) {
+			precomputedWordPatterns[word] = {};
+
+		for (const [conditionKey, patternIds] of Object.entries(wordsPattern)) {
+			precomputedWordPatterns[word][conditionKey] = patternIds
+			.filter(id => suitableWordPatterns[id])  // keep only valid patterns
+			.map(id => suitableWordPatterns[id]);    // replace ID with actual pattern
+			}
+		}
+
+/**
+ * Seeded Random Number Generator (Mulberry32)
+ */
+class SeededRandom {
+    constructor(seed) {
+        this.state = typeof seed === 'string' ? parseSeed(seed) : seed;
+    }
+    
+    next() {
+        let t = this.state += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
+    
+    nextInt(min, max) {
+        return Math.floor(this.next() * (max - min)) + min;
+    }
+    
+    shuffle(array) {
+        const result = [...array];
+        for (let i = result.length - 1; i > 0; i--) {
+            const j = Math.floor(this.next() * (i + 1));
+            [result[i], result[j]] = [result[j], result[i]];
+        }
+        return result;
+    }
+    
+    choice(array) {
+        return array[Math.floor(this.next() * array.length)];
+    }
+    
+    derive(suffix) {
+        return new SeededRandom(this.state + parseSeed(String(suffix)));
+    }
+}
+
+
+// ===== CATEGORY INDEX BUILDER =====
+
+/**
+ * Build index: category -> Set of textIds that contain words matching that category
+ * This is FAST - just checks if words appear in text, doesn't process sentences
+ */
+function buildCategoryToTextsIndex(texts, suitableWords, conditionsSet) {
+    const categoryIndex = new Map();
+    
+    conditionsSet.forEach(cat => categoryIndex.set(cat, new Set()));
+    
+    for (const textId in texts) {
+        const textObj = texts[textId];
+        const sections = textObj.text || {};
+        const parts = [];
+        
+        if (sections.start) parts.push(...sections.start);
+        if (sections.middle) parts.push(...sections.middle);
+        if (sections.end) parts.push(...sections.end);
+        
+        const combined = parts.join(" ").toLowerCase();
+        const textCategories = new Set();
+        
+        for (const word in suitableWords) {
+            if (combined.includes(word)) {
+                const wordConditions = suitableWords[word];
+                for (const condKey in wordConditions) {
+                    if (conditionsSet.has(condKey)) {
+                        textCategories.add(condKey);
+                    }
+                }
+            }
+        }
+        
+        textCategories.forEach(cat => {
+            categoryIndex.get(cat).add(textId);
+        });
+    }
+    
+    return categoryIndex;
+}
+
+function extractSentencesWithCoords(texts) {
+    const sentenceRegex = /.*?[.!?…][""''»„"]*/gs;
+    const results = [];
+
+    for (const textID in texts) {
+        const textObj = texts[textID];
+        const sections = textObj.text || {};
+        const parts = [];
+
+        if (sections.start) parts.push(...sections.start);
+        if (sections.middle) parts.push(...sections.middle);
+        if (sections.end) parts.push(...sections.end);
+
+        if (parts.length === 0) continue;
+
+        const combined = parts.join("").trim();
+        if (!combined) continue;
+
+        const rawSentences = combined.match(sentenceRegex) || [];
+        let index = 0;
+
+        for (const sentence of rawSentences) {
+            const cleaned = sentence.replace(/^[ ]+|[ ]+$/g, '');
+            if (!cleaned) continue;
+            results.push([cleaned, [Number(textID), index]]);
+            index++;
+        }
+    }
+
+    return results;
+}
+
+function indexSentenceWords(sentence, coords) {
+    const cleaned = sentence
+        .replace(/[.,!?;:()\[\]{}"""„«»…]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    if (!cleaned) return [];
+
+    const words = cleaned.split(" ");
+    const result = [];
+
+    words.forEach((word, absoluteIndex) => {
+        const w = word.trim();
+        if (!w) return;
+
+        const newCoords = Array.isArray(coords) ? [...coords, absoluteIndex] : [absoluteIndex];
+
+        result[absoluteIndex] = {
+            word: w,
+            coords: newCoords
+        };
+    });
+
+    return result;
+}
+
+function processAdjacentEndlessWords(words, rng) {
+    const result = [...words];
+    let i = 0;
+    
+    const separators = new Set(['ir', 'ar', 'o', 'ne']);
+    
+    const isSeparator = (wordObj) => {
+        const wordText = (wordObj.word || '').toLowerCase();
+        return separators.has(wordText);
+    };
+    
+    while (i < result.length) {
+        if (isSeparator(result[i])) {
+            i++;
+            continue;
+        }
+        
+        const patterns = result[i].suitablePatterns;
+        if (!patterns) {
+            i++;
+            continue;
+        }
+        
+        const hasC61 = 'C61' in patterns;
+        const hasC62C63 = 'C62' in patterns || 'C63' in patterns;
+        
+        if (!hasC61 && !hasC62C63) {
+            i++;
+            continue;
+        }
+        
+        const sequenceType = hasC61 ? 'C61' : 'C62C63';
+        let sequenceIndices = [i];
+        let j = i + 1;
+        
+        while (j < result.length) {
+            if (isSeparator(result[j])) {
+                j++;
+                continue;
+            }
+            
+            const nextPatterns = result[j].suitablePatterns;
+            if (!nextPatterns) {
+                break;
+            }
+            
+            const nextHasC61 = 'C61' in nextPatterns;
+            const nextHasC62C63 = 'C62' in nextPatterns || 'C63' in nextPatterns;
+            
+            const matches = (sequenceType === 'C61' && nextHasC61) || 
+                            (sequenceType === 'C62C63' && nextHasC62C63);
+            
+            if (!matches) {
+                break;
+            }
+            
+            sequenceIndices.push(j);
+            j++;
+        }
+        
+        const sequenceLength = sequenceIndices.length;
+        
+        if (sequenceLength >= 2) {
+            const keepOdd = rng.next() < 0.5;
+            
+            for (let k = 0; k < sequenceIndices.length; k++) {
+                const shouldRemove = keepOdd ? (k % 2 === 1) : (k % 2 === 0);
+                
+                if (shouldRemove) {
+                    const wordIdx = sequenceIndices[k];
+                    const p = result[wordIdx].suitablePatterns;
+                    delete p.C61;
+                    delete p.C62;
+                    delete p.C63;
+                    if (Object.keys(p).length === 0) {
+                        delete result[wordIdx].suitablePatterns;
+                    }
+                }
+            }
+            
+            i = j;
+        } else {
+            i++;
+        }
+    }
+    
+    return result;
+}
+
+function reduceToQuestionQuota(words, questionQuota, rng, PRIORITIZED_TASK_CATEGORIES) {
+    let usableWordsPerSentence = words.filter(w => w.suitablePatterns && Object.keys(w.suitablePatterns).length > 0).length;
+    
+    if (usableWordsPerSentence <= questionQuota) {
+        return words;
+    }
+    
+    const amountToRemove = usableWordsPerSentence - questionQuota;
+    const wordsWithPrioritized = [];
+    const wordsWithoutPrioritized = [];
+    
+    words.forEach((word, index) => {
+        if (!word.suitablePatterns || Object.keys(word.suitablePatterns).length === 0) {
+            return;
+        }
+        
+        const hasPrioritizedCategory = PRIORITIZED_TASK_CATEGORIES.some(cat => cat in word.suitablePatterns);
+        
+        if (hasPrioritizedCategory) {
+            wordsWithPrioritized.push(index);
+        } else {
+            wordsWithoutPrioritized.push(index);
+        }
+    });
+    
+    const shuffledNonPrioritized = rng.derive('non-priority').shuffle(wordsWithoutPrioritized);
+    const shuffledPrioritized = rng.derive('priority').shuffle(wordsWithPrioritized);
+    
+    let removed = 0;
+    const result = [...words];
+    
+    for (const index of shuffledNonPrioritized) {
+        if (removed >= amountToRemove) break;
+        delete result[index].suitablePatterns;
+        removed++;
+    }
+    
+    for (const index of shuffledPrioritized) {
+        if (removed >= amountToRemove) break;
+        delete result[index].suitablePatterns;
+        removed++;
+    }
+    
+    return result;
+}
+
+function pickRandomPatterns(words, rng) {
+    const modifiedWords = words.map((word, index) => {
+        if (!word.suitablePatterns || Object.keys(word.suitablePatterns).length === 0) {
+            return null;  // ← Changed from {} to null
+        }
+
+        const patternTypes = Object.keys(word.suitablePatterns);
+        const wordRng = rng.derive(`word-${index}`);
+        const randomPatternType = patternTypes[Math.floor(wordRng.next() * patternTypes.length)];
+
+        const sublists = word.suitablePatterns[randomPatternType];
+        const randomSublist = sublists[Math.floor(wordRng.next() * sublists.length)];
+
+        return {
+            ...word,
+            suitablePatterns: {
+                [randomPatternType]: [randomSublist]
+            }
+        };
+    }).filter(word => word !== null);  // ← Filter out nulls
+
+    const categorySet = new Set();
+    modifiedWords.forEach(word => {
+        const keys = Object.keys(word.suitablePatterns || {});
+        keys.forEach(k => categorySet.add(k));
+    });
+
+    const uniqueCategories = Array.from(categorySet);
+    return [modifiedWords, uniqueCategories];
+}
+
+
+function addSentenceToCategorisedSentences(sentence, categoryList, sentenceAnswers, categories, items, globalFormattedSentenceCounter) {
+    if (!Array.isArray(categoryList)) {
+        console.log("Second argument must be an array of categories");
+        return globalFormattedSentenceCounter;
+    }
+
+    const uniqueID = "s" + (globalFormattedSentenceCounter++);
+
+    items.set(uniqueID, {
+        sentence,
+        categories: new Set(),
+        sentenceAnswers: sentenceAnswers
+    });
+
+    for (const category of categoryList) {
+        if (!categories.has(category)) categories.set(category, new Set());
+        categories.get(category).add(uniqueID);
+        items.get(uniqueID).categories.add(category);
+    }
+
+    return globalFormattedSentenceCounter;
+}
+
+function drainAllCategories(categories, items) {
+    const finalSentences = [];
+
+    while (true) {
+        let progress = false;
+
+        for (const [category, set] of categories) {
+            if (set.size > 0) {
+                const uniqueID = set.values().next().value;
+                const entry = items.get(uniqueID);
+
+                if (!entry) continue;
+
+                const sentenceHTML = entry.sentence;
+                const answersForSentence = entry.sentenceAnswers;
+
+                // Remove from all categories
+                for (const cat of entry.categories) {
+                    categories.get(cat).delete(uniqueID);
+                }
+                items.delete(uniqueID);
+
+                finalSentences.push({
+                    sentenceHTML,
+                    answers: answersForSentence
+                });
+
+                progress = true;
+            }
+        }
+
+        if (!progress) break;
+    }
+
+    return finalSentences;
+}
+
+
+function processSentences(extractedSentences, sessionSeed, passNumber, config, state) {
+    const {
+        precomputedWordPatterns,
+        conditionsSet,
+        allowAdjacentEndlessWords,
+        MIN_SENTENCE_CHARACTER_NUMBER_FOR_GRADES_0_to_1,
+        MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_0_to_1,
+        MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_2_to_5,
+        PRIORITIZED_TASK_CATEGORIES,
+        userInPreSchool,
+        userInFirstGrade,
+        userInSecondGrade,
+        userInThirdGrade,
+        userInFourthGrade,
+        userInHigherGrade,
+        generateHelpSpans
+    } = config;
+
+    const {
+		categories,
+		items,
+		questionIdRef,
+		counterRef
+	} = state;
+
+    const mainRng = new SeededRandom(sessionSeed);
+    const textRng = mainRng.derive(`pass-${passNumber}`);
+    
+    const shuffledSentences = textRng.derive('sentence-order').shuffle(extractedSentences);
+    
+	let currentQuestionId = questionIdRef.value;
+	let currentCounter = counterRef.value;
+    
+    for (const [sentence, coords] of shuffledSentences) {
+        if (userInPreSchool || userInFirstGrade) {
+            if (sentence.length > MIN_SENTENCE_CHARACTER_NUMBER_FOR_GRADES_0_to_1) {
+                continue;
+            }
+        }
+
+        let indexedSentenceWords = indexSentenceWords(sentence, coords);
+
+        if (((userInPreSchool || userInFirstGrade) && indexedSentenceWords.length < MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_0_to_1) ||
+            ((userInSecondGrade || userInThirdGrade || userInFourthGrade || userInHigherGrade) && indexedSentenceWords.length < MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_2_to_5)) {
+            continue;
+        }
+
+        let usableWordsInSentence = 0;
+
+        for (let i = 0; i < indexedSentenceWords.length; i++) {
+            const item = indexedSentenceWords[i];
+            const word = item.word.toLowerCase();
+            const matchedPatterns = {};
+            const matchedConditionsHelpSpans = {};
+
+            if (precomputedWordPatterns[word]) {
+                const wordConditions = precomputedWordPatterns[word];
+
+                let wordIsSuitable = false;
+                for (const condKey in wordConditions) {
+                    if (conditionsSet.has(condKey)) {
+                        wordIsSuitable = true;
+                        matchedConditionsHelpSpans[condKey] = generateHelpSpans(word, condKey);
+                        matchedPatterns[condKey] = wordConditions[condKey];
+                    }
+                }
+
+                if (wordIsSuitable) usableWordsInSentence += 1;
+            }
+
+            if (Object.keys(matchedPatterns).length > 0) {
+                item.suitablePatterns = matchedPatterns;
+                item.helpSpans = matchedConditionsHelpSpans;
+            }
+        }
+        
+        if (usableWordsInSentence === 0) continue;
+        
+        const sentenceRng = textRng.derive(`sentence-${coords.join('-')}`);
+        
+        if (!allowAdjacentEndlessWords) {
+            indexedSentenceWords = processAdjacentEndlessWords(indexedSentenceWords, sentenceRng.derive('adjacent'));
+        }
+
+		const sentenceLength = indexedSentenceWords.length;
+        const questionQuota = 4 // Math.floor(sentenceLength / maximumQuestionFrequencyPerWord);
+
+        if (usableWordsInSentence > questionQuota) {
+            indexedSentenceWords = reduceToQuestionQuota(indexedSentenceWords, questionQuota, sentenceRng.derive('quota'), PRIORITIZED_TASK_CATEGORIES);
+        }
+
+        const [modifiedWords, remainingCategories] = pickRandomPatterns(indexedSentenceWords, sentenceRng.derive('patterns'));
+
+        if (remainingCategories.length === 0) continue;
+
+        let sentenceDiv = sentence;
+        const sentenceAnswers = {};
+
+		for (const item of modifiedWords) {
+			if (item.suitablePatterns) {
+				let selectedCategory = Object.keys(item.suitablePatterns)[0];
+				
+				// Add safety check
+				if (!item.suitablePatterns[selectedCategory] || 
+					!Array.isArray(item.suitablePatterns[selectedCategory]) ||
+					item.suitablePatterns[selectedCategory].length === 0) {
+					console.error('Invalid pattern structure for word:', item.word, item.suitablePatterns);
+					continue;
+				}
+				
+				let [startIdx, endIdx, answerLetters] = item.suitablePatterns[selectedCategory][0];
+
+                const wordStart = item.word.slice(0, startIdx);
+                const removedPart = item.word.slice(startIdx, endIdx); 
+                const firstLetterCapitalized = removedPart[0] === removedPart[0].toUpperCase() && /[A-ZĄČĘĖĮŠŲŪŽ]/.test(removedPart[0]);
+                
+                if (firstLetterCapitalized) {
+                    answerLetters = answerLetters.map(str => {
+                        if (!str) return str;
+                        return str[0].toUpperCase() + str.slice(1);
+                    });
+                }
+
+                const wordEnd = item.word.slice(endIdx);
+
+                let wordHTML = `<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${wordStart}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="6" id="id-${currentQuestionId}" class="question-input middle"></textarea>${wordEnd}<span class="pagalba-div">${item.helpSpans[selectedCategory]}</span></span>`;
+                
+                sentenceAnswers[`id-${currentQuestionId}`] = {};
+                sentenceAnswers[`id-${currentQuestionId}`]["klausimas"] = [wordStart, wordEnd];
+                sentenceAnswers[`id-${currentQuestionId}`]["atsakymas"] = [answerLetters];
+                sentenceAnswers[`id-${currentQuestionId}`]["kl-grupe"] = selectedCategory;
+                sentenceAnswers[`id-${currentQuestionId}`]["zodzio-id"] = item.coords;
+                currentQuestionId++;
+
+                sentenceDiv = sentenceDiv.replace(item.word, wordHTML);
+            }
+        }
+
+        currentCounter = addSentenceToCategorisedSentences(
+            `<div class="sakiniai">${sentenceDiv}</div>`, 
+            remainingCategories, 
+            sentenceAnswers,
+            categories,
+            items,
+            currentCounter
+        );
+    }
+    
+    // Update state
+    questionIdRef.value = currentQuestionId;
+    counterRef.value = currentCounter;
+}
+
+
+async function prepareSentences(sessionSeed, passNumber, targetFormattedSentences, config, state) {
+    const {
+        textsForGrammar,
+        suitableWords,
+        suitableWordPatterns,
+        codedConditions
+    } = config;
+
+    if (!(textsForGrammar && suitableWords && suitableWordPatterns)) return;
+
+    const conditions = [];
+    Object.entries(codedConditions).forEach(([key, value]) => {
+        if (key === "C66") {
+            if ("C75" in codedConditions) {
+                conditions.push("C66-C75");
+            } else {
+                conditions.push("C66-C76");
+            }
+        } else {
+            conditions.push(key);
+        }
+    });
+
+    const conditionsSet = new Set(conditions);
+    config.conditionsSet = conditionsSet;
+
+    const mainRng = new SeededRandom(sessionSeed);
+    const allTextIds = Object.keys(textsForGrammar);
+    const shuffledTextIds = mainRng.derive(`text-selection-pass-${passNumber}`).shuffle(allTextIds);
+    
+    let processedTextCount = 0;
+    const BATCH_SIZE = 50;
+    
+    while (state.sakiniaiAndAtsakymai.length < targetFormattedSentences && processedTextCount < shuffledTextIds.length) {
+        const batchTextIds = shuffledTextIds.slice(processedTextCount, processedTextCount + BATCH_SIZE);
+        const batchTexts = {};
+        batchTextIds.forEach(id => {
+            batchTexts[id] = textsForGrammar[id];
+        });
+        
+        const extractedSentences = extractSentencesWithCoords(batchTexts);
+        
+        processSentences(extractedSentences, sessionSeed, passNumber, config, state);
+        
+        // Drain and add to sakiniaiAndAtsakymai
+        const newSentences = drainAllCategories(state.categories, state.items);
+        state.sakiniaiAndAtsakymai.push(...newSentences);
+        
+        processedTextCount += BATCH_SIZE;
+        
+        if (processedTextCount >= shuffledTextIds.length) {
+            console.log(`Processed all ${shuffledTextIds.length} texts, got ${state.sakiniaiAndAtsakymai.length} formatted sentences`);
+            break;
+        }
+    }
+    
+    console.log(`Generated ${state.sakiniaiAndAtsakymai.length} formatted sentences from ${processedTextCount} texts`);
+}
+
+async function prepareSentencesWrapper(sessionSeed, passNumber = 0, targetFormattedSentences = 500) {
+    const config = {
+        textsForGrammar,
+        suitableWords,
+        suitableWordPatterns,
+        codedConditions,
+        precomputedWordPatterns,
+        conditionsSet: null,
+        allowAdjacentEndlessWords,
+        MIN_SENTENCE_CHARACTER_NUMBER_FOR_GRADES_0_to_1,
+        MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_0_to_1,
+        MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_2_to_5,
+        PRIORITIZED_TASK_CATEGORIES,
+        userInPreSchool,
+        userInFirstGrade,
+        userInSecondGrade,
+        userInThirdGrade,
+        userInFourthGrade,
+        userInHigherGrade,
+        generateHelpSpans
+    };
+
+    const state = {
+        categories: categories,
+        items: items,
+        questionIdRef: { value: questionId },
+        counterRef: { value: globalFormattedSentenceCounter },
+        sakiniaiAndAtsakymai: sakiniaiAndAtsakymai
+    };
+
+    await prepareSentences(sessionSeed, passNumber, targetFormattedSentences, config, state);
+    
+    questionId = state.questionIdRef.value;
+    globalFormattedSentenceCounter = state.counterRef.value;
+}
+
+
+		function generateHelpSpans (word, condKey) {
+			let pagalbaText = "";
+			let valuesToShow = [];
+	
+			if (condKey === "C62" || condKey === "C63" || condKey === "C65") {
+			const pagalbaIndex = {
+				"vns": "vns.",
+				"dgs": "dgs.",
+				"1-a": "Ia.",
+				"2-a": "IIa.",
+				"3-a": "IIIa.",
+				"es-l": "es.l.",
+				"b-k-l": "būt.k.l.",
+				"b-d-l": "būt.d.l.",
+				"būs-l": "būs.l.",
+				"vyr-g": "vyr.g.",
+				"mot-g": "mot.g.",
 			};
-			const subCategoryMatchingRules = {
-				"dkt": {
-					// Default case: category matches only itself
-					"default": [],
-					// Allow certain categories to match each other (e.g., įvr matches įvr)
-					"v": ["k", "n", "g", "įn", "vt", "š"],
-					"k": ["v", "n", "g", "įn", "vt", "š"],
-					"n": ["v", "k", "g", "įn", "vt", "š"],
-					"g": ["v", "k", "n", "įn", "vt", "š"],
-					"įn": ["v", "k", "n", "g", "vt", "š"],
-					"vt": ["v", "k", "n", "g", "įn", "š"],
-					"š": ["v", "k", "n", "g", "įn", "vt"],
-				},
-				"bdv": {
-					// Default case: category matches only itself
-					"default": [],
-					// Allow certain categories to match each other (e.g., įvr matches įvr)
-					"v": ["k", "n", "g", "įn", "vt", "š"],
-					"k": ["v", "n", "g", "įn", "vt", "š"],
-					"n": ["v", "k", "g", "įn", "vt", "š"],
-					"g": ["v", "k", "n", "įn", "vt", "š"],
-					"įn": ["v", "k", "n", "g", "vt", "š"],
-					"vt": ["v", "k", "n", "g", "įn", "š"],
-				},
-				"vks": {
-					// Default case: category matches only itself
-					"default": [],
-					"būs-l": [],
-					"es-l": [],
-					"b-k-l": [],
-					"b-d-l": []
-				},
-				"įsi-r": {
-					"1kl": ["2kl", "3kl", "4kl"],
-					"2kl": ["1kl", "3kl", "4kl"],
-					"3kl": ["1kl", "2kl", "4kl"],
-					"4kl": ["1kl", "2kl", "3kl"],
-				}
-			}
-			const subCategoriesToCheck = {
-				"dkt": ["v", "k", "n", "g", "įn", "vt", "š"],
-				"bdv": ["v", "k", "n", "g", "įn", "vt"],
-				"vks": ["būs-l", "es-l", "b-k-l", "b-d-l"],
-				"įsi-r": ["1kl", "2kl", "3kl", "4kl"]
-			}
 
-			function getAllowedMatchingCategories(category, rules) {
-					// Check if category is an array or a single string
-					if (Array.isArray(category)) {
-							// If category is an array, iterate over the array
-							return category.reduce((acc, cat) => {
-									if (rules[cat] && rules[cat].length > 0) {
-											return [...acc, ...[cat], ...rules[cat]];
-									} else {
-											return [...acc, cat];
-									}
-							}, []);
-					} else {
-							// If category is a single string, handle as before
-							if (rules[category] && rules[category].length > 0) {
-									return [...[category], ...rules[category]];
-							} else {
-									return [category];
+
+			if (wordLinguisticInfo[word].includes("vks")) {
+				if (wordLinguisticInfo[word].includes("3-a")) {
+					valuesToCheck = ["es-l", "b-k-l", "b-d-l", "būs-l", "3-a"];
+				} else {
+					valuesToCheck = ["es-l", "b-k-l", "b-d-l", "būs-l", "vns", "dgs", "1-a", "2-a", "3-a"];
+				}
+					valuesToCheck.forEach(value => {
+							if (wordLinguisticInfo[word].includes(value)) {  // If wordInfo has the specific value set to true
+									valuesToShow.push(pagalbaIndex[value]);
 							}
+					});
+			} else if (wordLinguisticInfo[word].includes("dkt") || wordLinguisticInfo[word].includes("bdv")) {
+					valuesToCheck = ["vns", "dgs"];
+					if (wordLinguisticInfo[word].includes("vns") && wordLinguisticInfo[word].includes("dgs")) {
+						valuesToShow.push(`${pagalbaIndex["vns"]}?, ${pagalbaIndex["dgs"]}?`);
+					} else if (wordLinguisticInfo[word].includes("vns")) {
+						valuesToShow.push(pagalbaIndex["vns"]);
+					} else if (wordLinguisticInfo[word].includes("dgs")) {
+						valuesToShow.push(pagalbaIndex["dgs"]);
+					}
+
+					if (wordLinguisticInfo[word].includes("prv")) {
+						valuesToShow.push(`pagalbaIndex["prv"]?`);
+					}
+
+					if (wordLinguisticInfo[word].includes("vyr-g") && wordLinguisticInfo[word].includes("mot-g")) {
+						valuesToShow.push(`${pagalbaIndex["vyr-g"]}?, ${pagalbaIndex["mot-g"]}?`);
+					} else if (wordLinguisticInfo[word].includes("vyr-g")) {
+						valuesToShow.push(pagalbaIndex["vyr-g"]);
+					} else if (wordLinguisticInfo[word].includes("mot-g")) {
+						valuesToShow.push(pagalbaIndex["mot-g"]);
 					}
 			}
-
-			function checkCategories(wordInfo, categoriesToCheck, allowedPairs) {
-				function ensureStrings(array) {
-					return array.map(item => {
-						if(typeof item === "object" && Array.isArray(item)) {
-							return item.map(innerItem => innerItem.toString()); // Flatten nested lists into strings
-						} else if(typeof item === "object") {
-							return JSON.stringify(item); // Handle generic objects
-						} else {
-							return item.toString(); // Convert primitives to strings
-						}
-					}).flat(); // Flatten the result in case of nested arrays
-				}
-				allowedPairs = ensureStrings(allowedPairs)
-				// Loop through each category to check
-				for(let category of categoriesToCheck) {
-					// If the category is in allowedPairs, we skip the check
-					if(allowedPairs.includes(category)) {
-						continue;
-					}
-					// If the value for the current category is not false, return false
-					if(wordInfo[category] !== false) {
-						return false;
-					}
-				}
-				// If all checks pass, return true
-				return true;
-			}
-
-			function shuffleArray(array) {
-				for(let i = array.length - 1; i > 0; i--) {
-					const j = Math.floor(Math.random() * (i + 1)); // Random index
-					[array[i], array[j]] = [array[j], array[i]]; // Swap elements
+			} else if (condKey === "C61") {
+				if (wordLinguisticInfo[word].includes("vns") && wordLinguisticInfo[word].includes("dgs") && wordLinguisticInfo[word].includes("g") && wordLinguisticInfo[word].includes("k")) {
+					valuesToShow.push("ką vieną? | ko daug?")
+				} else if (wordLinguisticInfo[word].includes('g')) {
+					valuesToShow.push("ką vieną?")
+				} else if (wordLinguisticInfo[word].includes('k')) {
+					valuesToShow.push("ko daug?")
+				} else if (wordLinguisticInfo[word].includes('vt')) {
+					valuesToShow.push("kur?")
 				}
 			}
 
-			let tempfilteredSentenceLibrary = [];
-			let filteredSentenceLibrary = []
-
-			function filterSentenceLibrary() {
-				filteredSentenceLibrary = sentenceLibrary.filter(entry => Object.entries(conditions).some(([key, values]) => {
-					if(!(key in entry.metadata)) {
-						return false; // Key must exist in metadata
-					}
-					if(values.length === 0) {
-						return true; // Key existence alone satisfies the condition
-					}
-					return values.some(value => entry.metadata[key].includes(value)); // At least one value must match
-				}));
-				tempfilteredSentenceLibrary = [...filteredSentenceLibrary];
-				shuffleArray(tempfilteredSentenceLibrary);
-			}
-
-			let noOfQuestionsGeneratedPerRound = 5 * Object.keys(conditions).length;
-
-			function assembleAndFormatSentences() {
-				sakiniai = [];
-				while(sakiniai.length < noOfQuestionsGeneratedPerRound) {
-					for(const [condition, subcondition] of Object.entries(conditions)) {
-						if(tempfilteredSentenceLibrary.length === 0) {
-							tempfilteredSentenceLibrary = [...filteredSentenceLibrary];
-							shuffleArray(tempfilteredSentenceLibrary);
-						}
-						for(let i = 0; i < tempfilteredSentenceLibrary.length; i++) {
-							const sentence = tempfilteredSentenceLibrary[i];
-							const metadata = sentence.metadata;
-							// Check if the condition key exists in metadata
-							if(metadata.hasOwnProperty(condition)) {
-								const metadataValues = metadata[condition];
-								// If subcondition is empty, or at least one required value matches metadata values
-								if(subcondition.length === 0 || subcondition.some(value => metadataValues.includes(value))) {
-									tempfilteredSentenceLibrary.splice(i, 1);
-									const sentenceLength = sentence["sentence"].length;
-									let questionQuota = Math.floor(sentenceLength / maximumQuestionFrequencyPerWord);
-									let wordsThatCanBeUsedForQuestions = {};
-									let wordsOneMustBeUsed = {};
-									// Loop through sentence and process word information
-									sentence["sentence"].map(([wordData, id]) => {
-										const [beforePunctuation, word, afterPunctuation, wordInfo] = wordData
-										if(wordInfo) {
-											let matchesCondition = false;
-											let matchesSubCondition = false;
-											// Check if the condition key exists in the wordInfo
-											if(!!wordInfo[condition]) {
-												// If subcondition is empty, match all, otherwise check for matching values
-												if(subcondition.length === 0 || subcondition.some(value => {
-														if(!(subcondition[0] === undefined)) {
-															return true;
-														}
-														return false;
-													})) {
-													matchesCondition = true;
-												}
-												if(matchesCondition) {
-													if(checkCategories(wordInfo, categoriesToCheck, getAllowedMatchingCategories(condition, categoryMatchingRules))) {
-														if (!(subcondition[0] === undefined)) {
-														if(checkCategories(wordInfo, subCategoriesToCheck[condition], getAllowedMatchingCategories(subcondition, subCategoryMatchingRules[condition]))) {
-															if (
-																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
-																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
-																			!categoriesThatNeedEndings.includes(condition)
-																	) {
-																			const isNounOrAdjective = (condition === "dkt") ||  (condition === "bdv");
-																			const isVerb = condition === "vks";
-
-																			const nounCondition = isNounOrAdjective && (
-																					(wordInfo["vns"] === true && wordInfo["dgs"] !== false) ||
-																					(wordInfo["vns"] === false && wordInfo["dgs"] !== true)
-																			);
-
-																			const verbCondition = isVerb && (
-																					wordInfo["dalc"] === false
-																			);
-
-																			if (((isNounOrAdjective && wordInfo["dalc"] === false)|| !isVerb) || nounCondition || verbCondition) {
-																					wordsOneMustBeUsed[word] = condition;
-																			}
-																	}
-														}
-													} else {
-														if (
-																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
-																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
-																			!categoriesThatNeedEndings.includes(condition)
-																	) {
-																			const isNounOrAdjective = (condition === "dkt") ||  (condition === "bdv");
-																			const isVerb = condition === "vks";
-
-																			const nounCondition = isNounOrAdjective && (
-																					(wordInfo["vns"] === true && wordInfo["dgs"] !== false) ||
-																					(wordInfo["vns"] === false && wordInfo["dgs"] !== true)
-																			);
-
-																			const verbCondition = isVerb && (
-																					wordInfo["dalc"] === false
-																			);
-
-																			if (((isNounOrAdjective && wordInfo["dalc"] === false)|| !isVerb) || nounCondition || verbCondition) {
-																wordsOneMustBeUsed[word] =  condition;
-																}
-															}
-													}
-												}
-												} else {
-													// Check remaining conditions
-													for(const [otherCondition, otherSubconditions] of Object.entries(conditions)) {
-														if(otherCondition === condition) continue;
-														if(!!wordInfo[otherCondition]) {
-															let otherMatchesCondition = false;
-															if(otherSubconditions.length === 0 || otherSubconditions.some(value => {
-																	return !!wordInfo[value];
-																})) {
-																otherMatchesCondition = true;
-															}
-															if(otherMatchesCondition) {
-																if(checkCategories(wordInfo, categoriesToCheck, getAllowedMatchingCategories(otherCondition, categoryMatchingRules))) {
-																	if (!(otherSubconditions[0] === undefined)) {
-																	if(checkCategories(wordInfo, subCategoriesToCheck[otherCondition], getAllowedMatchingCategories(otherSubconditions, subCategoryMatchingRules[otherCondition]))) {
-																		if (
-																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
-																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
-																			!categoriesThatNeedEndings.includes(otherCondition)
-																	) {
-																			const isNounOrAdjective = (otherCondition === "dkt") ||  (otherCondition === "bdv");
-																			const isVerb = otherCondition === "vks";
-
-																			const nounCondition = isNounOrAdjective && (
-																					(wordInfo["vns"] === true && wordInfo["dgs"] !== false) ||
-																					(wordInfo["vns"] === false && wordInfo["dgs"] !== true)
-																			);
-
-																			const verbCondition = isVerb && (
-																					wordInfo["dalc"] === false
-																			);
-
-																			if (((isNounOrAdjective && wordInfo["dalc"] === false)|| !isVerb) || nounCondition || verbCondition) {
-																		wordsThatCanBeUsedForQuestions[word] =  otherCondition;
-																		break;
-																			}
-															}
-																	}
-																} else {
-																	if (
-																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
-																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
-																			!categoriesThatNeedEndings.includes(otherCondition)
-																	) {
-																			const isNounOrAdjective = (otherCondition === "dkt") ||  (otherCondition === "bdv");
-																			const isVerb = otherCondition === "vks";
-
-																			const nounCondition = isNounOrAdjective && (
-																					(wordInfo["vns"] === true && wordInfo["dgs"] !== false) ||
-																					(wordInfo["vns"] === false && wordInfo["dgs"] !== true)
-																			);
-
-																			const verbCondition = isVerb && (
-																					wordInfo["dalc"] === false
-																			);
-
-																			if (((isNounOrAdjective && wordInfo["dalc"] === false)|| !isVerb) || nounCondition || verbCondition) {
-																	wordsThatCanBeUsedForQuestions[word] =  otherCondition;
-																	break;
-															}
-														}
-																}
-																}
-															}
-														}
-													}
-												}
-											} else {
-												for(const [otherCondition, otherSubconditions] of Object.entries(conditions)) {
-													if(otherCondition === condition) {
-														continue
-													} else {
-														if(wordInfo[otherCondition] === true) {
-															let otherMatchesCondition = false;
-															if(otherSubconditions.length === 0 || otherSubconditions.some(value => {
-																	return wordInfo[value] === true;
-																})) {
-																otherMatchesCondition = true;
-															}
-															if(otherMatchesCondition) {
-																if(checkCategories(wordInfo, categoriesToCheck, getAllowedMatchingCategories(otherCondition, categoryMatchingRules))) {
-																	if (!(otherSubconditions[0] === undefined)) {
-																	if(checkCategories(wordInfo, subCategoriesToCheck[otherCondition], getAllowedMatchingCategories(otherSubconditions, subCategoryMatchingRules[otherCondition]))) {
-																		if (
-																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
-																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
-																			!categoriesThatNeedEndings.includes(otherCondition)
-																	) {
-																			const isNounOrAdjective = (otherCondition === "dkt") ||  (otherCondition === "bdv");
-																			const isVerb = otherCondition === "vks";
-
-																			const nounCondition = isNounOrAdjective && (
-																					(wordInfo["vns"] === true && wordInfo["dgs"] !== false) ||
-																					(wordInfo["vns"] === false && wordInfo["dgs"] !== true)
-																			);
-
-																			const verbCondition = isVerb && (
-																					wordInfo["dalc"] === false
-																			);
-
-																			if (((isNounOrAdjective && wordInfo["dalc"] === false)|| !isVerb) || nounCondition || verbCondition) {
-																		wordsThatCanBeUsedForQuestions[word] =  otherCondition;
-																		break;
-																			}
-															}
-																	}
-																} else {
-																	if (
-																			(controller.classChoice === "C75" && categoriesThatNeedEndings.includes(condition) && wordInfo["fsc-gal"]) ||
-																			(controller.classChoice === "C76" && categoriesThatNeedEndings.includes(condition) && wordInfo["gal-s"]) ||
-																			!categoriesThatNeedEndings.includes(otherCondition)
-																	) {
-																			const isNounOrAdjective = (otherCondition === "dkt") ||  (otherCondition === "bdv");
-																			const isVerb = otherCondition === "vks";
-
-																			const nounCondition = isNounOrAdjective && (
-																					(wordInfo["vns"] === true && wordInfo["dgs"] !== false) ||
-																					(wordInfo["vns"] === false && wordInfo["dgs"] !== true)
-																			);
-
-																			const verbCondition = isVerb && (
-																					wordInfo["dalc"] === false
-																			);
-
-																			if (((isNounOrAdjective && wordInfo["dalc"] === false)|| !isVerb) || nounCondition || verbCondition) {
-																	wordsThatCanBeUsedForQuestions[word] =  otherCondition;
-																	break;
-																			}
-																	}
-																}
-															}
-															}
-														}
-													}
-												}
-											}
-										}
-									});
-									// Randomly select words that must be used and other words for the question
-									let wordsToBeUsed = {};
-									if (Object.keys(wordsOneMustBeUsed).length > 0) {
-										let randomWord = Object.keys(wordsOneMustBeUsed)[Math.floor(Math.random() * Object.keys(wordsOneMustBeUsed).length)];
-										wordsToBeUsed[randomWord] = wordsOneMustBeUsed[randomWord];
-										delete wordsOneMustBeUsed[randomWord];
-									}
-									let combinedWordsThatCanBeUsed = Object.assign({}, wordsOneMustBeUsed, wordsThatCanBeUsedForQuestions);
-									while (Object.keys(wordsToBeUsed).length < questionQuota && (Object.keys(combinedWordsThatCanBeUsed).length > 0)) {
-										let randomWord = Object.keys(combinedWordsThatCanBeUsed)[Math.floor(Math.random() * Object.keys(combinedWordsThatCanBeUsed).length)];
-										wordsToBeUsed[randomWord] = combinedWordsThatCanBeUsed[randomWord];
-										delete combinedWordsThatCanBeUsed[randomWord];
-									}
-									
-									if (Object.keys(wordsToBeUsed).length === 0) {
-											continue;
-									} else {
-									// Now loop through the sentence again and build the final formatted sentence
-									
-									const formattedSentence = sentence["sentence"].reduce((acc, [wordData, id]) => {
-										const [beforePunctuation, word, afterPunctuation, wordInfo] = wordData;
-										if (word in wordsToBeUsed) {
-											let pagalbaText = "";
-											let valuesToShow = [];
-											if (categoriesThatNeedEndings.includes(wordsToBeUsed[word])) {
-												if ((controller.classChoice === "C76" && wordInfo["gal-s"]) || (controller.classChoice === "C75" && wordInfo["fsc-gal"])) {
-													if (controller.classChoice === "C76") {
-													const pagalbaIndex = {
-															"vns": "vns.",
-															"dgs": "dgs.",
-															"1-a": "Ia.",
-															"2-a": "IIa.",
-															"3-a": "IIIa.",
-															"es-l": "es.l.",
-															"b-k-l": "būt.k.l.",
-															"b-d-l": "būt.d.l.",
-															"būs-l": "būs.l.",
-															"vyr-g": "vyr.g.",
-															"mot-g": "mot.g.",
-													};
-
-													// Assuming wordInfo is provided, e.g., wordInfo = { "vks": true, "dkt": false, "bdv": false }
-													if (wordInfo["vks"] === true) {
-														if (wordInfo["3-a"] === true) {
-															valuesToCheck = ["es-l", "b-k-l", "b-d-l", "būs-l", "3-a"];
-														} else {
-															valuesToCheck = ["es-l", "b-k-l", "b-d-l", "būs-l", "vns", "dgs", "1-a", "2-a", "3-a"];
-														}
-															valuesToCheck.forEach(value => {
-																	if (wordInfo[value]) {  // If wordInfo has the specific value set to true
-																			valuesToShow.push(pagalbaIndex[value]);
-																	}
-															});
-													} else if (wordInfo["dkt"] === true || wordInfo["bdv"] === true) {
-															valuesToCheck = ["vns", "dgs"];
-															valuesToCheck.forEach(value => {
-																	if (wordInfo[value]) {  // If wordInfo has the specific value set to true
-																			valuesToShow.push(pagalbaIndex[value]);
-																	}
-															});
-															if (valuesToShow.length === 2) {
-																valuesToShow = ["vns.?", "dgs.?"]
-															}
-															if (wordInfo["prv"] === true) {
-																valuesToShow = valuesToShow.map(item => {
-																// Check if the item does not already end with '?'
-																if (!item.endsWith('?')) {
-																	return item + '?';
-																}
-																return item;
-															});
-																valuesToShow.push("prv.?")
-															}
-															if (wordInfo['vyr-g']) {
-																valuesToShow.push(pagalbaIndex["vyr-g"]);
-															}
-															if (wordInfo['mot-g']) {
-																valuesToShow.push(pagalbaIndex["mot-g"]);
-															}
-													}
-													} else if (controller.classChoice === "C75") {
-														if (wordInfo['g'] === true) {
-															valuesToShow.push("ką vieną?")
-														} else if (wordInfo['k'] === true) {
-															valuesToShow.push("ko daug?")
-														} else if (wordInfo['vt'] === true) {
-															valuesToShow.push("kur?")
-														}
-													}
-
-												// Join the results into a single string separated by commas
-												const valuesToShowString = valuesToShow.join(', ');
-												formattedWord = [`${beforePunctuation}<span class="question-word-span end" style="display: inline; white-space: nowrap;">${wordInfo["gal-c"][0][0][0]}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" id="id-${questionId}" class="question-input end" maxlength="6"></textarea> <span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
-												atsakymai[`id-${questionId}`] = {};
-												atsakymai[`id-${questionId}`]["klausimas"] = [wordInfo["gal-c"][0][0][0], '']
-												atsakymai[`id-${questionId}`]["atsakymas"] = [wordInfo["gal-c"][0][1]];
-												atsakymai[`id-${questionId}`]["kl-grupe"] = wordsToBeUsed[word];
-												atsakymai[`id-${questionId}`]["zodzio-id"] = id;
-												questionId++;
-												
-												}
-											
-											} 
-											
-											if ((controller.classChoice === "C75" && (wordsToBeUsed[word] === "fsc-con" || wordsToBeUsed[word] === "fsc-vow")) ||
-												(controller.classChoice === "C76" && wordsToBeUsed[word] === "fsc-vow")
-											) {
-												removedLetterOptionIndex = {
-													"k": ["k", "g"],
-													"g": ["k", "g"],
-													"p": ["p", "b"],
-													"b": ["p", "b"],
-													"t": ["t", "d"],
-													"d": ["t", "d"],
-													"ž": ["ž", "š"],
-													"z": ["z", "s"],
-													"s": ["z", "s"],
-													"š": ["ž", "š"],
-													"e": ["e", "ė"],
-													"ė": ["e", "ė"],
-													"i": ["i", "y"],
-													"y": ["i", "y"],
-													"u": ["u", "ū"],
-													"ū": ["u", "ū"],
-												}
-												var combinations = wordInfo[`${wordsToBeUsed[word]}-c`];
-												if (combinations && combinations.length > 0) {
-														let randomIndex = Math.floor(Math.random() * combinations.length);
-														let randomElement = combinations[randomIndex];
-														if (randomElement[1][0].toLowerCase() in removedLetterOptionIndex) {
-															valuesToShow = removedLetterOptionIndex[randomElement[1][0].toLowerCase()];
-														}
-														const valuesToShowString = valuesToShow.join('/');
-														if (wordsToBeUsed[word] === "fsc-vow") {
-															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="6" id="id-${questionId}" class="question-input middle"></textarea>${randomElement[2][0]}<span class="pagalba-span">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
-														} else if (wordsToBeUsed[word] === "fsc-con" ) {
-															formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="6" id="id-${questionId}" class="question-input middle"></textarea>${randomElement[2][0]}<span class="pagalba-span-perm">(${valuesToShowString})</span>${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];															
-														}
-														atsakymai[`id-${questionId}`] = {};
-														atsakymai[`id-${questionId}`]["klausimas"] = [randomElement[0][0], randomElement[2][0]]
-														atsakymai[`id-${questionId}`]["atsakymas"] = [randomElement[1]];
-														atsakymai[`id-${questionId}`]["kl-grupe"] = wordsToBeUsed[word];
-														atsakymai[`id-${questionId}`]["zodzio-id"] = id;
-														questionId++;
-													}
-											} else {
-												var combinations = wordInfo[`${wordsToBeUsed[word]}-c`];
-												if (combinations && combinations.length > 0) {
-														let randomIndex = Math.floor(Math.random() * combinations.length);
-														let randomElement = combinations[randomIndex];
-														formattedWord = [`${beforePunctuation}<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${randomElement[0][0]}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="6" id="id-${questionId}" class="question-input middle"></textarea><span class="pagalba-div"></span>${randomElement[2][0]}${afterPunctuation}</span>`, wordsToBeUsed[word], `${beforePunctuation}${word}${afterPunctuation}`, false];
-														atsakymai[`id-${questionId}`] = {};
-														atsakymai[`id-${questionId}`]["klausimas"] = [randomElement[0][0], randomElement[2][0]]
-														atsakymai[`id-${questionId}`]["atsakymas"] = [randomElement[1]];
-														atsakymai[`id-${questionId}`]["kl-grupe"] = wordsToBeUsed[word];
-														atsakymai[`id-${questionId}`]["zodzio-id"] = id;
-														questionId++;
-														
-												}
-										}
-									 } else {
-										formattedWord = [`${beforePunctuation}${word}${afterPunctuation}`, "none"];
-										}
-										if (allowAdjacentEndlessWords) {
-											acc.push(formattedWord)
-										} else {
-											if (acc.length > 0) {
-											if ((formattedWord[1] === "bdv" || formattedWord[1] ==="dkt") && (acc[acc.length - 1][1] === "bdv" || acc[acc.length - 1][1] === "dkt") && acc[acc.length - 1][3] === false) {
-												if (Math.random() <= 0.5) {
-													var temp = acc[acc.length - 1][0]
-													acc[acc.length - 1][0] = acc[acc.length - 1][2]
-													acc[acc.length - 1][2] = temp
-													if (acc.length >= 3) {
-													if (acc[acc.length - 2][3] === true) {
-														var temp2 = acc[acc.length - 2][0]
-														acc[acc.length - 2][0] = acc[acc.length - 2][2]
-														acc[acc.length - 2][2] = temp2	
-													}
-													acc.push(formattedWord)
-												} else {
-													acc.push(formattedWord)
-												}
-											 } else {
-													// This code will run the other 50% of the time
-													var temp = formattedWord[0]
-													formattedWord[0] = formattedWord[2]
-													formattedWord[2] = temp
-													formattedWord[3] = true
-													acc.push(formattedWord)
-												}
-											} else {
-												acc.push(formattedWord)
-											}
-										} else {
-											acc.push(formattedWord)
-										}
-
-										}
-										return acc;
-									}, [])
-									const output = `<div class="sakiniai">${formattedSentence.map(item => item[0]).join(' ')}</div>`;
-									sakiniai.push(output);
-									break; // Stop processing further sentences once one has been added
-								}
-							}
-							}
-						}
-					}
-				}
+			if (valuesToShow.length > 0) {
+				const valuesToShowString = valuesToShow.join(', ');
+				const helpSpanHTML = `<span class="pagalba-span">(${valuesToShowString})</span>`
+				return helpSpanHTML
+			} else {
+				return ``
 			}
 		}
 
@@ -1619,8 +1757,25 @@ window.stopQuestionsCloseActions = function () {
 		}
 		}
 
+		function adjustFieldForTexts() {
+			const outer = document.getElementById("field-for-text-outer");
+			const inner = document.getElementById("field-for-text");
+
+			if (!outer || !inner) return;
+
+			// Compare heights
+			const innerHeight = inner.scrollHeight;
+			const outerHeight = outer.clientHeight;
+
+			if (innerHeight > outerHeight) {
+				outer.style.alignItems = "flex-start";
+			} else {
+				outer.style.alignItems = "center";
+			}
+		}
+
 		document.getElementById('increase-no-of-sentences').addEventListener('click', () => {
-		preserveFocusDuring(() => {
+		preserveFocusDuring(async () => {
 			const inputs = Array.from(document.querySelectorAll('.question-input'));
 			const anyNotEmpty = inputs.some(input => input.value.trim() !== '');
 			if (!firstTimeChecking || anyNotEmpty) {
@@ -1629,8 +1784,9 @@ window.stopQuestionsCloseActions = function () {
 			}
 			if (questionsToDisplay < 5) {
 			questionsToDisplay++;
-			displaySentences();
+			await displaySentences();
 			document.getElementById('help-toggle').checked = false;
+			adjustFieldForTexts();
 			helpToggle();
 			} else {
 			focusFirstInput();
@@ -1639,7 +1795,7 @@ window.stopQuestionsCloseActions = function () {
 		});
 
 		document.getElementById('decrease-no-of-sentences').addEventListener('click', () => {
-		preserveFocusDuring(() => {
+		preserveFocusDuring(async () => {
 			const inputs = Array.from(document.querySelectorAll('.question-input'));
 			const anyNotEmpty = inputs.some(input => input.value.trim() !== '');
 			if (!firstTimeChecking || anyNotEmpty) {
@@ -1648,8 +1804,9 @@ window.stopQuestionsCloseActions = function () {
 			}
 			if (questionsToDisplay > 1) {
 			questionsToDisplay--;
-			displaySentences();
+			await displaySentences();
 			document.getElementById('help-toggle').checked = false;
+			adjustFieldForTexts();
 			helpToggle();
 			} else {
 			focusFirstInput();
@@ -1657,97 +1814,159 @@ window.stopQuestionsCloseActions = function () {
 		});
 		});
 
-		function displaySentences() {
-			styleGrammarPage();
-			document.getElementById('help-toggle').checked = true;
-			allAnswersCorrect = false;
-			currentAnswerAttempts = 0;
-			document.getElementById('check-answers').disabled = false;
-			document.getElementById('show-answers').style.visibility = "hidden";
-			document.getElementById('field-for-final-message').innerHTML = '';
+async function restoresakiniaiAndAtsakymaiPosition(targetSentenceHTML, maxAttempts = 3) {
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        const idx = sakiniaiAndAtsakymai.findIndex(
+            entry => entry.sentenceHTML === targetSentenceHTML
+        );
 
-			if (controller.randomSelection.length === 0 || ((controller.randomSelection.length !== 0 && 5 > controller.randomSelection[0].length) && 5 > sakiniai.length)) {
-				controller.randomSelection[0] = [];
-				controller.randomSelection[1] = {};
-				localStorage.setItem("controller", JSON.stringify(controller));
-				assembleAndFormatSentences();
-			}
+        if (idx !== -1) {
+            // Found it! Restore position
+            sakiniaiAndAtsakymai = sakiniaiAndAtsakymai.slice(idx);
+            console.log(`Found sentence on attempt ${attempt + 1}, restored position`);
+            return true;
+        }
+        
+        // Not found, try next pass
+        if (attempt < maxAttempts - 1) {
+            console.log(`Sentence not found in pass ${controller.passNumber}, trying pass ${controller.passNumber + 1}`);
+            controller.passNumber = (controller.passNumber || 0) + 1;
+            
+            // Clear and regenerate
+            sakiniaiAndAtsakymai = [];
+            categories.clear();
+            items.clear();
+            globalFormattedSentenceCounter = 0;
+            
+            await prepareSentencesWrapper(controller.sessionSeed, controller.passNumber);
+        }
+    }
+    
+    // After max attempts, start fresh
+    console.log(`Could not find sentence after ${maxAttempts} attempts, starting fresh`);
+    controller.randomSelection[0] = [];
+    controller.randomSelection[1] = {};
+    controller.passNumber = (controller.passNumber || 0) + 1;
+    localStorage.setItem("controller", JSON.stringify(controller));
+    
+    sakiniaiAndAtsakymai = [];
+    categories.clear();
+    items.clear();
+    globalFormattedSentenceCounter = 0;
+    
+    await prepareSentencesWrapper(controller.sessionSeed, controller.passNumber);
+    return false;
+}
 
-			if (controller.modeChoice4 === "C40") {
-				if (!controller.randomSelection[2]) {
-					controller.randomSelection[2] = 0;
-				}
-				if ((controller.questionNumber - controller.randomSelection[2]) < questionsToDisplay) {
-					questionsToDisplay = controller.questionNumber - controller.randomSelection[2];
-				}
-			}
+async function displaySentences() {
+    styleGrammarPage();
+    document.getElementById('help-toggle').checked = true;
+    allAnswersCorrect = false;
+    currentAnswerAttempts = 0;
+    document.getElementById('check-answers').disabled = false;
+    document.getElementById('show-answers').style.visibility = "hidden";
+    document.getElementById('field-for-final-message').innerHTML = '';
 
-			let subSakiniai = [];
-			if (controller.randomSelection.length === 0 || controller.randomSelection[0].length < 5) {
+    sakiniai = [];
+    atsakymai = {};
 
-				if (controller.randomSelection[0]) {
-					subSakiniai.push(...controller.randomSelection[0]);
-				}
+	const totalAvailable = sakiniaiAndAtsakymai.length + (controller.randomSelection[0]?.length || 0);
 
-				// Select random unique indices
-				const selectedIndices = new Set();
-				while (selectedIndices.size < (5 - subSakiniai.length)) {
-					const randomIndex = Math.floor(Math.random() * sakiniai.length);
-					selectedIndices.add(randomIndex);
-				}
 
-				// Sort indices in descending order to avoid modifying the list while iterating
-				const sortedIndices = Array.from(selectedIndices).sort((a, b) => b - a);
-
-				// Store selected items in subSakiniai
-				for (const index of sortedIndices) {
-					subSakiniai.push(sakiniai[index]);
-				}
-
-				// Create the remaining sentences by filtering out the selected ones
-				const remainingSakiniai = sakiniai.filter((_, index) => !selectedIndices.has(index));
-				sakiniai = remainingSakiniai;
-
-				controller.randomSelection[0] = subSakiniai;
-				controller.randomSelection[1] = atsakymai;
-				localStorage.setItem("controller", JSON.stringify(controller));
-			} else {
-				subSakiniai = controller.randomSelection[0];
-				atsakymai = controller.randomSelection[1]
-			}
-
-			// Set the inner HTML of the text container
-			document.getElementById("field-for-sentences").innerHTML = subSakiniai.slice(0, questionsToDisplay).join('');
-
-			// Restrict input to Lithuanian letters and spaces for the question inputs
-			document.querySelectorAll('.question-input').forEach(input => {
-				input.addEventListener('input', function () {
-					// Replace any character that isn't a Lithuanian letter or space
-					this.value = this.value.replace(/[^a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ\s]/g, '');
-				});
-			});
-			document.querySelectorAll('input, textarea').forEach(input => {
-				input.setAttribute('spellcheck', 'false');
-				input.addEventListener('input', () => resizeInput(input));
-				resizeInput(input);
-			});
-
-			focusFirstInput();
-
-			document.querySelectorAll('.question-input').forEach(input => {
-				// Add event listener to remove 'wrong-answer' class on focus
-				input.addEventListener('focus', () => {
-					if (input.classList.contains('wrong-answer')) {
-						input.value = ''; // clear the input
-						resizeInput(input); // keep width consistent
-					}
-					input.classList.remove('wrong-answer');
-				});
-			});
-
-			setupDynamicListeners();
-
+    // Check if we need to generate more sentences
+	if (totalAvailable < 5) {
+		// Generate seed if first time
+		if (!currentSeed) {
+			currentSeed = generateSessionSeed();
+			currentPassNumber = 0;
 		}
+		
+		// CLEAR EVERYTHING including controller.randomSelection
+		sakiniaiAndAtsakymai = [];
+		categories.clear();
+		items.clear();
+		globalFormattedSentenceCounter = 0;
+		questionId = 1;
+		
+		// ← ADD THESE LINES:
+		controller.randomSelection[0] = [];
+		controller.randomSelection[1] = {};
+		// Don't reset [2] as it tracks completed questions
+		
+		console.log(`Generating pass ${currentPassNumber} with seed ${currentSeed}`);
+		
+		// Regenerate with current pass number
+		await prepareSentencesWrapper(currentSeed, currentPassNumber);
+		
+		// Increment pass number for next time
+		currentPassNumber++;
+	}
+
+    if (controller.modeChoice4 === "C40") {
+        if (!controller.randomSelection[2]) {
+            controller.randomSelection[2] = 0;
+        }
+        if ((controller.questionNumber - controller.randomSelection[2]) < questionsToDisplay) {
+            questionsToDisplay = controller.questionNumber - controller.randomSelection[2];
+        }
+    }
+
+    // Initialize randomSelection if needed
+    if (!controller.randomSelection[0]) {
+        controller.randomSelection[0] = [];
+    }
+    if (!controller.randomSelection[1]) {
+        controller.randomSelection[1] = {};
+    }
+
+    // Always ensure we have 5 sentences in randomSelection
+    while (controller.randomSelection[0].length < 5 && sakiniaiAndAtsakymai.length > 0) {
+        let sentenceAddition = sakiniaiAndAtsakymai.shift();
+        
+        controller.randomSelection[0].push(sentenceAddition.sentenceHTML);
+        Object.assign(controller.randomSelection[1], sentenceAddition.answers);
+    }
+    
+    sakiniai = controller.randomSelection[0] || [];
+    atsakymai = controller.randomSelection[1] || {};
+    
+    localStorage.setItem("controller", JSON.stringify(controller));
+
+    // Check if we have sentences to display
+    if (sakiniai.length === 0) {
+        console.error("No sentences to display!");
+        document.getElementById("field-for-sentences").innerHTML = '<p>Nepavyko sugeneruoti sakinių. Pabandykite dar kartą.</p>';
+        return;
+    }
+
+    document.getElementById("field-for-sentences").innerHTML = sakiniai.slice(0, questionsToDisplay).join('');
+
+    document.querySelectorAll('.question-input').forEach(input => {
+        input.addEventListener('input', function () {
+            this.value = this.value.replace(/[^a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ\s]/g, '');
+        });
+    });
+    
+    document.querySelectorAll('input, textarea').forEach(input => {
+        input.setAttribute('spellcheck', 'false');
+        input.addEventListener('input', () => resizeInput(input));
+        resizeInput(input);
+    });
+
+    focusFirstInput();
+
+    document.querySelectorAll('.question-input').forEach(input => {
+        input.addEventListener('focus', () => {
+            if (input.classList.contains('wrong-answer')) {
+                input.value = '';
+                resizeInput(input);
+            }
+            input.classList.remove('wrong-answer');
+        });
+    });
+
+    setupDynamicListeners();
+}
 
 		function toggleHelpButton() {
 			const helpToggle = document.getElementById("help-toggle");
@@ -1765,25 +1984,32 @@ window.stopQuestionsCloseActions = function () {
 		}
 
 
-		function initiateTheProgram() {
-			if (!controller.questionsStopped) {
-				filterSentenceLibrary();
-				displaySentences();
-				toggleHelpButton();
-				helpToggle();
+async function initiateTheProgram() {
+    if (!controller.questionsStopped) {
+        // Generate seed for first time
+        if (!currentSeed) {
+            currentSeed = generateSessionSeed();
+            currentPassNumber = 0;
+        }
+        
+        // Generate initial sentences
+        await prepareSentencesWrapper(currentSeed, currentPassNumber);
 
-				if (!controller.questionsStopped) {
-				if (controller.modeChoice4 === "C39") {
-					countDown();
-				} else if (controller.modeChoice4 === "C40") {
-					startTimer();
-				}
-				}
-			} else {
-				formatFinalMessageForGrammar();
-			}
-		}
+        await displaySentences();
+        toggleHelpButton();
+        helpToggle();
 
+        if (!controller.questionsStopped) {
+            if (controller.modeChoice4 === "C39") {
+                countDown();
+            } else if (controller.modeChoice4 === "C40") {
+                startTimer();
+            }
+        }
+    } else {
+        formatFinalMessageForGrammar();
+    }
+}
 
 		initiateTheProgram();
 
@@ -1946,11 +2172,15 @@ function focusWithKeyboardAdjustment(element, container) {
 
 
 function recordGrammarMistakes (inputId, userInput) {
+	const wordInfo = controller.randomSelection[1][inputId]
 	if (!mistakeRecords[inputId]) {
 		mistakeRecords[inputId] = {};
 		mistakeRecords[inputId] = {
-		"mistakesCounter": 0,
-		"wrongAnswer": []
+			"mistakesCounter": 0,
+			"wrongAnswer": [],
+			"wordWithAnswer": [wordInfo["klausimas"][0], wordInfo["atsakymas"][0][0], wordInfo["klausimas"][1]],
+			"wordGrammarType": wordInfo["kl-grupe"],
+			"wordId": wordInfo["zodzio-id"]
 		};
 	}
 	mistakeRecords[inputId]["mistakesCounter"]+=1
@@ -2116,23 +2346,23 @@ function helpToggle() {
             element.style.display = 'none'; // Set display to none if it's not none
         }
     });
+	adjustFieldForTexts();
 	focusFirstInput();
 }
 
 
-			function nextQuestion() {
+			async function nextQuestion() {
 				if (controller.modeChoice4 === "C40") {
 					if (controller.randomSelection[2] === controller.questionNumber) {
 						localStorage.setItem("elapsedTime", timerDisplay.textContent);
 						controller.taskCompleted = true;
-						formatFinalMessageForGrammar();
-						controller.questionsStopped = true;
+						await formatFinalMessageForGrammar();
 						localStorage.setItem('controller', JSON.stringify(controller));
 					}
 				}
 				
 				if (!controller.questionsStopped) {
-					displaySentences()
+					await displaySentences()
 					toggleHelpButton();
 					document.getElementById('check-answers').style.display = "flex"
 					nextQuestionButton.style.display = "none";
@@ -2235,7 +2465,6 @@ function enableEnterNavigation() {
 		});
 	});
 	
-	hiddenInput.addEventListener('keydown', handleEnterKey);
 	hiddenInput.addEventListener('input', handleHiddenInputChange);
 }
 
@@ -2299,9 +2528,9 @@ function handleEnterKey(event) {
     const allCorrect = inputs.every(input => input.classList.contains('correct-answer'));
 
     if (allCorrect) {
-        if (nextQuestionBtn) nextQuestionBtn.click();
+        nextQuestion();
     } else {
-        if (checkAnswersButton) checkAnswersButton.click();
+         checkAnswers();
     }
 }
 

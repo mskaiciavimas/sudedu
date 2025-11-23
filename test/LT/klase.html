@@ -1091,6 +1091,10 @@
             font-weight: 700;
         }
 
+        .grammar-params-list {
+            padding-top: 5px;
+        }
+
         .previous-challenge-winners-holder-outer {
             display: flex;
             flex-direction: column;
@@ -2780,9 +2784,11 @@ function renderMembers() {
 
   for (let i = 0; i < topEntries.length; i++) {
     const entry = topEntries[i];
-    if (previousPoints === null || entry.totalPoints < previousPoints) {
+    const currentPoints = Number(entry.totalPoints); // Convert to number
+    
+    if (previousPoints === null || currentPoints < previousPoints) {
       currentRank++;
-      if (currentRank > 3) break; // Only assign up to bronze rank
+      if (currentRank > 3) break;
       medalIndex = currentRank - 1;
     }
 
@@ -2791,7 +2797,7 @@ function renderMembers() {
       medalPath: medalPaths[medalIndex] || null
     });
 
-    previousPoints = entry.totalPoints;
+    previousPoints = currentPoints; // Store as number
   }
 
   // --- Render top students with medals ---
@@ -2932,6 +2938,7 @@ async function fetchClassData() {
             weekChlId,
             weekChlWinnerStudentId
         };
+        
     } else {
         // Handle case where requestingStudentData is null/falsy
         classDataCache = {

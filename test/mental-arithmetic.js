@@ -37,64 +37,64 @@ const LONG_TERM_RECORDING_ENABLED = true;
 const PET_STATS_EXPIRATION = 0.0035 // EXPIRE FULLY IN 48 hrs
 
 const animationStepsAndDurationNumberDict = {
-            "cat-1-sits-idle": [10, 2],
-            "cat-1-sits-idle-blinks": [10, 2],
-            "cat-1-sleeps": [4, 2],
-            "cat-1-dances": [4, 0.5],
-            "cat-1-talks": [8, 2],
-            "cat-1-excited": [12, 1.5],
-            "cat-1-lays-idle": [12, 2],
-            "cat-1-sits-idle-thinks": [9, 2],
-            "cat-1-cries": [4, 0.5],
-            "cat-1-in-box-1": [12, 1.5],
-            "cat-1-in-box-2": [4, 2],
-            "cat-1-in-box-3": [4, 0.5],
-            "cat-1-surprised": [12, 1.5],
-            "cat-1-eats": [15, 2],
-            "cat-1-waits": [6, 0.5],
-            "cat-1-refuses": [13, 2],
-            "cat-1-angry": [9, 2],
-            "cat-1-happy": [12, 2],
-            "cat-1-angry-2": [4, 1],
-            "cat-1-licks-paw": [11, 2],
-            "cat-1-medicine": [5, 1.5],
-            "cat-1-sick": [4, 1],
-            "cat-1-walks-upwards": [4, 0.85],
-            "cat-1-walks-downwards": [4, 0.85],
-            "cat-1-walks-sideways": [4, 0.85],
-            "cat-1-stands-idle": [4, 0.85],
-            "cat-2-sits-idle": [10, 2],
-            "cat-2-sits-idle-blinks": [10, 2],
-            "cat-2-sleeps": [4, 2],
-            "cat-2-dances": [4, 0.5],
-            "cat-2-talks": [8, 2],
-            "cat-2-excited": [12, 1.5],
-            "cat-2-lays-idle": [12, 2],
-            "cat-2-sits-idle-thinks": [9, 2],
-            "cat-2-cries": [4, 0.5],
-            "cat-2-in-box-1": [12, 1.5],
-            "cat-2-in-box-2": [4, 2],
-            "cat-2-in-box-3": [4, 0.5],
-            "cat-2-surprised": [12, 1.5],
-            "cat-2-eats": [15, 2],
-            "cat-2-waits": [6, 0.5],
-            "cat-2-refuses": [13, 2],
-            "cat-2-angry": [9, 2],
-            "cat-2-happy": [12, 2],
-            "cat-2-angry-2": [4, 1],
-            "cat-2-licks-paw": [11, 2],
-            "cat-2-medicine": [5, 1.5],
-            "cat-2-sick": [4, 1],
-            "cat-2-walks-upwards": [4, 0.85],
-            "cat-2-walks-downwards": [4, 0.85],
-            "cat-2-walks-sideways": [4, 0.85],
-            "cat-2-stands-idle": [4, 0.85],
-            "musicPlayerOff": [1, 1],
-            "musicPlayerOn": [1 ,1],
-            "bath-1-empty": [1 ,1],
-            "bath-1-filled": [6 ,1],
-            "bath-1-with-pet": [6 ,1]
-        }
+    "cat-1-sits-idle": [10, 2],
+    "cat-1-sits-idle-blinks": [10, 2],
+    "cat-1-sleeps": [4, 2],
+    "cat-1-dances": [4, 0.5],
+    "cat-1-talks": [8, 2],
+    "cat-1-excited": [12, 1.5],
+    "cat-1-lays-idle": [12, 2],
+    "cat-1-sits-idle-thinks": [9, 2],
+    "cat-1-cries": [4, 0.5],
+    "cat-1-in-box-1": [12, 1.5],
+    "cat-1-in-box-2": [4, 2],
+    "cat-1-in-box-3": [4, 0.5],
+    "cat-1-surprised": [12, 1.5],
+    "cat-1-eats": [15, 2],
+    "cat-1-waits": [6, 0.5],
+    "cat-1-refuses": [13, 2],
+    "cat-1-angry": [9, 2],
+    "cat-1-happy": [12, 2],
+    "cat-1-angry-2": [4, 1],
+    "cat-1-licks-paw": [11, 2],
+    "cat-1-medicine": [5, 1.5],
+    "cat-1-sick": [4, 1],
+    "cat-1-walks-upwards": [4, 0.85],
+    "cat-1-walks-downwards": [4, 0.85],
+    "cat-1-walks-sideways": [4, 0.85],
+    "cat-1-stands-idle": [4, 0.85],
+    "cat-2-sits-idle": [10, 2],
+    "cat-2-sits-idle-blinks": [10, 2],
+    "cat-2-sleeps": [4, 2],
+    "cat-2-dances": [4, 0.5],
+    "cat-2-talks": [8, 2],
+    "cat-2-excited": [12, 1.5],
+    "cat-2-lays-idle": [12, 2],
+    "cat-2-sits-idle-thinks": [9, 2],
+    "cat-2-cries": [4, 0.5],
+    "cat-2-in-box-1": [12, 1.5],
+    "cat-2-in-box-2": [4, 2],
+    "cat-2-in-box-3": [4, 0.5],
+    "cat-2-surprised": [12, 1.5],
+    "cat-2-eats": [15, 2],
+    "cat-2-waits": [6, 0.5],
+    "cat-2-refuses": [13, 2],
+    "cat-2-angry": [9, 2],
+    "cat-2-happy": [12, 2],
+    "cat-2-angry-2": [4, 1],
+    "cat-2-licks-paw": [11, 2],
+    "cat-2-medicine": [5, 1.5],
+    "cat-2-sick": [4, 1],
+    "cat-2-walks-upwards": [4, 0.85],
+    "cat-2-walks-downwards": [4, 0.85],
+    "cat-2-walks-sideways": [4, 0.85],
+    "cat-2-stands-idle": [4, 0.85],
+    "musicPlayerOff": [1, 1],
+    "musicPlayerOn": [1 ,1],
+    "bath-1-empty": [1 ,1],
+    "bath-1-filled": [6 ,1],
+    "bath-1-with-pet": [6 ,1]
+}
 
 function resetControllerTaskSettings () {
   controller.mode = '',
@@ -410,29 +410,7 @@ if (document.querySelector("#stop-button-span")) {
     localStorage.setItem('controller', JSON.stringify(controller))
 }
 
-function recordGrammarFinalMistakes() {
-  const mistakeEncodingIndex = {
-		"fsc-gal": "C61",
-		"dkt": "C62",
-		"bdv": "C63",
-		"prv": "C64",
-		"vks": "C65",
-		"įsi-r": "C66",
-		"fsc-con": "C67",
-		"fsc-vow": "C68",
-		"prš": "C69",
-		"prs": "C70",
-		"asim": "C71",
-		"md": "C72"
-	}
-
-	Object.keys(mistakeRecords).forEach(key => {
-		const answer = atsakymai[key]
-		mistakeRecords[key]["wordWithAnswer"] = [answer["klausimas"][0], answer["atsakymas"][0][0], answer["klausimas"][1]],
-		mistakeRecords[key]["wordGrammarType"] = mistakeEncodingIndex[answer["kl-grupe"]]
-		mistakeRecords[key]["wordId"] = answer["zodzio-id"]
-	});
-
+async function recordGrammarFinalMistakes() {
 	Object.keys(mistakeRecords).forEach(key => {
 		controller.currentMistakes.push([mistakeRecords[key]["wordWithAnswer"], mistakeRecords[key]["wordGrammarType"], [mistakeRecords[key]["mistakesCounter"], mistakeRecords[key]["wrongAnswer"]], mistakeRecords[key]["wordId"]])
 		controller.totalMistakes.push([mistakeRecords[key]["wordWithAnswer"], mistakeRecords[key]["wordGrammarType"], [mistakeRecords[key]["mistakesCounter"], mistakeRecords[key]["wrongAnswer"]], mistakeRecords[key]["wordId"]])
@@ -459,7 +437,7 @@ function styleGrammarPage () {
 
 async function formatFinalMessageForGrammar() {
   localStorage.setItem("elapsedTime", timerDisplay.textContent)
-  recordGrammarFinalMistakes();
+  await recordGrammarFinalMistakes();
 
     let aditionalFinalMessage = null
 
@@ -2174,8 +2152,7 @@ function getBarColor(value) {
 }
 
 // Function to generate the summary table
-function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=null, customDivForGrammarSummaryTable=null) {
-  controller = JSON.parse(localStorage.getItem('controller'));
+function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=null, customDivForGrammarSummaryTable=null, usePercentage=false) {  controller = JSON.parse(localStorage.getItem('controller'));
 
   mistakes = [];
   if (type === 'total') {
@@ -2280,63 +2257,105 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
           "Suklysta (kartai)": mistakes
       }));
 
+      // Calculate total mistakes for percentage
+      const totalMathMistakes = summaryData.reduce((sum, row) => sum + row["Suklysta (kartai)"], 0);
+
+      // Add percentage if needed
+      if (usePercentage && totalMathMistakes > 0) {
+          summaryData.forEach(row => {
+              row["Percentage"] = ((row["Suklysta (kartai)"] / totalMathMistakes) * 100).toFixed(1);
+          });
+      }
+
       // Sort the data by Suklysta (kartai) in descending order
       summaryData.sort((a, b) => b["Suklysta (kartai)"] - a["Suklysta (kartai)"]);
 
       // Generate the summary table HTML
       const summaryTable = document.createElement("table");
       if (controller.language === 'LT') {
-      summaryTable.innerHTML = `
-          <tr>
-              <th>Veiksmai</th>
-              <th>Suklysta (kartai)</th>
-              <th></th>
-          </tr>
-          ${summaryData
-              .map(
-                  (row) => `<div class="col-12 table-container">
-                  <tr>
-                      <td>${row["Veiksmai"]}</td>
-                      <td>${row["Suklysta (kartai)"]}</td>
-                      <td>
-                          <div class="bar" style="width: ${Math.min(
-                              row["Suklysta (kartai)"] * 10,
-                              100
-                          )}px; background-color: ${getBarColor(
-                      row["Suklysta (kartai)"]
-                  )};"></div>
-                      </td>
-                  </tr>
-              `
-              )
-              .join("")}
-      </div>`;
+          summaryTable.innerHTML = `
+              <tr>
+                  <th>Veiksmai</th>
+                  <th>${usePercentage ? 'Suklysta (%)' : 'Suklysta (kartai)'}</th>
+                  <th></th>
+              </tr>
+              ${summaryData
+                  .map(
+                        (row) => {
+                            const displayValue = usePercentage ? row["Percentage"] + '%' : row["Suklysta (kartai)"];
+                            let barWidth, barColor;
+                            
+                            if (usePercentage) {
+                                const percentValue = parseFloat(row["Percentage"]);
+                                barWidth = percentValue + '%'; // 10% = "10%", 50% = "50%", etc.
+                                
+                                // Color based on thresholds
+                                if (percentValue < 25) {
+                                    barColor = "rgba(64, 201, 169, 1)"; // green
+                                } else if (percentValue <= 50) {
+                                    barColor = "#E7B10A"; // yellow
+                                } else {
+                                    barColor = "rgba(213, 126, 126, 1)"; // red
+                                }
+                            } else {
+                                barWidth = Math.min(row["Suklysta (kartai)"] * 10, 100) + 'px';
+                                barColor = getBarColor(row["Suklysta (kartai)"]);
+                            }
+                            
+                            return `<div class="col-12 table-container">
+                            <tr>
+                                <td>${row["Veiksmai"]}</td>
+                                <td>${displayValue}</td>
+                                <td>
+                                    <div class="bar" style="width: ${barWidth}; background-color: ${barColor};"></div>
+                                </td>
+                            </tr>
+                        `}
+                    )
+                  .join("")}
+          </div>`;
       } else if (controller.language === 'EN') {
-        summaryTable.innerHTML = `
-            <tr>
-                <th>Equation</th>
-                <th>Mistake Frequency</th>
-                <th></th>
-            </tr>
-            ${summaryData
-                .map(
-                    (row) => `<div class="col-12 table-container">
-                    <tr>
-                        <td>${row["Veiksmai"]}</td>
-                        <td>${row["Suklysta (kartai)"]}</td>
-                        <td>
-                            <div class="bar" style="width: ${Math.min(
-                                row["Suklysta (kartai)"] * 10,
-                                100
-                            )}px; background-color: ${getBarColor(
-                        row["Suklysta (kartai)"]
-                    )};"></div>
-                        </td>
-                    </tr>
-                `
-                )
-                .join("")}
-        </div>`;
+          summaryTable.innerHTML = `
+              <tr>
+                  <th>Equation</th>
+                  <th>${usePercentage ? 'Percentage' : 'Mistake Frequency'}</th>
+                  <th></th>
+              </tr>
+              ${summaryData
+                  .map(
+                          (row) => {
+                              const displayValue = usePercentage ? row["Percentage"] + '%' : row["Suklysta (kartai)"];
+                              let barWidth, barColor;
+                              
+                              if (usePercentage) {
+                                  const percentValue = parseFloat(row["Percentage"]);
+                                  barWidth = percentValue + '%'; // 10% = "10%", 50% = "50%", etc.
+                                  
+                                  // Color based on thresholds
+                                  if (percentValue < 25) {
+                                      barColor = "rgba(64, 201, 169, 1)"; // green
+                                  } else if (percentValue <= 50) {
+                                      barColor = "#E7B10A"; // yellow
+                                  } else {
+                                      barColor = "rgba(213, 126, 126, 1)"; // red
+                                  }
+                              } else {
+                                  barWidth = Math.min(row["Suklysta (kartai)"] * 10, 100) + 'px';
+                                  barColor = getBarColor(row["Suklysta (kartai)"]);
+                              }
+                              
+                              return `<div class="col-12 table-container">
+                              <tr>
+                                  <td>${row["Veiksmai"]}</td>
+                                  <td>${displayValue}</td>
+                                  <td>
+                                      <div class="bar" style="width: ${barWidth}; background-color: ${barColor};"></div>
+                                  </td>
+                              </tr>
+                          `}
+                      )
+                  .join("")}
+          </div>`;
       }
 
       // Display the summary table
@@ -2368,6 +2387,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
 
  if (grammarMistakes.length > 0) {
   // First, group all word occurrences by their base form (prefix+answer+suffix)
+// First, group all word occurrences by their base form (prefix+answer+suffix)
   const wordOccurrences = grammarMistakes.reduce((acc, [wordParts, wordCategory, usersMistakes, wordId]) => {
     const key = wordParts.join('|');
     if (!acc[key]) {
@@ -2378,7 +2398,26 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
         totalMistakes: 0
       };
     }
-    acc[key].occurrences.push({ usersMistakes, wordId });
+    
+    // Check if this wordId already exists in occurrences
+    const existingOccurrence = acc[key].occurrences.find(occ => 
+      JSON.stringify(occ.wordId) === JSON.stringify(wordId)
+    );
+    
+    if (existingOccurrence) {
+      // Merge mistakes: increment count and combine mistake arrays
+      existingOccurrence.usersMistakes[0] += usersMistakes[0];
+      existingOccurrence.usersMistakes[1] = [
+        ...new Set([...existingOccurrence.usersMistakes[1], ...usersMistakes[1]])
+      ];
+    } else {
+      // New occurrence
+      acc[key].occurrences.push({ 
+        usersMistakes: [usersMistakes[0], [...usersMistakes[1]]], 
+        wordId 
+      });
+    }
+    
     acc[key].totalMistakes += usersMistakes[0];
     return acc;
   }, {});
@@ -2388,8 +2427,8 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
     const wordCategoryCoding = {
       "C61": "žodžio pabaiga",
       "C62": "daiktavardžio pabaiga",
-      "C63": "būdvardžio pabaiga",
-      "C64": "prieveiksmio pabaiga", 
+      "C63": "būdvardžio ir prieveiksmio pabaigos",
+      "C64": "sudurtiniai žodžiai", 
       "C65": "veiksmažodžio pabaiga",
       "C66": "įsimintina rašyba",
       "C67": "panašiai skambančios priebalsės",
@@ -2422,11 +2461,19 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
     return result;
   }, { words: {}, categories: {} });
 
-  // Generate table data for current view
+  // Calculate total grammar mistakes for percentage
+  const totalGrammarMistakes = Object.values(mistakeData.words).reduce((sum, count) => sum + count, 0);
+
   const getTableData = (viewType) => {
     const data = viewType === 'words' ? mistakeData.words : mistakeData.categories;
     return Object.entries(data)
-      .map(([display, count]) => ({ display, count }))
+      .map(([display, count]) => {
+          const result = { display, count };
+          if (usePercentage && totalGrammarMistakes > 0) {
+              result.percentage = ((count / totalGrammarMistakes) * 100).toFixed(1);
+          }
+          return result;
+      })
       .sort((a, b) => b.count - a.count);
   };
 
@@ -2469,17 +2516,37 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
     thead.appendChild(headerRow);
     
     const tbody = document.createElement('tbody');
-    tbody.innerHTML = tableData.map(item => `
-      <tr>
-        <td>${item.display}</td>
-        <td>${item.count}</td>
-        <td>
-          <div class="bar" style="width: ${Math.min(item.count * 10, 100)}px;
-               background-color: ${getBarColor(item.count)};">
-          </div>
-        </td>
-      </tr>
-    `).join('');
+        tbody.innerHTML = tableData.map(item => {
+            const displayValue = usePercentage ? item.percentage + '%' : item.count;
+            let barWidth, barColor;
+            
+            if (usePercentage) {
+                const percentValue = parseFloat(item.percentage);
+                barWidth = percentValue + '%'; // 10% = "10%", 50% = "50%", etc.
+                
+                // Color based on thresholds
+                if (percentValue < 25) {
+                    barColor = "rgba(64, 201, 169, 1)"; // green
+                } else if (percentValue <= 50) {
+                    barColor = "#E7B10A"; // yellow
+                } else {
+                    barColor = "rgba(213, 126, 126, 1)"; // red
+                }
+            } else {
+                barWidth = Math.min(item.count * 10, 100) + 'px';
+                barColor = getBarColor(item.count);
+            }
+            
+            return `
+          <tr>
+            <td>${item.display}</td>
+            <td>${displayValue}</td>
+            <td>
+              <div class="bar" style="width: ${barWidth}; background-color: ${barColor};">
+              </div>
+            </td>
+          </tr>
+        `}).join('');
     
     table.appendChild(thead);
     table.appendChild(tbody);
@@ -2819,7 +2886,7 @@ function countDown() {
         displayEquation();
       } else if (controller.mode === "lang") {
         if (controller.modeChoice1 === "C83") {
-          if (controller.modeChoice1 === "C50") {
+          if (controller.modeChoice2 === "C50") {
             formatFinalMessageForGrammar();
           }
       } else if (controller.modeChoice1 === "C49") {
@@ -3174,7 +3241,7 @@ function getOptionTextFromValues(values, taskDuration, forTeacher = false) {
             
             final_results.push(result[3]);
             if (result[2] === "3-4 KLASĖ") {
-                if ("C62" in values[4] || "C63" in values[4] || "C64" in values[4] || "C65" in values[4]) {
+                if ("C62" in values[4] || "C63" in values[4] || "C65" in values[4]) {
                     final_results.push(result[4]);
                 }
             } else {
@@ -4488,3 +4555,24 @@ function redirectToAppropriateLanguage(targetFolder) {
     // window.location.replace(newPath);
   }
 }
+
+// SEED OF RANDOMNESS GENERATION FOR LANGUAGE TASKS
+
+  function generateSessionSeed() {
+      const timestamp = Date.now() % 1000000;
+      const random = Math.floor(Math.random() * 46656);
+      return (timestamp * 46656 + random).toString(36).toUpperCase();
+  }
+
+  /**
+   * Parses seed string into numeric seed for RNG
+   */
+  function parseSeed(seedString) {
+      let hash = 0;
+      for (let i = 0; i < seedString.length; i++) {
+          const char = seedString.charCodeAt(i);
+          hash = ((hash << 5) - hash) + char;
+          hash = hash & hash;
+      }
+      return Math.abs(hash) || 1;
+  }

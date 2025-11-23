@@ -248,12 +248,12 @@ const parameterDictionary = {
         "decodedParameterText": "DAIKTAVARDŽIO PABAIGA"
     },
     "C63": {
-        "parameter": "bdv",
-        "decodedParameterText": "BŪDVARDŽIO PABAIGA"
+        "parameter": "bdv-prv",
+        "decodedParameterText": "BŪDVARDŽIO IR PRIEVEIKSMIO PABAIGOS"
     },
     "C64": {
-        "parameter": "prv",
-        "decodedParameterText": "PRIEVEIKSMIO PABAIGA"
+        "parameter": "sudr",
+        "decodedParameterText": "SUDURTINIAI ŽODŽIAI"
     },
     "C65": {
         "parameter": "vks",

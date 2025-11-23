@@ -1045,9 +1045,9 @@ window.onload = function () {
 
 	if (controller.modeChoice7 === "C82") {
     if (controller.classChoice === "C75") {
-      jsonFile = '../databases/1_2_klase_teksto_suvokimas.json';
+      jsonFile = '../databases/1_2_klase_teksto_suvokimas_tekstai.json';
     } else if (controller.classChoice === "C76") {
-      jsonFile = '../databases/3_4_klase_teksto_suvokimas.json';
+      jsonFile = '../databases/3_4_klase_teksto_suvokimas_tekstai.json';
     }
   } else if (controller.modeChoice7 === "C84") {
     jsonFile = '../databases/sudedu_duomenu_baze.json';
@@ -1083,74 +1083,214 @@ window.onload = function () {
     window.mistakesSummary = {};
     window.timeTakenForEachText = {};
 
-    function generateFilteredTextLibrary() {
-    var tempTextLibrary = Object.entries(textDatabase);
+    let currentSeed = controller.modeChoice8;
+    let currentPassNumber = 0;
 
-    if (controller.modeChoice2 === "C51") {
-      if (controller.modeChoice7 === "C82") {
-        filteredTextLibrary = tempTextLibrary.filter(([id, entry]) =>
-        entry["SF"]?.["C51"] === controller.modeChoiceLtDifficulty
-        );
-      } else if (controller.modeChoice7 === "C84") {
-        filteredTextLibrary = tempTextLibrary.filter(([id, entry]) =>
-            controller.modeChoice8.includes(parseInt(id))
-        );
-      }
-        answersField.style.display = "block";
-      } else if (controller.modeChoice2 === "C52") {
-        if (controller.modeChoice7 === "C82") {
-          filteredTextLibrary = tempTextLibrary.filter(([id, entry]) =>
-          entry["SF"]?.["C52"] === controller.modeChoiceLtDifficulty
-          );
-        } else if (controller.modeChoice7 === "C84") {
-          filteredTextLibrary = tempTextLibrary.filter(([id, entry]) =>
-              controller.modeChoice8.includes(parseInt(id))
-          );
+    let allTextIds = [];
+    let currentTextBatchIndex = 0;
+    const TEXT_BATCH_SIZE = 20;
+    let totalTextsAvailable = 0;
+    let virtualShuffledIndices = null;
+
+    /**
+     * Seeded Random Number Generator (Mulberry32)
+     */
+    class SeededRandom {
+        constructor(seed) {
+            this.state = typeof seed === 'string' ? parseSeed(seed) : seed;
         }
-        answersFieldStart.style.display = "block";
-        answersFieldMiddle.style.display = "block";
-        answersFieldEnd.style.display = "block";
-      }
-
-      if (filteredTextLibrary.length === 0) {
-        window.location.href = "./index.html";
-      }
+        
+        next() {
+            let t = this.state += 0x6D2B79F5;
+            t = Math.imul(t ^ t >>> 15, t | 1);
+            t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+            return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        }
+        
+        nextInt(min, max) {
+            return Math.floor(this.next() * (max - min)) + min;
+        }
+        
+        shuffle(array) {
+            const result = [...array];
+            for (let i = result.length - 1; i > 0; i--) {
+                const j = Math.floor(this.next() * (i + 1));
+                [result[i], result[j]] = [result[j], result[i]];
+            }
+            return result;
+        }
+        
+        choice(array) {
+            return array[Math.floor(this.next() * array.length)];
+        }
+        
+        derive(suffix) {
+            return new SeededRandom(this.state + parseSeed(String(suffix)));
+        }
     }
+
+
+function generateFilteredTextLibrary(forceRegenerate = false) {
+    // Only regenerate the ID list if needed
+    if (forceRegenerate || allTextIds.length === 0) {
+        var tempTextLibrary = Object.entries(textDatabase);
+        let filteredIds = [];
+
+        if (controller.modeChoice2 === "C51") {
+            if (controller.modeChoice7 === "C82") {
+                filteredIds = tempTextLibrary
+                    .filter(([id, entry]) => entry["SF"]?.["C51"] === controller.modeChoiceLtDifficulty)
+                    .map(([id]) => id);
+            } else if (controller.modeChoice7 === "C84") {
+                filteredIds = tempTextLibrary
+                    .filter(([id, entry]) => controller.modeChoice8.includes(parseInt(id)))
+                    .map(([id]) => id);
+            }
+            answersField.style.display = "block";
+        } else if (controller.modeChoice2 === "C52") {
+            if (controller.modeChoice7 === "C82") {
+                filteredIds = tempTextLibrary
+                    .filter(([id, entry]) => entry["SF"]?.["C52"] === controller.modeChoiceLtDifficulty)
+                    .map(([id]) => id);
+            } else if (controller.modeChoice7 === "C84") {
+                filteredIds = tempTextLibrary
+                    .filter(([id, entry]) => controller.modeChoice8.includes(parseInt(id)))
+                    .map(([id]) => id);
+            }
+            answersFieldStart.style.display = "block";
+            answersFieldMiddle.style.display = "block";
+            answersFieldEnd.style.display = "block";
+        }
+
+        if (filteredIds.length === 0) {
+            window.location.href = "./index.html";
+            return;
+        }
+        
+        // Store only IDs - lightweight!
+        allTextIds = filteredIds;
+        totalTextsAvailable = allTextIds.length;
+        currentTextBatchIndex = 0;
+        
+        console.log(`Found ${totalTextsAvailable} texts matching conditions`);
+        
+        // Generate virtual shuffle - just indices array
+        generateVirtualShuffle();
+    }
+    
+    // Load next batch
+    loadNextTextBatch();
+}
+
+function generateVirtualShuffle() {
+    // Create array of indices [0, 1, 2, 3, ...]
+    virtualShuffledIndices = Array.from({length: totalTextsAvailable}, (_, i) => i);
+    
+    // Shuffle the indices based on seed
+    const rng = new SeededRandom(currentSeed);
+    const passRng = rng.derive(`pass-${currentPassNumber}`);
+    virtualShuffledIndices = passRng.shuffle(virtualShuffledIndices);
+}
+
+function loadNextTextBatch() {
+    const startIdx = currentTextBatchIndex * TEXT_BATCH_SIZE;
+    const endIdx = Math.min(startIdx + TEXT_BATCH_SIZE, totalTextsAvailable);
+    
+    if (startIdx >= totalTextsAvailable) {
+        return;
+    }
+    
+    // Get batch of shuffled indices
+    const batchIndices = virtualShuffledIndices.slice(startIdx, endIdx);
+    
+    // Load actual text objects only for this batch
+    const batchTexts = batchIndices.map(idx => {
+        const textId = allTextIds[idx];
+        const textEntry = textDatabase[textId];
+        return [textId, textEntry];
+    }).filter(([id, entry]) => entry); // Remove any nulls
+    
+    filteredTextLibrary.push(...batchTexts);
+    
+    currentTextBatchIndex++;
+    
+    console.log(`Loaded batch ${currentTextBatchIndex}, texts available: ${filteredTextLibrary.length}/${totalTextsAvailable}`);
+}
   
     helpBtn.disabled = true;
 
     // Function to shuffle the array of sentences
     function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
-      }
-      return array;
+        // Use the current text's seed for consistent shuffling
+        const textRng = new SeededRandom(currentSeed);
+        const itemRng = textRng.derive(`text-${currentTextId}`);
+        return itemRng.shuffle([...array]);
     }
 
     function selectRandomItem() {
-    // Generate a random index
-    const randomIndex = Math.floor(Math.random() * filteredTextLibrary.length);
-    
-    // Remove the selected item from the array and return it
-    const [id, entry] = filteredTextLibrary.splice(randomIndex, 1)[0];
-    const selectedItem = { id, ...entry };
-    
-    return selectedItem;
+        // If we're running low on texts, load more
+        if (filteredTextLibrary.length <= 5) {
+            const hasMoreTexts = (currentTextBatchIndex * TEXT_BATCH_SIZE) < totalTextsAvailable;
+            
+            if (hasMoreTexts) {
+                loadNextTextBatch();
+            } else {
+                // We've gone through all texts in this pass
+                console.log(`Completed pass ${currentPassNumber}, starting pass ${currentPassNumber + 1}`);
+                currentPassNumber++;
+                controller.passNumber = currentPassNumber;
+                localStorage.setItem("controller", JSON.stringify(controller));
+                
+                // Clear and regenerate for next pass
+                filteredTextLibrary = [];
+                generateFilteredTextLibrary(true);
+            }
+        }
+        
+        // Take the first item (already shuffled by seed)
+        if (filteredTextLibrary.length > 0) {
+            const [id, entry] = filteredTextLibrary.shift();
+            const selectedItem = { id, ...entry };
+            return selectedItem;
+        }
+        
+        // Fallback - shouldn't happen
+        console.error("No texts available!");
+        return null;
     }
 
     function displayQuestion() {
       styleTextComprahensionPage();
-      if (filteredTextLibrary.length === 0) {
-        generateFilteredTextLibrary();
+
+      // Initialize seed if needed
+      if (!currentSeed) {
+          currentSeed = generateSessionSeed();
+          currentPassNumber = 0;
+          controller.modeChoice8 = currentSeed;
+          
+          localStorage.setItem("controller", JSON.stringify(controller));
       }
       
+      // Initialize text library if empty
+      if (allTextIds.length === 0) {
+          generateFilteredTextLibrary(true);
+      } else if (filteredTextLibrary.length === 0) {
+          // Texts exist but batch is empty - load next batch
+          loadNextTextBatch();
+      }
+
       if (controller.randomSelection.length === 0) {
-        selectedItem = selectRandomItem();
-        controller.randomSelection = [selectedItem];
-        localStorage.setItem("controller", JSON.stringify(controller));
+          selectedItem = selectRandomItem();
+          
+          if (!selectedItem) {
+              console.error("Failed to select item");
+              return;
+          }
+          
+          controller.randomSelection = [selectedItem];
+          localStorage.setItem("controller", JSON.stringify(controller));
       } else {
-        selectedItem = controller.randomSelection[0];
+          selectedItem = controller.randomSelection[0];
       }
     
       currentTextId = selectedItem.id;
@@ -1653,32 +1793,40 @@ window.onload = function () {
     });
 
     function initiateTheProgram() {
-        clearInputFields()
+        // Restore seed state from controller
+        if (!currentSeed) {
+          currentSeed = generateSessionSeed();
+          controller.modeChoice8 = currentSeed;
+        }
+        
+        localStorage.setItem("controller", JSON.stringify(controller));
+        
+        clearInputFields();
         displayQuestion();
 
-    if (!controller.questionsStopped) {
-        if (controller.modeChoice4 === "C39") {
-          countDown();
-        } else if (controller.modeChoice4 === "C40") {
-          startTimer();
-        }
-    } else {
-	    if (controller.questionsStopped) {
-        if (localStorage.getItem("elapsedTime") !== null) {
-          timerDisplay.textContent = localStorage.getItem("elapsedTime");
+        if (!controller.questionsStopped) {
+            if (controller.modeChoice4 === "C39") {
+                countDown();
+            } else if (controller.modeChoice4 === "C40") {
+                startTimer();
+            }
         } else {
-          timerDisplay.textContent = "00:00:00";
+            if (controller.questionsStopped) {
+                if (localStorage.getItem("elapsedTime") !== null) {
+                    timerDisplay.textContent = localStorage.getItem("elapsedTime");
+                } else {
+                    timerDisplay.textContent = "00:00:00";
+                }
+            }
+            formatFinalMessageForTextcomprehension();
         }
-      }
-      formatFinalMessageForTextcomprehension();
-    }
 
-    if (controller.modeChoice4 === "C40") {
-    questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
-    } else {
-      questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}`;
-    }
-    mistakesTracker.innerHTML = `Klaidos: ${controller.mistakesTracker}`;
+        if (controller.modeChoice4 === "C40") {
+            questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
+        } else {
+            questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}`;
+        }
+        mistakesTracker.innerHTML = `Klaidos: ${controller.mistakesTracker}`;
     }
 
     function clearInputFields() {
@@ -1713,30 +1861,43 @@ window.onload = function () {
     });
 
     function stopQuestions() {
-				if (stopButtonSpanElement.innerHTML === "close") {
+      if (stopButtonSpanElement.innerHTML === "close") {
           showCustomConfirm("Ar tikrai nori sustabdyti užduotį?", stopQuestionsCloseActions);
-				} else if (stopButtonSpanElement.innerHTML === "refresh") {
+      } else if (stopButtonSpanElement.innerHTML === "refresh") {
           controller.questionsStopped = false;
-					stopButtonSpanElement.innerHTML = "close";
+          stopButtonSpanElement.innerHTML = "close";
           if (localStorage.getItem("startTime")) {
-            localStorage.removeItem("startTime");
+              localStorage.removeItem("startTime");
           };
           if (localStorage.getItem("remainingTime")) {
-            localStorage.removeItem("remainingTime");
+              localStorage.removeItem("remainingTime");
           };
           checkAnswerBtn.disabled = false;
           nextQuestionBtn.disabled = false;
 
           if (window.matchMedia("(max-width: 767px), (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)").matches) {
-            document.querySelector(".tracker-timer-holder").style.paddingLeft = "30px";
+              document.querySelector(".tracker-timer-holder").style.paddingLeft = "30px";
           } else {
-            document.querySelector(".tracker-timer-holder").style.paddingLeft = "15px";
+              document.querySelector(".tracker-timer-holder").style.paddingLeft = "15px";
           }
 
+          // NEW: Reset seed system and lazy loading
+          currentSeed = generateSessionSeed();
+          currentPassNumber = 0;
+          controller.sessionSeed = currentSeed;
+          controller.passNumber = 0;
+
+          // Clear lazy loading state
+          filteredTextLibrary = [];
+          allTextIds = [];
+          currentTextBatchIndex = 0;
+          totalTextsAvailable = 0;
+          virtualShuffledIndices = null;
+          
           controller.randomSelection = [];
           helpTracker = 0;
           controller.mistakesTracker = 0;
-					controller.answeredQuestionTracker = 0;
+          controller.answeredQuestionTracker = 0;
           controller.correctAnswersTracker = 0;
           firstTimeChecking = true;
 
@@ -1744,26 +1905,25 @@ window.onload = function () {
           mistakesSummary = {};
 
           if (controller.modeChoice4 === "C40") {
-            questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
+              questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
           } else {
-            questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}`;
+              questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}`;
           }
           mistakesTracker.innerHTML = `Klaidos: ${controller.mistakesTracker}`;
-          //helpDiv.innerHTML = `Panaudota pagalba: ${helpTracker}`;
 
           document.getElementById("fields-row").style.display = "flex";
           document.getElementById("final-message-row").style.display = "none";
           document.querySelector(".help-and-check-button-holder").style.display = "flex"
 
-					controller.taskCompleted = false;
-	        controller.taskRecorded = false;
+          controller.taskCompleted = false;
+          controller.taskRecorded = false;
 
           restartPetOnWalkActions();
 
           localStorage.setItem('controller', JSON.stringify(controller));
           initiateTheProgram();
-				}
-			}
+      }
+  }
 
       if (controller.questionsStopped) {
         stopButtonSpanElement.innerHTML === "close"

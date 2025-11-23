@@ -7273,6 +7273,7 @@ navButtons.forEach((button) => {
             if (checkbox && switchText) {
                 switchText.textContent = checkbox.checked ? "" : "NENAUD.";
             }
+            document.getElementById('furnitureHeader').classList.remove('compact');
         } else if (targetId === 'shop-container') {
             renderShopCategoriesDropdown();
             const checkbox = document.getElementById("shop-not-owned-toggle");
@@ -7280,6 +7281,7 @@ navButtons.forEach((button) => {
             if (checkbox && switchText) {
                 switchText.textContent = checkbox.checked ? "" : "NETURIU";
             }
+            document.getElementById('shopHeader').classList.remove('compact');
         } else if (targetId === 'pet-room-container') {
             const allPets = document.querySelectorAll("#petContainer .pet");
             if (allPets[0]) {
@@ -7296,6 +7298,8 @@ navButtons.forEach((button) => {
                 return label && label.textContent.trim() === 'Maistas';
             });
 
+            document.getElementById('petAssetHeader').classList.remove('compact');
+
             // Trigger the click if it exists
             if (foodBtn) {
                 foodBtn.click(); // This fires any click listeners attached
@@ -7304,6 +7308,7 @@ navButtons.forEach((button) => {
             renderUsersPetAssets();
         } else if (targetId === 'taxes-container') {
             renderTaxesSection();
+            document.getElementById('taxesHeader').classList.remove('compact');
         }
     });
 });
@@ -8193,52 +8198,52 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
         if (canPurchase) {
     let quantityInput = null;
 
-    // Create button
-    const btn = createHoldPurchaseButton(item, assetIndex, selectedCategory, quantityInput);
+if (!item.oneOfKind) {
+    const quantityInputHolder = document.createElement('div');
+    quantityInputHolder.className = 'purchase-quantity-holder input-wrapper';
 
-    if (!item.oneOfKind) {
-        const quantityInputHolder = document.createElement('div');
-        quantityInputHolder.className = 'purchase-quantity-holder input-wrapper';
+    quantityInput = document.createElement('input');
+    quantityInput.type = 'number';
+    quantityInput.min = 1;
+    quantityInput.max = 999;
+    quantityInput.step = 1;
+    quantityInput.value = 1;
+    quantityInput.className = 'purchase-quantity';
+    quantityInput.id = `purchase-qty-${key}`;
+    quantityInput.readOnly = true;
 
-        quantityInput = document.createElement('input');
-        quantityInput.type = 'number';
-        quantityInput.min = 1;
-        quantityInput.max = 999;
-        quantityInput.step = 1;
-        quantityInput.value = 1;
-        quantityInput.className = 'purchase-quantity';
-        quantityInput.id = `purchase-qty-${key}`;
-        quantityInput.readOnly = true;
+    const updatePrice = () => {
+        const qty = parseInt(quantityInput.value, 10) || 1;
+        priceSpan.textContent = item.cost * qty;
+    };
 
-        const updatePrice = () => {
-            const qty = parseInt(quantityInput.value, 10) || 1;
-            priceSpan.textContent = item.cost * qty;
-        };
+    const minusBtn = document.createElement('button');
+    minusBtn.className = 'control-btn';
+    minusBtn.textContent = '−';
+    minusBtn.onmousedown = () => startHold(quantityInput.id, 1, 999, false, updatePrice);
+    minusBtn.onmouseup = minusBtn.onmouseleave = stopHold;
+    minusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, false, updatePrice); };
+    minusBtn.ontouchend = minusBtn.ontouchcancel = stopHold;
 
-        const minusBtn = document.createElement('button');
-        minusBtn.className = 'control-btn';
-        minusBtn.textContent = '−';
-        minusBtn.onmousedown = () => startHold(quantityInput.id, 1, 999, false, updatePrice);
-        minusBtn.onmouseup = minusBtn.onmouseleave = stopHold;
-        minusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, false, updatePrice); };
-        minusBtn.ontouchend = minusBtn.ontouchcancel = stopHold;
+    const plusBtn = document.createElement('button');
+    plusBtn.className = 'control-btn';
+    plusBtn.textContent = '+';
+    plusBtn.onmousedown = () => startHold(quantityInput.id, 1, 999, true, updatePrice);
+    plusBtn.onmouseup = plusBtn.onmouseleave = stopHold;
+    plusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, true, updatePrice); };
+    plusBtn.ontouchend = plusBtn.ontouchcancel = stopHold;
 
-        const plusBtn = document.createElement('button');
-        plusBtn.className = 'control-btn';
-        plusBtn.textContent = '+';
-        plusBtn.onmousedown = () => startHold(quantityInput.id, 1, 999, true, updatePrice);
-        plusBtn.onmouseup = plusBtn.onmouseleave = stopHold;
-        plusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, true, updatePrice); };
-        plusBtn.ontouchend = plusBtn.ontouchcancel = stopHold;
+    quantityInputHolder.appendChild(minusBtn);
+    quantityInputHolder.appendChild(quantityInput);
+    quantityInputHolder.appendChild(plusBtn);
+    priceAndQuantDiv.appendChild(quantityInputHolder);
 
-        quantityInputHolder.appendChild(minusBtn);
-        quantityInputHolder.appendChild(quantityInput);
-        quantityInputHolder.appendChild(plusBtn);
-        priceAndQuantDiv.appendChild(quantityInputHolder);
+    quantityInput.addEventListener('input', updatePrice);
+    quantityInput.addEventListener('change', updatePrice);
+}
 
-        quantityInput.addEventListener('input', updatePrice);
-        quantityInput.addEventListener('change', updatePrice);
-    }
+// NOW create the button with the properly initialized quantityInput
+const btn = createHoldPurchaseButton(item, assetIndex, selectedCategory, quantityInput);
 
     if (ownedIndexes.has(assetIndex) && item.oneOfKind) {
         itemDiv.classList.add('owned');
@@ -9979,12 +9984,12 @@ function increasePetStatsInDatabase(petId, stat, amount) {
     const petSpecies = petId.split("-")[0];
     const bonusStats = bonusFromDailySupplyItems();
 
-    currentPet._stats.food = Math.max(bonusStats[petSpecies]["food"], currentPet._stats.food - statDecrease);
-    currentPet._stats.foodNew = Math.max(bonusStats[petSpecies]["food"], currentPet._stats.foodNew - statDecrease);
-    currentPet._stats.water = Math.max(bonusStats[petSpecies]["water"], currentPet._stats.water - statDecrease);
-    currentPet._stats.waterNew = Math.max(bonusStats[petSpecies]["water"], currentPet._stats.waterNew - statDecrease);
-    currentPet._stats.love = Math.max(bonusStats[petSpecies]["love"], currentPet._stats.love - statDecrease);
-    currentPet._stats.loveNew = Math.max(bonusStats[petSpecies]["love"], currentPet._stats.loveNew - statDecrease);
+    currentPet._stats.food = Math.max(bonusStats[petSpecies]?.food ?? 0, currentPet._stats.food - statDecrease);
+    currentPet._stats.foodNew = Math.max(bonusStats[petSpecies]?.food ?? 0, currentPet._stats.foodNew - statDecrease);
+    currentPet._stats.water = Math.max(bonusStats[petSpecies]?.water ?? 0, currentPet._stats.water - statDecrease);
+    currentPet._stats.waterNew = Math.max(bonusStats[petSpecies]?.water ?? 0, currentPet._stats.waterNew - statDecrease);
+    currentPet._stats.love = Math.max(bonusStats[petSpecies]?.love ?? 0, currentPet._stats.love - statDecrease);
+    currentPet._stats.loveNew = Math.max(bonusStats[petSpecies]?.love ?? 0, currentPet._stats.loveNew - statDecrease);
 
     let newAmount = currentPet._stats[stat] + amount;
     if (newAmount > 10) newAmount = 10;
@@ -12243,7 +12248,7 @@ function initPetAssetHeaderCollapse() {
         if (scrollingDown && !headerIsCompact) {
             header.classList.add('compact');
         } else if (scrollingUp && scrollTop < expandThreshold && headerIsCompact) {
-            header.classList.remove('compact');
+            //header.classList.remove('compact');
         }
         lastScrollTop = scrollTop;
     }
@@ -12306,7 +12311,7 @@ function initFurnitureHeaderCollapse() {
         if (scrollingDown && !headerIsCompact) {
             header.classList.add('compact');
         } else if (scrollingUp && scrollTop < expandThreshold && headerIsCompact) {
-            header.classList.remove('compact');
+            //header.classList.remove('compact');
         }
         lastScrollTop = scrollTop;
     }
@@ -12369,7 +12374,7 @@ function initTaxesHeaderCollapse() {
         if (scrollingDown && !headerIsCompact) {
             header.classList.add('compact');
         } else if (scrollingUp && scrollTop < expandThreshold && headerIsCompact) {
-            header.classList.remove('compact');
+            //header.classList.remove('compact');
         }
         lastScrollTop = scrollTop;
     }

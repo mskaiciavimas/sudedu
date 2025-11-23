@@ -229,6 +229,26 @@
             transition: all 0.3s ease;
             box-shadow: none;
             text-align: center;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .group-dropdown-inner-group-list:not(:empty) {
+            border-top: 2px solid rgba(255, 255, 255, 1);
+            padding-top: 5px;
+            margin-top: 5px;
+        }
+
+        #task-group-count {
+            font-size: 0.9rem;
+        }
+
+        .group-options-arrow {
+            height: 24px;
+            width: 24px;
+            margin: 0 4px;
         }
         
         .left-side-bar-inner {
@@ -259,7 +279,7 @@
         #student-list-header {
             background: rgba(255, 255, 255, 0.2);
             border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 15px;
+            padding: 10px 15px;
             display: flex;
             justify-content: space-between;
         }
@@ -273,6 +293,19 @@
 
         #student-list-title-container {
             margin-left: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .teacher-home-button {
+            border: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.25);
+            padding: 5px 7px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: box-shadow 0.3s ease;
         }
 
         #select-all-checkbox {
@@ -805,6 +838,7 @@
             background-color: transparent;
             border: none;
             font-size: 1.5rem;
+            cursor: pointer;
         }
 
         .complete-task-holder {
@@ -921,7 +955,7 @@
 
 #student-statistics-komponavimas-completed-texts ol,
 #text-comprehension-mistakes-summary ol {
-    margin: 0 0 5px 0;
+    margin: 5px 0;
 }
 
 #student-statistics-komponavimas-completed-texts:not(:empty) {
@@ -2243,7 +2277,8 @@ button:disabled.cancel-btn::before {
 }
 
 .txt-viewer-selected-ids-container-outer {
-    margin: 15px;
+    padding: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .txt-viewer-selected-ids-container.txt-viewer-visible {
@@ -2402,7 +2437,6 @@ button:disabled.cancel-btn::before {
     flex: 1 1 auto;
     min-height: 0;
     overflow: auto;
-    border-top: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .txt-viewer-text-item {
@@ -2566,6 +2600,52 @@ button:disabled.cancel-btn::before {
     color: #e65100;
 }
 
+
+.dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+    margin: 15px 0;
+}
+
+.dropdown-toggle {
+    padding: 6px 12px;
+    border: 1px solid #aaa;
+    background: #f8f8f8;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    z-index: 999;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.5);
+    width: 100%;
+    padding: 8px;
+    border-radius: 20px;
+    max-height: 65vh;
+    overflow-y: auto;
+}
+
+.hidden {
+    display: none;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+    cursor: pointer;
+}
+
+.dropdown-item input {
+    margin-right: 6px;
+}
+
 @media (max-width: 768px) {
     .txt-viewer-sticky-header {
         padding: 15px;
@@ -2592,8 +2672,8 @@ button:disabled.cancel-btn::before {
         border-bottom: 2px solid rgba(255, 255, 255, 1);
     }
 
-    .txt-viewer-texts-list {
-        border-top: 2px solid rgba(255, 255, 255, 1);
+    .txt-viewer-selected-ids-container-outer {
+        border-bottom: 2px solid rgba(255, 255, 255, 1);
     }
 
     .text-section-paragraph {
@@ -2611,6 +2691,7 @@ button:disabled.cancel-btn::before {
         font-size: 1.25rem;
     }
 }
+
     </style>
 </head>
 
@@ -2760,7 +2841,19 @@ button:disabled.cancel-btn::before {
 
 
             <div id="student-details-for-teachers">
-                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" id="task-group-sorting"></select>
+                <div class="dropdown-wrapper">
+                    <button id="task-group-sorting" class="dropdown-toggle">
+                        <span id="task-group-count" class="group-count">0/0</span>
+                        Užduočių grupės 
+                        <span class="group-options-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor">
+                                <path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"></path>
+                            </svg>
+                        </span>
+                    </button>
+
+                    <div id="task-group-menu" class="dropdown-menu hidden"></div>
+                </div>
                 <div id="outer-student-list-container">
                     <div class="d-flex justify-content-between" id="student-list-header">
                         <div class="align-items-center justify-content-start" id="student-list-header-checkbox-container" style="display: none;">
@@ -2768,6 +2861,9 @@ button:disabled.cancel-btn::before {
                             <div>pasirinkti visus</div>
                         </div>
                         <div class="align-items-center justify-content-start" id="student-list-title-container">
+                            <div class="teacher-home-button selected-option">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"/></svg>
+                            </div>
                             <div>Mokinių sąrašas:</div>
                         </div>
                         <button type="button" id="expand-student-info-button" style="margin-left: auto;">&#x2212;</button>
@@ -2948,7 +3044,7 @@ button:disabled.cancel-btn::before {
                                             <br>
                                         </label>
                                         <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
-                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C63": [], "C64": []}'><span class="rasyba-options-label-text">BŪDVARDŽIAI IR PRIEVEIKSMIAI</span>
+                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C63": []}'><span class="rasyba-options-label-text">BŪDVARDŽIAI IR PRIEVEIKSMIAI</span>
                                             <br>
                                         </label>
                                         <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
@@ -2964,6 +3060,10 @@ button:disabled.cancel-btn::before {
                                     </div>
                                     <label class="rasyba-options-label">
                                         <input id="C66" type="checkbox" class="rasyba-options" name="rasyba-option" value='{"C66": []}' checked><span class="rasyba-options-label-text">ĮSIDĖMĖTINA RAŠYBA</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                        <input id="C64" type="checkbox" class="rasyba-options" name="rasyba-option" value='{"C64": []}' checked><span class="rasyba-options-label-text">SUDURTINIAI ŽODŽIAI</span>
                                         <br>
                                     </label>
                                     <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
@@ -3517,7 +3617,6 @@ button:disabled.cancel-btn::before {
 
         function toggleStudentListLabel() {
             showingSelectAllCheckbox = !showingSelectAllCheckbox
-            const dropdown = document.getElementById("task-group-sorting");
             if (showingSelectAllCheckbox && ! browsingHistory) {
                 studentListTitle.style.display = "none"
                 studentListSelectAllCheckbox.style.display = "flex"
@@ -3545,10 +3644,6 @@ button:disabled.cancel-btn::before {
             toggleStudentListLabel();
             clearTaskInfoContainer();
             if (deletingStudent) {
-                // Set the selected option to "Visos užduočių grupės"
-                dropdown.value = "Visos užduočių grupės";
-                // Manually trigger the change event
-                dropdown.dispatchEvent(new Event("change"));
                 dropdown.disabled = true;
                 taskContainerVisible = true;
                 toggleTaskVisibility()
@@ -3833,1023 +3928,1325 @@ function transformStudentStats(stats) {
 
 let studentStatisticsLastRecord;
 
-        function displayStudentStatistics(student, studentTasks) {
-            const processedStudentStats = transformStudentStats(student[3]);
-            const averageStudentScore = calculateAverageStudentScore(student[3]);
-            const averageStudentConsistency = calculateAverageStudentsConsistency(student[3]);
-            function processStudentTasks(studentTasks) {
-                // Initialize the result objects
-                const mathTasks = [[0, 0], []];
-                const grammarTasks = [[0, 0], []];
-                const komponavimasTasks = [[0, 0], []];
-                const isdestymasTasks = [[0, 0], []];
+function processStudentTasks(studentTasks) {
+    // Initialize the result objects
+    const mathTasks = [[0, 0], []];
+    const grammarTasks = [[0, 0], []];
+    const komponavimasTasks = [[0, 0], []];
+    const isdestymasTasks = [[0, 0], []];
 
-                // Filter tasks with status true
-                const filteredTasks = studentTasks.filter(task => task.status);
+    // Filter tasks with status true
+    const filteredTasks = studentTasks.filter(task => task.status);
 
-                for (const task of filteredTasks) {
-                    try {
-                        const taskDesc = JSON.parse(task.taskDescription);
-                        const result = JSON.parse(task.result);
+    for (const task of filteredTasks) {
+        try {
+            const taskDesc = JSON.parse(task.taskDescription);
+            const result = JSON.parse(task.result);
 
-                        if (taskDesc[0] === "math") {
-                            // Process math tasks
-                            mathTasks[0][0] += result[0][0];
-                            mathTasks[0][1] += result[0][1];
-                            mathTasks[1].push(...result[1]);
-                        } else if (taskDesc[0] === "lang") {
-                            if (taskDesc[1] === "C83") {
-                                // Process grammar tasks
-                                grammarTasks[0][0] += result[0][0];
-                                grammarTasks[0][1] += result[0][1];
-                                grammarTasks[1].push(...result[1]);
-                            } else if (taskDesc[1] === "C49") {
-                                if (taskDesc[2] === "C51") {
-                                    // Process komponavimas tasks
-                                    komponavimasTasks[0][0] += result[0][0];
-                                    komponavimasTasks[0][1] += result[0][1];
-                                    komponavimasTasks[1].push([[...result[1]], task.completionDate.split("T")[0]]);
-                                } else if (taskDesc[2] === "C52") {
-                                    // Process isdestymas tasks
-                                    isdestymasTasks[0][0] += result[0][0];
-                                    isdestymasTasks[0][1] += result[0][1];
-                                    isdestymasTasks[1].push([[...result[1]], task.completionDate.split("T")[0]]);
-                                }
-                            }
-                        }
-                    } catch (error) {
-                        // Skip tasks with invalid taskDescription or result format
-                        console.error("Error processing task:", error);
-                        continue;
+            if (taskDesc[0] === "math") {
+                // Process math tasks
+                mathTasks[0][0] += result[0][0];
+                mathTasks[0][1] += result[0][1];
+                mathTasks[1].push(...result[1]);
+            } else if (taskDesc[0] === "lang") {
+                if (taskDesc[1] === "C83") {
+                    // Process grammar tasks
+                    grammarTasks[0][0] += result[0][0];
+                    grammarTasks[0][1] += result[0][1];
+                    grammarTasks[1].push(...result[1]);
+                } else if (taskDesc[1] === "C49") {
+                    if (taskDesc[2] === "C51") {
+                        // Process komponavimas tasks
+                        komponavimasTasks[0][0] += result[0][0];
+                        komponavimasTasks[0][1] += result[0][1];
+                        komponavimasTasks[1].push([[...result[1]], task.completionDate.split("T")[0]]);
+                    } else if (taskDesc[2] === "C52") {
+                        // Process isdestymas tasks
+                        isdestymasTasks[0][0] += result[0][0];
+                        isdestymasTasks[0][1] += result[0][1];
+                        isdestymasTasks[1].push([[...result[1]], task.completionDate.split("T")[0]]);
                     }
                 }
-
-                    return {
-                        math: mathTasks,
-                        grammar: grammarTasks,
-                        komponavimas: komponavimasTasks,
-                        isdestymas: isdestymasTasks
-                    };
             }
-
-            function countTaskStatuses(studentTasks, category = null) {
-                let trueCount = 0;
-                let falseCount = 0;
-                let filteredTasks = studentTasks;
-
-                if (category) {
-                    filteredTasks = studentTasks.filter(task => {
-                        try {
-                            const taskDesc = JSON.parse(task.taskDescription);
-                            // Check for different possible category locations
-                            return taskDesc.some(item => item === category);
-                        } catch (e) {
-                            console.error("Error parsing taskDescription:", e);
-                            return false;
-                        }
-                    });
-                }
-
-                const total = filteredTasks.length;
-
-                for (const task of filteredTasks) {
-                    if (task.status === true) {
-                        trueCount++;
-                    } else if (task.status === false) {
-                        falseCount++;
-                    }
-                }
-
-                return {
-                    total: total,
-                    completed: trueCount,
-                    pending: falseCount,
-                };
-            }
-
-        clearTaskInfoContainer();
-        studentTaskStudentName.innerHTML = `
-            <span class="student-name-id-holder"><span id="student-name">${student[1]}</span><span id='student-id'>(ID: ${student[0]})</span></span>
-            <button class="edit-name-button" onclick="editStudentName('${student[0]}', this)">
-                <span class="edit-icon">
-                <img src="../images/icons/icon-edit.svg">
-                </span>
-            </button>
-            `;
-        studentTaskStudentEmail.innerHTML = student[4];
-
-        const knowledgeOptions = [
-            { value: -1, label: "Nustatykite lygį", hidden: true }, // placeholder, shown only if -1
-            { value: 0, label: "Priešmokyklinis" },
-            { value: 1, label: "1 klasė" },
-            { value: 2, label: "2 klasė" },
-            { value: 3, label: "3 klasė" },
-            { value: 4, label: "4 klasė" },
-            { value: 5, label: "Aukštesnis" },
-        ];
-
-        // Build the dropdown
-        let selectHTML = `<div class="categories-dropdown-holder">
-            <div class="knowledge-level-select-text">Žinių lygis</div>
-            <select id="knowledge-level-select">
-                ${knowledgeOptions.map(opt => `
-                    <option value="${opt.value}" ${opt.hidden ? "hidden" : ""}>${opt.label}</option>
-                `).join("")}
-            </select>
-        </div>`;
-
-        studentStatisticsKnowledgeLevel.innerHTML = selectHTML;
-        studentStatisticsKnowledgeLevel.style.display = "block";
-
-        studentStatisticsPerformanceMean.innerHTML = `<div class="student-points-holder"><div class="student-points-label">Taškai</div> <div class="student-points">${averageStudentScore} (${classScoreMedian})</div></div>`;
-        studentStatisticsPerformanceMean.style.display = "block";
-
-        studentStatisticsConsistencyMean.innerHTML = `<div class="student-points-holder"><div class="student-consistency-label">Nuoseklumas</div> <div class="student-points">${averageStudentConsistency}% (${classConsistencyMedian}%)</div></div>`;
-        studentStatisticsConsistencyMean.style.display = "block";
-
-        const knowledgeSelect = document.getElementById("knowledge-level-select");
-
-        // Preselect based on DB value
-        if (student[2] !== undefined) {
-            knowledgeSelect.value = student[2];
+        } catch (error) {
+            // Skip tasks with invalid taskDescription or result format
+            console.error("Error processing task:", error);
+            continue;
         }
+    }
 
-        // Event listener to update when changed
-        knowledgeSelect.addEventListener("change", async (e) => {
-            const newValue = parseInt(e.target.value, 10);
-            if (newValue !== student[2]) {
-                try {
-                    const response = await apiFetch(apiBase + `students/knowledge-level`, {
-                        method: "PATCH",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            studentId: Number(student[0]),
-                            knowledgeLvl: Number(newValue)
-                        })
-                    });
+        return {
+            math: mathTasks,
+            grammar: grammarTasks,
+            komponavimas: komponavimasTasks,
+            isdestymas: isdestymasTasks
+        };
+}
 
-                    if (!response) {
-                        return;
-                    }
+function countTaskStatuses(studentTasks, category = null) {
+    let trueCount = 0;
+    let falseCount = 0;
+    let filteredTasks = studentTasks;
 
-                    if (!response.ok) {
-                        throw new Error("Nepavyko atnaujinti lygio");
-                    }
-
-                    const data = await response.json();
-                    student[2] = data.knowledgeLvl; // update local student object
-                    messageToTheUser("Žinių lygis sėkmingai atnaujintas!", false);
-                } catch (error) {
-                    console.error("Error updating knowledge level:", error);
-                    messageToTheUser("Nepavyko atnaujinti žinių lygio. Bandykite vėliau vėl");
-                }
+    if (category) {
+        filteredTasks = studentTasks.filter(task => {
+            try {
+                const taskDesc = JSON.parse(task.taskDescription);
+                // Check for different possible category locations
+                return taskDesc.some(item => item === category);
+            } catch (e) {
+                console.error("Error parsing taskDescription:", e);
+                return false;
             }
         });
+    }
 
-        // STATS PART START
+    const total = filteredTasks.length;
 
-        var lithuanianMonths = ['Saus.', 'Vas.', 'Kov.', 'Bal.', 'Geg.', 'Birž.', 'Liep.', 'Rugp.', 'Rugs.', 'Spal.', 'Lap.', 'Gruod.'];
+    for (const task of filteredTasks) {
+        if (task.status === true) {
+            trueCount++;
+        } else if (task.status === false) {
+            falseCount++;
+        }
+    }
+
+    return {
+        total: total,
+        completed: trueCount,
+        pending: falseCount,
+    };
+}
+
+ // STATS PART START
+
+var lithuanianMonths = ['Saus.', 'Vas.', 'Kov.', 'Bal.', 'Geg.', 'Birž.', 'Liep.', 'Rugp.', 'Rugs.', 'Spal.', 'Lap.', 'Gruod.'];
+
+var metricColors = ['#286D8A', '#32ac93', '#e74c3c', '#F28C28', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
+
+var selectedSubject = null;
+var selectedMetrics = [];
+var availableMetrics = [];
+var previousDatasets = [];
+
+function getPreviousMonday(date) {
+    var d = new Date(date);
+    var day = d.getDay();
+    var diff = day === 0 ? 6 : day - 1;
+    d.setDate(d.getDate() - diff);
+    d.setHours(0, 0, 0, 0);
+    return d;
+}
+
+function generateMondayDates(count) {
+    var dates = [];
+    var today = new Date();
+
+    var currentMonday = getPreviousMonday(today);
+
+    if (studentStatisticsLastRecord) {
+        var lastDataDate = new Date((studentStatisticsLastRecord) * 24 * 60 * 60 * 1000);
+        var lastDataMonday = getPreviousMonday(lastDataDate);
+        currentMonday = lastDataMonday;
+    }
+    
+    for (var i = 0; i < count; i++) {
+        dates.push(formatLithuanianDate(currentMonday));
+        currentMonday.setDate(currentMonday.getDate() - 7);
+    }
+    
+    return dates.reverse();
+}
+
+function formatLithuanianDate(date) {
+    var day = date.getDate();
+    var month = lithuanianMonths[date.getMonth()];
+    return month + ' ' + day;
+}
+
+function isPercentageMetric(metricTitle) {
+    var lower = metricTitle.toLowerCase();
+    return lower.indexOf('atsakym') !== -1 || lower.indexOf('klaid') !== -1 || lower.indexOf('nuosekl') !== -1;
+}
+
+function extractMetricsFromData() {
+    var metrics = [];
+    var keys = Object.keys(processedStudentStats);
+    
+    for (var i = 0; i < keys.length; i++) {
+        var key = keys[i];
+        if (key === 'c') continue;
         
-        var metricColors = ['#286D8A', '#32ac93', '#e74c3c', '#F28C28', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
-        
-        var selectedSubject = null;
-        var selectedMetrics = [];
-        var availableMetrics = [];
-        var previousDatasets = [];
-
-        function getPreviousMonday(date) {
-            var d = new Date(date);
-            var day = d.getDay();
-            var diff = day === 0 ? 6 : day - 1;
-            d.setDate(d.getDate() - diff);
-            d.setHours(0, 0, 0, 0);
-            return d;
-        }
-
-        function generateMondayDates(count) {
-            var dates = [];
-            var today = new Date();
-
-            var currentMonday = getPreviousMonday(today);
-
-            if (studentStatisticsLastRecord) {
-                var lastDataDate = new Date((studentStatisticsLastRecord) * 24 * 60 * 60 * 1000);
-                var lastDataMonday = getPreviousMonday(lastDataDate);
-                currentMonday = lastDataMonday;
-            }
-            
-            for (var i = 0; i < count; i++) {
-                dates.push(formatLithuanianDate(currentMonday));
-                currentMonday.setDate(currentMonday.getDate() - 7);
-            }
-            
-            return dates.reverse();
-        }
-
-        function formatLithuanianDate(date) {
-            var day = date.getDate();
-            var month = lithuanianMonths[date.getMonth()];
-            return month + ' ' + day;
-        }
-
-        function isPercentageMetric(metricTitle) {
-            var lower = metricTitle.toLowerCase();
-            return lower.indexOf('atsakym') !== -1 || lower.indexOf('klaid') !== -1 || lower.indexOf('nuosekl') !== -1;
-        }
-
-        function extractMetricsFromData() {
-            var metrics = [];
-            var keys = Object.keys(processedStudentStats);
-            
-            for (var i = 0; i < keys.length; i++) {
-                var key = keys[i];
-                if (key === 'c') continue;
+        var subjectValues = processedStudentStats[key].values;
+        if (typeof subjectValues === 'object' && !Array.isArray(subjectValues)) {
+            var metricKeys = Object.keys(subjectValues);
+            for (var j = 0; j < metricKeys.length; j++) {
+                var metricKey = metricKeys[j];
+                var metricData = subjectValues[metricKey];
+                var isPercent = isPercentageMetric(metricData.title);
                 
-                var subjectValues = processedStudentStats[key].values;
-                if (typeof subjectValues === 'object' && !Array.isArray(subjectValues)) {
-                    var metricKeys = Object.keys(subjectValues);
-                    for (var j = 0; j < metricKeys.length; j++) {
-                        var metricKey = metricKeys[j];
-                        var metricData = subjectValues[metricKey];
-                        var isPercent = isPercentageMetric(metricData.title);
-                        
-                        var existing = false;
-                        for (var k = 0; k < metrics.length; k++) {
-                            if (metrics[k].id === metricKey && metrics[k].title === metricData.title) {
-                                existing = true;
-                                break;
-                            }
-                        }
-                        
-                        if (!existing) {
-                            metrics.push({
-                                id: metricKey,
-                                title: metricData.title,
-                                type: isPercent ? 'percentage' : 'absolute',
-                                color: metricColors[metrics.length % metricColors.length],
-                                yAxisID: isPercent ? 'y-percent' : 'y-absolute-' + metricKey
-                            });
-                        }
+                var existing = false;
+                for (var k = 0; k < metrics.length; k++) {
+                    if (metrics[k].id === metricKey && metrics[k].title === metricData.title) {
+                        existing = true;
+                        break;
                     }
+                }
+                
+                if (!existing) {
+                    metrics.push({
+                        id: metricKey,
+                        title: metricData.title,
+                        type: isPercent ? 'percentage' : 'absolute',
+                        color: metricColors[metrics.length % metricColors.length],
+                        yAxisID: isPercent ? 'y-percent' : 'y-absolute-' + metricKey
+                    });
+                }
+            }
+            break;
+        }
+    }
+    
+    return metrics;
+}
+
+function getAxisIdForAbsoluteMetric(metricId, allSelectedMetrics, subjectData) {
+    if (!subjectData || !subjectData.values || !subjectData.values[metricId]) {
+        return 'y-absolute-' + metricId;
+    }
+    
+    var currentValues = subjectData.values[metricId].values;
+    var currentMax = Math.max.apply(null, currentValues);
+    
+    for (var i = 0; i < allSelectedMetrics.length; i++) {
+        var otherId = allSelectedMetrics[i];
+        if (otherId === metricId) continue;
+        
+        var otherMetric = null;
+        for (var j = 0; j < availableMetrics.length; j++) {
+            if (availableMetrics[j].id === otherId && availableMetrics[j].type === 'absolute') {
+                otherMetric = availableMetrics[j];
+                break;
+            }
+        }
+        
+        if (!otherMetric || !subjectData.values[otherId]) continue;
+        
+        var otherValues = subjectData.values[otherId].values;
+        var otherMax = Math.max.apply(null, otherValues);
+        
+        var maxDiff = Math.abs(currentMax - otherMax);
+        var largerMax = Math.max(currentMax, otherMax);
+        var threshold = largerMax * 0.15;
+        
+        if (maxDiff <= threshold) {
+            var sharedId = parseInt(metricId) < parseInt(otherId) ? metricId : otherId;
+            return 'y-absolute-shared-' + sharedId;
+        }
+    }
+    
+    return 'y-absolute-' + metricId;
+}
+
+function selectSubject(key) {
+    selectedSubject = key;
+    
+    if (key === 'c') {
+        selectedMetrics = [];
+    } else {
+        if (selectedMetrics.length === 0 && availableMetrics.length > 0) {
+            selectedMetrics = [availableMetrics[0].id];
+        }
+    }
+    
+    var buttons = document.querySelectorAll('.btn-subject');
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].classList.remove('active');
+        if (buttons[i].getAttribute('data-subject-key') === key) {
+            buttons[i].classList.add('active');
+        }
+    }
+    
+    updateMetricButtonsState();
+    updateChart();
+}
+
+function updateMetricButtonsState() {
+    var buttons = document.querySelectorAll('#metricButtons .btn-metric');
+    var isConsistency = selectedSubject === 'c';
+    
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].disabled = isConsistency;
+        if (isConsistency) {
+            buttons[i].classList.remove('active');
+        } else {
+            var metricId = buttons[i].getAttribute('data-metric-id');
+            if (selectedMetrics.indexOf(metricId) !== -1) {
+                buttons[i].classList.add('active');
+            } else {
+                buttons[i].classList.remove('active');
+            }
+        }
+    }
+
+    var metricContainer = document.getElementById('metricButtons');
+    var chartOuterContainer = document.querySelector('.chart-scrollable');
+    var isMobile = window.matchMedia('(max-width: 578px)').matches;
+
+    if (selectedSubject === 'c' && isMobile) {
+        metricContainer.style.display = 'none';
+        chartOuterContainer.style.minWidth = "0";
+    } else {
+        metricContainer.style.display = 'flex';
+        chartOuterContainer.style.minWidth = "500px";
+    }
+}
+
+function toggleMetric(id) {
+    if (selectedSubject === 'c') return;
+    
+    var index = selectedMetrics.indexOf(id);
+    if (index !== -1) {
+        selectedMetrics.splice(index, 1);
+    } else {
+        selectedMetrics.push(id);
+    }
+    
+    updateMetricButtonsState();
+    updateChart();
+}
+
+function initializeButtons() {
+    var subjectContainer = document.getElementById('subjectButtons');
+    var metricContainer = document.getElementById('metricButtons');
+
+    subjectContainer.innerHTML = '';
+    metricContainer.innerHTML = '';
+    
+    availableMetrics = extractMetricsFromData();
+
+    var keys = Object.keys(processedStudentStats);
+    var firstKey = keys[0];
+    
+    for (var i = 0; i < keys.length; i++) {
+        var key = keys[i];
+        var data = processedStudentStats[key];
+        var btn = document.createElement('button');
+        btn.className = 'btn-subject';
+        btn.textContent = data.title;
+        btn.setAttribute('data-subject-key', key);
+        btn.onclick = (function(k) {
+            return function() { selectSubject(k); };
+        })(key);
+        subjectContainer.appendChild(btn);
+    }
+
+    for (var j = 0; j < availableMetrics.length; j++) {
+        var metric = availableMetrics[j];
+        var btn2 = document.createElement('button');
+        btn2.className = 'btn-metric';
+        var badge = document.createElement('span');
+        btn2.textContent = metric.title + ' ';
+        btn2.setAttribute('data-metric-id', metric.id);
+        btn2.onclick = (function(mid) {
+            return function() { toggleMetric(mid); };
+        })(metric.id);
+        metricContainer.appendChild(btn2);
+    }
+    
+    if (firstKey) {
+        selectSubject(firstKey);
+    }
+}
+
+function getDataForSubject() {
+    if (!selectedSubject) return null;
+    
+    var subject = processedStudentStats[selectedSubject];
+    if (selectedSubject === 'c') {
+        return { 
+            dates: generateMondayDates(subject.values.length), 
+            values: subject.values,
+            isConsistency: true
+        };
+    } else {
+        var firstMetricKey = Object.keys(subject.values)[0];
+        var firstMetric = subject.values[firstMetricKey];
+        return { 
+            dates: generateMondayDates(firstMetric.values.length),
+            values: subject.values,
+            isConsistency: false
+        };
+    }
+}
+
+function updateChart() {
+    if (chart) {
+        chart.destroy();
+        chart = null;
+    }
+
+    var subjectData = getDataForSubject();
+    if (!subjectData) return;
+    
+    var datasets = [];
+    var newDatasetLabels = [];
+
+    if (subjectData.isConsistency) {
+        var label = processedStudentStats.c.title;
+        newDatasetLabels.push(label);
+        
+        var wasAlreadyShown = false;
+        for (var p = 0; p < previousDatasets.length; p++) {
+            if (previousDatasets[p] === label) {
+                wasAlreadyShown = true;
+                break;
+            }
+        }
+        
+        datasets.push({
+            label: label,
+            data: subjectData.values,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.3,
+            borderWidth: 3,
+            borderDash: [],
+            pointRadius: 4, // Smaller points for mobile
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#10b981',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 0,
+            pointHoverBorderWidth: 3,
+            pointStyle: 'circle',
+            yAxisID: 'y-percent',
+            animation: wasAlreadyShown ? false : {
+                duration: 750,
+                easing: 'easeInOutQuart'
+            }
+        });
+    } else {
+        for (var i = 0; i < selectedMetrics.length; i++) {
+            var metricId = selectedMetrics[i];
+            var metric = null;
+            for (var j = 0; j < availableMetrics.length; j++) {
+                if (availableMetrics[j].id === metricId) {
+                    metric = availableMetrics[j];
                     break;
                 }
             }
+            var metricData = subjectData.values[metricId];
             
-            return metrics;
-        }
-
-        function getAxisIdForAbsoluteMetric(metricId, allSelectedMetrics, subjectData) {
-            if (!subjectData || !subjectData.values || !subjectData.values[metricId]) {
-                return 'y-absolute-' + metricId;
-            }
-            
-            var currentValues = subjectData.values[metricId].values;
-            var currentMax = Math.max.apply(null, currentValues);
-            
-            for (var i = 0; i < allSelectedMetrics.length; i++) {
-                var otherId = allSelectedMetrics[i];
-                if (otherId === metricId) continue;
+            if (metric && metricData) {
+                var datasetLabel = metricData.title;
+                newDatasetLabels.push(datasetLabel);
                 
-                var otherMetric = null;
-                for (var j = 0; j < availableMetrics.length; j++) {
-                    if (availableMetrics[j].id === otherId && availableMetrics[j].type === 'absolute') {
-                        otherMetric = availableMetrics[j];
-                        break;
-                    }
-                }
-                
-                if (!otherMetric || !subjectData.values[otherId]) continue;
-                
-                var otherValues = subjectData.values[otherId].values;
-                var otherMax = Math.max.apply(null, otherValues);
-                
-                var maxDiff = Math.abs(currentMax - otherMax);
-                var largerMax = Math.max(currentMax, otherMax);
-                var threshold = largerMax * 0.15;
-                
-                if (maxDiff <= threshold) {
-                    var sharedId = parseInt(metricId) < parseInt(otherId) ? metricId : otherId;
-                    return 'y-absolute-shared-' + sharedId;
-                }
-            }
-            
-            return 'y-absolute-' + metricId;
-        }
-
-        function selectSubject(key) {
-            selectedSubject = key;
-            
-            if (key === 'c') {
-                selectedMetrics = [];
-            } else {
-                if (selectedMetrics.length === 0 && availableMetrics.length > 0) {
-                    selectedMetrics = [availableMetrics[0].id];
-                }
-            }
-            
-            var buttons = document.querySelectorAll('.btn-subject');
-            for (var i = 0; i < buttons.length; i++) {
-                buttons[i].classList.remove('active');
-                if (buttons[i].getAttribute('data-subject-key') === key) {
-                    buttons[i].classList.add('active');
-                }
-            }
-            
-            updateMetricButtonsState();
-            updateChart();
-        }
-
-        function updateMetricButtonsState() {
-            var buttons = document.querySelectorAll('#metricButtons .btn-metric');
-            var isConsistency = selectedSubject === 'c';
-            
-            for (var i = 0; i < buttons.length; i++) {
-                buttons[i].disabled = isConsistency;
-                if (isConsistency) {
-                    buttons[i].classList.remove('active');
-                } else {
-                    var metricId = buttons[i].getAttribute('data-metric-id');
-                    if (selectedMetrics.indexOf(metricId) !== -1) {
-                        buttons[i].classList.add('active');
-                    } else {
-                        buttons[i].classList.remove('active');
-                    }
-                }
-            }
-
-            var metricContainer = document.getElementById('metricButtons');
-            var chartOuterContainer = document.querySelector('.chart-scrollable');
-            var isMobile = window.matchMedia('(max-width: 578px)').matches;
-
-            if (selectedSubject === 'c' && isMobile) {
-                metricContainer.style.display = 'none';
-                chartOuterContainer.style.minWidth = "0";
-            } else {
-                metricContainer.style.display = 'flex';
-                chartOuterContainer.style.minWidth = "500px";
-            }
-        }
-
-        function toggleMetric(id) {
-            if (selectedSubject === 'c') return;
-            
-            var index = selectedMetrics.indexOf(id);
-            if (index !== -1) {
-                selectedMetrics.splice(index, 1);
-            } else {
-                selectedMetrics.push(id);
-            }
-            
-            updateMetricButtonsState();
-            updateChart();
-        }
-
-        function initializeButtons() {
-            var subjectContainer = document.getElementById('subjectButtons');
-            var metricContainer = document.getElementById('metricButtons');
-
-            subjectContainer.innerHTML = '';
-            metricContainer.innerHTML = '';
-            
-            availableMetrics = extractMetricsFromData();
-
-            var keys = Object.keys(processedStudentStats);
-            var firstKey = keys[0];
-            
-            for (var i = 0; i < keys.length; i++) {
-                var key = keys[i];
-                var data = processedStudentStats[key];
-                var btn = document.createElement('button');
-                btn.className = 'btn-subject';
-                btn.textContent = data.title;
-                btn.setAttribute('data-subject-key', key);
-                btn.onclick = (function(k) {
-                    return function() { selectSubject(k); };
-                })(key);
-                subjectContainer.appendChild(btn);
-            }
-
-            for (var j = 0; j < availableMetrics.length; j++) {
-                var metric = availableMetrics[j];
-                var btn2 = document.createElement('button');
-                btn2.className = 'btn-metric';
-                var badge = document.createElement('span');
-                btn2.textContent = metric.title + ' ';
-                btn2.setAttribute('data-metric-id', metric.id);
-                btn2.onclick = (function(mid) {
-                    return function() { toggleMetric(mid); };
-                })(metric.id);
-                metricContainer.appendChild(btn2);
-            }
-            
-            if (firstKey) {
-                selectSubject(firstKey);
-            }
-        }
-
-        function getDataForSubject() {
-            if (!selectedSubject) return null;
-            
-            var subject = processedStudentStats[selectedSubject];
-            if (selectedSubject === 'c') {
-                return { 
-                    dates: generateMondayDates(subject.values.length), 
-                    values: subject.values,
-                    isConsistency: true
-                };
-            } else {
-                var firstMetricKey = Object.keys(subject.values)[0];
-                var firstMetric = subject.values[firstMetricKey];
-                return { 
-                    dates: generateMondayDates(firstMetric.values.length),
-                    values: subject.values,
-                    isConsistency: false
-                };
-            }
-        }
-
-        function updateChart() {
-            if (chart) {
-                chart.destroy();
-                chart = null;
-            }
-
-            var subjectData = getDataForSubject();
-            if (!subjectData) return;
-            
-            var datasets = [];
-            var newDatasetLabels = [];
-
-            if (subjectData.isConsistency) {
-                var label = processedStudentStats.c.title;
-                newDatasetLabels.push(label);
-                
-                var wasAlreadyShown = false;
+                var wasShown = false;
                 for (var p = 0; p < previousDatasets.length; p++) {
-                    if (previousDatasets[p] === label) {
-                        wasAlreadyShown = true;
+                    if (previousDatasets[p] === datasetLabel) {
+                        wasShown = true;
                         break;
                     }
                 }
+                
+                var yAxisId = metric.type === 'percentage' ? metric.yAxisID : getAxisIdForAbsoluteMetric(metricId, selectedMetrics, subjectData);
                 
                 datasets.push({
-                    label: label,
-                    data: subjectData.values,
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    label: datasetLabel,
+                    data: metricData.values,
+                    borderColor: metric.color,
+                    backgroundColor: metric.color + '20',
                     tension: 0.3,
                     borderWidth: 3,
                     borderDash: [],
                     pointRadius: 4, // Smaller points for mobile
                     pointHoverRadius: 6,
-                    pointBackgroundColor: '#10b981',
+                    pointBackgroundColor: metric.color,
                     pointBorderColor: '#ffffff',
                     pointBorderWidth: 0,
                     pointHoverBorderWidth: 3,
                     pointStyle: 'circle',
-                    yAxisID: 'y-percent',
-                    animation: wasAlreadyShown ? false : {
+                    yAxisID: yAxisId,
+                    animation: wasShown ? false : {
                         duration: 750,
                         easing: 'easeInOutQuart'
                     }
                 });
+            }
+        }
+    }
+
+    var dashPatterns = [
+        [5, 5],
+        [10, 5],
+        [15, 3, 3, 3],
+        [2, 8],
+        [20, 5, 5, 5],
+        [8, 3, 2, 3]
+    ];
+
+    var pointStyles = ['circle', 'rectRot', 'triangle', 'rect', 'star', 'cross'];
+
+    if (datasets.length > 1) {
+        var datasetsNeedDashes = new Array(datasets.length).fill(false);
+        
+        for (var i = 0; i < datasets.length; i++) {
+            for (var j = i + 1; j < datasets.length; j++) {
+                if (doDatasetsOverlap(datasets[i], datasets[j])) {
+                    datasetsNeedDashes[i] = true;
+                    datasetsNeedDashes[j] = true;
+                }
+            }
+        }
+        
+        var dashIndex = 0;
+        var pointStyleIndex = 0;
+        
+        for (var i = 0; i < datasets.length; i++) {
+            if (datasetsNeedDashes[i]) {
+                datasets[i].borderDash = dashPatterns[dashIndex % dashPatterns.length];
+                datasets[i].pointStyle = pointStyles[pointStyleIndex % pointStyles.length];
+                dashIndex++;
+                pointStyleIndex++;
             } else {
-                for (var i = 0; i < selectedMetrics.length; i++) {
-                    var metricId = selectedMetrics[i];
-                    var metric = null;
-                    for (var j = 0; j < availableMetrics.length; j++) {
-                        if (availableMetrics[j].id === metricId) {
-                            metric = availableMetrics[j];
-                            break;
-                        }
-                    }
+                datasets[i].borderDash = [];
+                datasets[i].pointStyle = 'circle';
+            }
+        }
+        
+        if (datasetsNeedDashes[0] && datasets.length > 1) {
+            datasets[0].borderDash = dashPatterns[0];
+            datasets[0].pointStyle = pointStyles[0];
+        }
+    }
+
+    function doDatasetsOverlap(dataset1, dataset2) {
+        var data1 = dataset1.data;
+        var data2 = dataset2.data;
+        
+        if (data1.length !== data2.length) return false;
+        
+        var overlapThreshold = 5;
+        var overlapCount = 0;
+        var totalPoints = data1.length;
+        
+        for (var k = 0; k < data1.length; k++) {
+            var diff = Math.abs(data1[k] - data2[k]);
+            
+            if (diff <= overlapThreshold) {
+                overlapCount++;
+            }
+        }
+        
+        var overlapRatio = overlapCount / totalPoints;
+        return overlapRatio > 0.3;
+    }
+
+    previousDatasets = newDatasetLabels;
+
+    var usedAxisTypes = {};
+    var percentageMetrics = [];
+    var over100Metrics = [];
+    
+    if (subjectData.isConsistency) {
+        percentageMetrics.push({ title: processedStudentStats.c.title, maxValue: Math.max.apply(null, subjectData.values), color: '#10b981' });
+    }
+    
+    for (var i = 0; i < selectedMetrics.length; i++) {
+        var metricId = selectedMetrics[i];
+        for (var j = 0; j < availableMetrics.length; j++) {
+            if (availableMetrics[j].id === metricId) {
+                var metric = availableMetrics[j];
+                var yAxisId = metric.type === 'percentage' ? metric.yAxisID : getAxisIdForAbsoluteMetric(metricId, selectedMetrics, subjectData);
+                
+                if (!usedAxisTypes[yAxisId]) {
+                    usedAxisTypes[yAxisId] = [];
+                }
+                usedAxisTypes[yAxisId].push(metric);
+                
+                if (metric.type === 'percentage') {
                     var metricData = subjectData.values[metricId];
+                    var maxVal = Math.max.apply(null, metricData.values);
+                    var metricInfo = { 
+                        title: metric.title, 
+                        maxValue: maxVal,
+                        id: metricId,
+                        metric: metric,
+                        color: metric.color
+                    };
                     
-                    if (metric && metricData) {
-                        var datasetLabel = metricData.title;
-                        newDatasetLabels.push(datasetLabel);
-                        
-                        var wasShown = false;
-                        for (var p = 0; p < previousDatasets.length; p++) {
-                            if (previousDatasets[p] === datasetLabel) {
-                                wasShown = true;
-                                break;
-                            }
-                        }
-                        
-                        var yAxisId = metric.type === 'percentage' ? metric.yAxisID : getAxisIdForAbsoluteMetric(metricId, selectedMetrics, subjectData);
-                        
-                        datasets.push({
-                            label: datasetLabel,
-                            data: metricData.values,
-                            borderColor: metric.color,
-                            backgroundColor: metric.color + '20',
-                            tension: 0.3,
-                            borderWidth: 3,
-                            borderDash: [],
-                            pointRadius: 4, // Smaller points for mobile
-                            pointHoverRadius: 6,
-                            pointBackgroundColor: metric.color,
-                            pointBorderColor: '#ffffff',
-                            pointBorderWidth: 0,
-                            pointHoverBorderWidth: 3,
-                            pointStyle: 'circle',
-                            yAxisID: yAxisId,
-                            animation: wasShown ? false : {
-                                duration: 750,
-                                easing: 'easeInOutQuart'
-                            }
-                        });
-                    }
-                }
-            }
-
-            var dashPatterns = [
-                [5, 5],
-                [10, 5],
-                [15, 3, 3, 3],
-                [2, 8],
-                [20, 5, 5, 5],
-                [8, 3, 2, 3]
-            ];
-
-            var pointStyles = ['circle', 'rectRot', 'triangle', 'rect', 'star', 'cross'];
-
-            if (datasets.length > 1) {
-                var datasetsNeedDashes = new Array(datasets.length).fill(false);
-                
-                for (var i = 0; i < datasets.length; i++) {
-                    for (var j = i + 1; j < datasets.length; j++) {
-                        if (doDatasetsOverlap(datasets[i], datasets[j])) {
-                            datasetsNeedDashes[i] = true;
-                            datasetsNeedDashes[j] = true;
-                        }
-                    }
-                }
-                
-                var dashIndex = 0;
-                var pointStyleIndex = 0;
-                
-                for (var i = 0; i < datasets.length; i++) {
-                    if (datasetsNeedDashes[i]) {
-                        datasets[i].borderDash = dashPatterns[dashIndex % dashPatterns.length];
-                        datasets[i].pointStyle = pointStyles[pointStyleIndex % pointStyles.length];
-                        dashIndex++;
-                        pointStyleIndex++;
+                    if (maxVal > 100) {
+                        over100Metrics.push(metricInfo);
                     } else {
-                        datasets[i].borderDash = [];
-                        datasets[i].pointStyle = 'circle';
+                        percentageMetrics.push(metricInfo);
                     }
                 }
-                
-                if (datasetsNeedDashes[0] && datasets.length > 1) {
-                    datasets[0].borderDash = dashPatterns[0];
-                    datasets[0].pointStyle = pointStyles[0];
-                }
+                break;
             }
+        }
+    }
 
-            function doDatasetsOverlap(dataset1, dataset2) {
-                var data1 = dataset1.data;
-                var data2 = dataset2.data;
-                
-                if (data1.length !== data2.length) return false;
-                
-                var overlapThreshold = 5;
-                var overlapCount = 0;
-                var totalPoints = data1.length;
-                
-                for (var k = 0; k < data1.length; k++) {
-                    var diff = Math.abs(data1[k] - data2[k]);
-                    
-                    if (diff <= overlapThreshold) {
-                        overlapCount++;
-                    }
-                }
-                
-                var overlapRatio = overlapCount / totalPoints;
-                return overlapRatio > 0.3;
-            }
-
-            previousDatasets = newDatasetLabels;
-
-            var usedAxisTypes = {};
-            var percentageMetrics = [];
-            var over100Metrics = [];
-            
-            if (subjectData.isConsistency) {
-                percentageMetrics.push({ title: processedStudentStats.c.title, maxValue: Math.max.apply(null, subjectData.values), color: '#10b981' });
-            }
-            
-            for (var i = 0; i < selectedMetrics.length; i++) {
-                var metricId = selectedMetrics[i];
-                for (var j = 0; j < availableMetrics.length; j++) {
-                    if (availableMetrics[j].id === metricId) {
-                        var metric = availableMetrics[j];
-                        var yAxisId = metric.type === 'percentage' ? metric.yAxisID : getAxisIdForAbsoluteMetric(metricId, selectedMetrics, subjectData);
-                        
-                        if (!usedAxisTypes[yAxisId]) {
-                            usedAxisTypes[yAxisId] = [];
-                        }
-                        usedAxisTypes[yAxisId].push(metric);
-                        
-                        if (metric.type === 'percentage') {
-                            var metricData = subjectData.values[metricId];
-                            var maxVal = Math.max.apply(null, metricData.values);
-                            var metricInfo = { 
-                                title: metric.title, 
-                                maxValue: maxVal,
-                                id: metricId,
-                                metric: metric,
-                                color: metric.color
-                            };
-                            
-                            if (maxVal > 100) {
-                                over100Metrics.push(metricInfo);
-                            } else {
-                                percentageMetrics.push(metricInfo);
-                            }
-                        }
+    for (var i = 0; i < datasets.length; i++) {
+        var dataset = datasets[i];
+        if (dataset.yAxisID === 'y-percent') {
+            var maxInDataset = Math.max.apply(null, dataset.data);
+            if (maxInDataset > 100) {
+                for (var j = 0; j < over100Metrics.length; j++) {
+                    if (dataset.label.indexOf(over100Metrics[j].title) !== -1) {
+                        dataset.yAxisID = 'y-percent-' + over100Metrics[j].id;
                         break;
                     }
                 }
             }
-
-            for (var i = 0; i < datasets.length; i++) {
-                var dataset = datasets[i];
-                if (dataset.yAxisID === 'y-percent') {
-                    var maxInDataset = Math.max.apply(null, dataset.data);
-                    if (maxInDataset > 100) {
-                        for (var j = 0; j < over100Metrics.length; j++) {
-                            if (dataset.label.indexOf(over100Metrics[j].title) !== -1) {
-                                dataset.yAxisID = 'y-percent-' + over100Metrics[j].id;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            var yAxes = {};
-            var axisColorInfo = {};
-            
-            if (percentageMetrics.length > 0) {
-                var percentColors = [];
-                for (var i = 0; i < percentageMetrics.length; i++) {
-                    percentColors.push(percentageMetrics[i].color);
-                }
-                
-                axisColorInfo['y-percent'] = percentColors;
-                if (selectedSubject === 'c') { // only for nuoseklumas
-                    yAxes['y-percent'] = {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        title: { display: false },
-                        min: 0,
-                        max: 100,
-                        ticks: { 
-                            stepSize: 10, // ticks every 10
-                            callback: function(value) { return value <= 100 ? value.toFixed(0) + '%' : ''; },
-                            color: '#666'
-                        },
-                        grid: {
-                            drawOnChartArea: true,
-                            color: 'rgba(0, 0, 0, 0.1)'
-                        },
-                        border: { display: false }
-                    };
-                } else {
-                    yAxes['y-percent'] = {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        title: { 
-                            display: false
-                        },
-                        min: 0,
-                        max: 100,
-                        ticks: { 
-                            callback: function(value) { return value.toFixed(0) + '%'; },
-                            color: '#666'
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.1)'
-                        },
-                        border: {
-                            display: false
-                        }
-                    };
-                }
-            }
-
-            for (var i = 0; i < over100Metrics.length; i++) {
-                var metric = over100Metrics[i];
-                var axisId = 'y-percent-' + metric.id;
-                axisColorInfo[axisId] = [metric.color];
-                
-                yAxes[axisId] = {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    title: { 
-                        display: false
-                    },
-                    min: 0,
-                    ticks: { 
-                        callback: function(value) { return value.toFixed(0) + '%'; },
-                        color: '#666'
-                    },
-                    grid: { 
-                        drawOnChartArea: true,
-                        color: 'rgba(0, 0, 0, 0.1)'
-                    },
-                    border: {
-                        display: false
-                    }
-                };
-            }
-
-            var rightAxisCount = 0;
-            var axisKeys = Object.keys(usedAxisTypes);
-            for (var i = 0; i < axisKeys.length; i++) {
-                var axisId = axisKeys[i];
-                if (axisId !== 'y-percent' && !axisId.startsWith('y-percent-')) {
-                    var metricsOnAxis = usedAxisTypes[axisId];
-                    var axisColors = metricsOnAxis.map(function(m) { return m.color; });
-                    
-                    axisColorInfo[axisId] = axisColors;
-                    
-                    yAxes[axisId] = {
-                        type: 'linear',
-                        display: true,
-                        min: 0,
-                        position: percentageMetrics.length > 0 || over100Metrics.length > 0 || rightAxisCount > 0 ? 'right' : 'left',
-                        title: { 
-                            display: false
-                        },
-                        ticks: {
-                            callback: function(value) { return value.toFixed(1); },
-                            color: '#666'
-                        },
-                        grid: { 
-                            drawOnChartArea: rightAxisCount === 0 && percentageMetrics.length === 0 && over100Metrics.length === 0,
-                            color: 'rgba(0, 0, 0, 0.1)'
-                        },
-                        border: {
-                            display: false
-                        }
-                    };
-                    rightAxisCount = rightAxisCount + 1;
-                }
-            }
-
-            var ctx = document.getElementById('statsChart').getContext('2d');
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: subjectData.dates,
-                    datasets: datasets
-                },
-                options: {
-                    clip: false, 
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    plugins: {
-                        legend: {
-                            display: false // We're using our custom legend
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    var label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    var yAxisId = context.dataset.yAxisID;
-                                    if (yAxisId === 'y-percent' || yAxisId.indexOf('y-percent-') === 0) {
-                                        label += context.parsed.y + '%';
-                                    } else {
-                                        label += context.parsed.y;
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
-                    },
-                    scales: yAxes
-                },
-                plugins: [{
-                    id: 'coloredAxisLines',
-                    afterDatasetsDraw: function(chart) {
-                        var ctx = chart.ctx;
-                        var chartArea = chart.chartArea;
-                        
-                        Object.keys(axisColorInfo).forEach(function(scaleId) {
-                            var scale = chart.scales[scaleId];
-                            if (!scale) return;
-                            
-                            var colors = axisColorInfo[scaleId];
-                            if (!colors || colors.length === 0) return;
-                            
-                            var lineWidth = 3;
-                            var spacing = 1;
-                            
-                            var isLeft = scale.position === 'left';
-                            var x = isLeft ? scale.left : scale.right;
-                            var y1 = chartArea.top;
-                            var y2 = chartArea.bottom;
-
-                            var axisFullWidth = scale.width;
-                            
-                            let secondaryLineShift;
-                            for (var i = 0; i < colors.length; i++) {
-                                secondaryLineShift = i * lineWidth;
-                                ctx.save();
-                                ctx.strokeStyle = hexToRgba(colors[i], 0.6);
-                                ctx.lineWidth = lineWidth;
-                                ctx.beginPath();
-                                
-                                var offset = i * (lineWidth + spacing);
-                                var xPos = isLeft ? x + axisFullWidth - secondaryLineShift : x - axisFullWidth + secondaryLineShift;
-                                
-                                ctx.moveTo(xPos, y1);
-                                ctx.lineTo(xPos, y2);
-                                ctx.stroke();
-                                ctx.restore();
-                            }
-                        });
-                    }
-                }]
-            });
-            addHideScrollbarForTouch();
-        }
-
-        if (processedStudentStats?.c?.values?.length > 2) {
-            initializeButtons();
-            document.querySelector("#student-stats-graph-holder").style.display = "flex";
-        } else {
-            document.querySelector("#student-stats-graph-holder").style.display = "none";
-        }
-
-        function hexToRgba(hex, opacity) {
-            // Remove the hash if it exists
-            hex = hex.replace('#', '');
-            
-            // Parse the hex values
-            var r = parseInt(hex.substring(0, 2), 16);
-            var g = parseInt(hex.substring(2, 4), 16);
-            var b = parseInt(hex.substring(4, 6), 16);
-            
-            return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-        }
-
-        // STATS PART END
-
-
-
-
-
-
-
-        const taskStatusSummary = countTaskStatuses(studentTasks)
-
-        if (taskStatusSummary.total > 0) {
-            studentStatisticsCompletedTasks.style.display = "block";
-            studentStatisticsCompletedTasks.innerHTML = `<span class="task-info-subtitle">Baigtos užduotys:</span> ${taskStatusSummary.completed}/${taskStatusSummary.total}`
-        }
-
-        const categorizedStudentTasks = processStudentTasks(studentTasks)
-
-        if (countTaskStatuses(studentTasks, "math").completed > 0)
-            studentStatisticsMathDiv.style.display = "block";
-            mistakeFrequency = Math.round(categorizedStudentTasks.math[0][1]/categorizedStudentTasks.math[0][0]*100)
-            if (!isNaN(mistakeFrequency)) {
-            studentStatisticsMathErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.math[0][1]}/${categorizedStudentTasks.math[0][0]} (${mistakeFrequency}%)`;
-            }
-
-        if (countTaskStatuses(studentTasks, "C83").completed > 0) {
-            studentStatisticsLangDiv.style.display = "block";
-            mistakeFrequency = Math.round(categorizedStudentTasks.grammar[0][1]/categorizedStudentTasks.grammar[0][0]*100)
-            if (!isNaN(mistakeFrequency)) {
-                studentStatisticsGrammarErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.grammar[0][1]}/${categorizedStudentTasks.grammar[0][0]} (${mistakeFrequency}%)`;
-            }
-        }
-
-        if (countTaskStatuses(studentTasks, "C51").completed > 0 || countTaskStatuses(studentTasks, "C52").completed > 0) {
-            studentStatisticsTextComprahensionDiv.style.display = "block";
-        }
-
-        if (countTaskStatuses(studentTasks, "C51").completed > 0) {
-            mistakeFrequency = Math.round(categorizedStudentTasks.komponavimas[0][1]/categorizedStudentTasks.komponavimas[0][0]*100)
-            if (!isNaN(mistakeFrequency)) {
-                studentStatisticsKomponavimasErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.komponavimas[0][1]}/${categorizedStudentTasks.komponavimas[0][0]} (${mistakeFrequency}%)`;
-                studentStatisticsTextComprahensionKomponavimasTitle.style.display = "block";
-            }
-        }
-
-        if (countTaskStatuses(studentTasks, "C52").completed > 0) {
-            mistakeFrequency = Math.round(categorizedStudentTasks.isdestymas[0][1]/categorizedStudentTasks.isdestymas[0][0]*100)
-            if (!isNaN(mistakeFrequency)) {
-                studentStatisticsIsdestymasErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.isdestymas[0][1]}/${categorizedStudentTasks.isdestymas[0][0]} (${mistakeFrequency}%)`;
-                studentStatisticsTextComprahensionIsdestymasTitle.style.display = "block";
-            }
-        }
-
-
-        const combinedMathAndGrammarMistakes = [...categorizedStudentTasks.math[1], ...categorizedStudentTasks.grammar[1]]
-
-        if (combinedMathAndGrammarMistakes.length > 0) {
-            generateSummaryTable("custom", combinedMathAndGrammarMistakes, "summary-table", "summary-table-grammar") 
-        }
-
-
-        document.querySelector("#mistakes-summary-math").style.display = "block";
-        document.querySelector("#mistakes-summary-grammar").style.display = "block";
-        if (document.querySelector("#summary-table").innerHTML === "Klaidų nėra!" || document.querySelector("#summary-table").innerHTML === '') {
-            document.querySelector("#mistakes-summary-math").style.display = "none";
-        }
-
-        if (document.querySelector("#summary-table-grammar").innerHTML === "Klaidų nėra!" || document.querySelector("#summary-table-grammar").innerHTML === '') {
-            document.querySelector("#mistakes-summary-grammar").style.display = "none";
-        }
-
-        function displayComletedTextIdsForTextComp(textInfo, htmlContainer) {
-            const ul = document.createElement("ol");
-            const textComprehensionTextsTitle = document.createElement("div");
-            textComprehensionTextsTitle.innerHTML = "Sudėlioti tekstai:";
-            textComprehensionTextsTitle.classList.add("task-info-subtitle");
-
-            // 1. Extract all [textId, mistakes, date] triples
-            const allEntries = [];
-            const entries = textInfo.slice(1)[0]; // Skip metadata (e.g., [2, 1])
-
-            for (const entry of entries) {
-                const [texts, date] = entry; // each entry is [texts, taskDate]
-
-                for (const text of texts) { // texts is an array of [textId, textMistakes]
-                    const [textId, textMistakes] = text;
-                    allEntries.push({ textId, textMistakes, date });
-                }
-            }
-
-            // 2. Sort by textId (ascending, converted to number)
-            allEntries.sort((a, b) => Number(a.textId) - Number(b.textId));
-
-            // 3. Display sorted entries
-            for (const { textId, textMistakes, date } of allEntries) {
-                const li = document.createElement("li");
-                const textIdSpan = document.createElement("span");
-                const mistakesNumberSpan = document.createElement("span");
-                const completionDataSpan = document.createElement("span");
-
-                textIdSpan.innerHTML = `ID${textId}`;
-                textIdSpan.classList.add("text-comprehenstion-text-id");
-
-                // Lithuanian pluralization
-                let numberLabel;
-                const mistakesNum = Number(textMistakes);
-                if (mistakesNum === 0 || (mistakesNum > 9 && mistakesNum < 21)) {
-                    numberLabel = "klaidų";
-                } else if (mistakesNum === 1 || String(mistakesNum).endsWith("1")) {
-                    numberLabel = "klaida";
-                } else {
-                    numberLabel = "klaidos";
-                }
-
-                mistakesNumberSpan.innerHTML = `: ${textMistakes} ${numberLabel}`;
-                completionDataSpan.innerHTML = ` (${date})`;
-                textIdSpan.dataset.textId = textId;
-
-                textIdSpan.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    const id = e.currentTarget.dataset.textId;
-                    openTextBrowser(Number(id));
-                });
-
-                li.appendChild(textIdSpan);
-                li.appendChild(mistakesNumberSpan);
-                li.appendChild(completionDataSpan);
-                ul.appendChild(li);
-            }
-
-            htmlContainer.appendChild(textComprehensionTextsTitle);
-            htmlContainer.appendChild(ul);
-        }
-
-        if (categorizedStudentTasks.isdestymas[1].length > 0) {
-            displayComletedTextIdsForTextComp(categorizedStudentTasks.isdestymas, studentStatisticsIsdestymasCompletedTexts)
-        }
-        if (categorizedStudentTasks.komponavimas[1].length > 0) {
-            displayComletedTextIdsForTextComp(categorizedStudentTasks.komponavimas, studentStatisticsKomponavimasCompletedTexts)
         }
     }
+
+    var yAxes = {};
+    var axisColorInfo = {};
+    
+    if (percentageMetrics.length > 0) {
+        var percentColors = [];
+        for (var i = 0; i < percentageMetrics.length; i++) {
+            percentColors.push(percentageMetrics[i].color);
+        }
+        
+        axisColorInfo['y-percent'] = percentColors;
+        if (selectedSubject === 'c') { // only for nuoseklumas
+            yAxes['y-percent'] = {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                title: { display: false },
+                min: 0,
+                max: 100,
+                ticks: { 
+                    stepSize: 10, // ticks every 10
+                    callback: function(value) { return value <= 100 ? value.toFixed(0) + '%' : ''; },
+                    color: '#666'
+                },
+                grid: {
+                    drawOnChartArea: true,
+                    color: 'rgba(0, 0, 0, 0.1)'
+                },
+                border: { display: false }
+            };
+        } else {
+            yAxes['y-percent'] = {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                title: { 
+                    display: false
+                },
+                min: 0,
+                max: 100,
+                ticks: { 
+                    callback: function(value) { return value.toFixed(0) + '%'; },
+                    color: '#666'
+                },
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.1)'
+                },
+                border: {
+                    display: false
+                }
+            };
+        }
+    }
+
+    for (var i = 0; i < over100Metrics.length; i++) {
+        var metric = over100Metrics[i];
+        var axisId = 'y-percent-' + metric.id;
+        axisColorInfo[axisId] = [metric.color];
+        
+        yAxes[axisId] = {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            title: { 
+                display: false
+            },
+            min: 0,
+            ticks: { 
+                callback: function(value) { return value.toFixed(0) + '%'; },
+                color: '#666'
+            },
+            grid: { 
+                drawOnChartArea: true,
+                color: 'rgba(0, 0, 0, 0.1)'
+            },
+            border: {
+                display: false
+            }
+        };
+    }
+
+    var rightAxisCount = 0;
+    var axisKeys = Object.keys(usedAxisTypes);
+    for (var i = 0; i < axisKeys.length; i++) {
+        var axisId = axisKeys[i];
+        if (axisId !== 'y-percent' && !axisId.startsWith('y-percent-')) {
+            var metricsOnAxis = usedAxisTypes[axisId];
+            var axisColors = metricsOnAxis.map(function(m) { return m.color; });
+            
+            axisColorInfo[axisId] = axisColors;
+            
+            yAxes[axisId] = {
+                type: 'linear',
+                display: true,
+                min: 0,
+                position: percentageMetrics.length > 0 || over100Metrics.length > 0 || rightAxisCount > 0 ? 'right' : 'left',
+                title: { 
+                    display: false
+                },
+                ticks: {
+                    callback: function(value) { return value.toFixed(1); },
+                    color: '#666'
+                },
+                grid: { 
+                    drawOnChartArea: rightAxisCount === 0 && percentageMetrics.length === 0 && over100Metrics.length === 0,
+                    color: 'rgba(0, 0, 0, 0.1)'
+                },
+                border: {
+                    display: false
+                }
+            };
+            rightAxisCount = rightAxisCount + 1;
+        }
+    }
+
+    var ctx = document.getElementById('statsChart').getContext('2d');
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: subjectData.dates,
+            datasets: datasets
+        },
+        options: {
+            clip: false, 
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    display: false // We're using our custom legend
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            var label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            var yAxisId = context.dataset.yAxisID;
+                            if (yAxisId === 'y-percent' || yAxisId.indexOf('y-percent-') === 0) {
+                                label += context.parsed.y + '%';
+                            } else {
+                                label += context.parsed.y;
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: yAxes
+        },
+        plugins: [{
+            id: 'coloredAxisLines',
+            afterDatasetsDraw: function(chart) {
+                var ctx = chart.ctx;
+                var chartArea = chart.chartArea;
+                
+                Object.keys(axisColorInfo).forEach(function(scaleId) {
+                    var scale = chart.scales[scaleId];
+                    if (!scale) return;
+                    
+                    var colors = axisColorInfo[scaleId];
+                    if (!colors || colors.length === 0) return;
+                    
+                    var lineWidth = 3;
+                    var spacing = 1;
+                    
+                    var isLeft = scale.position === 'left';
+                    var x = isLeft ? scale.left : scale.right;
+                    var y1 = chartArea.top;
+                    var y2 = chartArea.bottom;
+
+                    var axisFullWidth = scale.width;
+                    
+                    let secondaryLineShift;
+                    for (var i = 0; i < colors.length; i++) {
+                        secondaryLineShift = i * lineWidth;
+                        ctx.save();
+                        ctx.strokeStyle = hexToRgba(colors[i], 0.6);
+                        ctx.lineWidth = lineWidth;
+                        ctx.beginPath();
+                        
+                        var offset = i * (lineWidth + spacing);
+                        var xPos = isLeft ? x + axisFullWidth - secondaryLineShift : x - axisFullWidth + secondaryLineShift;
+                        
+                        ctx.moveTo(xPos, y1);
+                        ctx.lineTo(xPos, y2);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                });
+            }
+        }]
+    });
+    addHideScrollbarForTouch();
+}
+
+function hexToRgba(hex, opacity) {
+    // Remove the hash if it exists
+    hex = hex.replace('#', '');
+    
+    // Parse the hex values
+    var r = parseInt(hex.substring(0, 2), 16);
+    var g = parseInt(hex.substring(2, 4), 16);
+    var b = parseInt(hex.substring(4, 6), 16);
+    
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+}
+
+// STATS PART END
+
+
+function displayComletedTextIdsForTextComp(textInfo, htmlContainer, showAverages = false) {
+    const ul = document.createElement("ol");
+    const textComprehensionTextsTitle = document.createElement("div");
+    
+    if (showAverages) {
+        textComprehensionTextsTitle.innerHTML = "Sudėlioti tekstai (vidutinis klaidų skaičius):";
+    } else {
+        textComprehensionTextsTitle.innerHTML = "Sudėlioti tekstai:";
+    }
+    textComprehensionTextsTitle.classList.add("task-info-subtitle");
+
+    // 1. Extract all [textId, mistakes, date] triples
+    const allEntries = [];
+    const entries = textInfo.slice(1)[0]; // Skip metadata (e.g., [2, 1])
+
+    for (const entry of entries) {
+        const [texts, date] = entry; // each entry is [texts, taskDate]
+
+        for (const text of texts) { // texts is an array of [textId, textMistakes]
+            const [textId, textMistakes] = text;
+            allEntries.push({ textId, textMistakes, date });
+        }
+    }
+
+    if (showAverages) {
+        // Group by textId and calculate averages
+        const grouped = {};
+        
+        for (const { textId, textMistakes } of allEntries) {
+            if (!grouped[textId]) {
+                grouped[textId] = {
+                    textId,
+                    totalMistakes: 0,
+                    count: 0
+                };
+            }
+            grouped[textId].totalMistakes += Number(textMistakes);
+            grouped[textId].count += 1;
+        }
+
+        // Calculate averages and sort by highest average (descending)
+        const averages = Object.values(grouped).map(item => ({
+            textId: item.textId,
+            average: (item.totalMistakes / item.count).toFixed(1)
+        }));
+        
+        averages.sort((a, b) => Number(b.average) - Number(a.average));
+
+        // Display sorted averages
+        for (const { textId, average } of averages) {
+            const li = document.createElement("li");
+            const textIdSpan = document.createElement("span");
+            const averageSpan = document.createElement("span");
+
+            textIdSpan.innerHTML = `ID${textId}`;
+            textIdSpan.classList.add("text-comprehenstion-text-id");
+            textIdSpan.dataset.textId = textId;
+
+            averageSpan.innerHTML = `: ${average}`;
+
+            textIdSpan.addEventListener("click", (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                const id = e.currentTarget.dataset.textId;
+                openTextBrowser(Number(id));
+            });
+
+            li.appendChild(textIdSpan);
+            li.appendChild(averageSpan);
+            ul.appendChild(li);
+        }
+
+    } else {
+        // 2. Sort by textId (ascending, converted to number)
+        allEntries.sort((a, b) => Number(a.textId) - Number(b.textId));
+
+        // 3. Display sorted entries
+        for (const { textId, textMistakes, date } of allEntries) {
+            const li = document.createElement("li");
+            const textIdSpan = document.createElement("span");
+            const mistakesNumberSpan = document.createElement("span");
+            const completionDataSpan = document.createElement("span");
+
+            textIdSpan.innerHTML = `ID${textId}`;
+            textIdSpan.classList.add("text-comprehenstion-text-id");
+
+            // Lithuanian pluralization
+            let numberLabel;
+            const mistakesNum = Number(textMistakes);
+            if (mistakesNum === 0 || (mistakesNum > 9 && mistakesNum < 21)) {
+                numberLabel = "klaidų";
+            } else if (mistakesNum === 1 || String(mistakesNum).endsWith("1")) {
+                numberLabel = "klaida";
+            } else {
+                numberLabel = "klaidos";
+            }
+
+            mistakesNumberSpan.innerHTML = `: ${textMistakes} ${numberLabel}`;
+            completionDataSpan.innerHTML = ` (${date})`;
+            textIdSpan.dataset.textId = textId;
+
+            textIdSpan.addEventListener("click", (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                const id = e.currentTarget.dataset.textId;
+                openTextBrowser(Number(id));
+            });
+
+            li.appendChild(textIdSpan);
+            li.appendChild(mistakesNumberSpan);
+            li.appendChild(completionDataSpan);
+            ul.appendChild(li);
+        }
+    }
+
+    htmlContainer.appendChild(textComprehensionTextsTitle);
+    htmlContainer.appendChild(ul);
+}
+
+let processedStudentStats;
+
+function displayStudentStatistics(student, studentTasks) {
+    processedStudentStats = transformStudentStats(student[3]);
+    const averageStudentScore = calculateAverageStudentScore(student[3]);
+    const averageStudentConsistency = calculateAverageStudentsConsistency(student[3]);
+
+    clearTaskInfoContainer();
+    studentTaskStudentName.innerHTML = `
+        <span class="student-name-id-holder"><span id="student-name">${student[1]}</span><span id='student-id'>(ID: ${student[0]})</span></span>
+        <button class="edit-name-button" onclick="editStudentName('${student[0]}', this)">
+            <span class="edit-icon">
+            <img src="../images/icons/icon-edit.svg">
+            </span>
+        </button>
+        `;
+    studentTaskStudentEmail.innerHTML = student[4];
+
+    const knowledgeOptions = [
+        { value: -1, label: "Nustatykite lygį", hidden: true }, // placeholder, shown only if -1
+        { value: 0, label: "Priešmokyklinis" },
+        { value: 1, label: "1 klasė" },
+        { value: 2, label: "2 klasė" },
+        { value: 3, label: "3 klasė" },
+        { value: 4, label: "4 klasė" },
+        { value: 5, label: "Aukštesnis" },
+    ];
+
+    // Build the dropdown
+    let selectHTML = `<div class="categories-dropdown-holder">
+        <div class="knowledge-level-select-text">Žinių lygis</div>
+        <select id="knowledge-level-select">
+            ${knowledgeOptions.map(opt => `
+                <option value="${opt.value}" ${opt.hidden ? "hidden" : ""}>${opt.label}</option>
+            `).join("")}
+        </select>
+    </div>`;
+
+    studentStatisticsKnowledgeLevel.innerHTML = selectHTML;
+    studentStatisticsKnowledgeLevel.style.display = "block";
+
+    studentStatisticsPerformanceMean.innerHTML = `<div class="student-points-holder"><div class="student-points-label">Taškai</div> <div class="student-points">${averageStudentScore} (${classScoreMedian})</div></div>`;
+    studentStatisticsPerformanceMean.style.display = "block";
+
+    studentStatisticsConsistencyMean.innerHTML = `<div class="student-points-holder"><div class="student-consistency-label">Nuoseklumas</div> <div class="student-points">${averageStudentConsistency}% (${classConsistencyMedian}%)</div></div>`;
+    studentStatisticsConsistencyMean.style.display = "block";
+
+    const knowledgeSelect = document.getElementById("knowledge-level-select");
+
+    // Preselect based on DB value
+    if (student[2] !== undefined) {
+        knowledgeSelect.value = student[2];
+    }
+
+    // Event listener to update when changed
+    knowledgeSelect.addEventListener("change", async (e) => {
+        const newValue = parseInt(e.target.value, 10);
+        if (newValue !== student[2]) {
+            try {
+                const response = await apiFetch(apiBase + `students/knowledge-level`, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        studentId: Number(student[0]),
+                        knowledgeLvl: Number(newValue)
+                    })
+                });
+
+                if (!response) {
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error("Nepavyko atnaujinti lygio");
+                }
+
+                const data = await response.json();
+                student[2] = data.knowledgeLvl; // update local student object
+                messageToTheUser("Žinių lygis sėkmingai atnaujintas!", false);
+            } catch (error) {
+                console.error("Error updating knowledge level:", error);
+                messageToTheUser("Nepavyko atnaujinti žinių lygio. Bandykite vėliau vėl");
+            }
+        }
+    });
+
+    if (processedStudentStats?.c?.values?.length > 2) {
+        initializeButtons();
+        document.querySelector("#student-stats-graph-holder").style.display = "flex";
+        document.querySelector(".student-statistics-label").innerHTML = 'Mokinio ilgalaikė statistika'
+    } else {
+        document.querySelector("#student-stats-graph-holder").style.display = "none";
+    }
+
+    const taskStatusSummary = countTaskStatuses(studentTasks)
+
+    if (taskStatusSummary.total > 0) {
+        studentStatisticsCompletedTasks.style.display = "block";
+        studentStatisticsCompletedTasks.innerHTML = `<span class="task-info-subtitle">Baigtos užduotys:</span> ${taskStatusSummary.completed}/${taskStatusSummary.total}`
+    }
+
+    const categorizedStudentTasks = processStudentTasks(studentTasks)
+
+    if (countTaskStatuses(studentTasks, "math").completed > 0)
+        studentStatisticsMathDiv.style.display = "block";
+        mistakeFrequency = Math.round(categorizedStudentTasks.math[0][1]/categorizedStudentTasks.math[0][0]*100)
+        if (!isNaN(mistakeFrequency)) {
+        studentStatisticsMathErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.math[0][1]}/${categorizedStudentTasks.math[0][0]} (${mistakeFrequency}%)`;
+        }
+
+    if (countTaskStatuses(studentTasks, "C83").completed > 0) {
+        studentStatisticsLangDiv.style.display = "block";
+        mistakeFrequency = Math.round(categorizedStudentTasks.grammar[0][1]/categorizedStudentTasks.grammar[0][0]*100)
+        if (!isNaN(mistakeFrequency)) {
+            studentStatisticsGrammarErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.grammar[0][1]}/${categorizedStudentTasks.grammar[0][0]} (${mistakeFrequency}%)`;
+        }
+    }
+
+    if (countTaskStatuses(studentTasks, "C51").completed > 0 || countTaskStatuses(studentTasks, "C52").completed > 0) {
+        studentStatisticsTextComprahensionDiv.style.display = "block";
+    }
+
+    if (countTaskStatuses(studentTasks, "C51").completed > 0) {
+        mistakeFrequency = Math.round(categorizedStudentTasks.komponavimas[0][1]/categorizedStudentTasks.komponavimas[0][0]*100)
+        if (!isNaN(mistakeFrequency)) {
+            studentStatisticsKomponavimasErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.komponavimas[0][1]}/${categorizedStudentTasks.komponavimas[0][0]} (${mistakeFrequency}%)`;
+            studentStatisticsTextComprahensionKomponavimasTitle.style.display = "block";
+        }
+    }
+
+    if (countTaskStatuses(studentTasks, "C52").completed > 0) {
+        mistakeFrequency = Math.round(categorizedStudentTasks.isdestymas[0][1]/categorizedStudentTasks.isdestymas[0][0]*100)
+        if (!isNaN(mistakeFrequency)) {
+            studentStatisticsIsdestymasErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.isdestymas[0][1]}/${categorizedStudentTasks.isdestymas[0][0]} (${mistakeFrequency}%)`;
+            studentStatisticsTextComprahensionIsdestymasTitle.style.display = "block";
+        }
+    }
+
+
+    const combinedMathAndGrammarMistakes = [...categorizedStudentTasks.math[1], ...categorizedStudentTasks.grammar[1]]
+
+    if (combinedMathAndGrammarMistakes.length > 0) {
+        generateSummaryTable("custom", combinedMathAndGrammarMistakes, "summary-table", "summary-table-grammar") 
+    }
+
+
+    document.querySelector("#mistakes-summary-math").style.display = "block";
+    document.querySelector("#mistakes-summary-grammar").style.display = "block";
+    if (document.querySelector("#summary-table").innerHTML === "Klaidų nėra!" || document.querySelector("#summary-table").innerHTML === '') {
+        document.querySelector("#mistakes-summary-math").style.display = "none";
+    }
+
+    if (document.querySelector("#summary-table-grammar").innerHTML === "Klaidų nėra!" || document.querySelector("#summary-table-grammar").innerHTML === '') {
+        document.querySelector("#mistakes-summary-grammar").style.display = "none";
+    }
+
+
+    if (categorizedStudentTasks.isdestymas[1].length > 0) {
+        displayComletedTextIdsForTextComp(categorizedStudentTasks.isdestymas, studentStatisticsIsdestymasCompletedTexts)
+    }
+    if (categorizedStudentTasks.komponavimas[1].length > 0) {
+        displayComletedTextIdsForTextComp(categorizedStudentTasks.komponavimas, studentStatisticsKomponavimasCompletedTexts)
+    }
+}
+
+
+function calculateClassMedianStats(students) {
+    if (!students || students.length === 0) {
+        return {
+            c: [],
+            m: [],
+            t: [],
+            g: [],
+            d: 0
+        };
+    }
+
+    // Helper function to calculate median
+    function median(arr) {
+        if (arr.length === 0) return 0;
+        const sorted = [...arr].sort((a, b) => a - b);
+        const mid = Math.floor(sorted.length / 2);
+        return sorted.length % 2 === 0
+            ? (sorted[mid - 1] + sorted[mid]) / 2
+            : sorted[mid];
+    }
+
+    // Find the maximum length for each stat type
+    const maxLengths = {
+        c: Math.max(...students.map(s => s.stats.c?.length || 0)),
+        m: Math.max(...students.map(s => s.stats.m?.length || 0)),
+        t: Math.max(...students.map(s => s.stats.t?.length || 0)),
+        g: Math.max(...students.map(s => s.stats.g?.length || 0))
+    };
+
+    // Calculate median for consistency (c) - simple array of numbers
+    // Align from right to left (most recent data)
+    const medianC = [];
+    for (let i = 0; i < maxLengths.c; i++) {
+        const values = students
+            .map(s => {
+                const arr = s.stats.c || [];
+                const index = arr.length - maxLengths.c + i;
+                return index >= 0 ? arr[index] : null;
+            })
+            .filter(v => v !== undefined && v !== null);
+        if (values.length > 0) {
+            medianC.push(median(values));
+        }
+    }
+
+    // Calculate median for math (m), text (t), grammar (g) - arrays of arrays with 4 values
+    // Align from right to left (most recent data)
+    function calculateMedianForCategory(category, maxLength) {
+        const result = [];
+        for (let i = 0; i < maxLength; i++) {
+            const medianEntry = [0, 0, 0, 0];
+            
+            // For each of the 4 positions in the inner array
+            for (let j = 0; j < 4; j++) {
+                const values = students
+                    .map(s => {
+                        const arr = s.stats[category] || [];
+                        const index = arr.length - maxLength + i;
+                        return index >= 0 ? arr[index]?.[j] : null;
+                    })
+                    .filter(v => v !== undefined && v !== null);
+                
+                if (values.length > 0) {
+                    medianEntry[j] = median(values);
+                }
+            }
+            
+            result.push(medianEntry);
+        }
+        return result;
+    }
+
+    const medianM = calculateMedianForCategory('m', maxLengths.m);
+    const medianT = calculateMedianForCategory('t', maxLengths.t);
+    const medianG = calculateMedianForCategory('g', maxLengths.g);
+
+    // Find maximum d (date in days)
+    const maxD = Math.max(...students.map(s => s.stats.d || 0));
+
+    return {
+        c: medianC,
+        m: medianM,
+        t: medianT,
+        g: medianG,
+        d: maxD
+    };
+}
+
+function mergeAllStudentTasks(students) {
+    if (!students || students.length === 0) {
+        return [];
+    }
+
+    // Collect all tasks from all students
+    const allTasks = [];
+    
+    students.forEach(student => {
+        if (student.tasks && Array.isArray(student.tasks)) {
+            student.tasks.forEach(task => {
+                allTasks.push({
+                    assignmentId: task.assignmentId,
+                    status: task.status,
+                    result: task.result,
+                    completionDate: task.completionDate,
+                    group: task.group,
+                    duration: task.duration,
+                    taskDescription: task.taskDescription
+                });
+            });
+        }
+    });
+
+    // Sort by assignmentId to maintain some order
+    allTasks.sort((a, b) => a.assignmentId - b.assignmentId);
+
+    // Reindex assignmentIds to avoid conflicts
+    // Start from the highest existing assignmentId + 1 to ensure no conflicts
+    const maxExistingId = Math.max(
+        ...allTasks.map(t => t.assignmentId),
+        0
+    );
+
+    const reindexedTasks = allTasks.map((task, index) => ({
+        ...task,
+        assignmentId: maxExistingId + index + 1
+    }));
+
+    return reindexedTasks;
+}
+
+function displayTeacherHome(selectedGroupNames=null) {
+    // Deep copy studentList
+    studentListFiltered = JSON.parse(JSON.stringify(studentList));
+    
+    // Filter tasks if selectedGroupNames is provided
+    if (selectedGroupNames && selectedGroupNames.length > 0) {
+        studentListFiltered = studentListFiltered
+            .map(student => ({
+                ...student,
+                tasks: student.tasks.filter(task => selectedGroupNames.includes(task.group))
+            }))
+            .filter(student => student.tasks.length > 0); // Remove students with no matching tasks
+    }
+
+    clearTaskInfoContainer();
+    studentTaskStudentName.innerHTML = `
+        <span class="student-name-id-holder"><span id="student-name">KLASĖS APŽVALGA</span>
+        `;
+
+
+    studentStatisticsPerformanceMean.innerHTML = `<div class="student-points-holder"><div class="student-points-label">Vidutiniai taškai</div> <div class="student-points">${classScoreMedian}</div></div>`;
+    studentStatisticsPerformanceMean.style.display = "block";
+
+    studentStatisticsConsistencyMean.innerHTML = `<div class="student-points-holder"><div class="student-consistency-label">Vidutinis nuoseklumas</div> <div class="student-points">${classConsistencyMedian}%</div></div>`;
+    studentStatisticsConsistencyMean.style.display = "block";
+
+    const knowledgeSelect = document.getElementById("knowledge-level-select");
+
+    processedStudentStats = transformStudentStats(calculateClassMedianStats(studentListFiltered));
+
+    if (processedStudentStats?.c?.values?.length > 2) {
+        initializeButtons();
+        document.querySelector(".student-statistics-label").innerHTML = 'Klasės ilgalaikė statistika'
+        document.querySelector("#student-stats-graph-holder").style.display = "flex";
+    } else {
+        document.querySelector("#student-stats-graph-holder").style.display = "none";
+    }
+
+    const studentTasks = mergeAllStudentTasks(studentListFiltered)
+
+    console.log(studentTasks)
+
+    const taskStatusSummary = countTaskStatuses(studentTasks)
+
+    if (taskStatusSummary.total > 0) {
+        studentStatisticsCompletedTasks.style.display = "block";
+        studentStatisticsCompletedTasks.innerHTML =
+            `<span class="task-info-subtitle">Baigtos užduotys:</span> ${taskStatusSummary.completed}/${taskStatusSummary.total}` +
+            (taskStatusSummary.total ? ` (${Math.round(taskStatusSummary.completed / taskStatusSummary.total * 100)}%)` : "");
+
+    }
+
+    const categorizedStudentTasks = processStudentTasks(studentTasks)
+
+    if (countTaskStatuses(studentTasks, "math").completed > 0)
+        studentStatisticsMathDiv.style.display = "block";
+        mistakeFrequency = Math.round(categorizedStudentTasks.math[0][1]/categorizedStudentTasks.math[0][0]*100)
+        if (!isNaN(mistakeFrequency)) {
+        studentStatisticsMathErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.math[0][1]}/${categorizedStudentTasks.math[0][0]} (${mistakeFrequency}%)`;
+        }
+
+    if (countTaskStatuses(studentTasks, "C83").completed > 0) {
+        studentStatisticsLangDiv.style.display = "block";
+        mistakeFrequency = Math.round(categorizedStudentTasks.grammar[0][1]/categorizedStudentTasks.grammar[0][0]*100)
+        if (!isNaN(mistakeFrequency)) {
+            studentStatisticsGrammarErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.grammar[0][1]}/${categorizedStudentTasks.grammar[0][0]} (${mistakeFrequency}%)`;
+        }
+    }
+
+    if (countTaskStatuses(studentTasks, "C51").completed > 0 || countTaskStatuses(studentTasks, "C52").completed > 0) {
+        studentStatisticsTextComprahensionDiv.style.display = "block";
+    }
+
+    if (countTaskStatuses(studentTasks, "C51").completed > 0) {
+        mistakeFrequency = Math.round(categorizedStudentTasks.komponavimas[0][1]/categorizedStudentTasks.komponavimas[0][0]*100)
+        if (!isNaN(mistakeFrequency)) {
+            studentStatisticsKomponavimasErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.komponavimas[0][1]}/${categorizedStudentTasks.komponavimas[0][0]} (${mistakeFrequency}%)`;
+            studentStatisticsTextComprahensionKomponavimasTitle.style.display = "block";
+        }
+    }
+
+    if (countTaskStatuses(studentTasks, "C52").completed > 0) {
+        mistakeFrequency = Math.round(categorizedStudentTasks.isdestymas[0][1]/categorizedStudentTasks.isdestymas[0][0]*100)
+        if (!isNaN(mistakeFrequency)) {
+            studentStatisticsIsdestymasErrorFrequency.innerHTML = `<span class="task-info-subtitle">Klaidų dažnis:</span> ${categorizedStudentTasks.isdestymas[0][1]}/${categorizedStudentTasks.isdestymas[0][0]} (${mistakeFrequency}%)`;
+            studentStatisticsTextComprahensionIsdestymasTitle.style.display = "block";
+        }
+    }
+
+
+    const combinedMathAndGrammarMistakes = [...categorizedStudentTasks.math[1], ...categorizedStudentTasks.grammar[1]]
+
+    if (combinedMathAndGrammarMistakes.length > 0) {
+        generateSummaryTable("custom", combinedMathAndGrammarMistakes, "summary-table", "summary-table-grammar", usePercentage=true) 
+    }
+
+
+    document.querySelector("#mistakes-summary-math").style.display = "block";
+    document.querySelector("#mistakes-summary-grammar").style.display = "block";
+    if (document.querySelector("#summary-table").innerHTML === "Klaidų nėra!" || document.querySelector("#summary-table").innerHTML === '') {
+        document.querySelector("#mistakes-summary-math").style.display = "none";
+    }
+
+    if (document.querySelector("#summary-table-grammar").innerHTML === "Klaidų nėra!" || document.querySelector("#summary-table-grammar").innerHTML === '') {
+        document.querySelector("#mistakes-summary-grammar").style.display = "none";
+    }
+
+
+    if (categorizedStudentTasks.isdestymas[1].length > 0) {
+        displayComletedTextIdsForTextComp(categorizedStudentTasks.isdestymas, studentStatisticsIsdestymasCompletedTexts, showAverages=true)
+    }
+    if (categorizedStudentTasks.komponavimas[1].length > 0) {
+        displayComletedTextIdsForTextComp(categorizedStudentTasks.komponavimas, studentStatisticsKomponavimasCompletedTexts, showAverages=true)
+    }
+}
                 
 
         function displayTaskInfo(student, task) {
@@ -5188,56 +5585,166 @@ let studentStatisticsLastRecord;
         }
 
         function populateTaskGroupDropdown() {
-            const dropdown = document.getElementById("task-group-sorting");
-            dropdown.innerHTML = ''; // Clear existing options
+            const menu = document.getElementById("task-group-menu");
+            menu.innerHTML = ''; 
 
-            // Create a Set to store unique task groups
             const taskGroups = new Set();
 
-            // Iterate through students and collect unique task group names
             studentList.forEach(student => {
                 student.tasks.forEach(task => {
                     taskGroups.add(task.group);
                 });
             });
 
-            // Convert Set to sorted array
-            const sortedGroups = ["Visos užduočių grupės", ...Array.from(taskGroups).sort()];
+            const sortedGroups = Array.from(taskGroups).sort();
 
-            // Populate dropdown with options
+            // --- Add "Visos" checkbox ---
+            const selectAll = document.createElement("div");
+            selectAll.className = "dropdown-item";
+            selectAll.innerHTML = `
+                <input type="checkbox" id="select-all" checked>
+                Visos užduočių grupės
+            `;
+
+            menu.appendChild(selectAll);
+
+            const innerGroupNames = document.createElement("div");
+            innerGroupNames.classList = "group-dropdown-inner-group-list"
+
+            // --- Add each group checkbox ---
             sortedGroups.forEach(group => {
-                const option = document.createElement("option");
-                option.value = group;
-                option.textContent = group;
-                dropdown.appendChild(option);
+                const label = document.createElement("label");
+                label.className = "dropdown-item";
+                label.innerHTML = `
+                    <input type="checkbox" class="option-checkbox" value="${group}" checked>
+                    ${group}
+                `;
+                innerGroupNames.appendChild(label);
             });
+
+            menu.appendChild(innerGroupNames);
+
+            attachDropdownCheckboxLogic();
         }
 
-        function handleTaskGroupChange() {
-            const dropdown = document.getElementById("task-group-sorting");
-            
-            dropdown.addEventListener("change", () => {
-                const selectedGroup = dropdown.value;
+        function updateTaskGroupCount() {
+            const menu = document.getElementById("task-group-menu");
+            const checkboxes = [...menu.querySelectorAll(".option-checkbox")];
+            const selectedCount = checkboxes.filter(cb => cb.checked).length;
+            const totalCount = checkboxes.length;
 
-                // Filter students based on the selected task group
-                const filteredStudents = selectedGroup === "Visos užduočių grupės"
-                    ? studentList
-                    : studentList
+            const counter = document.getElementById("task-group-count");
+            counter.textContent = `${selectedCount} / ${totalCount}`;
+        }
+
+        function attachDropdownCheckboxLogic() {
+            const menu = document.getElementById("task-group-menu");
+            const selectAll = document.getElementById("select-all");
+            const checkboxes = [...menu.querySelectorAll(".option-checkbox")];
+
+            selectAll.addEventListener("change", () => {
+                checkboxes.forEach(cb => cb.checked = selectAll.checked);
+                menu.dispatchEvent(new Event("change"));
+                updateTaskGroupCount();
+            });
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener("change", () => {
+                    const allChecked = checkboxes.every(x => x.checked);
+                    selectAll.checked = allChecked;
+                    menu.dispatchEvent(new Event("change"));
+                    updateTaskGroupCount();
+                });
+            });
+
+            // Initial count
+            updateTaskGroupCount();
+        }
+
+
+        function restoreAllIfNoneSelected(selectAllAnyway=false) {
+            const menu = document.getElementById("task-group-menu");
+            const checkboxes = [...menu.querySelectorAll(".option-checkbox")];
+            const selectAll = document.getElementById("select-all");
+
+            const noneSelected = checkboxes.every(cb => !cb.checked);
+
+            if (noneSelected || selectAllAnyway) {
+                selectAll.checked = true;
+                checkboxes.forEach(cb => cb.checked = true);
+                menu.dispatchEvent(new Event("change"));
+            }
+
+            updateTaskGroupCount();
+        }
+
+
+        function handleTaskGroupChange() {
+            const menu = document.getElementById("task-group-menu");
+            const button = document.getElementById("task-group-sorting");
+            let selectedGroups = []; // List of selected checkbox values
+
+            menu.addEventListener("change", () => {
+                const checkboxes = [...document.querySelectorAll(".option-checkbox")];
+                const selected = checkboxes
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.value);
+
+                const allSelected = document.getElementById("select-all").checked;
+
+                // Update selectedGroups list (excluding "select-all")
+                if (allSelected) {
+                    selectedGroups = [];
+                } else {
+                    selectedGroups = selected;
+                }
+
+                let filteredStudents;
+
+                if (allSelected || selected.length === 0) {
+                    filteredStudents = studentList;
+                } else {
+                    filteredStudents = studentList
                         .map(student => ({
                             ...student,
-                            tasks: student.tasks.filter(task => task.group === selectedGroup)
+                            tasks: student.tasks.filter(task => selected.includes(task.group))
                         }))
-                        .filter(student => student.tasks.length > 0); // Remove students with no tasks after filtering
+                        .filter(student => student.tasks.length > 0);
+                }
 
-                // Re-render with the filtered student list
+                // Re-render
                 taskContainerVisible = false;
                 toggleTaskVisibility();
                 renderDataForTeachers(filteredStudents);
+                
+                displayTeacherHome(selectedGroups);
             });
         }
 
+
         // Ensure the function runs after populating the dropdown
         handleTaskGroupChange();
+
+        const toggleBtn = document.querySelector(".dropdown-wrapper");
+        const menu = document.getElementById("task-group-menu");
+
+        toggleBtn.addEventListener("click", e => {
+            e.stopPropagation();
+            menu.classList.toggle("hidden");
+            restoreAllIfNoneSelected();
+        });
+
+        // Prevent clicks inside the menu from bubbling up and closing it
+        menu.addEventListener("click", e => {
+            e.stopPropagation();
+        });
+
+        document.addEventListener("click", e => {
+            if (!menu.contains(e.target) && e.target !== toggleBtn) {
+                menu.classList.add("hidden");
+                restoreAllIfNoneSelected();
+            }
+        });
 
         function medianStudentScore(students) {
         const studentAverages = students.map(student => {
@@ -5301,7 +5808,7 @@ let studentStatisticsLastRecord;
 
 
         
-        function renderDataForTeachers(filteredList = studentList) {
+    function renderDataForTeachers(filteredList = studentList) {
         studentListDiv.innerHTML = '';
 
         // Sort students alphabetically by nickname
@@ -5358,6 +5865,8 @@ let studentStatisticsLastRecord;
                 name.classList.remove('selected-option');
             });
 
+            document.querySelector(".teacher-home-button").classList.remove('selected-option')
+
             // Add 'selected-option' class to the clicked task
             studentName.classList.add('selected-option');
 
@@ -5409,6 +5918,8 @@ let studentStatisticsLastRecord;
                 document.querySelectorAll('.selection-option').forEach(task => {
                     task.classList.remove('selected-option');
                 });
+
+                document.querySelector(".teacher-home-button").classList.remove('selected-option');
 
                 // Add 'selected-option' class to the clicked task
                 taskName.classList.add('selected-option');
@@ -5463,6 +5974,8 @@ let studentStatisticsLastRecord;
         checkbox.disabled = false;
         });
     }
+
+    displayTeacherHome();
 }
 
         document.getElementById('expand-student-info-button').addEventListener('click', () => {
@@ -5659,9 +6172,8 @@ let studentStatisticsLastRecord;
         toggleStudentListLabel();
         const dropdown = document.getElementById("task-group-sorting");
         if (addingNewTask) {
-            // Set the selected option to "Visos užduočių grupės"
-            dropdown.value = "Visos užduočių grupės";
-            // Manually trigger the change event
+            
+            restoreAllIfNoneSelected(true);
             dropdown.dispatchEvent(new Event("change"));
             dropdown.disabled = true;
             
@@ -5693,7 +6205,6 @@ let studentStatisticsLastRecord;
 
             refilterTexts();
 
-            const taskGroup = document.querySelector('#task-group-sorting');
             const groupName = document.querySelector('#group_name');
 
             openSidebar();
@@ -5731,10 +6242,7 @@ let studentStatisticsLastRecord;
         toggleStudentListLabel();
         const dropdown = document.getElementById("task-group-sorting");
         if (browsingHistory) {
-            // Set the selected option to "Visos užduočių grupės"
-            dropdown.value = "Visos užduočių grupės";
-            // Manually trigger the change event
-            dropdown.dispatchEvent(new Event("change"));
+
             dropdown.disabled = true;
             
             taskContainerVisible = true;
@@ -6026,7 +6534,7 @@ let studentStatisticsLastRecord;
                     task = [
                         mode, modeChoice1, modeChoice2, modeChoice14Selection, modeChoice15Selection, classChoiceSelection, modeChoiceLtDifficulty
                     ];
-                    taskDuration = [modeChoice4, durationType]
+                    taskDuration = [modeChoice4, durationType, generateSessionSeed()]
                 } else if (modeChoice15Selection === "C84") {
                     task = [
                         mode, modeChoice1, modeChoice2, modeChoice14Selection, modeChoice15Selection
@@ -6039,7 +6547,7 @@ let studentStatisticsLastRecord;
                         mode, modeChoice1, modeChoice2, classChoiceSelection, modeChoice3,
                         modeChoice5, questionFrequency
                     ];
-                    taskDuration = [modeChoice4, durationType]
+                    taskDuration = [modeChoice4, durationType, generateSessionSeed()]
                 }
             }
         }
@@ -6142,6 +6650,9 @@ let studentStatisticsLastRecord;
                         controller.modeChoiceLtDifficulty = parsedCurrentTaskInstructions[6];
                         controller.modeChoice4 = currentTaskDuration[0];
                         controller.setTaskDuration = currentTaskDuration[1];
+                        if (currentTaskDuration[2]) {
+                            controller.modeChoice8 = currentTaskDuration[2]
+                        }
                     } else if (controller.modeChoice7 === "C84") {
                         controller.modeChoice4 = currentTaskDuration[0];
                         controller.modeChoice8 = currentTaskDuration[1];
@@ -6167,6 +6678,9 @@ let studentStatisticsLastRecord;
 
                         controller.modeChoice4 = currentTaskDuration[0];
                         controller.setTaskDuration = currentTaskDuration[1];
+                        if (currentTaskDuration[2]) {
+                            controller.modeChoice8 = currentTaskDuration[2]
+                        }
                     }
                 }
             }
@@ -6346,6 +6860,28 @@ let studentStatisticsLastRecord;
     async function displayRetrievedTaskHistoryData () {
         return
     }
+
+    document.querySelector(".teacher-home-button").addEventListener('click', () => {
+        document.querySelectorAll('.selection-option').forEach(task => {
+            task.classList.remove('selected-option');
+        });
+
+        document.querySelector(".teacher-home-button").classList.add('selected-option');
+
+        // Display task info
+        displayTeacherHome();
+
+        if (currentAction !== "new-task") {
+            openSidebar();
+        }
+
+        toggleMainBrowser(true);
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
 
     // TASK HISTORY GRAPH START
 
@@ -7400,10 +7936,18 @@ function applyFilters() {
         const strukturaDiff = text['SF']['C52'];
         const komponavimasDiff = text['SF']['C51'];
 
-        const strukturaMatch = taskTypes['C52'] && difficulties[strukturaDiff];
-        const komponavimasMatch = taskTypes['C51'] && difficulties[komponavimasDiff];
+        // Check if at least one selected task type matches with its difficulty
+        let hasMatch = false;
+        
+        if (taskTypes['C52'] && strukturaDiff && difficulties[strukturaDiff]) {
+            hasMatch = true;
+        }
+        
+        if (taskTypes['C51'] && komponavimasDiff && difficulties[komponavimasDiff]) {
+            hasMatch = true;
+        }
 
-        if (!strukturaMatch && !komponavimasMatch) return false;
+        if (!hasMatch) return false;
 
         if (searchTerm) {
             const searchableText = textSearchCache.get(text.id);
@@ -7698,9 +8242,11 @@ function updateSelectionModeVisibility() {
     const container = document.getElementById('selectedIdsContainer');
     if (isSelectionModeEnabled) {
         container.classList.add('txt-viewer-visible');
+        document.querySelector(".txt-viewer-selected-ids-container-outer").style.display = "block";
         updateSelectedIdsDisplay();
     } else {
         container.classList.remove('txt-viewer-visible');
+        document.querySelector(".txt-viewer-selected-ids-container-outer").style.display = "none";
     }
 }
 
