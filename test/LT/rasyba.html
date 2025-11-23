@@ -1780,17 +1780,17 @@ async function prepareSentencesWrapper(sessionSeed, passNumber = 0, targetFormat
 			const inputs = Array.from(document.querySelectorAll('.question-input'));
 			const anyNotEmpty = inputs.some(input => input.value.trim() !== '');
 			if (!firstTimeChecking || anyNotEmpty) {
-			messageToTheUser("Sakinių skaičių galima pakeisti tik prieš įrašant raides.");
-			return;
+				messageToTheUser("Sakinių skaičių galima pakeisti tik prieš įrašant raides.");
+				return;
 			}
 			if (questionsToDisplay < 5) {
-			questionsToDisplay++;
-			await displaySentences();
-			document.getElementById('help-toggle').checked = false;
-			adjustFieldForTexts();
-			helpToggle();
+				questionsToDisplay++;
+				await displaySentences();
+				document.getElementById('help-toggle').checked = false;
+				adjustFieldForTexts();
+				helpToggle();
 			} else {
-			focusFirstInput();
+				focusFirstInput();
 			}
 		});
 		});
@@ -1800,17 +1800,17 @@ async function prepareSentencesWrapper(sessionSeed, passNumber = 0, targetFormat
 			const inputs = Array.from(document.querySelectorAll('.question-input'));
 			const anyNotEmpty = inputs.some(input => input.value.trim() !== '');
 			if (!firstTimeChecking || anyNotEmpty) {
-			messageToTheUser("Sakinių skaičių galima pakeisti tik prieš įrašant raides.");
-			return;
+				messageToTheUser("Sakinių skaičių galima pakeisti tik prieš įrašant raides.");
+				return;
 			}
 			if (questionsToDisplay > 1) {
-			questionsToDisplay--;
-			await displaySentences();
-			document.getElementById('help-toggle').checked = false;
-			adjustFieldForTexts();
-			helpToggle();
+				questionsToDisplay--;
+				await displaySentences();
+				document.getElementById('help-toggle').checked = false;
+				adjustFieldForTexts();
+				helpToggle();
 			} else {
-			focusFirstInput();
+				focusFirstInput();
 			}
 		});
 		});
@@ -2421,7 +2421,10 @@ function helpToggle() {
 
 					localStorage.setItem('controller', JSON.stringify(controller));
 					await initiateTheProgram();
-					adjustFieldForTexts();
+					
+					setTimeout(() => {
+						adjustFieldForTexts();
+					}, 100);
 				}
 			}
 
