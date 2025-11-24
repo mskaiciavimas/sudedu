@@ -1144,7 +1144,7 @@ function removeAuthToken() {
 
 // Text processing functions
 function addNoSplitMarkers(text) {
-  const endPunctuationPattern = /([.!?]+(?:\.\.|\.\.\.)?)/g;
+  const endPunctuationPattern = /([.!?…]+["„""]?)(?=\S)/gu;
   return text.replace(endPunctuationPattern, `$1${NO_SPLIT_MARKER}`);
 }
 
