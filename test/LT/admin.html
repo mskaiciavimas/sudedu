@@ -794,6 +794,7 @@
             <button class="tab-btn" onclick="showTab('messages', event)">💌 Send Gifts</button>
             <button class="tab-btn" onclick="showTab('itemlookup', event)">🔍 Item Lookup</button>
             <button class="tab-btn" onclick="showTab('statistics', event)">📊 Statistics</button>
+            <button class="tab-btn" onclick="showTab('taskstorage', event)">💾 Task Storage</button>
         </div>
 
         <!-- User Lookup Tab -->
@@ -809,70 +810,169 @@
         <!-- Bulk Operations Tab -->
         <div id="bulk-tab" class="tab-content">
             <div class="bulk-operations">
-                <!-- Send Gift -->
+                <!-- Manage Items for All -->
                 <div class="operation-card">
-                    <h3>🎁 Add Item to All</h3>
+                    <h3>📦 Manage Items for All</h3>
                     <div class="form-group">
-                        <label for="gift-itemid">Item ID</label>
-                        <input type="number" id="gift-itemid" placeholder="e.g., 42">
+                        <label>Action</label>
+                        <select id="item-action">
+                            <option value="add">Add Item</option>
+                            <option value="remove">Remove Item</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label for="gift-coords">Coordinates (X,Y)</label>
-                        <input type="text" id="gift-coords" placeholder="e.g., 10,5 (optional)">
+                        <label for="bulk-item-id">Item Game Index ID</label>
+                        <input type="number" id="bulk-item-id" placeholder="e.g., 42">
                     </div>
-                    <div id="gift-message"></div>
-                    <button class="btn" onclick="sendGift()">Send Item</button>
-                </div>
-
-                <!-- Remove Item -->
-                <div class="operation-card">
-                    <h3>🗑️ Remove Item from All</h3>
-                    <div class="form-group">
-                        <label for="remove-itemid">Item ID</label>
-                        <input type="number" id="remove-itemid" placeholder="e.g., 42">
+                    <div class="form-group" id="item-coords-group">
+                        <label for="bulk-item-coords">Coordinates (X,Y)</label>
+                        <input type="text" id="bulk-item-coords" placeholder="e.g., 10,5 (optional)">
                     </div>
-                    <div class="form-group">
-                        <label for="remove-compensation">Compensation (per item)</label>
-                        <input type="number" id="remove-compensation" placeholder="e.g., 100 (optional)" min="0">
+                    <div class="form-group" id="item-compensation-group" style="display: none;">
+                        <label for="bulk-item-compensation">Compensation (per item)</label>
+                        <input type="number" id="bulk-item-compensation" placeholder="e.g., 100 (optional)" min="0">
                         <small style="color: #666; display: block; margin-top: 5px;">
                             Money to add per removed item
                         </small>
                     </div>
-                    <div id="remove-message"></div>
-                    <button class="btn btn-danger" onclick="removeItemFromAll()">Remove Item</button>
+                    <div id="bulk-item-message"></div>
+                    <button class="btn" id="bulk-item-btn" onclick="manageItemsForAll()">Add Item</button>
                 </div>
 
-                <!-- Add Consumable to All -->
+                <!-- Manage Consumables for All -->
                 <div class="operation-card">
-                    <h3>🎒 Add Consumable to All</h3>
+                    <h3>🎒 Manage Consumables for All</h3>
                     <div class="form-group">
-                        <label for="bulk-consumable-id">Item ID</label>
-                        <input type="number" id="bulk-consumable-id" placeholder="e.g., 13">
+                        <label>Action</label>
+                        <select id="consumable-action">
+                            <option value="add">Add Consumable</option>
+                            <option value="remove">Remove Consumable</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label for="bulk-consumable-qty">Quantity</label>
-                        <input type="number" id="bulk-consumable-qty" placeholder="e.g., 5" value="1" min="1">
+                        <label for="bulk-consumable-item-id">Item Game Index ID</label>
+                        <input type="number" id="bulk-consumable-item-id" placeholder="e.g., 13">
                     </div>
-                    <div id="bulk-consumable-message"></div>
-                    <button class="btn" onclick="addConsumableToAll()">Add Consumable</button>
-                </div>
-
-                <!-- Remove Consumable from All -->
-                <div class="operation-card">
-                    <h3>🗑️ Remove Consumable from All</h3>
-                    <div class="form-group">
-                        <label for="bulk-remove-consumable-id">Item ID</label>
-                        <input type="number" id="bulk-remove-consumable-id" placeholder="e.g., 13">
+                    <div class="form-group" id="consumable-qty-group">
+                        <label for="bulk-consumable-item-qty">Quantity</label>
+                        <input type="number" id="bulk-consumable-item-qty" placeholder="e.g., 5" value="1" min="1">
                     </div>
-                    <div class="form-group">
-                        <label for="bulk-remove-compensation">Compensation (per item)</label>
-                        <input type="number" id="bulk-remove-compensation" placeholder="e.g., 50 (optional)" min="0">
+                    <div class="form-group" id="consumable-compensation-group" style="display: none;">
+                        <label for="bulk-consumable-item-compensation">Compensation (per item)</label>
+                        <input type="number" id="bulk-consumable-item-compensation" placeholder="e.g., 50 (optional)" min="0">
                         <small style="color: #666; display: block; margin-top: 5px;">
                             Money to add per removed item
                         </small>
                     </div>
-                    <div id="bulk-remove-consumable-message"></div>
-                    <button class="btn btn-danger" onclick="removeConsumableFromAll()">Remove Consumable</button>
+                    <div id="bulk-consumable-item-message"></div>
+                    <button class="btn" id="bulk-consumable-btn" onclick="manageConsumablesForAll()">Add Consumable</button>
+                </div>
+
+                <div class="operation-card">
+                    <h3>🐾 Manage Pets for All Students</h3>
+                    <div class="form-group">
+                        <label>Action</label>
+                        <select id="pet-action">
+                            <option value="add">Add Pet</option>
+                            <option value="remove">Remove Pet</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="bulk-pet-id">Pet ID (NOT GAME INDEX ID)</label>
+                        <input type="text" id="bulk-pet-id" placeholder="e.g., cat-1">
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            First class in the "css-class" list in the Game Index for the pet item.
+                        </small>
+                    </div>
+                    <div class="form-group" id="pet-name-group">
+                        <label for="bulk-pet-name">Pet Name</label>
+                           <input type="text" id="bulk-pet-name" placeholder="e.g., Fluffy">
+                    </div>
+                    <div class="form-group" id="pet-skin-id-group">
+                        <label for="bulk-pet-skin-id">Default Skin ID (NOT GAME INDEX ID)</label>
+                        <input type="text" id="bulk-pet-skin-id" placeholder="e.g., default-cat">
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            Second class in the "css-class" list in the Game Index for the pet or skin item. Default is ${pet ID}-1, i.e. cat-1-1.
+                        </small>
+                    </div>
+                    <div class="form-group" id="pet-skin-index-group">
+                        <label for="bulk-pet-skin-index">Default Skin Index</label>
+                        <input type="number" id="bulk-pet-skin-index" placeholder="e.g., 100">
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            Game Index ID for pet or skin item.
+                        </small>
+                    </div>
+                    <div class="form-group" id="pet-compensation-group" style="display: none;">
+                        <label for="bulk-pet-compensation">Compensation (per pet)</label>
+                        <input type="number" id="bulk-pet-compensation" placeholder="e.g., 100 (optional)" min="0">
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            Money to add per removed pet
+                        </small>
+                    </div>
+                    <div id="bulk-pet-message"></div>
+                    <button class="btn" id="bulk-pet-btn" onclick="managePetsForAll()">Add Pet</button>
+                </div>
+
+                <!-- Manage Skins for All -->
+                <div class="operation-card">
+                    <h3>👕 Manage Skins for All</h3>
+                    <div class="form-group">
+                        <label>Action</label>
+                        <select id="skin-action">
+                            <option value="add">Add Skin</option>
+                            <option value="remove">Remove Skin</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="target-pet-group">
+                        <label for="bulk-target-pet-id">Target Pet ID (NOT GAME INDEX ID)</label>
+                        <input type="text" id="bulk-target-pet-id" placeholder="e.g., cat-1">
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            First class in pet's "css-class" list in the Game Index.
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="bulk-skin-id">Skin ID (NOT GAME INDEX ID)</label>
+                        <input type="text" id="bulk-skin-id" placeholder="e.g., cat-skin-1">
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            Second class in "css-class" list in the Game Index for pet or skin items. Default is ${pet's first class}-1.
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="bulk-skin-index">Skin Game Index ID</label>
+                        <input type="number" id="bulk-skin-index" placeholder="e.g., 100">
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            Skin's ID in Game Index. Default is pet's ID in Game Index.
+                        </small>
+                    </div>
+                    <div class="form-group" id="skin-equipped-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="bulk-skin-equipped">
+                            Equipped
+                        </label>
+                    </div>
+                    <div class="form-group" id="skin-compensation-group" style="display: none;">
+                        <label for="bulk-skin-compensation">Compensation (per skin)</label>
+                        <input type="number" id="bulk-skin-compensation" placeholder="e.g., 50 (optional)" min="0">
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            Money to add per removed skin
+                        </small>
+                    </div>
+                    <div id="skin-backup-section" style="display: none;">
+                        <h4 style="margin-top: 15px; margin-bottom: 10px; color: #667eea;">Backup Skin (if pet left with no skins)</h4>
+                        <div class="form-group">
+                            <label for="backup-skin-id">Backup Skin ID</label>
+                            <input type="text" id="backup-skin-id" placeholder="e.g., default-cat">
+                        </div>
+                        <div class="form-group">
+                            <label for="backup-skin-index">Backup Skin Index</label>
+                            <input type="number" id="backup-skin-index" placeholder="e.g., 100">
+                        </div>
+                        <small style="color: #666; display: block; margin-bottom: 10px;">
+                            If removing a skin leaves a pet with no skins, this backup will be added and equipped
+                        </small>
+                    </div>
+                    <div id="bulk-skin-message"></div>
+                    <button class="btn" id="bulk-skin-btn" onclick="manageSkinsForAll()">Add Skin</button>
                 </div>
 
                                 <!-- Add/Subtract Money -->
@@ -892,9 +992,10 @@
                 <div class="operation-card">
                     <h3>⏰ Delete Inactive Users</h3>
                     <div class="form-group">
-                        <input type="number" id="inactive-days" placeholder="e.g., 90" min="1">
+                        <label for="inactive-months">Months of Inactivity</label>
+                        <input type="number" id="inactive-months" placeholder="e.g., 6" min="1">
                         <small style="color: #666; display: block; margin-top: 5px;">
-                            Users who haven't logged in for this many days (or never logged in) will be deleted
+                            Users who haven't logged in for this many months (or never logged in) will be deleted. Admin accounts will not be deleted.
                         </small>
                     </div>
                     <div id="inactive-message"></div>
@@ -985,6 +1086,13 @@
         <div id="statistics-tab" class="tab-content">
             <h2>Database Statistics</h2>
             <div id="statistics-content"></div>
+        </div>
+
+        <div id="taskstorage-tab" class="tab-content">
+            <h2>Task Result Archive Storage</h2>
+            <div id="task-storage-content">
+                <div class="loading">Loading storage information...</div>
+            </div>
         </div>
     </div>
 
@@ -1188,6 +1296,8 @@
                 loadMessages();
             } else if (tabName === 'statistics') {
                 loadStatistics();
+            } else if (tabName === 'taskstorage') {
+                loadTaskStorage();
             }
         }
 
@@ -1510,6 +1620,14 @@
                                 <label for="add-pet-name">Pet Name</label>
                                 <input type="text" id="add-pet-name" placeholder="e.g., Fluffy">
                             </div>
+                            <div class="form-group">
+                                <label for="add-pet-skin-id">Default Skin ID</label>
+                                <input type="text" id="add-pet-skin-id" placeholder="e.g., cat-1-1">
+                            </div>
+                            <div class="form-group">
+                                <label for="add-pet-skin-index">Default Skin Game Index ID</label>
+                                <input type="number" id="add-pet-skin-index" placeholder="e.g., 100">
+                            </div>
                             <button class="btn small-btn-with-text" onclick="addPet(${user.id})">➕ Add Pet</button>
                         </div>
 
@@ -1558,6 +1676,12 @@
                                 `;
                             }).join('')}
                         </div>
+
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            Pet ID is the first class in the "css-class" list in the Game Index for the pet item.
+                            Skin ID is the second class in the "css-class" list in the Game Index for the pet or skin items. 
+                            Game Index ID is the ID of the pet/skin item in the GameAssetIndex.json
+                        </small>
 
                         <h4 style="margin-top: 20px; margin-bottom: 10px; color: #667eea;">Consumables</h4>
                         
@@ -1857,16 +1981,16 @@
 
         // Delete inactive users
         async function deleteInactiveUsers() {
-            const days = document.getElementById('inactive-days').value;
-            if (!days || days < 1) {
-                showMessage('inactive-message', 'Please enter a valid number of days', 'error');
+            const months = document.getElementById('inactive-months').value;
+            if (!months || months < 1) {
+                showMessage('inactive-message', 'Please enter a valid number of months', 'error');
                 return;
             }
 
-            if (!confirm(`Delete all users inactive for ${days}+ days (including users who never logged in)?`)) return;
+            if (!confirm(`Delete all users inactive for ${months}+ months (including users who never logged in)?\n\nAdmin accounts will not be deleted.`)) return;
 
             try {
-                const response = await apiFetch(`${apiBase}admin/inactive?inactivePeriod=${days}`, {
+                const response = await apiFetch(`${apiBase}admin/inactive?inactivePeriod=${months}`, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' }
                 });
@@ -1878,7 +2002,7 @@
 
                 const data = await response.json();
                 showMessage('inactive-message', 
-                    `${data.message}<br>Deleted ${data.deletedCount} users`, 
+                    `${data.message}<br>Deleted ${data.deletedCount} users<br>Threshold: ${data.inactiveThresholdMonths} months`, 
                     'success'
                 );
             } catch (error) {
@@ -2060,9 +2184,16 @@
         async function addPet(userId) {
             const petId = document.getElementById('add-pet-id').value.trim();
             const petName = document.getElementById('add-pet-name').value.trim();
+            const defaultSkinId = document.getElementById('add-pet-skin-id').value.trim();
+            const defaultSkinIndex = document.getElementById('add-pet-skin-index').value.trim();
 
             if (!petId || !petName) {
                 alert('Please enter both pet ID and name');
+                return;
+            }
+
+            if (!defaultSkinId || !defaultSkinIndex) {
+                alert('Please enter default skin ID and index');
                 return;
             }
 
@@ -2070,13 +2201,20 @@
                 const response = await apiFetch(`${apiBase}admin/user/${userId}/pet`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ petId, petName })
+                    body: JSON.stringify({ 
+                        petId, 
+                        petName,
+                        defaultSkinId,
+                        defaultSkinIndex: parseInt(defaultSkinIndex)
+                    })
                 });
 
                 if (!response || !response.ok) throw new Error('Failed to add pet');
                 
                 document.getElementById('add-pet-id').value = '';
                 document.getElementById('add-pet-name').value = '';
+                document.getElementById('add-pet-skin-id').value = '';
+                document.getElementById('add-pet-skin-index').value = '';
                 searchUsers();
             } catch (error) {
                 alert(error.message);
@@ -3205,6 +3343,797 @@ function getOptionTextFromValues(values, duration) {
 window.onload = function () {
     if (userData?.accType !== "admin") {
         window.location.href = getIndexPage();
+    }
+}
+
+// TASK STORAGE FUNCTIONS
+let storageChart = null;
+
+async function loadTaskStorage() {
+    const contentDiv = document.getElementById('task-storage-content');
+    contentDiv.innerHTML = '<div class="loading">Loading storage information...</div>';
+
+    try {
+        const response = await apiFetch(`${apiBase}admin/task-archives/stats`);
+        
+        if (!response || !response.ok) {
+            throw new Error('Failed to load task storage stats');
+        }
+
+        const stats = await response.json();
+        displayTaskStorage(stats);
+    } catch (error) {
+        contentDiv.innerHTML = `<div class="message error">${error.message}</div>`;
+    }
+}
+
+function displayTaskStorage(stats) {
+    const contentDiv = document.getElementById('task-storage-content');
+    
+    if (stats.totalRecords === 0) {
+        contentDiv.innerHTML = '<div class="message info">No task result archives found</div>';
+        return;
+    }
+    
+    const earliestDate = new Date(stats.earliestDate).toLocaleDateString();
+    
+    let html = `
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>📊 Storage Overview</h3>
+                <div class="stat-items">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Records:</span>
+                        <span class="stat-value">${stats.totalRecords.toLocaleString()}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Earliest Record:</span>
+                        <span class="stat-value">${earliestDate}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Estimated Size:</span>
+                        <span class="stat-value">${stats.sizeInMB} MB (${stats.sizeInKB} KB)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>📈 Distribution Chart</h3>
+                <div class="chart-wrapper" style="height: 300px;">
+                    <canvas id="taskStorageChart"></canvas>
+                </div>
+                <small style="color: #666; display: block; margin-top: 5px;">
+                    Percentage of all tasks recorder within no. of months counting from today.
+                </small>
+            </div>
+        </div>
+        
+        <div class="user-card" style="margin-top: 20px;">
+            <h3>🗑️ Cleanup Old Records</h3>
+            <p style="color: #666; margin-bottom: 15px;">
+                Delete task result archives older than the specified number of months.
+            </p>
+            <div class="inline-form">
+                <div class="form-group">
+                    <label for="months-to-keep">Months to Keep</label>
+                    <input type="number" id="months-to-keep" placeholder="e.g., 12" min="1" value="12">
+                </div>
+                <button class="btn btn-danger" onclick="cleanupTaskArchives()">Delete Old Records</button>
+            </div>
+            <div id="cleanup-message"></div>
+        </div>
+    `;
+    
+    contentDiv.innerHTML = html;
+    
+    // Initialize chart
+    setTimeout(() => initializeTaskStorageChart(stats.distribution), 100);
+}
+
+function initializeTaskStorageChart(distribution) {
+    if (storageChart) {
+        storageChart.destroy();
+    }
+    
+    const ctx = document.getElementById('taskStorageChart').getContext('2d');
+    
+    const labels = distribution.map(d => `${d.months}`);
+    const percentages = distribution.map(d => d.percentage);
+    
+    storageChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Records within period (%)',
+                data: percentages,
+                backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                borderColor: 'rgba(102, 126, 234, 1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: (value) => value + '%'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            const dataPoint = distribution[context.dataIndex];
+                            return [
+                                `${dataPoint.percentage}% of all records`,
+                                `${dataPoint.count.toLocaleString()} records`
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+async function cleanupTaskArchives() {
+    const monthsInput = document.getElementById('months-to-keep');
+    const months = parseInt(monthsInput.value);
+    
+    if (!months || months < 1) {
+        showMessage('cleanup-message', 'Please enter a valid number of months (minimum 1)', 'error');
+        return;
+    }
+    
+    if (!confirm(`Delete all task archives older than ${months} months?\n\nThis action cannot be undone.`)) {
+        return;
+    }
+    
+    try {
+        const response = await apiFetch(`${apiBase}admin/task-archives/cleanup`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ monthsToKeep: months })
+        });
+        
+        if (!response || !response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Failed to cleanup task archives');
+        }
+        
+        const data = await response.json();
+        showMessage('cleanup-message', 
+            `${data.message}<br>Deleted ${data.deletedCount.toLocaleString()} records<br>Keeping records from ${new Date(data.cutoffDate).toLocaleDateString()} onwards`, 
+            'success'
+        );
+                
+    } catch (error) {
+        showMessage('cleanup-message', error.message, 'error');
+    }
+}
+
+// Remove pet from all users
+async function removePetFromAll() {
+    const petId = document.getElementById('bulk-remove-pet-id').value.trim();
+    const compensation = parseInt(document.getElementById('bulk-remove-pet-compensation').value) || 0;
+
+    if (!petId) {
+        showMessage('bulk-remove-pet-message', 'Please enter a pet ID', 'error');
+        return;
+    }
+
+    let confirmMsg = `Remove pet "${petId}" from all users?\n\nThis will remove the pet even if it's the only pet a user has.`;
+    if (compensation > 0) {
+        confirmMsg += `\n\nCompensation: ${compensation} money per pet removed`;
+    }
+
+    if (!confirm(confirmMsg)) return;
+
+    try {
+        const response = await apiFetch(`${apiBase}admin/bulk/pet/${encodeURIComponent(petId)}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ compensation })
+        });
+
+        if (!response || !response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Failed to remove pet');
+        }
+
+        const data = await response.json();
+        showMessage('bulk-remove-pet-message', 
+            `${data.message}<br>Users affected: ${data.usersAffected}<br>Pets removed: ${data.petsRemoved}${data.totalCompensation > 0 ? `<br>Total compensation: ${data.totalCompensation}` : ''}`, 
+            'success'
+        );
+        document.getElementById('bulk-remove-pet-id').value = '';
+        document.getElementById('bulk-remove-pet-compensation').value = '';
+    } catch (error) {
+        showMessage('bulk-remove-pet-message', error.message, 'error');
+    }
+}
+
+// Remove skin from all users
+async function removeSkinFromAll() {
+    const skinId = document.getElementById('bulk-remove-skin-id').value.trim();
+    const compensation = parseInt(document.getElementById('bulk-remove-skin-compensation').value) || 0;
+    const backupSkinId = document.getElementById('backup-skin-id').value.trim();
+    const backupSkinIndex = document.getElementById('backup-skin-index').value.trim();
+
+    if (!skinId) {
+        showMessage('bulk-remove-skin-message', 'Please enter a skin ID', 'error');
+        return;
+    }
+
+    const hasBackup = backupSkinId && backupSkinIndex;
+
+    let confirmMsg = `Remove skin "${skinId}" from all pets across all users?`;
+    if (hasBackup) {
+        confirmMsg += `\n\nIf a pet is left with no skins, backup skin "${backupSkinId}" (index ${backupSkinIndex}) will be added.`;
+    } else {
+        confirmMsg += `\n\nWARNING: No backup skin provided. Pets may be left with no skins!`;
+    }
+    if (compensation > 0) {
+        confirmMsg += `\n\nCompensation: ${compensation} money per skin removed`;
+    }
+
+    if (!confirm(confirmMsg)) return;
+
+    try {
+        const body = { compensation };
+        if (hasBackup) {
+            body.backupSkinId = backupSkinId;
+            body.backupSkinIndex = parseInt(backupSkinIndex);
+        }
+
+        const response = await apiFetch(`${apiBase}admin/bulk/skin/${encodeURIComponent(skinId)}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        if (!response || !response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Failed to remove skin');
+        }
+
+        const data = await response.json();
+        let message = `${data.message}<br>Users affected: ${data.usersAffected}<br>Skins removed: ${data.skinsRemoved}`;
+        if (data.backupsAdded > 0) {
+            message += `<br>Backup skins added: ${data.backupsAdded}`;
+        }
+        if (data.totalCompensation > 0) {
+            message += `<br>Total compensation: ${data.totalCompensation}`;
+        }
+        
+        showMessage('bulk-remove-skin-message', message, 'success');
+        document.getElementById('bulk-remove-skin-id').value = '';
+        document.getElementById('bulk-remove-skin-compensation').value = '';
+        document.getElementById('backup-skin-id').value = '';
+        document.getElementById('backup-skin-index').value = '';
+    } catch (error) {
+        showMessage('bulk-remove-skin-message', error.message, 'error');
+    }
+}
+
+// Toggle pet action UI
+document.addEventListener('DOMContentLoaded', function() {
+    const petActionSelect = document.getElementById('pet-action');
+    const skinActionSelect = document.getElementById('skin-action');
+    
+    if (petActionSelect) {
+    petActionSelect.addEventListener('change', function() {
+        const action = this.value;
+        const nameGroup = document.getElementById('pet-name-group');
+        const skinIdGroup = document.getElementById('pet-skin-id-group');
+        const skinIndexGroup = document.getElementById('pet-skin-index-group');
+        const compensationGroup = document.getElementById('pet-compensation-group');
+        const btn = document.getElementById('bulk-pet-btn');
+        
+        if (action === 'add') {
+            nameGroup.style.display = 'block';
+            skinIdGroup.style.display = 'block';
+            skinIndexGroup.style.display = 'block';
+            compensationGroup.style.display = 'none';
+            btn.textContent = 'Add Pet';
+            btn.className = 'btn';
+        } else {
+            nameGroup.style.display = 'none';
+            skinIdGroup.style.display = 'none';
+            skinIndexGroup.style.display = 'none';
+            compensationGroup.style.display = 'block';
+            btn.textContent = 'Remove Pet';
+            btn.className = 'btn btn-danger';
+        }
+    });
+}
+    
+    if (skinActionSelect) {
+        skinActionSelect.addEventListener('change', function() {
+            const action = this.value;
+            const targetPetGroup = document.getElementById('target-pet-group');
+            const equippedGroup = document.getElementById('skin-equipped-group');
+            const compensationGroup = document.getElementById('skin-compensation-group');
+            const backupSection = document.getElementById('skin-backup-section');
+            const btn = document.getElementById('bulk-skin-btn');
+            
+            if (action === 'add') {
+                targetPetGroup.style.display = 'block';
+                equippedGroup.style.display = 'block';
+                compensationGroup.style.display = 'none';
+                backupSection.style.display = 'none';
+                btn.textContent = 'Add Skin';
+                btn.className = 'btn';
+            } else {
+                targetPetGroup.style.display = 'none';
+                equippedGroup.style.display = 'none';
+                compensationGroup.style.display = 'block';
+                backupSection.style.display = 'block';
+                btn.textContent = 'Remove Skin';
+                btn.className = 'btn btn-danger';
+            }
+        });
+    }
+});
+
+// Manage pets for all users
+async function managePetsForAll() {
+    const action = document.getElementById('pet-action').value;
+    const petId = document.getElementById('bulk-pet-id').value.trim();
+    
+    if (!petId) {
+        showMessage('bulk-pet-message', 'Please enter a pet ID', 'error');
+        return;
+    }
+    
+    if (action === 'add') {
+        await addPetToAll(petId);
+    } else {
+        await removePetFromAll(petId);
+    }
+}
+
+// Add pet to all users
+async function addPetToAll(petId) {
+    const petName = document.getElementById('bulk-pet-name').value.trim();
+    const defaultSkinId = document.getElementById('bulk-pet-skin-id').value.trim();
+    const defaultSkinIndex = document.getElementById('bulk-pet-skin-index').value.trim();
+    
+    if (!petName) {
+        showMessage('bulk-pet-message', 'Please enter a pet name', 'error');
+        return;
+    }
+    
+    if (!defaultSkinId || !defaultSkinIndex) {
+        showMessage('bulk-pet-message', 'Please enter default skin ID and index', 'error');
+        return;
+    }
+    
+    if (!confirm(`Add pet "${petId}" (${petName}) with default skin "${defaultSkinId}" to all students?`)) return;
+    
+    try {
+        const response = await apiFetch(`${apiBase}admin/bulk/pet`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                petId, 
+                petName,
+                defaultSkinId,
+                defaultSkinIndex: parseInt(defaultSkinIndex)
+            })
+        });
+        
+        if (!response || !response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Failed to add pet');
+        }
+        
+        const data = await response.json();
+        let message = `${data.message}<br>Users affected: ${data.usersAffected}<br>Pets added: ${data.petsAdded}`;
+        if (data.skippedDuplicates > 0) {
+            message += `<br>Skipped (already existed): ${data.skippedDuplicates}`;
+        }
+        
+        showMessage('bulk-pet-message', message, 'success');
+        document.getElementById('bulk-pet-id').value = '';
+        document.getElementById('bulk-pet-name').value = '';
+        document.getElementById('bulk-pet-skin-id').value = '';
+        document.getElementById('bulk-pet-skin-index').value = '';
+    } catch (error) {
+        showMessage('bulk-pet-message', error.message, 'error');
+    }
+}
+
+// Remove pet from all users
+async function removePetFromAll(petId) {
+    const compensation = parseInt(document.getElementById('bulk-pet-compensation').value) || 0;
+    
+    let confirmMsg = `Remove pet "${petId}" from all users?\n\nThis will remove the pet even if it's the only pet a user has.`;
+    if (compensation > 0) {
+        confirmMsg += `\n\nCompensation: ${compensation} money per pet removed`;
+    }
+    
+    if (!confirm(confirmMsg)) return;
+    
+    try {
+        const response = await apiFetch(`${apiBase}admin/bulk/pet/${encodeURIComponent(petId)}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ compensation })
+        });
+        
+        if (!response || !response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Failed to remove pet');
+        }
+        
+        const data = await response.json();
+        showMessage('bulk-pet-message', 
+            `${data.message}<br>Users affected: ${data.usersAffected}<br>Pets removed: ${data.petsRemoved}${data.totalCompensation > 0 ? `<br>Total compensation: ${data.totalCompensation}` : ''}`, 
+            'success'
+        );
+        document.getElementById('bulk-pet-id').value = '';
+        document.getElementById('bulk-pet-compensation').value = '';
+    } catch (error) {
+        showMessage('bulk-pet-message', error.message, 'error');
+    }
+}
+
+// Manage skins for all users
+async function manageSkinsForAll() {
+    const action = document.getElementById('skin-action').value;
+    const skinId = document.getElementById('bulk-skin-id').value.trim();
+    const skinIndex = document.getElementById('bulk-skin-index').value.trim();
+    
+    if (!skinId || !skinIndex) {
+        showMessage('bulk-skin-message', 'Please enter skin ID and index', 'error');
+        return;
+    }
+    
+    if (action === 'add') {
+        await addSkinToAll(skinId, skinIndex);
+    } else {
+        await removeSkinFromAll(skinId);
+    }
+}
+
+// Add skin to all users
+async function addSkinToAll(skinId, skinIndex) {
+    const targetPetId = document.getElementById('bulk-target-pet-id').value.trim();
+    const equipped = document.getElementById('bulk-skin-equipped').checked;
+    
+    if (!targetPetId) {
+        showMessage('bulk-skin-message', 'Please enter target pet ID', 'error');
+        return;
+    }
+    
+    if (!confirm(`Add skin "${skinId}" to all pets with ID "${targetPetId}"?`)) return;
+    
+    try {
+        const response = await apiFetch(`${apiBase}admin/bulk/skin`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                targetPetId, 
+                skinId, 
+                skinIndex: parseInt(skinIndex), 
+                equipped 
+            })
+        });
+        
+        if (!response || !response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Failed to add skin');
+        }
+        
+        const data = await response.json();
+        let message = `${data.message}<br>Users affected: ${data.usersAffected}<br>Skins added: ${data.skinsAdded}`;
+        if (data.skippedDuplicates > 0) {
+            message += `<br>Skipped (already existed): ${data.skippedDuplicates}`;
+        }
+        if (data.petsNotFound > 0) {
+            message += `<br>Users without target pet: ${data.petsNotFound}`;
+        }
+        
+        showMessage('bulk-skin-message', message, 'success');
+        document.getElementById('bulk-target-pet-id').value = '';
+        document.getElementById('bulk-skin-id').value = '';
+        document.getElementById('bulk-skin-index').value = '';
+        document.getElementById('bulk-skin-equipped').checked = false;
+    } catch (error) {
+        showMessage('bulk-skin-message', error.message, 'error');
+    }
+}
+
+// Remove skin from all users
+async function removeSkinFromAll(skinId) {
+    const compensation = parseInt(document.getElementById('bulk-skin-compensation').value) || 0;
+    const backupSkinId = document.getElementById('backup-skin-id').value.trim();
+    const backupSkinIndex = document.getElementById('backup-skin-index').value.trim();
+    
+    const hasBackup = backupSkinId && backupSkinIndex;
+    
+    let confirmMsg = `Remove skin "${skinId}" from all pets across all users?`;
+    if (hasBackup) {
+        confirmMsg += `\n\nIf a pet is left with no skins, backup skin "${backupSkinId}" (index ${backupSkinIndex}) will be added.`;
+    } else {
+        confirmMsg += `\n\nWARNING: No backup skin provided. Pets may be left with no skins!`;
+    }
+    if (compensation > 0) {
+        confirmMsg += `\n\nCompensation: ${compensation} money per skin removed`;
+    }
+    
+    if (!confirm(confirmMsg)) return;
+    
+    try {
+        const body = { compensation };
+        if (hasBackup) {
+            body.backupSkinId = backupSkinId;
+            body.backupSkinIndex = parseInt(backupSkinIndex);
+        }
+        
+        const response = await apiFetch(`${apiBase}admin/bulk/skin/${encodeURIComponent(skinId)}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        
+        if (!response || !response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Failed to remove skin');
+        }
+        
+        const data = await response.json();
+        let message = `${data.message}<br>Users affected: ${data.usersAffected}<br>Skins removed: ${data.skinsRemoved}`;
+        if (data.backupsAdded > 0) {
+            message += `<br>Backup skins added: ${data.backupsAdded}`;
+        }
+        if (data.totalCompensation > 0) {
+            message += `<br>Total compensation: ${data.totalCompensation}`;
+        }
+        
+        showMessage('bulk-skin-message', message, 'success');
+        document.getElementById('bulk-skin-id').value = '';
+        document.getElementById('bulk-skin-index').value = '';
+        document.getElementById('bulk-skin-compensation').value = '';
+        document.getElementById('backup-skin-id').value = '';
+        document.getElementById('backup-skin-index').value = '';
+    } catch (error) {
+        showMessage('bulk-skin-message', error.message, 'error');
+    }
+}
+
+// Add to the DOMContentLoaded event listener (find it and add these inside):
+const itemActionSelect = document.getElementById('item-action');
+const consumableActionSelect = document.getElementById('consumable-action');
+
+if (itemActionSelect) {
+    itemActionSelect.addEventListener('change', function() {
+        const action = this.value;
+        const coordsGroup = document.getElementById('item-coords-group');
+        const compensationGroup = document.getElementById('item-compensation-group');
+        const btn = document.getElementById('bulk-item-btn');
+        
+        if (action === 'add') {
+            coordsGroup.style.display = 'block';
+            compensationGroup.style.display = 'none';
+            btn.textContent = 'Add Item';
+            btn.className = 'btn';
+        } else {
+            coordsGroup.style.display = 'none';
+            compensationGroup.style.display = 'block';
+            btn.textContent = 'Remove Item';
+            btn.className = 'btn btn-danger';
+        }
+    });
+}
+
+if (consumableActionSelect) {
+    consumableActionSelect.addEventListener('change', function() {
+        const action = this.value;
+        const qtyGroup = document.getElementById('consumable-qty-group');
+        const compensationGroup = document.getElementById('consumable-compensation-group');
+        const btn = document.getElementById('bulk-consumable-btn');
+        
+        if (action === 'add') {
+            qtyGroup.style.display = 'block';
+            compensationGroup.style.display = 'none';
+            btn.textContent = 'Add Consumable';
+            btn.className = 'btn';
+        } else {
+            qtyGroup.style.display = 'none';
+            compensationGroup.style.display = 'block';
+            btn.textContent = 'Remove Consumable';
+            btn.className = 'btn btn-danger';
+        }
+    });
+}
+
+// Manage items for all users
+async function manageItemsForAll() {
+    const action = document.getElementById('item-action').value;
+    const itemId = parseInt(document.getElementById('bulk-item-id').value);
+    
+    if (isNaN(itemId)) {
+        showMessage('bulk-item-message', 'Please enter a valid item ID', 'error');
+        return;
+    }
+    
+    if (action === 'add') {
+        await addItemToAll(itemId);
+    } else {
+        await removeItemFromAll(itemId);
+    }
+}
+
+// Add item to all users (previously sendGift)
+async function addItemToAll(itemId) {
+    const coordsInput = document.getElementById('bulk-item-coords').value.trim();
+    
+    let coordinates = [];
+    if (coordsInput) {
+        const parts = coordsInput.split(',').map(x => parseInt(x.trim()));
+        if (parts.length === 2 && !parts.some(isNaN)) {
+            coordinates = parts;
+        } else {
+            showMessage('bulk-item-message', 'Invalid coordinates format. Use X,Y or leave empty', 'error');
+            return;
+        }
+    }
+    
+    if (!confirm(`Add item ${itemId} to all users?`)) return;
+    
+    try {
+        const response = await apiFetch(`${apiBase}admin/gift`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ itemId, coordinates })
+        });
+        
+        if (!response || !response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Failed to add item');
+        }
+        
+        const data = await response.json();
+        showMessage('bulk-item-message', 
+            `${data.message}<br>Updated ${data.updatedCount} users`, 
+            'success'
+        );
+        document.getElementById('bulk-item-id').value = '';
+        document.getElementById('bulk-item-coords').value = '';
+    } catch (error) {
+        showMessage('bulk-item-message', error.message, 'error');
+    }
+}
+
+// Remove item from all users (updated to use new element IDs)
+async function removeItemFromAll(itemId) {
+    const compensation = parseInt(document.getElementById('bulk-item-compensation').value) || 0;
+    
+    let confirmMsg = `Remove all instances of item ${itemId} from all users?`;
+    if (compensation > 0) {
+        confirmMsg += `\n\nCompensation: ${compensation} money per item removed`;
+    }
+    
+    if (!confirm(confirmMsg)) return;
+    
+    try {
+        const response = await apiFetch(`${apiBase}admin/remove-item/${itemId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ compensation })
+        });
+        
+        if (!response || !response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Failed to remove item');
+        }
+        
+        const data = await response.json();
+        showMessage('bulk-item-message', 
+            `${data.message}<br>Users affected: ${data.usersAffected}<br>Items removed: ${data.itemsRemoved}${data.totalCompensation > 0 ? `<br>Total compensation: ${data.totalCompensation}` : ''}`, 
+            'success'
+        );
+        document.getElementById('bulk-item-id').value = '';
+        document.getElementById('bulk-item-compensation').value = '';
+    } catch (error) {
+        showMessage('bulk-item-message', error.message, 'error');
+    }
+}
+
+// Manage consumables for all users
+async function manageConsumablesForAll() {
+    const action = document.getElementById('consumable-action').value;
+    const itemId = parseInt(document.getElementById('bulk-consumable-item-id').value);
+    
+    if (isNaN(itemId)) {
+        showMessage('bulk-consumable-item-message', 'Please enter a valid item ID', 'error');
+        return;
+    }
+    
+    if (action === 'add') {
+        await addConsumableToAllUsers(itemId);
+    } else {
+        await removeConsumableFromAllUsers(itemId);
+    }
+}
+
+// Add consumable to all users (updated to use new element IDs)
+async function addConsumableToAllUsers(itemId) {
+    const quantity = parseInt(document.getElementById('bulk-consumable-item-qty').value);
+    
+    if (isNaN(quantity) || quantity < 1) {
+        showMessage('bulk-consumable-item-message', 'Please enter a valid quantity', 'error');
+        return;
+    }
+    
+    if (!confirm(`Add consumable ${itemId} (qty: ${quantity}) to all users?`)) return;
+    
+    try {
+        const response = await apiFetch(`${apiBase}admin/bulk/consumable`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ itemId, quantity })
+        });
+        
+        if (!response || !response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Failed to add consumable');
+        }
+        
+        const data = await response.json();
+        showMessage('bulk-consumable-item-message', 
+            `${data.message}<br>Updated ${data.updatedCount} users`, 
+            'success'
+        );
+        document.getElementById('bulk-consumable-item-id').value = '';
+        document.getElementById('bulk-consumable-item-qty').value = '1';
+    } catch (error) {
+        showMessage('bulk-consumable-item-message', error.message, 'error');
+    }
+}
+
+// Remove consumable from all users (updated to use new element IDs)
+async function removeConsumableFromAllUsers(itemId) {
+    const compensation = parseInt(document.getElementById('bulk-consumable-item-compensation').value) || 0;
+    
+    let confirmMsg = `Remove consumable ${itemId} from all users?`;
+    if (compensation > 0) {
+        confirmMsg += `\n\nCompensation: ${compensation} money per item removed`;
+    }
+    
+    if (!confirm(confirmMsg)) return;
+    
+    try {
+        const response = await apiFetch(`${apiBase}admin/bulk/consumable/${itemId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ compensation })
+        });
+        
+        if (!response || !response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Failed to remove consumable');
+        }
+        
+        const data = await response.json();
+        showMessage('bulk-consumable-item-message', 
+            `${data.message}<br>Users affected: ${data.usersAffected}${data.totalCompensation > 0 ? `<br>Total items removed: ${data.totalItemsRemoved}<br>Total compensation: ${data.totalCompensation}` : ''}`, 
+            'success'
+        );
+        document.getElementById('bulk-consumable-item-id').value = '';
+        document.getElementById('bulk-consumable-item-compensation').value = '';
+    } catch (error) {
+        showMessage('bulk-consumable-item-message', error.message, 'error');
     }
 }
 

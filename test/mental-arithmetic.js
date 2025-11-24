@@ -3517,30 +3517,42 @@ async function processSelectedTexts() {
     return recordsList;
 }
 
-// Cache for task averages - shared across all students for same task
+// Cache for task averages - shared across all students for same task combination
 const taskAverageCache = new Map();
 const retrievedInfoCache = {};
 
-// Frontend function to fetch task stats with caching
-async function fetchTaskStats(studentId, taskInfo) {
+// Frontend function to fetch task stats with caching for multiple tasks
+async function fetchTaskStats(studentId, taskInfoList) {
   try {
-    const taskInfoString = JSON.stringify(taskInfo);
-    const cacheKey = taskInfoString;
+    // taskInfoList should be an array of taskInfo objects
+    // e.g., [taskInfo1, taskInfo2, taskInfo3]
+    
+    if (!Array.isArray(taskInfoList) || taskInfoList.length === 0) {
+      console.error('taskInfoList must be a non-empty array');
+      return null;
+    }
+
+    // Create a stable cache key by sorting and stringifying the task list
+    const sortedTaskList = [...taskInfoList].sort((a, b) => 
+      JSON.stringify(a).localeCompare(JSON.stringify(b))
+    );
+    const cacheKey = JSON.stringify(sortedTaskList);
 
     // Initialize per-student cache if needed
     retrievedInfoCache[studentId] ??= {};
 
     // Return fully cached task data if available
     if (retrievedInfoCache[studentId][cacheKey]) {
-      console.log('Using fully cached data for student', studentId);
+      console.log('Using fully cached data for student', studentId, 'with', taskInfoList.length, 'tasks');
       return retrievedInfoCache[studentId][cacheKey];
     }
 
-    // Check if averages are already cached
+    // Check if averages are already cached for this task combination
     const cachedAverage = taskAverageCache.get(cacheKey);
 
-    // Build URL with optional skipAverages flag
-    const url = `${apiBase}students/task-stats/${studentId}?taskInfo=${encodeURIComponent(taskInfoString)}`
+    // Build URL with task list and optional skipAverages flag
+    const taskInfoListString = JSON.stringify(taskInfoList);
+    const url = `${apiBase}students/task-stats/${studentId}?taskInfoList=${encodeURIComponent(taskInfoListString)}`
       + (cachedAverage ? `&skipAverages=true` : `&skipAverages=false`);
 
     // Fetch student data (and possibly averages)
@@ -3558,13 +3570,13 @@ async function fetchTaskStats(studentId, taskInfo) {
 
     // If averages were already cached, apply them to the response
     if (cachedAverage) {
-      console.log('Using cached average data for task');
+      console.log('Using cached average data for', taskInfoList.length, 'tasks combined');
       data.averageDates = cachedAverage.averageDates;
       data.averageMistakeFrequency = cachedAverage.averageMistakeFrequency;
       data.averageAnswerRate = cachedAverage.averageAnswerRate;
     } else {
-      // First fetch - cache the averages
-      console.log('Caching average data for task');
+      // First fetch - cache the averages for this task combination
+      console.log('Caching average data for', taskInfoList.length, 'tasks combined');
       taskAverageCache.set(cacheKey, {
         averageDates: data.averageDates,
         averageMistakeFrequency: data.averageMistakeFrequency,
@@ -3585,10 +3597,17 @@ async function fetchTaskStats(studentId, taskInfo) {
 }
 
 
-// Clear cache when needed
+// Clear cache when needed (e.g., when switching between different task combinations)
 function clearTaskAverageCache() {
     taskAverageCache.clear();
     console.log('Cleared all task average cache');
+}
+
+function clearStudentTaskCache(studentId) {
+    if (retrievedInfoCache[studentId]) {
+        delete retrievedInfoCache[studentId];
+        console.log('Cleared cache for student', studentId);
+    }
 }
 
 function messageToTheUser(message, errorMessage=true, extendedMessage=false) {

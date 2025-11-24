@@ -66,11 +66,15 @@ if (isTeacher && window.location.pathname.includes("uzduotys.html")) {
             toggleVisibility(modeChoice10Element, true);
             toggleVisibility(modeChoice14Element, true);
 
-            if (modeChoice15Element) toggleVisibility(modeChoice15Element, true);
-
             let changeEvent = new Event('change');
             modeChoice8Element.value = 'C49';
             modeChoice8Element.dispatchEvent(changeEvent);
+
+            if (modeChoice15Element) {
+                toggleVisibility(modeChoice15Element, true);
+                let changeEvent = new Event('change');
+                modeChoice15Element.dispatchEvent(changeEvent);
+            }
 
         } else if (modeChoiceSelection === "math") {
             toggleVisibility(modeChoice1Element, true);
@@ -90,6 +94,11 @@ if (isTeacher && window.location.pathname.includes("uzduotys.html")) {
             toggleVisibility(modeChoice12Element, false);
             toggleVisibility(modeChoice13Element, false);
             toggleVisibility(timerQuestionNumberDiv, true);
+        }
+
+        if (modeChoice15Element) {
+            let changeEvent = new Event('change');
+            modeChoice15Element.dispatchEvent(changeEvent);
         }
     }
 
@@ -414,61 +423,84 @@ function handleModeChoice8Change() {
     }
     modeChoice9Element.innerHTML = "";
 
-if (modeChoice8Selection === "C83") {
-    toggleVisibility(timerQuestionNumberDiv, true);
-    toggleVisibility(modeChoice10Element, false);
-    toggleVisibility(modeChoice14Element, false);
-    if (modeChoice15Element) toggleVisibility(modeChoice15Element, false);
-    modeChoice9Element.innerHTML += '<option value="C50">RAŠYBĄ</option>';
-    toggleVisibility(modeChoice11DivElement, true);
-    if (classChoiceSelection === "C75") {
-        toggleVisibility(modeChoice13Element, true);
-        toggleVisibility(modeChoice12Element, false);
-        rasybaOptionsLabelTextGaluneElement.innerHTML = "ŽODŽIO PABAIGA";
-    } else {
-        toggleVisibility(modeChoice13Element, false);
-        toggleVisibility(modeChoice12Element, true);
-        rasybaOptionsLabelTextGaluneElement.innerHTML = "ŽODŽIO PABAIGA:";
-    }
-} else if (modeChoice8Selection === "C49") {
-    toggleVisibility(modeChoice10Element, true);
-    toggleVisibility(modeChoice14Element, true);
-    if (modeChoice15Element) toggleVisibility(modeChoice15Element, true);
-    toggleVisibility(modeChoice11DivElement, false);
-    toggleVisibility(modeChoice13Element, false);
-    modeChoice9Element.innerHTML += '<option value="C51">TURINIO KOMPONAVIMĄ</option>';
-    modeChoice9Element.innerHTML += '<option value="C52">STRUKTŪROS IŠDĖSTYMĄ</option>';
-    if (modeChoice15Selection === "C82") {
+    if (modeChoice8Selection === "C83") {
         toggleVisibility(timerQuestionNumberDiv, true);
-    } else if (modeChoice15Selection === "C84") {
-        toggleVisibility(timerQuestionNumberDiv, false);
+        toggleVisibility(modeChoice10Element, false);
+        toggleVisibility(modeChoice14Element, false);
+        if (modeChoice15Element) toggleVisibility(modeChoice15Element, false);
+        modeChoice9Element.innerHTML += '<option value="C50">RAŠYBĄ</option>';
+        toggleVisibility(modeChoice11DivElement, true);
+        if (classChoiceSelection === "C75") {
+            toggleVisibility(modeChoice13Element, true);
+            toggleVisibility(modeChoice12Element, false);
+            rasybaOptionsLabelTextGaluneElement.innerHTML = "ŽODŽIO PABAIGA";
+        } else {
+            toggleVisibility(modeChoice13Element, false);
+            toggleVisibility(modeChoice12Element, true);
+            rasybaOptionsLabelTextGaluneElement.innerHTML = "ŽODŽIO PABAIGA:";
+        }
+    } else if (modeChoice8Selection === "C49") {
+        toggleVisibility(modeChoice10Element, true);
+        toggleVisibility(modeChoice14Element, true);
+        if (modeChoice15Element) toggleVisibility(modeChoice15Element, true);
+        toggleVisibility(modeChoice11DivElement, false);
+        toggleVisibility(modeChoice13Element, false);
+        modeChoice9Element.innerHTML += '<option value="C51">TURINIO KOMPONAVIMĄ</option>';
+        modeChoice9Element.innerHTML += '<option value="C52">STRUKTŪROS IŠDĖSTYMĄ</option>';
+        if (modeChoice15Selection === "C82") {
+            toggleVisibility(timerQuestionNumberDiv, true);
+        } else if (modeChoice15Selection === "C84") {
+            toggleVisibility(timerQuestionNumberDiv, false);
+        }
     }
-}
+
+    if (modeChoice15Element) {
+        let changeEvent = new Event('change');
+        modeChoice15Element.dispatchEvent(changeEvent);
+    }
 }
 
 modeChoice8Element.addEventListener('change', handleModeChoice8Change);
 classChoiceElement.addEventListener('change', handleModeChoice8Change);
 
 function handleModeChoice15Change () {
-        let modeChoice15Selection = modeChoice15Element.value;
+    if (!modeChoice15Element) {
+        return
+    }
 
-        if (modeChoice15Selection === "C82") {
+    let modeChoiceSelection = modeChoiceElement.value;
+    let modeChoice15Selection = modeChoice15Element.value;
+    let modeChoice8Selection = modeChoice8Element.value;
+
+    if (modeChoiceSelection === "lang") {
+        if (modeChoice8Selection === "C83") {
             toggleVisibility(classChoiceElement, true);
-            toggleVisibility(modeChoice10Element, true);
+            toggleVisibility(modeChoice10Element, false);
             toggleVisibility(modeChoice4Element, true);
             toggleVisibility(timerQuestionNumberDiv, true);
-            isSelectionModeEnabled = false;
-            refilterTexts();
-        } else if (modeChoice15Selection === "C84") {
-            toggleVisibility(classChoiceElement, false);
-            toggleVisibility(modeChoice10Element, false);
-            toggleVisibility(modeChoice4Element, false);
-            toggleVisibility(timerQuestionNumberDiv, false);
-            messageToTheUser("Pasirinkite norimus tekstus tekstų naršyklėje.", false)
-            isSelectionModeEnabled = true;
-            refilterTexts();
+        } else if (modeChoice8Selection === "C49") {
+             if (modeChoice15Selection === "C82") {
+                toggleVisibility(classChoiceElement, true);
+                toggleVisibility(modeChoice10Element, true);
+                toggleVisibility(modeChoice4Element, true);
+                toggleVisibility(timerQuestionNumberDiv, true);
+                isSelectionModeEnabled = false;
+                refilterTexts();
+             } else if (modeChoice15Selection === "C84") {
+                toggleVisibility(classChoiceElement, false);
+                toggleVisibility(modeChoice10Element, false);
+                toggleVisibility(modeChoice4Element, false);
+                toggleVisibility(timerQuestionNumberDiv, false);
+                messageToTheUser("Pasirinkite norimus tekstus tekstų naršyklėje.", false)
+                isSelectionModeEnabled = true;
+                refilterTexts();
+            }
         }
+    } else if (modeChoiceSelection === "math") {
+        toggleVisibility(modeChoice4Element, true);
+        toggleVisibility(timerQuestionNumberDiv, true);
     }
+}
 
 if (modeChoice15Element) modeChoice15Element.addEventListener('change', handleModeChoice15Change);
 

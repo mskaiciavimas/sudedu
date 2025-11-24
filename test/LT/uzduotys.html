@@ -167,7 +167,6 @@
             width: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
             flex: 1;
             min-width: 0;
@@ -1147,7 +1146,7 @@
 
 .student-action-btn {
     flex: 0 0 auto;
-    width: 150px;
+    width: 100px;
 }
 
 .teacher-action-btn,
@@ -1174,7 +1173,6 @@
   cursor: pointer;
   font-size: 1rem;
   color: #F5F5F7;
-  overflow: hidden;
   min-width: 0;
   padding: 16px 15px;
   font-weight: 500;
@@ -1296,6 +1294,7 @@ button:disabled.cancel-btn::before {
     width: 100%;
     flex-direction: column;
     min-width: 0;
+    gap: 5px
 }
 
  .input-group {
@@ -1383,15 +1382,96 @@ button:disabled.cancel-btn::before {
 }
 
 .btn-label span {
-    display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-label svg {
+    height: 30px;
+    width: 30px;
+}
+
+#delete-task-button svg {
+    height: 32px;
+    width: 32px;
+}
+
+#frequent-mistakes-btn svg {
+    height: 40px;
+    width: 40px;
+}
+
+#new-task-button,
+#delete-task-button,
+#delete-student-button,
+#browse-task-history-button,
+#frequent-mistakes-btn {
+  position: relative;
+  overflow: visible; /* allow tooltip outside button */
+}
+
+#new-task-button::before,
+#delete-task-button::before,
+#delete-student-button::before,
+#browse-task-history-button::before,
+#frequent-mistakes-btn::before {
+  position: absolute;
+  top: 110%;        /* above the button */
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-block; /* << important: allow width/height to fit text */
+  background: #333;
+  color: white;
+  padding: 4px 6px;   /* padding around text */
+  border-radius: 6px;
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 9999;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  width: max-content;
+  height: max-content;
+}
+
+#new-task-button::before {
+    content: "Nauja užduotis";
+}
+
+#delete-task-button::before {
+    content: "Trinti užduotis";
+}
+
+#delete-student-button::before {
+    content: "Šalinti mokinius";
+}
+
+#browse-task-history-button::before {
+    content: "Rezultatų istorija";
+}
+
+#frequent-mistakes-btn::before {
+    content: "Paskutinės klaidos";
 }
 
 
-    .filter-section {
-        padding-bottom: 10px;
-        display: flex;
-        flex-wrap: wrap;
-    }
+#new-task-button:hover::before,
+#delete-task-button:hover::before,
+#delete-student-button:hover::before,
+#browse-task-history-button:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px); /* optional slight slide */
+}
+
+#frequent-mistakes-btn:hover::before {
+  opacity: 1;
+  transform: translateX(-60%) translateY(-4px); /* optional slight slide */
+}
+
+
+
 
     .filter-label {
         font-weight: 600;
@@ -1679,6 +1759,326 @@ button:disabled.cancel-btn::before {
         text-decoration: underline;
     }
 
+    /* Dropdown Controls */
+.filter-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.item-display-none-lock {
+    display: none !important;
+}
+
+.dropdown-container {
+    position: relative;
+}
+
+.dropdown-container:first-child {
+    flex: 1 1 200px;
+    min-width: 180px;
+}
+
+.dropdown-container:last-child {
+    flex: 2 1 300px;
+    min-width: 200px;
+}
+
+#subjectDropdownBtn,
+#metricsDropdownBtn {
+    width: 100%;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #333;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+    text-align: left;
+    min-height: 42px; /* Add this - ensures consistent height */
+    height: auto; /* Add this */
+}
+
+#subjectDropdownText,
+#metricsDropdownText {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1; /* Add this to prevent text from pushing the icon */
+    min-width: 0; /* Add this to allow text truncation */
+}
+
+#subjectDropdownBtn {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+#subjectDropdownText {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+#metricsDropdownText {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#subjectDropdownIcon,
+#metricsDropdownIcon {
+    flex-shrink: 0;
+    margin-left: 8px;
+    transition: transform 0.2s;
+}
+
+#subjectDropdownMenu,
+#metricsDropdownMenu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    right: 0;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    overflow: hidden;
+    animation: dropdownSlide 0.2s ease-out;
+}
+
+/* Dropdown menu items */
+.dropdown-menu-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    background: transparent;
+    transition: background 0.2s;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+    text-transform: uppercase;
+}
+
+.dropdown-menu-item:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.dropdown-menu-item.active {
+    background: rgba(50, 172, 147, 0.2);
+    font-weight: 600;
+}
+
+.metric-menu-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    background: transparent;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.metric-menu-item:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.metric-checkbox {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 2px solid;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+.metric-menu-item span {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.task-history-chart-wrapper {
+    position: relative;
+    height: 350px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.task-history-date-input {
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: #333;
+    transition: all 0.2s;
+    font-family: inherit; /* ADD THIS */
+}
+
+.task-history-date-input::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(0.5);
+}
+
+.task-history-date-input:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.task-history-date-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1 1 auto;
+}
+
+.task-history-date-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #4a4a4a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.task-history-dropdown-container {
+    position: relative;
+    flex: 1 1 50%;
+}
+
+#taskHistoryMetricsBtn {
+    width: auto;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #333;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+    text-align: left;
+    min-height: 42px;
+    height: auto;
+    width: 100%;
+}
+
+.task-history-controls {
+    flex: 1 1 auto;
+}
+
+.task-history-controls-outer {
+    display: flex;
+    align-items: end;
+    margin-bottom: 15px;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#taskHistoryMetricsText {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+}
+
+#taskHistoryMetricsIcon {
+    flex-shrink: 0;
+    margin-left: 8px;
+    transition: transform 0.2s;
+}
+
+#taskHistoryMetricsMenu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    right: 0;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    overflow: hidden;
+    animation: dropdownSlide 0.2s ease-out;
+}
+
+.task-history-metric-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    background: transparent;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.task-history-metric-item:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.task-history-metric-checkbox {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 2px solid;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+.task-history-metric-item span {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.task-history-date-selector {
+    display: flex;
+    gap: 10px;
+}
+
+.task-history-container {
+    display: flex;
+    flex-direction: column;
+}
+
 
     @media (max-width: 1999px) {
         #teacher-message-line,
@@ -1878,31 +2278,37 @@ button:disabled.cancel-btn::before {
     }
 
     .filter-section {
-                padding-bottom: 15px;
-            }
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    #subjectDropdownBtn,
+    #metricsDropdownBtn {
+        background: rgba(255, 255, 255, 1);
+    }
             
-            .button-group {
-                gap: 8px;
-            }
-            
-            .chart-container {
-                height: 400px;
-                padding: 15px;
-                border-radius: 15px;
-            }
-            
-            .info-box {
-                padding: 12px;
-                margin-top: 15px;
-            }
-            
-            .info-box p {
-                font-size: 12px;
-            }
-            
-            .chart-scroll-indicator {
-                display: none;
-            }
+    .button-group {
+        gap: 8px;
+    }
+    
+    .chart-container {
+        height: 400px;
+        padding: 15px;
+        border-radius: 15px;
+    }
+    
+    .info-box {
+        padding: 12px;
+        margin-top: 15px;
+    }
+    
+    .info-box p {
+        font-size: 12px;
+    }
+    
+    .chart-scroll-indicator {
+        display: none;
+    }
 
     .btn-metric,
     .btn-subject {
@@ -1916,6 +2322,22 @@ button:disabled.cancel-btn::before {
 
     .chart-container {
         height: 300px;
+    }
+
+    .task-history-container {
+        gap: 10px;
+    }
+    
+    .task-history-chart-wrapper {
+        height: 300px;
+        padding: 15px;
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.8);
+    }
+    
+    .task-history-date-input,
+    #taskHistoryMetricsBtn {
+        background: rgba(255, 255, 255, 1);
     }
 }
 
@@ -1997,6 +2419,19 @@ button:disabled.cancel-btn::before {
         #knowledge-level-select {
             width: 100px;
         }
+
+        .dropdown-container,
+        .dropdown-container:first-child,
+        .dropdown-container:last-child {
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
+        }
+
+        .task-history-chart-wrapper {
+            height: 250px;
+            padding: 10px;
+        }
+
     }
 
 
@@ -2162,7 +2597,7 @@ button:disabled.cancel-btn::before {
             }
 
             #knowledge-level-select {
-                background: rgba(255, 255, 255, 0.8);
+                background: rgba(255, 255, 255, 1);
                 font-size: 1.5rem;
             }
 
@@ -2559,6 +2994,12 @@ button:disabled.cancel-btn::before {
     padding: 5px 10px;
 }
 
+#student-task-history-container,
+.task-history-container {
+    height: 100%;
+    width: 100%;
+}
+
 .text-section-paragraph:last-child {
     margin-bottom: 0;
 }
@@ -2644,6 +3085,17 @@ button:disabled.cancel-btn::before {
 
 .dropdown-item input {
     margin-right: 6px;
+}
+
+@keyframes dropdownSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (max-width: 768px) {
@@ -2808,19 +3260,27 @@ button:disabled.cancel-btn::before {
                     <!-- Action buttons that transform -->
                     <div id="action-buttons-container">
                         <button id="new-task-button" class="teacher-action-btn" data-action="new-task">
-                            <span id="create-task-button-label" class="btn-label"><span>Kurti</span><span>užduotį</span></span>
+                            <span id="create-task-button-label" class="btn-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q65 0 123 19t107 53l-58 59q-38-24-81-37.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160q32 0 62-6t58-17l60 61q-41 20-86 31t-94 11Zm280-80v-120H640v-80h120v-120h80v120h120v80H840v120h-80ZM424-296 254-466l56-56 114 114 400-401 56 56-456 457Z"/></svg>
+                            </span>
                         </button>
                         
                         <button id="delete-task-button" class="teacher-action-btn" data-action="delete-task">
-                            <span id="delete-task-button-label"  class="btn-label"><span>Trinti</span><span>užduotis</span></span>
+                            <span id="delete-task-button-label"  class="btn-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="m376-300 104-104 104 104 56-56-104-104 104-104-56-56-104 104-104-104-56 56 104 104-104 104 56 56Zm-96 180q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520Zm-400 0v520-520Z"/></svg>
+                            </span>
                         </button>
                         
                         <button id="delete-student-button" class="teacher-action-btn" data-action="delete-student">
-                            <span id="delete-student-button-label"  class="btn-label"><span>Šalinti</span><span>mokinius</span></span>
+                            <span id="delete-student-button-label"  class="btn-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="M819-28 680-167v7H40v-112q0-34 17.5-62.5T104-378q62-31 126-46.5T360-440q12 0 24.5.5T409-438l-42-42h-7q-66 0-113-47t-47-113v-7L27-820l57-57L876-85l-57 57ZM666-434q51 6 96 20.5t84 35.5q36 20 55 44.5t19 53.5v120h-5L755-320q-9-33-31.5-62.5T666-434Zm-306 74q-56 0-111 13.5T140-306q-9 5-14.5 14t-5.5 20v32h480v-7l-87-87q-38-13-76.5-19.5T360-360Zm202-153q19-28 28.5-60t9.5-67q0-42-14.5-81T544-792q14-5 28-6.5t28-1.5q66 0 113 47t47 113q0 66-49.5 113T595-480l-33-33Zm-58-58-64-64v-5q0-33-23.5-56.5T360-720h-5l-64-64q16-8 33-12t36-4q66 0 113 47t47 113q0 19-4 36t-12 33ZM365-240Zm33-438Z"/></svg>
+                            </span>
                         </button>
 
                         <button id="browse-task-history-button" class="teacher-action-btn" data-action="browse-history">
-                            <span id="browse-task-history-label"  class="btn-label"><span>Rezultatų</span><span>istorija</span></span>
+                            <span id="browse-task-history-label"  class="btn-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="m105-399-65-47 200-320 120 140 160-260 120 180 135-214 65 47-198 314-119-179-152 247-121-141-145 233Zm475 159q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29ZM784-80 676-188q-21 14-45.5 21t-50.5 7q-75 0-127.5-52.5T400-340q0-75 52.5-127.5T580-520q75 0 127.5 52.5T760-340q0 26-7 50.5T732-244l108 108-56 56Z"/></svg>
+                            </span>
                         </button>
                     </div>
                     
@@ -3169,21 +3629,32 @@ button:disabled.cancel-btn::before {
 
                         <div id="student-task-history-container" style="display: none;">
                             <div class="task-history-container">
-                                <div class="task-history-controls">
-                                    <div class="task-history-metrics" id="taskHistoryMetrics">
-                                        <!-- Buttons will be added dynamically -->
-                                    </div>
+                                <div class="task-history-controls-outer">
+
+                                <div class="task-history-dropdown-container">
+                                    <button id="taskHistoryMetricsBtn">
+                                        <span id="taskHistoryMetricsText"></span>
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="taskHistoryMetricsIcon">
+                                            <polyline points="6 9 12 15 18 9"></polyline>
+                                        </svg>
+                                    </button>
                                     
+                                    <div id="taskHistoryMetricsMenu"></div>
+                                </div>
+
+                                <div class="task-history-controls">
                                     <div class="task-history-date-selector">
                                         <div class="task-history-date-group">
-                                            <label class="task-history-date-label">Pradžios data</label>
+                                            <label class="task-history-date-label">Nuo</label>
                                             <input type="date" class="task-history-date-input" id="taskHistoryStartDate">
                                         </div>
                                         <div class="task-history-date-group">
-                                            <label class="task-history-date-label">Pabaigos data</label>
+                                            <label class="task-history-date-label">Iki</label>
                                             <input type="date" class="task-history-date-input" id="taskHistoryEndDate">
                                         </div>
                                     </div>
+                                </div>
+
                                 </div>
 
                                 <div class="task-history-chart-wrapper">
@@ -3205,11 +3676,29 @@ button:disabled.cancel-btn::before {
                                     <div id="student-stats-graph-holder" style="display: none;">
                                         <div class="student-statistics-label">Mokinio ilgalaikė statistika</div>
                                         <div class="filter-section">
-                                            <div class="button-group" id="subjectButtons"></div>
-                                        </div>
-                                        
-                                        <div class="filter-section-metrics">
-                                            <div class="button-group-metrics" id="metricButtons"></div>
+                                            <!-- Subject Dropdown -->
+                                            <div class="dropdown-container">
+                                                <button id="subjectDropdownBtn">
+                                                    <span id="subjectDropdownText"></span>
+                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="subjectDropdownIcon">
+                                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                                    </svg>
+                                                </button>
+                                                
+                                                <div id="subjectDropdownMenu"></div>
+                                            </div>
+
+                                            <!-- Metrics Dropdown -->
+                                            <div class="dropdown-container">
+                                                <button id="metricsDropdownBtn">
+                                                    <span id="metricsDropdownText"></span>
+                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="metricsDropdownIcon">
+                                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                                    </svg>
+                                                </button>
+                                                
+                                                <div id="metricsDropdownMenu"></div>
+                                            </div>
                                         </div>
                                         
                                         <div class="chart-container">
@@ -3402,7 +3891,7 @@ button:disabled.cancel-btn::before {
                     <!-- Action buttons that transform -->
                     <div id="student-action-buttons-container">
                         <button id="frequent-mistakes-btn" class="student-action-btn" onclick="displayFrequentMistakes()">
-                            <span class="btn-label">Paskutinės klaidos</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="M280-280h80v-200h-80v200Zm320 0h80v-400h-80v400Zm-160 0h80v-120h-80v120Zm0-200h80v-80h-80v80ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z"/></svg>
                         </button>
                     </div>
                 </div>
@@ -3778,8 +4267,6 @@ button:disabled.cancel-btn::before {
             studentScoreDuration.innerHTML = "";
             studentStatisticsIsdestymasCompletedTexts.innerHTML = "";
             studentStatisticsKomponavimasCompletedTexts.innerHTML = "";
-            document.querySelector("#subjectButtons").innerHTML = '';
-            document.querySelector("#metricButtons").innerHTML = '';
             document.querySelector("#student-stats-graph-holder").style.display = "none";
             if (chart) {
                 chart.destroy();
@@ -4159,46 +4646,66 @@ function selectSubject(key) {
         }
     }
     
-    var buttons = document.querySelectorAll('.btn-subject');
-    for (var i = 0; i < buttons.length; i++) {
-        buttons[i].classList.remove('active');
-        if (buttons[i].getAttribute('data-subject-key') === key) {
-            buttons[i].classList.add('active');
+    // Update subject dropdown text
+    var subjectDropdownText = document.getElementById('subjectDropdownText');
+    var currentSubject = processedStudentStats[key];
+    if (subjectDropdownText && currentSubject) {
+        subjectDropdownText.textContent = currentSubject.title;
+    }
+    
+    // Update dropdown items active state
+    var subjectItems = document.querySelectorAll('#subjectDropdownMenu [data-subject-key]');
+    for (var i = 0; i < subjectItems.length; i++) {
+        var itemKey = subjectItems[i].getAttribute('data-subject-key');
+        if (itemKey === key) {
+            subjectItems[i].style.background = 'rgba(50, 172, 147, 0.2)';
+            subjectItems[i].style.fontWeight = '600';
+        } else {
+            subjectItems[i].style.background = 'transparent';
+            subjectItems[i].style.fontWeight = '500';
         }
     }
     
-    updateMetricButtonsState();
+    updateMetricsDropdownDisplay();
     updateChart();
 }
 
-function updateMetricButtonsState() {
-    var buttons = document.querySelectorAll('#metricButtons .btn-metric');
-    var isConsistency = selectedSubject === 'c';
+function updateMetricsDropdownDisplay() {
+    var metricsDropdownText = document.getElementById('metricsDropdownText');
+    var metricsDropdownBtn = document.getElementById('metricsDropdownBtn');
     
-    for (var i = 0; i < buttons.length; i++) {
-        buttons[i].disabled = isConsistency;
-        if (isConsistency) {
-            buttons[i].classList.remove('active');
-        } else {
-            var metricId = buttons[i].getAttribute('data-metric-id');
-            if (selectedMetrics.indexOf(metricId) !== -1) {
-                buttons[i].classList.add('active');
-            } else {
-                buttons[i].classList.remove('active');
-            }
-        }
-    }
-
-    var metricContainer = document.getElementById('metricButtons');
-    var chartOuterContainer = document.querySelector('.chart-scrollable');
-    var isMobile = window.matchMedia('(max-width: 578px)').matches;
-
-    if (selectedSubject === 'c' && isMobile) {
-        metricContainer.style.display = 'none';
-        chartOuterContainer.style.minWidth = "0";
+    if (selectedSubject === 'c') {
+        metricsDropdownBtn.style.display = 'none';
+        return;
     } else {
-        metricContainer.style.display = 'flex';
-        chartOuterContainer.style.minWidth = "500px";
+        metricsDropdownBtn.style.display = 'flex';
+    }
+    
+    // Update text
+    if (selectedMetrics.length === 0) {
+        metricsDropdownText.textContent = 'Pasirinkite rodiklius';
+    } else {
+        var selectedTitles = selectedMetrics.map(function(id) {
+            var metric = availableMetrics.find(function(m) { return m.id === id; });
+            return metric ? metric.title : '';
+        }).filter(function(t) { return t; });
+        metricsDropdownText.textContent = selectedTitles.join(', ');
+    }
+    
+    // Update checkboxes
+    var checkboxes = document.querySelectorAll('.metric-checkbox');
+    for (var i = 0; i < checkboxes.length; i++) {
+        var metricId = checkboxes[i].getAttribute('data-metric-id');
+        var isSelected = selectedMetrics.indexOf(metricId) !== -1;
+        var metric = availableMetrics.find(function(m) { return m.id === metricId; });
+        
+        if (isSelected) {
+            checkboxes[i].style.background = metric.color;
+            checkboxes[i].querySelector('svg').style.display = 'block';
+        } else {
+            checkboxes[i].style.background = 'transparent';
+            checkboxes[i].querySelector('svg').style.display = 'none';
+        }
     }
 }
 
@@ -4212,47 +4719,139 @@ function toggleMetric(id) {
         selectedMetrics.push(id);
     }
     
-    updateMetricButtonsState();
     updateChart();
 }
 
 function initializeButtons() {
-    var subjectContainer = document.getElementById('subjectButtons');
-    var metricContainer = document.getElementById('metricButtons');
-
-    subjectContainer.innerHTML = '';
-    metricContainer.innerHTML = '';
+    var subjectDropdownBtn = document.getElementById('subjectDropdownBtn');
+    var subjectDropdownMenu = document.getElementById('subjectDropdownMenu');
+    var subjectDropdownText = document.getElementById('subjectDropdownText');
+    var subjectDropdownIcon = document.getElementById('subjectDropdownIcon');
     
+    var metricsDropdownBtn = document.getElementById('metricsDropdownBtn');
+    var metricsDropdownMenu = document.getElementById('metricsDropdownMenu');
+    var metricsDropdownText = document.getElementById('metricsDropdownText');
+    var metricsDropdownIcon = document.getElementById('metricsDropdownIcon');
+
     availableMetrics = extractMetricsFromData();
 
     var keys = Object.keys(processedStudentStats);
     var firstKey = keys[0];
     
+    // Build subject dropdown
+    subjectDropdownMenu.innerHTML = '';
     for (var i = 0; i < keys.length; i++) {
         var key = keys[i];
         var data = processedStudentStats[key];
-        var btn = document.createElement('button');
-        btn.className = 'btn-subject';
-        btn.textContent = data.title;
-        btn.setAttribute('data-subject-key', key);
-        btn.onclick = (function(k) {
-            return function() { selectSubject(k); };
+        var item = document.createElement('div');
+        item.className = 'dropdown-menu-item';
+        item.textContent = data.title;
+        item.setAttribute('data-subject-key', key);
+
+        item.onmouseover = function() {
+            if (this.getAttribute('data-subject-key') !== selectedSubject) {
+                this.style.background = 'rgba(0, 0, 0, 0.05)';
+            }
+        };
+        item.onmouseout = function() {
+            if (this.getAttribute('data-subject-key') !== selectedSubject) {
+                this.style.background = 'transparent';
+            }
+        };
+        item.onclick = (function(k) {
+            return function() {
+                selectSubject(k);
+                subjectDropdownMenu.style.display = 'none';
+                subjectDropdownIcon.style.transform = 'rotate(0deg)';
+            };
         })(key);
-        subjectContainer.appendChild(btn);
+        
+        subjectDropdownMenu.appendChild(item);
     }
 
+    // Build metrics dropdown
+    metricsDropdownMenu.innerHTML = '';
     for (var j = 0; j < availableMetrics.length; j++) {
         var metric = availableMetrics[j];
-        var btn2 = document.createElement('button');
-        btn2.className = 'btn-metric';
-        var badge = document.createElement('span');
-        btn2.textContent = metric.title + ' ';
-        btn2.setAttribute('data-metric-id', metric.id);
-        btn2.onclick = (function(mid) {
-            return function() { toggleMetric(mid); };
-        })(metric.id);
-        metricContainer.appendChild(btn2);
+        var item = document.createElement('div');
+        item.className = 'metric-menu-item';
+        item.setAttribute('data-metric-id', metric.id);
+
+        var checkbox = document.createElement('div');
+        checkbox.className = 'metric-checkbox';
+        checkbox.setAttribute('data-metric-id', metric.id);
+        checkbox.className = 'metric-checkbox';
+        checkbox.style.borderColor = metric.color;        
+
+        var checkmark = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        checkmark.setAttribute('width', '12');
+        checkmark.setAttribute('height', '10');
+        checkmark.setAttribute('viewBox', '0 0 12 10');
+        checkmark.setAttribute('fill', 'none');
+        checkmark.style.display = 'none';
+        var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', 'M1 5L4.5 8.5L11 1.5');
+        path.setAttribute('stroke', 'white');
+        path.setAttribute('stroke-width', '2');
+        path.setAttribute('stroke-linecap', 'round');
+        path.setAttribute('stroke-linejoin', 'round');
+        checkmark.appendChild(path);
+        checkbox.appendChild(checkmark);
+        
+        var label = document.createElement('span');
+        label.textContent = metric.title;
+        label.style.cssText = 'font-size: 0.9rem; font-weight: 500; color: #333;';
+        
+        item.appendChild(checkbox);
+        item.appendChild(label);
+        
+        item.onmouseover = function() {
+            this.style.background = 'rgba(0, 0, 0, 0.05)';
+        };
+        item.onmouseout = function() {
+            this.style.background = 'transparent';
+        };
+        item.onclick = (function(mid, chk, lbl, color) {
+            return function(e) {
+                e.stopPropagation();
+                toggleMetric(mid);
+                updateMetricsDropdownDisplay();
+            };
+        })(metric.id, checkbox, label, metric.color);
+        
+        metricsDropdownMenu.appendChild(item);
     }
+    
+    // Subject dropdown toggle
+    subjectDropdownBtn.onclick = function(e) {
+        e.stopPropagation();
+        var isOpen = subjectDropdownMenu.style.display === 'block';
+        subjectDropdownMenu.style.display = isOpen ? 'none' : 'block';
+        subjectDropdownIcon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        metricsDropdownMenu.style.display = 'none';
+        metricsDropdownIcon.style.transform = 'rotate(0deg)';
+    };
+    
+    // Metrics dropdown toggle
+    metricsDropdownBtn.onclick = function(e) {
+        e.stopPropagation();
+        if (selectedSubject === 'c') return;
+        var isOpen = metricsDropdownMenu.style.display === 'block';
+        metricsDropdownMenu.style.display = isOpen ? 'none' : 'block';
+        metricsDropdownIcon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        subjectDropdownMenu.style.display = 'none';
+        subjectDropdownIcon.style.transform = 'rotate(0deg)';
+    };
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dropdown-container')) {
+            subjectDropdownMenu.style.display = 'none';
+            metricsDropdownMenu.style.display = 'none';
+            subjectDropdownIcon.style.transform = 'rotate(0deg)';
+            metricsDropdownIcon.style.transform = 'rotate(0deg)';
+        }
+    });
     
     if (firstKey) {
         selectSubject(firstKey);
@@ -4313,11 +4912,11 @@ function updateChart() {
             borderWidth: 3,
             borderDash: [],
             pointRadius: 4, // Smaller points for mobile
-            pointHoverRadius: 6,
+            pointHoverRadius: 4,
             pointBackgroundColor: '#10b981',
-            pointBorderColor: '#ffffff',
+            pointBorderColor: 'transparent',
             pointBorderWidth: 0,
-            pointHoverBorderWidth: 3,
+            pointHoverBorderWidth: 0,
             pointStyle: 'circle',
             yAxisID: 'y-percent',
             animation: wasAlreadyShown ? false : {
@@ -4359,12 +4958,12 @@ function updateChart() {
                     tension: 0.3,
                     borderWidth: 3,
                     borderDash: [],
-                    pointRadius: 4, // Smaller points for mobile
-                    pointHoverRadius: 6,
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
                     pointBackgroundColor: metric.color,
-                    pointBorderColor: '#ffffff',
+                    pointBorderColor: 'transparent',
                     pointBorderWidth: 0,
-                    pointHoverBorderWidth: 3,
+                    pointHoverBorderWidth: 0,
                     pointStyle: 'circle',
                     yAxisID: yAxisId,
                     animation: wasShown ? false : {
@@ -4643,9 +5242,9 @@ function updateChart() {
                             }
                             var yAxisId = context.dataset.yAxisID;
                             if (yAxisId === 'y-percent' || yAxisId.indexOf('y-percent-') === 0) {
-                                label += context.parsed.y + '%';
+                                label += context.parsed.y.toFixed(2) + '%';
                             } else {
-                                label += context.parsed.y;
+                                label += context.parsed.y.toFixed(2);
                             }
                             return label;
                         }
@@ -5171,8 +5770,6 @@ function displayTeacherHome(selectedGroupNames=null) {
     }
 
     const studentTasks = mergeAllStudentTasks(studentListFiltered)
-
-    console.log(studentTasks)
 
     const taskStatusSummary = countTaskStatuses(studentTasks)
 
@@ -6275,11 +6872,15 @@ function displayTeacherHome(selectedGroupNames=null) {
         });
             newTaskOptions.style.display = 'flex';
             document.querySelector("#group_name").style.display = "none";
-            document.querySelector("#mode_choice_4").style.display = "none";
-            document.querySelector(".timer-question-number-div").style.display = "none";
 
+            document.querySelector("#mode_choice_15").classList.add("item-display-none-lock");
+            document.querySelector("#mode_choice_4").classList.add("item-display-none-lock");
+            document.querySelector(".timer-question-number-div").classList.add("item-display-none-lock");
+
+            document.getElementById("new-search-button").disabled = true;
         } else {
             taskHistoryCurrentTask = null;
+            retrievedDataInstance = null;
             taskContainerVisible = false;
             toggleTaskVisibility();
             document.querySelector(".txt-browser-wrapper").style.display = 'block'; 
@@ -6294,6 +6895,10 @@ function displayTeacherHome(selectedGroupNames=null) {
             toggleMainBrowser(closeMainBrowser=true);
             isSelectionModeEnabled = false;
             refilterTexts();
+
+            document.querySelector("#mode_choice_15").classList.remove("item-display-none-lock");
+            document.querySelector("#mode_choice_4").classList.remove("item-display-none-lock");
+            document.querySelector(".timer-question-number-div").classList.remove("item-display-none-lock");
         }
     }
 
@@ -6698,126 +7303,173 @@ function displayTeacherHome(selectedGroupNames=null) {
             const valA = a[i];
             const valB = b[i];
 
-            // If elements are arrays/objects, compare recursively
             const bothArrays = Array.isArray(valA) && Array.isArray(valB);
-            const bothObjects = valA && valB && typeof valA === 'object' && typeof valB === 'object';
 
-            if (bothArrays && !arraysEqual(valA, valB)) return false;
-            else if (bothObjects && JSON.stringify(valA) !== JSON.stringify(valB)) return false;
-            else if (!bothArrays && !bothObjects && valA !== valB) return false;
+            if (bothArrays) {
+                if (!arraysEqual(valA, valB)) return false;
+            } else if (valA !== valB) {
+                return false;
+            }
         }
 
         return true;
     }
 
+function expandTaskForHistoryBrowsing(task) {
+    const tasks = [];
 
-    let taskHistoryCurrentTask = null;
-    
-    async function setTaskHistoryQuery() {
-        let modeChoice1 = document.getElementById('mode_choice_1').value
-        let modeChoice2 = document.getElementById('mode_choice_2').value
-        let modeChoice3 = document.getElementById('mode_choice_3').value
-        const modeChoice4 = document.getElementById('mode_choice_4').value
-        let modeChoice5 = document.getElementById('mode_choice_5').value
-        const modeChoice6 = document.getElementById('mode_choice_6').value
-        const modeChoice7 = document.getElementById('mode_choice_7').value
-        const classChoiceSelection = document.querySelector('#class_choice').value;
-        const timerInput = document.getElementById('timer-input').value
-        const questionNumberInput = document.getElementById('question-number-input').value
-        const remainderInput = document.getElementById('remainder-input').checked
+    if (task.includes("C18")) {
+        const range = task[7];
+        if (!Array.isArray(range) || range.length < 2) {
+            tasks.push(task);
+            return tasks;
+        }
 
-        const selectedNumberElement = document.querySelector('#selected_number');
-        const selectedNumber2Element = document.querySelector('#selected_number_2');
-        let selectedNumbers = [selectedNumberElement.value, selectedNumber2Element.value].sort();
+        const start = parseInt(range[0], 10);
+        const end = parseInt(range[1], 10);
 
-        let modeChoiceSelection = document.querySelector('#mode_choice').value;
-        let mode = modeChoiceSelection;
-
-        if (modeChoice3 === "") modeChoice3 = "C37"
-
-        const modeChoiceElementSelection = document.querySelector('#mode_choice').value;
-        
-        let task = [];
-
-        if (mode === "math") {
-            task = [
-                mode, modeChoice1, modeChoice2, modeChoice3, 
-                modeChoice5, modeChoice6, modeChoice7, selectedNumbers, 
-                remainderInput, "C79"
-            ];
-        } else if (mode === "lang") {
-            const classChoiceSelection = document.querySelector('#class_choice').value;
-            classChoice = classChoiceSelection;
-
-            let modeChoice8Selection = document.querySelector('#mode_choice_8').value;
-            modeChoice1 = modeChoice8Selection;
-
-            const modeChoice9Selection = document.querySelector('#mode_choice_9').value;
-
-            modeChoice2 = modeChoice9Selection;
-
-            const selectedOptions = getSelectedRasybaConditions();
-
-            const sortedModeChoice3 = Object.fromEntries(
-            Object.entries(selectedOptions).sort(([a], [b]) => {
-                const numA = parseInt(a.slice(1));
-                const numB = parseInt(b.slice(1));
-                return numA - numB;
-            })
-            );
-
-            modeChoice3 = sortedModeChoice3;
-
-            const modeChoice12Selection = document.querySelector('#mode_choice_12').value;
-            modeChoice5 = modeChoice12Selection;
-
-            const modeChoiceLtDifficulty = document.getElementById('mode_choice_10').value;
-
-            const modeChoice14Selection = document.getElementById('mode_choice_14').value;
-            const modeChoice15Selection = document.getElementById('mode_choice_15').value;
-
-            let questionFrequency;
-            if (classChoice === "C75") {
-                let modeChoice13Selection = document.querySelector('#mode_choice_13').value;
-                questionFrequency = Number(modeChoice13Selection);
-            } else {
-                questionFrequency = 1;
-            }
-            
-            if (modeChoice1 === "C49") {
-                task = [
-                    mode, modeChoice1, modeChoice2, modeChoice14Selection, modeChoice15Selection, classChoiceSelection, modeChoiceLtDifficulty
-                ];
-            } else if (modeChoice1 === "C83") {
-                if (modeChoice2 === "C50") {
-                    task = [
-                        mode, modeChoice1, modeChoice2, classChoiceSelection, modeChoice3,
-                        modeChoice5, questionFrequency
-                    ];
-                }
+        // Generate all combinations: first <= second, both in [start,end]
+        for (let first = start; first <= end; first++) {
+            for (let second = first; second <= end; second++) {
+                const newTask = JSON.parse(JSON.stringify(task));
+                newTask[7][0] = first.toString();
+                newTask[7][1] = second.toString();
+                tasks.push(newTask);
             }
         }
 
-        if (taskHistoryCurrentTask) {
-        if (!arraysEqual(taskHistoryCurrentTask, task)) {
-            clearTaskAverageCache();
-            taskHistoryCurrentTask = JSON.parse(JSON.stringify(task));
-        }
-        } else {
-            taskHistoryCurrentTask = JSON.parse(JSON.stringify(task));
-        }
-
-        let selectedStudent = document.querySelector(".outer-student-list-entry-item .student-name.selected-option");
-        if (!selectedStudent) {
-            selectedStudent = document.querySelector(".outer-student-list-entry-item .student-name");
-        }
-
-        const selectedStudentId = Number(selectedStudent.dataset.studentId)
-
-        retrieveTaskHistoryInformation(selectedStudentId, task);
+    } else {
+        tasks.push(task);
     }
 
-    async function retrieveTaskHistoryInformation (studentId, task) {
+    return tasks;
+}
+
+
+
+let taskHistoryCurrentTask = null;
+    
+ async function setTaskHistoryQuery() {
+    let modeChoice1 = document.getElementById('mode_choice_1').value
+    let modeChoice2 = document.getElementById('mode_choice_2').value
+    let modeChoice3 = document.getElementById('mode_choice_3').value
+    const modeChoice4 = document.getElementById('mode_choice_4').value
+    let modeChoice5 = document.getElementById('mode_choice_5').value
+    const modeChoice6 = document.getElementById('mode_choice_6').value
+    const modeChoice7 = document.getElementById('mode_choice_7').value
+    const classChoiceSelection = document.querySelector('#class_choice').value;
+    const timerInput = document.getElementById('timer-input').value
+    const questionNumberInput = document.getElementById('question-number-input').value
+    const remainderInput = document.getElementById('remainder-input').checked
+
+    const selectedNumberElement = document.querySelector('#selected_number');
+    const selectedNumber2Element = document.querySelector('#selected_number_2');
+    let selectedNumbers = [selectedNumberElement.value, selectedNumber2Element.value].sort();
+
+    let modeChoiceSelection = document.querySelector('#mode_choice').value;
+    let mode = modeChoiceSelection;
+
+    if (modeChoice3 === "") modeChoice3 = "C37"
+
+    const modeChoiceElementSelection = document.querySelector('#mode_choice').value;
+    
+    let task = [];
+
+    if (mode === "math") {
+        task = [
+            mode, modeChoice1, modeChoice2, modeChoice3, 
+            modeChoice5, modeChoice6, modeChoice7, selectedNumbers, 
+            remainderInput, "C79"
+        ];
+    } else if (mode === "lang") {
+        const classChoiceSelection = document.querySelector('#class_choice').value;
+        classChoice = classChoiceSelection;
+
+        let modeChoice8Selection = document.querySelector('#mode_choice_8').value;
+        modeChoice1 = modeChoice8Selection;
+
+        const modeChoice9Selection = document.querySelector('#mode_choice_9').value;
+
+        modeChoice2 = modeChoice9Selection;
+
+        const selectedOptions = getSelectedRasybaConditions();
+
+        const sortedModeChoice3 = Object.fromEntries(
+        Object.entries(selectedOptions).sort(([a], [b]) => {
+            const numA = parseInt(a.slice(1));
+            const numB = parseInt(b.slice(1));
+            return numA - numB;
+        })
+        );
+
+        modeChoice3 = sortedModeChoice3;
+
+        const modeChoice12Selection = document.querySelector('#mode_choice_12').value;
+        modeChoice5 = modeChoice12Selection;
+
+        const modeChoiceLtDifficulty = document.getElementById('mode_choice_10').value;
+
+        const modeChoice14Selection = document.getElementById('mode_choice_14').value;
+        const modeChoice15Selection = document.getElementById('mode_choice_15').value;
+
+        let questionFrequency;
+        if (classChoice === "C75") {
+            let modeChoice13Selection = document.querySelector('#mode_choice_13').value;
+            questionFrequency = Number(modeChoice13Selection);
+        } else {
+            questionFrequency = 1;
+        }
+        
+        if (modeChoice1 === "C49") {
+            task = [
+                mode, modeChoice1, modeChoice2, modeChoice14Selection, modeChoice15Selection, classChoiceSelection, modeChoiceLtDifficulty
+            ];
+        } else if (modeChoice1 === "C83") {
+            if (modeChoice2 === "C50") {
+                task = [
+                    mode, modeChoice1, modeChoice2, classChoiceSelection, modeChoice3,
+                    modeChoice5, questionFrequency
+                ];
+            }
+        }
+    }
+
+    const expandedTasks = expandTaskForHistoryBrowsing(task);
+
+    if (taskHistoryCurrentTask) {
+        if (!arraysEqual(taskHistoryCurrentTask, expandedTasks)) {
+            clearTaskAverageCache();
+            taskHistoryCurrentTask = JSON.parse(JSON.stringify(expandedTasks));
+        }
+    } else {
+        taskHistoryCurrentTask = JSON.parse(JSON.stringify(expandedTasks));
+    }
+
+    // Check if a student is selected, if not select the first one
+    let selectedStudent = document.querySelector(".outer-student-list-entry-item .student-name.selected-option");
+    if (!selectedStudent) {
+        // Select first student
+        selectedStudent = document.querySelector(".outer-student-list-entry-item .student-name");
+        if (selectedStudent) {
+            // Remove selected class from home button
+            document.querySelector(".teacher-home-button").classList.remove('selected-option');
+            // Add selected class to first student
+            selectedStudent.classList.add('selected-option');
+        }
+    }
+
+    if (!selectedStudent) {
+        messageToTheUser("Nepavyko rasti mokinių. Bandykite vėl vėliau.");
+        return;
+    }
+
+    const selectedStudentId = Number(selectedStudent.dataset.studentId);
+
+    console.log(expandedTasks)
+    retrieveTaskHistoryInformation(selectedStudentId, expandedTasks);
+}
+
+    async function retrieveTaskHistoryInformation (studentId, tasks) {
         disableNewTaskContainer();
         disableTeacherControlPannel();
         disableConfirmationButtons();
@@ -6827,7 +7479,8 @@ function displayTeacherHome(selectedGroupNames=null) {
             el.style.cursor = "default";     // change cursor
         });
 
-        let retrievedDataInstance = await fetchTaskStats(studentId, task);
+        console.log(tasks)
+        let retrievedDataInstance = await fetchTaskStats(studentId, tasks);
 
         if (retrievedDataInstance) {
             enableConfirmationButtons();
@@ -6857,10 +7510,6 @@ function displayTeacherHome(selectedGroupNames=null) {
         }
     }
 
-    async function displayRetrievedTaskHistoryData () {
-        return
-    }
-
     document.querySelector(".teacher-home-button").addEventListener('click', () => {
         document.querySelectorAll('.selection-option').forEach(task => {
             task.classList.remove('selected-option');
@@ -6885,376 +7534,556 @@ function displayTeacherHome(selectedGroupNames=null) {
 
     // TASK HISTORY GRAPH START
 
-    // Graph state management
-        const taskHistoryState = {
-            selectedMetrics: ['mistakeFrequency'], // Default: show mistake frequency
-            startDate: null,
-            endDate: null,
-            chart: null,
-            rawData: null
+// Graph state management
+const taskHistoryState = {
+    selectedMetrics: ['mistakeFrequency'], // Default: show mistake frequency
+    startDate: null,
+    endDate: null,
+    chart: null,
+    rawData: null
+};
+
+// Available metrics configuration
+const taskHistoryMetrics = [
+    {
+        id: 'mistakeFrequency',
+        label: 'Klaidų dažnis',
+        color: '#ef4444',
+        yAxisID: 'y-percent',
+        isPercent: true
+    },
+    {
+        id: 'answerRate',
+        label: 'Sprendimų greitis',
+        color: '#3b82f6',
+        yAxisID: 'y-rate',
+        isPercent: false
+    }
+];
+
+// Initialize dropdown
+function initTaskHistoryDropdown() {
+    const btn = document.getElementById('taskHistoryMetricsBtn');
+    const menu = document.getElementById('taskHistoryMetricsMenu');
+    const text = document.getElementById('taskHistoryMetricsText');
+    const icon = document.getElementById('taskHistoryMetricsIcon');
+
+    // Build menu items
+    menu.innerHTML = '';
+    taskHistoryMetrics.forEach(metric => {
+        const item = document.createElement('div');
+        item.className = 'task-history-metric-item';
+        item.setAttribute('data-metric-id', metric.id);
+
+        const checkbox = document.createElement('div');
+        checkbox.className = 'task-history-metric-checkbox';
+        checkbox.setAttribute('data-metric-id', metric.id);
+        checkbox.style.borderColor = metric.color;
+
+        const checkmark = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        checkmark.setAttribute('width', '12');
+        checkmark.setAttribute('height', '10');
+        checkmark.setAttribute('viewBox', '0 0 12 10');
+        checkmark.setAttribute('fill', 'none');
+        checkmark.style.display = 'none';
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', 'M1 5L4.5 8.5L11 1.5');
+        path.setAttribute('stroke', 'white');
+        path.setAttribute('stroke-width', '2');
+        path.setAttribute('stroke-linecap', 'round');
+        path.setAttribute('stroke-linejoin', 'round');
+        checkmark.appendChild(path);
+        checkbox.appendChild(checkmark);
+
+        const label = document.createElement('span');
+        label.textContent = metric.label;
+
+        item.appendChild(checkbox);
+        item.appendChild(label);
+
+        item.onmouseover = function() {
+            this.style.background = 'rgba(0, 0, 0, 0.05)';
+        };
+        item.onmouseout = function() {
+            this.style.background = 'transparent';
+        };
+        item.onclick = function(e) {
+            e.stopPropagation();
+            toggleTaskHistoryMetric(metric.id);
         };
 
-        // Available metrics configuration
-        const taskHistoryMetrics = [
-            {
-                id: 'mistakeFrequency',
-                label: 'Klaidų dažnis',
-                color: '#ef4444',
-                yAxisID: 'y-percent',
-                isPercent: true
+        menu.appendChild(item);
+    });
+
+    // Dropdown toggle
+    btn.onclick = function(e) {
+        e.stopPropagation();
+        const isOpen = menu.style.display === 'block';
+        menu.style.display = isOpen ? 'none' : 'block';
+        icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+    };
+
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.task-history-dropdown-container')) {
+            menu.style.display = 'none';
+            icon.style.transform = 'rotate(0deg)';
+        }
+    });
+
+    updateTaskHistoryDropdownDisplay();
+}
+
+function toggleTaskHistoryMetric(metricId) {
+    const index = taskHistoryState.selectedMetrics.indexOf(metricId);
+    
+    if (index !== -1) {
+        taskHistoryState.selectedMetrics.splice(index, 1);
+    } else {
+        taskHistoryState.selectedMetrics.push(metricId);
+    }
+
+    updateTaskHistoryDropdownDisplay();
+    renderTaskHistoryGraph();
+}
+
+function updateTaskHistoryDropdownDisplay() {
+    const text = document.getElementById('taskHistoryMetricsText');
+    
+    if (taskHistoryState.selectedMetrics.length === 0) {
+        text.textContent = 'Pasirinkite rodiklius';
+    } else {
+        const selectedTitles = taskHistoryState.selectedMetrics.map(function(id) {
+            const metric = taskHistoryMetrics.find(function(m) { return m.id === id; });
+            return metric ? metric.label : '';
+        }).filter(function(t) { return t; });
+        
+        // ADD THIS LINE - update the text display
+        text.textContent = selectedTitles.join(', ');
+    }
+    
+    // Update checkboxes
+    const checkboxes = document.querySelectorAll('.task-history-metric-checkbox');
+    checkboxes.forEach(function(checkbox) {
+        const metricId = checkbox.getAttribute('data-metric-id');
+        const isSelected = taskHistoryState.selectedMetrics.indexOf(metricId) !== -1;
+        const metric = taskHistoryMetrics.find(function(m) { return m.id === metricId; });
+        
+        if (isSelected) {
+            checkbox.style.background = metric.color;
+            checkbox.querySelector('svg').style.display = 'block';
+        } else {
+            checkbox.style.background = 'transparent';
+            checkbox.querySelector('svg').style.display = 'none';
+        }
+    });
+}
+
+function initTaskHistoryDateInputs(data) {
+    if (!data || !data.studentDates || data.studentDates.length === 0) {
+        return;
+    }
+
+    const startInput = document.getElementById('taskHistoryStartDate');
+    const endInput = document.getElementById('taskHistoryEndDate');
+
+    // Find actual min/max dates from ALL data (student + averages)
+    const allDates = [...data.studentDates, ...data.averageDates].sort();
+    const minDate = allDates[0];
+    const maxDate = allDates[allDates.length - 1];
+
+    // Set default range if not already set (use full data range)
+    if (!taskHistoryState.startDate) {
+        taskHistoryState.startDate = minDate;
+    }
+    if (!taskHistoryState.endDate) {
+        taskHistoryState.endDate = maxDate;
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    startInput.setAttribute('max', today);
+    endInput.setAttribute('max', today);
+
+    startInput.value = taskHistoryState.startDate;
+    endInput.value = taskHistoryState.endDate;
+
+    // Date change handlers
+    startInput.onchange = function(e) {
+        const newStart = e.target.value;
+        if (newStart > taskHistoryState.endDate) {
+            taskHistoryState.endDate = newStart;
+            endInput.value = newStart;
+        }
+        taskHistoryState.startDate = newStart;
+        renderTaskHistoryGraph();
+    };
+
+    endInput.onchange = function(e) {
+        const newEnd = e.target.value;
+        if (newEnd < taskHistoryState.startDate) {
+            taskHistoryState.startDate = newEnd;
+            startInput.value = newEnd;
+        }
+        taskHistoryState.endDate = newEnd;
+        renderTaskHistoryGraph();
+    };
+}
+
+function filterTaskHistoryData(data) {
+    if (!taskHistoryState.startDate || !taskHistoryState.endDate) {
+        return data;
+    }
+
+    const start = new Date(taskHistoryState.startDate);
+    const end = new Date(taskHistoryState.endDate);
+
+    // Find the actual data boundaries (what dates have real data)
+    const studentDataStart = data.studentDates.length > 0 ? new Date(data.studentDates[0]) : null;
+    const studentDataEnd = data.studentDates.length > 0 ? new Date(data.studentDates[data.studentDates.length - 1]) : null;
+
+    // Adjust display range to actual data boundaries
+    // Use the later of (selected start, actual data start)
+    // Use the earlier of (selected end, actual data end)
+    const effectiveStart = studentDataStart && studentDataStart > start ? studentDataStart : start;
+    const effectiveEnd = studentDataEnd && studentDataEnd < end ? studentDataEnd : end;
+
+    // Filter student data to effective range
+    const filteredStudentDates = [];
+    const filteredMistakeFreq = [];
+    const filteredAnswerRate = [];
+
+    data.studentDates.forEach(function(date, i) {
+        const d = new Date(date);
+        if (d >= effectiveStart && d <= effectiveEnd) {
+            filteredStudentDates.push(date);
+            filteredMistakeFreq.push(data.mistakeFrequency[i]);
+            filteredAnswerRate.push(data.answerRate[i]);
+        }
+    });
+
+    // Filter average data to the same effective range for proper alignment
+    const filteredAverageDates = [];
+    const filteredAvgMistakeFreq = [];
+    const filteredAvgAnswerRate = [];
+
+    data.averageDates.forEach(function(date, i) {
+        const d = new Date(date);
+        if (d >= effectiveStart && d <= effectiveEnd) {
+            filteredAverageDates.push(date);
+            filteredAvgMistakeFreq.push(data.averageMistakeFrequency[i]);
+            filteredAvgAnswerRate.push(data.averageAnswerRate[i]);
+        }
+    });
+
+    return {
+        studentDates: filteredStudentDates,
+        mistakeFrequency: filteredMistakeFreq,
+        answerRate: filteredAnswerRate,
+        averageDates: filteredAverageDates,
+        averageMistakeFrequency: filteredAvgMistakeFreq,
+        averageAnswerRate: filteredAvgAnswerRate
+    };
+}
+
+// Generate nice x-axis labels
+function generateXAxisLabels(dates) {
+    if (!dates || dates.length === 0) return [];
+
+    const sortedDates = [...dates].sort();
+    const firstDate = new Date(sortedDates[0]);
+    const lastDate = new Date(sortedDates[sortedDates.length - 1]);
+    const daysDiff = Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24));
+
+    let interval;
+    if (daysDiff <= 7) {
+        interval = 1; // Daily
+    } else if (daysDiff <= 30) {
+        interval = 3; // Every 3 days
+    } else if (daysDiff <= 90) {
+        interval = 7; // Weekly
+    } else if (daysDiff <= 180) {
+        interval = 14; // Bi-weekly
+    } else {
+        interval = 30; // Monthly
+    }
+
+    const labels = [];
+    const currentDate = new Date(firstDate);
+    
+    while (currentDate <= lastDate) {
+        labels.push(currentDate.toISOString().split('T')[0]);
+        currentDate.setDate(currentDate.getDate() + interval);
+    }
+
+    // Always include last date
+    const lastLabel = labels[labels.length - 1];
+    const lastDataDate = sortedDates[sortedDates.length - 1];
+    if (lastLabel !== lastDataDate) {
+        labels.push(lastDataDate);
+    }
+
+    return labels;
+}
+
+// Format date for display (e.g., "Sau. 15", "Vas. 3")
+function formatDateLabel(dateStr) {
+    const months = ['Sau.', 'Vas.', 'Kov.', 'Bal.', 'Geg.', 'Bir.', 
+                    'Lie.', 'Rugp.', 'Rugs.', 'Spal.', 'Lap.', 'Gruod.'];
+    const date = new Date(dateStr);
+    return months[date.getMonth()] + ' ' + date.getDate();
+}
+
+function renderTaskHistoryGraph() {
+    if (taskHistoryState.chart) {
+        taskHistoryState.chart.destroy();
+        taskHistoryState.chart = null;
+    }
+
+    if (!taskHistoryState.rawData) {
+        document.querySelector('.task-history-chart-wrapper').innerHTML = 
+            '<div class="task-history-empty">Nėra duomenų.</div>';
+        return;
+    }
+
+    // Check if there's any data at all for this task
+    const hasAnyData = taskHistoryState.rawData.studentDates.length > 0 || 
+                       taskHistoryState.rawData.averageDates.length > 0;
+
+    if (!hasAnyData) {
+        document.querySelector('.task-history-chart-wrapper').innerHTML = 
+            '<div class="task-history-empty">Nėra duomenų šiai užduočiai.</div>';
+        return;
+    }
+
+    const filteredData = filterTaskHistoryData(taskHistoryState.rawData);
+
+    if (filteredData.studentDates.length === 0 && filteredData.averageDates.length === 0) {
+        document.querySelector('.task-history-chart-wrapper').innerHTML = 
+            '<div class="task-history-empty">Nėra duomenų pasirinktam laikotarpiui.</div>';
+        return;
+    }
+
+    // Ensure canvas exists
+    let canvas = document.getElementById('taskHistoryChart');
+    if (!canvas) {
+        document.querySelector('.task-history-chart-wrapper').innerHTML = 
+            '<canvas id="taskHistoryChart"></canvas>';
+        canvas = document.getElementById('taskHistoryChart');
+    }
+
+    const datasets = [];
+
+    // Combine all dates and create unified x-axis
+    const allDates = [...new Set([...filteredData.studentDates, ...filteredData.averageDates])].sort();
+    const xLabels = allDates.map(date => formatDateLabel(date));
+
+    // Add average trendlines FIRST (so they're underneath)
+    taskHistoryState.selectedMetrics.forEach(function(metricId) {
+        const metric = taskHistoryMetrics.find(function(m) { return m.id === metricId; });
+        if (!metric) return;
+
+        const avgDataKey = 'average' + metricId.charAt(0).toUpperCase() + metricId.slice(1);
+        const avgData = filteredData[avgDataKey];
+        const avgDates = filteredData.averageDates;
+
+        if (!avgData || avgData.length === 0 || !avgDates || avgDates.length === 0) return;
+
+        // Create sparse data array aligned to allDates
+        const alignedAvgData = allDates.map(date => {
+            const idx = avgDates.indexOf(date);
+            return idx !== -1 ? avgData[idx] : null;
+        });
+
+        const fadeColor = metric.color + '80';
+
+        datasets.push({
+            label: '', // IMPORTANT: empty string (not null)
+            data: alignedAvgData,
+            borderColor: fadeColor,
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 0,
+            pointHoverRadius: 0,
+            yAxisID: metric.yAxisID,
+            order: 2,
+            spanGaps: true,
+            isAverage: true  // Add flag to identify average datasets
+        });
+    });
+
+
+    // Add student data ON TOP with dashed lines
+    taskHistoryState.selectedMetrics.forEach(function(metricId) {
+        const metric = taskHistoryMetrics.find(function(m) { return m.id === metricId; });
+        if (!metric) return;
+
+        const dataKey = metricId;
+        const studentData = filteredData[dataKey];
+        const studentDates = filteredData.studentDates;
+
+        if (studentData && studentData.length > 0) {
+            // Create sparse data array aligned to allDates
+            const alignedData = allDates.map(date => {
+                const idx = studentDates.indexOf(date);
+                return idx !== -1 ? studentData[idx] : null;
+            });
+
+            datasets.push({
+                label: metric.label,
+                data: alignedData,
+                borderColor: metric.color,
+                backgroundColor: metric.color + '20',
+                borderWidth: 3,
+                borderDash: [8, 4],
+                tension: 0.3,
+                pointRadius: 5,
+                pointHoverRadius: 5,
+                pointBackgroundColor: metric.color,
+                pointBorderColor: 'transparent',
+                pointBorderWidth: 0,
+                yAxisID: metric.yAxisID,
+                order: 1,
+                spanGaps: true
+            });
+        }
+    });
+
+    const yAxes = {};
+
+    // Add percentage axis if needed
+    if (taskHistoryState.selectedMetrics.indexOf('mistakeFrequency') !== -1) {
+        yAxes['y-percent'] = {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            min: 0,
+            suggestedMax: 100,
+            title: {
+                display: true,
+                text: 'Procentai (%)',
+                color: '#666',
+                font: {
+                    size: 12,
+                    weight: 'bold'
+                }
             },
-            {
-                id: 'answerRate',
-                label: 'Atsakymų greitis',
-                color: '#3b82f6',
-                yAxisID: 'y-rate',
-                isPercent: false
-            }
-        ];
-
-        // Initialize metric buttons
-        function initTaskHistoryButtons() {
-            const container = document.getElementById('taskHistoryMetrics');
-            container.innerHTML = '';
-
-            taskHistoryMetrics.forEach(metric => {
-                const btn = document.createElement('button');
-                btn.className = 'task-history-btn-metric';
-                btn.textContent = metric.label;
-                btn.setAttribute('data-metric-id', metric.id);
-                
-                if (taskHistoryState.selectedMetrics.includes(metric.id)) {
-                    btn.classList.add('active');
-                }
-
-                btn.onclick = () => toggleTaskHistoryMetric(metric.id);
-                container.appendChild(btn);
-            });
-        }
-
-        // Toggle metric selection
-        function toggleTaskHistoryMetric(metricId) {
-            const index = taskHistoryState.selectedMetrics.indexOf(metricId);
             
-            if (index !== -1) {
-                taskHistoryState.selectedMetrics.splice(index, 1);
-            } else {
-                taskHistoryState.selectedMetrics.push(metricId);
-            }
+            ticks: {
+                callback: function(value) { return Math.round(value); },
+                stepSize: 10,
+                color: '#666'
+            },
+            grid: {
+                color: 'rgba(0, 0, 0, 0.1)'
+            },
+            border: { display: false }
+        };
+    }
 
-            updateTaskHistoryButtons();
-            renderTaskHistoryGraph();
-        }
-
-        // Update button states
-        function updateTaskHistoryButtons() {
-            const buttons = document.querySelectorAll('.task-history-btn-metric');
-            buttons.forEach(btn => {
-                const metricId = btn.getAttribute('data-metric-id');
-                if (taskHistoryState.selectedMetrics.includes(metricId)) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
+    // Add rate axis if needed
+    if (taskHistoryState.selectedMetrics.indexOf('answerRate') !== -1) {
+        yAxes['y-rate'] = {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            min: 0,
+            title: {
+                display: true,
+                text: 'Ats. per min.',
+                color: '#666',
+                font: {
+                    size: 12,
+                    weight: 'bold'
                 }
-            });
-        }
+            },
+            ticks: {
+                callback: function(value) { return Math.round(value); },
+                stepSize: 1,
+                color: '#666'
+            },
+            grid: {
+                drawOnChartArea: taskHistoryState.selectedMetrics.indexOf('mistakeFrequency') === -1,
+                color: 'rgba(0, 0, 0, 0.1)'
+            },
+            border: { display: false }
+        };
+    }
 
-        // Initialize date inputs
-        function initTaskHistoryDateInputs(data) {
-            if (!data || !data.studentDates || data.studentDates.length === 0) {
-                return;
-            }
-
-            const startInput = document.getElementById('taskHistoryStartDate');
-            const endInput = document.getElementById('taskHistoryEndDate');
-
-            const minDate = data.studentDates[0];
-            const maxDate = data.studentDates[data.studentDates.length - 1];
-
-            // Set default range if not already set
-            if (!taskHistoryState.startDate) {
-                taskHistoryState.startDate = minDate;
-            }
-            if (!taskHistoryState.endDate) {
-                taskHistoryState.endDate = maxDate;
-            }
-
-            startInput.value = taskHistoryState.startDate;
-            endInput.value = taskHistoryState.endDate;
-
-            startInput.onchange = (e) => {
-                taskHistoryState.startDate = e.target.value;
-                renderTaskHistoryGraph();
-            };
-
-            endInput.onchange = (e) => {
-                taskHistoryState.endDate = e.target.value;
-                renderTaskHistoryGraph();
-            };
-        }
-
-        // Filter data by date range
-        function filterTaskHistoryData(data) {
-            if (!taskHistoryState.startDate || !taskHistoryState.endDate) {
-                return data;
-            }
-
-            const start = new Date(taskHistoryState.startDate);
-            const end = new Date(taskHistoryState.endDate);
-
-            // Filter student data
-            const filteredStudentIndices = [];
-            const filteredStudentDates = [];
-            const filteredMistakeFreq = [];
-            const filteredAnswerRate = [];
-
-            data.studentDates.forEach((date, i) => {
-                const d = new Date(date);
-                if (d >= start && d <= end) {
-                    filteredStudentIndices.push(i);
-                    filteredStudentDates.push(date);
-                    filteredMistakeFreq.push(data.mistakeFrequency[i]);
-                    filteredAnswerRate.push(data.answerRate[i]);
-                }
-            });
-
-            // Filter average data
-            const filteredAverageIndices = [];
-            const filteredAverageDates = [];
-            const filteredAvgMistakeFreq = [];
-            const filteredAvgAnswerRate = [];
-
-            data.averageDates.forEach((date, i) => {
-                const d = new Date(date);
-                if (d >= start && d <= end) {
-                    filteredAverageIndices.push(i);
-                    filteredAverageDates.push(date);
-                    filteredAvgMistakeFreq.push(data.averageMistakeFrequency[i]);
-                    filteredAvgAnswerRate.push(data.averageAnswerRate[i]);
-                }
-            });
-
-            return {
-                studentDates: filteredStudentDates,
-                mistakeFrequency: filteredMistakeFreq,
-                answerRate: filteredAnswerRate,
-                averageDates: filteredAverageDates,
-                averageMistakeFrequency: filteredAvgMistakeFreq,
-                averageAnswerRate: filteredAvgAnswerRate
-            };
-        }
-
-        // Generate nice x-axis labels
-        function generateXAxisLabels(dates) {
-            if (!dates || dates.length === 0) return [];
-
-            const sortedDates = [...dates].sort();
-            const firstDate = new Date(sortedDates[0]);
-            const lastDate = new Date(sortedDates[sortedDates.length - 1]);
-            const daysDiff = Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24));
-
-            let interval;
-            if (daysDiff <= 7) {
-                interval = 1; // Daily
-            } else if (daysDiff <= 30) {
-                interval = 3; // Every 3 days
-            } else if (daysDiff <= 90) {
-                interval = 7; // Weekly
-            } else if (daysDiff <= 180) {
-                interval = 14; // Bi-weekly
-            } else {
-                interval = 30; // Monthly
-            }
-
-            const labels = [];
-            const currentDate = new Date(firstDate);
-            
-            while (currentDate <= lastDate) {
-                labels.push(currentDate.toISOString().split('T')[0]);
-                currentDate.setDate(currentDate.getDate() + interval);
-            }
-
-            return labels;
-        }
-
-        // Render the graph
-        function renderTaskHistoryGraph() {
-            if (taskHistoryState.chart) {
-                taskHistoryState.chart.destroy();
-                taskHistoryState.chart = null;
-            }
-
-            if (!taskHistoryState.rawData) {
-                document.querySelector('.task-history-chart-wrapper').innerHTML = 
-                    '<div class="task-history-empty">Nėra duomenų</div>';
-                return;
-            }
-
-            const filteredData = filterTaskHistoryData(taskHistoryState.rawData);
-
-            if (filteredData.studentDates.length === 0) {
-                document.querySelector('.task-history-chart-wrapper').innerHTML = 
-                    '<div class="task-history-empty">Nėra duomenų pasirinktam laikotarpiui</div>';
-                return;
-            }
-
-            // Ensure canvas exists
-            let canvas = document.getElementById('taskHistoryChart');
-            if (!canvas) {
-                document.querySelector('.task-history-chart-wrapper').innerHTML = 
-                    '<canvas id="taskHistoryChart"></canvas>';
-                canvas = document.getElementById('taskHistoryChart');
-            }
-
-            const datasets = [];
-
-            // Add student data
-            taskHistoryState.selectedMetrics.forEach(metricId => {
-                const metric = taskHistoryMetrics.find(m => m.id === metricId);
-                if (!metric) return;
-
-                const dataKey = metricId;
-                const studentData = filteredData[dataKey];
-
-                if (studentData && studentData.length > 0) {
-                    datasets.push({
-                        label: metric.label,
-                        data: filteredData.studentDates.map((date, i) => ({
-                            x: date,
-                            y: studentData[i]
-                        })),
-                        borderColor: metric.color,
-                        backgroundColor: metric.color + '20',
-                        borderWidth: 3,
-                        tension: 0.3,
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
-                        yAxisID: metric.yAxisID
-                    });
-
-                    // Add average line
-                    const avgDataKey = 'average' + metricId.charAt(0).toUpperCase() + metricId.slice(1);
-                    const avgData = filteredData[avgDataKey];
-
-                    if (avgData && avgData.length > 0) {
-                        datasets.push({
-                            label: metric.label + ' (klasės vid.)',
-                            data: filteredData.averageDates.map((date, i) => ({
-                                x: date,
-                                y: avgData[i]
-                            })),
-                            borderColor: metric.color,
-                            backgroundColor: 'transparent',
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            tension: 0.3,
-                            pointRadius: 3,
-                            pointHoverRadius: 5,
-                            yAxisID: metric.yAxisID,
-                            opacity: 0.6
-                        });
+    const ctx = canvas.getContext('2d');
+    taskHistoryState.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: xLabels,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        filter: function(legendItem, chartData) {
+                            return legendItem.text !== '';    // ← hides your average lines
+                        }
+                    }
+                },
+                tooltip: {
+                    filter: function(tooltipItem) {
+                        // Hide average/trendline datasets from tooltip
+                        return !tooltipItem.dataset.isAverage;
+                    },
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            const yAxisId = context.dataset.yAxisID;
+                            if (yAxisId === 'y-percent') {
+                                label += Math.round(context.parsed.y) + '%';
+                            } else {
+                                label += Math.round(context.parsed.y);
+                            }
+                            return label;
+                        }
                     }
                 }
-            });
-
-            const allDates = [...new Set([...filteredData.studentDates, ...filteredData.averageDates])].sort();
-            const xLabels = generateXAxisLabels(allDates);
-
-            const yAxes = {};
-
-            // Add percentage axis if needed
-            if (taskHistoryState.selectedMetrics.includes('mistakeFrequency')) {
-                yAxes['y-percent'] = {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    min: 0,
-                    max: 100,
+            },
+            scales: Object.assign({
+                x: {
+                    type: 'category',
                     ticks: {
-                        callback: (value) => value + '%',
-                        color: '#666'
+                        maxRotation: 45,
+                        minRotation: 0,
+                        autoSkip: true,
+                        maxTicksLimit: 10
                     },
                     grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
-                    },
-                    border: { display: false }
-                };
-            }
-
-            // Add rate axis if needed
-            if (taskHistoryState.selectedMetrics.includes('answerRate')) {
-                yAxes['y-rate'] = {
-                    type: 'linear',
-                    display: true,
-                    position: 'right',
-                    min: 0,
-                    ticks: {
-                        callback: (value) => value.toFixed(1),
-                        color: '#666'
-                    },
-                    grid: {
-                        drawOnChartArea: !taskHistoryState.selectedMetrics.includes('mistakeFrequency'),
-                        color: 'rgba(0, 0, 0, 0.1)'
-                    },
-                    border: { display: false }
-                };
-            }
-
-            const ctx = canvas.getContext('2d');
-            taskHistoryState.chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: xLabels,
-                    datasets: datasets
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'bottom',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 15
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    const yAxisId = context.dataset.yAxisID;
-                                    if (yAxisId === 'y-percent') {
-                                        label += context.parsed.y + '%';
-                                    } else {
-                                        label += context.parsed.y.toFixed(1);
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
-                    },
-                    scales: yAxes
+                        display: false
+                    }
                 }
-            });
+            }, yAxes)
         }
+    });
+}
 
-        // Main initialization function
-        function initTaskHistoryGraph(data) {
-            taskHistoryState.rawData = data;
-            initTaskHistoryButtons();
-            initTaskHistoryDateInputs(data);
-            renderTaskHistoryGraph();
-        }
+function initTaskHistoryGraph(data) {
+    taskHistoryState.rawData = data;
+    initTaskHistoryDropdown();
+    initTaskHistoryDateInputs(data);
+    renderTaskHistoryGraph();
+}
 
-    // TASK HISTORY GRAPH END
+// TASK HISTORY GRAPH END
     
 
     if (userData) {
