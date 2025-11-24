@@ -1142,10 +1142,40 @@ function removeAuthToken() {
   localStorage.removeItem(AUTH_TOKEN_KEY);
 }
 
-// Text processing functions
 function addNoSplitMarkers(text) {
-  const endPunctuationPattern = /([.!?…]+["„""]?)(?=\S)/gu;
-  return text.replace(endPunctuationPattern, `$1${NO_SPLIT_MARKER}`);
+  // Trim trailing whitespace and invisible characters to detect the last tandem correctly
+  const trimmedText = text.replace(/[\s\u200B-\u200D\uFEFF]+$/gu, '');
+
+  // Regex to match end-of-sentence tandems: punctuation + optional quotes
+  const tandemPattern = /[.!?…]+["„“”]*/gu;
+
+  // Find all tandems
+  const tandems = [...trimmedText.matchAll(tandemPattern)];
+  if (tandems.length === 0) return text;
+
+  // Position of the last tandem
+  const lastTandem = tandems[tandems.length - 1];
+
+  // Replace all tandems except the last one
+  let indexOffset = 0; // Adjust for added markers
+  let result = trimmedText;
+
+  tandems.forEach((match, i) => {
+    const tandemText = match[0];
+    const offset = match.index + indexOffset;
+
+    if (i === tandems.length - 1) return; // Skip last tandem
+
+    // Insert marker after the tandem
+    result = result.slice(0, offset + tandemText.length) + NO_SPLIT_MARKER + result.slice(offset + tandemText.length);
+
+    // Update offset for subsequent insertions
+    indexOffset += NO_SPLIT_MARKER.length;
+  });
+
+  // Append any trailing characters (whitespace or invisible) that were trimmed
+  const trailing = text.slice(trimmedText.length);
+  return result + trailing;
 }
 
 function removeNoSplitMarkers(text) {
