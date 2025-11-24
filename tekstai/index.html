@@ -3,264 +3,64 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>sudedu duomenų bazė</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>sudEdu duomenų bazė</title>
   <link rel="stylesheet" type="text/css" href="../../index.css">
 
   <style>
-    h1 {
-      margin-top:10vh;
+    * {
+      box-sizing: border-box;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
 
-    body, html {
-      font-family: Arial, sans-serif;
+    html {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: linear-gradient(to top, #ffbf9c, #ffbf92, #ffbf89, #ffbf7e, #ffc074);
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    body {
       margin: 0;
-      height: auto;
-      width: 100%
-    }
-
-    .container {
-      flex-grow: 1;
-      padding: 20px;
+      font-family: 'SFpro', sans-serif;
       display: flex;
       flex-direction: column;
-    }
-
-    .individual-option input {
-      width: auto;
-    }
-
-    .type-text {
-      width: 150px;
-    }
-
-    .list {
-      font-size: 1.05rem;
-    }
-    
-    #entry-list {
-      overflow-y: auto;
-      height: 95vh;
-      width: 35vw;
-      border-right: 1px solid #ccc;
-      padding: 20px;
-      position: sticky;
-      top: 0;
-    }
-
-    #content-wrapper {
-      display: flex;
-      flex-direction: row;
-      width: 90%;
-    }
-
-    .form-section {
-      width: 100%;
-      flex-grow: 1;
-      margin: 20px;
-      padding-left: 50px;
-      box-sizing: border-box;
-    }
-
-    label {
-      display: block;
-      margin: 10px 0 5px;
-      font-size: 1.05rem;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 8px;
-      font-size:1.05rem;
-    }
-
-    input, textarea {
-      width: 100%;
-      padding: 8px;
-      box-sizing: border-box;
-    }
-
-    .class-label {
-      margin:0;
-      padding-left: 5px;
-    }
-
-    .individual-option {
-      display: flex;
       align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .individual-option label {
-      padding-left: 5px;
-    }
-
-    button {
-      margin-top: 10px;
-      margin-bottom: 10px;
-      font-size: 1.02rem;
-    }
-    
-    .type-text {
-      margin: 0;
-    }
-
-    #search-bar {
-      width:100%;
-      margin-top:15px
-    }
-
-    .radio {
-      margin-bottom: 0;
-    }
-
-    .list span {
-      display: inline-block;
-      margin: 5px;
-      background-color: #ddd;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .list span:hover {
-      background-color: #D57E7E;
-      color: white;
-    }
-
-    .selected {
-      background-color: #f0f0f0;
-      border-left: 4px solid #32ac93;
-      padding-left: 5px
-    }
-
-    #new-entry-btn {
-      margin-top: 3vh;
-      font-size: 1.5rem;
       width: 100%;
-      height: 50px;
+      height: 100%;
+      overflow: hidden;
     }
 
-    .container h1 {
-      margin-top: 0;
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 12px;
     }
 
-    .list {
-      margin: 10px 0;
-      padding: 10px;
-      border: 1px solid #ccc;
-      background-color: #f9f9f9;
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(6px);
+      border-radius: 10px;
     }
 
-    #database-entries {
-      padding-left: 5px;
-      font-size:1.05rem;
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(6px);
+      border-radius: 10px;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      background-clip: content-box;
     }
 
-    #database-entries li {
-      margin-bottom: 10px;
-      padding-top: 3px;
-      padding-bottom: 3px;
-      cursor: pointer;
-    }
-    
-    .label-bold {
-      font-size:1.25rem;
-      font-weight: bold;
-      padding-bottom: 10px
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.6);
     }
 
-    #tekstas-title {
-      font-size:1.25rem;
-    }
-
-    #tekstai-title {
-      margin-bottom: 8px;
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
-
-    ul {
-      list-style-type: none;
-      padding-left: 0;
-    }
-
-    .align-right {
-      float: right;
-      padding-top:6px;
-      padding-bottom:6px;
-      margin-top: 3vh;
-    }
-
-    #message-container {
-      height: 50px;
-      position: relative;
-      margin-bottom: 10px;
-      text-align: center;
-    }
-
-    #message-field {
-      position: absolute;
-      width: 100%;
-      padding: 10px;
-      border-radius: 4px;
-      display: none;
-      box-sizing: border-box;
-    }
-
-    #message-field.success {
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-
-    #message-field.error {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
-
-    #message-field.info {
-      background-color: #d1ecf1;
-      color: #0c5460;
-      border: 1px solid #bee5eb;
-    }
-
-    .edit-mode {
-      background-color: #f1b46a;
-    }
-
-    #edit-toggle-btn {
-      margin-bottom: 20px;
-    }
-
-    #edit-toggle-btn.cancel {
-      background-color: #32ac93;
-      border: #32ac93;
-    }
-
-    #edit-toggle-btn:disabled {
-      color: black;
-      cursor: not-allowed;
-    }
-
-    #delete-btn {
-      background-color: #D57E7E;
-      border-color: #D57E7E;
-      margin-bottom: 20px;
-      margin-left: 10px;
-    }
-
-    #delete-btn:disabled {
-      color: black;
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .button-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.4) transparent;
     }
 
     /* Login modal styles */
@@ -278,263 +78,1043 @@
     }
 
     #login-modal > div {
-      background-color: white;
-      padding: 30px;
-      border-radius: 8px;
-      width: 400px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 40px;
+      border-radius: 20px;
+      width: 450px;
       max-width: 90%;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    #login-modal h2 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      text-align: center;
+      color: #333;
+    }
+
+    #login-modal p {
+      margin-bottom: 20px;
+      text-align: center;
+      color: #666;
     }
 
     #login-message {
       margin-bottom: 15px;
-      color: red;
+      color: #e74c3c;
       text-align: center;
       display: none;
+      padding: 10px;
+      background: rgba(231, 76, 60, 0.1);
+      border-radius: 8px;
     }
 
     #login-password {
       width: 100%;
-      padding: 10px;
+      padding: 12px 16px;
       margin-bottom: 15px;
       font-size: 16px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.8);
+      transition: border-color 0.3s;
+    }
+
+    #login-password:focus {
+      outline: none;
+      border-color: #3288AC;
     }
 
     #login-submit {
-      padding: 10px 20px;
+      width: 100%;
+      padding: 12px 20px;
       border: none;
-      border-radius: 4px;
+      border-radius: 12px;
       cursor: pointer;
+      background: linear-gradient(135deg, #3288AC, #286D8A);
+      color: white;
+      font-size: 16px;
+      font-weight: 500;
+      transition: transform 0.2s;
+    }
+
+    #login-submit:hover {
+      transform: translateY(-2px);
     }
 
     #login-spinner {
       display: none;
       align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
     }
 
-    .mb-4 {
-      font-size: 3.5rem;
-      margin-top: 0;
+    /* Main container */
+    #main-app {
+      width: 100%;
+      height: 100%;
+      display: none;
+      overflow: hidden;
     }
 
-    #new-suitable-for-btn,
-    #new-type-btn {
-      margin: 0;
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
-      box-shadow: none;
-      border: 0;
-    }
-    
-    #start-text,
-    #middle-text,
-    #end-text {
-      min-height: 150px;
+    .app-container {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      gap: 20px;
+      padding: 20px;
     }
 
-    #start-list,
-    #middle-list,
-    #end-list,
-    #distractor-list {
-      min-height: 64px;
-    }
-
-    #text-list-outer-container {
-      padding-bottom: 0 !important;
-      position: sticky;
-      top: 0;
-      height: 100vh; /* Ensure full height */
-      overflow-y: auto; /* Allow scrolling if necessary */
-    }
-
-    .container-fluid {
+    /* Left sidebar - text list */
+    .text-list-sidebar {
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      gap: 15px;
+      height: 100%;
     }
 
-    .btn.disabled, .btn:disabled, fieldset:disabled .btn {
-    color: black;
-    pointer-events: none;
-    background-color: #40c9a9;
-    border-color: #40c9a9;
-    opacity: 0.6;
+    .new-entry-button {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin: 0;
+      background: linear-gradient(135deg, #A0C58F, #32ac93);
+      border: none;
+      color: #F5F5F7;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(50, 172, 147, 0.3);
+    }
+
+    .new-entry-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(50, 172, 147, 0.4);
+    }
+
+    .search-container {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      padding: 12px 16px;
+    }
+
+    .search-input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-size: 1rem;
+      color: #333;
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      color: rgba(0, 0, 0, 0.4);
+    }
+
+    /* Filter section */
+    .filter-wrapper {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .filter-header {
+      padding: 12px 16px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      user-select: none;
+      transition: background 0.2s;
+    }
+
+    .filter-header:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .filter-icon {
+      transition: transform 0.3s;
+      display: flex;
+    }
+
+    .filter-icon.collapsed {
+      transform: rotate(-180deg);
+    }
+
+    .filter-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .filter-content {
+      max-height: 400px;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+      padding: 0 16px 16px;
+    }
+
+    .filter-content.collapsed {
+      max-height: 0;
+      padding: 0 16px;
+    }
+
+    .filter-group {
+      margin-bottom: 15px;
+    }
+
+    .filter-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .filter-label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4a4a4a;
+    }
+
+    .filter-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-chip {
+      padding: 6px 12px;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .filter-chip:hover {
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .filter-chip.active {
+      background: linear-gradient(135deg, #3288AC, #286D8A);
+      color: white;
+      border-color: transparent;
+    }
+
+    .entries-list-container {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .entries-list-header {
+      background: rgba(255, 255, 255, 0.2);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 15px;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.95rem;
+    }
+
+    .entries-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .entry-item {
+      padding: 12px 15px;
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .entry-item:hover {
+      background: rgba(255, 255, 255, 0.5);
+      transform: translateX(4px);
+    }
+
+    .entry-item.selected {
+      background: linear-gradient(135deg, rgba(50, 136, 172, 0.3), rgba(40, 109, 138, 0.3));
+      border-left: 4px solid #3288AC;
+      font-weight: 600;
+    }
+
+    .entry-id {
+      font-weight: 600;
+      color: #3288AC;
+      min-width: 40px;
+    }
+
+    .entry-title {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Right form section */
+    .form-section {
+      flex: 1 1 60%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .header-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .action-btn {
+      position: relative;
+      padding: 10px 16px;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: none;
+      background: linear-gradient(135deg, #3288AC, #286D8A);
+      color: #F5F5F7;
+      transition: all 0.3s;
+    }
+
+    .action-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+    }
+
+    .action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .action-btn.success {
+      background: linear-gradient(135deg, #A0C58F, #32ac93);
+    }
+
+    .action-btn.danger {
+      background: linear-gradient(135deg, #ff8073, #e74c3c);
+    }
+
+    .action-btn.secondary {
+      background: rgba(255, 255, 255, 0.3);
+      color: #333;
+    }
+
+    .message-container {
+      min-height: 50px;
+    }
+
+    .message-field {
+      padding: 12px 16px;
+      border-radius: 12px;
+      display: none;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .message-field.success {
+      background-color: rgba(160, 197, 143, 0.2);
+      color: #32ac93;
+      border: 1px solid #32ac93;
+    }
+
+    .message-field.error {
+      background-color: rgba(231, 76, 60, 0.2);
+      color: #e74c3c;
+      border: 1px solid #e74c3c;
+    }
+
+    .message-field.info {
+      background-color: rgba(50, 136, 172, 0.2);
+      color: #3288AC;
+      border: 1px solid #3288AC;
+    }
+
+    #suitable-for-options,
+    #class-options {
+      flex-direction: column;
+    }
+
+    #class-options .checkbox-item {
+      padding: 14px 12px;
+    }
+
+    .form-content {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+
+    .form-content.edit-mode {
+      background: rgba(241, 180, 106, 0.1);
+      border-radius: 20px;
+      padding: 20px;
+    }
+
+    .form-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #333;
+      text-transform: uppercase;
+    }
+
+    .difficulty-level {
+      padding: 6px 8px !important;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s;
+      resize: vertical;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: #3288AC;
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .form-input:disabled,
+    .form-textarea:disabled,
+    .form-select:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     .single-line-input {
-      min-height: 42px;
-      height: 42px;
+      min-height: 44px;
+      height: 44px;
+      resize: none;
     }
 
-    #start-list span,
-    #middle-list span,
-    #end-list span,
-    #distractor-list span {
-      white-space: pre-line;
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .checkbox-item:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .checkbox-item input[type="checkbox"],
+    .checkbox-item input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .checkbox-item label {
+      cursor: pointer;
+      margin: 0;
+      user-select: none;
+    }
+
+    .option-with-select {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .option-with-select select {
+      width: auto;
+      min-width: 100px;
+    }
+
+    .input-with-button {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .input-with-button input {
+      flex: 1;
+    }
+
+    .input-with-button button {
+      white-space: nowrap;
+    }
+
+    .text-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+    }
+
+    .text-section-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    .text-add-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 10px;
+      margin-bottom: 12px;
+    }
+
+    .no-split-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      background: rgba(255, 152, 0, 0.2);
+      border: 2px solid #ff9800;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .no-split-checkbox input {
+      width: auto;
+      margin: 0;
+    }
+
+    .no-split-checkbox label {
+      margin: 0;
+      cursor: pointer;
+    }
+
+    #start-no-split,
+    #middle-no-split,
+    #end-no-split {
+      cursor: pointer;
+    }
+
+    .text-list {
+      min-height: 60px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .text-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background: rgba(50, 136, 172, 0.2);
+      border: 1px solid rgba(50, 136, 172, 0.3);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      max-width: 100%;
+      word-break: break-word;
+    }
+
+    .text-chip:hover {
+      background: rgba(50, 136, 172, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .no-split-indicator {
+      display: inline-block;
+      background-color: #ff9800;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      margin-left: 4px;
+    }
+
+    .save-button {
+      margin-top: 20px;
+      padding: 14px 24px;
+      font-size: 1.1rem;
+    }
+
+    .header-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+    /* Sidebar content */
+.sidebar-wrapper {
+    position: static;
+    flex: 1 1 25%;
+    height: 100%;
+    z-index: 100;
+    transition: transform 0.3s ease;
+    padding-left: 0;
+    z-index: 9000;
+}
+
+.sidebar {
+    position: static;
+    width: 100%;
+    padding: 0;
+    height: 100%;
+    margin: 0;
+    z-index: 10;
+}
+
+.sidebar-wrapper.open {
+    transform: translateX(-10px) !important;
+}
+
+.sidebar-wrapper.open .toggle-tab svg {
+    transform: rotate(180deg);
+}
+
+.sidebar-content {
+    min-height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+#dynamic-content,
+.edit-mode-object-sidebar {
+    height: 100%;
+    overflow: hidden;
+}
+
+.edit-mode-object-sidebar {
+    display: flex;
+    flex-direction: column;
+}
+
+.object-sidebar-assets {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.object-sidebar-categories-dropdown-holder {
+    margin-bottom: 15px;
+    flex: 0 1 auto;
+}
+
+/* Toggle tab - always visible */
+.toggle-tab {
+    position: absolute;
+    right: -34px;
+    top: 0;
+    border: none;
+    width: 34px;
+    height: 62px;
+    border-radius: 0 20px 20px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.5);
+    padding: 0;
+    margin: 0;
+}
+
+.toggle-tab svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+}
+
+@media (min-width: 769px) {
+    .toggle-tab {
+        display: none;
+    }
+}
+
+    @media (max-width: 768px) {
+      .sidebar-wrapper {
+        position: absolute;
+        top: 95px;
+        height: calc(100vh - 20px);
+        width: calc(100vw - 35px);
+        transform: translateX(calc(-100vw + 25px));
+        border-bottom-right-radius: 8px;
+        top: 10px;
+    }
+
+    .sidebar-wrapper.container-expanded {
+        top: 5px;
+        height: calc(100% - 20px);
+        width: calc(100vw - 35px - 5px);
+        transform: translateX(calc(-100vw + 35px));
+        border-bottom-right-radius: 8px;
+        margin: 0;
+        margin-top: 0;
+    }
+
+    .sidebar {
+        padding: 16px;
+        height: 100%;
+        border-bottom-right-radius: 8px;
+        margin: 0;
+        margin-top: 0;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        background: rgba(255, 255, 255, 0.5);
     }
 
 
+      .app-container {
+        padding: 10px;
+        gap: 10px;
+      }
+
+      .form-title {
+        font-size: 1.5rem;
+      }
+
+      .header-buttons {
+        width: 100%;
+      }
+
+      .action-btn {
+        width: 100%;
+      }
+
+        .form-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .header-buttons {
+        width: 100%;
+      }
+      
+      .action-btn {
+        flex: 1;
+      }
+    }
   </style>
 </head>
 <body>
 
 <div id="login-modal" style="display: none;">
   <div>
-    <h2 style="margin-top: 0; margin-bottom: 15pxS; text-align: center;">sudEdu tekstų duomenų bazė</h2>
-    <p style="margin-bottom: 20px; text-align: center;">Įveskite slaptažodį</p>
+    <h2>sudEdu tekstų duomenų bazė</h2>
+    <p>Įveskite slaptažodį</p>
     
     <div id="login-message"></div>
     
     <input type="password" id="login-password" placeholder="Slaptažodis">
     
-    <div style="display: flex; justify-content: space-between;">
-      <button id="login-submit" class="btn btn-primary">Prisijungti</button>
-      <div id="login-spinner">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Kraunama...</span>
-        </div>
-        <span style="margin-left: 10px;">Tikrinamas slaptažodis...</span>
+    <button id="login-submit">Prisijungti</button>
+    
+    <div id="login-spinner">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Kraunama...</span>
       </div>
+      <span>Tikrinamas slaptažodis...</span>
     </div>
   </div>
 </div>
 
-<div class="container-fluid vh-100" id="main-app" style="display: none;">
-  <div class="row">
+<div id="main-app">
+  <div class="app-container">
+  <div class="sidebar-wrapper" id="sidebarWrapper">
+  <aside class="sidebar" id="sidebar">
+      <div class="sidebar-content" id="sidebarContent">
+
     <!-- Left Sidebar -->
-    <div id="text-list-outer-container" class="col-md-4 p-3 d-flex flex-column" style="position: sticky; top: 0; height: 100vh; overflow-y: auto;">
-      <div class="mb-3">
-        <button id="new-entry-btn" class="btn btn-primary w-100 py-2">Naujas įrašas</button>
+    <div class="text-list-sidebar">
+      <button id="new-entry-btn" class="new-entry-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>Naujas įrašas</span>
+      </button>
+
+      <div class="search-container">
+        <input type="text" id="search-bar" class="search-input" placeholder="Ieškoti pagal ID, pavadinimą, autorių...">
       </div>
-      <div class="mb-3">
-        <input type="text" id="search-bar" class="form-control" placeholder="Ieškoti..." onkeyup="filterEntries()">
+
+      <!-- Filter Section -->
+      <div class="filter-wrapper">
+        <div class="filter-header" id="filter-header">
+          <span>Filtrai</span>
+          <div class="filter-icon" id="filter-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor">
+              <path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="filter-content collapsed" id="filter-content">
+          <div class="filter-group">
+            <div class="filter-label">Užduoties tipas</div>
+            <div class="filter-options" id="type-filters"></div>
+          </div>
+          <div class="filter-group" id="difficulty-filter-group" style="display: none;">
+            <div class="filter-label">Sudėtingumas</div>
+            <div class="filter-options" id="difficulty-filters"></div>
+          </div>
+        </div>
       </div>
-      <h5 class="mb-3">Tekstai</h5>
-      <div class="flex-grow-1 overflow-auto">
-        <ul id="database-entries" class="list-unstyled"></ul>
+
+      <div class="entries-list-container">
+        <div class="entries-list-header">
+          Tekstai (<span id="entry-count">0</span>)
+        </div>
+        <div class="entries-list" id="database-entries"></div>
       </div>
+    </div>
+
+    </aside>
+        <button class="toggle-tab" id="toggleTab" aria-label="Toggle sidebar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M9 18l6-6-6-6"/>
+            </svg>
+        </button>
     </div>
 
     <!-- Right Form Section -->
-    <div class="col-md-8 p-4 d-flex flex-column" id="form-section">
-      <div class="d-flex justify-content-end mb-3">
-        <button class="btn btn-outline-secondary me-2 btn btn-primary" onclick="downloadDatabaseInJsonFormat()">Atsisiųsti duomenų bazę (JSON)</button>
-        <button class="btn btn-outline-secondary btn btn-primary" onclick="downloadExcelSummary()">Atsisiųsti santrauką</button>
+    <div class="form-section">
+      <div class="form-header">
+        <div class="header-buttons">
+          <button class="action-btn success" id="edit-toggle-btn" disabled>Redaguoti</button>
+          <button id="save-btn" class="action-btn success" onclick="saveEntry()" disabled>Išsaugoti tekstą</button>
+          <button class="action-btn danger" id="delete-btn" disabled>Ištrinti</button>
+        </div>
+        <div class="header-buttons">
+          <button class="action-btn secondary" onclick="downloadDatabaseInJsonFormat()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            JSON
+          </button>
+          <button class="action-btn secondary" onclick="downloadExcelSummary()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Excel
+          </button>
+        </div>
       </div>
-      
-      <div id="message-container" class="mb-3">
-        <div id="message-field" class="alert" role="alert"></div>
+
+      <div class="message-container">
+        <div id="message-field" class="message-field"></div>
       </div>
-      
-      <div class="d-flex mb-3">
-        <button id="edit-toggle-btn" class="btn btn-success me-2 btn btn-primary" onclick="toggleEditMode()" disabled>Redaguoti pasirinktą įrašą</button>
-        <button id="delete-btn" class="btn btn-danger btn btn-primary" onclick="deleteEntry()" disabled>Ištrinti pasirinktą įrašą</button>
-      </div>
-      
-      <h1 class="mb-4">SudEdu Tekstų Pridėjimas</h1>
-      
-      <form id="main-form">
-        <div class="mb-3">
-          <label for="title" class="form-label fw-bold">Pavadinimas</label>
-          <textarea class="single-line-input" id="title" placeholder="Įveskite pavadinimą" disabled></textarea>
+
+      <div class="form-content" id="form-content">
+        <h1 class="form-title">SudEdu Tekstų Pridėjimas</h1>
+
+        <div class="form-group">
+          <label class="form-label">Pavadinimas</label>
+          <textarea class="form-input single-line-input" id="title" placeholder="Įveskite pavadinimą" disabled></textarea>
         </div>
-        
-        <div class="mb-3">
-          <label for="author" class="form-label fw-bold">Autorius</label>
-          <textarea class="single-line-input" id="author" placeholder="Įveskite autorių" disabled></textarea>
+
+        <div class="form-group">
+          <label class="form-label">Autorius</label>
+          <textarea class="form-input single-line-input" id="author" placeholder="Įveskite autorių" disabled></textarea>
         </div>
-        
-        <div class="mb-3">
-          <label for="reference" class="form-label fw-bold">Šaltinis</label>
-          <textarea class="single-line-input" id="reference" placeholder="Įveskite šaltinį" disabled></textarea>
+
+        <div class="form-group">
+          <label class="form-label">Šaltinis</label>
+          <textarea class="form-input single-line-input" id="reference" placeholder="Įveskite šaltinį" disabled></textarea>
         </div>
-        
-        <div class="mb-3">
-          <label class="form-label fw-bold">Teksto tipas</label>
-          <div id="type-options" class="mb-2"></div>
-          <div class="input-group mb-3">
-            <input type="text" id="new-type" class="form-control" placeholder="Įveskite naują tipą" disabled>
-            <button id="new-type-btn" class="btn btn-outline-secondary btn btn-primary" type="button" onclick="addOption('type')" disabled>Pridėti tipą</button>
+
+        <div class="form-group">
+          <label class="form-label">Teksto tipas</label>
+          <div class="checkbox-group" id="type-options"></div>
+          <div class="input-with-button">
+            <input type="text" class="form-input" id="new-type" placeholder="Naujas tipas" disabled>
+            <button class="action-btn" id="new-type-btn" onclick="addOption('type')" disabled>Pridėti</button>
           </div>
         </div>
-        
-        <div class="mb-3">
-          <label class="form-label fw-bold">Užduočių suderinamumas</label>
-          <div id="suitable-for-options" class="mb-2"></div>
-          <div class="input-group mb-3">
-            <input type="text" id="new-suitable-for" class="form-control" placeholder="Įveskite naują užduotį" disabled>
-            <button id="new-suitable-for-btn" class="btn btn-outline-secondary btn btn-primary" type="button" onclick="addOption('suitable-for')" disabled>Pridėti užduotį</button>
+
+        <div class="form-group">
+          <label class="form-label">Užduočių suderinamumas</label>
+          <div class="checkbox-group" id="suitable-for-options"></div>
+          <div class="input-with-button">
+            <input type="text" class="form-input" id="new-suitable-for" placeholder="Nauja užduotis" disabled>
+            <button class="action-btn" id="new-suitable-for-btn" onclick="addOption('suitable-for')" disabled>Pridėti</button>
           </div>
         </div>
-        
-        <div class="mb-3">
-          <label class="form-label fw-bold">Klasėms</label>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="class-choice-1-2" name="class-choice" value="1_2_klase" disabled>
-            <label class="form-check-label" for="class-choice-1-2">1-2 klasėms</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="class-choice-3-4" name="class-choice" value="3_4_klase" disabled>
-            <label class="form-check-label" for="class-choice-3-4">3-4 klasėms</label>
-          </div>
-        </div>
-        
-        <h3 class="mt-4 mb-3">Tekstas</h3>
-        
-        <div class="text-section">
-          <label for="start-text" class="form-label">Pradžia</label>
-          <textarea class="form-control autoResize mb-2" id="start-text" placeholder="Įveskite pradžią" disabled></textarea>
-          <button class="btn btn-sm btn-outline-primary mb-3 btn btn-primary" type="button" onclick="addText('start')" disabled>Pridėti</button>
-          <div class="text-list list p-2 border rounded bg-light" id="start-list"></div>
-        </div>
-        
-        <div class="text-section">
-          <label for="middle-text" class="form-label">Įvykių raida</label>
-          <textarea class="form-control autoResize mb-2" id="middle-text" placeholder="Įveskite įvykių raidą" disabled></textarea>
-          <button class="btn btn-sm btn-outline-primary mb-3 btn btn-primary" type="button" onclick="addText('middle')" disabled>Pridėti</button>
-          <div class="text-list list p-2 border rounded bg-light" id="middle-list"></div>
-        </div>
-        
-        <div class="text-section">
-          <label for="end-text" class="form-label">Pabaiga</label>
-          <textarea class="form-control autoResize mb-2" id="end-text" placeholder="Įveskite pabaigą" disabled></textarea>
-          <button class="btn btn-sm btn-outline-primary mb-3 btn btn-primary" type="button" onclick="addText('end')" disabled>Pridėti</button>
-          <div class="text-list list p-2 border rounded bg-light" id="end-list"></div>
+
+        <div class="form-group">
+          <label class="form-label">Klasėms</label>
+          <div class="checkbox-group" id="class-options"></div>
         </div>
 
         <div class="text-section">
-          <label for="end-text" class="form-label">Distraktorius</label>
-          <textarea class="form-control autoResize mb-2" id="distractor-text" placeholder="Įveskite distraktorių" disabled></textarea>
-          <button class="btn btn-sm btn-outline-primary mb-3 btn btn-primary" type="button" onclick="addText('distractor')" disabled>Pridėti</button>
-          <div class="text-list list p-2 border rounded bg-light" id="distractor-list"></div>
+          <div class="text-section-title">Pradžia</div>
+          <textarea class="form-textarea" id="start-text" placeholder="Įveskite pradžią" rows="3" disabled></textarea>
+          <div class="text-add-controls">
+            <button class="action-btn" onclick="addText('start')" disabled>Pridėti</button>
+            <div class="no-split-checkbox">
+              <input type="checkbox" id="start-no-split" disabled>
+              <label for="start-no-split">⚠️ Nedalomi sakiniai</label>
+            </div>
+          </div>
+          <div class="text-list" id="start-list"></div>
         </div>
-        
-        <button id="save-btn" class="btn btn-primary mt-3 btn btn-primary" type="button" onclick="saveEntry()" disabled>Išsaugoti tekstą</button>
-      </form>
-    </div>
+
+        <div class="text-section">
+          <div class="text-section-title">Įvykių raida</div>
+          <textarea class="form-textarea" id="middle-text" placeholder="Įveskite įvykių raidą" rows="3" disabled></textarea>
+          <div class="text-add-controls">
+            <button class="action-btn" onclick="addText('middle')" disabled>Pridėti</button>
+            <div class="no-split-checkbox">
+              <input type="checkbox" id="middle-no-split" disabled>
+              <label for="middle-no-split">⚠️ Neskirtyti sakinių</label>
+            </div>
+          </div>
+          <div class="text-list" id="middle-list"></div>
+        </div>
+
+        <div class="text-section">
+          <div class="text-section-title">Pabaiga</div>
+          <textarea class="form-textarea" id="end-text" placeholder="Įveskite pabaigą" rows="3" disabled></textarea>
+          <div class="text-add-controls">
+            <button class="action-btn" onclick="addText('end')" disabled>Pridėti</button>
+            <div class="no-split-checkbox">
+              <input type="checkbox" id="end-no-split" disabled>
+              <label for="end-no-split">⚠️ Neskirtyti sakinių</label>
+            </div>
+          </div>
+          <div class="text-list" id="end-list"></div>
+        </div>
+
+        <div class="text-section">
+          <div class="text-section-title">Distraktorius</div>
+          <textarea class="form-textarea" id="distractor-text" placeholder="Įveskite distraktorių" rows="3" disabled></textarea>
+          <div class="text-add-controls">
+            <button class="action-btn" onclick="addText('distractor')" disabled>Pridėti</button>
+            <div class="no-split-checkbox">
+              <input type="checkbox" id="distractor-no-split" disabled>
+              <label for="distractor-no-split">⚠️ Neskirtyti sakinių</label>
+</div>
+</div>
+<div class="text-list" id="distractor-list"></div>
+</div>
   </div>
 </div>
-
-
-<!-- Bootstrap JS Bundle with Popper -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </div>
+</div>
 <script>
 const apiBase = 'https://sudedu-text-database-server.onrender.com/';
 const messageField = document.querySelector("#message-field");
-let database = [];
+const NO_SPLIT_MARKER = '\uE000';
+let database = {};
 const textSections = { start: [], middle: [], end: [], distractor: [] };
 let editIndex = null;
 let isEditMode = false;
 let currentEntryId = null;
 let isAuthenticated = false;
+let allOptions = { types: [], SF: [], classes: [] };
+let selectedTypeFilter = new Set();
+let selectedDifficultyFilters = new Set();
 
-// Auth token management
 const AUTH_TOKEN_KEY = 'sudEduAuthToken';
 
+const codeDecoder = {
+  "C50": "RAŠYBA",
+  "C51": "TURINIO KOMPONAVIMAS",
+  "C52": "STRUKTŪROS IŠDĖSTYMAS",
+  "C58": "LENGVAS",
+  "C59": "VIDUTINIS",
+  "C60": "SUNKUS",
+  "C75": "1-2 KLASĖ",
+  "C76": "3-4 KLASĖ"
+};
 
-if (getAuthToken()) {
-  isAuthenticated = true;
+function decodeText(code) {
+  return codeDecoder[code] || code;
 }
 
+// Auth functions
 function getAuthToken() {
   return localStorage.getItem(AUTH_TOKEN_KEY);
 }
@@ -547,7 +1127,21 @@ function removeAuthToken() {
   localStorage.removeItem(AUTH_TOKEN_KEY);
 }
 
-// Authenticated request wrapper
+// Text processing functions
+function addNoSplitMarkers(text) {
+  const endPunctuationPattern = /([.!?]+(?:\.\.|\.\.\.)?)/g;
+  return text.replace(endPunctuationPattern, `$1${NO_SPLIT_MARKER}`);
+}
+
+function removeNoSplitMarkers(text) {
+  return text.replace(new RegExp(NO_SPLIT_MARKER, 'g'), '');
+}
+
+function hasNoSplitMarkers(text) {
+  return text.includes(NO_SPLIT_MARKER);
+}
+
+// API request wrapper
 async function makeAuthenticatedRequest(url, options = {}) {
   if (!isAuthenticated) {
     showLoginModal();
@@ -558,13 +1152,11 @@ async function makeAuthenticatedRequest(url, options = {}) {
   if (!token) {
     showLoginModal();
     throw new Error('Reikia prisijungti');
-  } else {
-    showMainApp();
   }
 
   const headers = {
     ...options.headers,
-    'Authorization': getAuthToken()
+    'Authorization': token
   };
 
   const response = await fetch(url, {
@@ -582,13 +1174,12 @@ async function makeAuthenticatedRequest(url, options = {}) {
   return response;
 }
 
-// Login function
+// Login handling
 async function handleLogin(password) {
   const loginSubmit = document.getElementById('login-submit');
   const loginSpinner = document.getElementById('login-spinner');
   const loginMessage = document.getElementById('login-message');
   
-  // UI state changes
   loginSubmit.style.display = 'none';
   loginSpinner.style.display = 'flex';
   loginMessage.style.display = 'none';
@@ -597,8 +1188,7 @@ async function handleLogin(password) {
     const response = await fetch(`${apiBase}auth/login`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': getAuthToken()
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ password })
     });
@@ -609,13 +1199,11 @@ async function handleLogin(password) {
       throw new Error(data.message || 'Prisijungimo klaida');
     }
     
-    // Save token and hide modal
     isAuthenticated = true;
     setAuthToken(data.token);
     hideLoginModal();
     showMainApp();
     
-    // Initialize the app
     initializeData();
   } catch (error) {
     console.error('Login error:', error);
@@ -630,8 +1218,9 @@ async function handleLogin(password) {
 function showLoginModal() {
   document.getElementById('login-modal').style.display = 'flex';
   document.getElementById('main-app').style.display = 'none';
+  const input = document.getElementById('login-password');
   if (input) {
-    input.value = ''; // Clear the text input value
+    input.value = '';
   }
 }
 
@@ -643,7 +1232,7 @@ function showMainApp() {
   document.getElementById('main-app').style.display = 'block';
 }
 
-// Helper functions
+// UI state management
 function disableButtons() {
   const buttons = document.querySelectorAll('button');
   buttons.forEach(button => {
@@ -672,12 +1261,10 @@ function disableForm() {
   });
   document.getElementById('save-btn').disabled = true;
   
-  // Also disable text add buttons
   document.querySelectorAll('.text-section button').forEach(btn => {
     btn.disabled = true;
   });
   
-  // Disable option add buttons
   document.getElementById('new-type-btn').disabled = true;
   document.getElementById('new-suitable-for-btn').disabled = true;
 }
@@ -691,23 +1278,17 @@ function enableForm() {
   });
   document.getElementById('save-btn').disabled = false;
   
-  // Enable text add buttons
   document.querySelectorAll('.text-section button').forEach(btn => {
     btn.disabled = false;
   });
   
-  // Enable option add buttons
   document.getElementById('new-type-btn').disabled = false;
   document.getElementById('new-suitable-for-btn').disabled = false;
 }
 
-function showAlert(message) {
-  alert(message);
-}
-
 function showMessage(message, type) {
   messageField.textContent = message;
-  messageField.className = type;
+  messageField.className = 'message-field ' + type;
   messageField.style.display = 'block';
   setTimeout(() => {
     messageField.style.display = 'none';
@@ -715,10 +1296,13 @@ function showMessage(message, type) {
 }
 
 function scrollToTop() {
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  });
+  const formContent = document.querySelector('.form-content');
+  if (formContent) {
+    formContent.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
 }
 
 function updateEditDeleteButtons() {
@@ -734,17 +1318,19 @@ function updateEditDeleteButtons() {
   }
   
   if (isEditMode) {
-    editBtn.textContent = 'Atšaukti redagavimą';
-    editBtn.classList.add('cancel');
+    editBtn.textContent = 'Atšaukti';
+    editBtn.classList.remove('success');
+    editBtn.classList.add('secondary');
   } else {
-    editBtn.textContent = 'Redaguoti pasirinktą įrašą';
-    editBtn.classList.remove('cancel');
+    editBtn.textContent = 'Redaguoti';
+    editBtn.classList.remove('secondary');
+    editBtn.classList.add('success');
   }
 }
 
 function toggleEditMode() {
   if (!currentEntryId) {
-    showAlert('Pasirinkite įrašą redagavimui');
+    alert('Pasirinkite įrašą redagavimui');
     return;
   }
 
@@ -752,22 +1338,19 @@ function toggleEditMode() {
   
   if (isEditMode) {
     enableForm();
-    document.getElementById('form-section').classList.add('edit-mode');
+    document.getElementById('form-content').classList.add('edit-mode');
     
-    // Enable "Add option" fields only in edit mode
     document.getElementById('new-type').disabled = false;
     document.getElementById('new-suitable-for').disabled = false;
   } else {
     disableForm();
-    document.getElementById('form-section').classList.remove('edit-mode');
-    // Reload the entry to reset any changes
-    const entry = database.find(e => e.id === currentEntryId);
+    document.getElementById('form-content').classList.remove('edit-mode');
+    const entry = database[currentEntryId];
     if (entry) {
-      const listItem = document.querySelector(`li[data-id="${currentEntryId}"]`);
-      loadEntry(database.indexOf(entry), entry, listItem);
+      const listItem = document.querySelector(`[data-id="${currentEntryId}"]`);
+      loadEntry(currentEntryId, entry, listItem);
     }
     
-    // Disable "Add option" fields when not in edit mode
     document.getElementById('new-type').disabled = true;
     document.getElementById('new-suitable-for').disabled = true;
   }
@@ -780,45 +1363,198 @@ function prepareNewEntry() {
     return;
   }
 
-  // Clear selection
-  document.querySelectorAll('#database-entries li').forEach(item => {
+  document.querySelectorAll('.entry-item').forEach(item => {
     item.classList.remove('selected');
-    item.style.fontWeight = '';
   });
 
-  // Reset all form fields
   clearForm();
-
-  // Enable form for new entry
   enableForm();
   
-  // Enable "Add option" fields
   document.getElementById('new-type').disabled = false;
   document.getElementById('new-suitable-for').disabled = false;
   document.getElementById('new-type-btn').disabled = false;
   document.getElementById('new-suitable-for-btn').disabled = false;
 
-  // Reset state variables
   editIndex = null;
   currentEntryId = null;
   isEditMode = false;
   
-  // Update UI
-  document.getElementById('form-section').classList.remove('edit-mode');
-  document.getElementById('edit-toggle-btn').textContent = 'Redaguoti pasirinktą įrašą';
-  document.getElementById('edit-toggle-btn').classList.remove('cancel');
+  document.getElementById('form-content').classList.remove('edit-mode');
   document.getElementById('save-btn').textContent = 'Išsaugoti tekstą';
   
-  // Update button states
   updateEditDeleteButtons();
-  
-  // Scroll to top
   scrollToTop();
   
   showMessage('Pasiruošta naujam įrašui', 'info');
+
+  closeSidebar();
 }
 
-// Initialize data
+function initializeFilters() {
+  const typeFiltersContainer = document.getElementById('type-filters');
+  const difficultyFiltersContainer = document.getElementById('difficulty-filters');
+  
+  // Create type filter chips (now checkboxes)
+  typeFiltersContainer.innerHTML = '';
+  allOptions.SF.forEach(type => {
+    const chip = document.createElement('div');
+    chip.className = 'filter-chip';
+    chip.textContent = decodeText(type); // CHANGED: Use decoded text
+    chip.dataset.type = type;
+    chip.onclick = () => toggleTypeFilter(type);
+    typeFiltersContainer.appendChild(chip);
+  });
+  
+  // Filter header toggle
+  document.getElementById('filter-header').onclick = toggleFilters;
+}
+
+function toggleFilters() {
+  const content = document.getElementById('filter-content');
+  const icon = document.getElementById('filter-icon');
+  
+  content.classList.toggle('collapsed');
+  icon.classList.toggle('collapsed');
+}
+
+function toggleTypeFilter(type) {
+  const chip = document.querySelector(`[data-type="${type}"]`);
+  
+  if (selectedTypeFilter === null) {
+    selectedTypeFilter = new Set();
+  }
+  
+  if (selectedTypeFilter.has(type)) {
+    // Deselect this type
+    selectedTypeFilter.delete(type);
+    chip.classList.remove('active');
+  } else {
+    // Select this type
+    selectedTypeFilter.add(type);
+    chip.classList.add('active');
+  }
+  
+  // Update difficulty filters based on all selected types
+  if (selectedTypeFilter.size > 0) {
+    updateDifficultyFilters();
+    document.getElementById('difficulty-filter-group').style.display = 'block';
+  } else {
+    document.getElementById('difficulty-filter-group').style.display = 'none';
+    selectedDifficultyFilters.clear();
+  }
+  
+  applyFilters();
+}
+
+function updateDifficultyFilters() {
+  const container = document.getElementById('difficulty-filters');
+  container.innerHTML = '';
+  
+  // Get unique difficulty levels for all selected types
+  const difficulties = new Set();
+  Object.values(database).forEach(entry => {
+    if (entry.SF) {
+      selectedTypeFilter.forEach(type => {
+        if (entry.SF[type]) {
+          difficulties.add(entry.SF[type]);
+        }
+      });
+    }
+  });
+  
+  // Preserve previously selected difficulties that still exist
+  const validDifficulties = new Set();
+  difficulties.forEach(diff => {
+    if (diff) {
+      validDifficulties.add(diff);
+      const chip = document.createElement('div');
+      chip.className = 'filter-chip';
+      chip.textContent = decodeText(diff); // CHANGED: Use decoded text
+      chip.dataset.difficulty = diff;
+      chip.onclick = () => toggleDifficultyFilter(diff);
+      
+      // Restore active state if previously selected
+      if (selectedDifficultyFilters.has(diff)) {
+        chip.classList.add('active');
+      }
+      
+      container.appendChild(chip);
+    }
+  });
+  
+  // Remove selected difficulties that are no longer valid
+  selectedDifficultyFilters.forEach(diff => {
+    if (!validDifficulties.has(diff)) {
+      selectedDifficultyFilters.delete(diff);
+    }
+  });
+}
+
+function toggleDifficultyFilter(difficulty) {
+  const chip = document.querySelector(`[data-difficulty="${difficulty}"]`);
+  
+  if (selectedDifficultyFilters.has(difficulty)) {
+    selectedDifficultyFilters.delete(difficulty);
+    chip.classList.remove('active');
+  } else {
+    selectedDifficultyFilters.add(difficulty);
+    chip.classList.add('active');
+  }
+  
+  applyFilters();
+}
+
+function applyFilters() {
+  const searchTerm = document.getElementById('search-bar').value.toLowerCase().trim();
+  const entries = document.querySelectorAll('.entry-item');
+  let visibleCount = 0;
+  
+  entries.forEach(item => {
+    const id = item.dataset.id;
+    const entry = database[id];
+    
+    // Search filter
+    let matchesSearch = true;
+    if (searchTerm) {
+      matchesSearch = 
+        String(id).includes(searchTerm) ||
+        (entry.title?.toLowerCase().includes(searchTerm)) ||
+        (entry.author?.toLowerCase().includes(searchTerm)) ||
+        (entry.ref?.toLowerCase().includes(searchTerm)) ||
+        (entry.text?.start?.some(part => removeNoSplitMarkers(part).toLowerCase().includes(searchTerm))) ||
+        (entry.text?.middle?.some(part => removeNoSplitMarkers(part).toLowerCase().includes(searchTerm))) ||
+        (entry.text?.end?.some(part => removeNoSplitMarkers(part).toLowerCase().includes(searchTerm))) ||
+        (entry.text?.distractor?.some(part => removeNoSplitMarkers(part).toLowerCase().includes(searchTerm)));
+    }
+    
+    // Type filter - CHANGED: Check if entry matches ANY selected type
+    let matchesType = true;
+    if (selectedTypeFilter && selectedTypeFilter.size > 0) {
+      matchesType = false;
+      selectedTypeFilter.forEach(type => {
+        if (entry.SF && entry.SF[type]) {
+          // If no difficulty filters, just matching the type is enough
+          if (selectedDifficultyFilters.size === 0) {
+            matchesType = true;
+          } else {
+            // Check if the difficulty matches
+            if (selectedDifficultyFilters.has(entry.SF[type])) {
+              matchesType = true;
+            }
+          }
+        }
+      });
+    }
+    
+    const isVisible = matchesSearch && matchesType;
+    item.style.display = isVisible ? 'flex' : 'none';
+    if (isVisible) visibleCount++;
+  });
+  
+  document.getElementById('entry-count').textContent = visibleCount;
+}
+
+// Data initialization
 function initializeData() {
   disableButtons();
   showMessage('Kraunami duomenys...', 'info');
@@ -828,12 +1564,14 @@ function initializeData() {
     makeAuthenticatedRequest(`${apiBase}text/get-database`).then(res => res.json())
   ])
   .then(([optionsData, dbData]) => {
+    allOptions = optionsData;
     displayOptions('type', optionsData.types);
-    displayOptions('suitable-for', optionsData['suitable-for']);
+    displayOptions('suitable-for', optionsData.SF);
+    displayOptions('class', optionsData.classes);
     database = dbData;
     displayEntries();
+    initializeFilters();
     showMessage('Duomenys sėkmingai įkelti', 'success');
-    // Prepare for new entry after load
     prepareNewEntry();
   })
   .catch(error => {
@@ -850,17 +1588,16 @@ function initializeData() {
   });
 }
 
-// Core functions
 function displayOptions(category, options) {
   const container = document.getElementById(`${category}-options`);
   container.innerHTML = '';
+  
   options.forEach(option => {
     const optionDiv = document.createElement('div');
-    optionDiv.classList.add('individual-option');
+    optionDiv.className = 'checkbox-item';
 
     const input = document.createElement('input');
     input.type = category === 'type' ? 'radio' : 'checkbox';
-    input.classList = category === 'type' ? 'radio' : 'checkbox';
     input.value = option;
     input.id = `${category}-${option}`;
     input.name = category;
@@ -868,23 +1605,29 @@ function displayOptions(category, options) {
 
     const label = document.createElement('label');
     label.setAttribute('for', `${category}-${option}`);
-    label.classList.add('type-text');
-    label.textContent = option;
+    label.textContent = decodeText(option); // CHANGED: Use decoded text
 
     if (category === 'suitable-for') {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'option-with-select';
+      
       const select = document.createElement('select');
+      select.className = 'form-select difficulty-level';
       select.id = `${category}-difficulty-${option}`;
       select.disabled = true;
-      ['', 'lengvas', 'vidutinis', 'sunkus'].forEach(diff => {
+      ['', 'C58', 'C59', 'C60'].forEach(diff => {
         const optionElem = document.createElement('option');
         optionElem.value = diff;
-        optionElem.textContent = diff;
+        optionElem.textContent = diff ? decodeText(diff) : 'Pasirinkite'; // CHANGED: Use decoded text
         select.appendChild(optionElem);
       });
-      optionDiv.append(input, label, select);
+      
+      wrapper.append(input, label, select);
+      optionDiv.appendChild(wrapper);
     } else {
       optionDiv.append(input, label);
     }
+    
     container.appendChild(optionDiv);
   });
 }
@@ -893,132 +1636,122 @@ function displayEntries() {
   const list = document.getElementById('database-entries');
   list.innerHTML = '';
   
-  database.sort((a, b) => a.id - b.id);
+  const sortedIds = Object.keys(database).sort((a, b) => parseInt(a) - parseInt(b));
   
-  database.forEach((entry) => {
-    const listItem = document.createElement('li');
-    listItem.dataset.id = entry.id;
-    listItem.innerHTML = `
-      <span class="entry-id">${entry.id}.</span>
-      <span class="entry-title">${entry.title || 'Rašybos sakiniai'}</span>
-    `;
+  sortedIds.forEach((id) => {
+    const entry = database[id];
+    const listItem = document.createElement('div');
+    listItem.className = 'entry-item';
+    listItem.dataset.id = id;
+    
+    const idSpan = document.createElement('span');
+    idSpan.className = 'entry-id';
+    idSpan.textContent = id;
+    
+    const titleSpan = document.createElement('span');
+    titleSpan.className = 'entry-title';
+    titleSpan.textContent = entry.title || 'Rašybos sakiniai';
+    
+    listItem.appendChild(idSpan);
+    listItem.appendChild(titleSpan);
     
     listItem.addEventListener('click', () => {
+      closeSidebar();
       disableForm();
       if (isEditMode) {
         if (confirm('Redagavimas vyksta. Ar norite išeiti neišsaugojus pakeitimų?')) {
           toggleEditMode();
-          loadSelectedEntry(entry, listItem);
+          loadSelectedEntry(id, entry, listItem);
         }
       } else {
-        loadSelectedEntry(entry, listItem);
+        loadSelectedEntry(id, entry, listItem);
       }
     });
     
     list.appendChild(listItem);
   });
+  
+  document.getElementById('entry-count').textContent = sortedIds.length;
 }
 
-function loadSelectedEntry(entry, listItem) {
-  const index = database.findIndex(e => e.id === entry.id);
-  if (index >= 0) {
-    currentEntryId = entry.id;
-    loadEntry(index, entry, listItem);
-    updateEditDeleteButtons();
-  }
+function loadSelectedEntry(id, entry, listItem) {
+  currentEntryId = id;
+  loadEntry(id, entry, listItem);
+  updateEditDeleteButtons();
 }
 
-function loadEntry(index, entry, listItem) {
-  // Clear previous selection
-  document.querySelectorAll('#database-entries li').forEach(item => {
+function loadEntry(id, entry, listItem) {
+  document.querySelectorAll('.entry-item').forEach(item => {
     item.classList.remove('selected');
-    item.style.fontWeight = '';
   });
   
-  // Highlight selected
   listItem.classList.add('selected');
-  listItem.style.fontWeight = 'bold';
-  editIndex = index;
+  editIndex = id;
   
-  // Scroll to entry
   listItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   
-  // Populate form
   document.getElementById('title').value = entry.title || '';
   document.getElementById('author').value = entry.author || '';
-  document.getElementById('reference').value = entry.reference || '';
+  document.getElementById('reference').value = entry.ref || '';
   
-  // Set type
   const typeInput = document.querySelector(`input[name="type"][value="${entry.type}"]`);
   if (typeInput) typeInput.checked = true;
   
-  // Clear all suitable-for checkboxes first
   document.querySelectorAll('input[name="suitable-for"]').forEach(input => {
     input.checked = false;
     const difficultySelect = document.getElementById(`suitable-for-difficulty-${input.value}`);
     if (difficultySelect) difficultySelect.value = '';
   });
   
-  // Set suitable-for options and difficulties
-  if (entry['suitable-for']) {
-    Object.entries(entry['suitable-for']).forEach(([key, value]) => {
+  if (entry.SF) {
+    Object.entries(entry.SF).forEach(([key, value]) => {
       const input = document.querySelector(`input[name="suitable-for"][value="${key}"]`);
       if (input) {
         input.checked = true;
         const difficultySelect = document.getElementById(`suitable-for-difficulty-${key}`);
         if (difficultySelect) {
-          difficultySelect.value = value.difficulty || '';
+          difficultySelect.value = value || '';
         }
       }
     });
   }
   
-  // Set class choices
-  document.querySelectorAll('input[name="class-choice"]').forEach(input => {
-    input.checked = entry['class-choice']?.includes(input.value) || false;
+  document.querySelectorAll('input[name="class"]').forEach(input => {
+    input.checked = entry.class?.includes(input.value) || false;
   });
   
-  // Load text sections
   ['start', 'middle', 'end', 'distractor'].forEach(section => {
     const textData = entry.text?.[section] || [];
     textSections[section] = Array.isArray(textData) ? [...textData] : [];
     updateTextList(section);
   });
   
-  // Update UI
   document.getElementById('save-btn').textContent = 'Atnaujinti tekstą';
-  document.title = `Redaguojama: ${entry.title || entry.id}`;
+  document.title = `Redaguojama: ${entry.title || id}`;
 }
 
 function saveEntry() {
-  // Get form values
   const title = document.getElementById('title').value.trim();
   const author = document.getElementById('author').value.trim();
   const reference = document.getElementById('reference').value.trim();
   const type = document.querySelector('input[name="type"]:checked')?.value;
   
-  // Build suitableFor object and validate
   const suitableFor = {};
   let hasSuitableFor = false;
   document.querySelectorAll('input[name="suitable-for"]:checked').forEach(input => {
     hasSuitableFor = true;
     const difficultySelect = document.getElementById(`suitable-for-difficulty-${input.value}`);
-    suitableFor[input.value] = {
-      difficulty: difficultySelect ? difficultySelect.value : '',
-      classChoices: [...document.querySelectorAll('input[name="class-choice"]:checked')].map(cb => cb.value)
-    };
+    suitableFor[input.value] = difficultySelect ? difficultySelect.value : '';
   });
 
-  // Validate class choices
-  const hasClassChoices = document.querySelectorAll('input[name="class-choice"]:checked').length > 0;
+  const classChoices = [...document.querySelectorAll('input[name="class"]:checked')].map(cb => cb.value);
+  const hasClassChoices = classChoices.length > 0;
 
-  // Validate text sections
   const hasStartText = textSections.start.length > 0;
   const hasMiddleText = textSections.middle.length > 0;
   const hasEndText = textSections.end.length > 0;
   const hasAnyText = hasStartText || hasMiddleText || hasEndText;
 
-  // Collect validation errors
   const errors = [];
   
   if (!type) {
@@ -1037,37 +1770,33 @@ function saveEntry() {
     errors.push('• Įveskite bent vieną teksto dalį (pradžią, įvykių raidą arba pabaigą)');
   }
 
-  // Show errors if any
   if (errors.length > 0) {
-    showAlert('Pataisykite šias klaidas:\n\n' + errors.join('\n'));
+    alert('Pataisykite šias klaidas:\n\n' + errors.join('\n'));
     return;
   }
 
-  // Prepare data for submission
   const entryData = {
     title,
     author,
-    reference,
+    ref: reference,
     type,
-    suitableFor,
+    SF: suitableFor,
+    class: classChoices,
     text: textSections
   };
 
-  // Include ID if editing
-  if (editIndex !== null && database[editIndex]?.id) {
-    entryData.id = database[editIndex].id;
+  if (editIndex !== null) {
+    entryData.id = editIndex;
   }
 
-  // Visual feedback - disable buttons during submission
   disableButtons();
   showMessage('Siunčiama...', 'info');
 
-  // Submit data
   makeAuthenticatedRequest(`${apiBase}text/save-entry`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json',
-                'Authorization': getAuthToken()
-     },
+    headers: { 
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify(entryData)
   })
   .then(response => {
@@ -1077,8 +1806,7 @@ function saveEntry() {
     return response.json();
   })
   .then(data => {
-    showAlert(editIndex !== null ? 'Įrašas sėkmingai atnaujintas!' : 'Įrašas sėkmingai sukurtas!');
-    // Reload the database
+    alert(editIndex !== null ? 'Įrašas sėkmingai atnaujintas!' : 'Įrašas sėkmingai sukurtas!');
     return makeAuthenticatedRequest(`${apiBase}text/get-database`);
   })
   .then(response => response.json())
@@ -1088,23 +1816,21 @@ function saveEntry() {
     editIndex = null;
     currentEntryId = null;
     isEditMode = false;
-    document.getElementById('form-section').classList.remove('edit-mode');
+    document.getElementById('form-content').classList.remove('edit-mode');
     document.getElementById('save-btn').textContent = 'Išsaugoti tekstą';
     clearForm();
     scrollToTop();
     updateEditDeleteButtons();
-    // Prepare for new entry after save
+    applyFilters();
     prepareNewEntry();
   })
   .catch(error => {
     console.error('Error:', error);
-    showAlert('Klaida: ' + (error.message || 'Serverio klaida'));
-
+    alert('Klaida: ' + (error.message || 'Serverio klaida'));
     if (error.message === "Unauthorized") {
       removeAuthToken();
       showLoginModal();
     }
-
   })
   .finally(() => {
     enableButtons();
@@ -1113,7 +1839,7 @@ function saveEntry() {
 
 function deleteEntry() {
   if (!currentEntryId) {
-    showAlert('Pasirinkite įrašą, kurį norite ištrinti');
+    alert('Pasirinkite įrašą, kurį norite ištrinti');
     return;
   }
 
@@ -1126,9 +1852,9 @@ function deleteEntry() {
 
   makeAuthenticatedRequest(`${apiBase}text/delete-entry`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json',
-                'Authorization': getAuthToken()
-     },
+    headers: { 
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify({ id: currentEntryId })
   })
   .then(response => {
@@ -1138,7 +1864,7 @@ function deleteEntry() {
     return response.json();
   })
   .then(data => {
-    showAlert('Įrašas sėkmingai ištrintas!');
+    alert('Įrašas sėkmingai ištrintas!');
     return makeAuthenticatedRequest(`${apiBase}text/get-database`);
   })
   .then(response => response.json())
@@ -1148,23 +1874,21 @@ function deleteEntry() {
     editIndex = null;
     currentEntryId = null;
     isEditMode = false;
-    document.getElementById('form-section').classList.remove('edit-mode');
+    document.getElementById('form-content').classList.remove('edit-mode');
     document.getElementById('save-btn').textContent = 'Išsaugoti tekstą';
     clearForm();
     scrollToTop();
     updateEditDeleteButtons();
-    // Prepare for new entry after delete
+    applyFilters();
     prepareNewEntry();
   })
   .catch(error => {
     console.error('Error:', error);
-    showAlert('Klaida: ' + (error.message || 'Serverio klaida'));
-
+    alert('Klaida: ' + (error.message || 'Serverio klaida'));
     if (error.message === "Unauthorized") {
       removeAuthToken();
       showLoginModal();
     }
-
   })
   .finally(() => {
     enableButtons();
@@ -1186,15 +1910,15 @@ function clearForm() {
     if (difficultySelect) difficultySelect.value = '';
   });
   
-  document.querySelectorAll('input[name="class-choice"]').forEach(input => {
+  document.querySelectorAll('input[name="class"]').forEach(input => {
     input.checked = false;
   });
   
-  // Clear text sections and textareas
   ['start', 'middle', 'end', 'distractor'].forEach(section => {
     textSections[section] = [];
     updateTextList(section);
     document.getElementById(`${section}-text`).value = '';
+    document.getElementById(`${section}-no-split`).checked = false;
   });
 }
 
@@ -1202,302 +1926,367 @@ function updateTextList(section) {
   const listDiv = document.getElementById(`${section}-list`);
   listDiv.innerHTML = '';
   textSections[section].forEach((text, index) => {
-    const span = document.createElement('span');
-    span.textContent = text;
-    span.dataset.index = index;
-    span.onclick = (e) => {
+    const chip = document.createElement('div');
+    chip.className = 'text-chip';
+    const displayText = removeNoSplitMarkers(text);
+    chip.textContent = displayText;
+    chip.dataset.index = index;
+    
+    if (hasNoSplitMarkers(text)) {
+      const indicator = document.createElement('span');
+      indicator.className = 'no-split-indicator';
+      indicator.textContent = '⚠️';
+      indicator.title = 'Neskirtyti sakinių';
+      chip.appendChild(indicator);
+    }
+    
+    chip.onclick = (e) => {
       e.stopPropagation();
       handleTextItemClick(section, index);
     };
-    listDiv.appendChild(span);
+    listDiv.appendChild(chip);
   });
 }
 
 function addText(section) {
   const textarea = document.getElementById(`${section}-text`);
-  const text = textarea.value.trim();
+  const noSplitCheckbox = document.getElementById(`${section}-no-split`);
+  let text = textarea.value.trim();
+  
   if (text) {
+    if (noSplitCheckbox.checked) {
+      text = addNoSplitMarkers(text);
+    }
+    
     textSections[section].push(text);
     updateTextList(section);
     textarea.value = '';
-    adjustTextareaHeight(textarea);
+    noSplitCheckbox.checked = false;
   }
 }
 
 function handleTextItemClick(section, index) {
   if (!isEditMode && currentEntryId) {
-    showAlert('Norėdami redaguoti tekstą, pirmiausia įjunkite redagavimo režimą');
+    alert('Norėdami redaguoti tekstą, pirmiausia įjunkite redagavimo režimą');
     return;
   }
 
   const list = document.getElementById(`${section}-list`);
-  const span = list.querySelector(`span[data-index="${index}"]`);
+  const chip = list.querySelector(`[data-index="${index}"]`);
   const originalText = textSections[section][index];
+  const hasMarkers = hasNoSplitMarkers(originalText);
+  const displayText = removeNoSplitMarkers(originalText);
 
-  // Replace span content with editable UI
   const wrapper = document.createElement('div');
-  wrapper.className = 'editable-item mb-2';
+  wrapper.style.width = '100%';
+  wrapper.style.padding = '10px';
+  wrapper.style.background = 'rgba(255, 255, 255, 0.6)';
+  wrapper.style.borderRadius = '12px';
 
   const textarea = document.createElement('textarea');
-  textarea.className = 'form-control mb-1';
-  textarea.value = originalText;
+  textarea.className = 'form-textarea';
+  textarea.value = displayText;
+  textarea.rows = 3;
+  textarea.style.marginBottom = '10px';
 
-  const btnGroup = document.createElement('div');
-  btnGroup.className = 'btn-group btn-group-sm';
+  const noSplitCheckbox = document.createElement('input');
+  noSplitCheckbox.type = 'checkbox';
+  noSplitCheckbox.checked = hasMarkers;
+  noSplitCheckbox.id = `edit-no-split-${section}-${index}`;
 
-  const saveBtn = document.createElement('button');
-  saveBtn.textContent = 'Išsaugoti';
-  saveBtn.className = 'btn btn-success';
-  saveBtn.onclick = () => {
-    textSections[section][index] = textarea.value;
-    updateTextList(section);
-  };
+  const noSplitLabel = document.createElement('label');
+  noSplitLabel.setAttribute('for', `edit-no-split-${section}-${index}`);
+  noSplitLabel.textContent = '⚠️ Neskirtyti sakinių';
+  noSplitLabel.style.cursor = 'pointer';
 
-  const cancelBtn = document.createElement('button');
-  cancelBtn.textContent = 'Atšaukti';
-  cancelBtn.className = 'btn btn-secondary';
-  cancelBtn.onclick = () => {
-    updateTextList(section);
-  };
-
-  const deleteBtn = document.createElement('button');
-  deleteBtn.textContent = 'Ištrinti';
-  deleteBtn.className = 'btn btn-danger';
-  deleteBtn.onclick = () => {
-    textSections[section].splice(index, 1);
-    updateTextList(section);
-  };
-
-  btnGroup.appendChild(saveBtn);
-  btnGroup.appendChild(cancelBtn);
-  btnGroup.appendChild(deleteBtn);
-
-  wrapper.appendChild(textarea);
-  wrapper.appendChild(btnGroup);
-
-  span.replaceWith(wrapper);
+  const checkboxWrapper = document.createElement('div');
+  checkboxWrapper.className = 'no-split-checkbox';
+  checkboxWrapper.style.marginBottom = '10px';
+  checkboxWrapper.appendChild(noSplitCheckbox);
+checkboxWrapper.appendChild(noSplitLabel);
+const btnGroup = document.createElement('div');
+btnGroup.style.display = 'flex';
+btnGroup.style.gap = '10px';
+const saveBtn = document.createElement('button');
+saveBtn.textContent = 'Išsaugoti';
+saveBtn.className = 'action-btn success';
+saveBtn.onclick = () => {
+let newText = textarea.value.trim();
+if (noSplitCheckbox.checked) {
+newText = addNoSplitMarkers(newText);
 }
-
+textSections[section][index] = newText;
+updateTextList(section);
+};
+const cancelBtn = document.createElement('button');
+cancelBtn.textContent = 'Atšaukti';
+cancelBtn.className = 'action-btn secondary';
+cancelBtn.onclick = () => {
+updateTextList(section);
+};
+const deleteBtn = document.createElement('button');
+deleteBtn.textContent = 'Ištrinti';
+deleteBtn.className = 'action-btn danger';
+deleteBtn.onclick = () => {
+textSections[section].splice(index, 1);
+updateTextList(section);
+};
+btnGroup.appendChild(saveBtn);
+btnGroup.appendChild(cancelBtn);
+btnGroup.appendChild(deleteBtn);
+wrapper.appendChild(textarea);
+wrapper.appendChild(checkboxWrapper);
+wrapper.appendChild(btnGroup);
+chip.replaceWith(wrapper);
+}
 function addOption(category) {
-  const input = document.getElementById(`new-${category}`);
-  const value = input.value.trim();
-  if (value) {
-    if (category === 'type') {
-      const container = document.getElementById('type-options');
-      const optionDiv = document.createElement('div');
-      optionDiv.classList.add('individual-option');
-      
-      optionDiv.innerHTML = `
-        <input type="radio" class="radio" value="${value}" id="type-${value}" name="type" />
-        <label class="type-text" for="type-${value}">${value}</label>
-      `;
-      container.appendChild(optionDiv);
-      
-      document.getElementById(`type-${value}`).checked = true;
-    } else if (category === 'suitable-for') {
-      const container = document.getElementById('suitable-for-options');
-      const optionDiv = document.createElement('div');
-      optionDiv.classList.add('individual-option');
-      
-      optionDiv.innerHTML = `
-        <input type="checkbox" class="checkbox" value="${value}" id="suitable-for-${value}" name="suitable-for" />
-        <label class="type-text" for="suitable-for-${value}">${value}</label>
-        <select id="suitable-for-difficulty-${value}">
-          <option value=""></option>
-          <option value="lengvas">lengvas</option>
-          <option value="vidutinis">vidutinis</option>
-          <option value="sunkus">sunkus</option>
-        </select>
-      `;
-      container.appendChild(optionDiv);
-      
-      document.getElementById(`suitable-for-${value}`).checked = true;
-    }
-    
-    input.value = '';
-    showMessage('Parinktis pridėta - bus išsaugota kartu su įrašu', 'success');
-  }
-}
-
-function filterEntries() {
-  const searchTerm = document.getElementById('search-bar').value.toLowerCase();
-  document.querySelectorAll('#database-entries li').forEach((listItem, index) => {
-    const entry = database[index];
-    const isMatch = 
-      (String(entry.id)?.includes(searchTerm)) ||
-      (entry.title?.toLowerCase().includes(searchTerm)) ||
-      (entry.author?.toLowerCase().includes(searchTerm)) ||
-      (entry.reference?.toLowerCase().includes(searchTerm)) ||
-      (entry.text?.start?.some(part => part.toLowerCase().includes(searchTerm))) ||
-      (entry.text?.middle?.some(part => part.toLowerCase().includes(searchTerm))) ||
-      (entry.text?.end?.some(part => part.toLowerCase().includes(searchTerm))) ||
-      (entry.text?.distractor?.some(part => part.toLowerCase().includes(searchTerm)));
-    listItem.style.display = isMatch ? 'block' : 'none';
+const input = document.getElementById(`new-${category}`);
+const value = input.value.trim();
+if (value) {
+if (category === 'type') {
+const container = document.getElementById('type-options');
+const optionDiv = document.createElement('div');
+optionDiv.className = 'checkbox-item';
+  const radioInput = document.createElement('input');
+  radioInput.type = 'radio';
+  radioInput.value = value;
+  radioInput.id = `type-${value}`;
+  radioInput.name = 'type';
+  
+  const label = document.createElement('label');
+  label.setAttribute('for', `type-${value}`);
+  label.textContent = value;
+  
+  optionDiv.appendChild(radioInput);
+  optionDiv.appendChild(label);
+  container.appendChild(optionDiv);
+  
+  radioInput.checked = true;
+} else if (category === 'suitable-for') {
+  const container = document.getElementById('suitable-for-options');
+  const optionDiv = document.createElement('div');
+  optionDiv.className = 'checkbox-item';
+  
+  const wrapper = document.createElement('div');
+  wrapper.className = 'option-with-select task-type';
+  
+  const checkInput = document.createElement('input');
+  checkInput.type = 'checkbox';
+  checkInput.value = value;
+  checkInput.id = `suitable-for-${value}`;
+  checkInput.name = 'suitable-for';
+  
+  const label = document.createElement('label');
+  label.setAttribute('for', `suitable-for-${value}`);
+  label.textContent = value;
+  
+  const select = document.createElement('select');
+  select.className = 'form-select';
+  select.id = `suitable-for-difficulty-${value}`;
+  ['', 'C58', 'C59', 'C60'].forEach(diff => {
+    const option = document.createElement('option');
+    option.value = diff;
+    option.textContent = diff || 'Pasirinkite';
+    select.appendChild(option);
   });
+  
+  wrapper.appendChild(checkInput);
+  wrapper.appendChild(label);
+  wrapper.appendChild(select);
+  optionDiv.appendChild(wrapper);
+  container.appendChild(optionDiv);
+  
+  checkInput.checked = true;
 }
 
-function adjustTextareaHeight(textarea) {
-  textarea.style.height = 'auto';
-  textarea.style.height = textarea.scrollHeight + 'px';
+input.value = '';
+showMessage('Parinktis pridėta - bus išsaugota kartu su įrašu', 'success');
 }
-
-function addAutoResizeEventListener() {
-  document.querySelectorAll('.autoResize').forEach(ta => {
-    ta.addEventListener('input', function() {
-      adjustTextareaHeight(this);
-    });
-    adjustTextareaHeight(ta);
-  });
 }
-
 async function downloadExcelSummary() {
-  disableButtons();
-  showMessage('Generuojama Excel santrauka...', 'info');
-  
-  try {
-    const response = await makeAuthenticatedRequest(`${apiBase}text/download-excel`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': getAuthToken()
-      },
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Server returned an error');
-    }
-
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'sudedu_duomenu_bazes_santrauka.xlsx';
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    
-    showAlert('Excel santrauka sėkmingai atsisiųsta!');
-  } catch (error) {
-    console.error('Download failed:', error);
-    showAlert(`Klaida: ${error.message}`);
-
-    if (error.message === "Unauthorized") {
-      removeAuthToken();
-      showLoginModal();
-    }
-
-  } finally {
-    enableButtons();
-  }
+disableButtons();
+showMessage('Generuojama Excel santrauka...', 'info');
+try {
+const response = await makeAuthenticatedRequest(`${apiBase}text/download-excel`, {
+method: 'GET'
+});
+if (!response.ok) {
+  const errorData = await response.json();
+  throw new Error(errorData.message || 'Server returned an error');
 }
 
+const blob = await response.blob();
+const url = window.URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = 'sudedu_duomenu_bazes_santrauka.xlsx';
+document.body.appendChild(a);
+a.click();
+window.URL.revokeObjectURL(url);
+
+alert('Excel santrauka sėkmingai atsisiųsta!');
+} catch (error) {
+console.error('Download failed:', error);
+alert(`Klaida: ${error.message}`);
+if (error.message === "Unauthorized") {
+removeAuthToken();
+showLoginModal();
+}
+} finally {
+enableButtons();
+}
+}
 async function downloadDatabaseInJsonFormat() {
-  disableButtons();
-  showMessage('Ruošiamas JSON failas...', 'info');
-  
-  try {
-    const response = await makeAuthenticatedRequest(`${apiBase}text/download-db`);
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Server returned an error');
-    }
-
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'sudedu_duomenu_baze.json';
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    
-    showAlert('Duomenų bazė sėkmingai atsisiųsta JSON formatu!');
-  } catch (error) {
-    console.error('Download failed:', error);
-    showAlert(`Klaida: ${error.message}`);
-
-    if (error.message === "Unauthorized") {
-      removeAuthToken();
-      showLoginModal();
-    }
-
-  } finally {
-    enableButtons();
-  }
+disableButtons();
+showMessage('Ruošiamas JSON failas...', 'info');
+try {
+const response = await makeAuthenticatedRequest(`${apiBase}text/download-db`);
+if (!response.ok) {
+  const errorData = await response.json();
+  throw new Error(errorData.message || 'Server returned an error');
 }
 
-// Initialize
+const blob = await response.blob();
+const url = window.URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = 'sudedu_duomenu_baze.json';
+document.body.appendChild(a);
+a.click();
+window.URL.revokeObjectURL(url);
+
+alert('Duomenų bazė sėkmingai atsisiųsta JSON formatu!');
+} catch (error) {
+console.error('Download failed:', error);
+alert(`Klaida: ${error.message}`);
+if (error.message === "Unauthorized") {
+removeAuthToken();
+showLoginModal();
+}
+} finally {
+enableButtons();
+}
+}
+// Event listeners
 document.addEventListener('DOMContentLoaded', () => {
-  addAutoResizeEventListener();
-  disableForm();
-  
-  // Check authentication status
-  const authToken = getAuthToken();
-  if (authToken) {
-    // Verify token is still valid
-    makeAuthenticatedRequest(`${apiBase}auth/verify-token`)
-      .then(() => {
-        isAuthenticated = true;
-        document.getElementById('login-modal').style.display = 'none';
-        document.getElementById('main-app').style.display = 'block';
-        initializeData();
-      })
-      .catch(() => {
-        if (!getAuthToken()) {
-          isAuthenticated = false;
-          removeAuthToken();
-        }
-        document.getElementById('login-modal').style.display = 'flex';
-        document.getElementById('main-app').style.display = 'none';
-      });
-  } else {
-    document.getElementById('login-modal').style.display = 'flex';
-    document.getElementById('main-app').style.display = 'none';
-  }
-  
-  // Setup login form
-  document.getElementById('login-submit').addEventListener('click', () => {
-    const password = document.getElementById('login-password').value.trim();
-    if (password) {
-      handleLogin(password);
-    } else {
-      document.getElementById('login-message').textContent = 'Įveskite slaptažodį';
-      document.getElementById('login-message').style.display = 'block';
-    }
-  });
-  
-  // Allow login on Enter key
-  document.getElementById('login-password').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      const password = document.getElementById('login-password').value.trim();
-      if (password) {
-        handleLogin(password);
-      }
-    }
-  });
-  
-  document.getElementById('new-entry-btn').addEventListener('click', prepareNewEntry);
+disableForm();
+// Search with debounce
+let searchTimeout;
+document.getElementById('search-bar').addEventListener('input', () => {
+clearTimeout(searchTimeout);
+searchTimeout = setTimeout(applyFilters, 300);
 });
-
-const input = document.getElementById('login-password');
-
+// New entry button
+document.getElementById('new-entry-btn').addEventListener('click', prepareNewEntry);
+// Edit and delete buttons
+document.getElementById('edit-toggle-btn').addEventListener('click', toggleEditMode);
+document.getElementById('delete-btn').addEventListener('click', deleteEntry);
+// Login handling
+const authToken = getAuthToken();
+if (authToken) {
+makeAuthenticatedRequest(`${apiBase}auth/verify-token`)
+.then(() => {
+isAuthenticated = true;
+document.getElementById('login-modal').style.display = 'none';
+document.getElementById('main-app').style.display = 'block';
+initializeData();
+})
+.catch(() => {
+isAuthenticated = false;
+removeAuthToken();
+document.getElementById('login-modal').style.display = 'flex';
+document.getElementById('main-app').style.display = 'none';
+});
+} else {
+document.getElementById('login-modal').style.display = 'flex';
+document.getElementById('main-app').style.display = 'none';
+}
+document.getElementById('login-submit').addEventListener('click', () => {
+const password = document.getElementById('login-password').value.trim();
+if (password) {
+handleLogin(password);
+} else {
+document.getElementById('login-message').textContent = 'Įveskite slaptažodį';
+document.getElementById('login-message').style.display = 'block';
+}
+});
+document.getElementById('login-password').addEventListener('keypress', (e) => {
+if (e.key === 'Enter') {
+const password = document.getElementById('login-password').value.trim();
+if (password) {
+handleLogin(password);
+}
+}
+});
+});
+// Prevent password field from being disabled
+const passwordInput = document.getElementById('login-password');
+if (passwordInput) {
 const observer = new MutationObserver(() => {
-  if (input.disabled) {
-    input.disabled = false;
-  }
+if (passwordInput.disabled) {
+passwordInput.disabled = false;
+}
 });
-
-// Observe attribute changes
-observer.observe(input, { attributes: true, attributeFilter: ['disabled'] });
-
-// Prevent disabling via JavaScript
-Object.defineProperty(input, 'disabled', {
-  set: () => {},
-  get: () => false
+observer.observe(passwordInput, { attributes: true, attributeFilter: ['disabled'] });
+Object.defineProperty(passwordInput, 'disabled', {
+set: () => {},
+get: () => false
 });
+}
 
+// Sidebar functionality
+const sidebarWrapper = document.getElementById('sidebarWrapper');
+const toggleTab = document.getElementById('toggleTab');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+// Toggle sidebar function
+function toggleSidebar() {
+  sidebarWrapper.classList.toggle('open');
+}
+
+// Open sidebar function
+function openSidebar() {
+  sidebarWrapper.classList.add('open');
+}
+
+// Close sidebar function
+function closeSidebar() {
+    sidebarWrapper.classList.remove('open');
+}
+
+function displaySidebar() {
+    const sidebarWrapper = document.querySelector('.sidebar-wrapper');
+    const width = sidebarWrapper.offsetWidth;
+
+    if (window.innerWidth <= 768) {
+        sidebarWrapper.style.transform = `translateX(${(width)*-1}px)`;
+    } else {
+        sidebarWrapper.style.transform = `translateX(0px)`;
+    }
+}
+
+function hideSidebar() {
+    document.querySelector(".object-sidebar-assets").innerHTML = '';
+    document.querySelector("#object-sidebar-category-select").innerHTML = '';
+
+    const sidebarWrapper = document.querySelector('.sidebar-wrapper');
+    const width = sidebarWrapper.offsetWidth;
+
+    sidebarWrapper.style.transform = `translateX(${(width+35)*-1}px)`;
+
+    closeSidebar();
+}
+
+
+// Event listeners
+if (toggleTab) {
+    toggleTab.addEventListener('click', toggleSidebar);
+}
+
+// Close sidebar on window resize if it becomes desktop size
+window.addEventListener('resize', () => {
+    hideSidebar()
+});
 </script>
 </body>
 </html>
