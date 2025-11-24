@@ -938,6 +938,10 @@
           </div>
         </div>
         <div class="filter-content collapsed" id="filter-content">
+          <div class="filter-group" id="class-filter-group">
+            <div class="filter-label">Klasės</div>
+            <div class="filter-options" id="class-filters"></div>
+          </div>
           <div class="filter-group">
             <div class="filter-label">Užduoties tipas</div>
             <div class="filter-options" id="type-filters"></div>
@@ -1058,7 +1062,7 @@
             <button class="action-btn" onclick="addText('middle')" disabled>Pridėti</button>
             <div class="no-split-checkbox">
               <input type="checkbox" id="middle-no-split" disabled>
-              <label for="middle-no-split">⚠️ Neskirtyti sakinių</label>
+              <label for="middle-no-split">⚠️ Nedalomi sakiniai</label>
             </div>
           </div>
           <div class="text-list" id="middle-list"></div>
@@ -1071,7 +1075,7 @@
             <button class="action-btn" onclick="addText('end')" disabled>Pridėti</button>
             <div class="no-split-checkbox">
               <input type="checkbox" id="end-no-split" disabled>
-              <label for="end-no-split">⚠️ Neskirtyti sakinių</label>
+              <label for="end-no-split">⚠️ Nedalomi sakiniai</label>
             </div>
           </div>
           <div class="text-list" id="end-list"></div>
@@ -1084,7 +1088,7 @@
             <button class="action-btn" onclick="addText('distractor')" disabled>Pridėti</button>
             <div class="no-split-checkbox">
               <input type="checkbox" id="distractor-no-split" disabled>
-              <label for="distractor-no-split">⚠️ Neskirtyti sakinių</label>
+              <label for="distractor-no-split">⚠️ Nedalomi sakiniai</label>
 </div>
 </div>
 <div class="text-list" id="distractor-list"></div>
@@ -1106,6 +1110,7 @@ let isAuthenticated = false;
 let allOptions = { types: [], SF: [], classes: [] };
 let selectedTypeFilter = new Set();
 let selectedDifficultyFilters = new Set();
+let selectedClassFilters = new Set();
 
 const AUTH_TOKEN_KEY = 'sudEduAuthToken';
 
@@ -1414,9 +1419,35 @@ function initializeFilters() {
     chip.onclick = () => toggleTypeFilter(type);
     typeFiltersContainer.appendChild(chip);
   });
+
+  // Create class filter chips
+  const classFiltersContainer = document.getElementById('class-filters');
+  classFiltersContainer.innerHTML = '';
+  allOptions.classes.forEach(classOption => {
+    const chip = document.createElement('div');
+    chip.className = 'filter-chip';
+    chip.textContent = decodeText(classOption);
+    chip.dataset.class = classOption;
+    chip.onclick = () => toggleClassFilter(classOption);
+    classFiltersContainer.appendChild(chip);
+  });
   
   // Filter header toggle
   document.getElementById('filter-header').onclick = toggleFilters;
+}
+
+function toggleClassFilter(classOption) {
+  const chip = document.querySelector(`[data-class="${classOption}"]`);
+  
+  if (selectedClassFilters.has(classOption)) {
+    selectedClassFilters.delete(classOption);
+    chip.classList.remove('active');
+  } else {
+    selectedClassFilters.add(classOption);
+    chip.classList.add('active');
+  }
+  
+  applyFilters();
 }
 
 function toggleFilters() {
@@ -1556,7 +1587,21 @@ function applyFilters() {
       });
     }
     
-    const isVisible = matchesSearch && matchesType;
+    
+    // Class filter - add this after the matchesType check
+    let matchesClass = true;
+    if (selectedClassFilters.size > 0) {
+      matchesClass = false;
+      if (entry.class && Array.isArray(entry.class)) {
+        selectedClassFilters.forEach(classOption => {
+          if (entry.class.includes(classOption)) {
+            matchesClass = true;
+          }
+        });
+      }
+    }
+
+    const isVisible = matchesSearch && matchesType && matchesClass; 
     item.style.display = isVisible ? 'flex' : 'none';
     if (isVisible) visibleCount++;
   });
@@ -1946,7 +1991,7 @@ function updateTextList(section) {
       const indicator = document.createElement('span');
       indicator.className = 'no-split-indicator';
       indicator.textContent = '⚠️';
-      indicator.title = 'Neskirtyti sakinių';
+      indicator.title = 'Nedalomi sakiniai';
       chip.appendChild(indicator);
     }
     
@@ -2006,7 +2051,7 @@ function handleTextItemClick(section, index) {
 
   const noSplitLabel = document.createElement('label');
   noSplitLabel.setAttribute('for', `edit-no-split-${section}-${index}`);
-  noSplitLabel.textContent = '⚠️ Neskirtyti sakinių';
+  noSplitLabel.textContent = '⚠️ Nedalomi sakiniai';
   noSplitLabel.style.cursor = 'pointer';
 
   const checkboxWrapper = document.createElement('div');
