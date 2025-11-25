@@ -6882,13 +6882,29 @@ function generatePlacementMap(draggedObjectId) {
     objectTilesCache.set(id, entry);
     return entry;
   }
+  
   function getExistingPlacingIndex(existingObj) {
+    let debugInfo = [];
+
+
     const id = existingObj.id;
     if (existingPlacingIndexCache.has(id)) return existingPlacingIndexCache.get(id);
     const existingAsset = combinedAssets[id];
     const existingAssetData = existingAsset ? gameAssetIndex[existingAsset.assetIndex] : null;
     const idx = (existingAssetData && existingAssetData["placingIndex"]) || 0;
+    debugInfo.push(`idx- ${idx}`);
     existingPlacingIndexCache.set(id, idx);
+
+
+    if (debugInfo.length > 0) {
+        const debugDiv = document.createElement('div');
+        debugDiv.style.cssText = 'position:fixed;top:10px;left:10px;background:black;color:lime;padding:10px;z-index:99999;font-size:12px;max-width:300px;';
+        debugDiv.textContent = debugInfo.join(', ');
+        document.body.appendChild(debugDiv);
+        setTimeout(() => debugDiv.remove(), 3000);
+    }
+
+
     return idx;
   }
 
