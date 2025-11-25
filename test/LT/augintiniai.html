@@ -6890,32 +6890,28 @@ function generatePlacementMap(draggedObjectId) {
 
     const id = existingObj.id;
     const existingAsset_tersrt = combinedAssets[id];
-    if (existingAsset_tersrt.assetIndex === 5) {
-        debugInfo.push(
-        `triggered id- ${id}`
-        );
+
+
+    // ✅ MOVE YOUR DEBUG CHECK BEFORE THE CACHE CHECK
+    const existingAsset_test = combinedAssets[id];
+    if (existingAsset_test && existingAsset_test.assetIndex === 5) {
+        if (existingPlacingIndexCache.has(id)) {
+        const cachedIdx = existingPlacingIndexCache.get(id);
+        if (existingAsset_test && existingAsset_test.assetIndex === 5) {
+            debugInfo.push(`CACHED idx- ${cachedIdx} for id- ${id}`);
+        }
+        return cachedIdx;
+    }
     }
 
     if (existingPlacingIndexCache.has(id)) return existingPlacingIndexCache.get(id);
     const existingAsset = combinedAssets[id];
     const existingAssetData = existingAsset ? gameAssetIndex[existingAsset.assetIndex] : null;
     const idx = (existingAssetData && existingAssetData["placingIndex"]) || 0;
-    if (existingAsset.assetIndex === 5) {
-        debugInfo.push(
-        `idx- ${idx}; existingAsset- ${JSON.stringify(existingAsset, null, 2)}; existingAssetData- ${JSON.stringify(existingAssetData, null, 2)}`
-        );
-    }
+
 
     existingPlacingIndexCache.set(id, idx);
 
-
-    if (debugInfo.length > 0) {
-        const debugDiv = document.createElement('div');
-        debugDiv.style.cssText = 'position:fixed;top:10px;left:10px;background:black;color:lime;padding:10px;z-index:99999;font-size:12px;max-width:300px;';
-        debugDiv.textContent = debugInfo.join(', ');
-        document.body.appendChild(debugDiv);
-        setTimeout(() => debugDiv.remove(), 600000);
-    }
 
 
     return idx;
@@ -6989,13 +6985,9 @@ function generatePlacementMap(draggedObjectId) {
                 const placingIndex = gameAssetIndex[assetIndex]["placingIndex"];
 
                 if (placingIndex === 8) {
-                    console.log(gameAssetIndex[assetIndex])
                     // Convert the object to a string to avoid [object Object]
                     const objectStr = JSON.stringify(gameAssetIndex[assetIndex]);
 
-                    if (!debugInfo.includes(gameAssetIndex[assetIndex])) {
-                        debugInfo.push(`objectsAtTile- ${JSON.stringify(gameAssetIndex[assetIndex], null, 2)}`);
-                    }
                 }
             });
 
@@ -7192,6 +7184,14 @@ function generatePlacementMap(draggedObjectId) {
       }
     } // end col
   } // end row
+
+if (debugInfo.length > 0) {
+    const debugDiv = document.createElement('div');
+    debugDiv.style.cssText = 'position:fixed;top:10px;left:10px;background:black;color:lime;padding:10px;z-index:99999;font-size:12px;max-width:300px;overflow-y:auto;max-height:400px;';
+    debugDiv.innerHTML = debugInfo.map(info => `<div>${info}</div>`).join('');
+    document.body.appendChild(debugDiv);
+    setTimeout(() => debugDiv.remove(), 10000);
+  }
 
   return placementMap;
 }
