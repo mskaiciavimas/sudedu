@@ -1410,26 +1410,50 @@ body.popup-active {
                             </div>
 
                             <div class="rasyba-options-row">
+
+                                <!--
+                                    To add a new controlled section, you just need:
+                                    <input type="checkbox" class="r parent-toggle" value='NEW_CATEGORY' data-controls="new-div">
+                                    <div id="new-div" data-parent="NEW_CATEGORY">
+                                        child checkboxes here
+                                    </div>
+                                -->
+
                                 <div class="mode_choice_11_div" id="mode_choice_11_div" style="display: none;">
                                     <label class="rasyba-options-label">
-                                        <input type="checkbox" class="r" name="r" value='GALŪNĖS' checked><span class="rasyba-options-label-text" id="rasyba-options-label-text-galune">ŽODŽIO PABAIGA:</span>
+                                        <input type="checkbox" class="r parent-toggle" name="r" value='GALŪNĖS' data-controls="galuniu-div" checked>
+                                        <span class="rasyba-options-label-text" id="rasyba-options-label-text-galune">ŽODŽIO PABAIGA:</span>
                                     </label>
                                     <br>
-                                    <div id="galuniu-div">
-                                        <label class="rasyba-options-label" style="display: none;">
-                                            <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" id="first-second-class-endings" name="rasyba-option" value='{"C61": []}' checked><span class="rasyba-options-label-text">DAIKTAVARDIS</span>
+                                    <div id="galuniu-div" data-parent="GALŪNĖS">
+                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                            <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C85": []}' checked>
+                                            <span class="rasyba-options-label-text">KĄ VIENĄ?</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                            <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C86": []}' checked>
+                                            <span class="rasyba-options-label-text">KO DAUG?</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                            <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C87": []}' checked>
+                                            <span class="rasyba-options-label-text">KUR KAME?</span>
                                             <br>
                                         </label>
                                         <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
-                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C62": []}'><span class="rasyba-options-label-text">DAIKTAVARDŽIAI</span>
+                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C62": []}'>
+                                            <span class="rasyba-options-label-text">DAIKTAVARDŽIAI</span>
                                             <br>
                                         </label>
                                         <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
-                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C63": []}'><span class="rasyba-options-label-text">BŪDVARDŽIAI IR PRIEVEIKSMIAI</span>
+                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C63": []}'>
+                                            <span class="rasyba-options-label-text">BŪDVARDŽIAI IR PRIEVEIKSMIAI</span>
                                             <br>
                                         </label>
                                         <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
-                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C65": []}'><span class="rasyba-options-label-text">VEIKSMAŽODŽIAI</span>
+                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C65": []}'>
+                                            <span class="rasyba-options-label-text">VEIKSMAŽODŽIAI</span>
                                             <br>
                                         </label>
                                         <div class="mode_choice_12_div" id="mode_choice_12_div">
@@ -1440,35 +1464,60 @@ body.popup-active {
                                         </div>
                                     </div>
                                     <label class="rasyba-options-label">
-                                        <input id="C66" type="checkbox" class="rasyba-options" name="rasyba-option" value='{"C66": []}' checked><span class="rasyba-options-label-text">ĮSIDĖMĖTINA RAŠYBA</span>
+                                        <input id="C66" type="checkbox" class="rasyba-options" name="rasyba-option" value='{"C66": []}' checked>
+                                        <span class="rasyba-options-label-text">ĮSIDĖMĖTINA RAŠYBA</span>
                                         <br>
                                     </label>
                                     <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
-                                        <input id="C64" type="checkbox" class="rasyba-options" name="rasyba-option" value='{"C64": []}' checked><span class="rasyba-options-label-text">SUDURTINIAI ŽODŽIAI</span>
+                                        <input id="C64" type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C64": []}' checked>
+                                        <span class="rasyba-options-label-text">SUDURTINIAI ŽODŽIAI</span>
                                         <br>
                                     </label>
                                     <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
-                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C71": []}'><span class="rasyba-options-label-text">PRIEBALSIŲ SUPANAŠĖJIMAS</span>
+                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C71": []}'>
+                                        <span class="rasyba-options-label-text">PRIEBALSIŲ SUPANAŠĖJIMAS</span>
                                         <br>
                                     </label>
                                     <label class="rasyba-options-label options-for-first-second-classes" style="display: block;">
-                                        <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C67": []}'checked><span class="rasyba-options-label-text">PANAŠIAI SKAMBANČIOS PRIEBALSĖS</span>
+                                        <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C67": []}' checked>
+                                        <span class="rasyba-options-label-text">PANAŠIAI SKAMBANČIOS PRIEBALSĖS</span>
                                         <br>
                                     </label>
-                                    <label class="rasyba-options-label" style="display: block;">
-                                        <input type="checkbox" class="rasyba-options" name="rasyba-option" value='{"C68": []}' checked><span class="rasyba-options-label-text">BALSĖS IR DVIBALSĖS</span>
+                                    <label class="rasyba-options-label options-for-first-second-classes" style="display: block;">
+                                        <input type="checkbox" class="r parent-toggle" name="r" value='BALSĖS' data-controls="balsiu-div" checked>
+                                        <span class="rasyba-options-label-text">BALSĖS</span>
+                                        <br>
+                                    </label>
+                                    <div id="balsiu-div" data-parent="BALSĖS">
+                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                            <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C88": []}' checked>
+                                            <span class="rasyba-options-label-text">E — Ė</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                            <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C89": []}' checked>
+                                            <span class="rasyba-options-label-text">I — Y</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                            <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C90": []}' checked>
+                                            <span class="rasyba-options-label-text">U — Ū</span>
+                                            <br>
+                                        </label>
+                                    </div>
+                                    <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C72": []}'>
+                                        <span class="rasyba-options-label-text">MIŠRIEJI DVIGARSIAI</span>
                                         <br>
                                     </label>
                                     <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
-                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C72": []}'><span class="rasyba-options-label-text">MIŠRIEJI DVIGARSIAI</span>
+                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C69": []}'>
+                                        <span class="rasyba-options-label-text">PRIEŠDĖLIAI</span>
                                         <br>
                                     </label>
                                     <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
-                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C69": []}'><span class="rasyba-options-label-text">PRIEŠDĖLIAI</span>
-                                        <br>
-                                    </label>
-                                    <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
-                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C70": []}'><span class="rasyba-options-label-text">PRIESAGOS</span>
+                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C70": []}'>
+                                        <span class="rasyba-options-label-text">PRIESAGOS</span>
                                         <br>
                                     </label>
                                 </div>
@@ -1482,14 +1531,14 @@ body.popup-active {
                                         </select>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="mode_choice_14_div">
-                                    <div class="col-12 d-flex justify-content-center align-items-center mode_choice_14_div text-center" id="mode_choice_14_div">
-                                        <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_14" id="mode_choice_14" style="display: none;">
-                                            <option value="C80">BE DISTRAKTORIAUS</option>
-                                            <option value="C81">SU DISTRAKTORIUMI</option>
-                                        </select>
-                                    </div>
+                            <div class="mode_choice_14_div">
+                                <div class="col-12 d-flex justify-content-center align-items-center mode_choice_14_div text-center" id="mode_choice_14_div">
+                                    <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_14" id="mode_choice_14" style="display: none;">
+                                        <option value="C80">BE DISTRAKTORIAUS</option>
+                                        <option value="C81">SU DISTRAKTORIUMI</option>
+                                    </select>
                                 </div>
                             </div>
 

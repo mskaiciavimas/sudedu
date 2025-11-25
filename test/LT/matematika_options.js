@@ -433,7 +433,7 @@ function handleModeChoice8Change() {
         if (classChoiceSelection === "C75") {
             toggleVisibility(modeChoice13Element, true);
             toggleVisibility(modeChoice12Element, false);
-            rasybaOptionsLabelTextGaluneElement.innerHTML = "ŽODŽIO PABAIGA";
+            rasybaOptionsLabelTextGaluneElement.innerHTML = "ŽODŽIO PABAIGA:";
         } else {
             toggleVisibility(modeChoice13Element, false);
             toggleVisibility(modeChoice12Element, true);
@@ -505,136 +505,124 @@ function handleModeChoice15Change () {
 if (modeChoice15Element) modeChoice15Element.addEventListener('change', handleModeChoice15Change);
 
 
+document.addEventListener('DOMContentLoaded', function() {
+    // Generic handler for all parent toggle checkboxes
+    const parentToggles = document.querySelectorAll('.parent-toggle');
+    
+    parentToggles.forEach(parentCheckbox => {
+        const targetDivId = parentCheckbox.getAttribute('data-controls');
+        const targetDiv = document.getElementById(targetDivId);
+        
+        if (!targetDiv) return;
+        
+        // Function to sync child checkboxes
+        const syncChildren = (isChecked) => {
+            const childCheckboxes = targetDiv.querySelectorAll('.rasyba-options');
+            childCheckboxes.forEach(child => {
+                child.checked = isChecked;
+            });
+        };
+        
+        // Function to toggle visibility and sync
+        const toggle = (isChecked) => {
+            targetDiv.style.display = isChecked ? 'block' : 'none';
+            syncChildren(isChecked);
+        };
+        
+        // Initialize on page load
+        toggle(parentCheckbox.checked);
+        
+        // Add event listener
+        parentCheckbox.addEventListener('change', function() {
+            toggle(this.checked);
+        });
+    });
+});
+
 function handleClassChoiceChange() {
-if (classChoiceElement.value === "C75") {
-    const elements = document.querySelectorAll('.options-for-third-fourth-classes');
-
-    // Loop through each element and set its display style to "none"
-    elements.forEach(function(element) {
-        element.style.display = 'none';
+    const isFirstSecond = classChoiceElement.value === "C75";
+    
+    // Show/hide labels based on class
+    document.querySelectorAll('.options-for-third-fourth-classes').forEach(el => {
+        el.style.display = isFirstSecond ? 'none' : 'block';
     });
-
-    const elements2 = document.querySelectorAll('.options-for-first-second-classes');
-
-    // Loop through each element and set its display style to "none"
-    elements2.forEach(function(element) {
-        element.style.display = 'block';
+    
+    document.querySelectorAll('.options-for-first-second-classes').forEach(el => {
+        el.style.display = isFirstSecond ? 'block' : 'none';
     });
-
-    const inputs = document.querySelectorAll('.options-for-third-fourth-classes-input');
-    inputs.forEach(function(input) {
-        input.checked = false;  // Uncheck the checkbox or radio button
+    
+    // Uncheck ALL inputs for the class being hidden
+    const inputsToUncheck = isFirstSecond 
+        ? '.options-for-third-fourth-classes-input'
+        : '.options-for-first-second-classes-input';
+    
+    document.querySelectorAll(inputsToUncheck).forEach(input => {
+        input.checked = false;
     });
-
-    const inputs2 = document.querySelectorAll('.options-for-first-second-classes-input');
-    inputs2.forEach(function(input) {
-        input.checked = true;  // Uncheck the checkbox or radio button
+    
+    // Check inputs for the class being shown
+    const inputsToCheck = isFirstSecond
+        ? '.options-for-first-second-classes-input'
+        : '.options-for-third-fourth-classes-input';
+    
+    document.querySelectorAll(inputsToCheck).forEach(input => {
+        // Check if this input is inside a controlled div
+        const controlledDiv = input.closest('[data-parent]');
+        
+        if (!controlledDiv) {
+            // Not in a controlled div, always check it
+            input.checked = true;
+        } else {
+            // In a controlled div, only check if:
+            // 1. The controlled div is visible AND
+            // 2. The parent checkbox is checked
+            const parentValue = controlledDiv.getAttribute('data-parent');
+            const parentCheckbox = document.querySelector(`.parent-toggle[value="${parentValue}"]`);
+            
+            // Only check if parent checkbox exists, is checked, AND the div should be visible for this class
+            if (parentCheckbox && parentCheckbox.checked && controlledDiv.style.display !== 'none') {
+                input.checked = true;
+            }
+        }
     });
-} else if (classChoiceElement.value === "C76") {
-    const elements = document.querySelectorAll('.options-for-third-fourth-classes');
-    // Loop through each element and set its display style to "block"
-    elements.forEach(function(element) {
-        element.style.display = 'block';
-    });
-
-    const elements2 = document.querySelectorAll('.options-for-first-second-classes');
-    // Loop through each element and set its display style to "block"
-    elements2.forEach(function(element) {
-        element.style.display = 'none';
-    });
-
-    const inputs = document.querySelectorAll('.options-for-third-fourth-classes-input');
-    inputs.forEach(function(input) {
-        input.checked = true;  // Uncheck the checkbox or radio button
-    });
-
-    const inputs2 = document.querySelectorAll('.options-for-first-second-classes-input');
-    inputs2.forEach(function(input) {
-        input.checked = false;  // Uncheck the checkbox or radio button
-    });
-
-}	
 }
 
 classChoiceElement.addEventListener('change', handleClassChoiceChange);
 
-
 function getSelectedRasybaConditions() {
     const conditions = {};
-  
-    // Get all checked checkboxes for the "rasyba-option"
     const checkboxes = document.querySelectorAll('.rasyba-options:checked');
-  
-    // Iterate over each checkbox and add its value to the conditions object
+    
     checkboxes.forEach(checkbox => {
-      const name = checkbox.name;
-      const value = JSON.parse(checkbox.value);
-  
-      // Merge the values into the dictionary entry (or create a new entry if it doesn't exist)
-      Object.keys(value).forEach(key => {
-        if (!conditions[key]) {
-          conditions[key] = [];
-        }
-        conditions[key] = conditions[key].concat(value[key]);
-      });
+        // Skip if parent label is hidden
+        const label = checkbox.closest('label');
+        if (label && label.style.display === 'none') return;
+        
+        // Skip if inside a hidden controlled div
+        const controlledDiv = checkbox.closest('[data-parent]');
+        if (controlledDiv && controlledDiv.style.display === 'none') return;
+        
+        const value = JSON.parse(checkbox.value);
+        
+        Object.keys(value).forEach(key => {
+            if (!conditions[key]) {
+                conditions[key] = [];
+            }
+            conditions[key] = conditions[key].concat(value[key]);
+        });
     });
-  
-    // Check if "ĮSIDĖMĖTINA RAŠYBA" checkbox is checked
-    const isIsidmetinaChecked = document.getElementById("C66").checked;
-  
-    // If it's checked, get the selected radio button for klase
+    
+    // Handle special case for C66
+    const isIsidmetinaChecked = document.getElementById("C66")?.checked;
+    
     if (isIsidmetinaChecked) {
-      if (classChoiceElement.value === "C75") {
-          conditions["C66"] = ["2kl"];
-      } else if (classChoiceElement.value === "C76") {
-          conditions["C66"] = ["4kl"];
-      }
+        conditions["C66"] = classChoiceElement.value === "C75" ? ["2kl"] : ["4kl"];
     } else {
-      // If the "ĮSIDĖMĖTINA RAŠYBA" checkbox is not checked, remove the "C66" key
-      delete conditions["C66"];
+        delete conditions["C66"];
     }
-  
-    // Log the conditions object in the desired format
+    
     return conditions;
-  }
-  
-  document.addEventListener('DOMContentLoaded', function() {
-    // Get the "GALŪNĖS" checkbox and the "galuniu-div" element
-    const galunesCheckbox = document.querySelector('input[value="GALŪNĖS"]');
-    const galuniuDiv = document.getElementById('galuniu-div'); // Ensure the div has this ID
-  
-    // Function to sync the specific checkboxes related to "GALŪNĖS"
-    const syncRelatedCheckboxes = (isChecked) => {
-      const relatedCheckboxes = document.querySelectorAll('input[value=\'{"C62": []}\'], input[value=\'{"C63": []\'], input[value=\'{"C65": []}\']');
-  
-      // Loop through each related checkbox and update its checked status
-      relatedCheckboxes.forEach(checkbox => {
-        checkbox.checked = isChecked;
-      });
-    };
-  
-    // Function to show/hide the "galuniu-div" based on the "GALŪNĖS" checkbox4
-    const firstSecondClassEndingCheckbox = document.getElementById('first-second-class-endings');
-    const toggleGaluniuDiv = (isChecked) => {
-      if (isChecked) {
-        galuniuDiv.style.display = 'block'; // Show the div
-        firstSecondClassEndingCheckbox.checked = true;
-      } else {
-        galuniuDiv.style.display = 'none';  // Hide the div
-        firstSecondClassEndingCheckbox.checked = false;
-      }
-    };
-  
-    // Initialize the visibility of the "galuniu-div" based on the initial checkbox state
-    toggleGaluniuDiv(galunesCheckbox.checked);
-  
-    // Add event listener to "GALŪNĖS" checkbox
-    galunesCheckbox.addEventListener('change', function() {
-      syncRelatedCheckboxes(this.checked);
-      toggleGaluniuDiv(this.checked); // Toggle the div visibility when the checkbox changes
-    });
-  });
-
+}
 
 const timerInputChoiceElement = document.querySelector('#timer-input');
 let timerChoiceLabel = document.querySelector('.timer-choice-label');

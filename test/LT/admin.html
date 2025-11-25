@@ -557,8 +557,103 @@
         border: 1px solid rgba(255, 255, 255, 0.15);
         padding: 20px;
         border-radius: 15px;
-        margin-top: 20px;
     }
+
+    .item-search-results-list {
+    margin-top: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.item-result-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.item-result-header {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.item-result-details {
+    display: none;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    animation: expandIn 0.3s ease;
+}
+
+@keyframes expandIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.item-result-card.expanded {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.item-result-card.expanded .item-result-details {
+    display: block;
+}
+
+.item-result-card:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.item-result-card.selected {
+    background: rgba(102, 126, 234, 0.3);
+    border: 2px solid rgba(102, 126, 234, 0.6);
+}
+
+.item-result-preview {
+    flex-shrink: 0;
+}
+
+.item-result-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.item-result-title {
+    font-weight: 700;
+    font-size: 16px;
+    color: rgba(0, 0, 0, 0.9);
+    margin-bottom: 5px;
+}
+
+.item-result-meta {
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.7);
+}
+
+.item-result-id {
+    display: inline-block;
+    background: rgba(102, 126, 234, 0.2);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+.search-list-and-item-details-holder {
+    max-height: 70vh;
+    overflow-y: auto;
+}
 
     .item-header {
         display: flex;
@@ -801,7 +896,7 @@
         <div id="lookup-tab" class="tab-content active">
             <h2>Search Users</h2>
             <div class="search-bar">
-                <input type="text" id="search-input" placeholder="Search by ID or email adress">
+                <input type="text" id="search-input" placeholder="Search by ID or email adress" autocomplete="off">
                 <button class="btn" onclick="searchUsers()">Search</button>
             </div>
             <div id="lookup-results"></div>
@@ -1076,10 +1171,13 @@
         <div id="itemlookup-tab" class="tab-content">
             <h2>Item Lookup</h2>
             <div class="search-bar">
-                <input type="number" id="item-search-input" placeholder="Enter item ID..." min="0">
+                <input type="text" id="item-search-input" placeholder="Enter item ID, title, category, css-class, or description..." min="0" autocomplete="off">
                 <button class="btn" onclick="searchItem()">Search</button>
             </div>
-            <div id="item-results"></div>
+            <div id="message-info"></div>
+            <div class="search-list-and-item-details-holder">
+                <div id="item-search-results-list"></div>
+            </div>
         </div>
 
         <!-- Statistics Tab -->
@@ -1101,21 +1199,59 @@
     <script src="../parameter_dictionary.js"></script>
     <script>
         // Global variables
-        let gameAssetIndex = {};
-        
-        // Fetch game asset index on page load
-        fetch("gameAssetIndex.json")
-            .then(response => response.json())
-            .then(data => {
-                gameAssetIndex = data;
-                console.log('Game asset index loaded');
-            })
-            .catch(error => {
-                console.error('Failed to load game asset index:', error);
-            });
+        let gameAssetIndex = null;
+        let gameAssetIndexPromise = null;
+        let isGameAssetIndexLoading = false;
+
+        // Lazy load game asset index only when needed
+        function loadGameAssetIndex() {
+            // If already loaded, return immediately
+            if (gameAssetIndex !== null) {
+                return Promise.resolve(gameAssetIndex);
+            }
+            
+            // If currently loading, return existing promise
+            if (gameAssetIndexPromise !== null) {
+                return gameAssetIndexPromise;
+            }
+            
+            // Start loading
+            isGameAssetIndexLoading = true;
+            gameAssetIndexPromise = fetch("gameAssetIndex.json")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch game asset index');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    gameAssetIndex = data;
+                    isGameAssetIndexLoading = false;
+                    console.log('Game asset index loaded:', Object.keys(data).length, 'items');
+                    return data;
+                })
+                .catch(error => {
+                    isGameAssetIndexLoading = false;
+                    gameAssetIndexPromise = null; // Reset so it can be retried
+                    console.error('Failed to load game asset index:', error);
+                    throw error;
+                });
+            
+            return gameAssetIndexPromise;
+        }
+
+        // Check if game asset index is available
+        function isGameAssetIndexAvailable() {
+            return gameAssetIndex !== null;
+        }
 
         // Helper function to create item preview
         function createItemPreview(itemId, size = 'normal') {
+            // If game asset index is not loaded yet, return loading placeholder
+            if (!isGameAssetIndexAvailable()) {
+                return '<span style="color: #999;">Loading...</span>';
+            }
+            
             const item = gameAssetIndex[itemId];
             if (!item) {
                 return '<span style="color: #999;">Unknown item</span>';
@@ -1130,101 +1266,354 @@
             return previewHolder.outerHTML;
         }
 
-        // Helper function to get item name
         function getItemName(itemId) {
+            if (!isGameAssetIndexAvailable()) {
+                return `Item ${itemId}`;
+            }
             const item = gameAssetIndex[itemId];
             return item ? item.title : `Item ${itemId}`;
         }
 
-        // Search item function
-        function searchItem() {
-            const itemId = document.getElementById('item-search-input').value.trim();
-            const resultsDiv = document.getElementById('item-results');
-            
-            if (!itemId) {
-                showMessage('item-results', 'Please enter an item ID', 'error');
-                return;
+        async function findMatchinItems(query) {
+            // Admin check is removed or replaced — frontend cannot check server-side admin
+            // But we keep the exact variable name and return format
+            if (!query) {
+                return { status: 400, json: { message: 'Search query required' } };
             }
 
-            const item = gameAssetIndex[itemId];
-            
-            if (!item) {
-                resultsDiv.innerHTML = '<div class="message error">Item not found</div>';
-                return;
-            }
+            try {
+                // Load game asset index (replace with actual fetch)
+                const response = await fetch('/gameAssetIndex.json');
+                if (!response.ok) {
+                    return { status: 500, json: { message: 'Game asset index not found' } };
+                }
 
-            displayItemDetails(itemId, item);
+                const gameAssetIndex = await response.json();
+
+                // If query is only numbers, return specific item by ID
+                if (/^\d+$/.test(query)) {
+                    const itemId = query;
+                    const item = gameAssetIndex[itemId];
+
+                    if (!item) {
+                        return { status: 404, json: { message: 'Item not found' } };
+                    }
+
+                    return {
+                        status: 200,
+                        json: {
+                            results: [{ id: itemId, ...item }],
+                            searchType: 'exact'
+                        }
+                    };
+                }
+
+                // Search by category, title, css-class, or description
+                const queryLower = query.toLowerCase();
+                const results = [];
+
+                for (const [itemId, item] of Object.entries(gameAssetIndex)) {
+                    let matches = false;
+
+                    // Check title
+                    if (item.title && item.title.toLowerCase().includes(queryLower)) {
+                        matches = true;
+                    }
+
+                    // Check css-class
+                    if (item['css-class'] && item['css-class'].toLowerCase().includes(queryLower)) {
+                        matches = true;
+                    }
+
+                    // Check description
+                    if (item.description && item.description.toLowerCase().includes(queryLower)) {
+                        matches = true;
+                    }
+
+                    // Check categories
+                    if (item.category && Array.isArray(item.category)) {
+                        if (item.category.some(cat => cat.toLowerCase().includes(queryLower))) {
+                            matches = true;
+                        }
+                    }
+
+                    if (matches) {
+                        results.push({ id: itemId, ...item });
+                    }
+                }
+
+                if (results.length === 0) {
+                    return { status: 404, json: { message: 'No items found' } };
+                }
+
+                return {
+                    status: 200,
+                    json: {
+                        results,
+                        searchType: 'multiple',
+                        count: results.length
+                    }
+                };
+
+            } catch (err) {
+                console.error('Error searching items:', err);
+                return { status: 500, json: { message: 'Internal server error' } };
+            }
         }
 
-        // Display item details
-        function displayItemDetails(itemId, item) {
-            const resultsDiv = document.getElementById('item-results');
-            let html = `
-                <div class="item-detail-card">
-                    <div class="item-header">
-                        ${createItemPreview(itemId, 'large')}
-                        <div class="item-info-section">
-                            <h3 style="margin: 0 0 10px 0;">${item.title || 'Unnamed Item'}</h3>
-                            <p style="color: #666; margin: 0;">${item.description || 'No description available'}</p>
-                            ${item.category && item.category.length > 0 ? `
-                                <div class="item-category-tags">
-                                    ${item.category.map(cat => `<span class="item-category-tag">${cat}</span>`).join('')}
-                                </div>
-                            ` : ''}
+
+
+
+
+
+
+        async function searchItem() {
+            const query = document.getElementById('item-search-input').value.trim();
+            const messageDiv = document.getElementById('message-info');
+            const resultsDiv = document.getElementById('item-search-results-list');
+
+            // Clear previous results
+            resultsDiv.innerHTML = '';
+
+            if (!query) {
+                messageDiv.innerHTML = '<div class="message error">Please enter a search term</div>';
+                return;
+            }
+
+            // Show searching status
+            messageDiv.innerHTML = '<div class="loading">Loading game data and searching...</div>';
+
+            try {
+                // Ensure game asset index is loaded before searching
+                await loadGameAssetIndex();
+                
+                messageDiv.innerHTML = '<div class="loading">Searching...</div>';
+                
+                const data = await findMatchingItems(query);
+
+                if (data.searchType === 'exact') {
+                    messageDiv.innerHTML = ''; // Clear message
+                    displaySingleItemExpanded(data.results[0].id, data.results[0]);
+                } else {
+                    displayItemSearchResults(data.results);
+                }
+
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="message error">${error.message}</div>`;
+            }
+        }
+
+        // Display single item immediately (for ID-only searches)
+        function displaySingleItemExpanded(itemId, item) {
+            const resultsDiv = document.getElementById('item-search-results-list');
+            const categories = item.category?.length ? item.category.join(', ') : 'No category';
+            
+            resultsDiv.innerHTML = `
+                <div class="item-result-card expanded" data-item-id="${itemId}">
+                    <div class="item-result-header">
+                        <div class="item-result-preview">${createItemPreview(itemId)}</div>
+                        <div class="item-result-info">
+                            <div class="item-result-title">
+                                <span class="item-result-id">ID: ${itemId}</span>
+                                ${item.title || 'Unnamed Item'}
+                            </div>
+                            <div class="item-result-meta">
+                                ${categories}${item.description ? ' • ' + item.description.substring(0, 80) + (item.description.length > 80 ? '...' : '') : ''}
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="item-properties">
-                        <div class="item-property"><strong>ID:</strong> ${itemId}</div>
-                        ${item.cost !== undefined ? `<div class="item-property"><strong>Cost:</strong> ${item.cost} 💰</div>` : ''}
-                        ${item.pet ? `<div class="item-property"><strong>Pet Name:</strong> ${item.petName || 'N/A'}</div>` : ''}
-                        <div class="item-property"><strong>Passable:</strong> ${item.passable ? '✅' : '❌'}</div>
-                        <div class="item-property"><strong>Steppable:</strong> ${item.steppable ? '✅' : '❌'}</div>
-                        <div class="item-property"><strong>One of Kind:</strong> ${item.oneOfKind ? '✅' : '❌'}</div>
-                        <div class="item-property"><strong>Stackable:</strong> ${item.stackable ? '✅' : '❌'}</div>
-                        <div class="item-property"><strong>Purchasable:</strong> ${item.purchasable ? '✅' : '❌'}</div>
-                        <div class="item-property"><strong>Pet:</strong> ${item.pet ? '✅' : '❌'}</div>
-                        <div class="item-property"><strong>Pet Asset:</strong> ${item.petAsset ? '✅' : '❌'}</div>
-                    </div>
-
-                    ${item.placingIndex !== null && item.placingIndex !== undefined ? `
-                        <div style="margin-top: 15px;">
-                            <strong>Placing Index:</strong> ${item.placingIndex}
-                        </div>
-                    ` : ''}
-
-                    ${item.canBePlacedOn && item.canBePlacedOn.length > 0 ? `
-                        <div style="margin-top: 15px;">
-                            <strong>Can Be Placed On:</strong> ${item.canBePlacedOn.join(', ')}
-                        </div>
-                    ` : ''}
-                    
-                    ${item.requires && item.requires.length > 0 ? `
-                        <div style="margin-top: 15px;">
-                            <strong>Requires:</strong> ${item.requires.join(', ')}
-                        </div>
-                    ` : ''}
-                    
-                    ${item.provides && item.provides.length > 0 ? `
-                        <div style="margin-top: 15px;">
-                            <strong>Provides:</strong> ${item.provides.join(', ')}
-                        </div>
-                    ` : ''}
-                    
-                    ${item['interactive-spot'] && item['interactive-spot'].length > 0 ? `
-                        <div style="margin-top: 15px;">
-                            <strong>Interactive Spot:</strong> ${item['interactive-spot']}
-                        </div>
-                    ` : ''}
-                    
-                    <div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
-                        <strong>CSS Class:</strong> <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">${item['css-class']}</code>
+                    <div class="item-result-details">
+                        ${generateItemDetailsHTML(itemId, item)}
                     </div>
                 </div>
             `;
+        }
+
+
+
+        async function findMatchingItems(query) {
+            // Ensure game asset index is loaded
+            if (!isGameAssetIndexAvailable()) {
+                throw new Error('Game asset index not loaded');
+            }
             
+            // EXACT NUMBER SEARCH
+            if (/^\d+$/.test(query)) {
+                const itemId = query;
+                const item = gameAssetIndex[itemId];
+
+                if (!item) {
+                    throw new Error('Item not found');
+                }
+
+                return {
+                    results: [{ id: itemId, ...item }],
+                    searchType: 'exact'
+                };
+            }
+
+            // TEXT SEARCH
+            const queryLower = query.toLowerCase();
+            const results = [];
+
+            for (const [itemId, item] of Object.entries(gameAssetIndex)) {
+                let matches = false;
+
+                if (item.title?.toLowerCase().includes(queryLower)) matches = true;
+                if (item['css-class']?.toLowerCase().includes(queryLower)) matches = true;
+                if (item.description?.toLowerCase().includes(queryLower)) matches = true;
+
+                if (Array.isArray(item.category)) {
+                    if (item.category.some(cat => cat.toLowerCase().includes(queryLower))) {
+                        matches = true;
+                    }
+                }
+
+                if (matches) {
+                    results.push({ id: itemId, ...item });
+                }
+            }
+
+            if (results.length === 0) {
+                throw new Error('No items found');
+            }
+
+            return {
+                results,
+                searchType: 'multiple',
+                count: results.length
+            };
+        }
+
+
+
+        // ===================== MESSAGE HELPER =====================
+        function showItemMessage(message, type) {
+            const resultsDiv = document.getElementById('message-info');
+            resultsDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
+        }
+
+
+
+        // ===================== SEARCH RESULTS RENDERER =====================
+        function displayItemSearchResults(results) {
+            // Show summary/status in message-info
+            const messageDiv = document.getElementById('message-info');
+            messageDiv.innerHTML = `Found ${results.length} item${results.length !== 1 ? 's' : ''}. Click to expand details.`;
+
+            // Render actual results in results list
+            const resultsDiv = document.getElementById('item-search-results-list');
+            let html = '';
+
+            results.forEach(item => {
+                const categories = item.category?.length ? item.category.join(', ') : 'No category';
+                html += `
+                    <div class="item-result-card" onclick="toggleItemExpansion('${item.id}')" data-item-id="${item.id}">
+                        <div class="item-result-header">
+                            <div class="item-result-preview">${createItemPreview(item.id)}</div>
+                            <div class="item-result-info">
+                                <div class="item-result-title">
+                                    <span class="item-result-id">ID: ${item.id}</span>
+                                    ${item.title || 'Unnamed Item'}
+                                </div>
+                                <div class="item-result-meta">
+                                    ${categories}${item.description ? ' • ' + item.description.substring(0, 80) + (item.description.length > 80 ? '...' : '') : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-result-details">
+                            ${generateItemDetailsHTML(item.id, item)}
+                        </div>
+                    </div>
+                `;
+            });
+
             resultsDiv.innerHTML = html;
         }
+
+        // Toggle item expansion
+        function toggleItemExpansion(itemId) {
+            const card = document.querySelector(`[data-item-id="${itemId}"]`);
+            if (!card) return;
+            
+            // Close all other expanded cards
+            document.querySelectorAll('.item-result-card.expanded').forEach(otherCard => {
+                if (otherCard !== card) {
+                    otherCard.classList.remove('expanded');
+                }
+            });
+            
+            // Toggle this card
+            card.classList.toggle('expanded');
+        }
+
+        // Generate item details HTML
+        function generateItemDetailsHTML(itemId, item) {
+            let html = `
+                <div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 15px;">
+                    <div class="item-preview-holder item-preview-large">${createItemPreview(itemId, 'large')}</div>
+                    <div style="flex: 1;">
+                        <h3 style="margin-bottom: 10px;">${item.title || 'Unnamed Item'}</h3>
+                        <p style="color: rgba(0, 0, 0, 0.7);">${item.description || 'No description available'}</p>
+                        ${item.category?.length ? `
+                            <div class="item-category-tags" style="margin-top: 10px;">
+                                ${item.category.map(cat => `<span class="item-category-tag">${cat}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <div class="item-properties">
+                    <div class="item-property"><strong>ID:</strong> ${itemId}</div>
+                    ${item.cost !== undefined 
+                        ? `<div class="item-property"><strong>Cost:</strong> ${item.cost} 💰</div>` 
+                        : ''}
+                    <div class="item-property"><strong>Passable:</strong> ${item.passable ? '✅' : '❌'}</div>
+                    <div class="item-property"><strong>Steppable:</strong> ${item.steppable ? '✅' : '❌'}</div>
+                    <div class="item-property"><strong>One of Kind:</strong> ${item.oneOfKind ? '✅' : '❌'}</div>
+                    <div class="item-property"><strong>Stackable:</strong> ${item.stackable ? '✅' : '❌'}</div>
+                    <div class="item-property"><strong>Purchasable:</strong> ${item.purchasable ? '✅' : '❌'}</div>
+                </div>
+
+                ${item.placingIndex != null 
+                    ? `<div style="margin-top: 15px"><strong>Placing Index:</strong> ${item.placingIndex}</div>` 
+                    : ''}
+
+                ${item.canBePlacedOn?.length 
+                    ? `<div style="margin-top: 15px"><strong>Can Be Placed On:</strong> ${item.canBePlacedOn.join(', ')}</div>` 
+                    : ''}
+
+                ${item.requires?.length 
+                    ? `<div style="margin-top: 15px"><strong>Requires:</strong> ${item.requires.join(', ')}</div>` 
+                    : ''}
+
+                ${item.provides?.length 
+                    ? `<div style="margin-top: 15px"><strong>Provides:</strong> ${item.provides.join(', ')}</div>` 
+                    : ''}
+
+                ${item['interactive-spot']?.length 
+                    ? `<div style="margin-top: 15px"><strong>Interactive Spot:</strong> ${item['interactive-spot']}</div>`
+                    : ''}
+
+                <div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                    <strong>CSS Class:</strong> 
+                    <code>${item['css-class']}</code>
+                </div>
+            `;
+            
+            return html;
+        }
+
+
+
+
+
+
+
+
+
+
+
 
         // Recipients management for messages
         let recipients = [];
@@ -1278,7 +1667,6 @@
             }, 5000);
         }
 
-        // Tab switching
         function showTab(tabName, event) {
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -1291,6 +1679,14 @@
                 event.target.classList.add('active');
             }
             
+            // Preload game asset index when switching to item lookup tab
+            if (tabName === 'itemlookup' && !isGameAssetIndexAvailable() && !isGameAssetIndexLoading) {
+                console.log('Preloading game asset index...');
+                loadGameAssetIndex().catch(err => {
+                    console.error('Failed to preload game asset index:', err);
+                });
+            }
+            
             // Load messages when switching to messages tab
             if (tabName === 'messages') {
                 loadMessages();
@@ -1300,6 +1696,35 @@
                 loadTaskStorage();
             }
         }
+
+        // Enter key handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            // User lookup enter key
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const activeTab = document.querySelector('.tab-content.active');
+                        if (activeTab && activeTab.id === 'lookup-tab') {
+                            searchUsers();
+                        }
+                    }
+                });
+            }
+            
+            // Item lookup enter key
+            const itemSearchInput = document.getElementById('item-search-input');
+            if (itemSearchInput) {
+                itemSearchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const activeTab = document.querySelector('.tab-content.active');
+                        if (activeTab && activeTab.id === 'itemlookup-tab') {
+                            searchItem();
+                        }
+                    }
+                });
+            }
+        });
 
         // Search users
         async function searchUsers() {
@@ -3354,20 +3779,30 @@ async function loadTaskStorage() {
     contentDiv.innerHTML = '<div class="loading">Loading storage information...</div>';
 
     try {
-        const response = await apiFetch(`${apiBase}admin/task-archives/stats`);
+        // Load both archive stats and library stats
+        const [archiveResponse, libraryResponse] = await Promise.all([
+            apiFetch(`${apiBase}admin/task-archives/stats`),
+            apiFetch(`${apiBase}admin/task-library/stats`)
+        ]);
         
-        if (!response || !response.ok) {
+        if (!archiveResponse || !archiveResponse.ok) {
             throw new Error('Failed to load task storage stats');
         }
+        
+        if (!libraryResponse || !libraryResponse.ok) {
+            throw new Error('Failed to load task library stats');
+        }
 
-        const stats = await response.json();
-        displayTaskStorage(stats);
+        const archiveStats = await archiveResponse.json();
+        const libraryStats = await libraryResponse.json();
+        
+        displayTaskStorage(archiveStats, libraryStats);
     } catch (error) {
         contentDiv.innerHTML = `<div class="message error">${error.message}</div>`;
     }
 }
 
-function displayTaskStorage(stats) {
+function displayTaskStorage(stats, libraryStats) {
     const contentDiv = document.getElementById('task-storage-content');
     
     if (stats.totalRecords === 0) {
@@ -3422,9 +3857,39 @@ function displayTaskStorage(stats) {
             </div>
             <div id="cleanup-message"></div>
         </div>
+
+        <div class="user-card" style="margin-top: 20px;">
+            <h3>📚 Task Library Overview</h3>
+            <p style="color: #666; margin-bottom: 15px;">
+                Collection of different tasks in TaskLibrary database table for referencing by other tables.
+            </p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Library Statistics</h3>
+                    <div class="stat-items">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Tasks in Library:</span>
+                            <span class="stat-value" id="total-library-tasks">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Unused Tasks:</span>
+                            <span class="stat-value" id="unused-library-tasks">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-danger" onclick="cleanupUnusedLibraryTasks()" style="margin-top: 15px;">Delete Unused Tasks</button>
+            <div id="library-cleanup-message"></div>
+        </div>
     `;
     
     contentDiv.innerHTML = html;
+
+    contentDiv.innerHTML = html;
+    
+    // Update library stats in the UI AFTER the HTML is rendered
+    document.getElementById('total-library-tasks').textContent = libraryStats.totalTasks.toLocaleString();
+    document.getElementById('unused-library-tasks').textContent = `${libraryStats.unusedTasks.toLocaleString()} (${libraryStats.totalTasks === 0 ? 0 : Math.round((libraryStats.unusedTasks / libraryStats.totalTasks) * 100).toLocaleString()}%)`
     
     // Initialize chart
     setTimeout(() => initializeTaskStorageChart(stats.distribution), 100);
@@ -4134,6 +4599,50 @@ async function removeConsumableFromAllUsers(itemId) {
         document.getElementById('bulk-consumable-item-compensation').value = '';
     } catch (error) {
         showMessage('bulk-consumable-item-message', error.message, 'error');
+    }
+}
+
+// Cleanup unused library tasks
+async function cleanupUnusedLibraryTasks() {
+    try {
+        // First get the count
+        const statsResponse = await apiFetch(`${apiBase}admin/task-library/stats`);
+        if (!statsResponse || !statsResponse.ok) {
+            throw new Error('Failed to fetch library stats');
+        }
+        
+        const stats = await statsResponse.json();
+        
+        if (stats.unusedTasks === 0) {
+            showMessage('library-cleanup-message', 'No unused tasks to delete', 'info');
+            return;
+        }
+        
+        if (!confirm(`Delete ${stats.unusedTasks} unused task(s) from the Task Library?\n\nThis action cannot be undone.`)) {
+            return;
+        }
+        
+        const response = await apiFetch(`${apiBase}admin/task-library/cleanup`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (!response || !response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Failed to cleanup task library');
+        }
+        
+        const data = await response.json();
+        showMessage('library-cleanup-message', 
+            `${data.message}<br>Deleted ${data.deletedCount.toLocaleString()} unused tasks`, 
+            'success'
+        );
+        
+        // Reload the task storage tab to update stats
+        setTimeout(() => loadTaskStorage(), 1500);
+        
+    } catch (error) {
+        showMessage('library-cleanup-message', error.message, 'error');
     }
 }
 

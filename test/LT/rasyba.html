@@ -1031,6 +1031,7 @@ window.stopQuestionsCloseActions = function () {
 		let userInHigherGrade = userData && userData.knowledgeLvl === 5;
 
 		const codedConditions = controller.modeChoice3
+
 		let conditions = []
 		let globalFormattedSentenceCounter = 0;
 		const categories = new Map();
@@ -1132,41 +1133,123 @@ function buildCategoryToTextsIndex(texts, suitableWords, conditionsSet) {
 }
 
 function extractSentencesWithCoords(texts) {
-    const sentenceRegex = /.*?[.!?…][""''»„"]*/gs;
     const results = [];
-
+    const NO_SPLIT_MARKER = '\uE000';
+    
     for (const textID in texts) {
         const textObj = texts[textID];
         const sections = textObj.text || {};
         const parts = [];
-
+        
         if (sections.start) parts.push(...sections.start);
         if (sections.middle) parts.push(...sections.middle);
         if (sections.end) parts.push(...sections.end);
-
+        
         if (parts.length === 0) continue;
-
+        
         const combined = parts.join("").trim();
         if (!combined) continue;
-
-        const rawSentences = combined.match(sentenceRegex) || [];
-        let index = 0;
-
-        for (const sentence of rawSentences) {
-            const cleaned = sentence.replace(/^[ ]+|[ ]+$/g, '');
-            if (!cleaned) continue;
-            results.push([cleaned, [Number(textID), index]]);
-            index++;
+        
+        // Process the combined text to find sentence boundaries
+        let currentPos = 0;
+        let sentenceStart = 0;
+        let sentenceNumber = 0; // Add sentence counter
+        
+        while (currentPos < combined.length) {
+            // Check if we're at a potential sentence end
+            const match = findSentenceEnd(combined, currentPos);
+            
+            if (match) {
+                const endPos = match.index + match[0].length;
+                
+                // Check if this is followed by NO_SPLIT_MARKER
+                if (combined.substring(endPos, endPos + NO_SPLIT_MARKER.length) !== NO_SPLIT_MARKER) {
+                    // Extract the sentence (including the end markers)
+                    const sentence = combined.substring(sentenceStart, endPos).trim();
+                    if (sentence) {
+                        results.push([sentence, [Number(textID), sentenceNumber]]);
+                        sentenceNumber++; // Increment sentence counter
+                    }
+                    sentenceStart = endPos;
+                    currentPos = endPos;
+                    continue;
+                } else {
+                    // Skip the NO_SPLIT_MARKER and continue
+                    currentPos = endPos + NO_SPLIT_MARKER.length;
+                    continue;
+                }
+            }
+            
+            currentPos++;
+        }
+        
+        // Add any remaining text as the last sentence
+        if (sentenceStart < combined.length) {
+            const remaining = combined.substring(sentenceStart).trim();
+            if (remaining) {
+                results.push([remaining, [Number(textID), sentenceNumber]]);
+            }
         }
     }
-
+    
     return results;
 }
 
+function findSentenceEnd(text, startPos) {
+    const EOS_SYMBOLS = /[!\.?]/;
+    const QUOTATION_MARKS = /["'`„“”«»]/; // Including Lithuanian quotation marks
+    
+    let i = startPos;
+    let foundEos = false;
+    let sequence = '';
+    
+    // Look for the pattern: any quotes + EOS symbols + any quotes
+    while (i < text.length) {
+        const char = text[i];
+        
+        if (char === ' ') {
+            // Spaces are allowed between symbols
+            sequence += char;
+            i++;
+            continue;
+        }
+        
+        if (QUOTATION_MARKS.test(char)) {
+            sequence += char;
+            i++;
+            continue;
+        }
+        
+        if (EOS_SYMBOLS.test(char)) {
+            sequence += char;
+            foundEos = true;
+            i++;
+            continue;
+        }
+        
+        // If we encounter a non-matching character, stop
+        break;
+    }
+    
+    // We have a valid sentence end if we found at least one EOS symbol
+    // and the sequence is not empty
+    if (foundEos && sequence.length > 0) {
+        return {
+            index: startPos,
+            length: sequence.length,
+            0: sequence
+        };
+    }
+    
+    return null;
+}
+
+
 function indexSentenceWords(sentence, coords) {
-    const cleaned = sentence
-        .replace(/[.,!?;:()\[\]{}"""„«»…]/g, " ")
-        .replace(/\s+/g, " ")
+	const cleaned = sentence
+		.replace(/\uE000/g, "")
+        .replace(/[\p{P}\p{S}]+/gu, " ")
+        .replace(/[\s\u00A0]+/g, " ")
         .trim();
 
     if (!cleaned) return [];
@@ -1451,7 +1534,7 @@ function processSentences(extractedSentences, sessionSeed, passNumber, config, s
 	let currentCounter = counterRef.value;
     
     for (const [sentence, coords] of shuffledSentences) {
-        if (userInPreSchool || userInFirstGrade) {
+        if (controller.classChoice === "C75" && (userInPreSchool || userInFirstGrade)) {
             if (sentence.length > MIN_SENTENCE_CHARACTER_NUMBER_FOR_GRADES_0_to_1) {
                 continue;
             }
@@ -1502,7 +1585,7 @@ function processSentences(extractedSentences, sessionSeed, passNumber, config, s
         }
 
 		const sentenceLength = indexedSentenceWords.length;
-        const questionQuota = 4 // Math.floor(sentenceLength / maximumQuestionFrequencyPerWord);
+        const questionQuota = Math.floor(sentenceLength / maximumQuestionFrequencyPerWord);
 
         if (usableWordsInSentence > questionQuota) {
             indexedSentenceWords = reduceToQuestionQuota(indexedSentenceWords, questionQuota, sentenceRng.derive('quota'), PRIORITIZED_TASK_CATEGORIES);
@@ -1512,7 +1595,8 @@ function processSentences(extractedSentences, sessionSeed, passNumber, config, s
 
         if (remainingCategories.length === 0) continue;
 
-        let sentenceDiv = sentence;
+        let sentenceDiv = sentence.replace(/\uE000/g, '');
+
         const sentenceAnswers = {};
 
 		for (const item of modifiedWords) {
@@ -1584,12 +1668,18 @@ async function prepareSentences(sessionSeed, passNumber, targetFormattedSentence
     const conditions = [];
     Object.entries(codedConditions).forEach(([key, value]) => {
         if (key === "C66") {
-            if ("C75" in codedConditions) {
+            if (controller.classChoice === "C75") {
                 conditions.push("C66-C75");
-            } else {
+            } else if (controller.classChoice === "C76") {
                 conditions.push("C66-C76");
             }
-        } else {
+        } else if (key === "C87") {
+			if (userInPreSchool || userInFirstGrade) {
+                conditions.push("C87-1");
+            } else {
+                conditions.push("C87-2");
+            }
+		} else {
             conditions.push(key);
         }
     });
@@ -1721,7 +1811,7 @@ async function prepareSentencesWrapper(sessionSeed, passNumber = 0, targetFormat
 						valuesToShow.push(pagalbaIndex["mot-g"]);
 					}
 			}
-			} else if (condKey === "C61") {
+			} else if (condKey === "C85" || condKey === "C86" || condKey === "C87") {
 				if (wordLinguisticInfo[word].includes("vns") && wordLinguisticInfo[word].includes("dgs") && wordLinguisticInfo[word].includes("g") && wordLinguisticInfo[word].includes("k")) {
 					valuesToShow.push("ką vieną? | ko daug?")
 				} else if (wordLinguisticInfo[word].includes('g')) {
@@ -2180,7 +2270,7 @@ function recordGrammarMistakes (inputId, userInput) {
 			"mistakesCounter": 0,
 			"wrongAnswer": [],
 			"wordWithAnswer": [wordInfo["klausimas"][0], wordInfo["atsakymas"][0][0], wordInfo["klausimas"][1]],
-			"wordGrammarType": wordInfo["kl-grupe"],
+			"wordGrammarType": wordInfo["kl-grupe"].split('-')[0],
 			"wordId": wordInfo["zodzio-id"]
 		};
 	}

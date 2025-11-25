@@ -2424,22 +2424,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
 
   // Then process into the final mistake data structure
   const mistakeData = Object.values(wordOccurrences).reduce((result, { wordParts, wordCategory, occurrences, totalMistakes }) => {
-    const wordCategoryCoding = {
-      "C61": "žodžio pabaiga",
-      "C62": "daiktavardžio pabaiga",
-      "C63": "būdvardžio ir prieveiksmio pabaigos",
-      "C64": "sudurtiniai žodžiai", 
-      "C65": "veiksmažodžio pabaiga",
-      "C66": "įsimintina rašyba",
-      "C67": "panašiai skambančios priebalsės",
-      "C68": "balsės ir dvibalsės",
-      "C69": "priešdėliai",
-      "C70": "priesagos",
-      "C71": "priebalsių supanašėjimas",
-      "C72": "mišrieji dvigarsiai",
-    };
-
-    const decodedWordCategory = wordCategoryCoding[wordCategory];
+    const decodedWordCategory = parameterDictionary[wordCategory]["decodedParameterText"];
     const [prefix, answer, suffix] = wordParts;
 
     // Create highlighted word form with all occurrence data
@@ -2554,214 +2539,317 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
     return table;
   };
 
-  // Function to process and display all sentences for a word
-  async function showAllSentencesForWord(wordParts, occurrences) {
-    // 1. Get the results container first
+// Optimized function to process and display sentences for a word
+async function showAllSentencesForWord(wordParts, occurrences) {
+    // 1. Get the results container
     const resultsContainer = document.getElementById('sentence-with-mistake-field');
     const resultsContainerForStudents = document.getElementById('sentence-with-mistake-field-for-student');
+    
     if (!resultsContainer && !resultsContainerForStudents) {
+        console.error("Results container not found");
         return;
     }
 
-    // Show loading state
-    userData = JSON.parse(userDataString);
+    // Parse user data
+    let userData;
+    try {
+        userData = JSON.parse(userDataString);
+    } catch (error) {
+        console.error("Failed to parse user data:", error);
+        return;
+    }
 
-    if (userData.accType === "teacher") {
-      if (resultsContainer) {
-        resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-        resultsContainer.innerHTML += '<div class="loading">Ieškoma sakinių...</div>';
-      }
-    } else if (userData.accType === "student") {
-      if (resultsContainerForStudents) {
-        resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-        resultsContainerForStudents.innerHTML += '<div class="loading">Loading sentences...</div>';
-      }
+    const container = userData.accType === "teacher" ? resultsContainer : resultsContainerForStudents;
+    
+    if (!container) {
+        console.error("Container not found for user type:", userData.accType);
+        return;
+    }
+
+    // Show initial loading state
+    container.innerHTML = `
+        <div class="task-info-subtitle">Klaidos sakiniuose:</div>
+        <div class="loading">Ieškoma sakinių...</div>
+    `;
+
+    // 2. Load database with timeout
+    let sudedu_duomenu_baze;
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        
+        const response = await fetch('../databases/sudedu_duomenu_baze.json', {
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        sudedu_duomenu_baze = await response.json();
+        
+        if (!sudedu_duomenu_baze || typeof sudedu_duomenu_baze !== 'object') {
+            throw new Error("Invalid database format");
+        }
+    } catch (error) {
+        console.error("Failed to load database:", error);
+        container.innerHTML = `
+            <div class="task-info-subtitle">Klaidos sakiniuose:</div>
+            <div class="error">*nepavyko įkelti duomenų bazės*</div>
+        `;
+        return;
+    }
+
+    // 3. Process occurrences with lazy loading
+    const sentencesHtml = [];
+    
+    for (const occurrence of occurrences) {
+        try {
+            const html = await processOccurrence(occurrence, wordParts, sudedu_duomenu_baze);
+            if (html) {
+                sentencesHtml.push(html);
+                
+                // Update UI progressively (lazy loading)
+                container.innerHTML = `
+                    <div class="task-info-subtitle">Klaidos sakiniuose:</div>
+                    ${sentencesHtml.join('')}
+                `;
+            }
+        } catch (error) {
+            console.error("Error processing occurrence:", error);
+            sentencesHtml.push(`
+                <div class="sentence-occurrence">
+                    <span class="error-marker">*sakinys nerastas*</span>
+                </div>
+            `);
+        }
+    }
+
+    // 4. Final display
+    if (sentencesHtml.length === 0) {
+        container.innerHTML = `
+            <div class="task-info-subtitle">Klaidos sakiniuose:</div>
+            <div class="error">*sakiniai nerasti*</div>
+        `;
+    } else {
+        container.innerHTML = `
+            <div class="task-info-subtitle">Klaidos sakiniuose:</div>
+            ${sentencesHtml.join('')}
+        `;
+    }
+}
+
+function extractSentences(text) {
+    const results = [];
+    const NO_SPLIT_MARKER = '\uE000';
+    
+    // Process the combined text to find sentence boundaries
+    let currentPos = 0;
+    let sentenceStart = 0;
+    
+    while (currentPos < text.length) {
+        // Check if we're at a potential sentence end
+        const match = findSentenceEnd(text, currentPos);
+        
+        if (match) {
+            const endPos = match.index + match[0].length;
+            
+            // Check if this is followed by NO_SPLIT_MARKER
+            if (text.substring(endPos, endPos + NO_SPLIT_MARKER.length) !== NO_SPLIT_MARKER) {
+                // Extract the sentence (including the end markers)
+                const sentence = text.substring(sentenceStart, endPos).trim();
+                if (sentence) {
+                    results.push(sentence);
+                }
+                sentenceStart = endPos;
+                currentPos = endPos;
+                continue;
+            } else {
+                // Skip the NO_SPLIT_MARKER and continue
+                currentPos = endPos + NO_SPLIT_MARKER.length;
+                continue;
+            }
+        }
+        
+        currentPos++;
+    }
+    
+    // Add any remaining text as the last sentence
+    if (sentenceStart < text.length) {
+        const remaining = text.substring(sentenceStart).trim();
+        if (remaining) {
+            results.push([remaining, [Number(textID), sentenceStart]]);
+        }
+    }
+
+    return results;
+}
+
+function findSentenceEnd(text, startPos) {
+    const EOS_SYMBOLS = /[!\.?]/;
+    const QUOTATION_MARKS = /["'`„“”«»]/; // Including Lithuanian quotation marks
+    
+    let i = startPos;
+    let foundEos = false;
+    let sequence = '';
+    
+    // Look for the pattern: any quotes + EOS symbols + any quotes
+    while (i < text.length) {
+        const char = text[i];
+        
+        if (char === ' ') {
+            // Spaces are allowed between symbols
+            sequence += char;
+            i++;
+            continue;
+        }
+        
+        if (QUOTATION_MARKS.test(char)) {
+            sequence += char;
+            i++;
+            continue;
+        }
+        
+        if (EOS_SYMBOLS.test(char)) {
+            sequence += char;
+            foundEos = true;
+            i++;
+            continue;
+        }
+        
+        // If we encounter a non-matching character, stop
+        break;
+    }
+    
+    // We have a valid sentence end if we found at least one EOS symbol
+    // and the sequence is not empty
+    if (foundEos && sequence.length > 0) {
+        return {
+            index: startPos,
+            length: sequence.length,
+            0: sequence
+        };
+    }
+    
+    return null;
+}
+
+function splitSentenceToWords(sentence) {
+    const cleaned = sentence
+        .replace(/\uE000/g, "")
+        .replace(/[\p{P}\p{S}]+/gu, " ")
+        .replace(/[\s\u00A0]+/g, " ")
+        .trim();
+
+    if (!cleaned) return [];
+
+    return cleaned.split(" ");
+}
+
+// Helper function to process a single occurrence
+async function processOccurrence({ usersMistakes, wordId }, wordParts, database) {
+    // Validate wordId structure
+    if (!Array.isArray(wordId) || wordId.length < 3) {
+        console.error("Invalid wordId structure:", wordId);
+        return `<div class="sentence-occurrence"><span class="error-marker">*sakinys nerastas*</span></div>`;
+    }
+
+    // Get entry from database
+    const entryKey = wordId[0].toString();
+    const entry = database[entryKey];
+    
+    if (!entry || !entry.text) {
+        console.error("Entry not found for key:", entryKey);
+        return `<div class="sentence-occurrence"><span class="error-marker">*sakinys nerastas*</span></div>`;
     }
 
     try {
-        // 2. Load the database
-        const response = await fetch('../databases/sudedu_duomenu_baze.json');
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const sudedu_duomenu_baze = await response.json();
+        // Combine text parts
+        const allTextParts = [
+            ...(entry.text.start || []),
+            ...(entry.text.middle || []),
+            ...(entry.text.end || [])
+        ];
 
-        // 3. Process each occurrence
-        const processOccurrence = async ({ usersMistakes, wordId }) => {
-            try {
-                // Validate wordId structure
-                if (!Array.isArray(wordId) || wordId.length < 3) {
-                    throw new Error(`Invalid wordId structure: ${JSON.stringify(wordId)}`);
-                }
+        if (allTextParts.length === 0) {
+            console.error("No text parts found in entry");
+            return `<div class="sentence-occurrence"><span class="error-marker">*sakinys nerastas*</span></div>`;
+        }
+        
+        let allTextPartsMerged = allTextParts.join(" ").trim();
 
-                const entry = sudedu_duomenu_baze[wordId[0].toString()];
-                if (!entry) {
-                    if (userData.accType === "teacher") {
-                      if (resultsContainer) {
-                        resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-                        resultsContainer.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
-                      }
-                    } else if (userData.accType === "student") {
-                      if (resultsContainerForStudents) {
-                        resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-                        resultsContainerForStudents.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
-                      }
-                    }
-                    return
-                }
+        // Split into sentences
+        const allTextPartsSentences = extractSentences(allTextPartsMerged) 
+            || [allTextPartsMerged];
 
-                // Combine text parts safely
-                const allTextParts = [
-                    ...(entry.text?.start || []),
-                    ...(entry.text?.middle || []),
-                    ...(entry.text?.end || [])
-                ];
+        // Validate sentence index
+        const sentenceIndex = wordId[1];
 
-                let allTextPartsMerged = allTextParts.join(" ").trim();
-
-                // Split sentences more reliably
-                allTextPartsMerged = allTextPartsMerged.replace(/\n/g, ' ');
-                const allTextPartsSentences = allTextPartsMerged.match(/[^.!?]+[.!?]+(?:[”"’'»“]*)/g) || [allTextPartsMerged];
-                if (wordId[1] < 0 || wordId[1] >= allTextPartsSentences.length) {
-                    console.error("Invalid sentence index:", wordId[1]);
-                    if (userData.accType === "teacher") {
-                      if (resultsContainer) {
-                        resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-                        resultsContainer.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
-                      }
-                    } else if (userData.accType === "student") {
-                      if (resultsContainerForStudents) {
-                        resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-                        resultsContainerForStudents.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
-                      }
-                    }
-                    return
-                }
-                const originalSentence = allTextPartsSentences[wordId[1]].trim();
-                
-                // Process words with punctuation handling
-                const sentenceWithoutPunctuation = originalSentence.replace(/\p{P}/gu, " ");;
-                const words = sentenceWithoutPunctuation.split(/\s+/).filter(word => word.trim() !== '');
-                
-                if (wordId[2] < 0 || wordId[2] >= words.length) {
-                    console.error("Invalid word index:", wordId[2]);
-                    if (userData.accType === "teacher") {
-                      if (resultsContainer) {
-                        resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-                        resultsContainer.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
-                      }
-                    } else if (userData.accType === "student") {
-                      if (resultsContainerForStudents) {
-                        resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-                        resultsContainerForStudents.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
-                      }
-                    }
-                    return
-                }
-
-                const targetWord = words[wordId[2]];
-                const originalWord = wordParts.join("")
-
-                if (targetWord.toLowerCase().trim() !== originalWord.toLowerCase().trim()) {
-                  console.error("Mismatch between targetWord and originalWord:", error);
-                  if (userData.accType === "teacher") {
-                    resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-                    resultsContainer.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
-                  } else if (userData.accType === "student") {
-                    resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-                    resultsContainerForStudents.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
-                  }
-                  return
-                }
-
-                const fullWordForm = wordParts.join('');
-
-                // Create case-insensitive regex with word boundaries
-                const escapedTarget = targetWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                const hyphens = '\u002D\u2010\u2011\u2012\u2013\u2014\u2015';
-                const punctuation = '.,!?;:';
-                const regex = new RegExp(`(^|\\s)${escapedTarget}(?=\\s|$|[${punctuation}${hyphens}])`, 'gi');
-                
-                // Find all matches safely
-                const matches = [];
-                let match;
-                while (match = regex.exec(originalSentence)) {
-                    matches.push(match);
-                    // Prevent infinite loop for zero-length matches
-                    if (match.index === regex.lastIndex) regex.lastIndex++;
-                }
-
-                if (matches.length === 0) {
-                    return `
-                        <div class="sentence-occurrence">
-                            ${originalSentence} 
-                            <span class="error-marker">
-                                (žodis "${fullWordForm}" sakinyje nerastas)
-                            </span>
-                        </div>
-                    `;
-                }
-
-                // Get the correct instance
-                const instanceIndex = Math.min(wordId[2], matches.length - 1);
-                const matchData = matches[instanceIndex];
-                const matchedText = matchData[0].trim();
-
-                // Prepare user mistakes display
-                const wrappedMistakes = Array.isArray(usersMistakes[1]) 
-                    ? usersMistakes[1].map(m => `<span class="user-incorrect-answer">${m}</span>`).join(",")
-                    : '';
-
-                // Construct marked sentence
-                const beforeMatch = originalSentence.substring(0, matchData.index);
-                const afterMatch = originalSentence.substring(matchData.index + matchData[0].length);
-                
-                return `
-                    <div class="sentence-occurrence">
-                        ${beforeMatch} <span class="answered-word">${wordParts[0]}<span class="incorrect-part">${wordParts[1]}</span>${wordParts[2]}(${wrappedMistakes})</span> ${afterMatch}</div>
-                `;
-
-            } catch (error) {
-                console.error("Error processing occurrence:", error);
-                if (userData.accType === "teacher") {
-                  resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-                  resultsContainer.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
-                } else if (userData.accType === "student") {
-                  resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>';
-                  resultsContainerForStudents.innerHTML += '<div class="loading">*sakinys nerastas*</div>';
-                }
-                return
-            }
-        };
-
-        // 4. Execute all processing and display results
-        const sentencesHtml = await Promise.all(occurrences.map(processOccurrence));
-
-      if (userData.accType === "teacher") {
-          resultsContainer.innerHTML = '';
-          resultsContainer.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>'
-          resultsContainer.innerHTML += sentencesHtml.join('');
-        } else if (userData.accType === "student") {
-          resultsContainerForStudents.innerHTML = '';
-          resultsContainerForStudents.innerHTML = '<div class="task-info-subtitle">Klaidos sakiniuose:</div>'
-          resultsContainerForStudents.innerHTML += sentencesHtml.join('');
+        if (sentenceIndex < 0 || sentenceIndex >= allTextPartsSentences.length) {
+            console.error(`Invalid sentence index: ${sentenceIndex} (max: ${allTextPartsSentences.length - 1})`);
+            return `<div class="sentence-occurrence"><span class="error-marker">*sakinys nerastas*</span></div>`;
         }
 
+        const originalSentence = allTextPartsSentences[sentenceIndex].trim();
+        
+        const words = splitSentenceToWords(originalSentence);
+        
+        // Validate word index
+        const wordIndex = wordId[2];
+        if (wordIndex < 0 || wordIndex >= words.length) {
+            console.error(`Invalid word index: ${wordIndex} (max: ${words.length - 1})`);
+            return `<div class="sentence-occurrence"><span class="error-marker">*sakinys nerastas*</span></div>`;
+        }
+
+        const targetWord = words[wordIndex];
+        const originalWord = wordParts.join("");
+
+        // Verify word match
+        if (targetWord.toLowerCase().trim() !== originalWord.toLowerCase().trim()) {
+            console.error(`Word mismatch: "${targetWord}" !== "${originalWord}"`);
+            return `<div class="sentence-occurrence"><span class="error-marker">*sakinys nerastas*</span></div>`;
+        }
+
+        // Find the word in the original sentence with punctuation
+        const escapedTarget = targetWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(?<!\\p{L})${escapedTarget}(?!\\p{L})`, 'giu');
+        
+        const matches = [];
+        let match;
+        while ((match = regex.exec(originalSentence)) !== null) {
+            matches.push(match);
+            if (match.index === regex.lastIndex) {
+                regex.lastIndex++;
+            }
+        }
+
+        if (matches.length === 0) {
+            console.error(`Word "${targetWord}" not found in sentence`);
+            return `<div class="sentence-occurrence"><span class="error-marker">*sakinys nerastas*</span></div>`;
+        }
+
+        // Get the correct instance (use first match if wordIndex exceeds matches)
+        const instanceIndex = Math.min(wordIndex, matches.length - 1);
+        const matchData = matches[instanceIndex];
+
+        // Prepare user mistakes display
+        const wrappedMistakes = Array.isArray(usersMistakes) && Array.isArray(usersMistakes[1])
+            ? usersMistakes[1].map(m => `<span class="user-incorrect-answer">${m}</span>`).join(", ")
+            : '';
+
+        // Construct marked sentence
+        const beforeMatch = originalSentence.substring(0, matchData.index).replace(/\uE000/g, "");
+        const afterMatch = originalSentence.substring(matchData.index + matchData[0].length).replace(/\uE000/g, "");
+
+        return `
+            <div class="sentence-occurrence">${beforeMatch}<span class="answered-word">${wordParts[0]}<span class="incorrect-part">${wordParts[1]}</span>${wordParts[2]}${wrappedMistakes ? `(${wrappedMistakes})` : ''}</span>${afterMatch}</div>
+        `;
+
     } catch (error) {
-        console.error("Error in showAllSentencesForWord:", error);
-        if (userData.accType === "teacher") {
-              resultsContainer.innerHTML = `
-              <div class="error">
-                  Failed to load sentences: ${error.message}
-                  <button onclick="location.reload()">Retry</button>
-              </div>
-            `;
-          } else if (userData.accType === "student") {
-            resultsContainerForStudents.innerHTML = `
-            <div class="error">
-                Failed to load sentences: ${error.message}
-                <button onclick="location.reload()">Retry</button>
-            </div>
-          `;
-          }
+        console.error("Error in processOccurrence:", error);
+        return `<div class="sentence-occurrence"><span class="error-marker">*sakinys nerastas*</span></div>`;
     }
 }
 

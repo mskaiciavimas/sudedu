@@ -240,8 +240,8 @@ const parameterDictionary = {
         "decodedParameterText": "SUNKUS LYGIS"
     },
     "C61": {
-        "parameter": "fsc-gal",
-        "decodedParameterText": "ŽODŽIO PABAIGA"
+        "parameter": "j-c",
+        "decodedParameterText": "ŽODŽIAI SU „J“"
     },
     "C62": {
         "parameter": "dkt",
@@ -334,5 +334,29 @@ const parameterDictionary = {
     "C84": {
         "parameter": "selectedTexts",
         "decodedParameterText": "PARINKTI TEKSTAI"
+    },
+    "C85": {
+        "parameter": "fsc-vg-gal-c",
+        "decodedParameterText": "KĄ VIENĄ?"
+    },
+    "C86": {
+        "parameter": "fsc-dk-gal-c",
+        "decodedParameterText": "KO DAUG?"
+    },
+    "C87": {
+        "parameter": "fsc-vvt-gal-c",
+        "decodedParameterText": "KUR KAME?"
+    },
+    "C88": {
+        "parameter": "vow-e-c",
+        "decodedParameterText": "E — Ė"
+    },
+    "C89": {
+        "parameter": "vow-i-c",
+        "decodedParameterText": "I — Y"
+    },
+    "C90": {
+        "parameter": "vow-u-c",
+        "decodedParameterText": "U — Ū"
     },
 }
