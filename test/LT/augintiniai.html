@@ -6868,6 +6868,8 @@ function generatePlacementMap(draggedObjectId) {
     return val;
   }
 
+  let debugInfo = [];
+
   // Cache coordinates/tiles for objects by object id and also cache placingIndex per object id
   const objectTilesCache = new Map(); // id -> {coords,w,h,tiles}
   const existingPlacingIndexCache = new Map(); // id -> placingIndex (number)
@@ -6884,7 +6886,7 @@ function generatePlacementMap(draggedObjectId) {
   }
   
   function getExistingPlacingIndex(existingObj) {
-    let debugInfo = [];
+    
 
     const id = existingObj.id;
     const existingAsset_tersrt = combinedAssets[id];
@@ -6978,6 +6980,29 @@ function generatePlacementMap(draggedObjectId) {
           // Preserve original branch ordering exactly, including the check against draggedAssetData["placingIndex"]
           if (!(draggedAssetData["placingIndex"] === 5 || draggedAssetData["placingIndex"] === 6 || draggedAssetData["placingIndex"] === 9 || draggedAssetData["placingIndex"] === 10 || draggedAssetData["placingIndex"] === 15)) {
             const objectsAtTile = getObjectsAtTileCached(x, y);
+            
+            
+            
+            
+            objectsAtTile.forEach((object, index) => {
+                const assetIndex = userObjectAssets[object.id].assetIndex;
+                const placingIndex = gameAssetIndex[assetIndex]["placingIndex"];
+
+                if (placingIndex === 8) {
+                    // Convert the object to a string to avoid [object Object]
+                    const objectStr = JSON.stringify(object);
+
+                    if (!debugInfo.includes(objectStr)) {
+                        debugInfo.push(`objectsAtTile- ${objectStr}`);
+                    }
+                }
+            });
+
+
+
+
+
+
             for (const existingObj of objectsAtTile) {
               const existingPlacingIndex = getExistingPlacingIndex(existingObj);
 
