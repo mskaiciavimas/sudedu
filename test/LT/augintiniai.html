@@ -6868,8 +6868,6 @@ function generatePlacementMap(draggedObjectId) {
     return val;
   }
 
-  let debugInfo = [];
-
   // Cache coordinates/tiles for objects by object id and also cache placingIndex per object id
   const objectTilesCache = new Map(); // id -> {coords,w,h,tiles}
   const existingPlacingIndexCache = new Map(); // id -> placingIndex (number)
@@ -6884,29 +6882,15 @@ function generatePlacementMap(draggedObjectId) {
     objectTilesCache.set(id, entry);
     return entry;
   }
-  
-function getExistingPlacingIndex(existingObj) {
+  function getExistingPlacingIndex(existingObj) {
     const id = existingObj.id;
-    const existingAsset_test = combinedAssets[id];
-    
-    // ✅ Debug ALL objects, not just assetIndex 5
-    debugInfo.push(`Checking id: ${id}, assetIndex: ${existingAsset_test?.assetIndex}`);
-    
-    if (existingPlacingIndexCache.has(id)) {
-        const cachedIdx = existingPlacingIndexCache.get(id);
-        debugInfo.push(`  → CACHED idx: ${cachedIdx}`);
-        return cachedIdx;
-    }
-    
+    if (existingPlacingIndexCache.has(id)) return existingPlacingIndexCache.get(id);
     const existingAsset = combinedAssets[id];
     const existingAssetData = existingAsset ? gameAssetIndex[existingAsset.assetIndex] : null;
     const idx = (existingAssetData && existingAssetData["placingIndex"]) || 0;
-    
-    debugInfo.push(`  → CALCULATED idx: ${idx}`);
-    
     existingPlacingIndexCache.set(id, idx);
     return idx;
-}
+  }
 
   // Initialize placementMap exactly like original
   const placementMap = [];
@@ -6965,27 +6949,29 @@ function getExistingPlacingIndex(existingObj) {
           }
 
           // Preserve original branch ordering exactly, including the check against draggedAssetData["placingIndex"]
+    
           if (!(draggedAssetData["placingIndex"] === 5 || draggedAssetData["placingIndex"] === 6 || draggedAssetData["placingIndex"] === 9 || draggedAssetData["placingIndex"] === 10 || draggedAssetData["placingIndex"] === 15)) {
-            const objectsAtTile = getObjectsAtTileCached(x, y);
-            
-            
-            
-            
-            objectsAtTile.forEach((object, index) => {
-                const assetIndex = userObjectAssets[object.id].assetIndex;
-                const placingIndex = gameAssetIndex[assetIndex]["placingIndex"];
+            let objectsAtTile = getObjectsAtTileCached(x, y);
 
-                if (placingIndex === 8) {
-                    // Convert the object to a string to avoid [object Object]
-                    const objectStr = JSON.stringify(gameAssetIndex[assetIndex]);
+            // CRITICAL: Sort to ensure placing index 8 objects are checked first for consistent behavior across devices
+            /* 
+                if item with placing index 8 does not appear before this part is triggered
+                    if (getFirstRow3() - (objectHeight - 1) <= row) {
+                        tileAllowed = true;
+                        break;
+                    }
+                placement will be allowed on top of item with placement index 8 (small objects that can be placed on top of others)
+                order of objectsAtTile can be different on mobiles, leading to inconsistent behavious
+            */
 
-                }
+            objectsAtTile = [...objectsAtTile].sort((a, b) => {
+                const indexA = getExistingPlacingIndex(a);
+                const indexB = getExistingPlacingIndex(b);
+                // Placing index 8 comes first
+                if (indexA === 8 && indexB !== 8) return -1;
+                if (indexA !== 8 && indexB === 8) return 1;
+                return 0;
             });
-
-
-
-
-
 
             for (const existingObj of objectsAtTile) {
               const existingPlacingIndex = getExistingPlacingIndex(existingObj);
@@ -7119,7 +7105,15 @@ function getExistingPlacingIndex(existingObj) {
 
                 if (bottomTileValid) tileAllowed = true;
 
-                const objectsAtTile2 = getObjectsAtTileCached(x, y);
+                let objectsAtTile2 = getObjectsAtTileCached(x, y);
+
+                objectsAtTile2 = [...objectsAtTile2].sort((a, b) => {
+                    const indexA = getExistingPlacingIndex(a);
+                    const indexB = getExistingPlacingIndex(b);
+                    if (indexA === 8 && indexB !== 8) return -1;
+                    if (indexA !== 8 && indexB === 8) return 1;
+                    return 0;
+                });
 
                 for (const existingObj of objectsAtTile2) {
                   const existingAsset = combinedAssets[existingObj.id];
@@ -7138,7 +7132,26 @@ function getExistingPlacingIndex(existingObj) {
               }
             }
           } else {
-            const objectsAtTile = getObjectsAtTileCached(x, y);
+            let objectsAtTile = getObjectsAtTileCached(x, y);
+
+            // CRITICAL: Sort to ensure placing index 8 objects are checked first for consistent behavior across devices
+            /* 
+                if item with placing index 8 does not appear before this part is triggered
+                    if (getFirstRow3() - (objectHeight - 1) <= row) {
+                        tileAllowed = true;
+                        break;
+                    }
+                placement will be allowed on top of item with placement index 8 (small objects that can be placed on top of others)
+                order of objectsAtTile can be different on mobiles, leading to inconsistent behavious
+            */
+
+            objectsAtTile = [...objectsAtTile].sort((a, b) => {
+                const indexA = getExistingPlacingIndex(a);
+                const indexB = getExistingPlacingIndex(b);
+                if (indexA === 8 && indexB !== 8) return -1;
+                if (indexA !== 8 && indexB === 8) return 1;
+                return 0;
+            });
 
             for (const existingObj of objectsAtTile) {
               const existingAsset = combinedAssets[existingObj.id];
@@ -7175,14 +7188,6 @@ function getExistingPlacingIndex(existingObj) {
       }
     } // end col
   } // end row
-
-if (debugInfo.length > 0) {
-    const debugDiv = document.createElement('div');
-    debugDiv.style.cssText = 'position:fixed;top:10px;left:10px;background:black;color:lime;padding:10px;z-index:99999;font-size:12px;max-width:300px;overflow-y:auto;max-height:400px;';
-    debugDiv.innerHTML = debugInfo.map(info => `<div>${info}</div>`).join('');
-    document.body.appendChild(debugDiv);
-    setTimeout(() => debugDiv.remove(), 10000);
-  }
 
   return placementMap;
 }
