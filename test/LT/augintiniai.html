@@ -6892,7 +6892,10 @@ function generatePlacementMap(draggedObjectId) {
     const existingAsset = combinedAssets[id];
     const existingAssetData = existingAsset ? gameAssetIndex[existingAsset.assetIndex] : null;
     const idx = (existingAssetData && existingAssetData["placingIndex"]) || 0;
-    debugInfo.push(`idx- ${idx}; existingAsset- ${existingAsset}; existingAsset- ${existingAsset}; existingAssetData- ${existingAssetData}`);
+    debugInfo.push(
+  `idx- ${idx}; existingAsset- ${JSON.stringify(existingAsset, null, 2)}; existingAssetData- ${JSON.stringify(existingAssetData, null, 2)}`
+);
+
     existingPlacingIndexCache.set(id, idx);
 
 
@@ -6901,7 +6904,7 @@ function generatePlacementMap(draggedObjectId) {
         debugDiv.style.cssText = 'position:fixed;top:10px;left:10px;background:black;color:lime;padding:10px;z-index:99999;font-size:12px;max-width:300px;';
         debugDiv.textContent = debugInfo.join(', ');
         document.body.appendChild(debugDiv);
-        setTimeout(() => debugDiv.remove(), 3000);
+        setTimeout(() => debugDiv.remove(), 600000);
     }
 
 
