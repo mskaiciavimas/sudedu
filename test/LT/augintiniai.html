@@ -6885,37 +6885,28 @@ function generatePlacementMap(draggedObjectId) {
     return entry;
   }
   
-  function getExistingPlacingIndex(existingObj) {
-    
-
+function getExistingPlacingIndex(existingObj) {
     const id = existingObj.id;
-    const existingAsset_tersrt = combinedAssets[id];
-
-
-    // ✅ MOVE YOUR DEBUG CHECK BEFORE THE CACHE CHECK
     const existingAsset_test = combinedAssets[id];
-    if (existingAsset_test && existingAsset_test.assetIndex === 5) {
-        if (existingPlacingIndexCache.has(id)) {
+    
+    // ✅ Debug ALL objects, not just assetIndex 5
+    debugInfo.push(`Checking id: ${id}, assetIndex: ${existingAsset_test?.assetIndex}`);
+    
+    if (existingPlacingIndexCache.has(id)) {
         const cachedIdx = existingPlacingIndexCache.get(id);
-        if (existingAsset_test && existingAsset_test.assetIndex === 5) {
-            debugInfo.push(`CACHED idx- ${cachedIdx} for id- ${id}`);
-        }
+        debugInfo.push(`  → CACHED idx: ${cachedIdx}`);
         return cachedIdx;
     }
-    }
-
-    if (existingPlacingIndexCache.has(id)) return existingPlacingIndexCache.get(id);
+    
     const existingAsset = combinedAssets[id];
     const existingAssetData = existingAsset ? gameAssetIndex[existingAsset.assetIndex] : null;
     const idx = (existingAssetData && existingAssetData["placingIndex"]) || 0;
-
-
+    
+    debugInfo.push(`  → CALCULATED idx: ${idx}`);
+    
     existingPlacingIndexCache.set(id, idx);
-
-
-
     return idx;
-  }
+}
 
   // Initialize placementMap exactly like original
   const placementMap = [];
