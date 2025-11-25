@@ -6989,11 +6989,12 @@ function generatePlacementMap(draggedObjectId) {
                 const placingIndex = gameAssetIndex[assetIndex]["placingIndex"];
 
                 if (placingIndex === 8) {
+                    console.log(gameAssetIndex[assetIndex])
                     // Convert the object to a string to avoid [object Object]
-                    const objectStr = JSON.stringify(object);
+                    const objectStr = JSON.stringify(gameAssetIndex[assetIndex]);
 
-                    if (!debugInfo.includes(objectStr)) {
-                        debugInfo.push(`objectsAtTile- ${objectStr}`);
+                    if (!debugInfo.includes(gameAssetIndex[assetIndex])) {
+                        debugInfo.push(`objectsAtTile- ${JSON.stringify(gameAssetIndex[assetIndex], null, 2)}`);
                     }
                 }
             });
