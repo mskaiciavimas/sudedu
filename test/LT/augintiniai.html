@@ -6892,9 +6892,11 @@ function generatePlacementMap(draggedObjectId) {
     const existingAsset = combinedAssets[id];
     const existingAssetData = existingAsset ? gameAssetIndex[existingAsset.assetIndex] : null;
     const idx = (existingAssetData && existingAssetData["placingIndex"]) || 0;
-    debugInfo.push(
-  `idx- ${idx}; existingAsset- ${JSON.stringify(existingAsset, null, 2)}; existingAssetData- ${JSON.stringify(existingAssetData, null, 2)}`
-);
+    if (existingAsset.assetIndex === 5) {
+        debugInfo.push(
+        `idx- ${idx}; existingAsset- ${JSON.stringify(existingAsset, null, 2)}; existingAssetData- ${JSON.stringify(existingAssetData, null, 2)}`
+        );
+    }
 
     existingPlacingIndexCache.set(id, idx);
 
