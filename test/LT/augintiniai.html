@@ -175,10 +175,12 @@
             touch-action: none;
             -webkit-user-select: none;
             user-select: none;
+            transition: box-shadow 0.2s ease;
         }
 
-        .room-object-edit:hover {
-            transform: scale(1.05);
+        .room-object-edit:not(.marked-for-deletion):hover {
+            box-shadow: inset 0 0 10px 5px rgba(245, 39, 39, 0.65);
+            transition: box-shadow 0.2s ease;
         }
 
         .room-object-edit.wallpaper:hover {
@@ -203,14 +205,16 @@
             z-index: 1000 !important;
         }
 
-        .room-object.dragging {
+        .room-object-edit:not(.marked-for-deletion).dragging {
             z-index: 1000 !important;
             cursor: grabbing;
             box-shadow: inset 0 0 0 2px red;
+            transition: box-shadow 0.2s ease;
         }
 
         .marked-for-deletion {
             box-shadow: inset 0 0 0 2px red;
+            transition: box-shadow 0.2s ease;
         }
 
         .pet-left {
@@ -6253,6 +6257,10 @@ function generateWalkabilityMap() {
                     const topRowOfAsset = assetY - assetHeight + 1;
                     const bottomRowOfAsset = assetY;
                     const rowAboveBottom = bottomRowOfAsset - 1;
+                    const otherThanTopRows = [];
+                    for (let row = topRowOfAsset; row <= bottomRowOfAsset; row++) {
+                        otherThanTopRows.push(row);
+                    }
 
                     // 🚨 NEW: Special handling for food-bowl items
                     if (element.className.includes('food-bowl')) {
@@ -6283,6 +6291,20 @@ function generateWalkabilityMap() {
                             // Case 2: current tile is directly above bottom row of asset
                             if (row === rowAboveBottom && col >= assetX && col < assetX + assetWidth) {
                                 map[row][col].allowedDirections[2] = false; // down
+                            }
+                        }
+                    }
+
+                    if (!assetData.steppable) {
+                        for (let row = topRowOfAsset; row <= bottomRowOfAsset; row++) {
+                            for (let col = assetX; col < assetX + assetWidth; col++) {
+                                if (row === topRowOfAsset) {
+                                    // Top row logic: only block down (direction 2)
+                                    map[row][col].allowedDirections[2] = false;
+                                } else {
+                                    // All other rows of the asset: block all directions
+                                    map[row][col].walkable = false;
+                                }
                             }
                         }
                     }
@@ -6924,11 +6946,7 @@ function generatePlacementMap(draggedObjectId) {
             if (!draggedAssetPlacingRules.includes(1)) {
               tileAllowed = false;
             }
-          } else if (tileType === 3.0) {
-            if (!draggedAssetPlacingRules.includes(3)) {
-              tileAllowed = false;
-            }
-          } else if (tileType === 2.0) {
+          } else if (tileType === 2.0 || tileType === 3.0) {
             if (!draggedAssetPlacingRules.includes(2)) {
               if (draggedAssetPlacingRules.includes(4)) {
                 const bottomSupportTile = rl[bottomOfSection][x];
@@ -6941,7 +6959,11 @@ function generatePlacementMap(draggedObjectId) {
                   tileAllowed = false;
                 }
               } else {
-                tileAllowed = false;
+                if (tileType === 3.0 && draggedAssetPlacingRules.includes(3)) {
+                    tileAllowed = true;
+                } else {
+                    tileAllowed = false;
+                }
               }
             } else {
               tileAllowed = true;
@@ -13369,10 +13391,10 @@ function highlightWalkabilityMap() {
                 const horizontal = dirs[1] && dirs[3];
                 const all = vertical && horizontal;
 
-                if (all) color = 'rgba(0, 255, 0, 0.2)';         // All directions
-                else if (vertical) color = 'rgba(0, 0, 255, 0.2)'; // Up/Down only
-                else if (horizontal) color = 'rgba(255, 255, 0, 0.2)'; // Left/Right only
-                else color = 'rgba(255, 165, 0, 0.2)';           // Single or other
+                if (all) color = 'rgba(0, 255, 0, 0.2)';         // All directions green
+                else if (vertical) color = 'rgba(0, 0, 255, 0.2)'; // Up/Down only purple
+                else if (horizontal) color = 'rgba(255, 255, 0, 0.2)'; // Left/Right only yellow
+                else color = 'rgba(255, 165, 0, 0.2)';           // Single or other peach
             }
 
             createTileHighlight(container, col, row, unitSize, color);

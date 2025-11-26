@@ -1171,9 +1171,7 @@ function generateFilteredTextLibrary(forceRegenerate = false) {
         allTextIds = filteredIds;
         totalTextsAvailable = allTextIds.length;
         currentTextBatchIndex = 0;
-        
-        console.log(`Found ${totalTextsAvailable} texts matching conditions`);
-        
+                
         // Generate virtual shuffle - just indices array
         generateVirtualShuffle();
     }
@@ -1213,8 +1211,6 @@ function loadNextTextBatch() {
     filteredTextLibrary.push(...batchTexts);
     
     currentTextBatchIndex++;
-    
-    console.log(`Loaded batch ${currentTextBatchIndex}, texts available: ${filteredTextLibrary.length}/${totalTextsAvailable}`);
 }
   
     helpBtn.disabled = true;
@@ -2072,11 +2068,13 @@ function makeDraggable(element) {
   element.removeEventListener('mousedown', handleDragStart);
   element.removeEventListener('touchstart', handleTouchStart);
   
-  // Always add mouse events for desktop/laptop
-  element.addEventListener('mousedown', handleDragStart);
-  
-  // Also add touch events for touch-capable devices
-  element.addEventListener('touchstart', handleTouchStart, { passive: false });
+  // For touch-capable devices, prioritize touch events
+  if ('ontouchstart' in window) {
+    element.addEventListener('touchstart', handleTouchStart, { passive: true });
+  } else {
+    // Desktop only - use mouse events
+    element.addEventListener('mousedown', handleDragStart);
+  }
   
   element.style.cursor = 'grab';
   if (!element.classList.contains('item')) {
@@ -2094,51 +2092,69 @@ function handleTouchStart(e) {
   startX = touch.clientX;
   startY = touch.clientY;
   
+  let holdStarted = false;
+  let touchMoved = false;
+  
   // Visual feedback
   element.classList.add('hold-indicator');
   
-  // Prevent any scrolling during hold
-  let holdStarted = false;
+  // Cancel if touch moves during hold
+  const cancelHold = (moveEvent) => {
+    if (!moveEvent.touches || moveEvent.touches.length === 0) {
+      return;
+    }
+    
+    const moveTouch = moveEvent.touches[0];
+    const moveThreshold = 10;
+    
+    if (Math.abs(moveTouch.clientX - startX) > moveThreshold || 
+        Math.abs(moveTouch.clientY - startY) > moveThreshold) {
+      touchMoved = true;
+      clearTimeout(touchHoldTimer);
+      element.classList.remove('hold-indicator');
+      document.removeEventListener('touchmove', cancelHold);
+    }
+  };
+  
+  // Add move listener to detect if user is scrolling
+  document.addEventListener('touchmove', cancelHold, { passive: true });
   
   // 300ms hold delay for touch devices
   touchHoldTimer = setTimeout(() => {
-    holdStarted = true;
-    e.preventDefault(); // Prevent scrolling once hold is confirmed
-    startDrag(element, touch.clientX, touch.clientY);
-    
-    // Add touch move and end listeners
-    document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    document.addEventListener('touchend', handleTouchEnd);
-    document.addEventListener('touchcancel', handleTouchEnd);
-  }, 300);
-  
-  // Cancel if touch moves too much during hold
-  const cancelHold = (cancelEvent) => {
-    if (!cancelEvent.touches || cancelEvent.touches.length === 0) {
-      clearTimeout(touchHoldTimer);
+    if (touchMoved) {
       element.classList.remove('hold-indicator');
       document.removeEventListener('touchmove', cancelHold);
       return;
     }
     
-    const touch = cancelEvent.touches[0];
-    const moveThreshold = 10;
+    holdStarted = true;
     
-    if (Math.abs(touch.clientX - startX) > moveThreshold || 
-        Math.abs(touch.clientY - startY) > moveThreshold) {
-      if (!holdStarted) {
-        clearTimeout(touchHoldTimer);
-        element.classList.remove('hold-indicator');
-        document.removeEventListener('touchmove', cancelHold);
-      }
+    // Now prevent default and start dragging
+    const currentTouch = e.touches[0];
+    startDrag(element, currentTouch.clientX, currentTouch.clientY);
+    
+    // Remove the cancel listener
+    document.removeEventListener('touchmove', cancelHold);
+    
+    // Add drag listeners
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
+    document.addEventListener('touchcancel', handleTouchEnd);
+  }, 300);
+  
+  // Clean up if touch ends before hold completes
+  const cleanupEarly = () => {
+    if (!holdStarted) {
+      clearTimeout(touchHoldTimer);
+      element.classList.remove('hold-indicator');
+      document.removeEventListener('touchmove', cancelHold);
+      document.removeEventListener('touchend', cleanupEarly);
+      document.removeEventListener('touchcancel', cleanupEarly);
     }
   };
   
-  document.addEventListener('touchmove', cancelHold, { passive: true });
-  
-  setTimeout(() => {
-    document.removeEventListener('touchmove', cancelHold);
-  }, 320);
+  document.addEventListener('touchend', cleanupEarly, { once: true });
+  document.addEventListener('touchcancel', cleanupEarly, { once: true });
 }
 
 function handleTouchMove(e) {
@@ -2155,9 +2171,7 @@ function handleTouchEnd(e) {
   document.removeEventListener('touchend', handleTouchEnd);
   document.removeEventListener('touchcancel', handleTouchEnd);
   
-  if (isDragging) {
-    endDrag();
-  }
+  endDrag();  // Remove the "if (isDragging)" check
   
   if (currentDraggedItem) {
     currentDraggedItem.classList.remove('hold-indicator');
@@ -2167,6 +2181,14 @@ function handleTouchEnd(e) {
 function handleDragStart(e) {
   if (e.button !== 0) return; // Only left mouse button
   
+  // Prevent this from triggering on touch devices - they should use handleTouchStart
+  if (e.type === 'mousedown' && 'ontouchstart' in window) {
+    // Check if this is a real mouse or a touch event masquerading as mouse
+    if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) {
+      return;
+    }
+  }
+  
   e.preventDefault();
   const element = e.currentTarget;
   
@@ -2175,7 +2197,6 @@ function handleDragStart(e) {
   document.addEventListener('mousemove', handleMouseMove);
   document.addEventListener('mouseup', handleMouseUp);
 }
-
 function handleMouseMove(e) {
   if (!isDragging) return;
   updateDragPosition(e.clientX, e.clientY);
@@ -2185,9 +2206,7 @@ function handleMouseUp(e) {
   document.removeEventListener('mousemove', handleMouseMove);
   document.removeEventListener('mouseup', handleMouseUp);
   
-  if (isDragging) {
-    endDrag();
-  }
+  endDrag();
 }
 
 function startDrag(element, clientX, clientY) {
@@ -2242,10 +2261,8 @@ function updateDragPosition(clientX, clientY) {
   draggedClone.style.left = currentX + 'px';
   draggedClone.style.top = currentY + 'px';
   
-  // Check what's under the cursor
-  draggedClone.style.pointerEvents = 'none';
+  // Check what's under the cursor (only set pointerEvents once)
   const elementBelow = document.elementFromPoint(clientX, clientY);
-  draggedClone.style.pointerEvents = 'none';
   
   checkDropTarget(elementBelow, clientX, clientY);
 }
@@ -2304,18 +2321,22 @@ function endDrag() {
   document.body.style.overflow = '';
   document.body.style.touchAction = '';
   
-  // Remove clone
-  if (draggedClone && draggedClone.parentNode) {
-    draggedClone.remove();
+  // IMPORTANT: Remove clone with extra safety checks
+  if (draggedClone) {
+    if (draggedClone.parentNode) {
+      draggedClone.parentNode.removeChild(draggedClone);
+    }
+    draggedClone = null;
   }
-  draggedClone = null;
   
-  // Restore original opacity
-  currentDraggedItem.style.opacity = '';
-  currentDraggedItem.classList.remove('hold-indicator');
+  // Restore original opacity and remove visual indicators
+  if (currentDraggedItem) {
+    currentDraggedItem.style.opacity = '';
+    currentDraggedItem.classList.remove('hold-indicator');
+  }
   
   // If not over valid container, return to options-field
-  if (!isOverValidContainer) {
+  if (!isOverValidContainer && currentDraggedItem) {
     const optionsField = document.getElementById('options-field');
     if (optionsField) {
       optionsField.appendChild(currentDraggedItem);
@@ -2332,15 +2353,38 @@ function makeContainerDroppable(container) {
 }
 
 function cleanupDragDrop() {
+  // Remove all event listeners
   document.removeEventListener('mousemove', handleMouseMove);
   document.removeEventListener('mouseup', handleMouseUp);
   document.removeEventListener('touchmove', handleTouchMove);
   document.removeEventListener('touchend', handleTouchEnd);
+  document.removeEventListener('touchcancel', handleTouchEnd);
   clearTimeout(touchHoldTimer);
   
-  if (draggedClone && draggedClone.parentNode) {
-    draggedClone.remove();
+  // Force remove any lingering clones
+  const allClones = document.querySelectorAll('.dragging-clone');
+  allClones.forEach(clone => {
+    if (clone.parentNode) {
+      clone.parentNode.removeChild(clone);
+    }
+  });
+  
+  if (draggedClone) {
+    if (draggedClone.parentNode) {
+      draggedClone.parentNode.removeChild(draggedClone);
+    }
+    draggedClone = null;
   }
+  
+  // Restore any semi-transparent items
+  if (currentDraggedItem) {
+    currentDraggedItem.style.opacity = '';
+    currentDraggedItem.classList.remove('hold-indicator');
+  }
+  
+  // Re-enable scrolling
+  document.body.style.overflow = '';
+  document.body.style.touchAction = '';
   
   // Disconnect all observers
   if (window.dragDropObservers) {
@@ -2350,7 +2394,6 @@ function cleanupDragDrop() {
   
   isDragging = false;
   currentDraggedItem = null;
-  draggedClone = null;
 }
 
 function initializeOptionsFieldDragDrop() {
@@ -2420,6 +2463,13 @@ function reinitializeAllItems() {
     }
   });
 }
+
+document.addEventListener('click', function(e) {
+  const stuckClones = document.querySelectorAll('.dragging-clone');
+  if (stuckClones.length > 0) {
+    stuckClones.forEach(clone => clone.remove());
+  }
+});
 
 // Initialize on load
 if (document.readyState === 'loading') {

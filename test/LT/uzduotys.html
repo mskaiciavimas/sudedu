@@ -584,6 +584,7 @@
         }
 
         th:first-child, th:nth-child(2) {
+            padding-top: 12.5px;
             text-align: center;
         }
 
@@ -1470,7 +1471,16 @@ button:disabled.cancel-btn::before {
   transform: translateX(-60%) translateY(-4px); /* optional slight slide */
 }
 
-
+/*OVERRIDE HOVER ON MOBILE AS IT STAYS THERE UNTILL NEXT CLICK*/
+@media (hover: none) and (pointer: coarse) {
+  #new-task-button::before,
+  #delete-task-button::before,
+  #delete-student-button::before,
+  #browse-task-history-button::before,
+  #frequent-mistakes-btn::before {
+    display: none !important;
+  }
+}
 
 
     .filter-label {
@@ -2077,6 +2087,11 @@ button:disabled.cancel-btn::before {
 .task-history-container {
     display: flex;
     flex-direction: column;
+}
+
+.latest-mistakes-summary-holder {
+    max-height: 50vh;
+    overflow-y: auto;
 }
 
 
@@ -4022,21 +4037,23 @@ button:disabled.cancel-btn::before {
                     <button class="display-summary-button active-summary-button" onclick="displayMathSummary()" id="display-math-summary-button">Matematika</button>
                     <button class="display-summary-button" onclick="displayGrammarSummary()" id="display-grammar-summary-button">Rašyba</button>
                     </div>
-                    <div class="summary-table-frequent-mistakes-outer-div">
-                        <div id="summary-table-outer-div" class="">
-                            <div class="table-container" id="table-container-math">
-                                <div id="summary-table-frequent-mistakes"></div>
+                    <div class="latest-mistakes-summary-holder">
+                        <div class="summary-table-frequent-mistakes-outer-div">
+                            <div id="summary-table-outer-div" class="">
+                                <div class="table-container" id="table-container-math">
+                                    <div id="summary-table-frequent-mistakes"></div>
+                                </div>
                             </div>
-                        </div>
                         </div>
 
                         <div id="mistakes-summary-grammar" class="summary-table-frequent-mistakes-outer-div">
-                        <div id="summary-table-grammar-outer-div" class="" style="display: none;">
-                            <div class="table-container" id="table-container-grammar">
-                                <div id="summary-table-grammar-frequent-mistakes"></div>
+                            <div id="summary-table-grammar-outer-div" class="" style="display: none;">
+                                <div class="table-container" id="table-container-grammar">
+                                    <div id="summary-table-grammar-frequent-mistakes"></div>
+                                </div>
                             </div>
                         </div>
-                        </div>
+                    </div>
                     </div>
                 </div>
                 </div>
