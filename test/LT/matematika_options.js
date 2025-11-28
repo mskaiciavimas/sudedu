@@ -596,7 +596,7 @@ function getSelectedRasybaConditions() {
     checkboxes.forEach(checkbox => {
         // Skip if parent label is hidden
         const label = checkbox.closest('label');
-        if (label && label.style.display === 'none') return;
+        if (label && (label.classList.contains('temporarily-disabled') || label.style.display === 'none')) return;
         
         // Skip if inside a hidden controlled div
         const controlledDiv = checkbox.closest('[data-parent]');

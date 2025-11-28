@@ -406,6 +406,16 @@
 			}
 		}
 
+		#authBtn:disabled,
+		#registerBtn:disabled,
+		#forgotPassBtn:disabled,
+		#requestPasswordResetBtn:disabled,
+		#resend-confirmation-btn:disabled {
+			opacity: 0.6;
+			cursor: not-allowed;
+			pointer-events: none;
+		}
+
 		@media (max-width: 767px) {
 			.container {
 				padding: 32px 24px;
@@ -557,7 +567,7 @@
 
 		<div id="error"></div>
 
-		<form onsubmit="event.preventDefault(); authenticate();">
+		<form onsubmit="event.preventDefault(); authenticate(event);">
 			<div class="form-group">
 				<input type="email" id="emailInput" placeholder="Elektroninis paštas" />
 			</div>
@@ -684,7 +694,10 @@
 		const isTeacher = document.getElementById('is-teacher');
 		const classSelectDropdown = document.getElementById('class-select');
 		const classSelectGroup = document.getElementById('class-select-group');
+		const forgotPasswordBtn = document.getElementById('forgotPassBtn');
+		const requestPasswordResetBtn = document.getElementById('requestPasswordResetBtn');
 		const forgotPasswordOuterDiv = document.getElementById('forgot-password-outer-div');
+		const resendConfirmationBtn = document.getElementById('resend-confirmation-btn');
 
 		let isRegistration = false;
 		let isLoading = false;
@@ -698,6 +711,23 @@
 			errorField.innerHTML = "Prisijunkite, kad rezultatai būtų išsaugoti.";
 			errorField.style.display = 'block';
 		}
+
+		function disableButtons() {
+			if (authBtn) authBtn.disabled = true;
+			if (registerBtn) registerBtn.disabled = true;
+			if (forgotPasswordBtn) forgotPasswordBtn.disabled = true;
+			if (requestPasswordResetBtn) requestPasswordResetBtn.disabled = true;
+			if (resendConfirmationBtn) resendConfirmationBtn.disabled = true;
+		}
+
+		function enableButtons() {
+			if (authBtn) authBtn.disabled = false;
+			if (registerBtn) registerBtn.disabled = false;
+			if (forgotPasswordBtn) forgotPasswordBtn.disabled = false;
+			if (requestPasswordResetBtn) requestPasswordResetBtn.disabled = false;
+			if (resendConfirmationBtn) resendConfirmationBtn.disabled = false;
+		}
+
 
 		function toggleIsRegister() {
 			isRegistration = !isRegistration;
@@ -723,7 +753,8 @@
 			}
 		}
 
-		async function authenticate() {
+		async function authenticate(e) {
+			e.preventDefault();
 			const emailVal = email.value.trim();
 			const passVal = password.value.trim();
 			const nicknameVal = nickname.value.trim();
@@ -738,8 +769,8 @@
 				showError('Įveskite slaptažodį'); 
 				return; 
 			}
-			if ((passVal.length < 6 || passVal.length > 15) && isRegistration) {
-				showError('Slaptažodis turi būti nuo 6 iki 15 simbolių'); 
+			if ((passVal.length < 6 || passVal.length > 20) && isRegistration) {
+				showError('Slaptažodis turi būti nuo 6 iki 20 simbolių'); 
 				return;
 			}
 			if (!emailVal.includes('@')) { 
@@ -750,8 +781,8 @@
 				showError('Įveskite vardą'); 
 				return; 
 			}
-			if (nicknameVal.length > 15 && isRegistration) { 
-				showError('Vardas gali būti tik iki 15 simbolių'); 
+			if (nicknameVal.length > 30 && isRegistration) { 
+				showError('Maksimalus vardo ilgis yra 30 simbolių'); 
 				return; 
 			}
 			if (isRegistration && !isTeacherVal && classValue === -1) {
@@ -765,107 +796,134 @@
 			errorField.style.display = 'none';
 			isAuthenticating = true;
 			authBtn.innerText = 'Tikrinama...';
-			authBtn.disabled = true;
+			
+			disableButtons();
 
-			try {
-				let data;
-				
-				if (isRegistration) {
-					const response = await fetch(apiBase + 'auth/register', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ 
-							username: emailVal, 
-							password: passVal, 
-							nickname: nicknameVal, 
-							isTeacher: isTeacherVal,
-							class: isTeacherVal ? null : classValue
-						})
-					});
-					data = await response.json();
-				} else {
-					const response = await fetch(apiBase + 'auth/login', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ username: emailVal, password: passVal })
-					});
-					data = await response.json();
-				}
-
-				if (isRegistration) {
-					if (data.code === 'REG_001' || data.code === 'REG_002') {
-						email.value = ''; 
-						password.value = ''; 
-						nickname.value = ''; 
-						isTeacher.checked = false;
-						classSelectDropdown.value = '-1';
-						
-						toggleIsRegister();
-						
-						showSuccess(getMsg(data.code));
-						return;
-					} else if (data.code === 'REG_003') {
-						showError(getMsg(data.code));
-						return;
+			// RETRY LOGIC
+			const maxRetries = 2;
+			let lastError = null;
+			
+			for (let attempt = 0; attempt < maxRetries; attempt++) {
+				try {
+					let response;
+					
+					if (isRegistration) {
+						response = await fetch(apiBase + 'auth/register', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({ 
+								username: emailVal, 
+								password: passVal, 
+								nickname: nicknameVal, 
+								isTeacher: isTeacherVal,
+								class: isTeacherVal ? null : classValue
+							}),
+							signal: AbortSignal.timeout(10000)
+						});
+					} else {
+						response = await fetch(apiBase + 'auth/login', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({ username: emailVal, password: passVal }),
+							signal: AbortSignal.timeout(10000)
+						});
 					}
-				}
+					
+					const data = await response.json();
 
-				if (data.token) {
-					if (!data.emailVerified) {
-						if (data.isNewAccount) {
-							showError(`
-								${getMsg('LOGIN_002')}
-								<br/>
-								<button class="btn-link" onclick="resendVerification('${emailVal}')" style="margin-top: 8px;">
-									Siųsti patvirtinimo el. laišką dar kartą
-								</button>
-							`);
-						} else {
-							window.tempUserData = data;
+					// SUCCESS - process response
+					if (isRegistration) {
+						if (data.code === 'REG_001' || data.code === 'REG_002') {
+							email.value = ''; 
+							password.value = ''; 
+							nickname.value = ''; 
+							isTeacher.checked = false;
+							classSelectDropdown.value = '-1';
 							
-							showError(`
-								${getMsg('LOGIN_003')}
-								<br/>
-								<button class="btn-link" onclick="resendVerification('${emailVal}')" style="margin-top: 8px;">
-									Siųsti patvirtinimo el. laišką dar kartą
-								</button>
-								<br/>
-								<button class="btn-link" onclick="continueAnywayFromTemp()" style="margin-top: 4px;">
-									Tęsti be patvirtinimo
-								</button>
-							`);
+							toggleIsRegister();
+							
+							showSuccess(getMsg(data.code));
+							return;
+						} else if (data.code === 'REG_003') {
+							showError(getMsg(data.code));
+							return;
+						}
+					}
+
+					if (data.token) {
+						if (!data.emailVerified) {
+							if (data.isNewAccount) {
+								showError(`
+									${getMsg('LOGIN_002')}
+									<br/>
+									<button class="btn-link" id="resend-confirmation-btn" onclick="resendVerification('${emailVal}')" style="margin-top: 8px;">
+										Siųsti patvirtinimo el. laišką dar kartą
+									</button>
+								`);
+							} else {
+								window.tempUserData = data;
+								
+								showError(`
+									${getMsg('LOGIN_003')}
+									<br/>
+									<button class="btn-link" id="resend-confirmation-btn" onclick="resendVerification('${emailVal}')" style="margin-top: 8px;">
+										Siųsti patvirtinimo el. laišką dar kartą
+									</button>
+									<br/>
+									<button class="btn-link" onclick="continueAnywayFromTemp()" style="margin-top: 4px;">
+										Tęsti be patvirtinimo
+									</button>
+								`);
+							}
+						} else {
+							const userData = {
+								token: data.token,
+								userId: data.userId,
+								nickname: data.nickname,
+								accType: data.accType,
+								teacher: data.teacher || '',
+								avatarCode: data.avatarCode || 'w63060003',
+								emailVerified: data.emailVerified,
+								petOnWalk: data.petOnWalk || '',
+								petStats: data.petStats || '[]',
+								knowledgeLvl: data.knowledgeLvl !== undefined ? data.knowledgeLvl : -1
+							};
+							
+							localStorage.setItem('userData', JSON.stringify(userData));
+							localStorage.setItem('refreshToken', data.refreshToken);
+							
+							window.location.href = './';
 						}
 					} else {
-						const userData = {
-							token: data.token,
-							userId: data.userId,
-							nickname: data.nickname,
-							accType: data.accType,
-							teacher: data.teacher || '',
-							avatarCode: data.avatarCode || 'w63060003',
-							emailVerified: data.emailVerified,
-							petOnWalk: data.petOnWalk || '',
-							petStats: data.petStats || '[]',
-							knowledgeLvl: data.knowledgeLvl !== undefined ? data.knowledgeLvl : -1 // ← ADD THIS
-						};
-						
-						localStorage.setItem('userData', JSON.stringify(userData));
-						localStorage.setItem('refreshToken', data.refreshToken);
-						
-						window.location.href = './';
+						handleLoginError(data, emailVal);
 					}
-				} else {
-					handleLoginError(data, emailVal);
-				}
+					
+					// If we got here, success - break out of retry loop
+					break;
 
-			} catch (err) {
-				showError('Nepavyko pasiekti duomenų. Bandykite vėl vėliau.');
-				console.log('Error fetching auth:', err);
-			} finally {
-				isAuthenticating = false;
-				authBtn.innerText = isRegistration ? 'Prisiregistruoti' : 'Prisijungti';
-				authBtn.disabled = false;
+				} catch (err) {
+					lastError = err;
+					console.log(`Attempt ${attempt + 1}/${maxRetries} failed:`, err.message);
+					
+					// Only retry on connection errors
+					if (attempt < maxRetries - 1 && 
+						(err.name === 'TypeError' || err.message.includes('Failed to fetch'))) {
+						// Wait 1 second before retry
+						await new Promise(resolve => setTimeout(resolve, 1000));
+						authBtn.innerText = 'Bandoma dar kartą...';
+						continue;
+					}
+					
+					// Last attempt or non-retryable error
+					showError('Nepavyko pasiekti duomenų. Bandykite vėl vėliau.');
+					console.log('Error fetching auth:', err);
+				}
 			}
+			
+			// FINALLY block
+			isAuthenticating = false;
+			authBtn.innerText = isRegistration ? 'Prisiregistruoti' : 'Prisijungti';
+			enableButtons();
 		}
 
 		function showError(message) {
@@ -931,6 +989,8 @@
 
 			document.getElementById('requestPasswordResetBtn').disabled = true;
 
+			disableButtons();
+
 			try {
 				const response = await fetch(apiBase + 'auth/forgot-password', {
 					method: 'POST',
@@ -956,11 +1016,14 @@
 				showSuccess(getMsg(data.code));
 			} catch (err) {
 				showError('Nepavyko pasiekti serverio.');
+			} finally {
+				enableButtons();
 			}
 		}
 
 		async function resendVerification(emailVal) {
 			document.querySelectorAll('#error button').forEach(btn => btn.disabled = true);
+			disableButtons();
 			try {
 				const response = await fetch(apiBase + 'auth/resend-verification', {
 					method: 'POST',
@@ -971,14 +1034,10 @@
 				showSuccess(getMsg(data.code));
 			} catch (err) {
 				showError('Nepavyko išsiųsti patvirtinimo laiško.');
+			} finally {
+				enableButtons();
 			}
 		}
-
-		document.addEventListener('keydown', function (event) {
-			if (event.key === 'Enter') {
-				authenticate();
-			}
-		});
 
 
 function detectMobileKeyboard() {

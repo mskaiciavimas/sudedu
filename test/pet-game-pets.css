@@ -1,8 +1,9 @@
 .cat-1-1,
 .cat-2-1 {
     background-image: url('images/pet-game/cat_1_sprite_sheet.png');
-    background-size: calc(var(--pet-size) * 16) calc(var(--pet-size)*26); /* 16 number of columns in iamge, 25 number of rows*/
+    background-size: calc(var(--pet-size) * 16) calc(var(--pet-size)*30); /* 16 number of columns in iamge, 25 number of rows*/
     background-position: 0 0;
+    animation: cat-1-hidden 1s steps(1);
 }
 
 .cat-1.pet-preview {
@@ -143,6 +144,26 @@
 @keyframes cat-1-stands-idle {
     0% { background-position: 0 calc(var(--pet-size) * -25); }
     100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -25); }
+}
+
+@keyframes cat-1-claps {
+    0% { background-position: 0 calc(var(--pet-size) * -26); }
+    100% { background-position: calc(var(--pet-size) * -3) calc(var(--pet-size) * -26); }
+}
+
+@keyframes cat-1-dragged {
+    0% { background-position: 0 calc(var(--pet-size) * -27); }
+    100% { background-position: calc(var(--pet-size) * -4) calc(var(--pet-size) * -27); }
+}
+
+@keyframes cat-1-jumps-on-platform {
+    0% { background-position: 0 calc(var(--pet-size) * -28); }
+    100% { background-position: calc(var(--pet-size) * -10) calc(var(--pet-size) * -28); }
+}
+
+@keyframes cat-1-hidden {
+    0% { background-position: 0 calc(var(--pet-size) * -29); }
+    100% { background-position: calc(var(--pet-size) * 0) calc(var(--pet-size) * -29); }
 }
 
 @keyframes cat-2-sits-idle {

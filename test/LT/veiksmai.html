@@ -236,8 +236,18 @@
 		#answer:focus,
 		#answer:active {
 			border: 1px solid rgba(255, 255, 255, 1);
-			background: rgba(255, 255, 255, 0.8);
 			outline: none;
+		}
+
+		textarea.correct-answer-field,
+		#answer.correct-answer-field {
+			background-color: rgba(64, 201, 169, 0.6);
+			pointer-events: none;
+		}
+
+		textarea.wrong-answer-field,
+		#answer.wrong-answer-field {
+			background-color: rgba(213, 126, 126, 0.6);
 		}
 
 		.equation {
@@ -788,13 +798,15 @@
 				const stopButtonSpanElement = document.querySelector('#stop-button-span');
 				stopButtonSpanElement.innerHTML = "refresh";
 				timerDisplay.textContent = localStorage.getItem("elapsedTime");
-		}
-	};
+			}
 
-let answerInputElement = document.querySelector('#answer');
+			initPetOnWalk();
+		};
+
+		let answerInputElement = document.querySelector('#answer');
 		answerInputElement.setAttribute("inputmode", "numeric");
 
-let answerRemainderInputElement = document.querySelector('#remainder');
+		let answerRemainderInputElement = document.querySelector('#remainder');
 		answerRemainderInputElement.setAttribute("inputmode", "numeric");
 
 		// Sanitize input field value on input event
@@ -822,15 +834,14 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 			}
 		});
 
-		// Handle "Enter" key press with condition
-		answerInputElement.addEventListener("keydown", function (event) {
+		answerInputElement.addEventListener("keydown", function(event) {
 			if (event.key === "Enter") {
-				if (answerInputElement.value.trim() !== "") {
-					checkAnswer();
-					clearAnswerField();
-				}
+				event.preventDefault(); // prevent form submit
+				handleTextareaFocusing(answerInputElement);
 			}
 		});
+
+
 		answerRemainderInputElement.addEventListener("keydown", function (event) {
 			if (event.key === "Enter") {
 				if (answerRemainderInputElement.value.trim() !== "") {
@@ -839,6 +850,117 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 				}
 			}
 		});
+
+		function handleTextareaFocusing(currentElement=null, answerFieldFirst=false) {
+			// If current element is empty or wrong, stay on it
+			if (currentElement && 
+				(currentElement.value.trim() === "" || 
+				currentElement.classList.contains("wrong-answer-field"))) {
+				return;
+			}
+
+			const inputs = [...document.querySelectorAll(".stulpeliu-input")];
+			const answer = document.getElementById("answer");
+			const remainder = document.getElementById("remainder");
+
+			if (answer) inputs.push(answer);
+			if (remainder && remainder.getClientRects().length > 0) {
+				inputs.push(remainder);
+			}
+
+			// Filter out correct answers
+			const activeInputs = inputs.filter(el => {
+				const isCorrect = el.classList.contains("correct-answer-field");
+				return !isCorrect;
+			});
+
+			if (answerFieldFirst && activeInputs.includes(answer)) {
+				focusCentered(answer);
+				return;
+			}
+
+
+			// 1️⃣ Focus first empty input
+			const emptyEl = activeInputs.find(el => el.value.trim() === "");
+
+			if (emptyEl) {
+				focusCentered(emptyEl);
+				return;
+			}
+
+			// 2️⃣ Focus first wrong input
+			const wrongEl = activeInputs.find(el => el.classList.contains("wrong-answer-field"));
+			if (wrongEl) {
+				focusCentered(wrongEl);
+				return;
+			}
+
+			if (currentElement) {
+				checkAnswer();
+				clearAnswerField();
+			}
+		}
+
+		function focusCentered(element) {
+			if (!element) return;
+
+			// Find the first parent with overflow-y: auto
+			function findScrollContainer(el) {
+				let current = el.parentElement;
+				while (current && current !== document.body) {
+					const style = window.getComputedStyle(current);
+					if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
+						return current;
+					}
+					current = current.parentElement;
+				}
+				return null;
+			}
+
+			const container = findScrollContainer(element);
+
+			// Detect if mobile device
+			const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+							('ontouchstart' in window) ||
+							(navigator.maxTouchPoints > 0);
+
+			// Focus textarea without scroll
+			element.focus({ preventScroll: true });
+			if (!container) return;
+
+			// Function to perform the scroll
+			function performScroll() {
+				// Get fresh measurements
+				const rect = element.getBoundingClientRect();
+				const containerRect = container.getBoundingClientRect();
+
+				// Current scroll position plus element offset within container
+				const targetScrollTop = container.scrollTop + rect.top - containerRect.top - (container.clientHeight / 2) + (element.offsetHeight / 2);
+
+				// Always try smooth scroll first
+				const supportsSmooth = 'scrollBehavior' in document.documentElement.style;
+				
+				if (supportsSmooth) {
+					container.scrollTo({
+						top: targetScrollTop,
+						behavior: 'smooth'
+					});
+				} else {
+					// Fallback: instant scroll if smooth not supported
+					container.scrollTop = targetScrollTop;
+				}
+			}
+
+			// Use requestAnimationFrame to ensure layout is updated before scrolling
+			requestAnimationFrame(() => {
+				performScroll();
+				
+				// On mobile, perform a second scroll after keyboard settles
+				if (isMobile) {
+					setTimeout(performScroll, 100);
+				}
+			});
+		}
 
 		function clearAnswerField() {
 			if (!isStulpeliu()) {
@@ -927,6 +1049,8 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 			}
 
 			element2Textarea.style.width = `${newWidth+1+antrasDaugiklisLength-2}ch`;
+
+			requestAnimationFrame(() => handleTextareaFocusing());
 			
 		} else if (controller.randomSelection[2] === 'D') {
 			const answerInput = document.querySelector("#answer")
@@ -962,6 +1086,8 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 				}
 			}
 
+			requestAnimationFrame(() => handleTextareaFocusing(currentElement=null, answerFieldFirst=true));
+
 			} else {
 				var demAtTur = document.getElementsByClassName('demuo-turinys-ateminys');
 				var didDemAtTurWidth = 0;
@@ -979,6 +1105,7 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 				}
 
 				element2Textarea.style.width = answerSize + 'px';
+				requestAnimationFrame(() => handleTextareaFocusing(currentElement=null, answerFieldFirst=true));
 			}
 
 			if (controller.withRemainder && controller.randomSelection[2] === 'D') {
@@ -1019,7 +1146,6 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 					}, { passive: false });
 				});
 			}
-
 		} else {
 			const answerElement = document.getElementById('answer');
 			const requiredWidth = getCorrectAnswerLength() + 1;
@@ -1036,6 +1162,7 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 			}
 			
 			adjustFontToFit()
+			requestAnimationFrame(() => handleTextareaFocusing(currentElement=null, answerFieldFirst=true));
 		}
 
   		adjustMiddleLineHeight();
@@ -1044,6 +1171,19 @@ let answerRemainderInputElement = document.querySelector('#remainder');
 			contentContainerElement.style.opacity = '1';
 		});
 	}
+
+document.addEventListener("input", function(event) {
+	const target = event.target;
+
+	// Check if the event came from a textarea
+	if (target.tagName === "TEXTAREA") {
+		// If this textarea has the wrong-answer-field class, remove it
+		if (target.classList.contains("wrong-answer-field")) {
+			console.log("gere")
+			target.classList.remove("wrong-answer-field");
+		}
+	}
+});
 
 function adjustFontToFit() {
   const container = document.getElementById('content-container');

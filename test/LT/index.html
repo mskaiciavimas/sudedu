@@ -1483,23 +1483,23 @@ body.popup-active {
                                         <span class="rasyba-options-label-text">PANAŠIAI SKAMBANČIOS PRIEBALSĖS</span>
                                         <br>
                                     </label>
-                                    <label class="rasyba-options-label options-for-first-second-classes" style="display: block;">
-                                        <input type="checkbox" class="r parent-toggle" name="r" value='BALSĖS' data-controls="balsiu-div" checked>
+                                    <label class="rasyba-options-label options-for-first-second-classes temporarily-disabled" style="display: block;">
+                                        <input type="checkbox" class="r parent-toggle" name="r" value='BALSĖS:' data-controls="balsiu-div" checked>
                                         <span class="rasyba-options-label-text">BALSĖS</span>
                                         <br>
                                     </label>
-                                    <div id="balsiu-div" data-parent="BALSĖS">
-                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                    <div id="balsiu-div temporarily-disabled" data-parent="BALSĖS">
+                                        <label class="rasyba-options-label options-for-first-second-classes temporarily-disabled">
                                             <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C88": []}' checked>
                                             <span class="rasyba-options-label-text">E — Ė</span>
                                             <br>
                                         </label>
-                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                        <label class="rasyba-options-label options-for-first-second-classes temporarily-disabled">
                                             <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C89": []}' checked>
                                             <span class="rasyba-options-label-text">I — Y</span>
                                             <br>
                                         </label>
-                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                        <label class="rasyba-options-label options-for-first-second-classes temporarily-disabled">
                                             <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C90": []}' checked>
                                             <span class="rasyba-options-label-text">U — Ū</span>
                                             <br>
@@ -1914,33 +1914,33 @@ const messagesToUsers = [
             title: "Naujos Užduotys",
             text: "MOKYTOJAS Šią savaitę pridėjome naujų užduočių visoms klasėms.",
             fullText: "Šią savaitę pridėjome naujų užduočių visoms klasėms. Ačiū už jūsų atsiliepimus! Dabar galite rasti daugiau užduočių skaitmeninėje lygybėje, teksto supratime ir rašybos pratybose. Nuolat tobuliname turinį pagal jūsų poreikius.",
-            date: "2025-01-20", 
+            date: "2025-11-20", 
             target: ["teacher"]
         },
         {
             title: "Priminimas",
-            text: "MOKINYS Primename: reguliari praktika pagerina rezultatus.",
+            text: "Primename: reguliari praktika pagerina rezultatus.",
             fullText: "Primename: reguliari praktika pagerina rezultatus. Rekomenduojame praktikuotis 15-20 minučių kasdien. Tyrimai rodo, kad nuoseklus mokymasis yra efektyvesnis nei ilgi, bet reti pratybų seansai. Sukurkite savo rutiną ir stebėkite savo pažangą!",
-            date: "2025-01-18", 
+            date: "2025-11-18", 
             target: ["student"]
         },
         {
-            title: "Nuaja Funkcija",
-            text: "Naujas funkcionalumas: dabar galite sekti savo pažangą per laiką.",
+            title: "Nauja Funkcija",
+            text: "Nuo šiol mokytojai teksto suvokimo užduotims gali užduoti pasirinktus tekstus.",
             fullText: "Naujas funkcionalumas: dabar galite sekti savo pažangą per laiką. Žiūrėkite statistikos skiltį ir analizuokite, kuriose srityse jums sekasi geriausiai, o kur galite tobulėti. Grafikais vaizduojami jūsų rezultatai padės geriau suprasti savo mokymosi kelią.",
-            date: "2025-01-15", 
+            date: "2025-11-15", 
+            target: ["all", "teacher", "student"]
+        },
+        {
+            title: "Nepamiršk pamaitinti savo augintinio!",
+            text: "Augintiniai pilnai išalksta per dvi dienas.",
+            fullText: "Naujas funkcionalumas: dabar galite sekti savo pažangą per laiką. Žiūrėkite statistikos skiltį ir analizuokite, kuriose srityse jums sekasi geriausiai, o kur galite tobulėti. Grafikais vaizduojami jūsų rezultatai padės geriau suprasti savo mokymosi kelią.",
+            date: "2025-11-13", 
             target: ["all", "teacher", "student"]
         },
         {
             title: "Nuaja Funkcija",
-            text: "Naujas funkcionalumas: dabar galite sekti savo pažangą per laiką.",
-            fullText: "Naujas funkcionalumas: dabar galite sekti savo pažangą per laiką. Žiūrėkite statistikos skiltį ir analizuokite, kuriose srityse jums sekasi geriausiai, o kur galite tobulėti. Grafikais vaizduojami jūsų rezultatai padės geriau suprasti savo mokymosi kelią.",
-            date: "2025-01-15", 
-            target: ["all", "teacher", "student"]
-        },
-        {
-            title: "Nuaja Funkcija",
-            text: "Naujas funkcionalumas: dabar galite sekti savo pažangą per laiką.",
+            text: "Nuo šiol užduočių atlikimas bei uždavimas mobiliuosiuose įrenginiuose daug patogesnis!",
             fullText: "Naujas funkcionalumas: dabar galite sekti savo pažangą per laiką. Žiūrėkite statistikos skiltį ir analizuokite, kuriose srityse jums sekasi geriausiai, o kur galite tobulėti. Grafikais vaizduojami jūsų rezultatai padės geriau suprasti savo mokymosi kelią.",
             date: "2025-01-15", 
             target: ["all", "teacher", "student"]
@@ -2793,9 +2793,11 @@ async function displayPersonalChl() {
 
             if (answeringMode === "C39" || challenge.chl[1] === "C83") {
                 let potentialEarnings = await calculateTasksPerCorrectAnswerPoints(challenge.chl);
+
                 if (potentialEarnings) {
                     potentialEarnings = Number((potentialEarnings * personalChlCoinBonusMultiplier).toFixed(2))
                 }
+                
                 earningsDisplay = `
                     <div class="earnings-estimation-outer">
                         <button class="earnings-estimation-display info-button"
@@ -2827,6 +2829,7 @@ async function displayPersonalChl() {
                 if (potentialEarnings) {
                     potentialEarnings = Number((potentialEarnings * numberOfQuestions * personalChlCoinBonusMultiplier).toFixed(2));
                 }
+
                 earningsDisplay = `
                     <div class="earnings-estimation-outer">
                         <button class="earnings-estimation-display info-button"

@@ -63,6 +63,10 @@ const animationStepsAndDurationNumberDict = {
     "cat-1-walks-downwards": [4, 0.85],
     "cat-1-walks-sideways": [4, 0.85],
     "cat-1-stands-idle": [4, 0.85],
+    "cat-1-claps": [3, 0.5],
+    "cat-1-dragged": [4, 1],
+    "cat-1-hidden": [1, 1],
+    "cat-1-jumps-on-platform": [10 ,1],
     "cat-2-sits-idle": [10, 2],
     "cat-2-sits-idle-blinks": [10, 2],
     "cat-2-sleeps": [4, 2],
@@ -90,10 +94,10 @@ const animationStepsAndDurationNumberDict = {
     "cat-2-walks-sideways": [4, 0.85],
     "cat-2-stands-idle": [4, 0.85],
     "musicPlayerOff": [1, 1],
-    "musicPlayerOn": [1 ,1],
-    "bath-1-empty": [1 ,1],
+    "musicPlayerOn": [1, 1],
+    "bath-1-empty": [1, 1],
     "bath-1-filled": [6 ,1],
-    "bath-1-with-pet": [6 ,1]
+    "bath-1-with-pet": [6, 1],
 }
 
 function resetControllerTaskSettings () {
@@ -596,7 +600,7 @@ async function sendSetTaskResultsToDatabase() {
 
       requestSuccess = await sendTaskResults(controller.task[1], resultsData)
       if (requestSuccess) {
-        [requestSuccess, pointsEarned, coinsEarned] = await updateStudentPointsAndStatistics(coinMultiplier=0);
+        [requestSuccess, pointsEarned, coinsEarned] = await updateStudentPointsAndStatistics(coinMultiplier=1);
       }
 
       if (requestSuccess) {
@@ -868,8 +872,14 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
   let statType = 'c'; // default to consistency
 
   // Calculate points and coins
-  pointsEarned = await calculateTasksPerCorrectAnswerPoints("controller");
-  pointsEarned = pointsEarned * controller.correctAnswersTracker
+  if (controller.modeChoice7 === "C84") {
+    const IDsOfCorrectlyAnsweredTexts = controller.currentMistakes.filter(item => item[1] === 0).map(item => item[0]);
+    pointsEarned = await calculateTasksPerCorrectAnswerPoints("selectedTexts", [[controller.mode, controller.modeChoice1, controller.modeChoice2, controller.modeChoice6, controller.modeChoice7], IDsOfCorrectlyAnsweredTexts]);
+  } else {
+    pointsEarned = await calculateTasksPerCorrectAnswerPoints("controller");
+    pointsEarned = pointsEarned * controller.correctAnswersTracker
+  }
+
   if (coinMultiplier) {
     coinsEarned = pointsEarned * coinMultiplier;
   }
@@ -1392,19 +1402,23 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
 
       // Loop through each input element and add an event listener
       inputElements.forEach(function(element) {
-	  element.setAttribute("inputmode", "numeric");    
-          element.addEventListener('input', function(event) {
-              // Sanitize input field value on input event
-              const sanitizedValue = event.target.value.replace(/[^0-9]/g, '');
-              event.target.value = sanitizedValue;
-          });
-          element.addEventListener("keydown", async function (event) {
-            if (event.key === "Enter") {
-                await checkAnswer();
-                clearAnswerField();
-            }
-          });
-      });
+    element.setAttribute("inputmode", "numeric");    
+
+    // Sanitize input on input event
+    element.addEventListener('input', function(event) {
+        const sanitizedValue = event.target.value.replace(/[^0-9]/g, '');
+        event.target.value = sanitizedValue;
+    });
+
+    element.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        handleTextareaFocusing(element);
+        }
+    });
+
+    });
+
 
     }
 
@@ -1458,10 +1472,9 @@ async function checkAnswer () {
     function answerFieldColor(element, correctness) {
       // Remove wrong-answer-field if it's correct or neutral
       if (correctness === true) {
-        element.style.backgroundColor = 'rgba(64, 201, 169, 0.6)';
+        element.classList.add('correct-answer-field');
         element.classList.remove('wrong-answer-field');
       } else if (correctness === false) {
-        element.style.backgroundColor = 'rgba(213, 126, 126, 0.6)';
         element.classList.add('wrong-answer-field');
         clearTimeout(timeoutReference);
         removeError(element);
@@ -1469,8 +1482,8 @@ async function checkAnswer () {
           removeError(element);
         }, 500);
       } else {
-        element.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
         element.classList.remove('wrong-answer-field');
+        element.classList.remove('correct-answer-field');
       }
     }
 
@@ -2012,7 +2025,7 @@ async function checkAnswer () {
       }
       await formEquation();
       displayEquation();
-      answerInputElement.setAttribute("style", "background-color: rgba(255, 255, 255, 0.6)")
+      answerInputElement.classList.remove('correct-answer-field');
     } else {
       updateScore();
     }
@@ -3471,11 +3484,10 @@ async function controllerToTask() {
 }
 
 async function processSelectedTexts() {
-    console.log(timeTakenForEachText)
     const validTextTimes = Object.entries(timeTakenForEachText).filter(([textId, times]) => {
         return times.startTime !== undefined && times.endTime !== undefined;
     });
-    console.log(validTextTimes)
+
     if (validTextTimes.length === 0) {
         return [];
     }
@@ -3888,7 +3900,7 @@ const pointWeights = {
     "C14": {"values": [2.0, 2.0, 2.0, 1.75, 1.5, 1.5], "label": "skaiciu iki 10000"},
     "C15": {"values": [2.0, 2.0, 2.0, 2.0, 2.0, 2.0], "label": "skaiciu iki 1000000"},
     "C16": {"values": [2.0, 2.0, 2.0, 1.5, 1.25, 1.15], "label": "turinyje gretimi nuliai"},
-    "C17": {"values": [2.0, 2.0, 1.0, 0.0, 0.0, 0.0], "label": "lenteline sudetis ir atimitis iki 20"},
+    "C17": {"values": [0.7, 0.6, 1.0, 0.0, 0.0, 0.0], "label": "lenteline sudetis ir atimitis iki 20"},
     "C18": {"values": [1.0, 0.75, 0.5, 0.35, 0.35, 0.35], "label": "daugybos lentle"},
     "DL1": {"values": [1.0, 1.0, 0.15, 0.0, 0.0, 0.0], "label": "daugybos range[1] === 1"},
     "DL2": {"values": [2.0, 2.0, 0.5, 0, 0, 0], "label": "daugybos range[1] === 2"},
@@ -4007,6 +4019,7 @@ async function calculateTasksPerCorrectAnswerPoints(type, selectedTextInfo = nul
 
     } else if (type === "selectedTexts") {
         const [taskSettings, textIds] = selectedTextInfo;
+
         const textCompType = taskSettings[2];
 
         const response = await fetch("../databases/sudedu_duomenu_baze.json");
@@ -4018,6 +4031,13 @@ async function calculateTasksPerCorrectAnswerPoints(type, selectedTextInfo = nul
 
         for (const info of textInfoList) {
             let perTextTotal = pointWeights.base?.values[taskInfoTemp.userClass] ?? 1;
+
+            Object.keys(taskInfoTemp).forEach(key => {
+                if (typeof taskInfoTemp[key] === 'boolean') {
+                    taskInfoTemp[key] = false;
+                }
+            });
+            taskInfoTemp["mult-table-selection"] = [];
 
             let tempController = {};
             const classChoice = info[0];
@@ -4044,7 +4064,6 @@ async function calculateTasksPerCorrectAnswerPoints(type, selectedTextInfo = nul
                 const weight = getTaskWeight(task);
                 perTextTotal *= weight;
             });
-
             customTextsTotal += perTextTotal
         }
 
@@ -4113,34 +4132,32 @@ async function calculateTasksPerCorrectAnswerPoints(type, selectedTextInfo = nul
     }
 
     function buildList(textDatabase, textIds, textCompType) {
-    const result = [];
+      const result = [];
 
-      for (const id of textIds) {
-          const entry = textDatabase[id.toString()]; // <-- direct lookup
-          if (!entry) continue;
+        for (const id of textIds) {
+            const entry = textDatabase[id.toString()]; // <-- direct lookup
 
-          const out = [];
+            if (!entry) continue;
 
-          const classes = entry["class"] ?? [];
-          let classCode = null;
-          const has12 = classes.includes("C75");
-          const has34 = classes.includes("C76");
-          if (has12 && !has34) classCode = "C75";
-          else if (has34 || (has12 && has34)) classCode = "C76";
-          out.push(classCode);
+            const classes = entry["class"] ?? [];
+            let classCode = null;
+            const has12 = classes.includes("C75");
+            const has34 = classes.includes("C76");
+            if (has12 && !has34) classCode = "C75";
+            else if (has34 || (has12 && has34)) classCode = "C76";
 
-          let complexityCode = null;
-          if (textCompType === "C51") complexityCode = entry["SF"]?.C51 ?? null;
-          else if (textCompType === "C52") complexityCode = entry["SF"]?.C52 ?? null;
+            let complexityCode = null;
+            if (textCompType === "C51") complexityCode = entry["SF"]?.C51 ?? null;
+            else if (textCompType === "C52") complexityCode = entry["SF"]?.C52 ?? null;
 
-          // Validate it's a known difficulty level
-          if (!["C58", "C59", "C60"].includes(complexityCode)) continue;
+            // Validate it's a known difficulty level
+            if (!["C58", "C59", "C60"].includes(complexityCode)) continue;
 
-          out.push(complexityCode);
-      }
+            result.push([classCode, complexityCode]);
+        }
 
-      return result;
-  }
+        return result;
+    }
 }
 
 
@@ -4486,9 +4503,11 @@ async function renderPetOnWalk () {
     const petOnWalkDiv = document.querySelector("#pet-on-walk")
     petOnWalkDiv.classList.add(userData.petOnWalk)
     petOnWalkDiv._petType = userData.petOnWalk.split('-').slice(0, 2).join('-');
+    petOnWalkDiv._hasJumpedOn = false; // Track if pet has jumped on platform
     const randomPosition = await getRandomLeft();
     petOnWalkDiv.style.left = `${randomPosition}px`
-    setObjectAnimation(petOnWalkDiv, `${petOnWalkDiv._petType}-sits-idle`)
+    const petEl = document.querySelector("#pet-on-walk");
+    setObjectAnimation(petEl, `${petEl._petType}-hidden`);
 
     // Start walking once the DOM is ready
     setTimeout(() => {
@@ -4497,7 +4516,24 @@ async function renderPetOnWalk () {
   }
 }
 
-renderPetOnWalk();
+async function initPetOnWalk() {
+  // Wait for window to fully load
+  if (document.readyState !== 'complete') {
+    await new Promise(resolve => {
+      window.addEventListener('load', resolve);
+    });
+  }
+  
+  // Wait for userData to be defined (if it loads asynchronously)
+  let attempts = 0;
+  while (typeof userData === "undefined" && attempts < 50) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    attempts++;
+  }
+  
+  // Now render
+  renderPetOnWalk();
+}
 
 function getRandomLeft() {
   return new Promise((resolve) => {
@@ -4524,20 +4560,331 @@ function getRandomLeft() {
   });
 }
 
-// Function to move pet smoothly to a random position
+// ============================================================================
+// PET ON WALK - ANIMATION SYSTEM
+// ============================================================================
+
+// Configuration Dictionary
+const petOnWalkActionDict = {
+  // Actions during active questions (looping animations)
+  questionActive: [
+    { action: "sits-idle", transitionBefore: null, transitionAfter: null },
+    { action: "lays-idle", transitionBefore: null, transitionAfter: null },
+    { action: "licks-paw", transitionBefore: null, transitionAfter: null },
+    { 
+      action: "sleeps", 
+      transitionBefore: { 
+        animation: "stands-idle", duration: 1000,
+        animation: "lays-idle", duration: 3000 
+      }, // 2 full loops before sleeping
+      transitionAfter: [
+        { animation: "lays-idle", duration: 500 },   // 1 loop - waking up
+        { animation: "surprised", duration: null, chance: 0.5 }     // 50% chance surprised reaction (play once)
+      ]
+    }
+  ],
+  
+  // Actions after questions completed (celebration animations)
+  questionsStopped: [
+    { action: "claps", transitionBefore: null, transitionAfter: null }
+  ],
+  
+  // Timing settings (in milliseconds)
+  timing: {
+    actionInterval: { min: 60000, max: 180000 },      // 1-3 minutes between actions
+    celebrationDelay: { min: 15000, max: 45000 }      // 15-45 seconds before walking after celebration
+  }
+};
+
+// State tracking
+let petOnWalkAction = null;
+let currentPetAction = null;
+let currentPetState = null; // Track actual state: 'transition-before' | 'main-action' | 'transition-after'
+let ongoingTransition = null; // Store abort controller for transitions
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Play a single animation once and wait for completion
+ */
+async function playAnimationOnce(petEl, animationName, abortSignal) {
+  const animKey = `${petEl._petType}-${animationName}`;
+  const animData = animationStepsAndDurationNumberDict[animKey];
+  
+  if (!animData) {
+    console.error('Animation data not found for:', animKey);
+    return;
+  }
+  
+  petEl.style.animation = 'none';
+  void petEl.offsetHeight;
+  
+  setObjectAnimation(petEl, animKey, 1);
+  
+  const animationDuration = animData[1] * 1000;
+  
+  await new Promise((resolve, reject) => {
+    let resolved = false;
+    
+    // Handle abort
+    if (abortSignal) {
+      abortSignal.addEventListener('abort', () => {
+        if (!resolved) {
+          resolved = true;
+          petEl.removeEventListener("animationend", onAnimationEnd);
+          reject(new Error('Animation aborted'));
+        }
+      });
+    }
+    
+    const calculatedTimeout = setTimeout(() => {
+      if (!resolved) {
+        resolved = true;
+        petEl.removeEventListener("animationend", onAnimationEnd);
+        resolve();
+      }
+    }, animationDuration + 100);
+    
+    function onAnimationEnd(e) {
+      if (e.animationName.includes(animationName) && !resolved) {
+        resolved = true;
+        clearTimeout(calculatedTimeout);
+        petEl.removeEventListener("animationend", onAnimationEnd);
+        resolve();
+      }
+    }
+    petEl.addEventListener("animationend", onAnimationEnd);
+  });
+}
+
+/**
+ * Play a transition animation for a specified duration
+ * If duration is null, plays animation once and waits for completion
+ */
+async function playTransitionAnimation(petEl, animationName, duration, abortSignal) {
+  const animKey = `${petEl._petType}-${animationName}`;
+  
+  if (duration === null) {
+    // Play once and wait for completion
+    await playAnimationOnce(petEl, animationName, abortSignal);
+  } else {
+    // Loop for specified duration
+    petEl.style.animation = 'none';
+    void petEl.offsetHeight;
+    setObjectAnimation(petEl, animKey);
+    
+    await new Promise((resolve, reject) => {
+      // Handle abort
+      if (abortSignal) {
+        abortSignal.addEventListener('abort', () => {
+          reject(new Error('Transition aborted'));
+        });
+      }
+      
+      setTimeout(resolve, duration);
+    });
+  }
+}
+
+/**
+ * Get random position for pet to walk to
+ */
+function getRandomLeft() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const petEl = document.querySelector("#pet-on-walk");
+      const parentEl = document.querySelector(".pet-on-walk-holder");
+      
+      if (!petEl || !parentEl) {
+        resolve(0);
+        return;
+      }
+
+      const parentComputedStyle = getComputedStyle(parentEl);
+      const parentWidth = parseFloat(parentComputedStyle.width);
+      const petWidth = petEl.offsetWidth;
+      const maxLeft = Math.max(0, parentWidth - petWidth);
+      const randomLeft = Math.random() * maxLeft;
+      
+      resolve(randomLeft);
+    }, 200);
+  });
+}
+
+// ============================================================================
+// MAIN ANIMATION FUNCTIONS
+// ============================================================================
+
+/**
+ * Start a random pet action during active questions
+ */
+async function startRandomPetOnWalkAction() {
+  const petEl = document.querySelector("#pet-on-walk");
+  if (!petEl || !petEl._petType) return;
+  
+  // Create abort controller for this animation sequence
+  const abortController = new AbortController();
+  ongoingTransition = abortController;
+  
+  try {
+    // Pick random action from questionActive list
+    const actionConfig = petOnWalkActionDict.questionActive[
+      Math.floor(Math.random() * petOnWalkActionDict.questionActive.length)
+    ];
+    
+    currentPetAction = actionConfig.action;
+    
+    // Play transition animation before main action (if defined)
+    if (actionConfig.transitionBefore) {
+      currentPetState = 'transition-before';
+      await playTransitionAnimation(
+        petEl, 
+        actionConfig.transitionBefore.animation, 
+        actionConfig.transitionBefore.duration,
+        abortController.signal
+      );
+    }
+    
+    // Start main looping animation
+    currentPetState = 'main-action';
+    setObjectAnimation(petEl, `${petEl._petType}-${actionConfig.action}`);
+    
+    // Clear abort controller since transitions are done
+    ongoingTransition = null;
+    
+    // Schedule next random action
+    const delay = petOnWalkActionDict.timing.actionInterval.min + 
+                  Math.random() * (petOnWalkActionDict.timing.actionInterval.max - 
+                                   petOnWalkActionDict.timing.actionInterval.min);
+    petOnWalkAction = setTimeout(startRandomPetOnWalkAction, delay);
+  } catch (error) {
+    if (error.message === 'Animation aborted' || error.message === 'Transition aborted') {
+      ongoingTransition = null;
+    } else {
+      throw error;
+    }
+  }
+}
+
+/**
+ * Trigger celebration action after questions are completed
+ */
+async function setPetOnWalkActionAfterQuestionsCompleted() {
+  const petEl = document.querySelector("#pet-on-walk");
+  if (!petEl || !petEl._petType) return;
+  
+  // Cancel any scheduled random action
+  if (petOnWalkAction) {
+    clearTimeout(petOnWalkAction);
+    petOnWalkAction = null;
+  }
+  
+  // Abort any ongoing transitions
+  if (ongoingTransition) {
+    ongoingTransition.abort();
+    ongoingTransition = null;
+  }
+  
+  // Determine what transition to play based on current state
+  const currentActionConfig = petOnWalkActionDict.questionActive.find(
+    config => config.action === currentPetAction
+  );
+  
+  // Handle wake-up/transition based on what the pet is currently doing
+  if (currentActionConfig && currentActionConfig.transitionAfter) {
+    // Handle single transition or array of transitions
+    const transitions = Array.isArray(currentActionConfig.transitionAfter) 
+      ? currentActionConfig.transitionAfter 
+      : [currentActionConfig.transitionAfter];
+    
+    // Play each transition in sequence (respecting chance if defined)
+    for (const transition of transitions) {
+      // Check if this transition has a chance requirement
+      if (transition.chance !== undefined) {
+        // Roll the dice
+        if (Math.random() < transition.chance) {
+          await playTransitionAnimation(
+            petEl,
+            transition.animation,
+            transition.duration
+          );
+        }
+      } else {
+        // Always play if no chance is defined
+        await playTransitionAnimation(
+          petEl,
+          transition.animation,
+          transition.duration
+        );
+      }
+    }
+  }
+
+  // Pick a random celebration action
+  const celebrationConfig = petOnWalkActionDict.questionsStopped[
+    Math.floor(Math.random() * petOnWalkActionDict.questionsStopped.length)
+  ];
+  
+  currentPetAction = celebrationConfig.action;
+  currentPetState = 'main-action';
+  
+  // Play transition before celebration (if defined)
+  if (celebrationConfig.transitionBefore) {
+    await playTransitionAnimation(
+      petEl,
+      celebrationConfig.transitionBefore.animation,
+      celebrationConfig.transitionBefore.duration
+    );
+  }
+
+  // Start celebration animation
+  setObjectAnimation(petEl, `${petEl._petType}-${celebrationConfig.action}`);
+  
+  // Schedule return to walking after celebration
+  const delay = petOnWalkActionDict.timing.celebrationDelay.min +
+                Math.random() * (petOnWalkActionDict.timing.celebrationDelay.max -
+                                 petOnWalkActionDict.timing.celebrationDelay.min);
+  petOnWalkAction = setTimeout(walkToRandomPosition, delay);
+}
+
+/**
+ * Restart pet actions (cancel current and trigger new walk)
+ */
+function restartPetOnWalkActions() {
+  if (petOnWalkAction) {
+    clearTimeout(petOnWalkAction);
+    petOnWalkAction = null;
+  }
+  
+  // Abort any ongoing transitions
+  if (ongoingTransition) {
+    ongoingTransition.abort();
+    ongoingTransition = null;
+  }
+
+  walkToRandomPosition();
+}
+
+/**
+ * Main walk function - handles jumping on platform and walking
+ */
 async function walkToRandomPosition() {
   const petEl = document.querySelector("#pet-on-walk");
+  
+  if (!petEl) {
+    console.error('Pet element not found!');
+    return;
+  }
+  
   const newLeft = await getRandomLeft();
-
   const currentLeft = petEl.offsetLeft;
   const delta = newLeft - currentLeft;
 
-  if (Math.abs(delta) > 50) {
-
-    // Set walking animation
-    setObjectAnimation(petEl, `${petEl._petType}-walks-sideways`);
-
-    // Flip sprite depending on direction
+  // ===== FIRST APPEARANCE: JUMP ON PLATFORM =====
+  if (!petEl._hasJumpedOn) {
+    // Flip sprite based on direction
     if (delta < 0) {
       petEl.classList.remove("pet-right");
       petEl.classList.add("pet-left");
@@ -4545,18 +4892,91 @@ async function walkToRandomPosition() {
       petEl.classList.remove("pet-left");
       petEl.classList.add("pet-right");
     }
+    
+    // Play jump animation
+    petEl.style.animation = 'none';
+    void petEl.offsetHeight;
+    
+    setObjectAnimation(petEl, `${petEl._petType}-jumps-on-platform`, 1);
+    
+    const animKey = `${petEl._petType}-jumps-on-platform`;
+    const animData = animationStepsAndDurationNumberDict[animKey];
+    
+    if (!animData) {
+      console.error('Animation data not found for:', animKey);
+      petEl._hasJumpedOn = true;
+    } else {
+      const animationDuration = animData[1] * 1000;
+      
+      await new Promise(resolve => {
+        let resolved = false;
+        
+        const calculatedTimeout = setTimeout(() => {
+          if (!resolved) {
+            resolved = true;
+            petEl.removeEventListener("animationend", onAnimationEnd);
+            resolve();
+          }
+        }, animationDuration + 100);
+        
+        function onAnimationEnd(e) {
+          if (e.animationName.includes('jumps-on-platform') && !resolved) {
+            resolved = true;
+            clearTimeout(calculatedTimeout);
+            petEl.removeEventListener("animationend", onAnimationEnd);
+            resolve();
+          }
+        }
+        petEl.addEventListener("animationend", onAnimationEnd);
+      });
+      
+      petEl._hasJumpedOn = true;
+    }
+    
+    startRandomPetOnWalkAction();
+  }
+  
+  // ===== SUBSEQUENT MOVEMENTS: WALK IF ENOUGH SPACE =====
+  if (Math.abs(delta) > 50) {
+    // Flip sprite based on direction
+    if (delta < 0) {
+      petEl.classList.remove("pet-right");
+      petEl.classList.add("pet-left");
+    } else {
+      petEl.classList.remove("pet-left");
+      petEl.classList.add("pet-right");
+    }
+    
+    // Start walking animation
+    petEl.style.animation = 'none';
+    void petEl.offsetHeight;
+    
+    setObjectAnimation(petEl, `${petEl._petType}-walks-sideways`);
 
-    // Random walking duration between 2–4 seconds
+    // Calculate walk duration based on distance
     const speed = 0.1; // pixels per ms
     const distance = Math.abs(newLeft - currentLeft);
     const duration = distance / speed;
+    
     petEl.style.transition = `left ${duration}ms linear`;
     petEl.style.left = `${newLeft}px`;
 
-    // Wait for transition to finish
+    // Wait for walk to complete
     await new Promise(resolve => {
+      let resolved = false;
+      
+      const calculatedTimeout = setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          petEl.removeEventListener("transitionend", onTransitionEnd);
+          resolve();
+        }
+      }, duration + 100);
+      
       function onTransitionEnd(e) {
-        if (e.propertyName === "left") {
+        if (e.propertyName === "left" && !resolved) {
+          resolved = true;
+          clearTimeout(calculatedTimeout);
           petEl.removeEventListener("transitionend", onTransitionEnd);
           resolve();
         }
@@ -4564,73 +4984,13 @@ async function walkToRandomPosition() {
       petEl.addEventListener("transitionend", onTransitionEnd);
     });
   }
-
-  startRandomPetOnWalkAction()
-}
-
-let petOnWalkAction = null; // only global for the timeout
-
-function startRandomPetOnWalkAction() {
-  // Pick random action
-  const randomAction = petOnWalkActionDict.questionActive[
-    Math.floor(Math.random() * petOnWalkActionDict.questionActive.length)
-  ];
-
-  // Use the action, e.g., set animation
-  const petEl = document.querySelector("#pet-on-walk");
-  if (petEl && petEl._petType) {
-    setObjectAnimation(petEl, `${petEl._petType}-${randomAction}`);
-  }
-
-  // Schedule next action in 1–3 minutes
-  const delay = 60_000 + Math.random() * 120_000;
-  petOnWalkAction = setTimeout(startRandomPetOnWalkAction, delay);
-}
-
-const petOnWalkActionDict = {
-  "questionActive": ["sits-idle", "lays-idle", "licks-paw", "sleeps"],
-  "questionsStopped": ["happy"]
-}
-
-
-function setPetOnWalkActionAfterQuestionsCompleted() {
-  // Cancel any scheduled random action
-  if (petOnWalkAction) {
-    clearTimeout(petOnWalkAction);
-    petOnWalkAction = null;
-  } else {
-    return
-  }
-
-  // Pick a random action from questionsStopped
-  const randomAction = petOnWalkActionDict.questionsStopped[
-    Math.floor(Math.random() * petOnWalkActionDict.questionsStopped.length)
-  ];
-
-  // Set it as animation indefinitely
-  const petEl = document.querySelector("#pet-on-walk");
-  if (petEl && petEl._petType) {
-    setObjectAnimation(petEl, `${petEl._petType}-${randomAction}`);
-    const delay = 15_000 + Math.random() * 30_000;
-    petOnWalkAction = setTimeout(walkToRandomPosition, delay);
-  }
-}
-
-function restartPetOnWalkActions() {
-  // Cancel any scheduled random action
-  if (petOnWalkAction) {
-    clearTimeout(petOnWalkAction);
-    petOnWalkAction = null;
-  } else {
-    return
-  }
-
-  walkToRandomPosition();
+  
+  startRandomPetOnWalkAction();
 }
 
 //Switch animation dynamically with JavaScript
-function setObjectAnimation(object, animationName) {
-    object.style.animation = `${animationName} ${animationStepsAndDurationNumberDict[animationName][1]}s steps(${animationStepsAndDurationNumberDict[animationName][0]}) infinite`;
+function setObjectAnimation(object, animationName, iterations = 'infinite') {
+    object.style.animation = `${animationName} ${animationStepsAndDurationNumberDict[animationName][1]}s steps(${animationStepsAndDurationNumberDict[animationName][0]}) ${iterations}`;
 }
 
 function redirectToAppropriateLanguage(targetFolder) {

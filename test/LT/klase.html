@@ -453,15 +453,16 @@
         }
 
         .teacher-name-input-holder {
-          flex: 1 0 auto;
-          justify-content: start;
+            flex: 1 0 auto;
+            justify-content: start;
             max-width: 100%;
             white-space: normal; 
         }
 
         #add-change-teacher-buttons {
-          flex: 1 1 50%;
+          flex: 1 1 auto;
           justify-content: end;
+          margin-left: 15px;
         }
 
         #change-teacher-input,
@@ -472,8 +473,10 @@
             background: rgba(255, 255, 255, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.1);
             padding-left: 20px;
-            width: 200px;
+            width: 100%;
+            box-sizing: border-box;
         }
+
 
         #change-teacher-input:focus,
         #change-teacher-input:active,
@@ -1562,6 +1565,18 @@
 
 
         @media (max-width: 767px) {
+            #change-teacher-input::placeholder,
+            #add-teacher-input::placeholder {
+                font-size: 1rem;
+            }
+
+            #change-teacher-input,
+            #add-teacher-input {
+                font-size: 1.25rem;
+                padding: 7.5px 15px;
+            }
+
+
             .avatar-section {
                 width: auto;
                 margin-bottom: 15px;
@@ -1838,8 +1853,8 @@
                     <div class="teacher-info-div">
                           <div class="teacher-name-input-holder">
                           <div id="teacher-name"></div>
-                          <input id="add-teacher-input" type="text" placeholder="mokytojo ID" style="display: none;" class="item-to-be-disabled-while-talking-to-server">
-                          <input id="change-teacher-input" type="text" placeholder="mokytojo ID" style="display: none;" class="item-to-be-disabled-while-talking-to-server">
+                          <input id="add-teacher-input" type="text" placeholder="mokytojo ID arba el. pašto adresas" style="display: none;" class="item-to-be-disabled-while-talking-to-server">
+                          <input id="change-teacher-input" type="text" placeholder="mokytojo ID arba el. pašto adresas" style="display: none;" class="item-to-be-disabled-while-talking-to-server">
                           </div>
                           <div id="add-change-teacher-buttons">
                           <button id="change-teacher-toggle-button" class="item-to-be-disabled-while-talking-to-server">Keisti mokytoją</button>
@@ -2385,7 +2400,7 @@
             document.getElementById('nameEdit').classList.remove('hidden');
             document.getElementById('nameDisplay').classList.add('hidden');
             
-            if (classDataCache.requestingStudent.avatarSvg) {
+            if (classDataCache.requestingStudent?.avatarSvg) {
                 document.getElementById('avatarControls').classList.remove('hidden');
                 populateFeatureSelect();
                 updateColorPalette();
@@ -2539,6 +2554,11 @@
                 return;
             }
 
+            if (newNickname.length > 30) { 
+				messageToTheUser('Maksimalus vardo ilgis yra 30 simbolių.'); 
+				return; 
+			}
+
             if (newNickname !== userData.nickname) {
                 await updateUserNickname(newNickname)
             }
@@ -2548,7 +2568,7 @@
                 await showCustomConfirm("Ar tikrai norite pakeisti paskyros tipą? Visi su paskyra susiję duomenys bus ištrinti.", changeAccountType, ["style"])
             }
 
-            if (classDataCache.requestingStudent.avatarSvg) {
+            if (classDataCache.requestingStudent?.avatarSvg) {
                 const newAvatarCode = encodeAvatarSettings();
 
                 if (classDataCache.requestingStudent && newAvatarCode !== classDataCache.requestingStudent.avatarCode) {
@@ -2612,13 +2632,15 @@
         async function updateUserNickname(newNickname) {
             try {
                 const response = await apiFetch(apiBase + 'class/updateNickname', {
-                    method: 'POST',
+                    method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ userId: userData.userId, newNickname })
+                    body: JSON.stringify({
+                        studentId: userData.userId,
+                        nickname: newNickname
+                    })
                 });
-
                 if (!response) {
                     return;
                 }

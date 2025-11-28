@@ -1471,6 +1471,10 @@ button:disabled.cancel-btn::before {
   transform: translateX(-60%) translateY(-4px); /* optional slight slide */
 }
 
+#browse-task-history-button {
+    display: none !important;
+}
+
 /*OVERRIDE HOVER ON MOBILE AS IT STAYS THERE UNTILL NEXT CLICK*/
 @media (hover: none) and (pointer: coarse) {
   #new-task-button::before,
@@ -1532,6 +1536,11 @@ button:disabled.cancel-btn::before {
     border-radius: 14px;
     pointer-events: none;
     transition: background 0.3s ease;
+    }
+
+    .mode_choice_11_div {
+        background: rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.3);
     }
 
     .btn-subject::after {
@@ -1731,7 +1740,6 @@ button:disabled.cancel-btn::before {
 
     .student-name-field {
         font-weight: 800;
-        text-transform: uppercase;
         font-size: 1.5rem;
         border: none;
         width: auto;
@@ -3582,23 +3590,23 @@ button:disabled.cancel-btn::before {
                                         <span class="rasyba-options-label-text">PANAŠIAI SKAMBANČIOS PRIEBALSĖS</span>
                                         <br>
                                     </label>
-                                    <label class="rasyba-options-label options-for-first-second-classes" style="display: block;">
+                                    <label class="rasyba-options-label options-for-first-second-classes temporarily-disabled" style="display: block;">
                                         <input type="checkbox" class="r parent-toggle" name="r" value='BALSĖS' data-controls="balsiu-div" checked>
                                         <span class="rasyba-options-label-text">BALSĖS</span>
                                         <br>
                                     </label>
-                                    <div id="balsiu-div" data-parent="BALSĖS">
-                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                    <div id="balsiu-div temporarily-disabled" data-parent="BALSĖS">
+                                        <label class="rasyba-options-label options-for-first-second-classes temporarily-disabled">
                                             <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C88": []}' checked>
                                             <span class="rasyba-options-label-text">E — Ė</span>
                                             <br>
                                         </label>
-                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                        <label class="rasyba-options-label options-for-first-second-classes temporarily-disabled">
                                             <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C89": []}' checked>
                                             <span class="rasyba-options-label-text">I — Y</span>
                                             <br>
                                         </label>
-                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                        <label class="rasyba-options-label options-for-first-second-classes temporarily-disabled">
                                             <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C90": []}' checked>
                                             <span class="rasyba-options-label-text">U — Ū</span>
                                             <br>
@@ -4200,24 +4208,34 @@ button:disabled.cancel-btn::before {
         function toggleDeleteStudent() {
             deletingStudent = !deletingStudent
             const dropdown = document.getElementById("task-group-sorting");
+            const menu = document.getElementById("task-group-menu");
+            
             toggleStudentListLabel();
             clearTaskInfoContainer();
+            
             if (deletingStudent) {
-                dropdown.disabled = true;
-                taskContainerVisible = true;
-                toggleTaskVisibility()
+                // First: select all groups and trigger filtering
+                restoreAllIfNoneSelected(true);
+                menu.dispatchEvent(new Event("change"));
+                
+                // Then: disable dropdown and show student checkboxes
+                setTimeout(() => {
+                    dropdown.disabled = true;
+                    taskContainerVisible = true;
+                    toggleTaskVisibility();
 
-                document.querySelectorAll('.student-checkbox').forEach(checkbox => {
-                checkbox.style.visibility = "visible";
-                checkbox.disabled = false;
-            });
+                    document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+                        checkbox.style.visibility = "visible";
+                        checkbox.disabled = false;
+                    });
+                }, 100);
             } else {
                 taskContainerVisible = false;
-                toggleTaskVisibility()
+                toggleTaskVisibility();
                 document.querySelectorAll('.student-checkbox').forEach(checkbox => {
-                checkbox.style.visibility = "hidden";
-                checkbox.checked = false;
-            });
+                    checkbox.style.visibility = "hidden";
+                    checkbox.checked = false;
+                });
                 dropdown.disabled = false;
             }
         }
@@ -6506,7 +6524,7 @@ function displayTeacherHome(selectedGroupNames=null) {
         studentName.classList.add('student-name');
         studentName.classList.add('selection-option');
         studentName.style.cursor = 'pointer';
-        studentName.dataset.studentId = student.id
+        studentName.dataset.studentId = student.id;
         studentName.innerHTML = `${studentIndex + 1}. ${student.nickname} (ID: ${student.id})`;
 
         studentName.addEventListener('click', async () => {
@@ -6641,6 +6659,13 @@ function displayTeacherHome(selectedGroupNames=null) {
         document.querySelectorAll('.task-checkbox').forEach(checkbox => {
         checkbox.style.visibility = "visible";
         checkbox.disabled = false;
+        });
+    }
+
+    if (deletingStudent || addingNewTask) {
+        document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+            checkbox.style.visibility = "visible";
+            checkbox.disabled = false;
         });
     }
 
@@ -6840,68 +6865,76 @@ function displayTeacherHome(selectedGroupNames=null) {
         addingNewTask = !addingNewTask
         toggleStudentListLabel();
         const dropdown = document.getElementById("task-group-sorting");
+        const menu = document.getElementById("task-group-menu");
+        
         if (addingNewTask) {
-            
+            // First: select all groups and trigger filtering
             restoreAllIfNoneSelected(true);
-            dropdown.dispatchEvent(new Event("change"));
-            dropdown.disabled = true;
+            menu.dispatchEvent(new Event("change"));
             
-            taskContainerVisible = true;
-            toggleTaskVisibility();
-            studentTaskInfoContainer.style.display = 'none'; 
-            document.querySelectorAll('.student-checkbox').forEach(checkbox => {
-            checkbox.style.visibility = 'visible';
+            // Then: disable dropdown and show UI
+            setTimeout(() => {
+                dropdown.disabled = true;
+                taskContainerVisible = true;
+                toggleTaskVisibility();
+                studentTaskInfoContainer.style.display = 'none';
+                
+                document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+                    checkbox.style.visibility = 'visible';
+                });
 
-            const modeChoice15Element = document.getElementById('mode_choice_15');
+                const modeChoice15Element = document.getElementById('mode_choice_15');
 
-            if (modeChoice15Element && modeChoice15Element.options.length < 2) {
-                modeChoice15Element.innerHTML = '';
-                modeChoice15Element.innerHTML += '<option value="C82">ATSITIKTINIAI TEKSTAI</option>'
-                modeChoice15Element.innerHTML += '<option value="C84">PARINKTI TEKSTUS</option>'
-            }
+                if (modeChoice15Element && modeChoice15Element.options.length < 2) {
+                    modeChoice15Element.innerHTML = '';
+                    modeChoice15Element.innerHTML += '<option value="C82">ATSITIKTINIAI TEKSTAI</option>'
+                    modeChoice15Element.innerHTML += '<option value="C84">PARINKTI TEKSTUS</option>'
+                }
 
-            let changeEvent = new Event('change');
-            modeChoice15Element.value = 'C82';
-            modeChoice15Element.dispatchEvent(changeEvent);
+                let changeEvent = new Event('change');
+                modeChoice15Element.value = 'C82';
+                modeChoice15Element.dispatchEvent(changeEvent);
 
-            const modeChoice15Selection = modeChoice15Element.value;
+                const modeChoice15Selection = modeChoice15Element.value;
 
-            if (modeChoice15Selection === "C82") {
-                isSelectionModeEnabled = false;
-            } else if (modeChoice15Selection === "C84") {
-                isSelectionModeEnabled = true;
-            }
+                if (modeChoice15Selection === "C82") {
+                    isSelectionModeEnabled = false;
+                    enforceTaskTypeFilter(); // Restore normal checkboxes
+                } else if (modeChoice15Selection === "C84") {
+                    isSelectionModeEnabled = true;
+                    enforceTaskTypeFilter(); // Enforce task type filter
+                }
 
-            refilterTexts();
+                refilterTexts();
 
-            const groupName = document.querySelector('#group_name');
+                openSidebar();
 
-            openSidebar();
-
-            toggleMainBrowser(true);
-            const sidebar = document.querySelector('.sidebar');
-            sidebar.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-            });
-        });
-            newTaskOptions.style.display = 'flex';
-            document.querySelector("#group_name").style.display = "block";
-            document.querySelector("#mode_choice_4").style.display = "block";
-            document.querySelector(".timer-question-number-div").style.display = "block";
+                toggleMainBrowser(true);
+                const sidebar = document.querySelector('.sidebar');
+                sidebar.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+                
+                newTaskOptions.style.display = 'flex';
+                document.querySelector("#group_name").style.display = "block";
+                document.querySelector("#mode_choice_4").style.display = "block";
+                document.querySelector(".timer-question-number-div").style.display = "block";
+            }, 100);
 
         } else {
             taskContainerVisible = false;
             toggleTaskVisibility();
             studentTaskInfoContainer.style.display = 'flex'; 
             document.querySelectorAll('.student-checkbox').forEach(checkbox => {
-            checkbox.style.visibility = 'hidden';
-            checkbox.checked = false;
-        });
+                checkbox.style.visibility = 'hidden';
+                checkbox.checked = false;
+            });
             newTaskOptions.style.display = 'none';
             dropdown.disabled = false;
             toggleMainBrowser(closeMainBrowser=true);
             isSelectionModeEnabled = false;
+            enforceTaskTypeFilter(); // ADD THIS LINE - restores normal behavior
             refilterTexts();
         }
     }
@@ -6992,21 +7025,24 @@ function displayTeacherHome(selectedGroupNames=null) {
     function toggleDeleteTask() {
         deletingTask = !deletingTask
         toggleStudentListLabel();
+        
         if (deletingTask) {
-            taskContainerVisible = false;
-            toggleTaskVisibility();
-            document.querySelectorAll('.task-checkbox').forEach(checkbox => {
-            checkbox.style.visibility = "visible";
-            checkbox.disabled = false;
-        });
+            setTimeout(() => {
+                taskContainerVisible = false;
+                toggleTaskVisibility();
+                document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+                    checkbox.style.visibility = "visible";
+                    checkbox.disabled = false;
+                });
+            }, 100);
         } else {
             taskContainerVisible = false;
             toggleTaskVisibility();
             document.querySelectorAll('.task-checkbox').forEach(checkbox => {
-            checkbox.style.visibility = "hidden";
-            checkbox.checked = false;
-            checkbox.disabled = true;
-        });
+                checkbox.style.visibility = "hidden";
+                checkbox.checked = false;
+                checkbox.disabled = true;
+            });
         }
     }
 
@@ -8498,6 +8534,15 @@ async function saveStudentName(studentId, buttonEl) {
     const input = document.querySelector('.student-name-field');
     const newName = input.value.trim();
     
+    // Find the student in studentList
+    const student = studentList.find(s => s.id === parseInt(studentId));
+    if (!student) {
+        messageToTheUser("Mokinys nerastas!");
+        return;
+    }
+    
+    const originalName = student.nickname; // Save original name
+    
     // Validation
     if (newName.length === 0) {
         messageToTheUser("Vardas negali būti tuščias!");
@@ -8511,15 +8556,8 @@ async function saveStudentName(studentId, buttonEl) {
         return;
     }
     
-    // Find the student in studentList
-    const student = studentList.find(s => s.id === parseInt(studentId));
-    if (!student) {
-        messageToTheUser("Mokinys nerastas!");
-        return;
-    }
-    
     // Check if name actually changed
-    if (newName === student.nickname) {
+    if (newName === originalName) {
         // No change, just revert to display mode
         const span = document.createElement('span');
         span.id = 'student-name';
@@ -8536,7 +8574,7 @@ async function saveStudentName(studentId, buttonEl) {
     input.disabled = true;
     
     try {
-        const response = await apiFetch(apiBase + 'students/update-nickname', {
+        const response = await apiFetch(apiBase + 'class/updateNickname', {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
@@ -8548,17 +8586,22 @@ async function saveStudentName(studentId, buttonEl) {
         });
         
         if (!response) {
-            return;
+            throw new Error('No response from server');
         }
         
+        // First check if response is OK
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
         }
         
-        const data = await response.json();
+        // Try to parse JSON response
+        const responseData = await response.json().catch(() => ({}));
         
-        if (data.message === "Nickname updated successfully") {
+        console.log('Server response:', responseData); // Debug log
+        
+        // Check for success - be more flexible with the response
+        if (response.ok && responseData) {
             // Update the student in studentList
             student.nickname = newName;
             
@@ -8566,10 +8609,16 @@ async function saveStudentName(studentId, buttonEl) {
             updateStudentNameInUI(studentId, newName);
             
             messageToTheUser("Vardas sėkmingai atnaujintas!", false);
+        } else {
+            throw new Error(responseData.message || 'Unexpected response format');
         }
         
     } catch (error) {
         console.error('Error updating student name:', error);
+
+        // Revert to original name in UI
+        updateStudentNameInUI(studentId, originalName);
+
         if (error.message === "Unauthorized") {
             clearUserData();
             window.location.href = "prisijungimas";
@@ -8577,10 +8626,10 @@ async function saveStudentName(studentId, buttonEl) {
             messageToTheUser('Nepavyko atnaujinti vardo. Bandykite vėl vėliau.');
         }
     } finally {
-        // Revert to display mode
+        // Revert to display mode (use current value from studentList)
         const span = document.createElement('span');
         span.id = 'student-name';
-        span.textContent = newName;
+        span.textContent = student.nickname; // Use the current value from studentList
         input.replaceWith(span);
         
         buttonEl.disabled = false;
@@ -8590,32 +8639,27 @@ async function saveStudentName(studentId, buttonEl) {
 }
 
 function updateStudentNameInUI(studentId, newName) {
-    // Update in the student list sidebar
-    const studentListItems = document.querySelectorAll('.student-name');
-    studentListItems.forEach(item => {
-        const text = item.textContent;
-        // Match pattern: "number. oldName (ID: studentId)"
-        const regex = new RegExp(`(\\d+\\.\\s+).+?\\(ID:\\s*${studentId}\\)`);
-        if (regex.test(text)) {
-            const match = text.match(/^(\d+\.)\s+/);
-            if (match) {
-                item.textContent = `${match[1]} ${newName} (ID: ${studentId})`;
-            }
-        }
+    // Update main student list (left column)
+    const studentElements = document.querySelectorAll(`.student-name[data-student-id="${studentId}"]`);
+
+    studentElements.forEach(el => {
+        const originalText = el.textContent;
+
+        // Extract order number: "1. Name (ID: X)"
+        const match = originalText.match(/^(\d+)\.\s/);
+        const orderNumber = match ? match[1] : "";
+
+        el.textContent = `${orderNumber}. ${newName} (ID: ${studentId})`;
     });
-    
-    // Update in the main display area if this student is currently selected
-    const displayedStudentId = document.getElementById('student-id');
-    if (displayedStudentId && displayedStudentId.textContent.includes(studentId)) {
-        const studentNameSpan = document.getElementById('student-name');
-        if (studentNameSpan) {
-            studentNameSpan.textContent = newName;
-        }
+
+    // Update edit panel header (right side)
+    const editPanelName = document.querySelector('#student-name');
+    if (editPanelName) {
+        editPanelName.textContent = newName;
     }
 }
 
 
-   
 function updateButtonLayout() {
   const container = document.getElementById('action-buttons-container');
   const buttons = Array.from(container.querySelectorAll('.teacher-action-btn'));
@@ -8740,8 +8784,44 @@ async function initTxtViewer() {
 
         // Dropdown change triggers re-filtering only
         document.getElementById('mode_choice_9').addEventListener('change', () => {
+            enforceTaskTypeFilter(); // ADD THIS LINE
             refilterTexts();
             applyFilters();
+        });
+
+        // Handle switching between grammar (C83) and text comprehension (C49)
+        document.getElementById('mode_choice_8').addEventListener('change', (e) => {
+            if (e.target.value === 'C83') {
+                // Switched to grammar - disable selection mode
+                isSelectionModeEnabled = false;
+                enforceTaskTypeFilter();
+                refilterTexts();
+                applyFilters();
+            }
+        });
+
+        document.getElementById('mode_choice_15').addEventListener('change', (e) => {
+            if (e.target.value === 'C82') {
+                // Switched to random texts
+                isSelectionModeEnabled = false;
+            } else if (e.target.value === 'C84') {
+                // Switched to selected texts
+                isSelectionModeEnabled = true;
+            }
+            enforceTaskTypeFilter();
+            refilterTexts();
+            applyFilters();
+        });
+
+        // Handle switching between math and language
+        document.getElementById('mode_choice').addEventListener('change', (e) => {
+            if (e.target.value === 'math') {
+                // Switched to math - disable selection mode
+                isSelectionModeEnabled = false;
+                enforceTaskTypeFilter();
+                refilterTexts();
+                applyFilters();
+            }
         });
 
         // Setup scroll observer for lazy loading BEFORE applying filters
@@ -8757,12 +8837,45 @@ async function initTxtViewer() {
     }
 }
 
+function enforceTaskTypeFilter() {
+    const strukturaCheckbox = document.getElementById('task_struktura');
+    const komponavimasCheckbox = document.getElementById('task_komponavimas');
+    
+    if (!isSelectionModeEnabled) {
+        // Restore normal behavior - enable both and check both
+        strukturaCheckbox.disabled = false;
+        komponavimasCheckbox.disabled = false;
+        strukturaCheckbox.checked = true;
+        komponavimasCheckbox.checked = true;
+        return;
+    }
+
+    // Get current task type from mode_choice_9
+    const taskType = document.getElementById('mode_choice_9').value;
+    
+    // Force check the appropriate checkbox and disable the other
+    if (taskType === 'C52') {
+        // Strukturos isdestymas
+        strukturaCheckbox.checked = true;
+        komponavimasCheckbox.checked = false;
+        strukturaCheckbox.disabled = false;
+        komponavimasCheckbox.disabled = true;
+    } else if (taskType === 'C51') {
+        // Turinio komponavimas
+        strukturaCheckbox.checked = false;
+        komponavimasCheckbox.checked = true;
+        strukturaCheckbox.disabled = true;
+        komponavimasCheckbox.disabled = false;
+    }
+}
+
 function refilterTexts() {
     const textArray = Object.entries(prefilteredTexts).map(([id, entry]) => ({ ...entry, id: parseInt(id) }));
 
     if (!textArray.length) return;
 
     if (isSelectionModeEnabled) {
+        enforceTaskTypeFilter();
         const mode = document.getElementById('mode_choice_9').value;
 
         allTexts = textArray.filter(entry => {
