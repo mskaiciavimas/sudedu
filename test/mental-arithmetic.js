@@ -871,13 +871,43 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
   let coinsEarned = 0;
   let statType = 'c'; // default to consistency
 
+  console.log(controller.currentMistakes)
+
   // Calculate points and coins
   if (controller.modeChoice7 === "C84") {
-    const IDsOfCorrectlyAnsweredTexts = controller.currentMistakes.filter(item => item[1] === 0).map(item => item[0]);
-    pointsEarned = await calculateTasksPerCorrectAnswerPoints("selectedTexts", [[controller.mode, controller.modeChoice1, controller.modeChoice2, controller.modeChoice6, controller.modeChoice7], IDsOfCorrectlyAnsweredTexts]);
+    pointsEarned = await calculateTasksPerCorrectAnswerPoints(
+        "selectedTexts",
+        {
+          taskSettings: [controller.mode, controller.modeChoice1, controller.modeChoice2, controller.modeChoice6, controller.modeChoice7],
+          textMistakes: controller.currentMistakes
+        }
+    );
   } else {
-    pointsEarned = await calculateTasksPerCorrectAnswerPoints("controller");
-    pointsEarned = pointsEarned * controller.correctAnswersTracker
+    if (controller.mode === "lang" && controller.modeChoice1 === "C49") {
+      const IDsOfTextsWithZeroMistakes = [];
+      const IDsOfTextsWithOneMistake = [];
+      const IDsOfTextsWithTwoMistakes = [];
+      const IDsOfTextsWithThreeMistakes = [];
+
+      controller.currentMistakes.forEach(([id, value]) => {
+          if (value === 0) IDsOfTextsWithZeroMistakes.push(id);
+          else if (value === 1) IDsOfTextsWithOneMistake.push(id);
+          else if (value === 2) IDsOfTextsWithTwoMistakes.push(id);
+          else if (value === 3) IDsOfTextsWithThreeMistakes.push(id);
+      });
+
+      pointsEarned = await calculateTasksPerCorrectAnswerPoints("controller");
+
+      pointsEarned = 
+          (IDsOfTextsWithZeroMistakes.length * pointsEarned * 1)
+        + (IDsOfTextsWithOneMistake.length * pointsEarned * 0.75)
+        + (IDsOfTextsWithTwoMistakes.length * pointsEarned * 0.5)
+        + (IDsOfTextsWithThreeMistakes.length * pointsEarned * 0.25);
+
+    } else {
+      pointsEarned = await calculateTasksPerCorrectAnswerPoints("controller");
+      pointsEarned = pointsEarned * controller.correctAnswersTracker
+    } 
   }
 
   if (coinMultiplier) {
@@ -4017,59 +4047,91 @@ async function calculateTasksPerCorrectAnswerPoints(type, selectedTextInfo = nul
 
         return Number(total.toFixed(2));
 
-    } else if (type === "selectedTexts") {
-        const [taskSettings, textIds] = selectedTextInfo;
+      } else if (type === "selectedTexts") {
+    let taskInfoArray = [];
+    let selectedTextIDs = [];
+    let mistakesMap = new Map();
 
-        const textCompType = taskSettings[2];
+    // Handle both call styles
+    if (Array.isArray(selectedTextInfo.taskSettings[0])) {
+        // Nested array style: [taskSettingsArray, textIDs]
+        taskInfoArray = selectedTextInfo.taskSettings[0];
+        selectedTextIDs = selectedTextInfo.taskSettings[1] ?? [];
+        selectedTextIDs.forEach(id => mistakesMap.set(id, 0));
+    } else {
+        // Flat taskSettings
+        taskInfoArray = selectedTextInfo.taskSettings;
+        if (selectedTextInfo.textMistakes?.length > 0) {
+            // Use provided mistakes
+            selectedTextIDs = selectedTextInfo.textMistakes.map(([id]) => id);
+            mistakesMap = new Map(selectedTextInfo.textMistakes);
+        } else if (selectedTextInfo.textIDs?.length > 0) {
+            // Only IDs provided, assume 0 mistakes
+            selectedTextIDs = selectedTextInfo.textIDs;
+            selectedTextIDs.forEach(id => mistakesMap.set(id, 0));
+        }
+    }
 
-        const response = await fetch("../databases/sudedu_duomenu_baze.json");
-        const textDatabase = await response.json();
+    const textCompType = taskInfoArray[2];
 
-        const textInfoList = buildList(textDatabase, textIds, textCompType);
+    const response = await fetch("../databases/sudedu_duomenu_baze.json");
+    const textDatabase = await response.json();
 
-        let customTextsTotal = 0;
+    const textInfoList = buildList(textDatabase, selectedTextIDs, textCompType);
 
-        for (const info of textInfoList) {
-            let perTextTotal = pointWeights.base?.values[taskInfoTemp.userClass] ?? 1;
+    let customTextsTotal = 0;
 
-            Object.keys(taskInfoTemp).forEach(key => {
-                if (typeof taskInfoTemp[key] === 'boolean') {
-                    taskInfoTemp[key] = false;
-                }
-            });
-            taskInfoTemp["mult-table-selection"] = [];
+    for (const info of textInfoList) {
+        const classCode = info[0];
+        const difficulty = info[1];
+        const textId = info[2];
 
-            let tempController = {};
-            const classChoice = info[0];
-            const difficulty = info[1];
+        let perTextTotal = pointWeights.base?.values[taskInfoTemp.userClass] ?? 1;
 
-            tempController.modeChoice1 = taskSettings[1];
-            tempController.modeChoice2 = taskSettings[2];
-            tempController.modeChoice6 = taskSettings[3];
-            tempController.classChoice = classChoice;
-            tempController.modeChoiceLtDifficulty = difficulty;
+        // Reset boolean tasks
+        Object.keys(taskInfoTemp).forEach(key => {
+            if (typeof taskInfoTemp[key] === "boolean") taskInfoTemp[key] = false;
+        });
 
-            for (let key in tempController) {
-                const val = tempController[key];
-                if (taskInfoTemp.hasOwnProperty(val)) taskInfoTemp[val] = true;
-            }
+        taskInfoTemp["mult-table-selection"] = [];
 
-            taskInfoTemp.C47 = false;
-            taskInfoTemp.C48 = false;
-            taskInfoTemp.remainder = false;
-            taskInfoTemp["mult-table-selection"] = false;
+        // Prepare controller object
+        let tempController = {};
+        tempController.modeChoice1 = taskInfoArray[1];
+        tempController.modeChoice2 = taskInfoArray[2];
+        tempController.modeChoice6 = taskInfoArray[3];
+        tempController.classChoice = classCode;
+        tempController.modeChoiceLtDifficulty = difficulty;
 
-            Object.keys(taskInfoTemp).forEach(task => {
-                if (!taskInfoTemp[task] || skipTasks.includes(task)) return;
-                const weight = getTaskWeight(task);
-                perTextTotal *= weight;
-            });
-            customTextsTotal += perTextTotal
+        for (let key in tempController) {
+            const val = tempController[key];
+            if (taskInfoTemp.hasOwnProperty(val)) taskInfoTemp[val] = true;
         }
 
-        return Number(customTextsTotal.toFixed(2));
+        // Clean up language tasks
+        taskInfoTemp.C47 = false;
+        taskInfoTemp.C48 = false;
+        taskInfoTemp.remainder = false;
 
-    } else {
+        Object.keys(taskInfoTemp).forEach(task => {
+            if (!taskInfoTemp[task] || skipTasks.includes(task)) return;
+            const weight = getTaskWeight(task);
+            perTextTotal *= weight;
+        });
+
+        const mistakes = mistakesMap.get(textId) ?? 0;
+
+        let multiplier =
+            mistakes === 0 ? 1 :
+            mistakes === 1 ? 0.75 :
+            mistakes === 2 ? 0.5 :
+            mistakes === 3 ? 0.25 : 0;
+
+        customTextsTotal += perTextTotal * multiplier;
+    }
+
+    return Number(customTextsTotal.toFixed(2));
+} else {
         const parsedCurrentTaskInstructions = type;
         let tempController = {};
 
@@ -4153,7 +4215,7 @@ async function calculateTasksPerCorrectAnswerPoints(type, selectedTextInfo = nul
             // Validate it's a known difficulty level
             if (!["C58", "C59", "C60"].includes(complexityCode)) continue;
 
-            result.push([classCode, complexityCode]);
+            result.push([classCode, complexityCode, id]);
         }
 
         return result;

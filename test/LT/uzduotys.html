@@ -1407,7 +1407,8 @@ button:disabled.cancel-btn::before {
 #delete-task-button,
 #delete-student-button,
 #browse-task-history-button,
-#frequent-mistakes-btn {
+#frequent-mistakes-btn,
+.teacher-home-button {
   position: relative;
   overflow: visible; /* allow tooltip outside button */
 }
@@ -1416,7 +1417,8 @@ button:disabled.cancel-btn::before {
 #delete-task-button::before,
 #delete-student-button::before,
 #browse-task-history-button::before,
-#frequent-mistakes-btn::before {
+#frequent-mistakes-btn::before,
+.teacher-home-button::before {
   position: absolute;
   top: 110%;        /* above the button */
   left: 50%;
@@ -1435,6 +1437,8 @@ button:disabled.cancel-btn::before {
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
   width: max-content;
   height: max-content;
+  font-weight: normal;
+  text-transform: none;
 }
 
 #new-task-button::before {
@@ -1457,6 +1461,10 @@ button:disabled.cancel-btn::before {
     content: "Paskutinės klaidos";
 }
 
+.teacher-home-button::before {
+    content: "Klasės apžvalga";
+}
+
 
 #new-task-button:hover::before,
 #delete-task-button:hover::before,
@@ -1464,6 +1472,11 @@ button:disabled.cancel-btn::before {
 #browse-task-history-button:hover::before {
   opacity: 1;
   transform: translateX(-50%) translateY(-4px); /* optional slight slide */
+}
+
+.teacher-home-button:hover::before {
+  opacity: 1;
+  transform: translateX(-15%) translateY(10px); /* optional slight slide */
 }
 
 #frequent-mistakes-btn:hover::before {
@@ -1481,7 +1494,8 @@ button:disabled.cancel-btn::before {
   #delete-task-button::before,
   #delete-student-button::before,
   #browse-task-history-button::before,
-  #frequent-mistakes-btn::before {
+  #frequent-mistakes-btn::before,
+  .teacher-home-button:hover::before {
     display: none !important;
   }
 }
@@ -6140,7 +6154,7 @@ function displayTeacherHome(selectedGroupNames=null) {
                 } else if (answeringMode === "C40") {
                     let parsedTaskInfo = JSON.parse(task.taskInstructions)
                     if (parsedTaskInfo[0] === "lang" && parsedTaskInfo[1] === "C49" && parsedTaskInfo[4] === "C84") {
-                        potentialEarnings = await calculateTasksPerCorrectAnswerPoints("selectedTexts", selectedTextInfo=[parsedTaskInfo,numberOfQuestions]);
+                        potentialEarnings = await calculateTasksPerCorrectAnswerPoints("selectedTexts", {taskSettings: [parsedTaskInfo,numberOfQuestions]});
                         if (potentialEarnings) {
                             potentialEarnings = Number(potentialEarnings.toFixed(2))
                         }

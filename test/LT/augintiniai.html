@@ -1507,13 +1507,6 @@
             background: rgba(255, 255, 255, 0.4);
         }
 
-        .pet-preview {
-            position: static;
-            height: 75px;
-            width: 75px;
-            background-size: calc(75px * 16) calc(75px * 26);
-        }
-
         .pet-btn.active {
                 background: linear-gradient(135deg, #3288AC, #286D8A) !important;
         }
@@ -6268,10 +6261,12 @@ function generateWalkabilityMap() {
     // Set directional movement restrictions (with safety checks)
     for (let row = 0; row < roomLayout.length; row++) {
         for (let col = 0; col < roomLayout[0].length; col++) {
+
             if (!map[row][col].walkable) continue;
 
             if (userObjectAssets && gameAssetIndex) {
                 Object.entries(userObjectAssets).forEach(([assetId, asset]) => {
+
                     const assetData = gameAssetIndex[asset.assetIndex];
                     if (!assetData) return;
 
@@ -6281,61 +6276,88 @@ function generateWalkabilityMap() {
 
                     const assetWidth = Math.ceil(element.offsetWidth / unitSize);
                     const assetHeight = Math.ceil(element.offsetHeight / unitSize);
+
                     const topRowOfAsset = assetY - assetHeight + 1;
                     const bottomRowOfAsset = assetY;
                     const rowAboveBottom = bottomRowOfAsset - 1;
-                    const otherThanTopRows = [];
-                    for (let row = topRowOfAsset; row <= bottomRowOfAsset; row++) {
-                        otherThanTopRows.push(row);
-                    }
 
-                    // 🚨 NEW: Special handling for food-bowl items
+                    // --- FOOD-BOWL SPECIAL LOGIC -----------------------------------
                     if (element.className.includes('food-bowl')) {
-                        // Block upward and downward movement on the food-bowl's cells
-                        if (row === bottomRowOfAsset && col >= assetX && col < assetX + assetWidth) {
+
+                        // Block movement on the bowl tile itself
+                        if (
+                            row === bottomRowOfAsset &&
+                            col >= assetX &&
+                            col < assetX + assetWidth
+                        ) {
                             map[row][col].allowedDirections[2] = false; // down
                         }
-                        // Block upward movement on cells one row below the food-bowl
-                        if (row === bottomRowOfAsset + 1 && col >= assetX && col < assetX + assetWidth) {
+
+                        // Block movement on tile beneath the bowl
+                        if (
+                            row === bottomRowOfAsset + 1 &&
+                            col >= assetX &&
+                            col < assetX + assetWidth
+                        ) {
                             map[row][col].allowedDirections[0] = false; // up
                         }
                     }
 
-                    // Only consider passable === false for movement restrictions
+                    // --- STANDARD NON-PASSABLE LOGIC -------------------------------
                     if (assetData.passable === false) {
+
                         if (assetHeight === 1 || assetHeight === 2) {
-                            // Case 3: up to double-tile height asset - block movement on the asset tile itself
-                            if (row === bottomRowOfAsset && col >= assetX && col < assetX + assetWidth) {
+                            // Block both up & down on bottom tile
+                            if (
+                                row === bottomRowOfAsset &&
+                                col >= assetX &&
+                                col < assetX + assetWidth
+                            ) {
                                 map[row][col].allowedDirections[0] = false; // up
                                 map[row][col].allowedDirections[2] = false; // down
                             }
                         } else {
-                            // Cases 1 & 2: multi-height assets
-                            // Case 1: current tile is bottom row of the asset
-                            if (row === bottomRowOfAsset && col >= assetX && col < assetX + assetWidth) {
+                            // Block up on bottom tile
+                            if (
+                                row === bottomRowOfAsset &&
+                                col >= assetX &&
+                                col < assetX + assetWidth
+                            ) {
                                 map[row][col].allowedDirections[0] = false; // up
                             }
-                            // Case 2: current tile is directly above bottom row of asset
-                            if (row === rowAboveBottom && col >= assetX && col < assetX + assetWidth) {
+
+                            // Block down on tile above bottom
+                            if (
+                                row === rowAboveBottom &&
+                                col >= assetX &&
+                                col < assetX + assetWidth
+                            ) {
                                 map[row][col].allowedDirections[2] = false; // down
                             }
                         }
                     }
 
+                    // --- NON-STEPPABLE ASSET LOGIC ---------------------------------
                     if (!assetData.steppable) {
-                        for (let row = topRowOfAsset; row <= bottomRowOfAsset; row++) {
-                            for (let col = assetX; col < assetX + assetWidth; col++) {
-                                if (row === topRowOfAsset) {
-                                    // Top row logic: only block down (direction 2)
-                                    map[row][col].allowedDirections[2] = false;
+
+                        for (let r = topRowOfAsset; r <= bottomRowOfAsset; r++) {
+                            if (!map[r]) continue;
+
+                            for (let c = assetX; c < assetX + assetWidth; c++) {
+                                if (!map[r][c]) continue;
+
+                                if (r === topRowOfAsset) {
+                                    // Top row: block only downward
+                                    map[r][c].allowedDirections[2] = false;
                                 } else {
-                                    // All other rows of the asset: block all directions
-                                    map[row][col].walkable = false;
+                                    // Other rows: cannot stand or walk here
+                                    map[r][c].walkable = false;
                                 }
                             }
                         }
                     }
-                });
+
+                }); // end forEach
             }
         }
     }
@@ -8972,7 +8994,6 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
             let tempDivId = renderSingleRoomObject(key);
 
             userObjectAssets[tempDivId].position = getObjectCoordinates(tempDivId);
-
 
             if (!sidebar) {
                 document.querySelectorAll('.game-content-panel').forEach(p => p.classList.remove('active'));
