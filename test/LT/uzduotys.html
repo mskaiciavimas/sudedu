@@ -4200,6 +4200,13 @@ button:disabled.cancel-btn::before {
 
         const frequentMistakeContainerElement = document.getElementById("frequent-mistakes-container");
 
+        // Add after your existing script tags
+document.addEventListener('click', function(e) {
+    console.log('Clicked element:', e.target);
+    console.log('Pointer events:', window.getComputedStyle(e.target).pointerEvents);
+    console.log('User select:', window.getComputedStyle(e.target).userSelect);
+}, true);
+
         enableTeacherControlPannel();
         enableNewTaskContainer();
         document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
