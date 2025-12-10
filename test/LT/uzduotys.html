@@ -58,6 +58,15 @@
             overflow: hidden;
         }
 
+        .teacher-action-btn svg,
+        .teacher-action-btn svg *,
+        .student-action-btn svg,
+        .student-action-btn svg *,
+        .btn-label svg,
+        .btn-label svg * {
+            pointer-events: none;
+        }
+
         /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: 12px;
@@ -4200,11 +4209,13 @@ button:disabled.cancel-btn::before {
 
         const frequentMistakeContainerElement = document.getElementById("frequent-mistakes-container");
 
-        // Add after your existing script tags
-document.addEventListener('click', function(e) {
+        document.addEventListener('click', function(e) {
     console.log('Clicked element:', e.target);
+    console.log('Current target:', e.currentTarget);
+    console.log('Event phase:', e.eventPhase);
     console.log('Pointer events:', window.getComputedStyle(e.target).pointerEvents);
     console.log('User select:', window.getComputedStyle(e.target).userSelect);
+    console.log('---');
 }, true);
 
         enableTeacherControlPannel();
@@ -8437,21 +8448,34 @@ function enableConfirmationButtons() {
 
 // Set up button click handlers
 document.addEventListener('DOMContentLoaded', () => {
-    // Action buttons
-    document.getElementById('new-task-button').addEventListener('click', () => {
-        showConfirmationButtons('new-task');
+    // Action buttons - use closest() to handle clicks on SVG children
+    document.getElementById('new-task-button').addEventListener('click', (e) => {
+        // This ensures the handler runs even if SVG is clicked
+        const button = e.target.closest('#new-task-button');
+        if (button) {
+            showConfirmationButtons('new-task');
+        }
     });
     
-    document.getElementById('delete-task-button').addEventListener('click', () => {
-        showConfirmationButtons('delete-task');
+    document.getElementById('delete-task-button').addEventListener('click', (e) => {
+        const button = e.target.closest('#delete-task-button');
+        if (button) {
+            showConfirmationButtons('delete-task');
+        }
     });
     
-    document.getElementById('delete-student-button').addEventListener('click', () => {
-        showConfirmationButtons('delete-student');
+    document.getElementById('delete-student-button').addEventListener('click', (e) => {
+        const button = e.target.closest('#delete-student-button');
+        if (button) {
+            showConfirmationButtons('delete-student');
+        }
     });
 
-     document.getElementById('browse-task-history-button').addEventListener('click', () => {
-        showConfirmationButtons('browse-history');
+    document.getElementById('browse-task-history-button').addEventListener('click', (e) => {
+        const button = e.target.closest('#browse-task-history-button');
+        if (button) {
+            showConfirmationButtons('browse-history');
+        }
     });
     
     // Confirmation buttons
