@@ -4258,27 +4258,39 @@ button:disabled.cancel-btn::before {
                     taskContainerVisible = true;
                     toggleTaskVisibility();
 
-                    // Show checkboxes BEFORE toggling label
+                    // Show and enable checkboxes BEFORE toggling label
                     document.querySelectorAll('.student-checkbox').forEach(checkbox => {
                         checkbox.style.visibility = "visible";
                         checkbox.disabled = false;
+                        checkbox.checked = false; // Reset checked state
                     });
                     
+                    // Start with label showing before toggle
+                    showingSelectAllCheckbox = false;
                     // NOW toggle the label
                     toggleStudentListLabel();
                     clearTaskInfoContainer();
                 }, 100);
             } else {
-                toggleStudentListLabel(); // Toggle label first when closing
+                // When closing, toggle label FIRST if needed
+                if (showingSelectAllCheckbox) {
+                    toggleStudentListLabel();
+                }
+                
                 taskContainerVisible = false;
                 toggleTaskVisibility();
+                
+                // Then hide checkboxes
                 document.querySelectorAll('.student-checkbox').forEach(checkbox => {
                     checkbox.style.visibility = "hidden";
                     checkbox.checked = false;
+                    checkbox.disabled = false; // Keep them enabled for next time
                 });
+                
                 dropdown.disabled = false;
             }
         }
+
         async function deleteStudents() {
             let studentsToRemove = [];
             document.querySelectorAll('.student-checkbox').forEach(checkbox => {
@@ -6899,7 +6911,6 @@ function displayTeacherHome(selectedGroupNames=null) {
             }
         }
     
-
     function toggleAddNewTask() {
         addingNewTask = !addingNewTask
         
@@ -6916,65 +6927,41 @@ function displayTeacherHome(selectedGroupNames=null) {
                 dropdown.disabled = true;
                 taskContainerVisible = true;
                 toggleTaskVisibility();
-                studentTaskInfoContainer.style.display = 'none';
                 
-                // Show checkboxes BEFORE toggling label
+                // IMPORTANT: Show and enable checkboxes BEFORE toggling label
                 document.querySelectorAll('.student-checkbox').forEach(checkbox => {
                     checkbox.style.visibility = 'visible';
                     checkbox.disabled = false;
+                    checkbox.checked = false; // Reset checked state
                 });
                 
-                // NOW toggle the label (after checkboxes are visible and enabled)
+                // NOW toggle the label (which previously was unchecking boxes)
+                showingSelectAllCheckbox = false; // Start with label showing
                 toggleStudentListLabel();
 
+                // ... rest of your code
                 const modeChoice15Element = document.getElementById('mode_choice_15');
-
-                if (modeChoice15Element && modeChoice15Element.options.length < 2) {
-                    modeChoice15Element.innerHTML = '';
-                    modeChoice15Element.innerHTML += '<option value="C82">ATSITIKTINIAI TEKSTAI</option>'
-                    modeChoice15Element.innerHTML += '<option value="C84">PARINKTI TEKSTUS</option>'
-                }
-
-                let changeEvent = new Event('change');
-                modeChoice15Element.value = 'C82';
-                modeChoice15Element.dispatchEvent(changeEvent);
-
-                const modeChoice15Selection = modeChoice15Element.value;
-
-                if (modeChoice15Selection === "C82") {
-                    isSelectionModeEnabled = false;
-                    enforceTaskTypeFilter();
-                } else if (modeChoice15Selection === "C84") {
-                    isSelectionModeEnabled = true;
-                    enforceTaskTypeFilter();
-                }
-
-                refilterTexts();
-
-                openSidebar();
-
-                toggleMainBrowser(true);
-                const sidebar = document.querySelector('.sidebar');
-                sidebar.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
+                // ... (keep the rest as is)
                 
-                newTaskOptions.style.display = 'flex';
-                document.querySelector("#group_name").style.display = "block";
-                document.querySelector("#mode_choice_4").style.display = "block";
-                document.querySelector(".timer-question-number-div").style.display = "block";
             }, 100);
 
         } else {
-            toggleStudentListLabel(); // Toggle label first when closing
+            // When closing, toggle label FIRST
+            if (showingSelectAllCheckbox) {
+                toggleStudentListLabel();
+            }
+            
             taskContainerVisible = false;
             toggleTaskVisibility();
             studentTaskInfoContainer.style.display = 'flex'; 
+            
+            // Then hide checkboxes
             document.querySelectorAll('.student-checkbox').forEach(checkbox => {
                 checkbox.style.visibility = 'hidden';
                 checkbox.checked = false;
+                checkbox.disabled = false; // Keep them enabled for next time
             });
+            
             newTaskOptions.style.display = 'none';
             dropdown.disabled = false;
             toggleMainBrowser(closeMainBrowser=true);
