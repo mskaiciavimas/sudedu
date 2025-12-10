@@ -4200,335 +4200,6 @@ button:disabled.cancel-btn::before {
 
         const frequentMistakeContainerElement = document.getElementById("frequent-mistakes-container");
 
-        // ============================================
-// COMPREHENSIVE DEBUGGING CODE - ADD THIS FIRST
-// ============================================
-
-// Track script execution
-console.log('%c=== SCRIPT LOADING ===', 'color: blue; font-weight: bold; font-size: 16px');
-console.log('Script execution time:', new Date().toISOString());
-console.log('Page URL:', window.location.href);
-
-// Track if script has run before
-if (window.debugScriptLoaded) {
-    console.error('%c⚠️ SCRIPT LOADED MULTIPLE TIMES!', 'color: red; font-weight: bold; font-size: 16px');
-    console.trace('Script duplicate load trace');
-} else {
-    window.debugScriptLoaded = true;
-    console.log('%c✓ First script load', 'color: green');
-}
-
-// Monitor all click events globally
-let clickCounter = 0;
-document.addEventListener('click', function(e) {
-    clickCounter++;
-    console.log(`%c--- CLICK #${clickCounter} ---`, 'color: purple; font-weight: bold');
-    console.log('Clicked element:', e.target);
-    console.log('Element tag:', e.target.tagName);
-    console.log('Element id:', e.target.id);
-    console.log('Element classes:', e.target.className);
-    console.log('Current target:', e.currentTarget);
-    console.log('Event phase:', e.eventPhase, '(1=capture, 2=target, 3=bubble)');
-    console.log('Pointer events:', window.getComputedStyle(e.target).pointerEvents);
-    console.log('User select:', window.getComputedStyle(e.target).userSelect);
-    console.log('Visibility:', window.getComputedStyle(e.target).visibility);
-    console.log('Display:', window.getComputedStyle(e.target).display);
-    console.log('Position:', window.getComputedStyle(e.target).position);
-    console.log('Z-index:', window.getComputedStyle(e.target).zIndex);
-    
-    // Check if click target is inside a button
-    const closestButton = e.target.closest('button');
-    if (closestButton) {
-        console.log('Inside button:', closestButton.id, closestButton.className);
-    }
-    
-    console.log('---');
-}, true); // Capture phase
-
-// Monitor page reloads
-window.addEventListener('beforeunload', (e) => {
-    console.error('%c⚠️ PAGE RELOADING!', 'color: red; font-weight: bold; font-size: 16px');
-    console.trace('Reload triggered by');
-});
-
-// Monitor state changes
-let stateChangeCounter = 0;
-function logStateChange(functionName, stateBefore, stateAfter) {
-    stateChangeCounter++;
-    console.log(`%c>>> STATE CHANGE #${stateChangeCounter}: ${functionName}`, 'color: orange; font-weight: bold');
-    console.log('Before:', stateBefore);
-    console.log('After:', stateAfter);
-    console.trace('State change trace');
-}
-
-// Monitor DOM changes
-const domObserver = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-            mutation.addedNodes.forEach(node => {
-                if (node.nodeType === 1) { // Element node
-                    console.log('%cDOM Added:', 'color: green', node);
-                }
-            });
-        }
-        if (mutation.type === 'childList' && mutation.removedNodes.length > 0) {
-            mutation.removedNodes.forEach(node => {
-                if (node.nodeType === 1) {
-                    console.log('%cDOM Removed:', 'color: red', node);
-                }
-            });
-        }
-        if (mutation.type === 'attributes') {
-            console.log('%cAttribute changed:', 'color: blue', mutation.target, mutation.attributeName);
-        }
-    });
-});
-
-// Start observing after DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('%c=== DOM READY - Starting observation ===', 'color: blue; font-weight: bold; font-size: 16px');
-    
-    domObserver.observe(document.body, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['style', 'class', 'disabled', 'checked']
-    });
-}, { once: true });
-
-// Monitor visibility changes
-document.addEventListener('visibilitychange', () => {
-    console.log('%cVisibility changed:', 'color: purple', document.hidden ? 'HIDDEN' : 'VISIBLE');
-});
-
-// Monitor all animations/transitions
-document.addEventListener('animationstart', (e) => {
-    console.log('%cAnimation started:', 'color: cyan', e.target, e.animationName);
-});
-
-document.addEventListener('transitionstart', (e) => {
-    console.log('%cTransition started:', 'color: cyan', e.target, e.propertyName);
-});
-
-// ============================================
-// WRAP YOUR EXISTING FUNCTIONS WITH LOGGING
-// ============================================
-
-// Store original functions
-const originalToggleAddNewTask = toggleAddNewTask;
-const originalShowConfirmationButtons = showConfirmationButtons;
-const originalHideConfirmationButtons = hideConfirmationButtons;
-const originalToggleDeleteTask = toggleDeleteTask;
-const originalToggleDeleteStudent = toggleDeleteStudent;
-const originalToggleBrowseHistory = toggleBrowseHistory;
-const originalToggleStudentListLabel = toggleStudentListLabel;
-
-// Override with logged versions - ADD THIS AFTER YOUR FUNCTIONS ARE DEFINED
-window.addEventListener('load', () => {
-    console.log('%c=== WRAPPING FUNCTIONS WITH LOGGING ===', 'color: green; font-weight: bold');
-    
-    if (typeof toggleAddNewTask !== 'undefined') {
-        window.toggleAddNewTask = function() {
-            const stateBefore = {
-                addingNewTask: addingNewTask,
-                currentAction: currentAction,
-                showingSelectAllCheckbox: showingSelectAllCheckbox
-            };
-            console.log('%c>>> toggleAddNewTask() CALLED', 'color: orange; font-weight: bold');
-            console.log('State before:', stateBefore);
-            
-            const result = originalToggleAddNewTask.apply(this, arguments);
-            
-            const stateAfter = {
-                addingNewTask: addingNewTask,
-                currentAction: currentAction,
-                showingSelectAllCheckbox: showingSelectAllCheckbox
-            };
-            console.log('State after:', stateAfter);
-            console.trace('Call stack');
-            
-            return result;
-        };
-    }
-    
-    if (typeof showConfirmationButtons !== 'undefined') {
-        window.showConfirmationButtons = function(action) {
-            console.log('%c>>> showConfirmationButtons() CALLED', 'color: orange; font-weight: bold');
-            console.log('Action:', action);
-            console.log('Current action before:', currentAction);
-            console.trace('Call stack');
-            
-            const result = originalShowConfirmationButtons.apply(this, arguments);
-            
-            console.log('Current action after:', currentAction);
-            return result;
-        };
-    }
-    
-    if (typeof hideConfirmationButtons !== 'undefined') {
-        window.hideConfirmationButtons = function() {
-            console.log('%c>>> hideConfirmationButtons() CALLED', 'color: orange; font-weight: bold');
-            console.trace('Call stack');
-            return originalHideConfirmationButtons.apply(this, arguments);
-        };
-    }
-});
-
-// ============================================
-// MONITOR SPECIFIC ELEMENTS
-// ============================================
-
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('%c=== MONITORING SPECIFIC ELEMENTS ===', 'color: blue; font-weight: bold');
-    
-    // Monitor action buttons container
-    const actionContainer = document.getElementById('action-buttons-container');
-    if (actionContainer) {
-        console.log('Action buttons container found:', actionContainer);
-        console.log('Initial display:', window.getComputedStyle(actionContainer).display);
-        
-        const actionObserver = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.attributeName === 'style') {
-                    console.log('%cAction buttons style changed!', 'color: red; font-weight: bold');
-                    console.log('New display:', window.getComputedStyle(actionContainer).display);
-                    console.trace('Style change trace');
-                }
-            });
-        });
-        
-        actionObserver.observe(actionContainer, { attributes: true });
-    }
-    
-    // Monitor confirmation buttons container
-    const confirmContainer = document.getElementById('confirmation-buttons-container');
-    if (confirmContainer) {
-        console.log('Confirmation buttons container found:', confirmContainer);
-        console.log('Initial display:', window.getComputedStyle(confirmContainer).display);
-        
-        const confirmObserver = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.attributeName === 'style') {
-                    console.log('%cConfirmation buttons style changed!', 'color: red; font-weight: bold');
-                    console.log('New display:', window.getComputedStyle(confirmContainer).display);
-                    console.trace('Style change trace');
-                }
-            });
-        });
-        
-        confirmObserver.observe(confirmContainer, { attributes: true });
-    }
-    
-    // Monitor all checkboxes
-    const checkboxes = document.querySelectorAll('.student-checkbox');
-    console.log('Found checkboxes:', checkboxes.length);
-    
-    checkboxes.forEach((checkbox, index) => {
-        console.log(`Checkbox #${index}:`, checkbox.id, 'checked:', checkbox.checked);
-        
-        checkbox.addEventListener('change', (e) => {
-            console.log('%cCheckbox changed!', 'color: green; font-weight: bold');
-            console.log('Checkbox:', e.target.id);
-            console.log('Checked:', e.target.checked);
-            console.trace('Change event trace');
-        });
-        
-        // Monitor attribute changes
-        const checkboxObserver = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                console.log('%cCheckbox attribute changed:', 'color: yellow', mutation.target.id, mutation.attributeName);
-                if (mutation.attributeName === 'checked') {
-                    console.log('New checked state:', mutation.target.checked);
-                }
-            });
-        });
-        
-        checkboxObserver.observe(checkbox, { attributes: true });
-    });
-});
-
-// ============================================
-// CHECK FOR MULTIPLE EVENT LISTENERS
-// ============================================
-
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('%c=== CHECKING EVENT LISTENERS ===', 'color: blue; font-weight: bold');
-    
-    const buttons = [
-        'new-task-button',
-        'delete-task-button', 
-        'delete-student-button',
-        'browse-task-history-button',
-        'confirm-button',
-        'cancel-button'
-    ];
-    
-    buttons.forEach(buttonId => {
-        const button = document.getElementById(buttonId);
-        if (button) {
-            console.log(`Button: ${buttonId}`);
-            
-            // Try to detect existing listeners (Chrome DevTools)
-            if (typeof getEventListeners !== 'undefined') {
-                const listeners = getEventListeners(button);
-                console.log('Event listeners:', listeners);
-            } else {
-                console.log('(getEventListeners not available - use Chrome DevTools)');
-            }
-        }
-    });
-}, { once: true });
-
-// ============================================
-// PERFORMANCE MONITORING
-// ============================================
-
-let lastClickTime = 0;
-document.addEventListener('click', () => {
-    const now = performance.now();
-    const timeSinceLastClick = now - lastClickTime;
-    
-    if (timeSinceLastClick < 100) {
-        console.warn('%c⚠️ RAPID CLICKS DETECTED!', 'color: red; font-weight: bold');
-        console.warn('Time since last click:', timeSinceLastClick, 'ms');
-    }
-    
-    lastClickTime = now;
-}, true);
-
-// ============================================
-// ENVIRONMENT INFO
-// ============================================
-
-console.log('%c=== ENVIRONMENT INFO ===', 'color: blue; font-weight: bold');
-console.log('User Agent:', navigator.userAgent);
-console.log('Platform:', navigator.platform);
-console.log('Screen size:', window.screen.width, 'x', window.screen.height);
-console.log('Window size:', window.innerWidth, 'x', window.innerHeight);
-console.log('Device pixel ratio:', window.devicePixelRatio);
-console.log('Touch support:', 'ontouchstart' in window);
-console.log('Protocol:', window.location.protocol);
-console.log('Host:', window.location.host);
-
-// ============================================
-// ERROR MONITORING
-// ============================================
-
-window.addEventListener('error', (e) => {
-    console.error('%c⚠️ JAVASCRIPT ERROR!', 'color: red; font-weight: bold; font-size: 16px');
-    console.error('Message:', e.message);
-    console.error('Source:', e.filename);
-    console.error('Line:', e.lineno, 'Column:', e.colno);
-    console.error('Error object:', e.error);
-});
-
-window.addEventListener('unhandledrejection', (e) => {
-    console.error('%c⚠️ UNHANDLED PROMISE REJECTION!', 'color: red; font-weight: bold; font-size: 16px');
-    console.error('Reason:', e.reason);
-});
-
-console.log('%c=== DEBUGGING CODE LOADED ===', 'color: green; font-weight: bold; font-size: 16px');
-
         enableTeacherControlPannel();
         enableNewTaskContainer();
         document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
@@ -6743,6 +6414,21 @@ function displayTeacherHome(selectedGroupNames=null) {
             updateTaskGroupCount();
         }
 
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Then wrap displayTeacherHome
+        const debouncedDisplayTeacherHome = debounce(displayTeacherHome, 50);
+
 
         function handleTaskGroupChange() {
             const menu = document.getElementById("task-group-menu");
@@ -6783,7 +6469,7 @@ function displayTeacherHome(selectedGroupNames=null) {
                 
                 renderDataForTeachers(filteredStudents);
                 
-                displayTeacherHome(selectedGroups);
+                debouncedDisplayTeacherHome(selectedGroups);
             });
         }
 
