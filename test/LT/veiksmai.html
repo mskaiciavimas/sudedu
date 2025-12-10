@@ -1126,6 +1126,8 @@
 				container = document.querySelector('#division-stulp-2-outer');
 			}
 
+			// Replace your textarea event listeners with this code:
+
 			if (answerInputs) {
 				answerInputs.forEach(textarea => {
 					if (controller.randomSelection[2] === 'M') {
@@ -1133,17 +1135,47 @@
 					} else if (controller.randomSelection[2] === 'D') {
 						container = document.querySelector('#division-stulp-2-outer');
 					} else {
-						return
+						return;
 					}
 
-					textarea.addEventListener('click', () => {
-						focusWithKeyboardAdjustment(textarea, container);
-					});
+					// Track touch movement to distinguish tap from scroll
+					let touchStartY = 0;
+					let touchStartX = 0;
+					let isTouchMove = false;
 
 					textarea.addEventListener('touchstart', (e) => {
-						e.preventDefault();
-						focusWithKeyboardAdjustment(textarea, container);
-					}, { passive: false });
+						touchStartY = e.touches[0].clientY;
+						touchStartX = e.touches[0].clientX;
+						isTouchMove = false;
+					}, { passive: true }); // Changed to passive: true
+
+					textarea.addEventListener('touchmove', (e) => {
+						const touchY = e.touches[0].clientY;
+						const touchX = e.touches[0].clientX;
+						const deltaY = Math.abs(touchY - touchStartY);
+						const deltaX = Math.abs(touchX - touchStartX);
+						
+						// If moved more than 10px, consider it a scroll gesture
+						if (deltaY > 10 || deltaX > 10) {
+							isTouchMove = true;
+						}
+					}, { passive: true });
+
+					textarea.addEventListener('touchend', (e) => {
+						// Only focus if it was a tap, not a scroll
+						if (!isTouchMove) {
+							e.preventDefault();
+							focusWithKeyboardAdjustment(textarea, container);
+						}
+					}, { passive: false }); // passive: false only on touchend
+
+					// Keep click event for non-touch devices
+					textarea.addEventListener('click', (e) => {
+						// Only handle if not triggered by touch
+						if (e.detail !== 0) { // detail is 0 for programmatic clicks
+							focusWithKeyboardAdjustment(textarea, container);
+						}
+					});
 				});
 			}
 		} else {

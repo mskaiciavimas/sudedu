@@ -1119,8 +1119,8 @@
             background: linear-gradient(135deg, #40c9a9, #32ac93);
             color: #F5F5F7;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 25px;
+            height: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -7383,6 +7383,7 @@ navButtons.forEach((button) => {
         if (button.id !== "pet-room-button") {
             selectedConsumable = [];
             clearPlacementHighlights();
+            clearSpecificPlacementHighlights();
         }
 
         // Trigger rendering depending on the panel
@@ -9565,11 +9566,35 @@ function highlightSpecificObjects(objects) {
         const occupiedTiles = getTilesOccupiedByObject(coords, objectWidth, objectHeight)
           
         for (let i = 0; i < occupiedTiles.length; i++) {
-            createPlacementHighlight(occupiedTiles[i][0], occupiedTiles[i][1], true)
+            createSpecificPlacementHighlight(occupiedTiles[i][0], occupiedTiles[i][1], true)
         }  
     });
     
     messageToTheUser(`Pasirink maisto dubenėlį.`, false)
+}
+
+// Function to create individual highlight overlay
+function createSpecificPlacementHighlight(col, row, isValid) {
+    const highlight = document.createElement('div');
+    highlight.className = `placement-highlight ${isValid ? 'valid' : 'invalid'}`;
+    highlight.style.cssText = `
+        position: absolute;
+        left: calc(${col} * var(--unit-size));
+        top: calc(${row} * var(--unit-size));
+        width: var(--unit-size);
+        height: var(--unit-size);
+        background-color: ${isValid ? 'rgba(0, 255, 0, 0.15)' : 'rgba(255, 0, 0, 0.15)'};
+        pointer-events: none;
+        z-index: 1000;
+    `;
+    
+    document.getElementById('room-container').appendChild(highlight);
+}
+
+function clearSpecificPlacementHighlights() {
+    document.querySelectorAll('.placement-highlight').forEach(highlight => {
+        highlight.remove();
+    });
 }
 
 function getTilesOccupiedByObject(bottomLeft, width, height) {
@@ -10321,6 +10346,7 @@ function displayFoodOptions(obj) {
         }
 
         clearPlacementHighlights();
+        clearSpecificPlacementHighlights();
 
         obj.classList.add("full");
         obj._foodContent = [selectedFoodInfo["provides"], selectedConsumable[1]];
@@ -10335,6 +10361,7 @@ function displayFoodOptions(obj) {
         }
         selectedConsumable = [];
         clearPlacementHighlights();
+        clearSpecificPlacementHighlights();
         sendPetAssetsUpdateToDatabase();
     } else {
         selectedConsumable = [];

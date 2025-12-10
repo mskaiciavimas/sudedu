@@ -1408,7 +1408,8 @@ button:disabled.cancel-btn::before {
 #delete-student-button,
 #browse-task-history-button,
 #frequent-mistakes-btn,
-.teacher-home-button {
+.teacher-home-button,
+.edit-name-button {
   position: relative;
   overflow: visible; /* allow tooltip outside button */
 }
@@ -1418,7 +1419,8 @@ button:disabled.cancel-btn::before {
 #delete-student-button::before,
 #browse-task-history-button::before,
 #frequent-mistakes-btn::before,
-.teacher-home-button::before {
+.teacher-home-button::before,
+.edit-name-button::before {
   position: absolute;
   top: 110%;        /* above the button */
   left: 50%;
@@ -1465,11 +1467,16 @@ button:disabled.cancel-btn::before {
     content: "Klasės apžvalga";
 }
 
+.edit-name-button::before {
+    content: "Keisti vardą";
+}
+
 
 #new-task-button:hover::before,
 #delete-task-button:hover::before,
 #delete-student-button:hover::before,
-#browse-task-history-button:hover::before {
+#browse-task-history-button:hover::before,
+.edit-name-button:hover::before {
   opacity: 1;
   transform: translateX(-50%) translateY(-4px); /* optional slight slide */
 }
@@ -1495,7 +1502,8 @@ button:disabled.cancel-btn::before {
   #delete-student-button::before,
   #browse-task-history-button::before,
   #frequent-mistakes-btn::before,
-  .teacher-home-button:hover::before {
+  .teacher-home-button:hover::before,
+  .edit-name-button:hover::before {
     display: none !important;
   }
 }
@@ -4198,14 +4206,29 @@ button:disabled.cancel-btn::before {
 
         function toggleStudentListLabel() {
             showingSelectAllCheckbox = !showingSelectAllCheckbox
-            if (showingSelectAllCheckbox && ! browsingHistory) {
+            if (showingSelectAllCheckbox && !browsingHistory) {
                 studentListTitle.style.display = "none"
                 studentListSelectAllCheckbox.style.display = "flex"
-                selectAllCheckbox.checked = false
+                // DON'T trigger change event when programmatically setting checked state
+                const selectAllCheckbox = document.getElementById('select-all-checkbox');
+                selectAllCheckbox.checked = false;
+                // Manually sync individual checkboxes without triggering events
+                const checkboxes = document.querySelectorAll('#student-list input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    if (getComputedStyle(checkbox).visibility !== 'hidden') {
+                        checkbox.checked = false;
+                    }
+                });
             } else {
                 studentListTitle.style.display = "flex"
                 studentListSelectAllCheckbox.style.display = "none"
-                selectAllCheckbox.checked = false
+                const selectAllCheckbox = document.getElementById('select-all-checkbox');
+                selectAllCheckbox.checked = false;
+                // Manually uncheck without triggering events
+                const checkboxes = document.querySelectorAll('#student-list input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
             }
         }
 
