@@ -4247,9 +4247,6 @@ button:disabled.cancel-btn::before {
             const dropdown = document.getElementById("task-group-sorting");
             const menu = document.getElementById("task-group-menu");
             
-            toggleStudentListLabel();
-            clearTaskInfoContainer();
-            
             if (deletingStudent) {
                 // First: select all groups and trigger filtering
                 restoreAllIfNoneSelected(true);
@@ -4261,12 +4258,18 @@ button:disabled.cancel-btn::before {
                     taskContainerVisible = true;
                     toggleTaskVisibility();
 
+                    // Show checkboxes BEFORE toggling label
                     document.querySelectorAll('.student-checkbox').forEach(checkbox => {
                         checkbox.style.visibility = "visible";
                         checkbox.disabled = false;
                     });
+                    
+                    // NOW toggle the label
+                    toggleStudentListLabel();
+                    clearTaskInfoContainer();
                 }, 100);
             } else {
+                toggleStudentListLabel(); // Toggle label first when closing
                 taskContainerVisible = false;
                 toggleTaskVisibility();
                 document.querySelectorAll('.student-checkbox').forEach(checkbox => {
@@ -4276,7 +4279,6 @@ button:disabled.cancel-btn::before {
                 dropdown.disabled = false;
             }
         }
-
         async function deleteStudents() {
             let studentsToRemove = [];
             document.querySelectorAll('.student-checkbox').forEach(checkbox => {
@@ -6900,7 +6902,7 @@ function displayTeacherHome(selectedGroupNames=null) {
 
     function toggleAddNewTask() {
         addingNewTask = !addingNewTask
-        toggleStudentListLabel();
+        
         const dropdown = document.getElementById("task-group-sorting");
         const menu = document.getElementById("task-group-menu");
         
@@ -6916,9 +6918,14 @@ function displayTeacherHome(selectedGroupNames=null) {
                 toggleTaskVisibility();
                 studentTaskInfoContainer.style.display = 'none';
                 
+                // Show checkboxes BEFORE toggling label
                 document.querySelectorAll('.student-checkbox').forEach(checkbox => {
                     checkbox.style.visibility = 'visible';
+                    checkbox.disabled = false;
                 });
+                
+                // NOW toggle the label (after checkboxes are visible and enabled)
+                toggleStudentListLabel();
 
                 const modeChoice15Element = document.getElementById('mode_choice_15');
 
@@ -6936,10 +6943,10 @@ function displayTeacherHome(selectedGroupNames=null) {
 
                 if (modeChoice15Selection === "C82") {
                     isSelectionModeEnabled = false;
-                    enforceTaskTypeFilter(); // Restore normal checkboxes
+                    enforceTaskTypeFilter();
                 } else if (modeChoice15Selection === "C84") {
                     isSelectionModeEnabled = true;
-                    enforceTaskTypeFilter(); // Enforce task type filter
+                    enforceTaskTypeFilter();
                 }
 
                 refilterTexts();
@@ -6960,6 +6967,7 @@ function displayTeacherHome(selectedGroupNames=null) {
             }, 100);
 
         } else {
+            toggleStudentListLabel(); // Toggle label first when closing
             taskContainerVisible = false;
             toggleTaskVisibility();
             studentTaskInfoContainer.style.display = 'flex'; 
@@ -6971,7 +6979,7 @@ function displayTeacherHome(selectedGroupNames=null) {
             dropdown.disabled = false;
             toggleMainBrowser(closeMainBrowser=true);
             isSelectionModeEnabled = false;
-            enforceTaskTypeFilter(); // ADD THIS LINE - restores normal behavior
+            enforceTaskTypeFilter();
             refilterTexts();
         }
     }
