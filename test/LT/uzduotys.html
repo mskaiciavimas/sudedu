@@ -4200,32 +4200,6 @@ button:disabled.cancel-btn::before {
 
         const frequentMistakeContainerElement = document.getElementById("frequent-mistakes-container");
 
-        // Emergency reload prevention
-        window.addEventListener('beforeunload', function(e) {
-            console.log('Page trying to reload/navigate');
-            // Remove this after debugging to see when reloads happen
-        });
-
-        // Prevent all form submissions globally
-        document.addEventListener('DOMContentLoaded', function() {
-            document.addEventListener('submit', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Prevented form submit');
-                return false;
-            }, true); // Use capture phase
-            
-            // Prevent Enter key submissions in inputs
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type !== 'checkbox') {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Prevented Enter in input');
-                    return false;
-                }
-            }, true);
-        });
-
         enableTeacherControlPannel();
         enableNewTaskContainer();
         document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
