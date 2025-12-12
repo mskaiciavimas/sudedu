@@ -3394,6 +3394,7 @@ async function recordTaskToLongTerm() {
   }
 
   const recordsList = await controllerToTask();
+  console.log(recordsList)
 
   try {
     const response = await apiFetch(apiBase + 'students/long-term', {
@@ -3817,12 +3818,12 @@ const objectPopupClose = objectPopup.querySelector(".object-popup-close");
 
 const infoMessages = {
   "coin-amount-custom-timer": {
-    "content": "Pasirinkę šią užduotį, uždirbsite nurodytą kiekį „sudedu“ pinigų už kiekvieną iš pirmo karto teisingai atsakytą klausimą.",
+    "content": `Pasirinkę šią užduotį, uždirbsite nurodytą kiekį „SUDEDU“ monetų už kiekvieną iš pirmo karto teisingai atsakytą klausimą (plačiau <a href="apie.html#sudedu-monetos">čia</a>).`,
     "title": "Uždarbis",
     "subtitle": ""
   },
   "coin-amount-custom-question-number": {
-    "content": "Pasirinkę šią užduotį, galite uždirbti iki nurodyto kiekio „sudedu“ pinigų, priklausomai nuo iš pirmo karto teisingai atsakytų klausimų skaičiaus.",
+    "content": `Pasirinkę šią užduotį, galite uždirbti iki nurodyto kiekio „SUDEDU“ monetų, priklausomai nuo iš pirmo karto teisingai atsakytų klausimų skaičiaus (plačiau <a href="apie.html#sudedu-monetos">čia</a>).`,
     "title": "Uždarbis",
     "subtitle": ""
   }
@@ -3911,66 +3912,34 @@ function showCustomConfirm(text, onConfirm, args = []) {
 
 // POINTS CALCULATION START
 
-const pointWeights = {
-    "userClass": {"values": [0, 1, 2, 3, 4, 5], "label": "ziniu lygis"},
-    "base": {"values": [0.76, 0.76, 0.76, 0.76, 0.76, 0.76], "label": "base"},
-    "C1": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "sudetis"},
-    "C2": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "atimtis"},
-    "C3": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "sudetis ir atimtis"},
-    "C4": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "daugyba"},
-    "C5": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "dalyba"},
-    "C6": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "daugyba ir dalyba"},
-    "C7": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "ivairius"},
-    "C8": {"values": [0.4, 0.4, 0.15, 0.0, 0.0, 0.0], "label": "vienazenkliu iki 10"},
-    "C9": {"values": [0.6, 0.5, 0.35, 0.0, 0.0, 0.0], "label": "vienazenkliu iki 20"},
-    "C10": {"values": [2.0, 1.25, 0.5, 0.0, 0.0, 0.0], "label": "dvizenkliu ir vienazenkliu iki 20"},
-    "C11": {"values": [2.0, 1.5, 0.5, 0.0, 0.0, 0.0], "label": "dvizenkliu ir vienazenkliu iki 100"},
-    "C12": {"values": [2.0, 2.0, 1.0, 0.5, 0.25, 0.25], "label": "dvizenkliu iki 100"},
-    "C13": {"values": [2.0, 2.0, 2.0, 1.5, 1.25, 1.25], "label": "skaiciu iki 1000"},
-    "C14": {"values": [2.0, 2.0, 2.0, 1.75, 1.5, 1.5], "label": "skaiciu iki 10000"},
-    "C15": {"values": [2.0, 2.0, 2.0, 2.0, 2.0, 2.0], "label": "skaiciu iki 1000000"},
-    "C16": {"values": [2.0, 2.0, 2.0, 1.5, 1.25, 1.15], "label": "turinyje gretimi nuliai"},
-    "C17": {"values": [0.7, 0.6, 1.0, 0.0, 0.0, 0.0], "label": "lenteline sudetis ir atimitis iki 20"},
-    "C18": {"values": [1.0, 0.75, 0.5, 0.35, 0.35, 0.35], "label": "daugybos lentle"},
-    "DL1": {"values": [1.0, 1.0, 0.15, 0.0, 0.0, 0.0], "label": "daugybos range[1] === 1"},
-    "DL2": {"values": [2.0, 2.0, 0.5, 0, 0, 0], "label": "daugybos range[1] === 2"},
-    "DL10": {"values": [1.25, 1.0, 0.15, 0, 0, 0], "label": "daugybos range[0] === 10 AND daugybos range[1] ===10"},
-    "DLALL": {"values": [2.0, 2.0, 1.0, 1.0, 1.0, 1.0], "label": "daugybos range else"},
-    "C19": {"values": [2.0, 2.0, 2.0, 1.0, 0.5, 0.5], "label": "dvizenklio is vienazenklio"},
-    "C20": {"values": [2.0, 2.0, 2.0, 1.5, 0.75, 0.75], "label": "trizenklio is vienazenklio"},
-    "C21": {"values": [2.0, 2.0, 2.0, 1.75, 0.95, 0.95], "label": "keturzenklio is vienazenklio"},
-    "C22": {"values": [2.0, 2.0, 2.0, 1.75, 1.0, 1.0], "label": "daugiazenklio is vienzenklio"},
-    "C23": {"values": [3.0, 3.0, 3.0, 3.0, 3.0, 3.0], "label": "dvizenklio is dvizenklio"},
-    "C24": {"values": [3.0, 3.0, 3.0, 3.0, 3.0, 3.0], "label": "trizenklio is dvizenklio"},
-    "C25": {"values": [3.0, 3.0, 3.0, 3.0, 3.0, 3.0], "label": "keturzenklio is dvizenklio"},
-    "C26": {"values": [3.0, 3.0, 3.0, 3.0, 3.0, 3.0], "label": "daugiazenklio is dvizenklio"},
-    "remainder": {"values": [2.0, 2.0, 2.0, 1.25, 1.15, 1], "label": "su liekana"},
-    "C27": {"values": [3.0, 3.0, 3.0, 3.0, 3.0, 3.0], "label": "daugiazenkliu"},
-    "C28": {"values": [2.0, 2.0, 2.0, 1.0, 0.5, 0.5], "label": "is pilnu lengvesni"},
-    "C29": {"values": [2.0, 2.0, 2.0, 1.0, 0.75, 0.75], "label": "is pilnu sunkesni"},
-    "C30": {"values": [2.0, 2.0, 1.5, 1.25, 1.25, 1.25], "label": "daugiazenklio is vienazenklio (dalmenyje 0)"},
-    "C31": {"values": [1.65, 1.0, 0, 0, 0, 0], "label": "ivairus iki 10"},
-    "C32": {"values": [2.0, 1.2, 0, 0, 0, 0], "label": "ivairus iki 20"},
-    "C33": {"values": [2.0, 2.0, 0.5, 0, 0, 0], "label": "ivairus iki 100"},
-    "C34": {"values": [2.0, 2.0, 1.0, 0.75, 0.5, 0.5], "label": "ivairus iki 1000"},
-    "C35": {"values": [2.0, 2.0, 2.0, 1.0, 1.0, 1.0], "label": "ivairus iki 10000"},
-    "C36": {"values": [2.0, 2.0, 2.0, 1.0, 1.0, 1.0], "label": "ivairus iki 1000000"},
-    "C37": {"values": [2.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "neperzengiant"},
-    "C38": {"values": [2.0, 1.5, 1.5, 1.5, 1.5, 1.0], "label": "perzengiant"},
-    "C41": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "skaitine"},
-    "C42": {"values": [2.0, 2.0, 2.0, 2.0, 2.0, 2.0], "label": "su nezinomuoju"},
-    "C49": {"values": [5.0, 5.0, 5.0, 5.0, 5.0, 5.0], "label": "teksto supratimas"},
-    "C50": {"values": [0.75, 0.75, 0.75, 0.75, 0.75, 0.75], "label": "rasyba"},
-    "C51": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "turinio komponavimas"},
-    "C52": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "strukturos isdestumas"},
-    "C75": {"values": [2.0, 1.0, 1.0, 0.0, 0.0, 0.0], "label": "lietuviu klases 1-2"},
-    "C76": {"values": [2.0, 2.0, 2.0, 1.0, 1.0, 1.0], "label": "lietuviu klases 3-4"},
-    "C77": {"values": [2.0, 2.0, 1.0, 1.0, 1.0, 1.0], "label": "is pilnu simtu"},
-    "C58": {"values": [2.0, 1.25, 1.15, 1.15, 0.95, 0.95], "label": "teksto supratimas lengvas"},
-    "C59": {"values": [2.0, 1.75, 1.75, 1.5, 1.5, 1.25], "label": "teksto supratimas vidutinis"},
-    "C60": {"values": [2.0, 2.0, 2.0, 1.75, 1.75, 1.5], "label": "teksto supratimas sunkus"},
-    "C80": {"values": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "label": "be distraktoriaus"},
-    "C81": {"values": [1.25, 1.25, 1.25, 1.2, 1.2, 1.2], "label": "su distraktoriumi"},
+function getLithuanianSchoolPeriod(date = new Date(), periods = [
+    { name: "9-10", months: [9, 10] },
+    { name: "11-12", months: [11, 12] },
+    { name: "1-2", months: [1, 2] },
+    { name: "3-8", months: [3, 4, 5, 6, 7, 8] },
+]) {
+    const month = date.getMonth() + 1;
+    for (const period of periods) {
+        if (period.months.includes(month)) return period.name;
+    }
+    return "unknown";
+}
+
+const currentSchoolPeriod = getLithuanianSchoolPeriod();
+
+let pointWeights;
+
+if (currentSchoolPeriod === "9-10") {
+  pointWeights = {"C1":{"label":"sudetis","values":[1,1,1,1,1,1]},"C10":{"label":"dvizenkliu ir vienazenkliu iki 20","values":[1.5,1.25,0.2,0,0,0]},"C11":{"label":"dvizenkliu ir vienazenkliu iki 100","values":[2,1.75,0.75,0.35,0,0]},"C12":{"label":"dvizenkliu iki 100","values":[2,2,0.85,0.325,0.25,0.25]},"C13":{"label":"skaiciu iki 1000","values":[2,2,1.25,0.85,0.5,0.5]},"C14":{"label":"skaiciu iki 10000","values":[2,2,2,1.25,1.15,0.75]},"C15":{"label":"skaiciu iki 1000000","values":[2,2,2,2,1.5,1.15]},"C16":{"label":"turinyje gretimi nuliai","values":[2,2,2,1.25,1.25,1]},"C17":{"label":"lenteline sudetis ir atimtis iki 20","values":[2,1,0.3,0,0,0]},"C18":{"label":"daugybos lentele","values":[2,2,1,0.25,0.35,0.25]},"C19":{"label":"dvizenklio is vienazenklio","values":[2,2,2,1.15,0.65,0.5]},"C2":{"label":"atimtis","values":[1,1,1,1,1,1]},"C20":{"label":"trizenklio is vienazenklio","values":[2,2,2,1.5,0.85,0.75]},"C21":{"label":"keturzenklio is vienazenklio","values":[2,2,2,1.75,1.15,1]},"C22":{"label":"daugiazenklio is vienzenklio","values":[2,2,2,1.75,1.25,1]},"C23":{"label":"dvizenklio is dvizenklio","values":[2,2,2,2,2,1.5]},"C24":{"label":"trizenklio is dvizenklio","values":[2,2,2,2,2,1.65]},"C25":{"label":"keturzenklio is dvizenklio","values":[2,2,2,2,2,2]},"C26":{"label":"daugiazenklio is dvizenklio","values":[2,2,2,2,2,2]},"C27":{"label":"daugiazenkliu","values":[2,2,2,2,2,2]},"C28":{"label":"is pilnu lengvesni","values":[2,2,2,1,0.35,0.15]},"C29":{"label":"is pilnu sunkesni","values":[2,2,2,1,0.5,0.45]},"C3":{"label":"sudetis ir atimtis","values":[1,1,1,1,1,1]},"C30":{"label":"daugiazenklio is vienazenklio (dalmenyje 0)","values":[2,2,1.5,1.25,1.25,1.25]},"C31":{"label":"ivairus iki 10","values":[1.25,1,0.1,0,0,0]},"C32":{"label":"ivairus iki 20","values":[1.5,1.25,0.2,0,0,0]},"C33":{"label":"ivairus iki 100","values":[2,1.75,0.85,0.325,0,0]},"C34":{"label":"ivairus iki 1000","values":[2,2,1.25,0.85,0.75,0.65]},"C35":{"label":"ivairus iki 10000","values":[2,2,2,1.15,1.25,0.95]},"C36":{"label":"ivairus iki 1000000","values":[2,2,2,2,1.25,1.15]},"C37":{"label":"neperzengiant","values":[1,1,1,1,1,1]},"C38":{"label":"perzengiant","values":[1.5,1.5,1.5,1.5,1.5,1.5]},"C4":{"label":"daugyba","values":[1,1,1,1,1,1]},"C41":{"label":"skaitine","values":[1,1,1,1,1,1]},"C42":{"label":"su nezinomuoju","values":[1.25,1.75,1.65,1.25,1.25,1.25]},"C49":{"label":"teksto supratimas","values":[3,10,7,3,6,6]},"C5":{"label":"dalyba","values":[1.25,1.25,1.25,1.15,1.15,1]},"C50":{"label":"rasyba","values":[2,6,2,0.35,0.35,0.25]},"C51":{"label":"turinio komponavimas","values":[1.25,1.25,1.25,1.25,1.25,1.25]},"C52":{"label":"strukturos isdestumas","values":[1,1,1,1,1,1]},"C58":{"label":"teksto supratimas lengvas","values":[1,1,0.75,1.15,0.75,0.5]},"C59":{"label":"teksto supratimas vidutinis","values":[1.75,1.75,1.25,2,1.25,0.85]},"C6":{"label":"daugyba ir dalyba","values":[1.25,1.25,1.25,1.15,1.15,1]},"C60":{"label":"teksto supratimas sunkus","values":[2,2,1.75,2,1.75,1.25]},"C7":{"label":"ivairius","values":[1,1,1,1,1,1]},"C75":{"label":"lietuviu klases 1-2","values":[1.5,1.5,1,0,0,0]},"C76":{"label":"lietuviu klases 3-4","values":[2,1.75,1.5,1.25,1,1]},"C77":{"label":"is pilnu simtu","values":[2,2,1,1,0.5,0.15]},"C8":{"label":"vienazenkliu iki 10","values":[1.25,1,0.1,0,0,0]},"C80":{"label":"be distraktoriaus","values":[1,1,1,1,1,1]},"C81":{"label":"su distraktoriumi","values":[1.25,1.25,1.5,1.25,1.25,1.25]},"C9":{"label":"vienazenkliu iki 20","values":[1.5,1.25,0.2,0,0,0]},"DL1":{"label":"daugybos range[1] === 1","values":[1,0.5,0.15,0,0,0]},"DL10":{"label":"daugybos range[0] === 10 AND daugybos range[1] ===10","values":[1.25,0.75,0.15,0,0,0]},"DL2":{"label":"daugybos range[1] === 2","values":[2,1,0.75,0,0,0]},"DLALL":{"label":"daugybos range else","values":[2,1,1,1,1,1]},"base":{"label":"base","values":[1.75,0.53,0.52,0.95,0.68,0.61]},"remainder":{"label":"su liekana","values":[1.25,1.25,1.25,1.25,1.25,1.25]},"userClass":{"label":"ziniu lygis","values":[0,1,2,3,4,5]}}
+} else if (currentSchoolPeriod === "11-12") {
+  pointWeights = {"C1":{"label":"sudetis","values":[1,1,1,1,1,1]},"C10":{"label":"dvizenkliu ir vienazenkliu iki 20","values":[1.5,1.15,0.2,0,0,0]},"C11":{"label":"dvizenkliu ir vienazenkliu iki 100","values":[2,1.75,0.65,0.35,0,0]},"C12":{"label":"dvizenkliu iki 100","values":[2,2,0.85,0.35,0.25,0.25]},"C13":{"label":"skaiciu iki 1000","values":[2,2,1.25,0.85,0.5,0.5]},"C14":{"label":"skaiciu iki 10000","values":[2,2,2,1.25,1.15,0.85]},"C15":{"label":"skaiciu iki 1000000","values":[2,2,2,2,1.5,1.15]},"C16":{"label":"turinyje gretimi nuliai","values":[2,2,2,1.25,1.15,0.85]},"C17":{"label":"lenteline sudetis ir atimtis iki 20","values":[2,1,0.3,0,0,0]},"C18":{"label":"daugybos lentele","values":[2,2,0.75,0.3,0.35,0.25]},"C19":{"label":"dvizenklio is vienazenklio","values":[2,2,2,1.15,0.65,0.5]},"C2":{"label":"atimtis","values":[1,1,1,1,1,1]},"C20":{"label":"trizenklio is vienazenklio","values":[2,2,2,1.5,0.85,0.75]},"C21":{"label":"keturzenklio is vienazenklio","values":[2,2,2,1.75,1.15,1]},"C22":{"label":"daugiazenklio is vienzenklio","values":[2,2,2,1.75,1.25,1]},"C23":{"label":"dvizenklio is dvizenklio","values":[2,2,2,2,2,2]},"C24":{"label":"trizenklio is dvizenklio","values":[2,2,2,2,2,2]},"C25":{"label":"keturzenklio is dvizenklio","values":[2,2,2,2,2,2]},"C26":{"label":"daugiazenklio is dvizenklio","values":[2,2,2,2,2,2]},"C27":{"label":"daugiazenkliu","values":[2,2,2,2,2,2]},"C28":{"label":"is pilnu lengvesni","values":[2,2,2,1,0.35,0.15]},"C29":{"label":"is pilnu sunkesni","values":[2,2,2,1,0.5,0.25]},"C3":{"label":"sudetis ir atimtis","values":[1,1,1,1,1,1]},"C30":{"label":"daugiazenklio is vienazenklio (dalmenyje 0)","values":[2,2,1.5,1.25,1.25,1.25]},"C31":{"label":"ivairus iki 10","values":[1.25,1,0.1,0,0,0]},"C32":{"label":"ivairus iki 20","values":[1.5,1.15,0.2,0,0,0]},"C33":{"label":"ivairus iki 100","values":[2,1.75,0.65,0.35,0,0]},"C34":{"label":"ivairus iki 1000","values":[2,2,1.25,0.85,0.5,0.5]},"C35":{"label":"ivairus iki 10000","values":[2,2,2,1.15,1.15,0.85]},"C36":{"label":"ivairus iki 1000000","values":[2,2,2,2,1.25,1.15]},"C37":{"label":"neperzengiant","values":[1,1,1,1,1,1]},"C38":{"label":"perzengiant","values":[1.5,1.5,1.5,1.5,1.5,1.5]},"C4":{"label":"daugyba","values":[1,1,1,1,1,1]},"C41":{"label":"skaitine","values":[1,1,1,1,1,1]},"C42":{"label":"su nezinomuoju","values":[1.25,1.25,1.25,1.25,1.25,1.25]},"C49":{"label":"teksto supratimas","values":[6.5,9,5,4.5,6.5,6]},"C5":{"label":"dalyba","values":[1.25,1.25,1.25,1.15,1.15,1]},"C50":{"label":"rasyba","values":[4.5,3,0.75,0.4,0.35,0.25]},"C51":{"label":"turinio komponavimas","values":[1.25,1.25,1.25,1.25,1.25,1.25]},"C52":{"label":"strukturos isdestumas","values":[1,1,1,1,1,1]},"C58":{"label":"teksto supratimas lengvas","values":[1,1.25,0.75,1,0.85,0.5]},"C59":{"label":"teksto supratimas vidutinis","values":[1.75,1.75,1.25,1.5,1.25,0.75]},"C6":{"label":"daugyba ir dalyba","values":[1.25,1.25,1.25,1.15,1.15,1]},"C60":{"label":"teksto supratimas sunkus","values":[2,2,1.85,1.75,2,1.15]},"C7":{"label":"ivairius","values":[1,1,1,1,1,1]},"C75":{"label":"lietuviu klases 1-2","values":[1.5,1.25,1,0,0,0]},"C76":{"label":"lietuviu klases 3-4","values":[2,1.75,1.5,1,1,1]},"C77":{"label":"is pilnu simtu","values":[2,2,1,1,0.5,0.15]},"C8":{"label":"vienazenkliu iki 10","values":[1.25,1,0.1,0,0,0]},"C80":{"label":"be distraktoriaus","values":[1,1,1,1,1,1]},"C81":{"label":"su distraktoriumi","values":[1.25,1.25,1.25,1.2,1.25,1.25]},"C9":{"label":"vienazenkliu iki 20","values":[1.5,1.15,0.2,0,0,0]},"DL1":{"label":"daugybos range[1] === 1","values":[1,0.5,0.15,0,0,0]},"DL10":{"label":"daugybos range[0] === 10 AND daugybos range[1] ===10","values":[1.25,0.75,0.15,0,0,0]},"DL2":{"label":"daugybos range[1] === 2","values":[2,1,0.75,0,0,0]},"DLALL":{"label":"daugybos range else","values":[2,1,1,1,1,1]},"base":{"label":"base","values":[0.85,0.43,0.65,0.77,0.48,0.47]},"remainder":{"label":"su liekana","values":[1.25,1.25,1.25,1.25,1.25,1.25]},"userClass":{"label":"ziniu lygis","values":[0,1,2,3,4,5]}}
+} else if (currentSchoolPeriod === "1-2") {
+  pointWeights = {"C1":{"label":"sudetis","values":[1,1,1,1,1,1]},"C10":{"label":"dvizenkliu ir vienazenkliu iki 20","values":[1.5,0.8,0.2,0,0,0]},"C11":{"label":"dvizenkliu ir vienazenkliu iki 100","values":[2,1.75,0.65,0,0,0]},"C12":{"label":"dvizenkliu iki 100","values":[2,2,0.65,0.35,0.25,0.25]},"C13":{"label":"skaiciu iki 1000","values":[2,2,1.25,0.65,0.5,0.5]},"C14":{"label":"skaiciu iki 10000","values":[2,2,2,1.25,1,0.75]},"C15":{"label":"skaiciu iki 1000000","values":[2,2,2,2,1.95,1.15]},"C16":{"label":"turinyje gretimi nuliai","values":[2,2,2,1.25,1,0.85]},"C17":{"label":"lenteline sudetis ir atimtis iki 20","values":[2,0.8,0.3,0,0,0]},"C18":{"label":"daugybos lentele","values":[2,2,0.75,0.3,0.35,0.25]},"C19":{"label":"dvizenklio is vienazenklio","values":[2,2,2,1.25,0.65,0.5]},"C2":{"label":"atimtis","values":[1,1,1,1,1,1]},"C20":{"label":"trizenklio is vienazenklio","values":[2,2,2,1.5,0.85,0.75]},"C21":{"label":"keturzenklio is vienazenklio","values":[2,2,2,1.65,1.15,1]},"C22":{"label":"daugiazenklio is vienzenklio","values":[2,2,2,1.65,1.2,1]},"C23":{"label":"dvizenklio is dvizenklio","values":[2,2,2,2,2,1.85]},"C24":{"label":"trizenklio is dvizenklio","values":[2,2,2,2,2,1.85]},"C25":{"label":"keturzenklio is dvizenklio","values":[2,2,2,2,2,1.85]},"C26":{"label":"daugiazenklio is dvizenklio","values":[2,2,2,2,2,1.85]},"C27":{"label":"daugiazenkliu","values":[2,2,2,2,2,1.85]},"C28":{"label":"is pilnu lengvesni","values":[2,2,2,1,0.35,0.15]},"C29":{"label":"is pilnu sunkesni","values":[2,2,2,1,0.5,0.25]},"C3":{"label":"sudetis ir atimtis","values":[1,1,1,1,1,1]},"C30":{"label":"daugiazenklio is vienazenklio (dalmenyje 0)","values":[2,2,1.5,1.25,1.25,1.25]},"C31":{"label":"ivairus iki 10","values":[1.25,0.65,0.1,0,0,0]},"C32":{"label":"ivairus iki 20","values":[1.5,0.8,0.2,0,0,0]},"C33":{"label":"ivairus iki 100","values":[2,1.75,0.65,0,0,0]},"C34":{"label":"ivairus iki 1000","values":[2,2,1.25,0.75,0.5,0.5]},"C35":{"label":"ivairus iki 10000","values":[2,2,2,1.15,1,0.75]},"C36":{"label":"ivairus iki 1000000","values":[2,2,2,2,1.25,1.15]},"C37":{"label":"neperzengiant","values":[1,1,1,1,1,1]},"C38":{"label":"perzengiant","values":[1.5,1.5,1.5,1.5,1.5,1.5]},"C4":{"label":"daugyba","values":[1,1,1,1,1,1]},"C41":{"label":"skaitine","values":[1,1,1,1,1,1]},"C42":{"label":"su nezinomuoju","values":[1.25,1.25,1.25,1.25,1.25,1.25]},"C49":{"label":"teksto supratimas","values":[6.5,10,8,5.5,5.5,6]},"C5":{"label":"dalyba","values":[1.25,1.25,1.25,1.25,1.15,1]},"C50":{"label":"rasyba","values":[4,2.5,1,0.65,0.3,0.25]},"C51":{"label":"turinio komponavimas","values":[1.25,1.25,1.25,1.25,1.25,1.25]},"C52":{"label":"strukturos isdestumas","values":[1,1,1,1,1,1]},"C58":{"label":"teksto supratimas lengvas","values":[1,1,0.75,1.15,0.75,0.5]},"C59":{"label":"teksto supratimas vidutinis","values":[1.75,1.85,1.15,1.5,1.25,0.75]},"C6":{"label":"daugyba ir dalyba","values":[1.25,1.25,1.25,1.25,1.15,1]},"C60":{"label":"teksto supratimas sunkus","values":[2,2,1.75,2,1.75,1.15]},"C7":{"label":"ivairius","values":[1,1,1,1,1,1]},"C75":{"label":"lietuviu klases 1-2","values":[1.5,1,1,0,0,0]},"C76":{"label":"lietuviu klases 3-4","values":[2,1.75,1.5,1,1,1]},"C77":{"label":"is pilnu simtu","values":[2,2,1,1,0.5,0.15]},"C8":{"label":"vienazenkliu iki 10","values":[1.25,0.65,0.1,0,0,0]},"C80":{"label":"be distraktoriaus","values":[1,1,1,1,1,1]},"C81":{"label":"su distraktoriumi","values":[1.25,1.25,1.25,1.2,1.25,1.25]},"C9":{"label":"vienazenkliu iki 20","values":[1.5,0.8,0.2,0,0,0]},"DL1":{"label":"daugybos range[1] === 1","values":[1,0.5,0.15,0,0,0]},"DL10":{"label":"daugybos range[0] === 10 AND daugybos range[1] ===10","values":[1.25,0.75,0.15,0,0,0]},"DL2":{"label":"daugybos range[1] === 2","values":[2,1,0.75,0,0,0]},"DLALL":{"label":"daugybos range else","values":[2,1,1,1,1,1]},"base":{"label":"base","values":[0.85,0.42,0.44,0.55,0.56,0.51]},"remainder":{"label":"su liekana","values":[1.25,1.25,1.25,1.25,1.25,1.25]},"userClass":{"label":"ziniu lygis","values":[0,1,2,3,4,5]}}
+} else if (currentSchoolPeriod === "3-8") {
+  pointWeights = {"C1":{"label":"sudetis","values":[1,1,1,1,1,1]},"C10":{"label":"dvizenkliu ir vienazenkliu iki 20","values":[1.5,1,0.2,0,0,0]},"C11":{"label":"dvizenkliu ir vienazenkliu iki 100","values":[2,1.25,0.65,0,0,0]},"C12":{"label":"dvizenkliu iki 100","values":[2,1.75,0.65,0.35,0.25,0.25]},"C13":{"label":"skaiciu iki 1000","values":[2,2,1.85,0.65,0.5,0.5]},"C14":{"label":"skaiciu iki 10000","values":[2,2,2,1.25,0.75,0.75]},"C15":{"label":"skaiciu iki 1000000","values":[2,2,2,2,1.85,1.15]},"C16":{"label":"turinyje gretimi nuliai","values":[2,2,2,1.25,0.75,0.75]},"C17":{"label":"lenteline sudetis ir atimtis iki 20","values":[2,0.5,0.3,0,0,0]},"C18":{"label":"daugybos lentele","values":[2,2,0.35,0.5,0.35,0.25]},"C19":{"label":"dvizenklio is vienazenklio","values":[2,2,2,1.15,0.65,0.5]},"C2":{"label":"atimtis","values":[1,1,1,1,1,1]},"C20":{"label":"trizenklio is vienazenklio","values":[2,2,2,1.5,0.85,0.75]},"C21":{"label":"keturzenklio is vienazenklio","values":[2,2,2,1.55,1,1]},"C22":{"label":"daugiazenklio is vienzenklio","values":[2,2,2,1.6,1,1]},"C23":{"label":"dvizenklio is dvizenklio","values":[2,2,2,2,2,1.75]},"C24":{"label":"trizenklio is dvizenklio","values":[2,2,2,2,2,1.75]},"C25":{"label":"keturzenklio is dvizenklio","values":[2,2,2,2,2,1.75]},"C26":{"label":"daugiazenklio is dvizenklio","values":[2,2,2,2,2,1.75]},"C27":{"label":"daugiazenkliu","values":[2,2,2,2,2,2]},"C28":{"label":"is pilnu lengvesni","values":[2,2,2,1,0.35,0.15]},"C29":{"label":"is pilnu sunkesni","values":[2,2,2,1,0.5,0.25]},"C3":{"label":"sudetis ir atimtis","values":[1,1,1,1,1,1]},"C30":{"label":"daugiazenklio is vienazenklio (dalmenyje 0)","values":[2,2,1.5,1.25,1.25,1.25]},"C31":{"label":"ivairus iki 10","values":[1.25,1,0.1,0,0,0]},"C32":{"label":"ivairus iki 20","values":[1.5,1,0.2,0,0,0]},"C33":{"label":"ivairus iki 100","values":[2,1.25,0.65,0,0,0]},"C34":{"label":"ivairus iki 1000","values":[2,2,1.25,0.75,0.5,0.5]},"C35":{"label":"ivairus iki 10000","values":[2,2,2,1.25,0.95,0.75]},"C36":{"label":"ivairus iki 1000000","values":[2,2,2,2,1.25,1.15]},"C37":{"label":"neperzengiant","values":[1,1,1,1,1,1]},"C38":{"label":"perzengiant","values":[1.5,1.5,1.5,1.5,1.5,1.5]},"C4":{"label":"daugyba","values":[1,1,1,1,1,1]},"C41":{"label":"skaitine","values":[1,1,1,1,1,1]},"C42":{"label":"su nezinomuoju","values":[1.25,1.25,1.25,1.25,1.25,1.25]},"C49":{"label":"teksto supratimas","values":[7,7.5,5.5,4.25,4,4]},"C5":{"label":"dalyba","values":[1.25,1.25,1.25,1.15,1.15,1]},"C50":{"label":"rasyba","values":[4,3.5,1,0.35,0.25,0.25]},"C51":{"label":"turinio komponavimas","values":[1.25,1.25,1.25,1.25,1.25,1.25]},"C52":{"label":"strukturos isdestumas","values":[1,1,1,1,1,1]},"C58":{"label":"teksto supratimas lengvas","values":[1,1,0.75,1.15,0.75,0.5]},"C59":{"label":"teksto supratimas vidutinis","values":[1.75,1.85,1.15,1.5,1.15,0.75]},"C6":{"label":"daugyba ir dalyba","values":[1.25,1.25,1.25,1.15,1.15,1]},"C60":{"label":"teksto supratimas sunkus","values":[2,2,1.75,1.75,1.75,1.15]},"C7":{"label":"ivairius","values":[1,1,1,1,1,1]},"C75":{"label":"lietuviu klases 1-2","values":[1.5,1,1,0,0,0]},"C76":{"label":"lietuviu klases 3-4","values":[2,1.75,1.5,1,1,1]},"C77":{"label":"is pilnu simtu","values":[2,2,1,1,0.5,0.15]},"C8":{"label":"vienazenkliu iki 10","values":[1.25,1,0.1,0,0,0]},"C80":{"label":"be distraktoriaus","values":[1,1,1,1,1,1]},"C81":{"label":"su distraktoriumi","values":[1.25,1.25,1.25,1.2,1.25,1.25]},"C9":{"label":"vienazenkliu iki 20","values":[1.5,1,0.2,0,0,0]},"DL1":{"label":"daugybos range[1] === 1","values":[1,0.5,0.15,0,0,0]},"DL10":{"label":"daugybos range[0] === 10 AND daugybos range[1] ===10","values":[1.25,0.75,0.15,0,0,0]},"DL2":{"label":"daugybos range[1] === 2","values":[2,1,0.75,0,0,0]},"DLALL":{"label":"daugybos range else","values":[2,1,1,1,1,1]},"base":{"label":"base","values":[0.8,0.355,0.48,0.61,0.64,0.53]},"remainder":{"label":"su liekana","values":[1.25,1.25,1.25,1.25,1.25,1.25]},"userClass":{"label":"ziniu lygis","values":[0,1,2,3,4,5]}}
+} else {
+  console.log("school period undefined - defaulting to 1-2");
+  pointWeights = {"C1":{"label":"sudetis","values":[1,1,1,1,1,1]},"C10":{"label":"dvizenkliu ir vienazenkliu iki 20","values":[1.5,0.8,0.2,0,0,0]},"C11":{"label":"dvizenkliu ir vienazenkliu iki 100","values":[2,1.75,0.65,0,0,0]},"C12":{"label":"dvizenkliu iki 100","values":[2,2,0.65,0.35,0.25,0.25]},"C13":{"label":"skaiciu iki 1000","values":[2,2,1.25,0.65,0.5,0.5]},"C14":{"label":"skaiciu iki 10000","values":[2,2,2,1.25,1,0.75]},"C15":{"label":"skaiciu iki 1000000","values":[2,2,2,2,1.95,1.15]},"C16":{"label":"turinyje gretimi nuliai","values":[2,2,2,1.25,1,0.85]},"C17":{"label":"lenteline sudetis ir atimtis iki 20","values":[2,0.8,0.3,0,0,0]},"C18":{"label":"daugybos lentele","values":[2,2,0.75,0.3,0.35,0.25]},"C19":{"label":"dvizenklio is vienazenklio","values":[2,2,2,1.25,0.65,0.5]},"C2":{"label":"atimtis","values":[1,1,1,1,1,1]},"C20":{"label":"trizenklio is vienazenklio","values":[2,2,2,1.5,0.85,0.75]},"C21":{"label":"keturzenklio is vienazenklio","values":[2,2,2,1.65,1.15,1]},"C22":{"label":"daugiazenklio is vienzenklio","values":[2,2,2,1.65,1.2,1]},"C23":{"label":"dvizenklio is dvizenklio","values":[2,2,2,2,2,1.85]},"C24":{"label":"trizenklio is dvizenklio","values":[2,2,2,2,2,1.85]},"C25":{"label":"keturzenklio is dvizenklio","values":[2,2,2,2,2,1.85]},"C26":{"label":"daugiazenklio is dvizenklio","values":[2,2,2,2,2,1.85]},"C27":{"label":"daugiazenkliu","values":[2,2,2,2,2,1.85]},"C28":{"label":"is pilnu lengvesni","values":[2,2,2,1,0.35,0.15]},"C29":{"label":"is pilnu sunkesni","values":[2,2,2,1,0.5,0.25]},"C3":{"label":"sudetis ir atimtis","values":[1,1,1,1,1,1]},"C30":{"label":"daugiazenklio is vienazenklio (dalmenyje 0)","values":[2,2,1.5,1.25,1.25,1.25]},"C31":{"label":"ivairus iki 10","values":[1.25,0.65,0.1,0,0,0]},"C32":{"label":"ivairus iki 20","values":[1.5,0.8,0.2,0,0,0]},"C33":{"label":"ivairus iki 100","values":[2,1.75,0.65,0,0,0]},"C34":{"label":"ivairus iki 1000","values":[2,2,1.25,0.75,0.5,0.5]},"C35":{"label":"ivairus iki 10000","values":[2,2,2,1.15,1,0.75]},"C36":{"label":"ivairus iki 1000000","values":[2,2,2,2,1.25,1.15]},"C37":{"label":"neperzengiant","values":[1,1,1,1,1,1]},"C38":{"label":"perzengiant","values":[1.5,1.5,1.5,1.5,1.5,1.5]},"C4":{"label":"daugyba","values":[1,1,1,1,1,1]},"C41":{"label":"skaitine","values":[1,1,1,1,1,1]},"C42":{"label":"su nezinomuoju","values":[1.25,1.25,1.25,1.25,1.25,1.25]},"C49":{"label":"teksto supratimas","values":[6.5,10,8,5.5,5.5,6]},"C5":{"label":"dalyba","values":[1.25,1.25,1.25,1.25,1.15,1]},"C50":{"label":"rasyba","values":[4,2.5,1,0.65,0.3,0.25]},"C51":{"label":"turinio komponavimas","values":[1.25,1.25,1.25,1.25,1.25,1.25]},"C52":{"label":"strukturos isdestumas","values":[1,1,1,1,1,1]},"C58":{"label":"teksto supratimas lengvas","values":[1,1,0.75,1.15,0.75,0.5]},"C59":{"label":"teksto supratimas vidutinis","values":[1.75,1.85,1.15,1.5,1.25,0.75]},"C6":{"label":"daugyba ir dalyba","values":[1.25,1.25,1.25,1.25,1.15,1]},"C60":{"label":"teksto supratimas sunkus","values":[2,2,1.75,2,1.75,1.15]},"C7":{"label":"ivairius","values":[1,1,1,1,1,1]},"C75":{"label":"lietuviu klases 1-2","values":[1.5,1,1,0,0,0]},"C76":{"label":"lietuviu klases 3-4","values":[2,1.75,1.5,1,1,1]},"C77":{"label":"is pilnu simtu","values":[2,2,1,1,0.5,0.15]},"C8":{"label":"vienazenkliu iki 10","values":[1.25,0.65,0.1,0,0,0]},"C80":{"label":"be distraktoriaus","values":[1,1,1,1,1,1]},"C81":{"label":"su distraktoriumi","values":[1.25,1.25,1.25,1.2,1.25,1.25]},"C9":{"label":"vienazenkliu iki 20","values":[1.5,0.8,0.2,0,0,0]},"DL1":{"label":"daugybos range[1] === 1","values":[1,0.5,0.15,0,0,0]},"DL10":{"label":"daugybos range[0] === 10 AND daugybos range[1] ===10","values":[1.25,0.75,0.15,0,0,0]},"DL2":{"label":"daugybos range[1] === 2","values":[2,1,0.75,0,0,0]},"DLALL":{"label":"daugybos range else","values":[2,1,1,1,1,1]},"base":{"label":"base","values":[0.85,0.42,0.44,0.55,0.56,0.51]},"remainder":{"label":"su liekana","values":[1.25,1.25,1.25,1.25,1.25,1.25]},"userClass":{"label":"ziniu lygis","values":[0,1,2,3,4,5]}}
 }
 
 const personalChlCoinBonusMultiplier = 1.1;
@@ -3995,7 +3964,8 @@ async function calculateTasksPerCorrectAnswerPoints(type, selectedTextInfo = nul
     };
 
     const userClass = userData?.knowledgeLvl;
-    if (!userClass) return;
+    
+    if ((userClass == null)) return;
 
     let taskInfoTemp = {
         userClass,
@@ -4021,9 +3991,41 @@ async function calculateTasksPerCorrectAnswerPoints(type, selectedTextInfo = nul
     let total = pointWeights.base?.values[taskInfoTemp.userClass] ?? 1;
     const skipTasks = ['C47', 'C48', 'userClass'];
 
+    let tempController = {};
     if (type === "controller") {
-        for (let key in controller) {
-            const val = controller[key];
+        if (controller.mode === "math") {
+            tempController.mode = 'math';
+            tempController.modeChoice1 = controller.modeChoice1;
+            tempController.modeChoice2 = controller.modeChoice2;
+            tempController.modeChoice3 = controller.modeChoice3;
+            tempController.modeChoice5 = controller.modeChoice5;
+            tempController.modeChoice6 = controller.modeChoice6;
+            tempController.modeChoice7 = controller.modeChoice7
+            tempController.selectedNumbers = controller.selectedNumbers;
+            tempController.withRemainder = controller.withRemainder;
+            tempController.modeChoice8 = controller.modeChoice8;
+        } else if (controller.mode === "lang") {
+            tempController.mode = 'lang';
+            if (controller.modeChoice1 === "C49") {
+                tempController.modeChoice1 = controller.modeChoice1;
+                tempController.modeChoice2 = controller.modeChoice2;
+                tempController.modeChoice6 = controller.modeChoice6;
+                tempController.classChoice = controller.classChoice;
+                tempController.modeChoiceLtDifficulty = controller.modeChoiceLtDifficulty;
+            } else if (controller.modeChoice1 === "C83") {
+                if (controller.modeChoice2 === "C50") {
+                    tempController.classChoice = controller.classChoice;
+                    tempController.modeChoice1 = controller.modeChoice1;
+                    tempController.modeChoice2 = controller.modeChoice2;
+                    tempController.modeChoice3 = controller.modeChoice3;
+                    tempController.modeChoice5 = controller.modeChoice5;
+                    tempController.questionFrequency = controller.questionFrequency;
+                }
+            }
+        }
+
+        for (let key in tempController) {
+            const val = tempController[key];
             if (taskInfoTemp.hasOwnProperty(val)) taskInfoTemp[val] = true;
         }
 
@@ -4048,90 +4050,90 @@ async function calculateTasksPerCorrectAnswerPoints(type, selectedTextInfo = nul
         return Number(total.toFixed(2));
 
       } else if (type === "selectedTexts") {
-    let taskInfoArray = [];
-    let selectedTextIDs = [];
-    let mistakesMap = new Map();
+          let taskInfoArray = [];
+          let selectedTextIDs = [];
+          let mistakesMap = new Map();
 
-    // Handle both call styles
-    if (Array.isArray(selectedTextInfo.taskSettings[0])) {
-        // Nested array style: [taskSettingsArray, textIDs]
-        taskInfoArray = selectedTextInfo.taskSettings[0];
-        selectedTextIDs = selectedTextInfo.taskSettings[1] ?? [];
-        selectedTextIDs.forEach(id => mistakesMap.set(id, 0));
-    } else {
-        // Flat taskSettings
-        taskInfoArray = selectedTextInfo.taskSettings;
-        if (selectedTextInfo.textMistakes?.length > 0) {
-            // Use provided mistakes
-            selectedTextIDs = selectedTextInfo.textMistakes.map(([id]) => id);
-            mistakesMap = new Map(selectedTextInfo.textMistakes);
-        } else if (selectedTextInfo.textIDs?.length > 0) {
-            // Only IDs provided, assume 0 mistakes
-            selectedTextIDs = selectedTextInfo.textIDs;
-            selectedTextIDs.forEach(id => mistakesMap.set(id, 0));
-        }
-    }
+          // Handle both call styles
+          if (Array.isArray(selectedTextInfo.taskSettings[0])) {
+              // Nested array style: [taskSettingsArray, textIDs]
+              taskInfoArray = selectedTextInfo.taskSettings[0];
+              selectedTextIDs = selectedTextInfo.taskSettings[1] ?? [];
+              selectedTextIDs.forEach(id => mistakesMap.set(id, 0));
+          } else {
+              // Flat taskSettings
+              taskInfoArray = selectedTextInfo.taskSettings;
+              if (selectedTextInfo.textMistakes?.length > 0) {
+                  // Use provided mistakes
+                  selectedTextIDs = selectedTextInfo.textMistakes.map(([id]) => id);
+                  mistakesMap = new Map(selectedTextInfo.textMistakes);
+              } else if (selectedTextInfo.textIDs?.length > 0) {
+                  // Only IDs provided, assume 0 mistakes
+                  selectedTextIDs = selectedTextInfo.textIDs;
+                  selectedTextIDs.forEach(id => mistakesMap.set(id, 0));
+              }
+          }
 
-    const textCompType = taskInfoArray[2];
+          const textCompType = taskInfoArray[2];
 
-    const response = await fetch("../databases/sudedu_duomenu_baze.json");
-    const textDatabase = await response.json();
+          const response = await fetch("../databases/sudedu_duomenu_baze.json");
+          const textDatabase = await response.json();
 
-    const textInfoList = buildList(textDatabase, selectedTextIDs, textCompType);
+          const textInfoList = buildList(textDatabase, selectedTextIDs, textCompType);
 
-    let customTextsTotal = 0;
+          let customTextsTotal = 0;
 
-    for (const info of textInfoList) {
-        const classCode = info[0];
-        const difficulty = info[1];
-        const textId = info[2];
+          for (const info of textInfoList) {
+              const classCode = info[0];
+              const difficulty = info[1];
+              const textId = info[2];
 
-        let perTextTotal = pointWeights.base?.values[taskInfoTemp.userClass] ?? 1;
+              let perTextTotal = pointWeights.base?.values[taskInfoTemp.userClass] ?? 1;
 
-        // Reset boolean tasks
-        Object.keys(taskInfoTemp).forEach(key => {
-            if (typeof taskInfoTemp[key] === "boolean") taskInfoTemp[key] = false;
-        });
+              // Reset boolean tasks
+              Object.keys(taskInfoTemp).forEach(key => {
+                  if (typeof taskInfoTemp[key] === "boolean") taskInfoTemp[key] = false;
+              });
 
-        taskInfoTemp["mult-table-selection"] = [];
+              taskInfoTemp["mult-table-selection"] = [];
 
-        // Prepare controller object
-        let tempController = {};
-        tempController.modeChoice1 = taskInfoArray[1];
-        tempController.modeChoice2 = taskInfoArray[2];
-        tempController.modeChoice6 = taskInfoArray[3];
-        tempController.classChoice = classCode;
-        tempController.modeChoiceLtDifficulty = difficulty;
+              // Prepare controller object
+              let tempController = {};
+              tempController.modeChoice1 = taskInfoArray[1];
+              tempController.modeChoice2 = taskInfoArray[2];
+              tempController.modeChoice6 = taskInfoArray[3];
+              tempController.classChoice = classCode;
+              tempController.modeChoiceLtDifficulty = difficulty;
 
-        for (let key in tempController) {
-            const val = tempController[key];
-            if (taskInfoTemp.hasOwnProperty(val)) taskInfoTemp[val] = true;
-        }
+              for (let key in tempController) {
+                  const val = tempController[key];
+                  if (taskInfoTemp.hasOwnProperty(val)) taskInfoTemp[val] = true;
+              }
 
-        // Clean up language tasks
-        taskInfoTemp.C47 = false;
-        taskInfoTemp.C48 = false;
-        taskInfoTemp.remainder = false;
+              // Clean up language tasks
+              taskInfoTemp.C47 = false;
+              taskInfoTemp.C48 = false;
+              taskInfoTemp.remainder = false;
 
-        Object.keys(taskInfoTemp).forEach(task => {
-            if (!taskInfoTemp[task] || skipTasks.includes(task)) return;
-            const weight = getTaskWeight(task);
-            perTextTotal *= weight;
-        });
+              Object.keys(taskInfoTemp).forEach(task => {
+                  if (!taskInfoTemp[task] || skipTasks.includes(task)) return;
+                  const weight = getTaskWeight(task);
+                  perTextTotal *= weight;
+              });
 
-        const mistakes = mistakesMap.get(textId) ?? 0;
+              const mistakes = mistakesMap.get(textId) ?? 0;
 
-        let multiplier =
-            mistakes === 0 ? 1 :
-            mistakes === 1 ? 0.75 :
-            mistakes === 2 ? 0.5 :
-            mistakes === 3 ? 0.25 : 0;
+              let multiplier =
+                  mistakes === 0 ? 1 :
+                  mistakes === 1 ? 0.75 :
+                  mistakes === 2 ? 0.5 :
+                  mistakes === 3 ? 0.25 : 0;
 
-        customTextsTotal += perTextTotal * multiplier;
-    }
+              customTextsTotal += perTextTotal * multiplier;
+          }
 
-    return Number(customTextsTotal.toFixed(2));
-} else {
+          return Number(customTextsTotal.toFixed(2));
+      } else {
         const parsedCurrentTaskInstructions = type;
         let tempController = {};
 
@@ -4262,9 +4264,10 @@ async function displayCustomTaskPotentialEarnings() {
         if (earningsHolder) earningsHolder.innerHTML = 'IKI';
 
         let potentialEarnings = await calculateTasksPerCorrectAnswerPoints("controller");
+  
         const questionNumber = parseInt(questionNumberInputElement.value) || 1;
 
-        if (potentialEarnings && coinAmountValueEl) {
+        if (potentialEarnings != null && coinAmountValueEl) {
             coinAmountValueEl.innerHTML = Number((potentialEarnings * questionNumber).toFixed(2));
         }
 

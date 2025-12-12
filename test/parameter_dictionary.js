@@ -196,7 +196,7 @@ const parameterDictionary = {
         "decodedParameterText": "TEKSTO SUPRATIMAS"
     },
     "C50": {
-        "parameter": "grammar",
+        "parameter": "spelling",
         "decodedParameterText": "RAŠYBA"
     },
     "C51": {

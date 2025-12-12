@@ -1020,7 +1020,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
-            width: 60%;
+            width: 170px;
             height: 40px;
         }
 
@@ -3641,6 +3641,9 @@
     <script src="../mental-arithmetic.js"></script>
     <script src="../main-nav-bar.js"></script>
     <script>
+        
+        const COST_MULTIPLIER = 1
+
         if (!userData || userData?.accType === "teacher") {
             window.location.href = './';
         }
@@ -3682,8 +3685,8 @@
         const taxPaymentPeriod = 14 //days
         const taxGracePeriod = 2 //days;
         const taxPrice = {
-            "waterTax": 20,
-            "electricityTax": 20
+            "waterTax": 18 * COST_MULTIPLIER,
+            "electricityTax": 18 * COST_MULTIPLIER
         }
         let petOnWalk = "";
         const speciesTranslationDict = {
@@ -3855,16 +3858,23 @@
         
         /*
         const roomLayout = [
-          [4.3, ...Array(40).fill(4.1), 4.4],
+          [4.31, ...Array(40).fill(4.1), 4.32],
           ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2]),
           [4.2, ...Array(40).fill(3.0), 4.2],
           ...Array(20).fill([4.2, ...Array(40).fill(1.0), 4.2]),
-          [4.6, ...Array(40).fill(4.1), 4.5],
+          [4.34, ...Array(40).fill(4.1), 4.33],
         ];
         */
 
         const roomLayoutLibrary = {
             1: [
+                [4.31, ...Array(40).fill(4.1), 4.32],
+                ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2]),
+                [4.2, ...Array(40).fill(3.0), 4.2],
+                ...Array(20).fill([4.2, ...Array(40).fill(1.0), 4.2]),
+                [4.34, ...Array(40).fill(4.1), 4.33],
+            ],
+            2: [
                 // Top part of floor 2
                 [4.31, ...Array(40).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.32],
                 ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2]),
@@ -4940,7 +4950,9 @@ if (isTouchDevice) {
 
             if (!isTouchDevice) {
                 const placementMap = generatePlacementMap(obj.id);
-                determineAndHighlightValidTiles(placementMap);
+                highlightTimeout = setTimeout(() => {
+                    determineAndHighlightValidTiles(placementMap);
+                }, 100);
                 obj._placementMap = placementMap;
             }
             
@@ -5048,6 +5060,8 @@ if (isTouchDevice) {
         obj.addEventListener('pointerdown', obj._editModeHandler);
     });
 }
+
+let highlightTimeout = null;
 
 function disableObjectDragging() {
     // Remove all delete icons when exiting edit mode
@@ -7351,6 +7365,10 @@ function clearPlacementHighlights() {
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
+    if (highlightTimeout !== null) {
+        clearTimeout(highlightTimeout);
+        highlightTimeout = null;
+    }
 }
 
 // NAVIGATION START
@@ -7538,7 +7556,7 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
     }
     
     // Calculate total cost
-    const totalCost = itemDetails.cost * quantity;
+    const totalCost = (itemDetails.cost * COST_MULTIPLIER) * quantity;
     
     // Check if user has enough money (local check first)
     if (userMoney < totalCost) {
@@ -8287,7 +8305,7 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
         coinSpan.className = 'item-price-coin-icon';
         coinSpan.innerHTML = '<span class="coin-icon"><img src="../images/icons/icon-sudedu-coin.png"></span>';
         const priceSpan = document.createElement('span');
-        priceSpan.textContent = item.cost;
+        priceSpan.textContent = (item.cost * COST_MULTIPLIER);
         priceDiv.appendChild(coinSpan);
         priceDiv.appendChild(priceSpan);
 
@@ -8335,7 +8353,7 @@ if (!item.oneOfKind) {
 
     const updatePrice = () => {
         const qty = parseInt(quantityInput.value, 10) || 1;
-        priceSpan.textContent = item.cost * qty;
+        priceSpan.textContent = (item.cost * COST_MULTIPLIER) * qty;
     };
 
     const minusBtn = document.createElement('button');
@@ -8390,6 +8408,17 @@ const btn = createHoldPurchaseButton(item, assetIndex, selectedCategory, quantit
     itemDiv.appendChild(btn);
 
 } else {
+    const priceDiv = document.createElement('div');
+    priceDiv.className = 'item-price';
+    const coinSpan = document.createElement('span');
+    coinSpan.className = 'item-price-coin-icon';
+    coinSpan.innerHTML = '<span class="coin-icon"><img src="../images/icons/icon-sudedu-coin.png"></span>';
+    const priceSpan = document.createElement('span');
+    priceSpan.textContent = (item.cost * COST_MULTIPLIER);
+    priceDiv.appendChild(coinSpan);
+    priceDiv.appendChild(priceSpan);
+
+
     const requiresDiv = document.createElement('div');
     requiresDiv.className = 'item-requires';
     requiresDiv.textContent = 'Reikalinga: ' + unmetRequirements.join(', ');
@@ -8400,6 +8429,7 @@ const btn = createHoldPurchaseButton(item, assetIndex, selectedCategory, quantit
 
     itemDiv.appendChild(previewHolder);
     itemDiv.appendChild(infoDiv);
+    itemDiv.appendChild(priceDiv);
     itemDiv.appendChild(requiresDiv);
 }
 
@@ -8417,7 +8447,7 @@ const btn = createHoldPurchaseButton(item, assetIndex, selectedCategory, quantit
     scalePreview();
 }
 
-const HOLD_DURATION_MS = 1600; // hold duration
+const HOLD_DURATION_MS = 2000; // hold duration
 const DYNAMIC_BTN_CLASS = 'purchase-btn-hold'; // unique class
 
 function createHoldPurchaseButton(item, assetIndex, selectedCategory, quantityInput) {
@@ -8842,10 +8872,11 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
     
                 updateStatsBeforeRerunningInitGameAndRenderPets();
                 await initGame();
+                let tempDivId = renderSingleRoomObject(newKey);
             }
 
             userObjectAssets[tempDivId].position = getObjectCoordinates(tempDivId);
-        
+            
             // Attempt to place the item at a valid position
             const placementMap = generatePlacementMap(tempDivId);
             const validPosition = findValidPosition(placementMap, tempDivId);
@@ -8897,7 +8928,7 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
             deleteBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 6 L6 18 M6 6 L18 18" stroke="#F5F5F7" stroke-width="2"/></svg>';
 
             deleteBtn.addEventListener('click', () => {
-                const refund = Math.round(gameAssetIndex[userObjectAssets[keys[0]]["assetIndex"]].cost / 2 * 10) / 10;
+                const refund = Math.round((gameAssetIndex[userObjectAssets[keys[0]]["assetIndex"]].cost * COST_MULTIPLIER) / 2 * 10) / 10;
                 showCustomConfirm(`Ar tikrai nori parduoti šį daiktą? Už jį atgausi tik pusę kainos: 
                     <div class="coin-display-delete-confirm">
                         <span class="coin-icon">
@@ -9067,7 +9098,7 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
             deleteBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 6 L6 18 M6 6 L18 18" stroke="#F5F5F7" stroke-width="2"/></svg>';
 
             deleteBtn.addEventListener('click', () => {
-                const itemPrice = Math.round(gameAssetIndex[userObjectAssets[key]["assetIndex"]].cost / 2 * 10) / 10;
+                const itemPrice = Math.round((gameAssetIndex[userObjectAssets[key]["assetIndex"]].cost * COST_MULTIPLIER) / 2 * 10) / 10;
                 showCustomConfirm(`Ar tikrai nori parduoti šį daiktą? Už jį atgausi tik pusę kainos: 
                 <div class="coin-display-delete-confirm">
                     <span class="coin-icon">

@@ -472,7 +472,9 @@
           text-align: center;
         }
 
-
+        .modern-popup {
+          top: 190px;
+        }
 
         @media (max-width: 1150px) {
         #next-question-btn,
@@ -497,6 +499,10 @@
         }
 
         @media (max-width: 767px) {
+          .modern-popup {
+            top: 160px;
+          }
+
           .container {
               width: 100%;
               max-height: calc(100% - 80px);
@@ -1080,7 +1086,6 @@
     let filteredTextLibrary = [];
     let currentTextId;
     let answeredTexts = [];
-    let firstTimeChecking = true;
     window.mistakesSummary = {};
     window.timeTakenForEachText = {};
 
@@ -1463,7 +1468,7 @@ function loadNextTextBatch() {
         for (let i = minLength; i < arr1.length; i++) {
           items[i].style.backgroundColor = '#D57E7C';
     }
-  }
+    }
 
     // Trigger error indicator if arrays are not equal
     if (!answerCorrect) {
@@ -1471,7 +1476,7 @@ function loadNextTextBatch() {
     }
 
     return answerCorrect;
-}
+    }
 
 
       function titlesAreEqual(items, answer, title) {
@@ -1526,11 +1531,22 @@ function loadNextTextBatch() {
 
         controller.answeredQuestionTracker++;
 
-        if (firstTimeChecking) {
-          controller.correctAnswersTracker++;
+        // Calculate score based on mistakes for this specific text attempt
+        const currentAttemptMistakes = mistakesSummary[currentTextId][`${textIncidenceCount}`];
+        let scoreToAdd = 0;
+        
+        if (currentAttemptMistakes === 0) {
+          scoreToAdd = 1.0;
+        } else if (currentAttemptMistakes === 1) {
+          scoreToAdd = 0.75;
+        } else if (currentAttemptMistakes === 2) {
+          scoreToAdd = 0.5;
+        } else if (currentAttemptMistakes === 3) {
+          scoreToAdd = 0.25;
         }
-
-        firstTimeChecking = true;
+        // More than 3 mistakes = 0 points
+        
+        controller.correctAnswersTracker += scoreToAdd;
       
         localStorage.setItem('controller', JSON.stringify(controller));
         if (controller.modeChoice4 === "C40") {
@@ -1547,8 +1563,6 @@ function loadNextTextBatch() {
       } else {
         trackHelpButtonCounter();
         controller.mistakesTracker++;
-
-        firstTimeChecking = false;
 
         recordTextComprehensionMistake()
         localStorage.setItem('controller', JSON.stringify(controller));
@@ -1910,7 +1924,6 @@ function loadNextTextBatch() {
           controller.mistakesTracker = 0;
           controller.answeredQuestionTracker = 0;
           controller.correctAnswersTracker = 0;
-          firstTimeChecking = true;
 
           answeredTexts = [];
           mistakesSummary = {};

@@ -6128,7 +6128,7 @@ function displayTeacherHome(selectedGroupNames=null) {
                 let potentialEarnings;
                 if (answeringMode === "C39" || parsedTaskDescription[1] === "C83") {
                     potentialEarnings = await calculateTasksPerCorrectAnswerPoints(JSON.parse(task.taskInstructions));
-                    if (potentialEarnings) {
+                    if (potentialEarnings != null) {
                         potentialEarnings = Number(potentialEarnings.toFixed(2))
                     }
                     earningsDiplay = `
@@ -6163,12 +6163,12 @@ function displayTeacherHome(selectedGroupNames=null) {
                     let parsedTaskInfo = JSON.parse(task.taskInstructions)
                     if (parsedTaskInfo[0] === "lang" && parsedTaskInfo[1] === "C49" && parsedTaskInfo[4] === "C84") {
                         potentialEarnings = await calculateTasksPerCorrectAnswerPoints("selectedTexts", {taskSettings: [parsedTaskInfo,numberOfQuestions]});
-                        if (potentialEarnings) {
+                        if (potentialEarnings != null) {
                             potentialEarnings = Number(potentialEarnings.toFixed(2))
                         }
                     } else {
                         potentialEarnings = await calculateTasksPerCorrectAnswerPoints(JSON.parse(task.taskInstructions));
-                        if (potentialEarnings) {
+                        if (potentialEarnings != null) {
                             potentialEarnings = Number((potentialEarnings * numberOfQuestions).toFixed(2))
                         }
                     }

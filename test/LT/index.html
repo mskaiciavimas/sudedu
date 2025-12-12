@@ -2400,7 +2400,7 @@ const personalChlDict = {
                 `[["math","C4","C21","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
                 `[["math","C5","C20","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
                 `[["math","C5","C21","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C5","C18","","C41","C45","C47",["2","9"],true,"C79"], ["C40","10"]]`,
+                `[["math","C5","C18","","C41","C45","C47",["2","9"],true,"C79"], ["C40","20"]]`,
                 `[["math","C5","C22","","C41","C45","C48",["1","1"],true,"C79"], ["C40","10"]]`,
                 `[["math","C5","C30","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
                 `[["math","C7","C34","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
@@ -2785,7 +2785,7 @@ async function displayPersonalChl() {
         const completeButtonDiv = document.createElement('div');
         completeButtonDiv.className = 'complete-button-div';
 
-        if (userData && userData.knowledgeLvl) {
+        if (userData && userData.knowledgeLvl != null) {
             const potentialEarningsDisplay = document.createElement('div');
             let answeringMode = challenge.duration[0];
             let numberOfQuestions = challenge.duration[1];
@@ -2794,7 +2794,7 @@ async function displayPersonalChl() {
             if (answeringMode === "C39" || challenge.chl[1] === "C83") {
                 let potentialEarnings = await calculateTasksPerCorrectAnswerPoints(challenge.chl);
 
-                if (potentialEarnings) {
+                if (potentialEarnings != null) {
                     potentialEarnings = Number((potentialEarnings * personalChlCoinBonusMultiplier).toFixed(2))
                 }
                 
@@ -2826,7 +2826,7 @@ async function displayPersonalChl() {
                     `;
             } else if (answeringMode === "C40") {
                 let potentialEarnings = await calculateTasksPerCorrectAnswerPoints(challenge.chl);
-                if (potentialEarnings) {
+                if (potentialEarnings != null) {
                     potentialEarnings = Number((potentialEarnings * numberOfQuestions * personalChlCoinBonusMultiplier).toFixed(2));
                 }
 
@@ -3072,7 +3072,7 @@ window.addEventListener('load', checkWrap);
 async function handleKnowledgeLvlStatus () {
     const knowledgeLvlStatus = getClassLocalStorage();
     console.log()
-    if ((userData && userData.knowledgeLvl) || (knowledgeLvlStatus !== null && knowledgeLvlStatus !== undefined)) {
+    if ((userData && userData.knowledgeLvl != null) || (knowledgeLvlStatus !== null && knowledgeLvlStatus !== undefined)) {
         await displayPersonalChl();
     } else {
         showClassPopup();
@@ -3080,6 +3080,14 @@ async function handleKnowledgeLvlStatus () {
 }
 
 handleKnowledgeLvlStatus();
+
+window.addEventListener("pageshow", function () {
+    const nav = performance.getEntriesByType("navigation")[0];
+
+    if (nav && nav.type === "back_forward") {
+        window.location.reload();
+    }
+});
 
 // LOCAL STORAGE LIMIT START
 
