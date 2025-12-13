@@ -2715,7 +2715,40 @@
 
 
 @media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)  {
-.game-navigation {
+    .toggle-tab {
+        display: flex;
+        right: -38px;
+        width: 38px;
+        height: 80px;
+    }
+
+    .sidebar-wrapper {
+        top: 16px;
+        height: calc(100% - 116px - 32px);
+        width: calc(100vw - 38px - 5px);
+        max-width: 500px;
+        transform: translateX(calc(-100vw - 38px - 5px));
+        border-bottom-right-radius: 8px;
+        margin: 0;
+        margin-top: 0;
+    }
+
+    .sidebar {
+        border-bottom-right-radius: 16px;
+    }
+
+    #toggle-zoom-lock-btn svg {
+    width: 36px;
+    height: 36px;
+}
+
+#toggle-expand-btn svg {
+    width: 32px;
+    height: 32px;
+}
+
+
+    .game-navigation {
     min-height: 116px;
 }
 
@@ -2928,7 +2961,8 @@
     .pet-stats-selection-button,
     #toggle-edit-save-btn, 
     #cancel-edit-btn,
-    #end-preview-button {
+    #end-preview-button,
+    #delete-selected-item-button {
         font-size: 1.5rem;
     }
 
@@ -3664,8 +3698,16 @@
             closestTile: [0, 0]
         };
 
-        if (window.innerWidth <= 768) {
+        // Set different zoom limits based on device
+        const width = window.innerWidth;
+        const isTabletPortrait = width >= 768 && width <= 1200 && 
+                                window.matchMedia('(orientation: portrait)').matches;
+
+        if (width <= 767) {  // Mobile phones
             viewportState.maxScale = 1.5
+        } else if (isTabletPortrait) {  // Tablets in portrait mode
+            viewportState.scale = 0.58
+            viewportState.maxScale = 0.68
         }
 
         const topHalfClickBlockedItemClasses = ["bath-1"]
@@ -13258,7 +13300,13 @@ function displaySidebar() {
     const sidebarWrapper = document.querySelector('.sidebar-wrapper');
     const width = sidebarWrapper.offsetWidth;
 
-    if (window.innerWidth <= 768) {
+    const isSmallScreen = window.innerWidth <= 768;
+
+    const isPortraitTablet = window.matchMedia(
+    "(min-width: 768px) and (max-width: 1024px) and (orientation: portrait)"
+    ).matches;
+
+    if (isSmallScreen || isPortraitTablet) {
         sidebarWrapper.style.transform = `translateX(${(width)*-1}px)`;
     } else {
         sidebarWrapper.style.transform = `translateX(0px)`;

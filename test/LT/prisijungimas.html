@@ -645,43 +645,6 @@
 	<script src="../main-nav-bar.js"></script>
 
 	<script>
-		const MESSAGES = {
-			'REG_001': 'Paskyra sukurta! Patikrinkite el. paštą, kad ją patvirtintumėte.',
-			'REG_002': 'Patvirtinimo el. laiškas išsiųstas dar kartą. Patikrinkite savo el. paštą.',
-			'REG_003': 'Elektroninis paštas jau užimtas',
-			'LOGIN_001': '',
-			'LOGIN_002': 'Paskyra sukurta! Patikrinkite el. paštą, kad ją patvirtintumėte.',
-			'LOGIN_003': 'El. paštas nėra patvirtintas.',
-			'LOGIN_004': 'Vartotojas nerastas',
-			'LOGIN_005': 'Neteisingas slaptažodis',
-			'VERIFY_001': 'El. paštas sėkmingai patvirtintas! Galite prisijungti.',
-			'VERIFY_002': 'El. paštas jau patvirtintas.',
-			'VERIFY_003': 'Vartotojas nerastas',
-			'VERIFY_004': 'Patvirtinimo nuoroda nebegalioja.',
-			'RESET_001': 'Slaptažodžio atkūrimo nuoroda išsiųsta el. paštu (galioja 15 minučių).',
-			'RESET_002': 'Vartotojas su tokiu el. paštu nerastas',
-			'RESET_003': '✅ Slaptažodis sėkmingai pakeistas! Galite prisijungti.',
-			'RESET_004': 'Atkūrimo nuoroda nebegalioja arba neteisinga.',
-			'RESET_005': 'Nuoroda galioja.',
-			'ERR_001': 'Serverio klaida. Bandykite vėliau.',
-			'ERR_002': 'Trūksta duomenų'
-		};
-
-		function getMsg(code) {
-			return MESSAGES[code] || 'Nežinoma klaida';
-		}
-
-		function redirectToIndex() {
-			if (typeof controller !== 'undefined') {
-				localStorage.setItem('controller', JSON.stringify(controller));
-			}
-			window.location.href = "./";
-		}
-
-		if (userData && userData.emailVerified) {
-			window.location.href = './';
-		}
-
 		const registerBtn = document.getElementById('registerBtn');
 		const logInTitle = document.getElementById('log-in-text');
 		const authBtn = document.getElementById('authBtn');
@@ -702,6 +665,44 @@
 		let isRegistration = false;
 		let isLoading = false;
 		let isAuthenticating = false;
+
+
+		function getMsg(code, emailValue = '') {
+			const MESSAGES = {
+				'REG_001': `Paskyra sukurta el. pašto adresu ${emailValue}! Patikrinkite el. paštą, kad ją patvirtintumėte.`,
+				'REG_002': `Patvirtinimo el. laiškas išsiųstas ${emailValue}. Patikrinkite savo el. paštą.`,
+				'REG_003': 'Elektroninis paštas jau užimtas',
+				'LOGIN_001': '',
+				'LOGIN_002': `Paskyra el. paštu ${emailValue} jau sukurta! Patikrinkite el. paštą, kad ją patvirtintumėte.`,
+				'LOGIN_003': 'El. paštas nėra patvirtintas.',
+				'LOGIN_004': 'Vartotojas nerastas',
+				'LOGIN_005': 'Neteisingas slaptažodis',
+				'VERIFY_001': 'El. paštas sėkmingai patvirtintas! Galite prisijungti.',
+				'VERIFY_002': 'El. paštas jau patvirtintas.',
+				'VERIFY_003': 'Vartotojas nerastas',
+				'VERIFY_004': 'Patvirtinimo nuoroda nebegalioja.',
+				'RESET_001': `Slaptažodžio atkūrimo nuoroda išsiųsta el. pašto adresu ${emailValue} (galioja 15 minučių).`,
+				'RESET_002': 'Vartotojas su tokiu el. paštu nerastas',
+				'RESET_003': '✅ Slaptažodis sėkmingai pakeistas! Galite prisijungti.',
+				'RESET_004': 'Atkūrimo nuoroda nebegalioja arba neteisinga.',
+				'RESET_005': 'Nuoroda galioja.',
+				'ERR_001': 'Serverio klaida. Bandykite vėliau.',
+				'ERR_002': 'Trūksta duomenų'
+			};
+			return MESSAGES[code] || 'Nežinoma klaida';
+		}
+
+		function redirectToIndex() {
+			if (typeof controller !== 'undefined') {
+				localStorage.setItem('controller', JSON.stringify(controller));
+			}
+			window.location.href = "./";
+		}
+
+		if (userData && userData.emailVerified) {
+			window.location.href = './';
+		}
+
 
 		if (!controller) {
 			let controller = JSON.parse(localStorage.getItem('controller')) || {};
@@ -842,10 +843,12 @@
 							
 							toggleIsRegister();
 							
-							showSuccess(getMsg(data.code));
+							showSuccess(getMsg(data.code, emailVal));
+							enableButtons();
 							return;
 						} else if (data.code === 'REG_003') {
 							showError(getMsg(data.code));
+							enableButtons();
 							return;
 						}
 					}
@@ -854,7 +857,7 @@
 						if (!data.emailVerified) {
 							if (data.isNewAccount) {
 								showError(`
-									${getMsg('LOGIN_002')}
+									${getMsg('LOGIN_002', emailVal)}
 									<br/>
 									<button class="btn-link" id="resend-confirmation-btn" onclick="resendVerification('${emailVal}')" style="margin-top: 8px;">
 										Siųsti patvirtinimo el. laišką dar kartą
@@ -1013,7 +1016,7 @@
 				}, 300);
 				
 				// Show success message
-				showSuccess(getMsg(data.code));
+				showSuccess(getMsg(data.code, emailVal));
 			} catch (err) {
 				showError('Nepavyko pasiekti serverio.');
 			} finally {
