@@ -1639,8 +1639,14 @@ function processSentences(extractedSentences, sessionSeed, passNumber, config, s
 
                 const wordEnd = item.word.slice(endIdx);
 
-                let wordHTML = `<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${wordStart}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="6" id="id-${currentQuestionId}" class="question-input middle"></textarea>${wordEnd}<span class="pagalba-div">${item.helpSpans[selectedCategory]}</span></span>`;
-                
+				let wordHTML;
+
+				if (selectedCategory === "C67" || selectedCategory === "C68") {
+					const constantHelpSpan = generateConstantHelpSpansForC67andC68(answerLetters[0])
+					wordHTML = `<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${wordStart}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="6" id="id-${currentQuestionId}" class="question-input middle"></textarea>${wordEnd}<span class="pagalba-div-constant">${constantHelpSpan}</span></span>`;
+				} else {
+					wordHTML = `<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${wordStart}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="6" id="id-${currentQuestionId}" class="question-input middle"></textarea>${wordEnd}<span class="pagalba-div">${item.helpSpans[selectedCategory]}</span></span>`;
+				}                
                 sentenceAnswers[`id-${currentQuestionId}`] = {};
                 sentenceAnswers[`id-${currentQuestionId}`]["klausimas"] = [wordStart, wordEnd];
                 sentenceAnswers[`id-${currentQuestionId}`]["atsakymas"] = [answerLetters];
@@ -1839,6 +1845,44 @@ async function prepareSentencesWrapper(sessionSeed, passNumber = 0, targetFormat
 			if (valuesToShow.length > 0) {
 				const valuesToShowString = valuesToShow.join(', ');
 				const helpSpanHTML = `<span class="pagalba-span">(${valuesToShowString})</span>`
+				return helpSpanHTML
+			} else {
+				return ``
+			}
+		}
+
+		function generateConstantHelpSpansForC67andC68 (letter) {
+			if (!letter) return '';
+			
+			let pagalbaText = "";
+			let valuesToShow = [];
+	
+			removedLetterOptionIndex = {
+				"k": ["k", "g"],
+				"g": ["k", "g"],
+				"p": ["p", "b"],
+				"b": ["p", "b"],
+				"t": ["t", "d"],
+				"d": ["t", "d"],
+				"ž": ["ž", "š"],
+				"z": ["z", "s"],
+				"s": ["z", "s"],
+				"š": ["ž", "š"],
+				"e": ["e", "ė"],
+				"ė": ["e", "ė"],
+				"i": ["i", "y"],
+				"y": ["i", "y"],
+				"u": ["u", "ū"],
+				"ū": ["u", "ū"],
+			};
+
+			if (letter.toLowerCase() in removedLetterOptionIndex) {
+				valuesToShow = removedLetterOptionIndex[letter.toLowerCase()];
+			}
+
+			if (valuesToShow.length > 0) {
+				const valuesToShowString = valuesToShow.join('/');
+				const helpSpanHTML = `<span class="pagalba-span-perm ">(${valuesToShowString})</span>`
 				return helpSpanHTML
 			} else {
 				return ``
