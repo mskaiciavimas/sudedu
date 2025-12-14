@@ -809,6 +809,18 @@
             color: #92400e;
         }
 
+        .coin-display.main {
+            background: transparent;
+            transition:
+                max-height 0.3s ease,
+                opacity 0.3s ease;
+        }
+
+        .coin-display.main.container-expanded  {
+            max-height: 0;
+            opacity: 0;
+        }
+
         .coin-display-delete-confirm {
             display: flex;
             align-items: center;
@@ -2021,6 +2033,21 @@
     height: 24px;
 }
 
+#toggle-zoom-lock-btn,
+#toggle-expand-btn {
+    padding-bottom: 0;
+    margin-bottom: 0
+}
+
+.upper-controls-holder {
+    margin-bottom: 2svh;
+}
+
+.upper-controls-inner-holder {
+    display: flex;
+    justify-content: center;
+}
+
 #toggle-zoom-lock-btn svg path {
     fill: #212529;
 }
@@ -2560,6 +2587,10 @@
 
     .game-content-panel.mobile {
         padding: 15px 15px 0 15px !important;
+    }
+
+    .game-content-panel.mobile.container-expanded  {
+        padding: 15px 15px 2.5px 15px !important;
     }
 
     .shop-items:not(:empty), .object-assets:not(:empty), #pet-skins:not(:empty), #pet-supplies:not(:empty) {
@@ -3372,20 +3403,30 @@
             </div>
 
             <div class="upper-controls-holder">
-                <button id="toggle-zoom-lock-btn" class="viewport-control-btn">
-                    <span>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
-                            <path d="M240-160h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM240-160v-400 400Zm0 80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h280v-80q0-83 58.5-141.5T720-920q83 0 141.5 58.5T920-720h-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80h120q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Z"/>
-                        </svg>
-                    </span>
-                </button>
-                <button id="toggle-expand-btn" class="viewport-control-btn" onclick="toggleRoomExpansion()">
-                    <span>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
-                            <path d="M120-120v-320h80v184l504-504H520v-80h320v320h-80v-184L256-200h184v80H120Z"/>
-                        </svg>
-                    </span>
-                </button>
+                <div class="main-coin-display-holder">
+                    <div class="coin-display main">
+                        <span class="coin-icon">
+                            <img src="../images/icons/icon-sudedu-coin.png">
+                        </span>
+                        <span class="coin-amount"></span>
+                    </div>
+                </div>
+                <div class="upper-controls-inner-holder">
+                    <button id="toggle-zoom-lock-btn" class="viewport-control-btn">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                                <path d="M240-160h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM240-160v-400 400Zm0 80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h280v-80q0-83 58.5-141.5T720-920q83 0 141.5 58.5T920-720h-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80h120q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Z"/>
+                            </svg>
+                        </span>
+                    </button>
+                    <button id="toggle-expand-btn" class="viewport-control-btn" onclick="toggleRoomExpansion()">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                                <path d="M120-120v-320h80v184l504-504H520v-80h320v320h-80v-184L256-200h184v80H120Z"/>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
             </div>
             </div>
 
@@ -3521,6 +3562,12 @@
                 </button>
                 <h2>Augintiniai</h2>
             </div>
+            <div class="coin-display">
+                <span class="coin-icon">
+                    <img src="../images/icons/icon-sudedu-coin.png">
+                </span>
+                <span class="coin-amount"></span>
+            </div>
         </div>
         
         <div class="collapsible-content" id="petAssetCollapsibleContent">
@@ -3644,6 +3691,12 @@
                             </svg>
                         </button>
                         <h2>Baldai</h2>
+                    </div>
+                    <div class="coin-display">
+                        <span class="coin-icon">
+                            <img src="../images/icons/icon-sudedu-coin.png">
+                        </span>
+                        <span class="coin-amount"></span>
                     </div>
                 </div>
                 
@@ -13727,17 +13780,21 @@ function toggleRoomExpansion() {
     const gameNavigation = document.querySelector(".game-navigation");
     const contentContainer = document.querySelector("#content-outer-container");
     const sidebarWrapper = document.querySelector(".sidebar-wrapper");
+    const mainCoinDisplay = document.querySelector(".main-coin-display-holder .coin-display");
+    const gameContentPanel = document.querySelector(".game-content-panel");
 
     const isExpanded = game.classList.contains(containerExpanded);
 
     if (isExpanded) {
         game.classList.remove(containerExpanded);
         petButtons.classList.remove(containerExpanded);
+        mainCoinDisplay.classList.remove(containerExpanded);
         statsBars.classList.remove(containerExpanded);
         upperControls.classList.remove(containerExpanded);
         gameNavigation.classList.remove(containerExpanded);
         contentContainer.classList.remove(containerExpanded);
         sidebarWrapper.classList.remove(containerExpanded);
+        gameContentPanel.classList.remove(containerExpanded);
 
         expandBtnSpan.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
@@ -13755,6 +13812,8 @@ function toggleRoomExpansion() {
         gameNavigation.classList.add(containerExpanded);
         contentContainer.classList.add(containerExpanded);
         sidebarWrapper.classList.add(containerExpanded);
+        mainCoinDisplay.classList.add(containerExpanded);
+        gameContentPanel.classList.add(containerExpanded);
 
         expandBtnSpan.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
