@@ -3120,11 +3120,12 @@ async function handleKnowledgeLvlStatus () {
         }
     } else {
         if (userData.knowledgeLvl != null && userData.knowledgeLvl !== -1) {
-            if (userData.accType !== "teacher" || userData.accType !== "admin") {
+            if (userData.accType !== "teacher" && userData.accType !== "admin") {
                 await displayPersonalChl();
             }
         } else {
-            if (userData.accType !== "teacher" || userData.accType !== "admin") {
+            console.log(userData.accType)
+            if (userData.accType !== "teacher" && userData.accType !== "admin") {
                 showClassPopupLoggedInClassConfirmation();
             }
         }
