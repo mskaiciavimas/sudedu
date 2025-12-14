@@ -3992,7 +3992,6 @@ async function calculateTasksPerCorrectAnswerPoints(type, selectedTextInfo = nul
     const skipTasks = ['C47', 'C48', 'userClass'];
 
     let tempController = {};
-    console.log(controller)
     if (type === "controller") {
         if (controller.mode === "math") {
             tempController.mode = 'math';
