@@ -85,6 +85,9 @@
             -webkit-user-select: none;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+        }
+
+        *:not(#shop-container *):not(#pet-asset-container *):not(#furniture-container *):not(#taxes-container *) {
             box-sizing: border-box;
         }
 
@@ -172,10 +175,14 @@
             touch-action: none;
             -webkit-user-select: none;
             user-select: none;
+            transition: box-shadow 0.2s ease;
         }
 
-        .room-object-edit:hover {
-            transform: scale(1.05);
+        @media (hover: hover) and (pointer: fine) {
+            .room-object-edit:not(.marked-for-deletion):hover {
+                box-shadow: inset 0 0 10px 5px rgba(245, 39, 39, 0.65);
+                transition: box-shadow 0.2s ease;
+            }
         }
 
         .room-object-edit.wallpaper:hover {
@@ -200,14 +207,16 @@
             z-index: 1000 !important;
         }
 
-        .room-object.dragging {
+        .room-object-edit:not(.marked-for-deletion).dragging {
             z-index: 1000 !important;
             cursor: grabbing;
             box-shadow: inset 0 0 0 2px red;
+            transition: box-shadow 0.2s ease;
         }
 
         .marked-for-deletion {
             box-shadow: inset 0 0 0 2px red;
+            transition: box-shadow 0.2s ease;
         }
 
         .pet-left {
@@ -703,18 +712,80 @@
             cursor: not-allowed;
         }
 
-        .shop-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-        }
+.shop-header {
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+}
+
+.shop-header.compact .collapsible-content {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    margin-bottom: 0;
+}
+
+.shop-header.compact .header-main {
+    padding: 10px 15px;
+}
+
+.header-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    transition: padding 0.3s ease;
+    cursor: pointer;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.header-left h2 {
+    margin: 0 !important;
+}
+
+.expand-toggle {
+    background: transparent;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    padding: 0;
+    margin: 0;
+}
+
+.expand-toggle svg {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+}
+
+.shop-header.compact .expand-toggle svg {
+    transform: rotate(180deg);
+}
+
+.collapsible-content {
+    max-height: 500px;
+    overflow: hidden;
+    opacity: 1;
+    transition: max-height 0.3s ease, opacity 0.3s ease, margin-bottom 0.3s ease;
+    padding: 0 20px 20px;
+}
 
         .shop-header h2 {
             color: #212529;
@@ -732,6 +803,29 @@
             gap: 3px;
             background: #ffc074;
             border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 2px 8px 2px 4px;
+            border-radius: 15px;
+            font-weight: 600;
+            color: #92400e;
+        }
+
+        .coin-display.main {
+            background: transparent;
+            transition:
+                max-height 0.3s ease,
+                opacity 0.3s ease;
+        }
+
+        .coin-display.main.container-expanded  {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .coin-display-delete-confirm {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
             padding: 2px 8px 2px 4px;
             border-radius: 15px;
             font-weight: 600;
@@ -782,7 +876,8 @@
         }
 
         .shop-categories-dropdown select,
-        #pet-category-select {
+        #pet-category-select,
+        #shop-category-select {
             padding: 12px 16px;
             font-size: 1rem;
             border-radius: 20px;
@@ -806,13 +901,22 @@
             cursor: pointer;
         }
 
-        .shop-items,
-        .object-assets,
-        #pet-skins,
-        #pet-supplies {
+        .shop-items:not(:empty),
+        .object-assets:not(:empty),
+        #pet-skins:not(:empty),
+        #pet-supplies:not(:empty) {
+            height: 100%;
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1.5rem;
+            overflow-y: auto;
+            padding-bottom: 30px;
+        }
+
+        .shop-items {
+            height: 100%;
+            overflow-y: auto;
+            box-sizing: content-box !important;
         }
  
         .food-options-container {
@@ -916,6 +1020,7 @@
             justify-content: space-between;
             display: flex;
             flex-direction: column;
+            max-height: 320px;
         }
 
         .purchase-btn,
@@ -927,7 +1032,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
-            width: 60%;
+            width: 170px;
             height: 40px;
         }
 
@@ -1010,7 +1115,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
-            min-height: 40px;
+            min-height: 30px;
             min-width: 60%;
             font-size: 1rem;
             text-align: center;
@@ -1026,8 +1131,8 @@
             background: linear-gradient(135deg, #40c9a9, #32ac93);
             color: #F5F5F7;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 25px;
+            height: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1077,7 +1182,14 @@
         #shop-container,
         #taxes-container,
         #pet-asset-container {
-            padding: 30px;
+            padding: 30px 30px 0 30px;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .tax-section-inner-holder {
+            height: 100%;
+            overflow: auto;
         }
 
         .department-btn.active,
@@ -1125,11 +1237,6 @@
             margin-top: 12px;
         }
 
-        .categories-dropdown-holder {
-            margin-bottom: 28px;
-        }
-
-
         @keyframes draw {
         0% {
             stroke-dashoffset: 1000;
@@ -1142,10 +1249,10 @@
         .tick {
             fill: none;
             stroke: #F5F5F7;
-            stroke-width: 4;
+            stroke-width: 3;
             stroke-linecap: round;
             stroke-linejoin: round;
-            stroke-dasharray: 24; /* length of path */
+            stroke-dasharray: 24;
             stroke-dashoffset: 24;
         }
 
@@ -1305,6 +1412,7 @@
 
         .tax-info {
             margin-top: 20px;
+            margin-bottom: 30px;
         }
 
         #days-remaining-water,
@@ -1351,17 +1459,23 @@
             justify-content: center;
         }
 
-        .shop-departments,
-        .pet-asset-supply-tabs {
+        .shop-departments {
             display: flex;
             margin-bottom: 16px;
             gap: 10px;
             flex-wrap: wrap;
         }
 
+        .pet-asset-supply-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
         .pet-supplies-tabs {
             display: flex;
-            margin-bottom: 20px;
+            flex-direction: column;
             gap: 10px;
             flex-wrap: wrap;
         }
@@ -1405,13 +1519,6 @@
             background: rgba(255, 255, 255, 0.4);
         }
 
-        .pet-preview {
-            position: static;
-            height: 75px;
-            width: 75px;
-            background-size: calc(75px * 16) calc(75px * 26);
-        }
-
         .pet-btn.active {
                 background: linear-gradient(135deg, #3288AC, #286D8A) !important;
         }
@@ -1421,7 +1528,6 @@
             flex: 1 1 auto;
             display: flex;
             flex-direction: row;
-            margin-bottom: 16px;
             gap: 10px;
         }
 
@@ -1803,7 +1909,6 @@
   padding: 20px 30px;
   border-radius: 10px;
   text-align: center;
-  max-width: 300px;
   width: 80%;
 }
 
@@ -1928,6 +2033,21 @@
     height: 24px;
 }
 
+#toggle-zoom-lock-btn,
+#toggle-expand-btn {
+    padding-bottom: 0;
+    margin-bottom: 0
+}
+
+.upper-controls-holder {
+    margin-bottom: 2svh;
+}
+
+.upper-controls-inner-holder {
+    display: flex;
+    justify-content: center;
+}
+
 #toggle-zoom-lock-btn svg path {
     fill: #212529;
 }
@@ -1951,6 +2071,7 @@
   justify-content: space-between;
   align-items: flex-end;
   gap: 10px;
+  margin-bottom: 16px;
 }
 
 .categories-dropdown-holder {
@@ -2307,6 +2428,80 @@
     display: block;
 }
 
+
+.shop-header.compact .collapsible-content{
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.purchase-btn-hold {
+  --progress: #3288AC;
+  --duration: 1600ms;
+
+  padding: 12px 24px;
+  border: 0;
+  outline: none;
+  user-select: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.purchase-btn-hold > span:first-child {
+  position: relative;
+  z-index: 3;
+  backface-visibility: hidden;
+  transition: transform 0.3s, opacity 0.2s;
+}
+
+/* Background layer for press effect */
+.purchase-btn-hold::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  transition: transform 0.3s;
+  background: var(--background, transparent);
+}
+
+/* SVG stroke - FIXED: Hide initially */
+.purchase-btn-hold svg rect {
+  stroke-dasharray: 0;
+  stroke-dashoffset: 0;
+  transition: none;
+  opacity: 0; /* Hidden by default */
+}
+
+/* SVG stroke */
+.purchase-btn-hold svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Press effect */
+.purchase-btn-hold:active:not(.success)::before {
+  transform: scaleX(0.95) scaleY(0.84);
+}
+
+/* Process animation - FIXED: Show stroke and sync timing */
+.purchase-btn-hold.process svg rect {
+  opacity: 1;
+  stroke-dashoffset: 0;
+}
+
+
 @media (min-width: 769px) {
     .toggle-tab {
         display: none;
@@ -2391,12 +2586,17 @@
     }
 
     .game-content-panel.mobile {
-        padding: 15px 10px !important;
+        padding: 15px 15px 0 15px !important;
     }
 
-    .shop-header {
-        padding: 20px;
+    .game-content-panel.mobile.container-expanded  {
+        padding: 15px 15px 2.5px 15px !important;
     }
+
+    .shop-items:not(:empty), .object-assets:not(:empty), #pet-skins:not(:empty), #pet-supplies:not(:empty) {
+        padding-bottom: 15px;
+    }
+
 
     #game-panel {
         margin: 0;
@@ -2422,6 +2622,28 @@
     #pet-category-select,
     .shop-categories-dropdown select {
         padding: 8px 8px;
+    }
+
+     .shop-header.compact .header-main {
+        padding: 10px 15px;
+    }
+    
+    .header-main {
+        padding: 10px 15px;
+    }
+    
+    .collapsible-content {
+        padding: 0 15px 10px 15px;
+    }
+    
+    .expand-toggle {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .expand-toggle svg {
+        width: 18px;
+        height: 18px;
     }
 }
 
@@ -2515,12 +2737,49 @@
   #pet-buttons {
     margin-left: 4px;
   }
-    
+
+    .expand-toggle {
+        width: 20px;
+        height: 32px;
+    }
 }
 
 
 @media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)  {
-.game-navigation {
+    .toggle-tab {
+        display: flex;
+        right: -38px;
+        width: 38px;
+        height: 80px;
+    }
+
+    .sidebar-wrapper {
+        top: 16px;
+        height: calc(100% - 116px - 32px);
+        width: calc(100vw - 38px - 5px);
+        max-width: 500px;
+        transform: translateX(calc(-100vw - 38px - 5px));
+        border-bottom-right-radius: 8px;
+        margin: 0;
+        margin-top: 0;
+    }
+
+    .sidebar {
+        border-bottom-right-radius: 16px;
+    }
+
+    #toggle-zoom-lock-btn svg {
+    width: 36px;
+    height: 36px;
+}
+
+#toggle-expand-btn svg {
+    width: 32px;
+    height: 32px;
+}
+
+
+    .game-navigation {
     min-height: 116px;
 }
 
@@ -2733,7 +2992,8 @@
     .pet-stats-selection-button,
     #toggle-edit-save-btn, 
     #cancel-edit-btn,
-    #end-preview-button {
+    #end-preview-button,
+    #delete-selected-item-button {
         font-size: 1.5rem;
     }
 
@@ -3143,20 +3403,30 @@
             </div>
 
             <div class="upper-controls-holder">
-                <button id="toggle-zoom-lock-btn" class="viewport-control-btn">
-                    <span>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
-                            <path d="M240-160h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM240-160v-400 400Zm0 80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h280v-80q0-83 58.5-141.5T720-920q83 0 141.5 58.5T920-720h-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80h120q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Z"/>
-                        </svg>
-                    </span>
-                </button>
-                <button id="toggle-expand-btn" class="viewport-control-btn" onclick="toggleRoomExpansion()">
-                    <span>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
-                            <path d="M120-120v-320h80v184l504-504H520v-80h320v320h-80v-184L256-200h184v80H120Z"/>
-                        </svg>
-                    </span>
-                </button>
+                <div class="main-coin-display-holder">
+                    <div class="coin-display main">
+                        <span class="coin-icon">
+                            <img src="../images/icons/icon-sudedu-coin.png">
+                        </span>
+                        <span class="coin-amount"></span>
+                    </div>
+                </div>
+                <div class="upper-controls-inner-holder">
+                    <button id="toggle-zoom-lock-btn" class="viewport-control-btn">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                                <path d="M240-160h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM240-160v-400 400Zm0 80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h280v-80q0-83 58.5-141.5T720-920q83 0 141.5 58.5T920-720h-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80h120q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Z"/>
+                            </svg>
+                        </span>
+                    </button>
+                    <button id="toggle-expand-btn" class="viewport-control-btn" onclick="toggleRoomExpansion()">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                                <path d="M120-120v-320h80v184l504-504H520v-80h320v320h-80v-184L256-200h184v80H120Z"/>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
             </div>
             </div>
 
@@ -3194,89 +3464,113 @@
             </div>
 
       <div id="shop-container" class="game-content-panel">
-        <div class="shop-header">
-            <h2>Parduotuvė</h2>
+    <div class="shop-header" id="shopHeader">
+        <div class="header-main">
+            <div class="header-left">
+                <button class="expand-toggle" id="expandToggle">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 15l-6-6-6 6"/>
+                    </svg>
+                </button>
+                <h2>Parduotuvė</h2>
+            </div>
             <div class="coin-display">
                 <span class="coin-icon">
-                        <img src="../images/icons/icon-sudedu-coin.png">
+                    <img src="../images/icons/icon-sudedu-coin.png">
                 </span>
                 <span class="coin-amount"></span>
             </div>
         </div>
         
-        <div class="shop-departments">
-            <button class="department-btn">
-                <span class="department-icon">
+        <div class="collapsible-content" id="collapsibleContent">
+            <div class="shop-departments">
+                <button class="department-btn">
                     <span class="department-icon">
-                        <img src="../images/icons/icon-pet-supplies.svg">
+                        <span class="department-icon">
+                            <img src="../images/icons/icon-pet-supplies.svg">
+                        </span>
                     </span>
-                </span>
-                <span class="department-label">Reikmenys</span>
-            </button>
-            
-            <button class="department-btn">
-                <span class="department-icon">
-                    <span class="nav-icon">
-                        <img src="../images/icons/icon-furniture.svg">
+                    <span class="department-label">Reikmenys</span>
+                </button>
+                
+                <button class="department-btn">
+                    <span class="department-icon">
+                        <span class="nav-icon">
+                            <img src="../images/icons/icon-furniture.svg">
+                        </span>
                     </span>
-                </span>
-                <span class="department-label">Baldai</span>
-            </button>
-            <button class="department-btn">
-                <span class="department-icon">
-                    <span class="nav-icon">
-                        <img src="../images/icons/icon-animals.svg">
+                    <span class="department-label">Baldai</span>
+                </button>
+                <button class="department-btn">
+                    <span class="department-icon">
+                        <span class="nav-icon">
+                            <img src="../images/icons/icon-animals.svg">
+                        </span>
                     </span>
-                </span>
-                <span class="department-label">Gyvūnėliai</span>
-            </button>
-            
-        </div>
+                    <span class="department-label">Gyvūnėliai</span>
+                </button>
+            </div>
 
-        <div id="shop-buttons">
-        <!-- Pet list (only shown for Maistas) -->
-        <div id="pet-list-shop" class="pet-list hidden"></div>
+            <div id="shop-buttons">
+                <!-- Pet list (only shown for Maistas) -->
+                <div id="pet-list-shop" class="pet-list hidden"></div>
 
-        <!-- Maistas tabs (only shown for Maistas) -->
-        <div id="pet-supplies-tabs" class="pet-supplies-tabs hidden">
-            <button class="pet-supply-tab active" data-type="supplies">
-                <span class="department-icon">
-                    <img src="../images/icons/icon-pet-food.svg">
-                </span>
-                <span class="tab-label">Maistas</span>
-            </button>
-            <button class="pet-supply-tab" data-type="skins">
-                <span class="department-icon">
-                    <img src="../images/icons/icon-pet-skins.svg">
-                </span>
-                <span class="tab-label">Išvaizda</span>
-            </button>
-        </div>
-        </div>
+                <!-- Maistas tabs (only shown for Maistas) -->
+                <div id="pet-supplies-tabs" class="pet-supplies-tabs hidden">
+                    <button class="pet-supply-tab active" data-type="supplies">
+                        <span class="department-icon">
+                            <img src="../images/icons/icon-pet-food.svg">
+                        </span>
+                        <span class="tab-label">Maistas</span>
+                    </button>
+                    <button class="pet-supply-tab" data-type="skins">
+                        <span class="department-icon">
+                            <img src="../images/icons/icon-pet-skins.svg">
+                        </span>
+                        <span class="tab-label">Išvaizda</span>
+                    </button>
+                </div>
+            </div>
 
-        <div class="shop-categories-dropdown">
             <div class="categories-dropdown-holder">
                 <select id="shop-category-select"></select>
             
-            <div class="shop-not-owned-holder">
-                <label class="switch"><input type="checkbox" id="shop-not-owned-toggle" class="shop-not-owned-toggle">
-                    <span class="switch-slider">
-                        <span class="switch-text switch-text-shop">
-                            NETURIU
+                <div class="shop-not-owned-holder">
+                    <label class="switch"><input type="checkbox" id="shop-not-owned-toggle" class="shop-not-owned-toggle">
+                        <span class="switch-slider">
+                            <span class="switch-text switch-text-shop">
+                                NETURIU
+                            </span>
                         </span>
-                    </span>
-                </label>
+                    </label>
+                </div>
             </div>
-
-            </div>
-            <div class="shop-items" id="shop-items"></div>
         </div>
     </div>
+    
+    <div class="shop-items" id="shop-items"></div>
+</div>
 
     <div id="pet-asset-container" class="game-content-panel">
-                <div class="shop-header">
-                    <h2>Augintiniai</h2>
-                </div>
+    <div class="shop-header" id="petAssetHeader">
+        <div class="header-main">
+            <div class="header-left">
+                <button class="expand-toggle" id="petAssetExpandToggle">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 15l-6-6-6 6"/>
+                    </svg>
+                </button>
+                <h2>Augintiniai</h2>
+            </div>
+            <div class="coin-display">
+                <span class="coin-icon">
+                    <img src="../images/icons/icon-sudedu-coin.png">
+                </span>
+                <span class="coin-amount"></span>
+            </div>
+        </div>
+        
+        <div class="collapsible-content" id="petAssetCollapsibleContent">
                 
 
                 <div id="pet-asset-buttons">
@@ -3301,26 +3595,33 @@
                 <div class="categories-dropdown-holder">
                         <select id="pet-category-select" style="display: none;"></select>
                 </div>
+                    </div>
+                </div>
                 <div id="pet-skins"></div>
                 <div id="pet-supplies">
                     <div id="pet-supplies-items"></div>
                 </div>
                 <div class="pet-categories-dropdown"></div>
-    </div>
+        </div> 
+    
 
             <div id="taxes-container" class="game-content-panel">
             
-                <div class="taxes-header">
-                <div class="shop-header">
-                    <h2>Mokesčiai</h2>
+            <div class="shop-header" id="taxesHeader">
+                <div class="header-main">
+                    <div class="header-left">
+                        <h2>Mokesčiai</h2>
+                    </div>
                     <div class="coin-display">
-                    <span class="coin-icon">
+                        <span class="coin-icon">
                             <img src="../images/icons/icon-sudedu-coin.png">
-                    </span>
-                    <span class="coin-amount"></span>
+                        </span>
+                        <span class="coin-amount"></span>
+                    </div>
                 </div>
+            
                 </div>
-                </div>
+                <div class="tax-section-inner-holder hide-scrollbar">
                 <div class="tax-records">
                     <h3>Mokesčių sąrašas</h3>
                     <div class="records-list">
@@ -3375,14 +3676,31 @@
                         </div>
                     </div>
                 </div>
+                </div>
 
 
             </div>
 
             <div id="furniture-container" class="game-content-panel">
-                <div class="shop-header">
-                    <h2>Baldai</h2>
+            <div class="shop-header" id="furnitureHeader">
+                <div class="header-main">
+                    <div class="header-left">
+                        <button class="expand-toggle" id="furnitureExpandToggle">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 15l-6-6-6 6"/>
+                            </svg>
+                        </button>
+                        <h2>Baldai</h2>
+                    </div>
+                    <div class="coin-display">
+                        <span class="coin-icon">
+                            <img src="../images/icons/icon-sudedu-coin.png">
+                        </span>
+                        <span class="coin-amount"></span>
+                    </div>
                 </div>
+                
+                <div class="collapsible-content" id="furnitureCollapsibleContent">
                 <div class="shop-categories-dropdown">
                     <div class="categories-dropdown-holder">
                         <select id="object-category-select"></select>
@@ -3396,6 +3714,9 @@
                             </label>
                         </div>
                     </div>
+                    </div>
+                    </div>
+                    </div>
                     <div class="object-assets">
 
                     </div>
@@ -3403,11 +3724,13 @@
             </div>
         </div>
     </div>
-    </div>
 
     <script src="../mental-arithmetic.js"></script>
     <script src="../main-nav-bar.js"></script>
     <script>
+        
+        const COST_MULTIPLIER = 1
+
         if (!userData || userData?.accType === "teacher") {
             window.location.href = './';
         }
@@ -3428,8 +3751,16 @@
             closestTile: [0, 0]
         };
 
-        if (window.innerWidth <= 768) {
+        // Set different zoom limits based on device
+        const width = window.innerWidth;
+        const isTabletPortrait = width >= 768 && width <= 1200 && 
+                                window.matchMedia('(orientation: portrait)').matches;
+
+        if (width <= 767) {  // Mobile phones
             viewportState.maxScale = 1.5
+        } else if (isTabletPortrait) {  // Tablets in portrait mode
+            viewportState.scale = 0.58
+            viewportState.maxScale = 0.68
         }
 
         const topHalfClickBlockedItemClasses = ["bath-1"]
@@ -3449,8 +3780,8 @@
         const taxPaymentPeriod = 14 //days
         const taxGracePeriod = 2 //days;
         const taxPrice = {
-            "waterTax": 20,
-            "electricityTax": 20
+            "waterTax": 18 * COST_MULTIPLIER,
+            "electricityTax": 18 * COST_MULTIPLIER
         }
         let petOnWalk = "";
         const speciesTranslationDict = {
@@ -3622,16 +3953,23 @@
         
         /*
         const roomLayout = [
-          [4.3, ...Array(40).fill(4.1), 4.4],
+          [4.31, ...Array(40).fill(4.1), 4.32],
           ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2]),
           [4.2, ...Array(40).fill(3.0), 4.2],
           ...Array(20).fill([4.2, ...Array(40).fill(1.0), 4.2]),
-          [4.6, ...Array(40).fill(4.1), 4.5],
+          [4.34, ...Array(40).fill(4.1), 4.33],
         ];
         */
 
         const roomLayoutLibrary = {
             1: [
+                [4.31, ...Array(40).fill(4.1), 4.32],
+                ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2]),
+                [4.2, ...Array(40).fill(3.0), 4.2],
+                ...Array(20).fill([4.2, ...Array(40).fill(1.0), 4.2]),
+                [4.34, ...Array(40).fill(4.1), 4.33],
+            ],
+            2: [
                 // Top part of floor 2
                 [4.31, ...Array(40).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.32],
                 ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2]),
@@ -3858,7 +4196,7 @@ function resizeCanvas() {
 // Call on window resize
 window.addEventListener('resize', resizeCanvas);
 
-        function setPetAndObjectContainersToGridDimentions() {
+        async function setPetAndObjectContainersToGridDimentions() {
             const roomGrid = document.getElementById('roomGrid');
 
             const width = roomGrid.offsetWidth;
@@ -3926,10 +4264,24 @@ function toggleRoomDarknessBasedOnElectricityTax() {
 
 async function initGame() {
     adjustUnitSizeForSmallScreens();
+    await new Promise(resolve => requestAnimationFrame(resolve));
     await renderRoomGrid();
-    setPetAndObjectContainersToGridDimentions();
+    
+    // ADD: Extra safety delay for canvas rendering
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    await setPetAndObjectContainersToGridDimentions();
+    
+    // ADD: Validate room loaded before proceeding
+    if (!roomLayout || roomLayout.length === 0) {
+        throw new Error("Room layout not initialized");
+    }
+    
     renderRoomObjects();
-    blockTopHalfOfSelectedDivsClickEvents()
+    blockTopHalfOfSelectedDivsClickEvents();
+    
+    // NO VALIDATION HERE - let placement logic run first
+    
     renderPets();
     enablePetDragging();
     updateCoinAmounts(userMoney);
@@ -3956,14 +4308,246 @@ async function initGame() {
     });
 }
 
+async function validateAndFixObjectPositions() {
+    const roomObjectsContainer = document.getElementById('roomObjectsContainer');
+    if (!roomObjectsContainer) return false;
+    
+    const objects = roomObjectsContainer.querySelectorAll('.room-object:not(.furniture-preview)');
+    const invalidObjects = [];
+    
+    objects.forEach(obj => {
+        const coords = getObjectCoordinates(obj.id);
+        
+        // Check if coordinates exist and are valid
+        if (!coords || coords.length !== 2) {
+            console.warn(`Invalid coordinates for ${obj.id}`);
+            invalidObjects.push(obj.id);
+            return;
+        }
+        
+        const [x, y] = coords;
+        
+        // Check if within room bounds
+        if (x < 0 || y < 0 || y >= roomLayout.length || x >= roomLayout[0].length) {
+            console.warn(`Object ${obj.id} outside bounds: [${x}, ${y}]`);
+            invalidObjects.push(obj.id);
+            return;
+        }
+        
+        // Check if on valid tile type
+        const tileType = roomLayout[y]?.[x];
+        if (tileType === undefined) {
+            console.warn(`Object ${obj.id} on undefined tile at [${x}, ${y}]`);
+            invalidObjects.push(obj.id);
+            return;
+        }
+        
+        const type = tileType?.type ?? tileType;
+        const validTypes = [1.0, 2.0, 3.0, 5.0, 6.0];
+        
+        if (!validTypes.includes(type)) {
+            console.warn(`Object ${obj.id} on invalid tile type ${type} at [${x}, ${y}]`);
+            invalidObjects.push(obj.id);
+        }
+    });
+    
+    // If invalid objects found, trigger reload
+    if (invalidObjects.length > 0) {
+        console.warn(`Found ${invalidObjects.length} invalid object positions`);
+        return false;
+    }
+    
+    return true;
+}
+
+let initAttempts = 0;
+const maxAttempts = 3;
+
+async function attemptGameInit() {
+    // Show loading state at the start
+    showRoomLoading();
+    
+    try {
+        initAttempts++;
+        console.log(`Init attempt ${initAttempts}/${maxAttempts}`);
+        
+        await initGame();
+        
+        // Give placement logic time to position new objects
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // NOW validate object positions
+        const objectsValid = await validateAndFixObjectPositions();
+        if (!objectsValid) {
+            throw new Error("Object positions invalid after placement");
+        }
+        
+        // Validate pet positions (reload if needed, don't throw error)
+        await validatePetPositions();
+        
+        initAttempts = 0;
+        console.log("Game initialized successfully");
+        
+        // Hide loading state on success
+        hideRoomLoading();
+        
+    } catch (error) {
+        console.error(`Init attempt ${initAttempts} failed:`, error);
+        
+        if (initAttempts < maxAttempts) {
+            // Wait before retry (loading state stays visible)
+            await new Promise(resolve => setTimeout(resolve, 500));
+            console.log("Retrying initialization...");
+            await attemptGameInit();
+        } else {
+            // After max attempts, remove invalid objects
+            console.error("Max attempts reached, removing invalid objects");
+            await removeInvalidObjectsAndSave();
+            
+            // Try one final init after cleanup
+            await initGame();
+            
+            // Hide loading state even after failure
+            hideRoomLoading();
+        }
+    }
+}
+
+function showRoomLoading() {
+    const roomContainer = document.getElementById('room-container');
+    const viewport = document.getElementById('viewport-container');
+    
+    if (roomContainer) {
+        roomContainer.style.opacity = '0';
+        roomContainer.style.pointerEvents = 'none';
+    }
+    if (viewport) {
+        viewport.style.pointerEvents = 'none';
+    }
+}
+
+function hideRoomLoading() {
+    const roomContainer = document.getElementById('room-container');
+    const viewport = document.getElementById('viewport-container');
+    
+    if (roomContainer) {
+        roomContainer.style.opacity = '1';
+        roomContainer.style.pointerEvents = 'auto';
+    }
+    if (viewport) {
+        viewport.style.pointerEvents = 'auto';
+    }
+}
+
+async function validatePetPositions() {
+    const petContainer = document.getElementById('petContainer');
+    if (!petContainer) return false;
+    
+    const pets = petContainer.querySelectorAll('.pet');
+    let anyInvalid = false;
+    
+    pets.forEach(pet => {
+        const coords = getObjectCoordinates(pet.id);
+        
+        if (!coords || coords.length !== 2) {
+            console.warn(`Invalid pet coordinates for ${pet.id}`);
+            anyInvalid = true;
+            return;
+        }
+        
+        const [x, y] = coords;
+        const petWidth = Math.ceil(pet.offsetWidth / unitSize);
+        const petHeight = Math.ceil(pet.offsetHeight / unitSize);
+        const bottomRow = y;
+        
+        // Check if bottom row is walkable
+        if (!isBottomRowWalkable(globalWalkabilityMap, bottomRow, x, petWidth)) {
+            console.warn(`Pet ${pet.id} on invalid position: [${x}, ${y}]`);
+            anyInvalid = true;
+        }
+    });
+    
+    if (anyInvalid) {
+        console.warn("Invalid pet positions detected, reloading pets");
+        updateStatsBeforeRerunningInitGameAndRenderPets();
+        renderPets();
+        enablePetDragging();
+    }
+    
+    return true;
+}
+
+async function removeInvalidObjectsAndSave() {
+    const roomObjectsContainer = document.getElementById('roomObjectsContainer');
+    if (!roomObjectsContainer) return;
+    
+    const objects = roomObjectsContainer.querySelectorAll('.room-object:not(.furniture-preview)');
+    let removedAny = false;
+    
+    objects.forEach(obj => {
+        const coords = getObjectCoordinates(obj.id);
+        
+        if (!coords || coords.length !== 2) {
+            console.warn(`Removing ${obj.id}: invalid coordinates`);
+            obj.remove();
+            if (userObjectAssets[obj.id]) {
+                userObjectAssets[obj.id].position = [];
+                removedAny = true;
+            }
+            return;
+        }
+        
+        const [x, y] = coords;
+        
+        if (x < 0 || y < 0 || y >= roomLayout.length || x >= roomLayout[0].length) {
+            console.warn(`Removing ${obj.id}: out of bounds`);
+            obj.remove();
+            if (userObjectAssets[obj.id]) {
+                userObjectAssets[obj.id].position = [];
+                removedAny = true;
+            }
+            return;
+        }
+        
+        const tileType = roomLayout[y]?.[x];
+        if (tileType === undefined) {
+            console.warn(`Removing ${obj.id}: undefined tile`);
+            obj.remove();
+            if (userObjectAssets[obj.id]) {
+                userObjectAssets[obj.id].position = [];
+                removedAny = true;
+            }
+            return;
+        }
+        
+        const type = tileType?.type ?? tileType;
+        const validTypes = [1.0, 2.0, 3.0, 5.0, 6.0];
+        
+        if (!validTypes.includes(type)) {
+            console.warn(`Removing ${obj.id}: invalid tile type ${type}`);
+            obj.remove();
+            if (userObjectAssets[obj.id]) {
+                userObjectAssets[obj.id].position = [];
+                removedAny = true;
+            }
+        }
+    });
+    
+    if (removedAny) {
+        console.log("Saving cleaned object list to database");
+        await sendObjectAssetsUpdateToDatabase();
+    }
+}
+
+
 fetch("gameAssetIndex.json")
     .then(response => response.json())
     .then(data => {
         gameAssetIndex = data;      // assign JSON result
         return fetchGameData();     // call your function next
     })
-    .then(() => {
-        initGame();                 // only runs after fetchGameData completes
+    .then(async () => {
+        await attemptGameInit();
         fetchMessageGiftsFromServer();
     })
     .catch(error => {
@@ -3971,7 +4555,6 @@ fetch("gameAssetIndex.json")
     });
 
 function parseGameData(dataFromServer) {
-    console.log(dataFromServer)
     userObjectAssets = formatObjectAssets(dataFromServer.objectAssets);
     userPetAssets = parseUserPetAssets(dataFromServer.petAssets);
     userMoney = Number(dataFromServer.money);
@@ -4296,6 +4879,10 @@ function enablePetDragging() {
         pet.style.userSelect = 'none';
         pet.style.touchAction = 'none';
         
+        let startX, startY;
+        let hasMoved = false;
+        const moveThreshold = 5; // pixels to distinguish drag from click
+        
         pet.addEventListener('pointerdown', function(e) {
             // FIX: Ignore if multi-touch is active
             if (multiTouchActive) {
@@ -4308,13 +4895,14 @@ function enablePetDragging() {
             // Only allow left mouse or touch
             if (e.pointerType === "mouse" && e.button !== 0) return;
 
-            pet.classList.add('dragging');
-            
             cancelMovement(this.id);
             e.preventDefault();
             
             currentObject = this;
             holdStartTime = Date.now();
+            startX = e.clientX;
+            startY = e.clientY;
+            hasMoved = false;
 
             if (pet.actionTimer) {
                 clearTimeout(pet.actionTimer);
@@ -4323,18 +4911,30 @@ function enablePetDragging() {
 
             if (petControllers[pet.id]) {
                 petControllers[pet.id].abort();
-                setObjectAnimation(pet, `${pet.id}-stands-idle`);
             }
             
             holdTimer = setInterval(() => {
                 const elapsed = Date.now() - holdStartTime;
-                const progress = Math.min(elapsed / 100, 1) * 100;
                 
-                if (elapsed >= 100) {
+                if (elapsed >= 100 && hasMoved) {
                     clearInterval(holdTimer);
+                    pet.classList.add('dragging');
+                    setObjectAnimation(pet, `${pet.id}-dragged`);
                     startDragging(e);
                 }
             }, 10);
+        });
+        
+        // Track pointer movement
+        pet.addEventListener('pointermove', function(e) {
+            if (multiTouchActive || !holdTimer) return;
+            
+            const deltaX = Math.abs(e.clientX - startX);
+            const deltaY = Math.abs(e.clientY - startY);
+            
+            if (deltaX > moveThreshold || deltaY > moveThreshold) {
+                hasMoved = true;
+            }
         });
         
         // Cancel hold if pointer is released early
@@ -4349,8 +4949,16 @@ function enablePetDragging() {
             pet.classList.remove('dragging');
             if (holdTimer) {
                 clearInterval(holdTimer);
+                holdTimer = null;
             }
-            setObjectAnimation(pet, `${pet.id}-stands-idle`)
+            
+            // If it was just a click (no movement, quick release)
+            if (!hasMoved && (Date.now() - holdStartTime) < 100) {
+                // Handle as click - you can add click behavior here if needed
+                console.log('Pet clicked:', pet.id);
+            }
+            
+            setObjectAnimation(pet, `${pet.id}-stands-idle`);
             pet.actionTimer = setTimeout(() => {
                 managePetActions(pet);
                 pet.actionTimer = null;
@@ -4415,7 +5023,8 @@ function removeObjectsMarkedForRemoval() {
             // delete immediately
             const el = document.getElementById(obj.id);
             if (el) el.remove();
-            deletedIds.push(obj.id); // ✅ track deleted ID
+            userObjectAssets[obj.id].position = [];
+            deletedIds.push(obj.id);
         }
     }
 
@@ -4443,6 +5052,7 @@ function removeObjectsMarkedForRemoval() {
             // becomes free → delete now
             const el = document.getElementById(obj.id);
             if (el) el.remove();
+            userObjectAssets[obj.id].position = [];
             deletedIds.push(obj.id); // ✅ track deleted ID
         }
     }
@@ -4466,7 +5076,7 @@ function removeObjectsMarkedForRemoval() {
         }
     });
 
-
+    rerenderObjectAssetListIfNoItemsInSelectedCategory(sidebar=true)
 }
 
 
@@ -4680,7 +5290,9 @@ if (isTouchDevice) {
 
             if (!isTouchDevice) {
                 const placementMap = generatePlacementMap(obj.id);
-                determineAndHighlightValidTiles(placementMap);
+                highlightTimeout = setTimeout(() => {
+                    determineAndHighlightValidTiles(placementMap);
+                }, 100);
                 obj._placementMap = placementMap;
             }
             
@@ -4788,6 +5400,8 @@ if (isTouchDevice) {
         obj.addEventListener('pointerdown', obj._editModeHandler);
     });
 }
+
+let highlightTimeout = null;
 
 function disableObjectDragging() {
     // Remove all delete icons when exiting edit mode
@@ -5010,10 +5624,11 @@ function validateAndResetPosition(object) {
 
     clearPlacementHighlights();
 
-    // Check if editing mode and validate object placement
-    if (editing && object._placementMap) {
+    // ✅ IMPROVED: Always validate placement for objects in edit mode
+    if (editing && object._placementMap && object._originalCoords) {
         const canPlace = checkPlacement(object, object._placementMap, unitSize);
         if (!canPlace) {
+            // Revert to original position
             object.style.left = `calc(${object._originalCoords[0]} * var(--unit-size))`;
             object.style.top = `calc((${object._originalCoords[1] + 1} * var(--unit-size)) - ${object.offsetHeight}px)`;
         }
@@ -5054,7 +5669,7 @@ document.addEventListener('pointerup', function(e) {
     currentObject.style.top = snappedTop + 'px';
     currentObject.classList.remove('dragging');
 
-    if ([...currentObject.classList].some(cls => cls.includes("pet"))) {
+    if ([...currentObject.classList].some(cls => /^pet$|^-pet$|^pet-$|^-pet-$/.test(cls))) {
         const petWidthInTiles = Math.ceil(currentObject.offsetWidth / unitSize);
         const petHeightInTiles = Math.ceil(currentObject.offsetHeight / unitSize);
 
@@ -6000,10 +6615,12 @@ function generateWalkabilityMap() {
     // Set directional movement restrictions (with safety checks)
     for (let row = 0; row < roomLayout.length; row++) {
         for (let col = 0; col < roomLayout[0].length; col++) {
+
             if (!map[row][col].walkable) continue;
 
             if (userObjectAssets && gameAssetIndex) {
                 Object.entries(userObjectAssets).forEach(([assetId, asset]) => {
+
                     const assetData = gameAssetIndex[asset.assetIndex];
                     if (!assetData) return;
 
@@ -6013,43 +6630,88 @@ function generateWalkabilityMap() {
 
                     const assetWidth = Math.ceil(element.offsetWidth / unitSize);
                     const assetHeight = Math.ceil(element.offsetHeight / unitSize);
+
                     const topRowOfAsset = assetY - assetHeight + 1;
                     const bottomRowOfAsset = assetY;
                     const rowAboveBottom = bottomRowOfAsset - 1;
 
-                    // 🚨 NEW: Special handling for food-bowl items
+                    // --- FOOD-BOWL SPECIAL LOGIC -----------------------------------
                     if (element.className.includes('food-bowl')) {
-                        // Block upward and downward movement on the food-bowl's cells
-                        if (row === bottomRowOfAsset && col >= assetX && col < assetX + assetWidth) {
+
+                        // Block movement on the bowl tile itself
+                        if (
+                            row === bottomRowOfAsset &&
+                            col >= assetX &&
+                            col < assetX + assetWidth
+                        ) {
                             map[row][col].allowedDirections[2] = false; // down
                         }
-                        // Block upward movement on cells one row below the food-bowl
-                        if (row === bottomRowOfAsset + 1 && col >= assetX && col < assetX + assetWidth) {
+
+                        // Block movement on tile beneath the bowl
+                        if (
+                            row === bottomRowOfAsset + 1 &&
+                            col >= assetX &&
+                            col < assetX + assetWidth
+                        ) {
                             map[row][col].allowedDirections[0] = false; // up
                         }
                     }
 
-                    // Only consider passable === false for movement restrictions
+                    // --- STANDARD NON-PASSABLE LOGIC -------------------------------
                     if (assetData.passable === false) {
+
                         if (assetHeight === 1 || assetHeight === 2) {
-                            // Case 3: up to double-tile height asset - block movement on the asset tile itself
-                            if (row === bottomRowOfAsset && col >= assetX && col < assetX + assetWidth) {
+                            // Block both up & down on bottom tile
+                            if (
+                                row === bottomRowOfAsset &&
+                                col >= assetX &&
+                                col < assetX + assetWidth
+                            ) {
                                 map[row][col].allowedDirections[0] = false; // up
                                 map[row][col].allowedDirections[2] = false; // down
                             }
                         } else {
-                            // Cases 1 & 2: multi-height assets
-                            // Case 1: current tile is bottom row of the asset
-                            if (row === bottomRowOfAsset && col >= assetX && col < assetX + assetWidth) {
+                            // Block up on bottom tile
+                            if (
+                                row === bottomRowOfAsset &&
+                                col >= assetX &&
+                                col < assetX + assetWidth
+                            ) {
                                 map[row][col].allowedDirections[0] = false; // up
                             }
-                            // Case 2: current tile is directly above bottom row of asset
-                            if (row === rowAboveBottom && col >= assetX && col < assetX + assetWidth) {
+
+                            // Block down on tile above bottom
+                            if (
+                                row === rowAboveBottom &&
+                                col >= assetX &&
+                                col < assetX + assetWidth
+                            ) {
                                 map[row][col].allowedDirections[2] = false; // down
                             }
                         }
                     }
-                });
+
+                    // --- NON-STEPPABLE ASSET LOGIC ---------------------------------
+                    if (!assetData.steppable) {
+
+                        for (let r = topRowOfAsset; r <= bottomRowOfAsset; r++) {
+                            if (!map[r]) continue;
+
+                            for (let c = assetX; c < assetX + assetWidth; c++) {
+                                if (!map[r][c]) continue;
+
+                                if (r === topRowOfAsset) {
+                                    // Top row: block only downward
+                                    map[r][c].allowedDirections[2] = false;
+                                } else {
+                                    // Other rows: cannot stand or walk here
+                                    map[r][c].walkable = false;
+                                }
+                            }
+                        }
+                    }
+
+                }); // end forEach
             }
         }
     }
@@ -6257,10 +6919,8 @@ function changeCatFacingDirection(pet, direction) {
 }
 
 async function sendObjectAssetsUpdateToDatabase() {
-    // Store original state for rollback
     const originalObjectAssets = JSON.parse(JSON.stringify(userObjectAssets));
     
-    // Convert dictionary to array of arrays and stringify
     let objectAssetsString = JSON.stringify(
         Object.values(userObjectAssets).map(entry => [entry.assetIndex, entry.position])
     );
@@ -6275,22 +6935,18 @@ async function sendObjectAssetsUpdateToDatabase() {
         });
 
         if (!response) {
-            return;
+            return false;
         }
 
         if (response.ok && response.status === 204) {
-            // Success - add tick animation
-            document.querySelector('.some-purchase-element')?.classList.add('tick-svg');
             return true;
         } else {
-            // Failed response - revert local state
             userObjectAssets = originalObjectAssets;
             messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
             console.error(`Failed to update object assets: ${response.status}`);
             return false;
         }
     } catch (error) {
-        // Network error - revert local state
         userObjectAssets = originalObjectAssets;
         messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
         console.log('Error sending Objects Asset position update:', error);
@@ -6299,10 +6955,8 @@ async function sendObjectAssetsUpdateToDatabase() {
 }
 
 async function sendPetAssetsUpdateToDatabase() {
-    // Store original state for rollback
     const originalPetAssets = JSON.parse(JSON.stringify(userPetAssets));
     
-    // Convert dictionary to array of arrays and stringify
     let petAssetsString = JSON.stringify(convertUserPetAssetsDictToCompactList(userPetAssets));
 
     try {
@@ -6315,22 +6969,18 @@ async function sendPetAssetsUpdateToDatabase() {
         });
 
         if (!response) {
-            return;
+            return false;
         }
 
         if (response.ok && response.status === 204) {
-            // Success - add tick animation
-            document.querySelector('.some-purchase-element')?.classList.add('tick-svg');
             return true;
         } else {
-            // Failed response - revert local state
             userPetAssets = originalPetAssets;
             messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
             console.error(`Failed to update pet assets: ${response.status}`);
             return false;
         }
     } catch (error) {
-        // Network error - revert local state
         userPetAssets = originalPetAssets;
         messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
         console.log('Error sending Pet Asset update:', error);
@@ -6338,45 +6988,44 @@ async function sendPetAssetsUpdateToDatabase() {
     }
 }
 
-async function sendMoneyUpdateToDatabase() {
-    // Store original state for rollback
-    const originalMoney = userMoney;
-    
+async function sendMoneyTransactionToDatabase(amount, type = 'subtract') {
     try {
-        const response = await apiFetch(apiBase + 'petGame/money', {
+        const response = await apiFetch(apiBase + 'petGame/transaction', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ studentId: userData.userId, money: userMoney })
+            body: JSON.stringify({ 
+                studentId: userData.userId, 
+                amount: amount,
+                type: type 
+            })
         });
 
         if (!response) {
-            return;
+            return false;
         }
 
         if (response.ok && response.status === 204) {
-            // Success - update UI and add tick animation
-            updateCoinAmounts(userMoney);
-            document.querySelector('.some-purchase-element')?.classList.add('tick-svg');
             return true;
+        } else if (response.status === 400) {
+            const data = await response.json();
+            if (data.error === 'insufficient_funds') {
+                messageToTheUser("Nepakanka pinigų!", 'error');
+            }
+            return false;
         } else {
-            // Failed response - revert local state
-            userMoney = originalMoney;
-            console.error(`Failed to update money: ${response.status}`);
             return false;
         }
     } catch (error) {
-        // Network error - revert local state
-        userMoney = originalMoney;
-        console.log('Error sending Money update:', error);
+        console.log('Error sending money transaction:', error);
         return false;
     }
 }
 
 function updateCoinAmounts(money) {
     document.querySelectorAll('.coin-amount').forEach(span => {
-        span.textContent = money;
+        span.textContent = money.toFixed(1);
     });
 }
 
@@ -6530,7 +7179,7 @@ toggleEditSaveBtn.addEventListener("click", () => {
 });
 
 cancelEditBtn.addEventListener("click", () => {
-    if (preEditUserObjectAssets) {
+    if (editing && preEditUserObjectAssets) {
         userObjectAssets = JSON.parse(JSON.stringify(preEditUserObjectAssets));
     }
     renderRoomObjects();
@@ -6700,11 +7349,7 @@ function generatePlacementMap(draggedObjectId) {
             if (!draggedAssetPlacingRules.includes(1)) {
               tileAllowed = false;
             }
-          } else if (tileType === 3.0) {
-            if (!draggedAssetPlacingRules.includes(3)) {
-              tileAllowed = false;
-            }
-          } else if (tileType === 2.0) {
+          } else if (tileType === 2.0 || tileType === 3.0) {
             if (!draggedAssetPlacingRules.includes(2)) {
               if (draggedAssetPlacingRules.includes(4)) {
                 const bottomSupportTile = rl[bottomOfSection][x];
@@ -6717,7 +7362,11 @@ function generatePlacementMap(draggedObjectId) {
                   tileAllowed = false;
                 }
               } else {
-                tileAllowed = false;
+                if (tileType === 3.0 && draggedAssetPlacingRules.includes(3)) {
+                    tileAllowed = true;
+                } else {
+                    tileAllowed = false;
+                }
               }
             } else {
               tileAllowed = true;
@@ -6725,8 +7374,30 @@ function generatePlacementMap(draggedObjectId) {
           }
 
           // Preserve original branch ordering exactly, including the check against draggedAssetData["placingIndex"]
+    
           if (!(draggedAssetData["placingIndex"] === 5 || draggedAssetData["placingIndex"] === 6 || draggedAssetData["placingIndex"] === 9 || draggedAssetData["placingIndex"] === 10 || draggedAssetData["placingIndex"] === 15)) {
-            const objectsAtTile = getObjectsAtTileCached(x, y);
+            let objectsAtTile = getObjectsAtTileCached(x, y);
+
+            // CRITICAL: Sort to ensure placing index 8 objects are checked first for consistent behavior across devices
+            /* 
+                if item with placing index 8 does not appear before this part is triggered
+                    if (getFirstRow3() - (objectHeight - 1) <= row) {
+                        tileAllowed = true;
+                        break;
+                    }
+                placement will be allowed on top of item with placement index 8 (small objects that can be placed on top of others)
+                order of objectsAtTile can be different on mobiles, leading to inconsistent behavious
+            */
+
+            objectsAtTile = [...objectsAtTile].sort((a, b) => {
+                const indexA = getExistingPlacingIndex(a);
+                const indexB = getExistingPlacingIndex(b);
+                // Placing index 8 comes first
+                if (indexA === 8 && indexB !== 8) return -1;
+                if (indexA !== 8 && indexB === 8) return 1;
+                return 0;
+            });
+
             for (const existingObj of objectsAtTile) {
               const existingPlacingIndex = getExistingPlacingIndex(existingObj);
 
@@ -6859,7 +7530,15 @@ function generatePlacementMap(draggedObjectId) {
 
                 if (bottomTileValid) tileAllowed = true;
 
-                const objectsAtTile2 = getObjectsAtTileCached(x, y);
+                let objectsAtTile2 = getObjectsAtTileCached(x, y);
+
+                objectsAtTile2 = [...objectsAtTile2].sort((a, b) => {
+                    const indexA = getExistingPlacingIndex(a);
+                    const indexB = getExistingPlacingIndex(b);
+                    if (indexA === 8 && indexB !== 8) return -1;
+                    if (indexA !== 8 && indexB === 8) return 1;
+                    return 0;
+                });
 
                 for (const existingObj of objectsAtTile2) {
                   const existingAsset = combinedAssets[existingObj.id];
@@ -6878,7 +7557,26 @@ function generatePlacementMap(draggedObjectId) {
               }
             }
           } else {
-            const objectsAtTile = getObjectsAtTileCached(x, y);
+            let objectsAtTile = getObjectsAtTileCached(x, y);
+
+            // CRITICAL: Sort to ensure placing index 8 objects are checked first for consistent behavior across devices
+            /* 
+                if item with placing index 8 does not appear before this part is triggered
+                    if (getFirstRow3() - (objectHeight - 1) <= row) {
+                        tileAllowed = true;
+                        break;
+                    }
+                placement will be allowed on top of item with placement index 8 (small objects that can be placed on top of others)
+                order of objectsAtTile can be different on mobiles, leading to inconsistent behavious
+            */
+
+            objectsAtTile = [...objectsAtTile].sort((a, b) => {
+                const indexA = getExistingPlacingIndex(a);
+                const indexB = getExistingPlacingIndex(b);
+                if (indexA === 8 && indexB !== 8) return -1;
+                if (indexA !== 8 && indexB === 8) return 1;
+                return 0;
+            });
 
             for (const existingObj of objectsAtTile) {
               const existingAsset = combinedAssets[existingObj.id];
@@ -7007,6 +7705,10 @@ function clearPlacementHighlights() {
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
+    if (highlightTimeout !== null) {
+        clearTimeout(highlightTimeout);
+        highlightTimeout = null;
+    }
 }
 
 // NAVIGATION START
@@ -7017,6 +7719,13 @@ const contentPanels = document.querySelectorAll('.game-content-panel');
 navButtons.forEach((button) => {
     button.addEventListener('click', () => {
         const targetId = button.dataset.target;
+
+        const previouslyActivePanel = document.querySelector(".game-content-panel.active");
+        const previousId = previouslyActivePanel ? previouslyActivePanel.id : null;
+
+        if (previousId === "pet-room-container" && targetId !== "pet-room-container") {
+            document.getElementById('cancel-edit-btn').click();
+        }
         
         // Remove active class from all buttons and panels
         navButtons.forEach(btn => btn.classList.remove('active'));
@@ -7032,9 +7741,8 @@ navButtons.forEach((button) => {
         if (button.id !== "pet-room-button") {
             selectedConsumable = [];
             clearPlacementHighlights();
+            clearSpecificPlacementHighlights();
         }
-
-        document.getElementById('cancel-edit-btn').click();
 
         // Trigger rendering depending on the panel
         if (targetId === 'furniture-container') {
@@ -7044,6 +7752,7 @@ navButtons.forEach((button) => {
             if (checkbox && switchText) {
                 switchText.textContent = checkbox.checked ? "" : "NENAUD.";
             }
+            document.getElementById('furnitureHeader').classList.remove('compact');
         } else if (targetId === 'shop-container') {
             renderShopCategoriesDropdown();
             const checkbox = document.getElementById("shop-not-owned-toggle");
@@ -7051,6 +7760,7 @@ navButtons.forEach((button) => {
             if (checkbox && switchText) {
                 switchText.textContent = checkbox.checked ? "" : "NETURIU";
             }
+            document.getElementById('shopHeader').classList.remove('compact');
         } else if (targetId === 'pet-room-container') {
             const allPets = document.querySelectorAll("#petContainer .pet");
             if (allPets[0]) {
@@ -7067,6 +7777,8 @@ navButtons.forEach((button) => {
                 return label && label.textContent.trim() === 'Maistas';
             });
 
+            document.getElementById('petAssetHeader').classList.remove('compact');
+
             // Trigger the click if it exists
             if (foodBtn) {
                 foodBtn.click(); // This fires any click listeners attached
@@ -7075,6 +7787,7 @@ navButtons.forEach((button) => {
             renderUsersPetAssets();
         } else if (targetId === 'taxes-container') {
             renderTaxesSection();
+            document.getElementById('taxesHeader').classList.remove('compact');
         }
     });
 });
@@ -7104,14 +7817,14 @@ function navigationResponsiveLayout() {
 }
 
 // Recalculate on resize
-window.addEventListener("resize", () => {
+window.addEventListener("resize", async () => {
     updateStatsBeforeRerunningInitGameAndRenderPets();
     navigationResponsiveLayout();
     endPreview()
     hideSidebar()
 
     if (document.getElementById("pet-room-container").classList.contains("active")) {
-        initGame();
+        await initGame();
         document.querySelector("#end-preview-button").classList.add("hidden")
         resetEditButtonToggle();
     }
@@ -7167,6 +7880,13 @@ let shopState = {
 
 async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn) {
     updateShopState();
+
+    const buttons = document.querySelectorAll('.purchase-btn');
+
+    buttons.forEach(btn => {
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+    });
     
     const itemDetails = gameAssetIndex[assetIndex];
     
@@ -7176,11 +7896,15 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
     }
     
     // Calculate total cost
-    const totalCost = itemDetails.cost * quantity;
+    const totalCost = (itemDetails.cost * COST_MULTIPLIER) * quantity;
     
-    // Check if user has enough money
+    // Check if user has enough money (local check first)
     if (userMoney < totalCost) {
-        messageToTheUser("Nepakanka pingų!", 'error');
+        messageToTheUser("Nepakanka pinigų!", 'error');
+        buttons.forEach(btn => {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        });
         return;
     }
     
@@ -7189,59 +7913,43 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
     const originalObjectAssets = JSON.parse(JSON.stringify(userObjectAssets));
     const originalPetAssets = JSON.parse(JSON.stringify(userPetAssets));
     
-    // Deduct money from user (optimistic update)
-    userMoney -= totalCost;
-    
     // Save current state before making changes (for shop restoration)
     const currentState = {...shopState};
     
-    let assetUpdateNeeded = false;
+    // Build the new assets BEFORE any server calls
+    let newAssets = {};
+    let assetType = null; // 'pet' or 'object'
     
     if (item.petAsset) {
+        assetType = 'pet';
         const cssClasses = itemDetails['css-class'].split(' ');
         const isSkin = cssClasses.includes('skin');
         
         if (isSkin) {
-            // Handle skin assets
-            const petType = cssClasses[0]; // First class is the pet type (e.g., 'cat-1', 'dog-1')
+            const petType = cssClasses[0];
             
-            // Initialize pets structure if it doesn't exist
-            if (!userPetAssets.pets) {
-                userPetAssets.pets = {};
-            }
-            
-            // Initialize pet type if it doesn't exist
+            if (!userPetAssets.pets) userPetAssets.pets = {};
             if (!userPetAssets.pets[petType]) {
                 userPetAssets.pets[petType] = { 
                     skins: {},
                     name: item.petName
                 };
             }
-            
-            // Initialize skins object if it doesn't exist
             if (!userPetAssets.pets[petType].skins) {
                 userPetAssets.pets[petType].skins = {};
             }
             
-            // Generate new skin key
             const existingSkins = Object.keys(userPetAssets.pets[petType].skins);
             const skinNumber = existingSkins.length + 1;
             const newSkinKey = `${petType}-${skinNumber}`;
             
-            // Add the skin (skins are always unique, so no quantity stacking)
             userPetAssets.pets[petType].skins[newSkinKey] = {
                 assetIndex: assetIndex,
-                equiped: false // New skins start as not equipped
+                equiped: false
             };
-            
         } else {
-            // Handle supply assets
-            // Initialize supplies structure if it doesn't exist
-            if (!userPetAssets.supplies) {
-                userPetAssets.supplies = {};
-            }
+            if (!userPetAssets.supplies) userPetAssets.supplies = {};
             
-            // Check if item is stackable and already exists
             if (itemDetails.stackable) {
                 let existingSupplyKey = null;
                 for (const key in userPetAssets.supplies) {
@@ -7252,20 +7960,17 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
                 }
                 
                 if (existingSupplyKey) {
-                    // Stack with existing supply
                     userPetAssets.supplies[existingSupplyKey].quantity += quantity;
                 } else {
-                    // Create new supply entry
-                    const newSupplyKey = `S${Object.keys(userPetAssets.supplies).length + 1}`;
+                    const newSupplyKey = getNextSupplyKey();
                     userPetAssets.supplies[newSupplyKey] = {
                         assetIndex: assetIndex,
                         quantity: quantity
                     };
                 }
             } else {
-                // Non-stackable items get separate entries
                 for (let i = 0; i < quantity; i++) {
-                    const newSupplyKey = `S${Object.keys(userPetAssets.supplies).length + 1}`;
+                    const newSupplyKey = getNextSupplyKey();
                     userPetAssets.supplies[newSupplyKey] = {
                         assetIndex: assetIndex,
                         quantity: 1
@@ -7273,71 +7978,85 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
                 }
             }
         }
-        assetUpdateNeeded = true;
-        
     } else {
-        // Object assets (unchanged from your original code)
+        assetType = 'object';
         if (item.oneOfKind) {
-            const newKey = `O${Object.keys(userObjectAssets).length + 1}`;
+            const newKey = getNextObjectKey();
             userObjectAssets[newKey] = { assetIndex, position: [] };
         } else {
             for (let i = 0; i < quantity; i++) {
-                const newKey = `O${Object.keys(userObjectAssets).length + 1}`;
+                const newKey = getNextObjectKey();
                 userObjectAssets[newKey] = { assetIndex, position: [] };
             }
         }
-        assetUpdateNeeded = true;
     }
     
     try {
-        // First, update money on server
-        const moneyUpdateSuccess = await sendMoneyUpdateToDatabase();
+        // 1. Deduct money from server
+        const moneySuccess = await sendMoneyTransactionToDatabase(totalCost, 'subtract');
         
-        if (!moneyUpdateSuccess) {
+        if (!moneySuccess) {
             // Revert all changes
             userMoney = originalMoney;
             userObjectAssets = originalObjectAssets;
             userPetAssets = originalPetAssets;
+
+            buttons.forEach(btn => {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            });
+            
             messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
-            console.log('Purchase failed - money update failed');
             return;
         }
         
-        // If assets were added, update them on server
-        if (assetUpdateNeeded) {
-            let assetUpdateSuccess = false;
-            
-            if (item.petAsset) {
-                assetUpdateSuccess = await sendPetAssetsUpdateToDatabase();
-                const isPet = itemDetails["pet"] === true;
-                if (isPet) {
-                    updateStatsBeforeRerunningInitGameAndRenderPets();
-                    renderPets();
-                    enablePetDragging();
-                    createPetButtons();
-                }
-            } else {
-                assetUpdateSuccess = await sendObjectAssetsUpdateToDatabase();
+        // 2. Update local money only after server confirms
+        userMoney -= totalCost;
+        updateCoinAmounts(userMoney);
+        
+        // 3. Update assets on server
+        let assetUpdateSuccess = false;
+        if (assetType === 'pet') {
+            assetUpdateSuccess = await sendPetAssetsUpdateToDatabase();
+            const isPet = itemDetails["pet"] === true;
+            if (assetUpdateSuccess && isPet) {
+                updateStatsBeforeRerunningInitGameAndRenderPets();
+                renderPets();
+                enablePetDragging();
+                createPetButtons();
             }
-            
-            if (!assetUpdateSuccess) {
-                // Asset update failed, but money was already deducted on server
-                console.error('Critical error: Money deducted but asset update failed');
-                
-                // Attempt to revert money on server
-                userMoney = originalMoney;
-                await sendMoneyUpdateToDatabase();
-                
-                // Revert local asset state
-                userObjectAssets = originalObjectAssets;
-                userPetAssets = originalPetAssets;
-                
-                messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
-                return;
-            }
+        } else {
+            assetUpdateSuccess = await sendObjectAssetsUpdateToDatabase();
         }
         
-        // Success! Add your original animation logic
+        if (!assetUpdateSuccess) {
+            // Asset update failed - revert everything including money
+            console.error('Critical error: Money deducted but asset update failed');
+            
+            // Try to refund money on server
+            await sendMoneyTransactionToDatabase(totalCost, 'add');
+            
+            // Revert local state
+            userMoney = originalMoney;
+            userObjectAssets = originalObjectAssets;
+            userPetAssets = originalPetAssets;
+            updateCoinAmounts(userMoney);
+
+            buttons.forEach(btn => {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            });
+
+            messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
+            return;
+        }
+
+        buttons.forEach(btn => {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        });
+
+        // Success! Add animation
         btn.innerHTML = '<svg class="tick-svg" viewBox="0 0 24 24" width="24" height="24"><path class="tick" d="M4 12l6 6 10-10"></path></svg>';
         const tick = btn.querySelector('.tick');
         requestAnimationFrame(() => {
@@ -7348,23 +8067,36 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
             b.disabled = true;
         });
         
-        // Remove it after animation finishes (e.g. 300ms)
         setTimeout(() => {
-            // Restore the shop state after purchase
             restoreShopState(currentState);
         }, 500);
         
     } catch (error) {
-        // Network error or other unexpected error
         console.error('Purchase error:', error);
         
         // Revert all local changes
         userMoney = originalMoney;
         userObjectAssets = originalObjectAssets;
         userPetAssets = originalPetAssets;
+        updateCoinAmounts(userMoney);
+
+        buttons.forEach(btn => {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        });
         
         messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
     }
+}
+
+function getNextSupplyKey() {
+    if (!userPetAssets.supplies) return 'S1';
+    let maxNum = 0;
+    for (const key in userPetAssets.supplies) {
+        const num = parseInt(key.substring(1)); // Extract number from "S5"
+        if (num > maxNum) maxNum = num;
+    }
+    return `S${maxNum + 1}`;
 }
 
 function restoreShopState(state) {
@@ -7696,10 +8428,10 @@ let furniturePreviewDict = {
     }
 }
 
-document.querySelector("#end-preview-button").addEventListener("click", () => {
+document.querySelector("#end-preview-button").addEventListener("click", async () => {
     endPreview();
     updateStatsBeforeRerunningInitGameAndRenderPets();
-    initGame();
+    await initGame();
 });;
 
 function endPreview() {
@@ -7727,7 +8459,7 @@ function endPreview() {
     }
 }
 
-function previewFurniture (key) {
+async function previewFurniture (key) {
     
     let tempDivId = renderTemporaryRoomObject(key);
 
@@ -7743,7 +8475,7 @@ function previewFurniture (key) {
 
     updateStatsBeforeRerunningInitGameAndRenderPets();
     
-    initGame();
+    await initGame();
     const placementMap = generatePlacementMap(tempDivId);
 
     const validPosition = findValidPosition(placementMap, tempDivId);
@@ -7752,8 +8484,9 @@ function previewFurniture (key) {
         furniturePreviewDict["furniture-preview"].position = validPosition;
         updateStatsBeforeRerunningInitGameAndRenderPets();
         adjustUnitSizeForSmallScreens();
+        await new Promise(resolve => requestAnimationFrame(resolve));
         renderRoomGrid();
-        setPetAndObjectContainersToGridDimentions();
+        await setPetAndObjectContainersToGridDimentions();
         renderRoomObjects();
         toggleRoomDarknessBasedOnElectricityTax();
         predictAndSetZIndex();
@@ -7763,6 +8496,7 @@ function previewFurniture (key) {
         document.querySelector("#end-preview-button").classList.remove("hidden")
         document.querySelector("#toggle-edit-save-btn").classList.add("hidden")
         document.querySelector("#cancel-edit-btn").classList.add("hidden")
+        hideSidebar();
 
         centerViewportOnObject("furniture-preview")
 
@@ -7925,7 +8659,7 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
         coinSpan.className = 'item-price-coin-icon';
         coinSpan.innerHTML = '<span class="coin-icon"><img src="../images/icons/icon-sudedu-coin.png"></span>';
         const priceSpan = document.createElement('span');
-        priceSpan.textContent = item.cost;
+        priceSpan.textContent = (item.cost * COST_MULTIPLIER);
         priceDiv.appendChild(coinSpan);
         priceDiv.appendChild(priceSpan);
 
@@ -7955,102 +8689,103 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
         }
 
         if (canPurchase) {
-            const btn = document.createElement('button');
-            btn.className = 'purchase-btn';
-            btn.textContent = 'Pirkti';
+    let quantityInput = null;
 
-            
+if (!item.oneOfKind) {
+    const quantityInputHolder = document.createElement('div');
+    quantityInputHolder.className = 'purchase-quantity-holder input-wrapper';
 
-            let quantityInput = null;
+    quantityInput = document.createElement('input');
+    quantityInput.type = 'number';
+    quantityInput.min = 1;
+    quantityInput.max = 999;
+    quantityInput.step = 1;
+    quantityInput.value = 1;
+    quantityInput.className = 'purchase-quantity';
+    quantityInput.id = `purchase-qty-${key}`;
+    quantityInput.readOnly = true;
 
-            if (!item.oneOfKind) {
-                const quantityInputHolder = document.createElement('div');
-                quantityInputHolder.className = 'purchase-quantity-holder input-wrapper';
+    const updatePrice = () => {
+        const qty = parseInt(quantityInput.value, 10) || 1;
+        priceSpan.textContent = (item.cost * COST_MULTIPLIER) * qty;
+    };
 
-                // Quantity input
-                quantityInput = document.createElement('input');
-                quantityInput.type = 'number';
-                quantityInput.min = 1;
-                quantityInput.max = 999;
-                quantityInput.step = 1;
-                quantityInput.value = 1;
-                quantityInput.className = 'purchase-quantity';
-                quantityInput.id = `purchase-qty-${key}`;
-                quantityInput.readOnly = true;
+    const minusBtn = document.createElement('button');
+    minusBtn.className = 'control-btn';
+    minusBtn.textContent = '−';
+    minusBtn.onmousedown = () => startHold(quantityInput.id, 1, 999, false, updatePrice);
+    minusBtn.onmouseup = minusBtn.onmouseleave = stopHold;
+    minusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, false, updatePrice); };
+    minusBtn.ontouchend = minusBtn.ontouchcancel = stopHold;
 
-                // Price update function
-                const updatePrice = () => {
-                    const qty = parseInt(quantityInput.value, 10) || 1;
-                    priceSpan.textContent = item.cost * qty;
-                };
+    const plusBtn = document.createElement('button');
+    plusBtn.className = 'control-btn';
+    plusBtn.textContent = '+';
+    plusBtn.onmousedown = () => startHold(quantityInput.id, 1, 999, true, updatePrice);
+    plusBtn.onmouseup = plusBtn.onmouseleave = stopHold;
+    plusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, true, updatePrice); };
+    plusBtn.ontouchend = plusBtn.ontouchcancel = stopHold;
 
-                // Buttons
-                const minusBtn = document.createElement('button');
-                minusBtn.className = 'control-btn';
-                minusBtn.textContent = '−';
-                minusBtn.onmousedown = () => startHold(quantityInput.id, 1, 999, false, updatePrice);
-                minusBtn.onmouseup = minusBtn.onmouseleave = stopHold;
-                minusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, false, updatePrice); };
-                minusBtn.ontouchend = minusBtn.ontouchcancel = stopHold;
+    quantityInputHolder.appendChild(minusBtn);
+    quantityInputHolder.appendChild(quantityInput);
+    quantityInputHolder.appendChild(plusBtn);
+    priceAndQuantDiv.appendChild(quantityInputHolder);
 
-                const plusBtn = document.createElement('button');
-                plusBtn.className = 'control-btn';
-                plusBtn.textContent = '+';
-                plusBtn.onmousedown = () => startHold(quantityInput.id, 1, 999, true, updatePrice);
-                plusBtn.onmouseup = plusBtn.onmouseleave = stopHold;
-                plusBtn.ontouchstart = (e) => { e.preventDefault(); startHold(quantityInput.id, 1, 999, true, updatePrice); };
-                plusBtn.ontouchend = plusBtn.ontouchcancel = stopHold;
+    quantityInput.addEventListener('input', updatePrice);
+    quantityInput.addEventListener('change', updatePrice);
+}
 
-                // Append elements
-                quantityInputHolder.appendChild(minusBtn);
-                quantityInputHolder.appendChild(quantityInput);
-                quantityInputHolder.appendChild(plusBtn);
-                priceAndQuantDiv.appendChild(quantityInputHolder);
+// NOW create the button with the properly initialized quantityInput
+const btn = createHoldPurchaseButton(item, assetIndex, selectedCategory, quantityInput);
 
-                // Optional: manual input (if readOnly removed later)
-                quantityInput.addEventListener('input', updatePrice);
-                quantityInput.addEventListener('change', updatePrice);
-            }
+    if (ownedIndexes.has(assetIndex) && item.oneOfKind) {
+        itemDiv.classList.add('owned');
+        btn.classList.add('owned');
+        btn.textContent = 'Nupirkta';
+        btn.disabled = true;
 
-            if (ownedIndexes.has(assetIndex)) {
-                if (item.oneOfKind) {
-                    itemDiv.classList.add('owned');
-                    btn.classList.add('owned');
-                    btn.textContent = 'Nupirkta';
-                    btn.disabled = true;
+        const ownedBadge = document.createElement('div');
+        ownedBadge.className = 'owned-badge';
+        ownedBadge.innerHTML = '<span class="owned-badge-icon"><img src="../images/icons/icon-check.svg"></span>';
+        previewHolder.appendChild(ownedBadge);
+    }
 
-                    const ownedBadge = document.createElement('div');
-                    ownedBadge.className = 'owned-badge';
-                    ownedBadge.innerHTML = '<span class="owned-badge-icon"><img src="../images/icons/icon-check.svg"></span>';
-                    previewHolder.appendChild(ownedBadge);
-                }
-            }
+    priceAndQuantDiv.appendChild(priceDiv);
+    infoDiv.appendChild(priceAndQuantDiv);
 
-            priceAndQuantDiv.appendChild(priceDiv);
-            infoDiv.appendChild(priceAndQuantDiv);
+    if (previewButton && !(ownedIndexes.has(assetIndex) && item.oneOfKind)) {
+        previewHolder.appendChild(previewButton);
+    }
 
-            btn.addEventListener('click', () => {
-                const quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
-                handlePurchase(item, assetIndex, quantity, selectedCategory, btn);
-            });
+    itemDiv.appendChild(previewHolder);
+    itemDiv.appendChild(infoDiv);
+    itemDiv.appendChild(btn);
 
-            if (previewButton && !(ownedIndexes.has(assetIndex) && item.oneOfKind)) {
-                previewHolder.appendChild(previewButton);
-            }
-            itemDiv.appendChild(previewHolder);
-            itemDiv.appendChild(infoDiv);
-            itemDiv.appendChild(btn);
-        } else {
-            const requiresDiv = document.createElement('div');
-            requiresDiv.className = 'item-requires';
-            requiresDiv.textContent = 'Reikalinga: ' + unmetRequirements.join(', ');
-            if (previewButton && !(ownedIndexes.has(assetIndex) && item.oneOfKind)) {
-                itemDiv.appendChild(previewButton);
-            }
-            itemDiv.appendChild(previewHolder);
-            itemDiv.appendChild(infoDiv);
-            itemDiv.appendChild(requiresDiv);
-        }
+} else {
+    const priceDiv = document.createElement('div');
+    priceDiv.className = 'item-price';
+    const coinSpan = document.createElement('span');
+    coinSpan.className = 'item-price-coin-icon';
+    coinSpan.innerHTML = '<span class="coin-icon"><img src="../images/icons/icon-sudedu-coin.png"></span>';
+    const priceSpan = document.createElement('span');
+    priceSpan.textContent = (item.cost * COST_MULTIPLIER);
+    priceDiv.appendChild(coinSpan);
+    priceDiv.appendChild(priceSpan);
+
+
+    const requiresDiv = document.createElement('div');
+    requiresDiv.className = 'item-requires';
+    requiresDiv.textContent = 'Reikalinga: ' + unmetRequirements.join(', ');
+
+    if (previewButton && !(ownedIndexes.has(assetIndex) && item.oneOfKind)) {
+        itemDiv.appendChild(previewButton);
+    }
+
+    itemDiv.appendChild(previewHolder);
+    itemDiv.appendChild(infoDiv);
+    itemDiv.appendChild(priceDiv);
+    itemDiv.appendChild(requiresDiv);
+}
 
         shopContainer.appendChild(itemDiv);
     }
@@ -8066,6 +8801,87 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
     scalePreview();
 }
 
+const HOLD_DURATION_MS = 2000; // hold duration
+const DYNAMIC_BTN_CLASS = 'purchase-btn-hold'; // unique class
+
+function createHoldPurchaseButton(item, assetIndex, selectedCategory, quantityInput) {
+    const btn = document.createElement('button');
+    btn.className = `purchase-btn ${DYNAMIC_BTN_CLASS}`;
+    
+    // Add text content
+    const textSpan = document.createElement('span');
+    textSpan.textContent = 'Pirkti';
+    btn.appendChild(textSpan);
+
+    // Add responsive SVG with <rect>
+    btn.innerHTML += `
+        <svg class="btn-svg" viewBox="0 0 120 40" preserveAspectRatio="none">
+            <rect x="1%" y="2" width="98%" height="36px" rx="10" ry="18"
+                fill="none" stroke="var(--progress)" stroke-width="4"></rect>
+        </svg>
+    `;
+
+    const svgRect = btn.querySelector('svg rect');
+
+    // Dynamically calculate perimeter
+    function updateStroke() {
+        const width = btn.offsetWidth;
+        const height = btn.offsetHeight;
+        const perimeter = 2 * (width + height);
+        
+        // Remove transition first
+        svgRect.style.transition = 'none';
+        svgRect.style.strokeDasharray = perimeter;
+        svgRect.style.strokeDashoffset = perimeter;
+        
+        // Force reflow
+        svgRect.offsetHeight;
+    }
+    updateStroke();
+    window.addEventListener('resize', updateStroke);
+
+    // Hold logic
+    let holdTimeout;
+
+    function startHold() {
+        // Reset state without transition
+        updateStroke();
+        
+        btn.classList.add('process');
+
+        // Use requestAnimationFrame to ensure reset happened before animating
+        requestAnimationFrame(() => {
+            // Animate stroke
+            svgRect.style.transition = `stroke-dashoffset ${HOLD_DURATION_MS}ms linear`;
+            svgRect.style.strokeDashoffset = '0';
+        });
+
+        holdTimeout = setTimeout(async () => {
+            btn.classList.remove('process');
+            btn.classList.add('success');
+
+            const quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
+            await handlePurchase(item, assetIndex, quantity, selectedCategory, btn);
+        }, HOLD_DURATION_MS-600);
+    }
+
+    function cancelHold() {
+        clearTimeout(holdTimeout);
+        btn.classList.remove('process');
+        updateStroke();
+    }
+
+    btn.addEventListener('mousedown', startHold);
+    btn.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(); });
+    btn.addEventListener('mouseup', cancelHold);
+    btn.addEventListener('mouseleave', cancelHold);
+    btn.addEventListener('touchend', cancelHold);
+    btn.addEventListener('touchcancel', cancelHold);
+
+    return btn;
+}
+
+
 // Toggle functionality for unpurchased only
 const toggle = document.getElementById('shop-not-owned-toggle');
 toggle.addEventListener('change', () => {
@@ -8078,6 +8894,130 @@ toggle.addEventListener('change', () => {
     if (activeDepartment === 'Maistas' || activeDepartment === 'Reikmenys') dept = 'pet-supplies';
     renderShopItems(selectedCategory, dept, activePetSupplyTab);
 });
+
+function rerenderObjectAssetListIfNoItemsInSelectedCategory(sidebar=false) {
+    // Select correct dropdown
+    const dropdown = sidebar
+        ? document.getElementById('object-sidebar-category-select')
+        : document.getElementById('object-category-select');
+
+    function thereAreItemsInSelectedCategory () {
+        if (!dropdown) return false;
+
+        const selected = dropdown.value;
+
+        if (selected === 'all') {
+            return Object.values(userObjectAssets).some(asset => {
+                if (!asset || asset.assetIndex != null === false) return false;
+
+                // NEW: sidebar only counts items not placed anywhere
+                if (sidebar && asset.position && asset.position.length !== 0) return false;
+
+                return true;
+            });
+        }
+
+        for (const key in userObjectAssets) {
+            const asset = userObjectAssets[key];
+            if (!asset || asset.assetIndex == null) continue;
+
+            // NEW: sidebar only counts items with no position
+            if (sidebar && asset.position && asset.position.length !== 0) continue;
+
+            const item = gameAssetIndex[asset.assetIndex];
+            if (!item || !item.category) continue;
+
+            if (item.category.includes(selected)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    if (!thereAreItemsInSelectedCategory()) {
+        if (sidebar) {
+            renderObjectAssetsDropdown(sidebar);
+        } else {
+            renderObjectAssetsDropdown();
+        }
+    } else {
+        if (sidebar) {
+            let dropdown = document.getElementById('object-sidebar-category-select');
+            if (dropdown) {
+                renderObjectAssets(dropdown.value, false, true);
+            }
+        } else {
+            let dropdown = document.getElementById('object-category-select');
+            usageToggle = document.getElementById('object-usage-toggle');
+            
+            if (dropdown && usageToggle) {
+                renderObjectAssets(dropdown.value, usageToggle.checked, false);
+            }
+        }
+    }
+
+    updateObjectAssetDropdown(sidebar);
+}
+
+function updateObjectAssetDropdown(sidebar = false) {
+    let dropdown;
+    if (sidebar) {
+        dropdown = document.getElementById('object-sidebar-category-select');
+    } else {
+        dropdown = document.getElementById('object-category-select');
+    }
+
+    if (!dropdown) return;
+
+    const currentValue = dropdown.value; // Save currently selected option
+
+    // Gather categories from currently owned object assets
+    const categoryCounts = {};
+
+    for (const key in userObjectAssets) {
+        const asset = userObjectAssets[key];
+        if (!asset || asset.assetIndex == null) continue;
+
+        // Sidebar only counts assets with empty position
+        if (sidebar && asset.position && asset.position.length !== 0) continue;
+
+        const item = gameAssetIndex[asset.assetIndex];
+        if (!item || !item.category) continue;
+
+        item.category.forEach(cat => {
+            categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+        });
+    }
+
+    // Clear existing options
+    dropdown.innerHTML = '';
+
+    // Add "All" option
+    const allOption = document.createElement('option');
+    allOption.value = 'all';
+    allOption.textContent = `Visi`;
+    dropdown.appendChild(allOption);
+
+    // Add categories (sorted alphabetically)
+    Object.keys(categoryCounts).sort((a, b) => {
+        const nameA = a.charAt(0).toUpperCase() + a.slice(1);
+        const nameB = b.charAt(0).toUpperCase() + b.slice(1);
+        return nameA.localeCompare(nameB);
+    }).forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = `${cat.charAt(0).toUpperCase() + cat.slice(1)}`;
+        dropdown.appendChild(option);
+    });
+
+    // Restore previously selected option if it exists, else default to 'all'
+    if (Array.from(dropdown.options).some(opt => opt.value === currentValue)) {
+        dropdown.value = currentValue;
+    } else {
+        dropdown.value = 'all';
+    }
+}
 
 function renderObjectAssetsDropdown(sidebar=false) {
     let dropdown;
@@ -8103,6 +9043,9 @@ function renderObjectAssetsDropdown(sidebar=false) {
     for (const key in userObjectAssets) {
         const asset = userObjectAssets[key];
         if (!asset || asset.assetIndex == null) continue;
+
+        // If sidebar, only count assets with empty position
+        if (sidebar && asset.position && asset.position.length !== 0) continue;
 
         const item = gameAssetIndex[asset.assetIndex];
         if (!item || !item.category) continue;
@@ -8156,6 +9099,7 @@ function renderObjectAssetsDropdown(sidebar=false) {
         });
     }
 }
+
 
 
 function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sidebar) {
@@ -8265,9 +9209,9 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
         btn.disabled = false;
 
         //Render Stackable Items
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
             // Create a new instance for stackable items
-            const newKey = `O${Object.keys(userObjectAssets).length + 1}`;
+            const newKey = getNextObjectKey();
             userObjectAssets[newKey] = { assetIndex: parseInt(assetIndex), position: [] };
 
             let tempDivId = renderSingleRoomObject(newKey);
@@ -8281,11 +9225,12 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
                 navButtons[0].classList.add('active');
     
                 updateStatsBeforeRerunningInitGameAndRenderPets();
-                initGame();
+                await initGame();
+                let tempDivId = renderSingleRoomObject(newKey);
             }
 
             userObjectAssets[tempDivId].position = getObjectCoordinates(tempDivId);
-        
+            
             // Attempt to place the item at a valid position
             const placementMap = generatePlacementMap(tempDivId);
             const validPosition = findValidPosition(placementMap, tempDivId);
@@ -8293,16 +9238,20 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
             if (validPosition) {
                 userObjectAssets[tempDivId].position = validPosition;
                 if (!sidebar) {
-                    sendObjectAssetsUpdateToDatabase();
+                    await sendObjectAssetsUpdateToDatabase();
                     updateStatsBeforeRerunningInitGameAndRenderPets();
-                    initGame();
+                    await attemptGameInit();
                 } else {
                     const tempDiv = document.getElementById(tempDivId)
                     tempDiv.style.left = `calc(${validPosition[0]} * var(--unit-size))`;
                     tempDiv.style.top = `calc((${validPosition[1] + 1} * var(--unit-size)) - ${tempDiv.offsetHeight}px)`;
-                    enableObjectDragging();
+                    
+                    setTimeout(() => {
+                        disableObjectDragging();
+                        enableObjectDragging();
+                    }, 50);
                 }
-                console.log()
+
                 if (!isObjectVisibleInViewport(tempDivId)) {
                     centerViewportOnObject(tempDivId)
                 }
@@ -8333,11 +9282,32 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
             deleteBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 6 L6 18 M6 6 L18 18" stroke="#F5F5F7" stroke-width="2"/></svg>';
 
             deleteBtn.addEventListener('click', () => {
-                showCustomConfirm(`Ar tikrai nori išmestį šį daiktą? Jo susigrąžinti negalėsi.`, () => {
-                    // Delete all instances of this stackable item
-                    keys.forEach(key => {
-                        removeObjectFromUserAssets(key);
-                    });
+                const refund = Math.round((gameAssetIndex[userObjectAssets[keys[0]]["assetIndex"]].cost * COST_MULTIPLIER) / 2 * 10) / 10;
+                showCustomConfirm(`Ar tikrai nori parduoti šį daiktą? Už jį atgausi tik pusę kainos: 
+                    <div class="coin-display-delete-confirm">
+                        <span class="coin-icon">
+                            <img src="../images/icons/icon-sudedu-coin.png">
+                        </span>
+                        <span class="coin-amount">${refund}</span>
+                    </div>`, async () => {
+                    
+                    const sucess = await Promise.all(
+                        keys.map(key => removeObjectFromUserAssets(key))
+                    )
+
+                    if (sucess) {
+                        const moneySuccess = await sendMoneyTransactionToDatabase(refund, 'add');
+                    
+                        if (!moneySuccess) {
+                            return;
+                        }
+                        
+                        userMoney += refund;
+                        updateCoinAmounts(userMoney);
+                    }
+
+                    rerenderObjectAssetListIfNoItemsInSelectedCategory();
+                    renderShopCategoriesDropdown();
                 });
             });
 
@@ -8406,70 +9376,73 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
             btn.disabled = false;
         }
 
-        btn.addEventListener('click', () => {
-                let tempDivId = renderSingleRoomObject(key);
+        btn.addEventListener('click', async () => {
+            let tempDivId = renderSingleRoomObject(key);
 
-                userObjectAssets[tempDivId].position = getObjectCoordinates(tempDivId);
+            userObjectAssets[tempDivId].position = getObjectCoordinates(tempDivId);
 
+            if (!sidebar) {
+                document.querySelectorAll('.game-content-panel').forEach(p => p.classList.remove('active'));
+                document.getElementById('pet-room-container').classList.add('active');
 
+                const navButtons = document.querySelectorAll('.nav-item');
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                navButtons[0].classList.add('active');
+                
+                updateStatsBeforeRerunningInitGameAndRenderPets();
+                await initGame();
+            }
+        
+            // Attempt to place the item at a valid position
+            const placementMap = generatePlacementMap(tempDivId);
+            const validPosition = findValidPosition(placementMap, tempDivId);
+
+            if (validPosition) {
+                userObjectAssets[tempDivId].position = validPosition;
                 if (!sidebar) {
-                    document.querySelectorAll('.game-content-panel').forEach(p => p.classList.remove('active'));
-                    document.getElementById('pet-room-container').classList.add('active');
-
-                    const navButtons = document.querySelectorAll('.nav-item');
-                    navButtons.forEach(btn => btn.classList.remove('active'));
-                    navButtons[0].classList.add('active');
-                    
+                    await sendObjectAssetsUpdateToDatabase();
                     updateStatsBeforeRerunningInitGameAndRenderPets();
-                    initGame();
-                }
-            
-                // Attempt to place the item at a valid position
-                const placementMap = generatePlacementMap(tempDivId);
-                const validPosition = findValidPosition(placementMap, tempDivId);
-
-                if (validPosition) {
-                    userObjectAssets[tempDivId].position = validPosition;
-                    if (!sidebar) {
-                        sendObjectAssetsUpdateToDatabase();
-                        updateStatsBeforeRerunningInitGameAndRenderPets();
-                        initGame();
-                    } else {
-                        const tempDiv = document.getElementById(tempDivId)
-                        tempDiv.style.left = `calc(${validPosition[0]} * var(--unit-size))`;
-                        tempDiv.style.top = `calc((${validPosition[1] + 1} * var(--unit-size)) - ${tempDiv.offsetHeight}px)`;
-                        enableObjectDragging();
-                    }
-
-                    if (!isObjectVisibleInViewport(tempDivId)) {
-                        centerViewportOnObject(tempDivId)
-                    }
+                    await attemptGameInit();
                 } else {
-                    userObjectAssets[tempDivId].position = [];
-                    document.getElementById(tempDivId).remove();
-                    if (gameAssetIndex[userObjectAssets[tempDivId].assetIndex].placingIndex === 13 || 
-                        gameAssetIndex[userObjectAssets[tempDivId].assetIndex]["css-class"].includes("window-sill")) {
-                        messageToTheUser("Nėra tinkamo dydžio lango arba jį užstoja kiti daiktai!");
-                    } else {
-                        messageToTheUser("Nepakanka vietos!");
-                    }
-                    predictAndSetZIndex();
+                    const tempDiv = document.getElementById(tempDivId)
+                    tempDiv.style.left = `calc(${validPosition[0]} * var(--unit-size))`;
+                    tempDiv.style.top = `calc((${validPosition[1] + 1} * var(--unit-size)) - ${tempDiv.offsetHeight}px)`;
+                    rerenderObjectAssetListIfNoItemsInSelectedCategory(sidebar=true);
+                    setTimeout(() => {
+                        disableObjectDragging();
+                        enableObjectDragging();
+                    }, 50);
                 }
 
-                itemDiv.classList.add("in-use");
-
-                if (sidebar) {
-                    if (userObjectAssets[tempDivId].position && userObjectAssets[tempDivId].position.length > 0) {
-                        btn.textContent = 'Naudojama';
-                        btn.disabled = true;
-                        btn.className = 'use-btn used';
-                    } else {
-                        btn.textContent = 'Naudoti';
-                        btn.disabled = false;
-                        btn.className = 'use-btn';
-                    }
+                if (!isObjectVisibleInViewport(tempDivId)) {
+                    centerViewportOnObject(tempDivId)
                 }
-            });
+            } else {
+                userObjectAssets[tempDivId].position = [];
+                document.getElementById(tempDivId).remove();
+                if (gameAssetIndex[userObjectAssets[tempDivId].assetIndex].placingIndex === 13 || 
+                    gameAssetIndex[userObjectAssets[tempDivId].assetIndex]["css-class"].includes("window-sill")) {
+                    messageToTheUser("Nėra tinkamo dydžio lango arba jį užstoja kiti daiktai!");
+                } else {
+                    messageToTheUser("Nepakanka vietos!");
+                }
+                predictAndSetZIndex();
+            }
+
+            itemDiv.classList.add("in-use");
+
+            if (sidebar) {
+                if (userObjectAssets[tempDivId].position && userObjectAssets[tempDivId].position.length > 0) {
+                    btn.textContent = 'Naudojama';
+                    btn.disabled = true;
+                    btn.className = 'use-btn used';
+                } else {
+                    btn.textContent = 'Naudoti';
+                    btn.disabled = false;
+                    btn.className = 'use-btn';
+                }
+            }
+        });
 
         if (asset.position && asset.position.length === 0) {
             const itemDeleteBtnHolder = document.createElement('div');
@@ -8479,7 +9452,15 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
             deleteBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 6 L6 18 M6 6 L18 18" stroke="#F5F5F7" stroke-width="2"/></svg>';
 
             deleteBtn.addEventListener('click', () => {
-                showCustomConfirm(`Ar tikrai nori išmestį šį daiktą? Jo susigrąžinti negalėsi.`, removeObjectFromUserAssets, key);
+                const itemPrice = Math.round((gameAssetIndex[userObjectAssets[key]["assetIndex"]].cost * COST_MULTIPLIER) / 2 * 10) / 10;
+                showCustomConfirm(`Ar tikrai nori parduoti šį daiktą? Už jį atgausi tik pusę kainos: 
+                <div class="coin-display-delete-confirm">
+                    <span class="coin-icon">
+                        <img src="../images/icons/icon-sudedu-coin.png">
+                    </span>
+                    <span class="coin-amount">${itemPrice}</span>
+                </div>`, 
+                removeObjectFromUserAssets, [key, itemPrice]);
             });
             
             if (!sidebar) {
@@ -8499,10 +9480,21 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
     scalePreview();
 }
 
-function removeObjectFromUserAssets(assetKey) {
+async function removeObjectFromUserAssets(assetKey, refund=null) {
     delete userObjectAssets[assetKey];
-    sendObjectAssetsUpdateToDatabase();
-    renderObjectAssets('all', false);
+    let success = await sendObjectAssetsUpdateToDatabase();
+    if (success && refund) {
+        console.log(refund)
+        const moneySuccess = await sendMoneyTransactionToDatabase(refund, 'add');
+    
+        if (!moneySuccess) {
+            return;
+        }
+        
+        userMoney += refund;
+        updateCoinAmounts(userMoney);
+    }
+    rerenderObjectAssetListIfNoItemsInSelectedCategory();
 }
 
 // Render a single object in the room
@@ -8530,24 +9522,75 @@ function findValidPosition(placementMap, assetId) {
     const objectHeight = Math.ceil(tempDiv.offsetHeight / unitSize);
 
     const [targetCol, targetRow] = viewportState.closestTile;
-    let closestPosition = null;
-    let minDistance = Infinity;
+    
+    // Valid tile types for rooms
+    const validTypes = new Set([1.0, 2.0, 3.0]);
+    
+    // Helper to check if tile is valid
+    const isValidTile = (x, y) => {
+        if (x < 0 || x >= roomLayout[0].length || y < 0 || y >= roomLayout.length) return false;
+        const tileType = roomLayout[y][x];
+        const type = tileType?.type ?? tileType;
+        return validTypes.has(type);
+    };
+    
+    // Find all tiles in the room containing the target position using flood-fill
+    const roomTiles = new Set();
+    if (isValidTile(targetCol, targetRow)) {
+        const visited = new Set();
+        const queue = [[targetCol, targetRow]];
+        visited.add(`${targetCol},${targetRow}`);
+        
+        while (queue.length > 0) {
+            const [x, y] = queue.shift();
+            roomTiles.add(`${x},${y}`);
+            
+            // Check 4 adjacent cells
+            const neighbors = [[x-1, y], [x+1, y], [x, y-1], [x, y+1]];
+            for (const [nx, ny] of neighbors) {
+                const key = `${nx},${ny}`;
+                if (!visited.has(key) && isValidTile(nx, ny)) {
+                    visited.add(key);
+                    queue.push([nx, ny]);
+                }
+            }
+        }
+    }
+    
+    // Helper to check if object fits at position
+    const checkFit = (row, col) => {
+        for (let y = 0; y < objectHeight; y++) {
+            for (let x = 0; x < objectWidth; x++) {
+                if (!placementMap[row + y] || !placementMap[row + y][col + x]?.canPlace) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+    
+    // Helper to check if position is in the target room
+    const isInTargetRoom = (col, row) => {
+        // Check if any part of the object footprint is in the target room
+        for (let y = 0; y < objectHeight; y++) {
+            for (let x = 0; x < objectWidth; x++) {
+                if (roomTiles.has(`${col + x},${row + y}`)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+    
+    let closestInRoom = null;
+    let closestGlobal = null;
+    let minDistanceInRoom = Infinity;
+    let minDistanceGlobal = Infinity;
 
     // Search placement map for fitting positions
     for (let row = 0; row < placementMap.length; row++) {
         for (let col = 0; col < placementMap[0].length; col++) {
-            let fits = true;
-            for (let y = 0; y < objectHeight; y++) {
-                for (let x = 0; x < objectWidth; x++) {
-                    if (!placementMap[row + y] || !placementMap[row + y][col + x]?.canPlace) {
-                        fits = false;
-                        break;
-                    }
-                }
-                if (!fits) break;
-            }
-            
-            if (fits) {
+            if (checkFit(row, col)) {
                 // Calculate position (bottom-left corner like original)
                 const positionRow = row + objectHeight - 1;
                 const positionCol = col;
@@ -8558,15 +9601,25 @@ function findValidPosition(placementMap, assetId) {
                     Math.pow(positionRow - targetRow, 2)
                 );
                 
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestPosition = [positionCol, positionRow];
+                // Check if in target room
+                if (roomTiles.size > 0 && isInTargetRoom(col, row)) {
+                    if (distance < minDistanceInRoom) {
+                        minDistanceInRoom = distance;
+                        closestInRoom = [positionCol, positionRow];
+                    }
+                }
+                
+                // Track global closest as backup
+                if (distance < minDistanceGlobal) {
+                    minDistanceGlobal = distance;
+                    closestGlobal = [positionCol, positionRow];
                 }
             }
         }
     }
     
-    return closestPosition;
+    // Prefer position in target room, fall back to global closest
+    return closestInRoom || closestGlobal;
 }
 
 
@@ -8898,11 +9951,35 @@ function highlightSpecificObjects(objects) {
         const occupiedTiles = getTilesOccupiedByObject(coords, objectWidth, objectHeight)
           
         for (let i = 0; i < occupiedTiles.length; i++) {
-            createPlacementHighlight(occupiedTiles[i][0], occupiedTiles[i][1], true)
+            createSpecificPlacementHighlight(occupiedTiles[i][0], occupiedTiles[i][1], true)
         }  
     });
     
     messageToTheUser(`Pasirink maisto dubenėlį.`, false)
+}
+
+// Function to create individual highlight overlay
+function createSpecificPlacementHighlight(col, row, isValid) {
+    const highlight = document.createElement('div');
+    highlight.className = `placement-highlight ${isValid ? 'valid' : 'invalid'}`;
+    highlight.style.cssText = `
+        position: absolute;
+        left: calc(${col} * var(--unit-size));
+        top: calc(${row} * var(--unit-size));
+        width: var(--unit-size);
+        height: var(--unit-size);
+        background-color: ${isValid ? 'rgba(0, 255, 0, 0.15)' : 'rgba(255, 0, 0, 0.15)'};
+        pointer-events: none;
+        z-index: 1000;
+    `;
+    
+    document.getElementById('room-container').appendChild(highlight);
+}
+
+function clearSpecificPlacementHighlights() {
+    document.querySelectorAll('.placement-highlight').forEach(highlight => {
+        highlight.remove();
+    });
 }
 
 function getTilesOccupiedByObject(bottomLeft, width, height) {
@@ -9086,7 +10163,7 @@ function renderPetListForPetSection() {
         deleteBtn.className = 'pet-delete-btn';
         deleteBtn.textContent = 'Atiduoti';
         deleteBtn.addEventListener('click', () => {
-            showCustomConfirm("Ar tikrai nori atiduoti šį augintinį į gyvunėlių namus? Jo susigrąžinti negalėsi.", deletePetConfirmed, petType);
+            showCustomConfirm("Ar tikrai nori atiduoti šį augintinį į gyvunėlių namus? Jo susigrąžinti negalėsi.", deletePetConfirmed, [petType]);
         });
 
         const petSectionPetButtonContainer = document.createElement('div');
@@ -9097,34 +10174,6 @@ function renderPetListForPetSection() {
         
         container.appendChild(petSectionPetButtonContainer);
     }
-}
-
-function showCustomConfirm(text, onConfirm, item) {
-    const modal = document.getElementById('customConfirmModal');
-    const modalText = document.getElementById('customModalText');
-    const yesBtn = document.getElementById('customConfirmYes');
-    const noBtn = document.getElementById('customConfirmNo');
-
-    // Set text
-    modalText.textContent = text;
-
-    // Show modal
-    modal.style.display = 'flex';
-
-    // Remove previous click handlers
-    yesBtn.onclick = null;
-    noBtn.onclick = null;
-
-    // Yes click
-    yesBtn.onclick = () => {
-        onConfirm(item);
-        modal.style.display = 'none';
-    };
-
-    // No click
-    noBtn.onclick = () => {
-        modal.style.display = 'none';
-    };
 }
 
 function deletePetConfirmed(petId) {
@@ -9464,12 +10513,12 @@ function increasePetStatsInDatabase(petId, stat, amount) {
     const petSpecies = petId.split("-")[0];
     const bonusStats = bonusFromDailySupplyItems();
 
-    currentPet._stats.food = Math.max(bonusStats[petSpecies]["food"], currentPet._stats.food - statDecrease);
-    currentPet._stats.foodNew = Math.max(bonusStats[petSpecies]["food"], currentPet._stats.foodNew - statDecrease);
-    currentPet._stats.water = Math.max(bonusStats[petSpecies]["water"], currentPet._stats.water - statDecrease);
-    currentPet._stats.waterNew = Math.max(bonusStats[petSpecies]["water"], currentPet._stats.waterNew - statDecrease);
-    currentPet._stats.love = Math.max(bonusStats[petSpecies]["love"], currentPet._stats.love - statDecrease);
-    currentPet._stats.loveNew = Math.max(bonusStats[petSpecies]["love"], currentPet._stats.loveNew - statDecrease);
+    currentPet._stats.food = Math.max(bonusStats[petSpecies]?.food ?? 0, currentPet._stats.food - statDecrease);
+    currentPet._stats.foodNew = Math.max(bonusStats[petSpecies]?.food ?? 0, currentPet._stats.foodNew - statDecrease);
+    currentPet._stats.water = Math.max(bonusStats[petSpecies]?.water ?? 0, currentPet._stats.water - statDecrease);
+    currentPet._stats.waterNew = Math.max(bonusStats[petSpecies]?.water ?? 0, currentPet._stats.waterNew - statDecrease);
+    currentPet._stats.love = Math.max(bonusStats[petSpecies]?.love ?? 0, currentPet._stats.love - statDecrease);
+    currentPet._stats.loveNew = Math.max(bonusStats[petSpecies]?.love ?? 0, currentPet._stats.loveNew - statDecrease);
 
     let newAmount = currentPet._stats[stat] + amount;
     if (newAmount > 10) newAmount = 10;
@@ -9682,6 +10731,7 @@ function displayFoodOptions(obj) {
         }
 
         clearPlacementHighlights();
+        clearSpecificPlacementHighlights();
 
         obj.classList.add("full");
         obj._foodContent = [selectedFoodInfo["provides"], selectedConsumable[1]];
@@ -9696,6 +10746,7 @@ function displayFoodOptions(obj) {
         }
         selectedConsumable = [];
         clearPlacementHighlights();
+        clearSpecificPlacementHighlights();
         sendPetAssetsUpdateToDatabase();
     } else {
         selectedConsumable = [];
@@ -11368,27 +12419,25 @@ function renderTaxesSection() {
 
 async function payTax(taxType) {
     const originalMoney = userMoney;
-
-    // Calculate total cost
     const totalCost = taxPrice[taxType];
     
     // Check if user has enough money
     if (userMoney < totalCost) {
-        messageToTheUser("Nepakanka pingų!", 'error');
+        messageToTheUser("Nepakanka pinigų!", 'error');
         return;
     }
 
-    userMoney -= totalCost;
-
-    const moneyUpdateSuccess = await sendMoneyUpdateToDatabase();
-        
-    if (!moneyUpdateSuccess) {
-        // Revert all changes
-        userMoney = originalMoney;
+    // Deduct money from server first
+    const moneySuccess = await sendMoneyTransactionToDatabase(totalCost, 'subtract');
+    
+    if (!moneySuccess) {
         messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
-        console.log('Purchase failed - money update failed');
         return;
     }
+    
+    // Update local money only after server confirms
+    userMoney -= totalCost;
+    updateCoinAmounts(userMoney);
 
     const currentTime = Math.floor(Date.now() / 1000 / 60);
     
@@ -11400,11 +12449,19 @@ async function payTax(taxType) {
     const taxesArray = [taxesData.waterTax.date, taxesData.electricityTax.date];
     
     // Send to server
-    sendTaxUpdate(taxesArray);
-    
-    // Re-render the taxes section
-    renderTaxesSection();
-    taxesNavChoiceIndicator();
+    try {
+        await sendTaxUpdate(taxesArray);
+        
+        // Re-render the taxes section
+        renderTaxesSection();
+        taxesNavChoiceIndicator();
+    } catch (error) {
+        // Tax update failed - try to refund
+        await sendMoneyTransactionToDatabase(totalCost, 'add');
+        userMoney = originalMoney;
+        updateCoinAmounts(userMoney);
+        messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
+    }
 }
 
 async function sendTaxUpdate(taxesArray) {
@@ -11505,7 +12562,6 @@ function savePetName(petId, buttonEl) {
 function changePetName(petId, newName) {
   userPetAssets["pets"][petId].name = newName;
   sendPetAssetsUpdateToDatabase();
-  initGame();
 }
 
 
@@ -11599,6 +12655,296 @@ document.querySelectorAll('input.purchase-quantity').forEach(input => {
         else if (value > max) this.value = max;
 
     });
+});
+
+function initShopHeaderCollapse() {
+    const shopHeader = document.getElementById('shopHeader');
+    const shopHeaderMain = document.querySelector('.header-main');
+    const shopItems = document.getElementById('shop-items');
+    const expandToggle = document.getElementById('expandToggle');
+
+    if (!shopHeader || !shopItems || !expandToggle) return;
+
+    let isManuallyExpanded = false;
+    let lastScrollTop = 0;
+    let userScrolling = false;
+
+    const expandThreshold = 50;
+
+    function handleScroll() {
+        if (!userScrolling) return;
+
+        const scrollTop = shopItems.scrollTop;
+        const scrollingDown = scrollTop > lastScrollTop;
+        const scrollingUp = scrollTop < lastScrollTop;
+
+        const headerIsCompact = shopHeader.classList.contains('compact');
+
+        if (scrollingDown && !headerIsCompact) {
+            shopHeader.classList.add('compact');
+        } else if (scrollingUp && scrollTop < expandThreshold && headerIsCompact) {
+            //shopHeader.classList.remove('compact');
+        }
+
+        lastScrollTop = scrollTop;
+    }
+
+    // Scroll container user events
+    shopItems.addEventListener('wheel', () => { 
+        userScrolling = true; 
+        handleScroll();
+        requestAnimationFrame(() => userScrolling = false);
+    });
+
+    shopItems.addEventListener('touchstart', () => { userScrolling = true; });
+    shopItems.addEventListener('touchmove', () => { userScrolling = true; handleScroll(); });
+    shopItems.addEventListener('touchend', () => { userScrolling = false; });
+
+    shopItems.addEventListener('scroll', handleScroll);
+
+    // Manual toggle
+    shopHeaderMain.addEventListener('click', () => {
+        const isCompact = shopHeader.classList.toggle('compact');
+        isManuallyExpanded = !isCompact;
+        if (isManuallyExpanded) {
+            setTimeout(() => { isManuallyExpanded = false; }, 5000);
+        }
+    });
+
+    // Header inputs/buttons/toggles
+    shopHeader.querySelectorAll('button, input[type="checkbox"], input[type="radio"], input[type="range"]').forEach(el => {
+        el.addEventListener('click', () => {
+            shopItems.scrollTop = 0;
+        });
+    });
+
+    // Dropdowns (<select>) trigger scroll on change
+    shopHeader.querySelectorAll('select').forEach(el => {
+        el.addEventListener('change', () => {
+            shopItems.scrollTop = 0;
+        });
+    });
+
+    // Proxy scroll from header (wheel)
+    shopHeader.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        userScrolling = true;
+        shopItems.scrollTop += e.deltaY;
+        handleScroll();
+        requestAnimationFrame(() => userScrolling = false);
+    });
+
+    // Proxy scroll from header (touch)
+    let lastTouchY = null;
+    shopHeader.addEventListener('touchstart', (e) => {
+        lastTouchY = e.touches[0].clientY;
+        userScrolling = true;
+    });
+    shopHeader.addEventListener('touchmove', (e) => {
+        if (lastTouchY === null) return;
+        const currentY = e.touches[0].clientY;
+        const deltaY = lastTouchY - currentY;
+        shopItems.scrollTop += deltaY;
+        lastTouchY = currentY;
+        userScrolling = true;
+        handleScroll();
+        e.preventDefault();
+    });
+    shopHeader.addEventListener('touchend', () => {
+        lastTouchY = null;
+        userScrolling = false;
+    });
+}
+
+function initPetAssetHeaderCollapse() {
+    const header = document.getElementById('petAssetHeader');
+    const headerMain = header?.querySelector('.header-main');
+    const container = document.getElementById('pet-supplies') || document.getElementById('pet-skins');
+    const expandToggle = document.getElementById('petAssetExpandToggle');
+
+    if (!header || !container || !expandToggle) return;
+
+    let isManuallyExpanded = false;
+    let lastScrollTop = 0;
+    let userScrolling = false;
+    const expandThreshold = 50;
+
+    function handleScroll() {
+        if (!userScrolling || isManuallyExpanded) return;
+        const scrollTop = container.scrollTop;
+        const scrollingDown = scrollTop > lastScrollTop;
+        const scrollingUp = scrollTop < lastScrollTop;
+        const headerIsCompact = header.classList.contains('compact');
+
+        if (scrollingDown && !headerIsCompact) {
+            header.classList.add('compact');
+        } else if (scrollingUp && scrollTop < expandThreshold && headerIsCompact) {
+            //header.classList.remove('compact');
+        }
+        lastScrollTop = scrollTop;
+    }
+
+    container.addEventListener('wheel', () => { 
+        userScrolling = true; 
+        handleScroll();
+        requestAnimationFrame(() => userScrolling = false);
+    });
+
+    container.addEventListener('touchstart', () => { userScrolling = true; });
+    container.addEventListener('touchmove', () => { userScrolling = true; handleScroll(); });
+    container.addEventListener('touchend', () => { userScrolling = false; });
+    container.addEventListener('scroll', handleScroll);
+
+    headerMain?.addEventListener('click', () => {
+        const isCompact = header.classList.toggle('compact');
+        isManuallyExpanded = true;
+        if (isManuallyExpanded) {
+            setTimeout(() => { isManuallyExpanded = false; }, 3000);
+        }
+    });
+
+    header.querySelectorAll('button, input, select').forEach(el => {
+        el.addEventListener('click', () => { container.scrollTop = 0; });
+        if (el.tagName === 'SELECT') {
+            el.addEventListener('change', () => { container.scrollTop = 0; });
+        }
+    });
+
+    header.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        userScrolling = true;
+        container.scrollTop += e.deltaY;
+        handleScroll();
+        requestAnimationFrame(() => userScrolling = false);
+    });
+}
+
+function initFurnitureHeaderCollapse() {
+    const header = document.getElementById('furnitureHeader');
+    const headerMain = header?.querySelector('.header-main');
+    const container = document.querySelector('.object-assets');
+    const expandToggle = document.getElementById('furnitureExpandToggle');
+
+    if (!header || !container || !expandToggle) return;
+
+    let isManuallyExpanded = false;
+    let lastScrollTop = 0;
+    let userScrolling = false;
+    const expandThreshold = 50;
+
+    function handleScroll() {
+        if (!userScrolling || isManuallyExpanded) return;
+        const scrollTop = container.scrollTop;
+        const scrollingDown = scrollTop > lastScrollTop;
+        const scrollingUp = scrollTop < lastScrollTop;
+        const headerIsCompact = header.classList.contains('compact');
+
+        if (scrollingDown && !headerIsCompact) {
+            header.classList.add('compact');
+        } else if (scrollingUp && scrollTop < expandThreshold && headerIsCompact) {
+            //header.classList.remove('compact');
+        }
+        lastScrollTop = scrollTop;
+    }
+
+    container.addEventListener('wheel', () => { 
+        userScrolling = true; 
+        handleScroll();
+        requestAnimationFrame(() => userScrolling = false);
+    });
+
+    container.addEventListener('touchstart', () => { userScrolling = true; });
+    container.addEventListener('touchmove', () => { userScrolling = true; handleScroll(); });
+    container.addEventListener('touchend', () => { userScrolling = false; });
+    container.addEventListener('scroll', handleScroll);
+
+    headerMain?.addEventListener('click', () => {
+        const isCompact = header.classList.toggle('compact');
+        isManuallyExpanded = true;
+        if (isManuallyExpanded) {
+            setTimeout(() => { isManuallyExpanded = false; }, 3000);
+        }
+    });
+
+    header.querySelectorAll('button, input, select').forEach(el => {
+        el.addEventListener('click', () => { container.scrollTop = 0; });
+        if (el.tagName === 'SELECT') {
+            el.addEventListener('change', () => { container.scrollTop = 0; });
+        }
+    });
+
+    header.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        userScrolling = true;
+        container.scrollTop += e.deltaY;
+        handleScroll();
+        requestAnimationFrame(() => userScrolling = false);
+    });
+}
+
+function initTaxesHeaderCollapse() {
+    const header = document.getElementById('taxesHeader');
+    const headerMain = header?.querySelector('.header-main');
+    const container = document.querySelector('.tax-records');
+    const expandToggle = document.getElementById('taxesExpandToggle');
+
+    if (!header || !container || !expandToggle) return;
+
+    let isManuallyExpanded = false;
+    let lastScrollTop = 0;
+    let userScrolling = false;
+    const expandThreshold = 50;
+
+    function handleScroll() {
+        if (!userScrolling || isManuallyExpanded) return;
+        const scrollTop = container.scrollTop;
+        const scrollingDown = scrollTop > lastScrollTop;
+        const scrollingUp = scrollTop < lastScrollTop;
+        const headerIsCompact = header.classList.contains('compact');
+
+        if (scrollingDown && !headerIsCompact) {
+            header.classList.add('compact');
+        } else if (scrollingUp && scrollTop < expandThreshold && headerIsCompact) {
+            //header.classList.remove('compact');
+        }
+        lastScrollTop = scrollTop;
+    }
+
+    container.addEventListener('wheel', () => { 
+        userScrolling = true; 
+        handleScroll();
+        requestAnimationFrame(() => userScrolling = false);
+    });
+
+    container.addEventListener('touchstart', () => { userScrolling = true; });
+    container.addEventListener('touchmove', () => { userScrolling = true; handleScroll(); });
+    container.addEventListener('touchend', () => { userScrolling = false; });
+    container.addEventListener('scroll', handleScroll);
+
+    headerMain?.addEventListener('click', () => {
+        const isCompact = header.classList.toggle('compact');
+        isManuallyExpanded = true;
+        if (isManuallyExpanded) {
+            setTimeout(() => { isManuallyExpanded = false; }, 3000);
+        }
+    });
+
+    header.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        userScrolling = true;
+        container.scrollTop += e.deltaY;
+        handleScroll();
+        requestAnimationFrame(() => userScrolling = false);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        initShopHeaderCollapse();
+        initPetAssetHeaderCollapse();
+        initFurnitureHeaderCollapse();
+        initTaxesHeaderCollapse();
+    }, 100);
 });
 
 window.onload = function () {
@@ -11706,7 +13052,7 @@ async function handleReceivedMessagesAndGifts(gifts) {
             if (existingSupplyKey) {
               userPetAssets.supplies[existingSupplyKey].quantity += quantity;
             } else {
-              const newSupplyKey = `S${Object.keys(userPetAssets.supplies).length + 1}`;
+              const newSupplyKey = getNextSupplyKey();
               userPetAssets.supplies[newSupplyKey] = {
                 assetIndex: gift.giftId,
                 quantity: quantity,
@@ -11715,7 +13061,7 @@ async function handleReceivedMessagesAndGifts(gifts) {
           } else {
             // Non-stackable pet item
             for (let i = 0; i < quantity; i++) {
-              const newSupplyKey = `S${Object.keys(userPetAssets.supplies).length + 1}`;
+              const newSupplyKey = getNextSupplyKey();
               userPetAssets.supplies[newSupplyKey] = {
                 assetIndex: gift.giftId,
                 quantity: 1,
@@ -11738,11 +13084,11 @@ async function handleReceivedMessagesAndGifts(gifts) {
       } else {
         // OBJECT ASSET LOGIC
         if (item.oneOfKind) {
-          const newKey = `O${Object.keys(userObjectAssets).length + 1}`;
+          const newKey = getNextObjectKey();
           userObjectAssets[newKey] = { assetIndex: gift.giftId, position: [] };
         } else {
           for (let i = 0; i < quantity; i++) {
-            const newKey = `O${Object.keys(userObjectAssets).length + 1}`;
+            const newKey = getNextObjectKey();
             userObjectAssets[newKey] = { assetIndex: gift.giftId, position: [] };
           }
         }
@@ -11760,7 +13106,15 @@ async function handleReceivedMessagesAndGifts(gifts) {
   displayReceivedMessages();
 }
 
-
+// Add this function near the top of your script (after line 100 or so):
+function getNextObjectKey() {
+    let maxNum = 0;
+    for (const key in userObjectAssets) {
+        const num = parseInt(key.substring(1)); // Extract number from "O5"
+        if (num > maxNum) maxNum = num;
+    }
+    return `O${maxNum + 1}`;
+}
 
 function displayReceivedMessages () {
     if (receivedMessages.length > 0) {
@@ -11951,6 +13305,10 @@ function handleTouchEnd(e) {
         initialPinchY = 0;
         initialViewportX = 0;
         initialViewportY = 0;
+    }
+
+    if (isDragging && currentObject) {
+        validateAndResetPosition(currentObject);
     }
     
     // When ALL touches end after multi-touch
@@ -12262,7 +13620,13 @@ function displaySidebar() {
     const sidebarWrapper = document.querySelector('.sidebar-wrapper');
     const width = sidebarWrapper.offsetWidth;
 
-    if (window.innerWidth <= 768) {
+    const isSmallScreen = window.innerWidth <= 768;
+
+    const isPortraitTablet = window.matchMedia(
+    "(min-width: 768px) and (max-width: 1024px) and (orientation: portrait)"
+    ).matches;
+
+    if (isSmallScreen || isPortraitTablet) {
         sidebarWrapper.style.transform = `translateX(${(width)*-1}px)`;
     } else {
         sidebarWrapper.style.transform = `translateX(0px)`;
@@ -12438,17 +13802,21 @@ function toggleRoomExpansion() {
     const gameNavigation = document.querySelector(".game-navigation");
     const contentContainer = document.querySelector("#content-outer-container");
     const sidebarWrapper = document.querySelector(".sidebar-wrapper");
+    const mainCoinDisplay = document.querySelector(".main-coin-display-holder .coin-display");
+    const gameContentPanel = document.querySelector(".game-content-panel");
 
     const isExpanded = game.classList.contains(containerExpanded);
 
     if (isExpanded) {
         game.classList.remove(containerExpanded);
         petButtons.classList.remove(containerExpanded);
+        mainCoinDisplay.classList.remove(containerExpanded);
         statsBars.classList.remove(containerExpanded);
         upperControls.classList.remove(containerExpanded);
         gameNavigation.classList.remove(containerExpanded);
         contentContainer.classList.remove(containerExpanded);
         sidebarWrapper.classList.remove(containerExpanded);
+        gameContentPanel.classList.remove(containerExpanded);
 
         expandBtnSpan.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
@@ -12466,6 +13834,8 @@ function toggleRoomExpansion() {
         gameNavigation.classList.add(containerExpanded);
         contentContainer.classList.add(containerExpanded);
         sidebarWrapper.classList.add(containerExpanded);
+        mainCoinDisplay.classList.add(containerExpanded);
+        gameContentPanel.classList.add(containerExpanded);
 
         expandBtnSpan.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
@@ -12501,10 +13871,10 @@ function highlightWalkabilityMap() {
                 const horizontal = dirs[1] && dirs[3];
                 const all = vertical && horizontal;
 
-                if (all) color = 'rgba(0, 255, 0, 0.2)';         // All directions
-                else if (vertical) color = 'rgba(0, 0, 255, 0.2)'; // Up/Down only
-                else if (horizontal) color = 'rgba(255, 255, 0, 0.2)'; // Left/Right only
-                else color = 'rgba(255, 165, 0, 0.2)';           // Single or other
+                if (all) color = 'rgba(0, 255, 0, 0.2)';         // All directions green
+                else if (vertical) color = 'rgba(0, 0, 255, 0.2)'; // Up/Down only purple
+                else if (horizontal) color = 'rgba(255, 255, 0, 0.2)'; // Left/Right only yellow
+                else color = 'rgba(255, 165, 0, 0.2)';           // Single or other peach
             }
 
             createTileHighlight(container, col, row, unitSize, color);

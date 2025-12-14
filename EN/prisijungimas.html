@@ -181,7 +181,7 @@
 
 	document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = false);
 
-	const apiBase = 'https://sudedu-server.onrender.com/'
+	const apiBase = 'http://localhost:5000/'
 
     const registerBtn = document.getElementById('registerBtn')
 	const logInTitle = document.getElementById('log-in-text')
@@ -202,7 +202,7 @@
 
 	controller = JSON.parse(localStorage.getItem('controller'));
 
-	if (controller.taskId !== 0 && controller.taskCompleted === true) {
+	if (controller.task && controller.taskCompleted === true) {
 		errorField.innerHTML = "Prisijunkite, kad rezultatai būtų išsaugoti."
 	}
 
@@ -293,14 +293,16 @@
 
 				localStorage.setItem('userData', JSON.stringify(userData));
 				
-				if (controller.taskId !== 0 && controller.taskCompleted === true) {
+				if (controller.task && controller.taskCompleted === true) {
 						if (controller.mode === "math") {
 						window.location.href = `veiksmai`;
 						} else if (controller.mode === "lang") {
 							if (controller.modeChoice1 === "C49") {
 								window.location.href = `teksto-suvokimas`;
-							} else if (controller.modeChoice1 === "C50") {
-								window.location.href = `rasyba`;
+							} else if (controller.modeChoice1 === "C83") {
+								if (controller.modeChoice2 === "C50") {
+									window.location.href = `rasyba`;
+								}
 							}
 						}
 					} else {

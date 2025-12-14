@@ -5,60 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>sudedu - teksto supratimas</title>
 
-    <!-- Include Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <!-- Include Dragula CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/dragula@3.7.3/dist/dragula.min.css" rel="stylesheet">
     <link rel="stylesheet"
 		href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="../main-nav-bar.css">
+    <link rel="stylesheet" type="text/css" href="../index.css">
+    <link id="questionsStyleSheet" rel="stylesheet" type="text/css" href="">
+    <link rel="stylesheet" href="../pet-game-pets.css">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-96Q83PW8XY"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+      //window.dataLayer = window.dataLayer || [];
+      //function gtag(){dataLayer.push(arguments);}
+      //gtag('js', new Date());
 
-      gtag('config', 'G-96Q83PW8XY');
+      //gtag('config', 'G-96Q83PW8XY');
     </script>	
+    <script src="../refresh-token.js"></script>
     
     <style>
+
+        * {
+          -webkit-user-select: none;
+          -webkit-tap-highlight-color: transparent;
+          user-select: none;
+          box-sizing: border-box;
+          -webkit-user-drag: none;
+          user-drag: none;
+        }
+
       	html {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background-image: linear-gradient(to top, #ffbf9c, #ffbf92, #ffbf89, #ffbf7e, #ffc074);
-          min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: linear-gradient(to top, #ffbf9c, #ffbf92, #ffbf89, #ffbf7e, #ffc074);
+            width: 100vw;
+            height: 100svh;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         body {
-  		    background: transparent;
-          font-family: 'Andika', sans-serif;
-          padding: 20px;
-          overscroll-behavior: none;
-          user-select: none;
-          -webkit-user-select: none;
-          -ms-user-select: none;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          width: 100vw;
-          margin: 0;
+            margin: 0;
+            font-family: 'SFpro', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .main-nav-mobile-btn {
+            width: auto;
+            height: auto;
         }
 
         .container {
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          width: 100%;
-          max-width: 1200px; /* Optional: limit the maximum width */
-  		    min-height: 95dvh;
+            flex: 1;
+            max-height: calc(100% - 80px - 16px - 16px);
+            min-height: calc(100% - 80px - 16px - 16px);
+            width: calc(100% - (2 * 16px));
+            display: flex;
+            justify-content: start;
+            background: rgba(255, 255, 255, 0.08);
+            margin: 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+            flex-direction: column;
+            padding: 20px;
         }
 
-        .field {
-          background-color: #e0e0e0;
-          padding: 10px;
-          width: 100%;
-          margin-top: 10px;
+        .trackers-row {
+          display: flex;
+          flex-wrap: wrap;
+        }
+
+        .trackers-holder,
+        .timer-holder {
+          display: flex;
+          flex: 0 0 auto;
+          white-space: nowrap;
+        }
+
+		    .pet-on-walk-holder {
+          flex: 1 1 auto;
+          min-width: 0;
+        }
+
+        .timer-holder {
+          justify-content: end;
         }
 
         .item {
@@ -66,11 +105,11 @@
           color: black;;
           padding: 10px;
           margin: 5px;
-          background-color: #FAF1E6;
           cursor: move;
-          border: 1px solid #ccc;
+          background: rgba(255, 255, 255, 0.2);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          backdrop-filter: blur(10px);
           border-radius: 5px;
-          box-shadow: 0px 0.1px 3px rgba(0, 0, 0, 0.2);
           white-space: pre-line;
         }
 
@@ -78,33 +117,66 @@
 
         #title-field {
           min-height: 100px;
-          margin-top: 20px;
+        }
+
+        .tracker-timer-holder {
+          padding: 0 15px;
+          margin-bottom: 10px;
+        }
+
+        #mistakes-tracker,
+        #question-number-tracker,
+        #timer {
+          margin: 0;
+          font-weight: 600;
+          font-size: 1.25rem
+        }
+
+        #question-number-tracker {
+          margin-bottom: 5px;
+        }
+
+        .trackers-holder,
+        .timer-holder {
+          align-items: center;
         }
 
         .button-row {
-          margin-top: 10px;
+          display: flex;
+          margin-top: 15px;
+          justify-content: space-between;
         }
 
         #options-field,
         #answers-field {
-          margin-top: 20px;
           display: flex;
           flex-direction: column;
         }
+
+        #answers-field {
+          margin-top: 15px;
+        }
+
+        #answers-field-start,
+        #answers-field-middle,
+        #answers-field-end {
+          margin-top: 15px;
+        }
         
         #final-message-row {
-          min-height: 330px;
-          background-color: #FAF1E6;
-          box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-          border-radius: 10px 10px 10px 10px;
+          position: relative;
+          backdrop-filter: blur(15px);
+          -webkit-backdrop-filter: blur(15px);
+          background: rgba(255, 255, 255, 0.15);
+          border-radius: 20px;
           display: flex;
           align-items: center;
           justify-content: center;
+          flex: 1 1 auto;
         }
 
         #final-message-div {
-          font-size: 3.5rem;
-          color: black;
+          font-size: 2rem;
           display: flex;
         }
 
@@ -118,55 +190,87 @@
           margin-left: 10px;
         }
 
-        #dots {
-          padding-top: 5px;
-          display: flex;
-          justify-content: space-between;
-          width: 100%; /* Ensure it takes up the same space as the button */
-        }
-
-        .dot {
-            width: 15px; /* Size of each circle */
-            height: 15px; /* Size of each circle */
-            background-color: #ffbf92; /* Circle color */
-            border: 2px solid #D57E7C; /* Creates a border around the element */
-            border-radius: 50%; /* Make it round */
-            margin: 0 2px; /* Space between circles */
-            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+        #help-btn {
+          position: relative;
         }
 
         .field {
+          padding: 10px;
           color: gray;
-          background-color: #FAF1E6;
-          box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
+          background: rgba(255, 255, 255, 0.4);
+          border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 10px 10px 10px 10px;
         }
 
-        .btn-primary {
-          font-size: 1rem;
-          align-items: center;
-          justify-content: center;
-          width: 11.5vw;
-          margin: 10px 0 10px 0;
-          background-color: #40c9a9;
-          border-color: #40c9a9;
-          color: black;
-          font-weight: bold;
-          box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
+        #help-btn,
+        #next-question-btn,
+        #check-answer-btn,
+        #stopButtonTextComp {
+            position: relative;
+            background: linear-gradient(135deg, #3288AC, #286D8A);
+            border: none;
+            /* border: 1px solid #286D8A; */
+            color: #F5F5F7;
+            display: flex;
+            align-items: center;
+            padding: 12px 18px 12px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            letter-spacing: 0.01em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 0;
+            justify-content: center;
+            min-width: 10vw;
         }
 
-        .btn-primary:focus,
-        .btn-primary:active,
-        .btn-primary:hover,
-        .btn-primary:disabled {
-          background-color: #32ac93;
-          border-color: #32ac93;
-          color: black;
+        #stopButtonTextComp {
+          width: 6vw;
+          min-width: 75px;
+          height: 42.5px;
+          border-radius: 100px;
+          font-size: 2rem;
         }
 
-        #task-saving-message {
-          font-size: 1.35rem;
-          text-align: center;
+        #help-btn::before,
+        #next-question-btn::before,
+        #check-answer-btn::before,
+        #stopButtonTextComp::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+            border-radius: 20px;
+            pointer-events: none;
+            transition: background 0.3s ease;
+        }
+
+        #help-btn::after,
+        #next-question-btn::after,
+        #check-answer-btn::after,
+        #stopButtonTextComp::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        #help-btn:hover::before,
+        #next-question-btn:hover::before,
+        #check-answer-btn:hover::before,
+        #stopButtonTextComp:hover::before {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .help-and-check-button-holder {
+          display: flex;
+          gap: 10px;
         }
 
         #check-answer-btn {
@@ -189,27 +293,8 @@
         }
 
         .material-symbols-rounded {
-          font-size: 3.5rem;
-        }
-
-        .reset-button-div {
-          display: flex;
-          justify-content: flex-end;
-          z-index: 3;
-      }
-
-        .reset-button {
-          width: 5rem;
-          height: 5rem;
-          margin-top: 20px;
-          border-radius: 0.25rem;
-          background-color: #40c9a9;
-          border-color: #40c9a9;
-          box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 3;
+          font-size: 2rem;
+          font-weight: 300;
         }
 
         .stop-button-div {
@@ -218,32 +303,112 @@
             z-index: 3;
           }
 
-        .stop-button {
-          width: 5rem;
-          height: 5rem;
-          border-radius: 0.25rem;
-          background-color: #40c9a9;
-          border-color: #40c9a9;
-          box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 3;
-        }
-
-        .reset-row {
-          padding: 0;
-        }
-
         .error {
             animation: shake 0.2s ease-in-out 0s 2;
         }
 
+        #fields-row {
+          display: flex;
+          flex: 1 1 auto;
+          min-height: 0;
+          gap: 10px;
+        }
+
+        .right-side-panel {
+            flex: 1 1 50%;
+            min-height: 0;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .right-side-panel-inner {
+          height: 100%;
+          overflow-y: auto;
+          padding: 15px;
+        }
+
+        /* Sidebar wrapper */
+        .sidebar-wrapper {
+            position: relative;
+            flex: 1 1 50%;
+            height: 100%;
+            margin-right: 10px;
+        }
+
+        /* Sidebar content */
+        .sidebar {
+            position: relative;
+            height: 100%;
+            width: 100%;
+            margin-right: 15px;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .sidebar-content {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 15px;
+        }
+
+        /* Toggle tab - always visible */
+        .toggle-tab {
+            position: absolute;
+            right: -34px;
+            top: 0;
+            border: none;
+            width: 34px;
+            height: 58px;
+            border-radius: 0 20px 20px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.5);
+            padding: 0;
+        }
+
+        .toggle-tab svg {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        /* Overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
         @keyframes shake {
-          0% { margin-left: 0rem; }
-          25% { margin-left: 0.5rem; }
-          75% { margin-left: -0.5rem; }
-          100% { margin-left: 0rem; }
+          0% { transform: translateX(0); }
+          25% { transform: translateX(0.5rem); }
+          75% { transform: translateX(-0.5rem); }
+          100% { transform: translateX(0); }
         }
 
         #fireworks-div {
@@ -253,10 +418,73 @@
           width: 250px;
         }
 
+        .drag-ghost {
+          opacity: 0.5;
+        }
+
+        .drag-chosen {
+          background-color: #faf1e6 !important;
+          background: rgba(255, 255, 255, 0.2);
+          border: 2px dashed #40c9a9;
+        }
+
+        .drag-dragging {
+          background-color: #FAF1E6;
+        }
+
+        .item.hold-indicator {
+          position: relative;
+          box-shadow: 0 0 0 2px #40c9a9 inset; /* subtle glow */
+          transition: box-shadow 0.2s ease;
+        }
+
+        #help-btn {
+          position: relative;
+          cursor: not-allowed;
+          transition: background-color 0.3s, color 0.3s;
+          background: #809498;
+          overflow: hidden;
+        }
+
+        #help-btn.enabled {
+          color: white;
+          cursor: pointer;
+          opacity: 1;
+          background: linear-gradient(135deg, #3288AC, #286D8A);
+        }
+
+        .fill-bar {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          height: 100%;
+          width: 0%;
+          background: linear-gradient(135deg, #3288AC, #286D8A);
+          transition: width 0.5s ease;
+          z-index: 0;
+          border-radius: 20px;
+        }
+
+        #help-btn span,
+        #help-btn::before {
+          position: relative;
+          z-index: 2;
+          text-align: center;
+        }
+
+        .modern-popup {
+          top: 190px;
+        }
+
         @media (max-width: 1150px) {
         #next-question-btn,
-        #check-answer-btn {
-          width: 17vw;
+        #check-answer-btn,
+        #help-btn {
+          min-width: 15vw;
+        }
+
+        #stopButtonTextComp {
+          width: 8vw;
         }
 
         #final-message-div {
@@ -264,35 +492,103 @@
         }
         }
 
+        @media (min-width: 769px) {
+            .toggle-tab {
+                display: none;
+            }
+        }
+
         @media (max-width: 767px) {
-        body {
-          display: block; /* Change to block on mobile */
+          .modern-popup {
+            top: 160px;
+          }
+
+          .container {
+              width: 100%;
+              max-height: calc(100% - 80px);
+              min-height: calc(100% - 80px);
+              margin: 0;
+              background: transparent;
+              border: none;
+              border-radius: 0;
+              padding: 15px;
+          }
+
+          .sidebar {
+            border-radius: 0;
+            padding: 0;
+            border-bottom-right-radius: 20px;
+            background: rgba(255, 255, 255, 0.5);
+          }
+
+          .sidebar-content {
+              height: 100%;
+              width: 100%;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
+              overflow-y: auto;
+              padding: 15px;
+          }
+
+          #options-field {
+            margin: 0;
+            padding: 0;
+            background-color: transparent;
+            border: none;
           }
 
           #next-question-btn,
-          #check-answer-btn {
-          width: 35vw;
+          #check-answer-btn,
+          #help-btn {
+          min-width: 25vw;
         }
 
-        #help-btn {
-          width: 28vw;
+        #stopButtonTextComp {
+          width: 10vw;
+        }
+
+        .tracker-timer-holder {
+          padding: 0 15px 0 30px;
         }
 
         #fireworks-div {
           width: 200px;
           bottom: -5%;
         }
-        
+
+        .sidebar-wrapper {
+            position: fixed;
+            left: 0;
+            top: 95px;
+            height: calc(100% - 80px - 30px);
+            width: calc(100vw - 34px - 5px);
+            z-index: 100;
+            transition: transform 0.3s ease;
+            transform: translateX(calc(-1*(100vw - 34px - 5px)));
+            padding-left: 0;
         }
         
-        @media (max-width: 575px) {
+        #author {
+          margin-top: 10px;
+          padding-top: 10px;
+          border-top: 1px solid rgba(255, 255, 255, 1);
+          margin-left: 0;
+          text-align: center;
+          }
+
+        .sidebar-wrapper.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-wrapper.open .toggle-tab svg {
+            transform: rotate(180deg);
+        }        
+      }
+        
+      @media (max-width: 575px) {
 
       .stop-button {
-        width: 4.25rem;
-        height: 4.25rem;
-      }
-
-      .reset-button {
         width: 4.25rem;
         height: 4.25rem;
       }
@@ -304,9 +600,97 @@
     }
 
     @media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)  {
-		  body {
-      font-size: 1.4rem;
-    }
+      .modern-popup {
+          top: 220px;
+        }
+
+		  .container {
+          width: 100%;
+          max-height: calc(100% - 100px);
+          min-height: calc(100% - 100px);
+          margin: 0;
+          background: transparent;
+          border: none;
+          border-radius: 0;
+          padding: 30px;
+      }
+
+      .sidebar {
+        border-radius: 0;
+        padding: 0;
+        border-bottom-right-radius: 20px;
+        background: rgba(255, 255, 255, 0.5);
+      }
+
+      .sidebar-content {
+          height: 100%;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          overflow-y: auto;
+          padding: 15px;
+      }
+
+      #options-field {
+        margin: 0;
+        padding: 0;
+        background-color: transparent;
+        border: none;
+      }
+
+      .sidebar-wrapper {
+            position: fixed;
+            left: 0;
+            top: 115px;
+            height: calc(100% - 100px - 30px);
+            width: calc(100vw - 34px - 5px);
+            z-index: 100;
+            transition: transform 0.3s ease;
+            transform: translateX(calc(-1*(100vw - 34px - 5px)));
+            padding-left: 0;
+        }
+
+        .toggle-tab {
+            display: flex;
+            height: 80px;
+        }
+
+        .tracker-timer-holder {
+          padding: 0 15px 0 30px;
+        }
+        
+        #author {
+          margin-top: 10px;
+          padding-top: 10px;
+          border-top: 1px solid rgba(255, 255, 255, 1);
+          margin-left: 0;
+          text-align: center;
+          }
+
+        .sidebar-wrapper.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-wrapper.open .toggle-tab svg {
+            transform: rotate(180deg);
+        }   
+
+        #mistakes-tracker, #question-number-tracker, #timer {
+          font-size: 1.5rem;
+        }
+      
+      body {
+        font-size: 1.4rem;
+      }
+
+      #stopButtonTextComp {
+          width: 10vw;
+          min-width: 90px;
+          height: 51.5px;
+          border-radius: 100px;
+          font-size: 2rem;
+      }
 
     
       :root {
@@ -318,13 +702,8 @@
 			width: 6rem;
 		}
 
-		.reset-button {
-			height: 6rem;
-			width: 6rem;	
-		}
-
 		.material-symbols-rounded {
-			font-size: 4.5rem;
+			font-size: 2.75rem;
 		}
 
 		.summary-button {
@@ -342,88 +721,249 @@
 		#check-answer-btn,
 		#help-btn,
 		#next-question-btn {
-			font-size: 1.5rem;
-			width: 25vw;
+			font-size: 1.25rem;
+			min-width: 25vw;
 		}
 
     .item {
       font-size: 1.4rem;
     }
-
-    #task-saving-message {
-			font-size: 1.75rem
-		}
 	}
+
+  /* Draggable base styles */
+.draggable-item {
+  cursor: move;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.draggable-item:active {
+  cursor: grabbing;
+}
+
+/* Dragging states */
+.draggable-source--is-dragging {
+  opacity: 0.3;
+  cursor: grabbing;
+}
+
+.draggable-mirror {
+  opacity: 0.9;
+  cursor: grabbing;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.draggable--over {
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+/* Container receiving drag */
+.draggable-container--over {
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Placeholder for where item will drop */
+.draggable-source--placed {
+  opacity: 0.5;
+}
+
+/* Touch device feedback */
+@media (hover: none) and (pointer: coarse) {
+  .draggable-item {
+    cursor: default;
+  }
+  
+  .draggable-item:active {
+    cursor: default;
+  }
+  
+  /* Visual feedback during hold delay */
+  .draggable-item.hold-indicator {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+}
+
+/* Swap animation */
+.draggable-item {
+  transition: transform 150ms ease-in-out;
+}
+
+/* Prevent text selection during drag */
+.draggable-container--is-dragging {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Empty container hint */
+.draggable-container:empty::before {
+  content: 'Drop items here';
+  display: block;
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  font-style: italic;
+}
+
+/* Ensure proper stacking */
+.draggable-mirror,
+.draggable-source--is-dragging {
+  position: relative;
+  z-index: 10000;
+}
 
     </style>
 </head>
 <body>
 
+    <div id="customConfirmModal" class="modal">
+    <div class="modal-content">
+        <p id="customModalText"></p>
+        <div class="modal-buttons">
+        <button id="customConfirmYes" class="btn-confirm">Taip</button>
+        <button id="customConfirmNo" class="btn-cancel">Ne</button>
+        </div>
+    </div>
+    </div>
+
+    <div id="object-popup" class="object-popup-overlay" style="display:none;">
+    <div class="object-popup-panel">
+        <button class="object-popup-close">&times;</button>
+        <div class="title-subtitle-inline-button-wrapper">
+        <div class="object-popup-title-subtitle-wrapper">
+        <div class="object-popup-title" id="object-popup-title"></div>
+        <div class="object-popup-subtitle" id="object-popup-subtitle"></div>
+        </div>
+        </div>
+        <div class="object-popup-content" id="object-popup-content">
+        <!-- Dynamic content goes here -->
+        </div>
+    </div>
+    </div>
+
+
+    <nav class="main-navbar" id="mainNavbar">
+      <div class="main-nav-container">
+          <!-- Logo -->
+          <a href="#" class="main-nav-logo">
+              <div class="main-nav-logo-icon">
+                <img id="sudedu-main-nav-bar-logo" src="../images/sudedu_logo.png" alt="sudEdu">
+              </div>
+          </a>
+
+          <!-- Desktop Navigation -->
+          <div class="main-nav-links invisible">
+            <a class="main-nav-back-btn" id="desktopBackBtn">
+              <span class="main-nav-back-icon">←</span>
+              <div class="main-nav-back-text">
+                <span class="main-nav-back-label">Grįžti</span>
+                <span class="main-nav-back-title">Atgal</span>
+              </div>
+            </a>
+          </div>
+
+          <!-- Mobile Navigation -->
+          <div class="main-nav-mobile-btn simplified">
+            <a class="main-nav-back-btn" id="mobileBackBtn">
+              <span class="main-nav-back-icon">←</span>
+              <div class="main-nav-back-text">
+                <span class="main-nav-back-label">Grįžti</span>
+                <span class="main-nav-back-title">Atgal</span>
+              </div>
+            </a>
+          </div>
+      </div>
+  </nav>
+
   <div class="container">
-    <div class="row">
-      <div class="row justify-content-center align-items-center trackers-row">
-        <div class="col-6 d-flex justify-content-start align-items-left">
+      <div class="tracker-timer-holder">
+      <div class="trackers-row">
+        <div class="trackers-holder">
           <div class="trackers">
               <div>
-                <h3 id="question-number-tracker"></h3>
+                <div id="question-number-tracker"></div>
               </div>
               <div>
-                <h3 id="mistakes-tracker"></h3>
-              </div>
-              <div id="help">
+                <div id="mistakes-tracker"></div>
               </div>
           </div>
       </div>
-      <div class="col-6 d-flex justify-content-end align-items-left">
-        <h3>
+      <div class="pet-on-walk-holder">
+        <div id="pet-on-walk"></div>
+      </div>
+      <div class="timer-holder">
           <div id="timer"></div>
-        </h3>
       </div>
       </div>
     </div>
     
     
     <!-- First row: Left column empty, Right column with item -->
-    <div class="row" id="fields-row">
-      <div class="col-12 col-md-6">
-        <div id="options-field-div" class="col-12">
-          <div id="options-field" class="field">
+    <div class="" id="fields-row">
+
+    <div class="sidebar-wrapper" id="sidebarWrapper">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-content" id="sidebarContent">
+
+          <div class="options-field-holder">
+            <div id="options-field-div" class="col-12">
+              <div id="options-field" class="field">
+              </div>
+              <div id="author">
+              </div>
+            </div>
           </div>
-          <div id="author">
-          </div>
+
         </div>
-      </div>
+      </aside>
+
+      <button class="toggle-tab" id="toggleTab" aria-label="Toggle sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M9 18l6-6-6-6"/>
+          </svg>
+      </button>
+    </div>
 
       <!-- Second row: Draggable items and Bottom right -->
-      <div class="col-12 col-md-6">
-        <div class="col-12">
+      <div class="right-side-panel">
+        <div class="right-side-panel-inner">
+        <div class="">
           <div id="title-field" class="field">
             Pavadinimas
           </div>
         </div>
-        <div id="answers-field-div" class="col-12 komponavimas">
+        <div id="answers-field-div" class="komponavimas">
           <div id="answers-field" class="field" style="display: none;">
             Tekstas
           </div>
         </div>
 
         <!-- Right column with bottom-right item -->
-        <div id="answers-field-start-div" class="col-12 isdestymas">
+        <div id="answers-field-start-div" class="isdestymas">
           <div id="answers-field-start" class="field" style="display: none;">
             Pradžia
           </div>
         </div>
 
-        <div id="answers-field-middle-div" class="col-12 isdestymas">
+        <div id="answers-field-middle-div" class="isdestymas">
           <div id="answers-field-middle" class="field" style="display: none;">
             Įvykio raida
           </div>
         </div>
 
-        <div id="answers-field-end-div" class="col-12 isdestymas">
+        <div id="answers-field-end-div" class="isdestymas">
           <div id="answers-field-end" class="field" style="display: none;">
             Pabaiga
           </div>
+        </div>
         </div>
       </div>
     </div>
@@ -431,80 +971,98 @@
     <div id="final-message-row" style="display: none; position: relative;">
           <div id="fireworks-div" class="image-container fireworks-div"></div>
           <div id="final-message-div"></div>
-          <div id="task-saving-message"></div>
     </div>
 
-    <!-- Check answer button -->
-    <!-- Check answer button -->
-    <div class="row button-row">
-      <div class="col-6 d-flex justify-content-start">
-        <div class="justify-content-end">
-        <button id="help-btn" class="btn btn-primary">Pagalba</button>
-        <div id="dots" class="d-flex ml-2">
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-      </div>
-
+    <div class="button-row">
+      <div class="stop-restart-button-row" id="stop-restart-button-row">
+      <div class="stop-reset-button-div">
+        <div class="">
+          <div class="stop-button-div">
+            <button id="stopButtonTextComp" class="stop-button"><span id="stop-button-span"
+                class="material-symbols-rounded">close</span></button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="col-6 d-flex justify-content-end">
-      <div class="justify-content-end">
-        <button id="check-answer-btn" class="btn btn-primary">Tikrinti</button>
-        <div class="d-flex ml-2">
-      <button id="next-question-btn" class="btn btn-primary" style="display: none;">Kita užduotis</button>
+    <div class="help-and-check-button-holder">
+    <div class="help-button-holder">
+        <div class="help-button-holder-inner">
+        <button id="help-btn" class="help-btn" disabled>
+          Pagalba
+          <div class="fill-bar"></div>
+        </button>
+      </div>
+    </div>
+
+    <div class="check-button-holder">
+      <div class="check-button-holder-inner">
+        <button id="check-answer-btn" class="">Tikrinti</button>
+        <div class="d-flex">
+      <button id="next-question-btn" class="" style="display: none;">Kita užduotis</button>
     </div>
     </div>
   </div>
+  </div>
 
-  <div class="row justify-content-center align-items-center" id="stop-restart-button-row">
-    <div class="row d-flex d-flex align-items-end justify-content-center stop-reset-button-div">
-      <div class="col-2">
-        <div class="stop-button-div">
-          <button id="stopButton" class="btn btn-primary stop-button"><span id="stop-button-span"
-              class="material-symbols-rounded">close</span></button>
-        </div>
-      </div>
-      <div class="col-8"></div>
-      <div class="col-2">
-        <div class="reset-button-div">
-          <button class="btn btn-primary reset-button"><span class="material-symbols-rounded">roofing</span></button>
-        </div>
-      </div>
-    </div>
   </div>
   
-
-  <!-- Include Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pzjw8f+ua7Kw1TIq0r3ry7kAop5z3XMJ4g/4dWl56h3xW00tiy8b6Bc5tbtiq5x7" crossorigin="anonymous"></script>
-  <!-- Include Dragula JS -->
-  <script src="https://cdn.jsdelivr.net/npm/dragula@3.7.3/dist/dragula.min.js"></script>
+  <script src="../main-nav-bar.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script src="../parameter_dictionary.js"></script>
   <script src="../mental-arithmetic.js"></script>
-  
+  <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.12/lib/draggable.bundle.js"></script>
+
   <script>
 
-window.onload = function () {
-    if (localStorage.getItem('controller') === null) {
+  window.onload = function () {
+    if (!localStorage.getItem('controller')) {
         window.location.href = "./";
     } else {
       controller = JSON.parse(localStorage.getItem('controller')) 
-      if (controller.mode !== "lang") {
+      if (controller.mode !== "lang" || controller.modeChoice1 !== "C49") {
 			window.location.href = "./";
-		}
+		} else {
+      styleTextComprahensionPage();
+      initPetOnWalk();
+    }
     }
   }
 
-  controller = JSON.parse(localStorage.getItem('controller')) 
-  let jsonFiles = [];
+  window.stopButtonElement = document.querySelector('.stop-button');
+  window.stopButtonSpanElement = document.querySelector('#stop-button-span');
+  window.checkAnswerBtn = document.getElementById('check-answer-btn');
+  window.nextQuestionBtn = document.getElementById('next-question-btn');
+  window.helpBtn = document.getElementById('help-btn');
 
-	// Define an array of URLs for the JSON files you want to fetch
-	if (controller.classChoice === "C75") {
-		jsonFile = '../databases/1_2_klase_teksto_suvokimas.json';
-	} else if (controller.classChoice === "C76") {
-		jsonFile = '../databases/3_4_klase_teksto_suvokimas.json';
-	}
+  controller = JSON.parse(localStorage.getItem('controller')) 
+    window.stopQuestionsCloseActions = function () {
+    controller.questionsStopped = true;
+    clearInterval(timerInterval);
+    stopButtonSpanElement.innerHTML = "refresh";
+    checkAnswerBtn.disabled = true;
+    helpBtn.disabled = true;
+    nextQuestionBtn.disabled = true;
+    updateSortables()
+    controller.questionsStopped = true;
+    localStorage.setItem("elapsedTime", timerDisplay.textContent);
+    localStorage.setItem('controller', JSON.stringify(controller));
+    document.querySelector(".tracker-timer-holder").style.paddingLeft = "15px";
+    formatFinalMessageForTextcomprehension();
+    document.querySelector(".help-and-check-button-holder").style.display = "none"
+  }
+
+  let jsonFile;
+
+	if (controller.modeChoice7 === "C82") {
+    if (controller.classChoice === "C75") {
+      jsonFile = '../databases/1_2_klase_teksto_suvokimas_tekstai.json';
+    } else if (controller.classChoice === "C76") {
+      jsonFile = '../databases/3_4_klase_teksto_suvokimas_tekstai.json';
+    }
+  } else if (controller.modeChoice7 === "C84") {
+    jsonFile = '../databases/sudedu_duomenu_baze.json';
+  }
 
   fetch(jsonFile)
       .then(response => {
@@ -525,9 +1083,6 @@ window.onload = function () {
     const answersFieldEnd = document.getElementById('answers-field-end');
     const titleField = document.getElementById('title-field');
     const optionsField = document.getElementById('options-field');
-    const checkAnswerBtn = document.getElementById('check-answer-btn');
-    const nextQuestionBtn = document.getElementById('next-question-btn');
-    const helpBtn = document.getElementById('help-btn');
     var selectedItem;
     let questionNumberTracker = document.getElementById('question-number-tracker');
     let mistakesTracker = document.getElementById('mistakes-tracker'); 
@@ -535,59 +1090,227 @@ window.onload = function () {
     let filteredTextLibrary = [];
     let currentTextId;
     let answeredTexts = [];
-    let firstTimeChecking = true;
     window.mistakesSummary = {};
+    window.timeTakenForEachText = {};
 
-    function generateFilteredTextLibrary() {
-    var tempTextLibrary = Array.from(textDatabase);
+    let currentSeed = controller.modeChoice8;
+    let currentPassNumber = 0;
 
-    if (controller.modeChoice2 === "C51") {
-      filteredTextLibrary = tempTextLibrary.filter(entry =>
-      entry['suitable-for']?.[parameterDictionary["C51"]["parameter"]]?.includes(parameterDictionary[controller.modeChoiceLtDifficulty]["parameter"])
-    );
-      answersField.style.display = "block";
-    } else if (controller.modeChoice2 === "C52") {
-      filteredTextLibrary = tempTextLibrary.filter(entry =>
-      entry['suitable-for']?.['struktura']?.includes(parameterDictionary[controller.modeChoiceLtDifficulty]["parameter"])
-    );
-      answersFieldStart.style.display = "block";
-      answersFieldMiddle.style.display = "block";
-      answersFieldEnd.style.display = "block";
+    let allTextIds = [];
+    let currentTextBatchIndex = 0;
+    const TEXT_BATCH_SIZE = 20;
+    let totalTextsAvailable = 0;
+    let virtualShuffledIndices = null;
+
+    /**
+     * Seeded Random Number Generator (Mulberry32)
+     */
+    class SeededRandom {
+        constructor(seed) {
+            this.state = typeof seed === 'string' ? parseSeed(seed) : seed;
+        }
+        
+        next() {
+            let t = this.state += 0x6D2B79F5;
+            t = Math.imul(t ^ t >>> 15, t | 1);
+            t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+            return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        }
+        
+        nextInt(min, max) {
+            return Math.floor(this.next() * (max - min)) + min;
+        }
+        
+        shuffle(array) {
+            const result = [...array];
+            for (let i = result.length - 1; i > 0; i--) {
+                const j = Math.floor(this.next() * (i + 1));
+                [result[i], result[j]] = [result[j], result[i]];
+            }
+            return result;
+        }
+        
+        choice(array) {
+            return array[Math.floor(this.next() * array.length)];
+        }
+        
+        derive(suffix) {
+            return new SeededRandom(this.state + parseSeed(String(suffix)));
+        }
     }
-    }
 
+
+function generateFilteredTextLibrary(forceRegenerate = false) {
+    // Only regenerate the ID list if needed
+    if (forceRegenerate || allTextIds.length === 0) {
+        var tempTextLibrary = Object.entries(textDatabase);
+        let filteredIds = [];
+
+        if (controller.modeChoice2 === "C51") {
+            if (controller.modeChoice7 === "C82") {
+                filteredIds = tempTextLibrary
+                    .filter(([id, entry]) => entry["SF"]?.["C51"] === controller.modeChoiceLtDifficulty)
+                    .map(([id]) => id);
+            } else if (controller.modeChoice7 === "C84") {
+                filteredIds = tempTextLibrary
+                    .filter(([id, entry]) => {
+                        // Check if ID is in the list AND has the required SF key
+                        return controller.modeChoice8.includes(parseInt(id)) &&
+                               entry["SF"] && 
+                               entry["SF"]["C51"];
+                    })
+                    .map(([id]) => id);
+            }
+            answersField.style.display = "block";
+        } else if (controller.modeChoice2 === "C52") {
+            if (controller.modeChoice7 === "C82") {
+                filteredIds = tempTextLibrary
+                    .filter(([id, entry]) => entry["SF"]?.["C52"] === controller.modeChoiceLtDifficulty)
+                    .map(([id]) => id);
+            } else if (controller.modeChoice7 === "C84") {
+                filteredIds = tempTextLibrary
+                    .filter(([id, entry]) => {
+                        // Check if ID is in the list AND has the required SF key
+                        return controller.modeChoice8.includes(parseInt(id)) &&
+                               entry["SF"] && 
+                               entry["SF"]["C52"];
+                    })
+                    .map(([id]) => id);
+            }
+            answersFieldStart.style.display = "block";
+            answersFieldMiddle.style.display = "block";
+            answersFieldEnd.style.display = "block";
+        }
+
+        if (filteredIds.length === 0) {
+            window.location.href = "./index.html";
+            return;
+        }
+        
+        // Store only IDs - lightweight!
+        allTextIds = filteredIds;
+        totalTextsAvailable = allTextIds.length;
+        currentTextBatchIndex = 0;
+        
+        console.log(`Found ${totalTextsAvailable} texts matching conditions`);
+        
+        // Generate virtual shuffle - just indices array
+        generateVirtualShuffle();
+    }
+    
+    // Load next batch
+    loadNextTextBatch();
+}
+
+function generateVirtualShuffle() {
+    // Create array of indices [0, 1, 2, 3, ...]
+    virtualShuffledIndices = Array.from({length: totalTextsAvailable}, (_, i) => i);
+    
+    // Shuffle the indices based on seed
+    const rng = new SeededRandom(currentSeed);
+    const passRng = rng.derive(`pass-${currentPassNumber}`);
+    virtualShuffledIndices = passRng.shuffle(virtualShuffledIndices);
+}
+
+function loadNextTextBatch() {
+    const startIdx = currentTextBatchIndex * TEXT_BATCH_SIZE;
+    const endIdx = Math.min(startIdx + TEXT_BATCH_SIZE, totalTextsAvailable);
+    
+    if (startIdx >= totalTextsAvailable) {
+        return;
+    }
+    
+    // Get batch of shuffled indices
+    const batchIndices = virtualShuffledIndices.slice(startIdx, endIdx);
+    
+    // Load actual text objects only for this batch
+    const batchTexts = batchIndices.map(idx => {
+        const textId = allTextIds[idx];
+        const textEntry = textDatabase[textId];
+        return [textId, textEntry];
+    }).filter(([id, entry]) => entry); // Remove any nulls
+    
+    filteredTextLibrary.push(...batchTexts);
+    
+    currentTextBatchIndex++;
+    
+    console.log(`Loaded batch ${currentTextBatchIndex}, texts available: ${filteredTextLibrary.length}/${totalTextsAvailable}`);
+}
+  
     helpBtn.disabled = true;
 
     // Function to shuffle the array of sentences
     function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
-      }
-      return array;
+        // Use the current text's seed for consistent shuffling
+        const textRng = new SeededRandom(currentSeed);
+        const itemRng = textRng.derive(`text-${currentTextId}`);
+        return itemRng.shuffle([...array]);
     }
 
     function selectRandomItem() {
-    // Generate a random index
-    const randomIndex = Math.floor(Math.random() * filteredTextLibrary.length);
-    
-    // Remove the selected item from the array and return it
-    const selectedItem = filteredTextLibrary.splice(randomIndex, 1)[0];
-    
-    return selectedItem;
+        // If we're running low on texts, load more
+        if (filteredTextLibrary.length === 0) {
+            const hasMoreTexts = (currentTextBatchIndex * TEXT_BATCH_SIZE) < totalTextsAvailable;
+            
+            if (hasMoreTexts) {
+                loadNextTextBatch();
+            } else {
+                // We've gone through all texts in this pass
+                console.log(`Completed pass ${currentPassNumber}, starting pass ${currentPassNumber + 1}`);
+                currentPassNumber++;
+                controller.passNumber = currentPassNumber;
+                localStorage.setItem("controller", JSON.stringify(controller));
+                
+                // Clear and regenerate for next pass
+                filteredTextLibrary = [];
+                generateFilteredTextLibrary(true);
+            }
+        }
+        
+        // Take the first item (already shuffled by seed)
+        if (filteredTextLibrary.length > 0) {
+            const [id, entry] = filteredTextLibrary.shift();
+            const selectedItem = { id, ...entry };
+            return selectedItem;
+        }
+        
+        // Fallback - shouldn't happen
+        console.error("No texts available!");
+        return null;
     }
 
     function displayQuestion() {
-      if (filteredTextLibrary.length === 0) {
-        generateFilteredTextLibrary();
+      styleTextComprahensionPage();
+
+      // Initialize seed if needed
+      if (!currentSeed) {
+          currentSeed = generateSessionSeed();
+          currentPassNumber = 0;
+          controller.modeChoice8 = currentSeed;
+          
+          localStorage.setItem("controller", JSON.stringify(controller));
       }
       
+      // Initialize text library if empty
+      if (allTextIds.length === 0) {
+          generateFilteredTextLibrary(true);
+      } else if (filteredTextLibrary.length === 0) {
+          // Texts exist but batch is empty - load next batch
+          loadNextTextBatch();
+      }
+
       if (controller.randomSelection.length === 0) {
-        selectedItem = selectRandomItem();
-        controller.randomSelection = [selectedItem];
-        localStorage.setItem("controller", JSON.stringify(controller));
+          selectedItem = selectRandomItem();
+          
+          if (!selectedItem) {
+              console.error("Failed to select item");
+              return;
+          }
+          
+          controller.randomSelection = [selectedItem];
+          localStorage.setItem("controller", JSON.stringify(controller));
       } else {
-        selectedItem = controller.randomSelection[0];
+          selectedItem = controller.randomSelection[0];
       }
     
       currentTextId = selectedItem.id;
@@ -597,12 +1320,24 @@ window.onload = function () {
         mistakesSummary[currentTextId] = {};
       }
 
+      let currentTime;
+      if (localStorage.getItem("elapsedTime")) {
+        currentTime = localStorage.getItem("elapsedTime")
+      }
+
+      if (!timeTakenForEachText[currentTextId]) {
+        timeTakenForEachText[currentTextId] = {};
+      }
+
+      if (timeTakenForEachText[currentTextId]) {
+        timeTakenForEachText[currentTextId]["startTime"] = elapsedTime;
+      }
+
       textIncidenceCount = answeredTexts.filter(id => id === currentTextId).length;
 
       if (!mistakesSummary[currentTextId][`${textIncidenceCount}`]) {
         mistakesSummary[currentTextId][`${textIncidenceCount}`] = 0;
       }
-
 
       const originalTitle = selectedItem.title;
       const fullText = [...selectedItem.text.start, ...selectedItem.text.middle, ...selectedItem.text.end];
@@ -613,19 +1348,20 @@ window.onload = function () {
       authorDiv.innerHTML = paragraphAuthor;
 
       let combinedItems = [];
+ 
       if (controller.modeChoice2 === "C51") {
-        if (controller.modeChoiceLtDifficulty === "C58" || controller.modeChoiceLtDifficulty === "C59" || controller.modeChoiceLtDifficulty === "C60") {
+        if (controller.modeChoice6 === "C80") {
           orderedSentences = splitParagraphToSentences(fullText);
           combinedItems = [originalTitle, ...orderedSentences];
-        } else if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+        } else if (controller.modeChoice6 === "C81") {
           orderedSentences = splitParagraphToSentences(fullText);
           distractorSentences = splitParagraphToSentences(selectedItem.text.distractor);
           combinedItems = [originalTitle, ...orderedSentences, ...distractorSentences];
         }
       } else if (controller.modeChoice2 === "C52") {
-        if (controller.modeChoiceLtDifficulty === "C58" || controller.modeChoiceLtDifficulty === "C59" || controller.modeChoiceLtDifficulty === "C60") {
+        if (controller.modeChoice6 === "C80") {
           combinedItems = [...fullText, ...[originalTitle]];
-        } else if (controller.modeChoiceLtDifficulty === "C80" || controller.modeChoiceLtDifficulty === "C81" || controller.modeChoiceLtDifficulty === "C82") {
+        } else if (controller.modeChoice6 === "C81") {
           distractorItems = selectedItem.text.distractor;
           combinedItems = [...fullText, ...distractorItems, ...[originalTitle]];
         }
@@ -650,14 +1386,12 @@ window.onload = function () {
       const answerFieldMiddleHeight = answersFieldMiddle.scrollHeight;
       const answerFieldEndHeight = answersFieldEnd.scrollHeight;
 
-      optionsField.style.minHeight = `${optionsHeight+120}px`;
-      answersField.style.minHeight = `${optionsHeight}px`;
+      optionsField.style.minHeight = `${optionsHeight}px`;
+      answersField.style.minHeight = `${optionsHeight-40}px`;
       answersFieldStart.style.minHeight = `${Math.max(optionsHeight/3*0.75, 100)}px`
       answersFieldMiddle.style.minHeight = `${Math.max(optionsHeight/3*1.5, 100)}px`
       answersFieldEnd.style.minHeight = `${Math.max(optionsHeight/3*0.75, 100)}px`
       
-
-      initializeDragula();
 
       if (controller.modeChoice4 === "C40") {
         questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
@@ -668,11 +1402,7 @@ window.onload = function () {
 
       //helpDiv.innerHTML = `Panaudota pagalba: ${helpTracker}`;
 
-      const dots = document.querySelectorAll('#dots .dot');
-      for (let i = 0; i < dots.length; i++) {
-          const dot = dots[i];
-          dot.style.backgroundColor = '#ffbf92';
-          }
+      resetHelpButton();
     }
 
     function splitParagraphToSentences(paragraph) {
@@ -688,67 +1418,7 @@ window.onload = function () {
         return allSentences;
     }
 
-    function initializeDragula() {
-      // Destroy the previous instance if it exists
-      if (drake) {
-        drake.destroy();
-      }
-
-      // Create a new Dragula instance
-      drake = dragula([document.getElementById('options-field'), document.getElementById('title-field'), document.getElementById('answers-field'), document.getElementById('answers-field-start'), document.getElementById('answers-field-middle'), document.getElementById('answers-field-end')]);
-
-      drake.on('drag', function (el) {
-        // Disable touch scrolling while dragging
-        if (window.ontouchstart !== undefined) {
-          document.body.style.overflow = 'hidden'; // Disable body scroll
-        }
-        // Change color of the item while dragging
-        el.style.backgroundColor = '#FAF1E6';  // Change background to white
-      })
-      .on('dragend', function (el) {
-        // Re-enable scrolling when drag ends
-        if (window.ontouchstart !== undefined) {
-          document.body.style.overflow = ''; // Re-enable body scroll
-        }
-        // Reset the color when drag ends
-        el.style.backgroundColor = ''; // Reset background color
-      })
-      .on('drop', function (el, target) {
-        // Handle drop event if needed
-      });
-    }
-
-    // Add touch event listener for scroll behavior on mobile
-    let isDragging = false;
-    let dragStartY = 0;
-
-    document.addEventListener('touchstart', function (event) {
-  if (event.target.classList.contains('item')) {
-    event.preventDefault(); // Prevent scroll from starting
-    dragStartY = event.touches[0].clientY;
-    isDragging = true;
-  }
-}, { passive: false });
-
-document.addEventListener('touchmove', function (event) {
-  if (isDragging) {
-    event.preventDefault(); // Ensure scroll remains disabled
-    const dragY = event.touches[0].clientY;
-    const screenHeight = window.innerHeight;
-
-    // Only scroll near edges
-    if (dragY < 50) {
-      window.scrollBy(0, -20);
-    } else if (dragY > screenHeight - 50) {
-      window.scrollBy(0, 20);
-    }
-  }
-}, { passive: false });
-
-    document.addEventListener('touchend', function () {
-      isDragging = false;
-    });
-
+    updateSortables();
 
     checkAnswerBtn.addEventListener('click', function () {
       const titleAnswerItems = titleField.querySelectorAll('.item');
@@ -802,7 +1472,7 @@ document.addEventListener('touchmove', function (event) {
         for (let i = minLength; i < arr1.length; i++) {
           items[i].style.backgroundColor = '#D57E7C';
     }
-  }
+    }
 
     // Trigger error indicator if arrays are not equal
     if (!answerCorrect) {
@@ -810,7 +1480,7 @@ document.addEventListener('touchmove', function (event) {
     }
 
     return answerCorrect;
-}
+    }
 
 
       function titlesAreEqual(items, answer, title) {
@@ -859,54 +1529,45 @@ document.addEventListener('touchmove', function (event) {
       }
 
       if (allFieldsCorrect) {
-        controller.answeredQuestionTracker++
-        
-        if (firstTimeChecking) {
-          controller.correctAnswersTracker++;
+        if (timeTakenForEachText[currentTextId]) {
+          timeTakenForEachText[currentTextId]["endTime"] = elapsedTime;
         }
-        firstTimeChecking = true;
 
+        controller.answeredQuestionTracker++;
+
+        // Calculate score based on mistakes for this specific text attempt
+        const currentAttemptMistakes = mistakesSummary[currentTextId][`${textIncidenceCount}`];
+        let scoreToAdd = 0;
+        
+        if (currentAttemptMistakes === 0) {
+          scoreToAdd = 1.0;
+        } else if (currentAttemptMistakes === 1) {
+          scoreToAdd = 0.75;
+        } else if (currentAttemptMistakes === 2) {
+          scoreToAdd = 0.5;
+        } else if (currentAttemptMistakes === 3) {
+          scoreToAdd = 0.25;
+        }
+        // More than 3 mistakes = 0 points
+        
+        controller.correctAnswersTracker += scoreToAdd;
+      
         localStorage.setItem('controller', JSON.stringify(controller));
         if (controller.modeChoice4 === "C40") {
         questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
         } else {
           questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}`;
         }
-        drake.destroy();
+        updateSortables()
         nextQuestionBtn.style.display = 'flex';
         checkAnswerBtn.style.display = "none";
         checkAnswerBtn.disabled = true;
         controller.randomSelection = [];
         localStorage.setItem("controller", JSON.stringify(controller));
       } else {
-        firstTimeChecking = false;
-        const dots = document.querySelectorAll('#dots .dot');
-        const targetColor = 'rgb(255, 191, 146)'; // Example target color (white in RGB)
-        let foundMatch = false;
-
-        for (let i = 0; i < dots.length; i++) {
-            const dot = dots[i];
-            const backgroundColor = window.getComputedStyle(dot).backgroundColor;
-
-            if (backgroundColor === targetColor) {
-                dot.style.backgroundColor = '#D57E7C';
-                break;
-            }
-        }
-
-        for (let i = 0; i < dots.length; i++) {
-            const dot = dots[i];
-            const backgroundColor = window.getComputedStyle(dot).backgroundColor;
-
-            if (backgroundColor === targetColor) {
-                foundMatch = true;
-            }
-        }
-        if (!foundMatch) {
-            helpBtn.disabled = false;
-        }
-
+        trackHelpButtonCounter();
         controller.mistakesTracker++;
+
         recordTextComprehensionMistake()
         localStorage.setItem('controller', JSON.stringify(controller));
         mistakesTracker.innerHTML = `Klaidos: ${controller.mistakesTracker}`;
@@ -917,7 +1578,35 @@ document.addEventListener('touchmove', function (event) {
       mistakesSummary[currentTextId][`${textIncidenceCount}`]+=1
     }
 
+    const fillBar = helpBtn.querySelector('.fill-bar');
+    let anserAttemptsSinceLastHelp = 0;
+    const maxAttempts = 3;
 
+    function trackHelpButtonCounter() {
+      anserAttemptsSinceLastHelp++;
+
+      // Calculate progress (in thirds)
+      const progress = Math.min((anserAttemptsSinceLastHelp / maxAttempts) * 100, 100);
+      fillBar.style.width = `${progress * 1.15}%`;
+
+      // When all three tries are used
+      if (anserAttemptsSinceLastHelp >= maxAttempts) {
+          setTimeout(() => {
+            helpBtn.disabled = false;
+            helpBtn.classList.add('enabled');
+            fillBar.style.opacity = 0;
+          }, 300); // 300 milliseconds = 0.3 seconds
+      }
+    }
+
+    // Example reset system
+    function resetHelpButton() {
+      anserAttemptsSinceLastHelp = 0;
+      fillBar.style.width = '0%';
+      helpBtn.disabled = true;
+      helpBtn.classList.remove('enabled');
+      fillBar.style.opacity = 0.3;
+    }
 
     helpBtn.addEventListener('click', function () {
       helpTracker++;
@@ -1129,42 +1818,44 @@ document.addEventListener('touchmove', function (event) {
       }
       }
       
-      helpBtn.disabled = true;
-
-      const dots = document.querySelectorAll('#dots .dot');
-      for (let i = 0; i < dots.length; i++) {
-          const dot = dots[i];
-          dot.style.backgroundColor = '#ffbf92';
-          }
+      resetHelpButton()
     });
 
     function initiateTheProgram() {
-        clearInputFields()
+        // Restore seed state from controller
+        if (!currentSeed) {
+          currentSeed = generateSessionSeed();
+          controller.modeChoice8 = currentSeed;
+        }
+        
+        localStorage.setItem("controller", JSON.stringify(controller));
+        
+        clearInputFields();
         displayQuestion();
 
         if (!controller.questionsStopped) {
-        if (controller.modeChoice4 === "C39") {
-          countDown();
-        } else if (controller.modeChoice4 === "C40") {
-          startTimer();
-        }
-    } else {
-	    if (controller.questionsStopped) {
-        if (localStorage.getItem("elapsedTime") !== null) {
-          timerDisplay.textContent = localStorage.getItem("elapsedTime");
+            if (controller.modeChoice4 === "C39") {
+                countDown();
+            } else if (controller.modeChoice4 === "C40") {
+                startTimer();
+            }
         } else {
-          timerDisplay.textContent = "00:00:00";
+            if (controller.questionsStopped) {
+                if (localStorage.getItem("elapsedTime") !== null) {
+                    timerDisplay.textContent = localStorage.getItem("elapsedTime");
+                } else {
+                    timerDisplay.textContent = "00:00:00";
+                }
+            }
+            formatFinalMessageForTextcomprehension();
         }
-      }
-      formatFinalMessageForTextcomprehension();
-    }
 
-    if (controller.modeChoice4 === "C40") {
-    questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
-    } else {
-      questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}`;
-    }
-    mistakesTracker.innerHTML = `Klaidos: ${controller.mistakesTracker}`;
+        if (controller.modeChoice4 === "C40") {
+            questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
+        } else {
+            questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}`;
+        }
+        mistakesTracker.innerHTML = `Klaidos: ${controller.mistakesTracker}`;
     }
 
     function clearInputFields() {
@@ -1198,60 +1889,69 @@ document.addEventListener('touchmove', function (event) {
         }
     });
 
-    const stopButtonElement = document.querySelector('.stop-button');
-    let stopButtonSpanElement = document.querySelector('#stop-button-span');
-
     function stopQuestions() {
-				if (stopButtonSpanElement.innerHTML === "close") {
-          controller.questionsStopped = true;
-					clearInterval(timerInterval);
-					stopButtonSpanElement.innerHTML = "refresh";
-          checkAnswerBtn.disabled = true;
-          helpBtn.disabled = true;
-          nextQuestionBtn.disabled = true;
-          drake.destroy();
-          controller.questionsStopped = true;
-          localStorage.setItem("elapsedTime", timerDisplay.textContent);
-					localStorage.setItem('controller', JSON.stringify(controller));
-          initiateTheProgram() 
-
-				} else if (stopButtonSpanElement.innerHTML === "refresh") {
+      if (stopButtonSpanElement.innerHTML === "close") {
+          showCustomConfirm("Ar tikrai nori sustabdyti užduotį?", stopQuestionsCloseActions);
+      } else if (stopButtonSpanElement.innerHTML === "refresh") {
           controller.questionsStopped = false;
-					stopButtonSpanElement.innerHTML = "close";
+          stopButtonSpanElement.innerHTML = "close";
           if (localStorage.getItem("startTime")) {
-            localStorage.removeItem("startTime");
+              localStorage.removeItem("startTime");
           };
           if (localStorage.getItem("remainingTime")) {
-            localStorage.removeItem("remainingTime");
+              localStorage.removeItem("remainingTime");
           };
           checkAnswerBtn.disabled = false;
           nextQuestionBtn.disabled = false;
 
+          if (window.matchMedia("(max-width: 767px), (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)").matches) {
+              document.querySelector(".tracker-timer-holder").style.paddingLeft = "30px";
+          } else {
+              document.querySelector(".tracker-timer-holder").style.paddingLeft = "15px";
+          }
+
+          // NEW: Reset seed system and lazy loading
+          currentSeed = generateSessionSeed();
+          currentPassNumber = 0;
+          controller.sessionSeed = currentSeed;
+          controller.passNumber = 0;
+
+          // Clear lazy loading state
+          filteredTextLibrary = [];
+          allTextIds = [];
+          currentTextBatchIndex = 0;
+          totalTextsAvailable = 0;
+          virtualShuffledIndices = null;
+          
           controller.randomSelection = [];
           helpTracker = 0;
           controller.mistakesTracker = 0;
-					controller.answeredQuestionTracker = 0;
+          controller.answeredQuestionTracker = 0;
           controller.correctAnswersTracker = 0;
-          firstTimeChecking = true;
+
           answeredTexts = [];
           mistakesSummary = {};
 
           if (controller.modeChoice4 === "C40") {
-            questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
+              questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;
           } else {
-            questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}`;
+              questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}`;
           }
           mistakesTracker.innerHTML = `Klaidos: ${controller.mistakesTracker}`;
-          //helpDiv.innerHTML = `Panaudota pagalba: ${helpTracker}`;
 
           document.getElementById("fields-row").style.display = "flex";
           document.getElementById("final-message-row").style.display = "none";
+          document.querySelector(".help-and-check-button-holder").style.display = "flex"
 
-          controller.tempTracking = true;
+          controller.taskCompleted = false;
+          controller.taskRecorded = false;
+
+          restartPetOnWalkActions();
+
           localStorage.setItem('controller', JSON.stringify(controller));
           initiateTheProgram();
-				}
-			}
+      }
+  }
 
       if (controller.questionsStopped) {
         stopButtonSpanElement.innerHTML === "close"
@@ -1259,22 +1959,513 @@ document.addEventListener('touchmove', function (event) {
 
       stopButtonElement.addEventListener("click", stopQuestions)
 
-    const resetButtonElement = document.querySelector('.reset-button');
-		resetButtonElement.addEventListener("click", redirectToIndex);
     initiateTheProgram();
 
-    window.addEventListener("beforeunload", () => {
-        if (!redirectingToAuthentication) {
-          controller.taskId = 0;
-          controller.taskCompleted = false;
-        }
-        localStorage.setItem("controller", JSON.stringify(controller));
-        localStorage.setItem("elapsedTime", timerDisplay.textContent);
-        localStorage.setItem("elapsedTime", timerDisplay.textContent);
-      });
     })
     .catch(error => console.error('Error:', error));
+
+
+
+
+
+    // Sidebar functionality
+const sidebarWrapper = document.getElementById('sidebarWrapper');
+const toggleTab = document.getElementById('toggleTab');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+// Toggle sidebar function
+function toggleSidebar() {
+  sidebarWrapper.classList.toggle('open');
+}
+
+// Open sidebar function
+function openSidebar() {
+  sidebarWrapper.classList.add('open');
+}
+
+// Close sidebar function
+function closeSidebar() {
+    sidebarWrapper.classList.remove('open');
+}
+
+// Event listeners
+if (toggleTab) {
+    toggleTab.addEventListener('click', toggleSidebar);
+}
+
+// Close sidebar on window resize if it becomes desktop size
+window.addEventListener('resize', () => {
+    if (window.matchMedia("(max-width: 767px), (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)").matches) {
+      document.querySelector(".tracker-timer-holder").style.paddingLeft = "30px";
+    } else {
+      document.querySelector(".tracker-timer-holder").style.paddingLeft = "15px";
+    }
+    if (window.innerWidth > 768) {
+        closeSidebar();
+    }
+});
+// Simple vanilla JS drag and drop implementation
+// No external dependencies needed!
+
+let sortableInstances = [];
+let isOverValidContainer = false;
+let currentDraggedItem = null;
+let draggedClone = null;
+let touchHoldTimer = null;
+let isDragging = false;
+let startX = 0;
+let startY = 0;
+let currentX = 0;
+let currentY = 0;
+let offsetX = 0;
+let offsetY = 0;
+
+function initializeDragDrop() {
+  // Clean up previous instances
+  cleanupDragDrop();
+
+  const containers = [
+    'title-field',
+    'answers-field',
+    'answers-field-start',
+    'answers-field-middle',
+    'answers-field-end'
+  ];
+
+  // On desktop, also include options-field
+  if (window.innerWidth > 768) {
+    containers.push('options-field');
+  }
+
+  containers.forEach(containerId => {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    makeContainerDroppable(container);
+    
+    // Make existing items draggable
+    const items = container.querySelectorAll('.item');
+    items.forEach(item => {
+      makeDraggable(item);
+    });
+    
+    // Watch for new items being added
+    observeContainer(container);
+  });
+}
+
+// MutationObserver to watch for dynamically added items
+function observeContainer(container) {
+  // First, make any existing items draggable
+  const existingItems = container.querySelectorAll('.item');
+  existingItems.forEach(item => {
+    if (!item.dataset.draggableInitialized) {
+      makeDraggable(item);
+      item.dataset.draggableInitialized = 'true';
+    }
+  });
+  
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (node.nodeType === 1 && node.classList.contains('item')) {
+          if (!node.dataset.draggableInitialized) {
+            makeDraggable(node);
+            node.dataset.draggableInitialized = 'true';
+          }
+        }
+      });
+    });
+  });
+  
+  observer.observe(container, {
+    childList: true,
+    subtree: false
+  });
+  
+  // Store observer for cleanup
+  if (!window.dragDropObservers) {
+    window.dragDropObservers = [];
+  }
+  window.dragDropObservers.push(observer);
+}
+
+function makeDraggable(element) {
+  // Skip if already initialized
+  if (element.dataset.draggableInitialized === 'true') {
+    return;
+  }
+  
+  // Remove any existing listeners first to prevent duplicates
+  element.removeEventListener('mousedown', handleDragStart);
+  element.removeEventListener('touchstart', handleTouchStart);
+  
+  // Always add mouse events for desktop/laptop
+  element.addEventListener('mousedown', handleDragStart);
+  
+  // Also add touch events for touch-capable devices
+  element.addEventListener('touchstart', handleTouchStart, { passive: false });
+  
+  element.style.cursor = 'grab';
+  if (!element.classList.contains('item')) {
+    element.classList.add('item');
+  }
+  
+  // Mark as initialized
+  element.dataset.draggableInitialized = 'true';
+}
+
+function handleTouchStart(e) {
+  const element = e.currentTarget;
+  const touch = e.touches[0];
+  
+  startX = touch.clientX;
+  startY = touch.clientY;
+  
+  // Visual feedback
+  element.classList.add('hold-indicator');
+  
+  // Prevent any scrolling during hold
+  let holdStarted = false;
+  
+  // 300ms hold delay for touch devices
+  touchHoldTimer = setTimeout(() => {
+    holdStarted = true;
+    e.preventDefault(); // Prevent scrolling once hold is confirmed
+    startDrag(element, touch.clientX, touch.clientY);
+    
+    // Add touch move and end listeners
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
+    document.addEventListener('touchcancel', handleTouchEnd);
+  }, 300);
+  
+  // Cancel if touch moves too much during hold
+  const cancelHold = (cancelEvent) => {
+    if (!cancelEvent.touches || cancelEvent.touches.length === 0) {
+      clearTimeout(touchHoldTimer);
+      element.classList.remove('hold-indicator');
+      document.removeEventListener('touchmove', cancelHold);
+      return;
+    }
+    
+    const touch = cancelEvent.touches[0];
+    const moveThreshold = 10;
+    
+    if (Math.abs(touch.clientX - startX) > moveThreshold || 
+        Math.abs(touch.clientY - startY) > moveThreshold) {
+      if (!holdStarted) {
+        clearTimeout(touchHoldTimer);
+        element.classList.remove('hold-indicator');
+        document.removeEventListener('touchmove', cancelHold);
+      }
+    }
+  };
+  
+  document.addEventListener('touchmove', cancelHold, { passive: true });
+  
+  setTimeout(() => {
+    document.removeEventListener('touchmove', cancelHold);
+  }, 320);
+}
+
+function handleTouchMove(e) {
+  if (!isDragging) return;
+  
+  e.preventDefault();
+  const touch = e.touches[0];
+  updateDragPosition(touch.clientX, touch.clientY);
+}
+
+function handleTouchEnd(e) {
+  clearTimeout(touchHoldTimer);
+  document.removeEventListener('touchmove', handleTouchMove);
+  document.removeEventListener('touchend', handleTouchEnd);
+  document.removeEventListener('touchcancel', handleTouchEnd);
+  
+  if (isDragging) {
+    endDrag();
+  }
+  
+  if (currentDraggedItem) {
+    currentDraggedItem.classList.remove('hold-indicator');
+  }
+}
+
+function handleDragStart(e) {
+  if (e.button !== 0) return; // Only left mouse button
+  
+  e.preventDefault();
+  const element = e.currentTarget;
+  
+  startDrag(element, e.clientX, e.clientY);
+  
+  document.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('mouseup', handleMouseUp);
+}
+
+function handleMouseMove(e) {
+  if (!isDragging) return;
+  updateDragPosition(e.clientX, e.clientY);
+}
+
+function handleMouseUp(e) {
+  document.removeEventListener('mousemove', handleMouseMove);
+  document.removeEventListener('mouseup', handleMouseUp);
+  
+  if (isDragging) {
+    endDrag();
+  }
+}
+
+function startDrag(element, clientX, clientY) {
+  currentDraggedItem = element;
+  isDragging = true;
+  isOverValidContainer = true;
+  
+  // Reset background color when drag starts
+  element.style.backgroundColor = '';
+  
+  // Prevent body scrolling during drag
+  document.body.style.overflow = 'hidden';
+  document.body.style.touchAction = 'none';
+  
+  // Close sidebar when drag starts
+  if (typeof sidebarWrapper !== 'undefined' && sidebarWrapper.classList.contains('open')) {
+    if (typeof closeSidebar === 'function') {
+      closeSidebar();
+    }
+  }
+  
+  // Get element position
+  const rect = element.getBoundingClientRect();
+  offsetX = clientX - rect.left;
+  offsetY = clientY - rect.top;
+  
+  // Create clone for dragging
+  draggedClone = element.cloneNode(true);
+  draggedClone.classList.add('dragging-clone');
+  draggedClone.style.position = 'fixed';
+  draggedClone.style.width = rect.width + 'px';
+  draggedClone.style.height = rect.height + 'px';
+  draggedClone.style.zIndex = '9999';
+  draggedClone.style.pointerEvents = 'none';
+  draggedClone.style.opacity = '0.9';
+  draggedClone.style.cursor = 'grabbing';
+  draggedClone.style.touchAction = 'none';
+  document.body.appendChild(draggedClone);
+  
+  // Make original semi-transparent
+  element.style.opacity = '0.3';
+  
+  updateDragPosition(clientX, clientY);
+}
+
+function updateDragPosition(clientX, clientY) {
+  if (!draggedClone) return;
+  
+  currentX = clientX - offsetX;
+  currentY = clientY - offsetY;
+  
+  draggedClone.style.left = currentX + 'px';
+  draggedClone.style.top = currentY + 'px';
+  
+  // Check what's under the cursor
+  draggedClone.style.pointerEvents = 'none';
+  const elementBelow = document.elementFromPoint(clientX, clientY);
+  draggedClone.style.pointerEvents = 'none';
+  
+  checkDropTarget(elementBelow, clientX, clientY);
+}
+
+function checkDropTarget(element, clientX, clientY) {
+  const validContainers = [
+    'title-field',
+    'answers-field',
+    'answers-field-start',
+    'answers-field-middle',
+    'answers-field-end',
+    'options-field'
+  ];
+  
+  isOverValidContainer = false;
+  
+  // Traverse up to find valid container
+  let current = element;
+  while (current && current !== document.body) {
+    if (validContainers.includes(current.id)) {
+      isOverValidContainer = true;
+      
+      // Find insertion point
+      const container = current;
+      const items = Array.from(container.children).filter(child => 
+        child.classList.contains('item') && child !== currentDraggedItem
+      );
+      
+      let insertBefore = null;
+      for (let item of items) {
+        const rect = item.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
         
+        if (clientY < midY) {
+          insertBefore = item;
+          break;
+        }
+      }
+      
+      if (insertBefore) {
+        container.insertBefore(currentDraggedItem, insertBefore);
+      } else {
+        container.appendChild(currentDraggedItem);
+      }
+      
+      break;
+    }
+    current = current.parentElement;
+  }
+}
+
+function endDrag() {
+  if (!currentDraggedItem) return;
+  
+  // Re-enable body scrolling
+  document.body.style.overflow = '';
+  document.body.style.touchAction = '';
+  
+  // Remove clone
+  if (draggedClone && draggedClone.parentNode) {
+    draggedClone.remove();
+  }
+  draggedClone = null;
+  
+  // Restore original opacity
+  currentDraggedItem.style.opacity = '';
+  currentDraggedItem.classList.remove('hold-indicator');
+  
+  // If not over valid container, return to options-field
+  if (!isOverValidContainer) {
+    const optionsField = document.getElementById('options-field');
+    if (optionsField) {
+      optionsField.appendChild(currentDraggedItem);
+    }
+  }
+  
+  isDragging = false;
+  currentDraggedItem = null;
+  isOverValidContainer = false;
+}
+
+function makeContainerDroppable(container) {
+  container.classList.add('drop-container');
+}
+
+function cleanupDragDrop() {
+  document.removeEventListener('mousemove', handleMouseMove);
+  document.removeEventListener('mouseup', handleMouseUp);
+  document.removeEventListener('touchmove', handleTouchMove);
+  document.removeEventListener('touchend', handleTouchEnd);
+  clearTimeout(touchHoldTimer);
+  
+  if (draggedClone && draggedClone.parentNode) {
+    draggedClone.remove();
+  }
+  
+  // Disconnect all observers
+  if (window.dragDropObservers) {
+    window.dragDropObservers.forEach(observer => observer.disconnect());
+    window.dragDropObservers = [];
+  }
+  
+  isDragging = false;
+  currentDraggedItem = null;
+  draggedClone = null;
+}
+
+function initializeOptionsFieldDragDrop() {
+  const optionsField = document.getElementById('options-field');
+  if (!optionsField) return;
+  
+  makeContainerDroppable(optionsField);
+  
+  const items = optionsField.querySelectorAll('.item');
+  items.forEach(item => {
+    makeDraggable(item);
+  });
+  
+  // Watch for new items
+  observeContainer(optionsField);
+}
+
+function isTouchDevice() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+}
+
+function updateDragDropInstances() {
+  initializeDragDrop();
+  
+  const touchDevice = isTouchDevice();
+  
+  if (window.innerWidth <= 768 && touchDevice) {
+    initializeOptionsFieldDragDrop();
+  } else {
+    const optionsField = document.getElementById('options-field');
+    if (optionsField) {
+      makeContainerDroppable(optionsField);
+      const items = optionsField.querySelectorAll('.item');
+      items.forEach(item => {
+        makeDraggable(item);
+      });
+      observeContainer(optionsField);
+    }
+  }
+}
+
+// Alias for backward compatibility
+function updateSortables() {
+  updateDragDropInstances();
+}
+
+// Function to manually reinitialize all items (useful after dynamic content loads)
+function reinitializeAllItems() {
+  const allContainers = [
+    'title-field',
+    'answers-field',
+    'answers-field-start',
+    'answers-field-middle',
+    'answers-field-end',
+    'options-field'
+  ];
+  
+  allContainers.forEach(containerId => {
+    const container = document.getElementById(containerId);
+    if (container) {
+      const items = container.querySelectorAll('.item');
+      items.forEach(item => {
+        // Reset initialization flag
+        delete item.dataset.draggableInitialized;
+        makeDraggable(item);
+      });
+    }
+  });
+}
+
+// Initialize on load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', updateDragDropInstances);
+} else {
+  updateDragDropInstances();
+}
+
+// Also try initializing after a short delay to catch any dynamically loaded content
+setTimeout(() => {
+  reinitializeAllItems();
+}, 500);
+
+window.addEventListener('resize', updateDragDropInstances);
+
+// Clean up on page unload
+window.addEventListener('beforeunload', cleanupDragDrop);
+
   </script>
 
 </body>

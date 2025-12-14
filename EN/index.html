@@ -250,10 +250,6 @@
 		summaryButtonElement.addEventListener("click", redirectToSummary);
 
 		window.onload = function () {
-			document.querySelector('#template-container').removeAttribute('hidden');
-		};
-
-		window.onload = function () {
 			if (localStorage.getItem('controller') !== null) {
 				summaryButtonElement.style.visibility = "visible";
 			};
@@ -310,7 +306,9 @@ function submitSelection() {
     controller.modeChoice7 = modeChoice7Selection;
     controller.modeChoice8 = modeChoice8Selection;
     controller.result = ['', '', '', '', '']
-	controller.taskId = 0;
+    controller.taskCompleted = false;
+	controller.taskRecorded = false;
+	controller.task = null;
 
     localStorage.setItem('controller', JSON.stringify(controller))
     redirectToIntermediate()

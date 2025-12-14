@@ -196,7 +196,7 @@ const parameterDictionary = {
         "decodedParameterText": "TEKSTO SUPRATIMAS"
     },
     "C50": {
-        "parameter": "grammar",
+        "parameter": "spelling",
         "decodedParameterText": "RAŠYBA"
     },
     "C51": {
@@ -240,20 +240,20 @@ const parameterDictionary = {
         "decodedParameterText": "SUNKUS LYGIS"
     },
     "C61": {
-        "parameter": "fsc-gal",
-        "decodedParameterText": "ŽODŽIO PABAIGA"
+        "parameter": "j-c",
+        "decodedParameterText": "ŽODŽIAI SU „J“"
     },
     "C62": {
         "parameter": "dkt",
         "decodedParameterText": "DAIKTAVARDŽIO PABAIGA"
     },
     "C63": {
-        "parameter": "bdv",
-        "decodedParameterText": "BŪDVARDŽIO PABAIGA"
+        "parameter": "bdv-prv",
+        "decodedParameterText": "BŪDVARDŽIO IR PRIEVEIKSMIO PABAIGOS"
     },
     "C64": {
-        "parameter": "prv",
-        "decodedParameterText": "PRIEVEIKSMIO PABAIGA"
+        "parameter": "sudr",
+        "decodedParameterText": "SUDURTINIAI ŽODŽIAI"
     },
     "C65": {
         "parameter": "vks",
@@ -265,7 +265,7 @@ const parameterDictionary = {
     },
     "C67": {
         "parameter": "fsc-con",
-        "decodedParameterText": "PANAŠIAI SKAMBANČIO PRIEBALSĖS"
+        "decodedParameterText": "PANAŠIAI SKAMBANČIOS PRIEBALSĖS"
     },
     "C68": {
         "parameter": "fsc-vow",
@@ -316,15 +316,47 @@ const parameterDictionary = {
         "decodedParameterText": "EASTERN EUROPE VERSION"
     },
     "C80": {
-        "parameter": "lengvas",
-        "decodedParameterText": "LENGVAS SU DISTRAKTORIUMI"
+        "parameter": "beDis",
+        "decodedParameterText": "BE DISTRAKTORIAUS"
     },
     "C81": {
-        "parameter": "vidutinis",
-        "decodedParameterText": "VIDUTINIS SU DISTRAKTORIUMI"
+        "parameter": "sudDis",
+        "decodedParameterText": "SU DISTRAKTORIUMI"
     },
     "C82": {
-        "parameter": "sunkus",
-        "decodedParameterText": "SUNKUS SU DISTRAKTORIUMI"
-    }
+        "parameter": "randomTexts",
+        "decodedParameterText": "ATSITIKTINIAI TEKSTAI"
+    },
+    "C83": {
+        "parameter": "gramatika",
+        "decodedParameterText": "GRAMATIKA"
+    },
+    "C84": {
+        "parameter": "selectedTexts",
+        "decodedParameterText": "PARINKTI TEKSTAI"
+    },
+    "C85": {
+        "parameter": "fsc-vg-gal-c",
+        "decodedParameterText": "KĄ VIENĄ?"
+    },
+    "C86": {
+        "parameter": "fsc-dk-gal-c",
+        "decodedParameterText": "KO DAUG?"
+    },
+    "C87": {
+        "parameter": "fsc-vvt-gal-c",
+        "decodedParameterText": "KUR KAME?"
+    },
+    "C88": {
+        "parameter": "vow-e-c",
+        "decodedParameterText": "E — Ė"
+    },
+    "C89": {
+        "parameter": "vow-i-c",
+        "decodedParameterText": "I — Y"
+    },
+    "C90": {
+        "parameter": "vow-u-c",
+        "decodedParameterText": "U — Ū"
+    },
 }
