@@ -5715,6 +5715,13 @@ function displayStudentStatistics(student, studentTasks) {
 
                 const data = await response.json();
                 student[2] = data.knowledgeLvl; // update local student object
+
+                // ADD THIS: Update the student in the global studentList
+                const studentInList = studentList.find(s => s.id === Number(student[0]));
+                if (studentInList) {
+                    studentInList.knowledgeLvl = data.knowledgeLvl;
+                }
+
                 messageToTheUser("Žinių lygis sėkmingai atnaujintas!", false);
             } catch (error) {
                 console.error("Error updating knowledge level:", error);
