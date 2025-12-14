@@ -7011,7 +7011,7 @@ async function sendMoneyTransactionToDatabase(amount, type = 'subtract') {
         } else if (response.status === 400) {
             const data = await response.json();
             if (data.error === 'insufficient_funds') {
-                messageToTheUser("Nepakanka pingų!", 'error');
+                messageToTheUser("Nepakanka pinigų!", 'error');
             }
             return false;
         } else {
@@ -7900,7 +7900,11 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
     
     // Check if user has enough money (local check first)
     if (userMoney < totalCost) {
-        messageToTheUser("Nepakanka pinų!", 'error');
+        messageToTheUser("Nepakanka pinigų!", 'error');
+        buttons.forEach(btn => {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        });
         return;
     }
     
@@ -7958,7 +7962,7 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
                 if (existingSupplyKey) {
                     userPetAssets.supplies[existingSupplyKey].quantity += quantity;
                 } else {
-                    const newSupplyKey = `S${Object.keys(userPetAssets.supplies).length + 1}`;
+                    const newSupplyKey = getNextSupplyKey();
                     userPetAssets.supplies[newSupplyKey] = {
                         assetIndex: assetIndex,
                         quantity: quantity
@@ -7966,7 +7970,7 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
                 }
             } else {
                 for (let i = 0; i < quantity; i++) {
-                    const newSupplyKey = `S${Object.keys(userPetAssets.supplies).length + 1}`;
+                    const newSupplyKey = getNextSupplyKey();
                     userPetAssets.supplies[newSupplyKey] = {
                         assetIndex: assetIndex,
                         quantity: 1
@@ -7977,11 +7981,11 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
     } else {
         assetType = 'object';
         if (item.oneOfKind) {
-            const newKey = `O${Object.keys(userObjectAssets).length + 1}`;
+            const newKey = getNextObjectKey();
             userObjectAssets[newKey] = { assetIndex, position: [] };
         } else {
             for (let i = 0; i < quantity; i++) {
-                const newKey = `O${Object.keys(userObjectAssets).length + 1}`;
+                const newKey = getNextObjectKey();
                 userObjectAssets[newKey] = { assetIndex, position: [] };
             }
         }
@@ -8083,6 +8087,16 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
         
         messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
     }
+}
+
+function getNextSupplyKey() {
+    if (!userPetAssets.supplies) return 'S1';
+    let maxNum = 0;
+    for (const key in userPetAssets.supplies) {
+        const num = parseInt(key.substring(1)); // Extract number from "S5"
+        if (num > maxNum) maxNum = num;
+    }
+    return `S${maxNum + 1}`;
 }
 
 function restoreShopState(state) {
@@ -9197,7 +9211,7 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
         //Render Stackable Items
         btn.addEventListener('click', async () => {
             // Create a new instance for stackable items
-            const newKey = `O${Object.keys(userObjectAssets).length + 1}`;
+            const newKey = getNextObjectKey();
             userObjectAssets[newKey] = { assetIndex: parseInt(assetIndex), position: [] };
 
             let tempDivId = renderSingleRoomObject(newKey);
@@ -12409,7 +12423,7 @@ async function payTax(taxType) {
     
     // Check if user has enough money
     if (userMoney < totalCost) {
-        messageToTheUser("Nepakanka pinų!", 'error');
+        messageToTheUser("Nepakanka pinigų!", 'error');
         return;
     }
 
@@ -13038,7 +13052,7 @@ async function handleReceivedMessagesAndGifts(gifts) {
             if (existingSupplyKey) {
               userPetAssets.supplies[existingSupplyKey].quantity += quantity;
             } else {
-              const newSupplyKey = `S${Object.keys(userPetAssets.supplies).length + 1}`;
+              const newSupplyKey = getNextSupplyKey();
               userPetAssets.supplies[newSupplyKey] = {
                 assetIndex: gift.giftId,
                 quantity: quantity,
@@ -13047,7 +13061,7 @@ async function handleReceivedMessagesAndGifts(gifts) {
           } else {
             // Non-stackable pet item
             for (let i = 0; i < quantity; i++) {
-              const newSupplyKey = `S${Object.keys(userPetAssets.supplies).length + 1}`;
+              const newSupplyKey = getNextSupplyKey();
               userPetAssets.supplies[newSupplyKey] = {
                 assetIndex: gift.giftId,
                 quantity: 1,
@@ -13070,11 +13084,11 @@ async function handleReceivedMessagesAndGifts(gifts) {
       } else {
         // OBJECT ASSET LOGIC
         if (item.oneOfKind) {
-          const newKey = `O${Object.keys(userObjectAssets).length + 1}`;
+          const newKey = getNextObjectKey();
           userObjectAssets[newKey] = { assetIndex: gift.giftId, position: [] };
         } else {
           for (let i = 0; i < quantity; i++) {
-            const newKey = `O${Object.keys(userObjectAssets).length + 1}`;
+            const newKey = getNextObjectKey();
             userObjectAssets[newKey] = { assetIndex: gift.giftId, position: [] };
           }
         }
@@ -13092,7 +13106,15 @@ async function handleReceivedMessagesAndGifts(gifts) {
   displayReceivedMessages();
 }
 
-
+// Add this function near the top of your script (after line 100 or so):
+function getNextObjectKey() {
+    let maxNum = 0;
+    for (const key in userObjectAssets) {
+        const num = parseInt(key.substring(1)); // Extract number from "O5"
+        if (num > maxNum) maxNum = num;
+    }
+    return `O${maxNum + 1}`;
+}
 
 function displayReceivedMessages () {
     if (receivedMessages.length > 0) {
