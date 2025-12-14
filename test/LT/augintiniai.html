@@ -4213,9 +4213,22 @@ async function initGame() {
     adjustUnitSizeForSmallScreens();
     await new Promise(resolve => requestAnimationFrame(resolve));
     await renderRoomGrid();
+    
+    // ADD: Extra safety delay for canvas rendering
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
     await setPetAndObjectContainersToGridDimentions();
+    
+    // ADD: Validate room loaded before proceeding
+    if (!roomLayout || roomLayout.length === 0) {
+        throw new Error("Room layout not initialized");
+    }
+    
     renderRoomObjects();
-    blockTopHalfOfSelectedDivsClickEvents()
+    blockTopHalfOfSelectedDivsClickEvents();
+    
+    // NO VALIDATION HERE - let placement logic run first
+    
     renderPets();
     enablePetDragging();
     updateCoinAmounts(userMoney);
@@ -4242,6 +4255,238 @@ async function initGame() {
     });
 }
 
+async function validateAndFixObjectPositions() {
+    const roomObjectsContainer = document.getElementById('roomObjectsContainer');
+    if (!roomObjectsContainer) return false;
+    
+    const objects = roomObjectsContainer.querySelectorAll('.room-object:not(.furniture-preview)');
+    const invalidObjects = [];
+    
+    objects.forEach(obj => {
+        const coords = getObjectCoordinates(obj.id);
+        
+        // Check if coordinates exist and are valid
+        if (!coords || coords.length !== 2) {
+            console.warn(`Invalid coordinates for ${obj.id}`);
+            invalidObjects.push(obj.id);
+            return;
+        }
+        
+        const [x, y] = coords;
+        
+        // Check if within room bounds
+        if (x < 0 || y < 0 || y >= roomLayout.length || x >= roomLayout[0].length) {
+            console.warn(`Object ${obj.id} outside bounds: [${x}, ${y}]`);
+            invalidObjects.push(obj.id);
+            return;
+        }
+        
+        // Check if on valid tile type
+        const tileType = roomLayout[y]?.[x];
+        if (tileType === undefined) {
+            console.warn(`Object ${obj.id} on undefined tile at [${x}, ${y}]`);
+            invalidObjects.push(obj.id);
+            return;
+        }
+        
+        const type = tileType?.type ?? tileType;
+        const validTypes = [1.0, 2.0, 3.0, 5.0, 6.0];
+        
+        if (!validTypes.includes(type)) {
+            console.warn(`Object ${obj.id} on invalid tile type ${type} at [${x}, ${y}]`);
+            invalidObjects.push(obj.id);
+        }
+    });
+    
+    // If invalid objects found, trigger reload
+    if (invalidObjects.length > 0) {
+        console.warn(`Found ${invalidObjects.length} invalid object positions`);
+        return false;
+    }
+    
+    return true;
+}
+
+let initAttempts = 0;
+const maxAttempts = 3;
+
+async function attemptGameInit() {
+    // Show loading state at the start
+    showRoomLoading();
+    
+    try {
+        initAttempts++;
+        console.log(`Init attempt ${initAttempts}/${maxAttempts}`);
+        
+        await initGame();
+        
+        // Give placement logic time to position new objects
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // NOW validate object positions
+        const objectsValid = await validateAndFixObjectPositions();
+        if (!objectsValid) {
+            throw new Error("Object positions invalid after placement");
+        }
+        
+        // Validate pet positions (reload if needed, don't throw error)
+        await validatePetPositions();
+        
+        initAttempts = 0;
+        console.log("Game initialized successfully");
+        
+        // Hide loading state on success
+        hideRoomLoading();
+        
+    } catch (error) {
+        console.error(`Init attempt ${initAttempts} failed:`, error);
+        
+        if (initAttempts < maxAttempts) {
+            // Wait before retry (loading state stays visible)
+            await new Promise(resolve => setTimeout(resolve, 500));
+            console.log("Retrying initialization...");
+            await attemptGameInit();
+        } else {
+            // After max attempts, remove invalid objects
+            console.error("Max attempts reached, removing invalid objects");
+            await removeInvalidObjectsAndSave();
+            
+            // Try one final init after cleanup
+            await initGame();
+            
+            // Hide loading state even after failure
+            hideRoomLoading();
+        }
+    }
+}
+
+function showRoomLoading() {
+    const roomContainer = document.getElementById('room-container');
+    const viewport = document.getElementById('viewport-container');
+    
+    if (roomContainer) {
+        roomContainer.style.opacity = '0';
+        roomContainer.style.pointerEvents = 'none';
+    }
+    if (viewport) {
+        viewport.style.pointerEvents = 'none';
+    }
+}
+
+function hideRoomLoading() {
+    const roomContainer = document.getElementById('room-container');
+    const viewport = document.getElementById('viewport-container');
+    
+    if (roomContainer) {
+        roomContainer.style.opacity = '1';
+        roomContainer.style.pointerEvents = 'auto';
+    }
+    if (viewport) {
+        viewport.style.pointerEvents = 'auto';
+    }
+}
+
+async function validatePetPositions() {
+    const petContainer = document.getElementById('petContainer');
+    if (!petContainer) return false;
+    
+    const pets = petContainer.querySelectorAll('.pet');
+    let anyInvalid = false;
+    
+    pets.forEach(pet => {
+        const coords = getObjectCoordinates(pet.id);
+        
+        if (!coords || coords.length !== 2) {
+            console.warn(`Invalid pet coordinates for ${pet.id}`);
+            anyInvalid = true;
+            return;
+        }
+        
+        const [x, y] = coords;
+        const petWidth = Math.ceil(pet.offsetWidth / unitSize);
+        const petHeight = Math.ceil(pet.offsetHeight / unitSize);
+        const bottomRow = y;
+        
+        // Check if bottom row is walkable
+        if (!isBottomRowWalkable(globalWalkabilityMap, bottomRow, x, petWidth)) {
+            console.warn(`Pet ${pet.id} on invalid position: [${x}, ${y}]`);
+            anyInvalid = true;
+        }
+    });
+    
+    if (anyInvalid) {
+        console.warn("Invalid pet positions detected, reloading pets");
+        updateStatsBeforeRerunningInitGameAndRenderPets();
+        renderPets();
+        enablePetDragging();
+    }
+    
+    return true;
+}
+
+async function removeInvalidObjectsAndSave() {
+    const roomObjectsContainer = document.getElementById('roomObjectsContainer');
+    if (!roomObjectsContainer) return;
+    
+    const objects = roomObjectsContainer.querySelectorAll('.room-object:not(.furniture-preview)');
+    let removedAny = false;
+    
+    objects.forEach(obj => {
+        const coords = getObjectCoordinates(obj.id);
+        
+        if (!coords || coords.length !== 2) {
+            console.warn(`Removing ${obj.id}: invalid coordinates`);
+            obj.remove();
+            if (userObjectAssets[obj.id]) {
+                userObjectAssets[obj.id].position = [];
+                removedAny = true;
+            }
+            return;
+        }
+        
+        const [x, y] = coords;
+        
+        if (x < 0 || y < 0 || y >= roomLayout.length || x >= roomLayout[0].length) {
+            console.warn(`Removing ${obj.id}: out of bounds`);
+            obj.remove();
+            if (userObjectAssets[obj.id]) {
+                userObjectAssets[obj.id].position = [];
+                removedAny = true;
+            }
+            return;
+        }
+        
+        const tileType = roomLayout[y]?.[x];
+        if (tileType === undefined) {
+            console.warn(`Removing ${obj.id}: undefined tile`);
+            obj.remove();
+            if (userObjectAssets[obj.id]) {
+                userObjectAssets[obj.id].position = [];
+                removedAny = true;
+            }
+            return;
+        }
+        
+        const type = tileType?.type ?? tileType;
+        const validTypes = [1.0, 2.0, 3.0, 5.0, 6.0];
+        
+        if (!validTypes.includes(type)) {
+            console.warn(`Removing ${obj.id}: invalid tile type ${type}`);
+            obj.remove();
+            if (userObjectAssets[obj.id]) {
+                userObjectAssets[obj.id].position = [];
+                removedAny = true;
+            }
+        }
+    });
+    
+    if (removedAny) {
+        console.log("Saving cleaned object list to database");
+        await sendObjectAssetsUpdateToDatabase();
+    }
+}
+
+
 fetch("gameAssetIndex.json")
     .then(response => response.json())
     .then(data => {
@@ -4249,7 +4494,7 @@ fetch("gameAssetIndex.json")
         return fetchGameData();     // call your function next
     })
     .then(async () => {
-        await initGame();                 // only runs after fetchGameData completes
+        await attemptGameInit();
         fetchMessageGiftsFromServer();
     })
     .catch(error => {
@@ -6881,7 +7126,7 @@ toggleEditSaveBtn.addEventListener("click", () => {
 });
 
 cancelEditBtn.addEventListener("click", () => {
-    if (preEditUserObjectAssets) {
+    if (editing && preEditUserObjectAssets) {
         userObjectAssets = JSON.parse(JSON.stringify(preEditUserObjectAssets));
     }
     renderRoomObjects();
@@ -8926,9 +9171,9 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
             if (validPosition) {
                 userObjectAssets[tempDivId].position = validPosition;
                 if (!sidebar) {
-                    sendObjectAssetsUpdateToDatabase();
+                    await sendObjectAssetsUpdateToDatabase();
                     updateStatsBeforeRerunningInitGameAndRenderPets();
-                    await initGame();
+                    await attemptGameInit();
                 } else {
                     const tempDiv = document.getElementById(tempDivId)
                     tempDiv.style.left = `calc(${validPosition[0]} * var(--unit-size))`;
@@ -9088,9 +9333,9 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
             if (validPosition) {
                 userObjectAssets[tempDivId].position = validPosition;
                 if (!sidebar) {
-                    sendObjectAssetsUpdateToDatabase();
+                    await sendObjectAssetsUpdateToDatabase();
                     updateStatsBeforeRerunningInitGameAndRenderPets();
-                    await initGame();
+                    await attemptGameInit();
                 } else {
                     const tempDiv = document.getElementById(tempDivId)
                     tempDiv.style.left = `calc(${validPosition[0]} * var(--unit-size))`;

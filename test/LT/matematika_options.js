@@ -289,7 +289,7 @@ function updateModeChoice3() {
     modeChoice5Element.innerHTML += '<option value="C42">SKAITINĖ LYGYBĖ SU NEŽINOMUOJU</option>';
 
     if (modeChoice2Selection === "C9" && modeChoice1Selection === "C1") {
-        modeChoice3Element.innerHTML += '<option value="C37">PERŽENGIANT DEŠIMTĮ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERŽENGIANT DEŠIMTĮ</option>';
     } else if (modeChoice2Selection === "C9" && modeChoice1Selection === "C2") {
         modeChoice3Element.innerHTML += '<option value="C37">NEIŠARDANT DEŠIMTIES</option>';
     } else if (modeChoice2Selection === "C9" && modeChoice1Selection === "C3") {
