@@ -3553,14 +3553,18 @@ function displayStatistics(stats) {
             </div>
 
             <div class="stat-card">
-                <h3>📚 Knowledge Level Distribution</h3>
+            <h3>📚 Knowledge Level Distribution</h3>
                 <div class="stat-items">
                     ${stats.knowledgeLevels.map(kl => `
                         <div class="stat-item">
-                            <span class="stat-label">Class ${kl.level === -1 ? 'Unassigned' : kl.level}:</span>
-                            <span class="stat-value">${kl.count} (${calcPercentage(kl.count, kl.total)}%)</span>
+                            <span class="stat-label">Class ${kl.level}:</span>
+                            <span class="stat-value">${kl.count} (${kl.percentage}%)</span>
                         </div>
                     `).join('')}
+                    <div class="stat-item">
+                        <span class="stat-label">Class Unassigned Active After 14/12/2025:</span>
+                        <span class="stat-value">${stats.unassignedClass.recentlyActive} (${stats.unassignedClass.recentlyActivePercentage}%)</span>
+                    </div>
                 </div>
             </div>
         </div>
