@@ -501,11 +501,22 @@ function styleTextComprahensionPage () {
 
 function recordFinalMistakesForTextComprehension() {
   let mistakeList = [];
-  for (const entry of mistakesSummary) {
+
+  // Calculate how many extra entries exist
+  const extraLength = mistakesSummary.length - controller.answeredQuestionTracker;
+
+  // Truncate mistakesSummary from the end if it's longer
+  const trimmedMistakesSummary = extraLength > 0
+    ? mistakesSummary.slice(0, mistakesSummary.length - extraLength)
+    : mistakesSummary;
+
+  // Process the (possibly trimmed) mistakesSummary
+  for (const entry of trimmedMistakesSummary) {
     for (let i = 0; i < entry.attempts.length; i++) {
       mistakeList.push([entry.textId, entry.attempts[i]]);
     }
   }
+
   controller.currentMistakes = mistakeList;
 }
 
@@ -653,12 +664,6 @@ async function sendSetTaskResultsToDatabase() {
       const mistakes = controller.mistakesTracker || 1; // avoid dividing by 0
 
       function calculateTotalScoreForTextComp(list) {
-        // Trim the list if it has more entries than 'answered'
-        console.log(list.length, answered)
-        if (list.length > answered) {
-          list = list.slice(0, answered);
-        }
-
         const total = list.reduce((sum, [, mistakes]) => {
           let score = 1 - mistakes * 0.25;
           score = Math.max(0, score); // prevent negatives
@@ -894,8 +899,6 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
   let pointsEarned = 0;
   let coinsEarned = 0;
   let statType = 'c'; // default to consistency
-
-  console.log(controller.currentMistakes)
 
   // Calculate points and coins
   if (controller.modeChoice7 === "C84") {
@@ -3455,6 +3458,13 @@ async function controllerToTask() {
     const mode = controller.mode;
     let recordsList = [];
     let task = [];
+    let timeSpentInTask
+
+    if (controller.modeChoice4 === "C40") {
+      timeSpentInTask = elapsedTime;
+    } else if (controller.modeChoice4 === "C39") {
+      timeSpentInTask = controller.timerLimit * 60000;
+    }
 
     if (mode === "math") {
         const modeChoice3Value = controller.modeChoice3 ? "C37" : "C38";
@@ -3472,8 +3482,8 @@ async function controllerToTask() {
             controller.modeChoice8
         ];
         
-        console.log(elapsedTime)
-        const answerRate = Number((totalAnswers / (elapsedTime / 1000 / 60)).toFixed(1));
+        console.log(timeSpentInTask)
+        const answerRate = Number((totalAnswers / (timeSpentInTask / 1000 / 60)).toFixed(1));
 
         recordsList = [{
             taskInfo: task,
@@ -3496,7 +3506,7 @@ async function controllerToTask() {
                     controller.modeChoiceLtDifficulty
                 ];
                 
-                const answerRate = Number((totalAnswers / (elapsedTime / 1000 / 60)).toFixed(1));
+                const answerRate = Number((totalAnswers / (timeSpentInTask / 1000 / 60)).toFixed(1));
                 recordsList = [{
                     taskInfo: task,
                     correct: correctAnswers,
@@ -3522,7 +3532,7 @@ async function controllerToTask() {
                     controller.questionFrequency
                 ];
                 
-                const answerRate = Number((totalAnswers / (elapsedTime / 1000 / 60)).toFixed(1));
+                const answerRate = Number((totalAnswers / (timeSpentInTask / 1000 / 60)).toFixed(1));
                 recordsList = [{
                     taskInfo: task,
                     correct: correctAnswers,
@@ -3534,7 +3544,6 @@ async function controllerToTask() {
         }
     }
 
-    console.log(recordsList)
     return recordsList;
 }
 
