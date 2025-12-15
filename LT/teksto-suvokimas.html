@@ -1090,7 +1090,7 @@
     let filteredTextLibrary = [];
     let currentTextId;
     let answeredTexts = [];
-    window.mistakesSummary = {};
+    window.mistakesSummary = [];
     window.timeTakenForEachText = {};
 
     let currentSeed = controller.modeChoice8;
@@ -1316,8 +1316,10 @@ function loadNextTextBatch() {
       currentTextId = selectedItem.id;
       answeredTexts.push(currentTextId);
 
-      if (!mistakesSummary[currentTextId]) {
-        mistakesSummary[currentTextId] = {};
+      let textEntry = mistakesSummary.find(entry => entry.textId === currentTextId);
+      if (!textEntry) {
+        textEntry = { textId: currentTextId, attempts: [] };
+        mistakesSummary.push(textEntry);
       }
 
       let currentTime;
@@ -1335,8 +1337,9 @@ function loadNextTextBatch() {
 
       textIncidenceCount = answeredTexts.filter(id => id === currentTextId).length;
 
-      if (!mistakesSummary[currentTextId][`${textIncidenceCount}`]) {
-        mistakesSummary[currentTextId][`${textIncidenceCount}`] = 0;
+      textEntry = mistakesSummary.find(entry => entry.textId === currentTextId);
+      while (textEntry.attempts.length < textIncidenceCount) {
+        textEntry.attempts.push(0);
       }
 
       const originalTitle = selectedItem.title;
@@ -1536,7 +1539,8 @@ function loadNextTextBatch() {
         controller.answeredQuestionTracker++;
 
         // Calculate score based on mistakes for this specific text attempt
-        const currentAttemptMistakes = mistakesSummary[currentTextId][`${textIncidenceCount}`];
+        const textEntry = mistakesSummary.find(entry => entry.textId === currentTextId);
+        const currentAttemptMistakes = textEntry ? textEntry.attempts[textIncidenceCount - 1] : 0;
         let scoreToAdd = 0;
         
         if (currentAttemptMistakes === 0) {
@@ -1575,7 +1579,10 @@ function loadNextTextBatch() {
     });
 
     function recordTextComprehensionMistake() {
-      mistakesSummary[currentTextId][`${textIncidenceCount}`]+=1
+      const textEntry = mistakesSummary.find(entry => entry.textId === currentTextId);
+      if (textEntry && textEntry.attempts[textIncidenceCount - 1] !== undefined) {
+        textEntry.attempts[textIncidenceCount - 1] += 1;
+      }
     }
 
     const fillBar = helpBtn.querySelector('.fill-bar');
@@ -1930,7 +1937,7 @@ function loadNextTextBatch() {
           controller.correctAnswersTracker = 0;
 
           answeredTexts = [];
-          mistakesSummary = {};
+          mistakesSummary = [];
 
           if (controller.modeChoice4 === "C40") {
               questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}/${controller.questionNumber}`;

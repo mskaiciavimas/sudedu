@@ -501,13 +501,12 @@ function styleTextComprahensionPage () {
 
 function recordFinalMistakesForTextComprehension() {
   let mistakeList = [];
-  for (const outerKey in mistakesSummary) {
-    const innerObj = mistakesSummary[outerKey];
-    for (const innerKey in innerObj) {
-      mistakeList.push([outerKey, innerObj[innerKey]]);
+  for (const entry of mistakesSummary) {
+    for (let i = 0; i < entry.attempts.length; i++) {
+      mistakeList.push([entry.textId, entry.attempts[i]]);
     }
   }
-  controller.currentMistakes = mistakeList
+  controller.currentMistakes = mistakeList;
 }
 
 async function formatFinalMessageForTextcomprehension() {
@@ -653,7 +652,32 @@ async function sendSetTaskResultsToDatabase() {
       const answered = controller.answeredQuestionTracker || 0;
       const mistakes = controller.mistakesTracker || 1; // avoid dividing by 0
 
-      const resultsData = Math.max(0, answered - mistakes);
+      function calculateTotalScoreForTextComp(list) {
+        // Trim the list if it has more entries than 'answered'
+        console.log(list.length, answered)
+        if (list.length > answered) {
+          list = list.slice(0, answered);
+        }
+
+        const total = list.reduce((sum, [, mistakes]) => {
+          let score = 1 - mistakes * 0.25;
+          score = Math.max(0, score); // prevent negatives
+          return sum + score;
+        }, 0);
+
+        // round final result to 2 decimals
+        return Number(total.toFixed(2));
+      }
+
+      let resultsData;
+
+      if (controller.modeChoice1 === "C49") {
+        resultsData = calculateTotalScoreForTextComp(controller.currentMistakes);
+      } else {
+        resultsData = Math.max(0, answered - mistakes);
+      }
+
+      console.log(resultsData);
 
       try {
         const response = await apiFetch(apiBase + 'class/updateWeekChlScore', {
@@ -3532,14 +3556,13 @@ async function processSelectedTexts() {
         console.error('Error loading text database:', error);
         return [];
     }
-    console.log(controller.currentMistakes)
+
     // Create a map of mistakes by textId
     const mistakesByText = {};
     controller.currentMistakes.forEach(([textId, mistakeCount]) => {
         mistakesByText[textId] = mistakeCount;
     });
 
-    console.log(mistakesByText)
     // Process each text and group by difficulty AND class
     const groupedByDifficultyAndClass = {};
     
