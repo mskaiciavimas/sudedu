@@ -941,31 +941,48 @@
 			errorField.style.display = 'block';
 		}
 
-		function continueAnywayFromTemp() {
-		document.querySelectorAll('#error button').forEach(btn => btn.disabled = true);
-		if (window.tempUserData) {
+		async function continueAnywayFromTemp() {
+			document.querySelectorAll('#error button').forEach(btn => btn.disabled = true);
+
+			if (!window.tempUserData) return;
+
 			const data = window.tempUserData;
-			
+
 			const userData = {
-			token: data.token,
-			userId: data.userId,
-			nickname: data.nickname,
-			accType: data.accType,
-			teacher: data.teacher || '',
-			avatarCode: data.avatarCode || 'w63060003',
-			emailVerified: data.emailVerified,
-			petOnWalk: data.petOnWalk || '',
-			petStats: data.petStats || '[]',
-			knowledgeLvl: data.knowledgeLvl !== undefined ? data.knowledgeLvl : -1 // ← ADD THIS
+				token: data.token,
+				userId: data.userId,
+				nickname: data.nickname,
+				accType: data.accType,
+				teacher: data.teacher || '',
+				avatarCode: data.avatarCode || 'w63060003',
+				emailVerified: data.emailVerified,
+				petOnWalk: data.petOnWalk || '',
+				petStats: data.petStats || '[]',
+				knowledgeLvl: data.knowledgeLvl !== undefined ? data.knowledgeLvl : -1
 			};
-			
+
+			// Save locally
 			localStorage.setItem('userData', JSON.stringify(userData));
 			localStorage.setItem('refreshToken', data.refreshToken);
-			
-			delete window.tempUserData;
-			window.location.href = './';
+
+			try {
+				const response = await fetch(apiBase + 'auth/continue-unverified', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ userId: data.userId })
+				});
+
+				const result = await response.json();
+				
+			} catch (err) {
+				console.error('Error contacting backend:', err);
+			} finally {
+				// Redirect regardless of backend result
+				delete window.tempUserData;
+				window.location.href = './';
+			}
 		}
-		}
+
 
 		function handleLoginError(data, emailVal) {
 			const msg = getMsg(data.code);
