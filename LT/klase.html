@@ -2715,6 +2715,8 @@
 
 
 function renderMembers() {
+    const isTeacher = userData && userData.accType === "teacher";
+    
     if (userData) {
     if (userData.teacher !== '' && userData.accType === "student") {
         teacherName.innerHTML = `<span class="teachers-name">Mok. ${userData.teacher.split("(ID:")[0]}</span><span class="teachers-id">ID: ${userData.teacher.split("(ID:")[1].replace(/[^a-zA-Z0-9]/g, "")}</span>`
@@ -2808,60 +2810,104 @@ function renderMembers() {
     '../images/icons/icon-third-place-medal.svg'
   ];
 
-  const rankedStudents = [];
-  let currentRank = 0;
-  let previousPoints = null;
-  let medalIndex = 0; // 0 = gold, 1 = silver, 2 = bronze
+  if (isTeacher) {
+    // === TEACHER VIEW: Show all students sorted by points with medals on top 3 ===
+    let currentRank = 0;
+    let previousPoints = null;
+    let medalIndex = 0;
 
-  for (let i = 0; i < topEntries.length; i++) {
-    const entry = topEntries[i];
-    const currentPoints = Number(entry.totalPoints); // Convert to number
-    
-    if (previousPoints === null || currentPoints < previousPoints) {
-      currentRank++;
-      if (currentRank > 3) break;
-      medalIndex = currentRank - 1;
-    }
+    // Render ALL students from topEntries (which contains all students with points for teachers)
+    topEntries.forEach((entry) => {
+      const currentPoints = Number(entry.totalPoints);
+      
+      if (previousPoints === null || currentPoints < previousPoints) {
+        currentRank++;
+        if (currentRank <= 3) {
+          medalIndex = currentRank - 1;
+        }
+      }
 
-    rankedStudents.push({
-      ...entry,
-      medalPath: medalPaths[medalIndex] || null
+      const member = studentMap[entry.id];
+      if (member) {
+        const medalPath = currentRank <= 3 ? (medalPaths[medalIndex] || null) : null;
+        const extraClass = medalPath ? 'member-card-top3' : '';
+        createMemberCard(member, extraClass, entry.totalPoints, medalPath, false);
+      }
+
+      previousPoints = currentPoints;
     });
 
-    previousPoints = currentPoints; // Store as number
-  }
-
-  // --- Render top students with medals ---
-  const topIds = [];
-  rankedStudents.forEach((entry) => {
-    const member = studentMap[entry.id];
-    if (member) {
-      const isYou = requestingStudent && member.id === requestingStudent.id;
-      const extraClass = isYou ? 'member-card-top3 member-card-requesting' : 'member-card-top3';
-      createMemberCard(member, extraClass, entry.totalPoints, entry.medalPath, isYou);
-      topIds.push(entry.id);
+    // ONLY render students WITHOUT points (who weren't in topEntries)
+    const renderedIds = topEntries.map(e => e.id);
+    const remainingStudents = students.filter(s => !renderedIds.includes(s.id));
+    
+    // Shuffle remaining students
+    for (let i = remainingStudents.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [remainingStudents[i], remainingStudents[j]] = [remainingStudents[j], remainingStudents[i]];
     }
-  });
+    
+    // Render them without points (these are students who haven't earned any points yet)
+    remainingStudents.forEach(member => {
+      createMemberCard(member); // No points displayed
+    });
 
-  // --- Render requesting student if not in top group ---
-  if (requestingStudent && !topIds.includes(requestingStudent.id)) {
-    createMemberCard(requestingStudent, 'member-card-requesting', classDataCache.requestingStudentTotalPoints || 0, null, true);
+  } else {
+    // === STUDENT VIEW: Top 3 with medals, requesting student, then random others without points ===
+    const rankedStudents = [];
+    let currentRank = 0;
+    let previousPoints = null;
+    let medalIndex = 0;
+
+    for (let i = 0; i < topEntries.length; i++) {
+      const entry = topEntries[i];
+      const currentPoints = Number(entry.totalPoints);
+      
+      if (previousPoints === null || currentPoints < previousPoints) {
+        currentRank++;
+        if (currentRank > 3) break;
+        medalIndex = currentRank - 1;
+      }
+
+      rankedStudents.push({
+        ...entry,
+        medalPath: medalPaths[medalIndex] || null
+      });
+
+      previousPoints = currentPoints;
+    }
+
+    // Render top 3 students with medals
+    const topIds = [];
+    rankedStudents.forEach((entry) => {
+      const member = studentMap[entry.id];
+      if (member) {
+        const isYou = requestingStudent && member.id === requestingStudent.id;
+        const extraClass = isYou ? 'member-card-top3 member-card-requesting' : 'member-card-top3';
+        createMemberCard(member, extraClass, entry.totalPoints, entry.medalPath, isYou);
+        topIds.push(entry.id);
+      }
+    });
+
+    // Render requesting student if not in top 3
+    if (requestingStudent && !topIds.includes(requestingStudent.id)) {
+      createMemberCard(requestingStudent, 'member-card-requesting', classDataCache.requestingStudentTotalPoints || 0, null, true);
+    }
+
+    // Render remaining students (no points shown, random order)
+    const remaining = students.filter(s => !topIds.includes(s.id) && (!requestingStudent || s.id !== requestingStudent.id));
+
+    // Shuffle remaining
+    for (let i = remaining.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [remaining[i], remaining[j]] = [remaining[j], remaining[i]];
+    }
+
+    remaining.forEach(member => {
+      createMemberCard(member); // No points displayed
+    });
   }
-
-  // --- Render remaining students ---
-  const remaining = students.filter(s => !topIds.includes(s.id) && (!requestingStudent || s.id !== requestingStudent.id));
-
-  // Shuffle remaining
-  for (let i = remaining.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [remaining[i], remaining[j]] = [remaining[j], remaining[i]];
-  }
-
-  remaining.forEach(member => {
-    createMemberCard(member);
-  });
 }
-
     
 
   function loadClassDataCache() {
@@ -3566,8 +3612,6 @@ if (classDataCache.weekChlWinnerStudentId && classDataCache.weekChlWinnerStudent
         )
     ).toFixed(2)
     );
-
-    console.log(winningsBase, winnersByPosition)
 
     if (winningsBase <= 0) {
         return

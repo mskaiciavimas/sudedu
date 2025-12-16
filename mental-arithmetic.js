@@ -950,6 +950,8 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
   }
 
   let response;
+
+  pointsEarned = parseFloat(pointsEarned.toFixed(2));
   try {
     response = await apiFetch(apiBase + 'students/updateStudentStats', {
       method: 'POST',
