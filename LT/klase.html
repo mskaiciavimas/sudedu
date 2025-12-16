@@ -1991,10 +1991,11 @@
     <script src="../parameter_dictionary.js"></script>
     <script src="../mental-arithmetic-combinations.js"></script>
     <script type="module">
-        const weekChallengeWinnings = {
-            "firstPlace": 40,
-            "secondPlace": 30,
-            "thirdPlace": 20
+        const weekChallengeWinningsTotalPrizeCoins = 90;
+        const weekChallengeWinningsWeights = {
+            "firstPlace": 0.444,
+            "secondPlace": 0.333,
+            "thirdPlace": 0.222
         }
 
         let userData;
@@ -3228,11 +3229,11 @@ if (storedCacheExpiry) {
         let description = document.createElement('div');
     }
 
-function renderPodiumRewards() {
+function renderPodiumRewards(firstPlaceReward, secondPlaceRewards, thirdPlaceReward) {
   const rewards = [
-    { place: 'first',  amount: weekChallengeWinnings.firstPlace },
-    { place: 'second', amount: weekChallengeWinnings.secondPlace },
-    { place: 'third',  amount: weekChallengeWinnings.thirdPlace },
+    { place: 'first',  amount: firstPlaceReward },
+    { place: 'second', amount: secondPlaceRewards},
+    { place: 'third',  amount: thirdPlaceReward },
   ];
 
   for (const reward of rewards) {
@@ -3242,20 +3243,25 @@ function renderPodiumRewards() {
     const pedestal = podiumPlace.querySelector('.pedestal');
     if (!pedestal) continue;
     
-    if (pedestal.querySelector('.coin-display')) continue;
+    const existingReward = pedestal.querySelector('.podium-reward');
+    if (existingReward) {
+      existingReward.remove();
+    }
 
     // Create reward display container
     const rewardDiv = document.createElement('div');
     rewardDiv.className = 'podium-reward';
 
-    rewardDiv.innerHTML = `
-      <div class="coin-display">
-        <span class="coin-icon">
-          <img src="../images/icons/icon-sudedu-coin.png" alt="coin">
-        </span>
-        <span class="coin-amount">${reward.amount}</span>
-      </div>
-    `;
+    if (reward.amount > 0) {
+        rewardDiv.innerHTML = `
+        <div class="coin-display">
+            <span class="coin-icon">
+            <img src="../images/icons/icon-sudedu-coin.png" alt="coin">
+            </span>
+            <span class="coin-amount">${reward.amount}</span>
+        </div>
+        `;
+    }
 
     // Append reward under the number on the pedestal
     pedestal.appendChild(rewardDiv);
@@ -3281,8 +3287,6 @@ async function renderClassWeekChallenge () {
     }
 
     timeLeftDiv.innerHTML = `Liko ${daysLeft} ${dayLabel}`;
-
-    renderPodiumRewards();
 
     if (classDataCache && classDataCache.requestingStudent) {
         document.querySelector("#class-challenge-user-points").innerHTML = ""
@@ -3320,10 +3324,12 @@ async function renderClassWeekChallenge () {
             const placeNumbers = ['1', '2', '3'];
             const carouselStates = {};
 
+            const placeCounts = {};
             uniqueScores.forEach((score, index) => {
                 const students = scoreGroups[score];
                 const placeClass = placeClasses[index];
                 const placeNumber = placeNumbers[index];
+                placeCounts[placeNumber] = students.length;
 
                 const podiumPlaceDiv = document.querySelector(`.podium-place.${placeClass}`);
                 if (!podiumPlaceDiv) return;
@@ -3390,6 +3396,50 @@ async function renderClassWeekChallenge () {
 
                 // Render first student
                 renderStudent(placeClass, 0);
+
+                // Get number of students in 1st place
+                const firstPlaceCount = uniqueScores[0] ? scoreGroups[uniqueScores[0]].length : 0;
+
+                // Get number of students in 2nd place
+                const secondPlaceCount = uniqueScores[1] ? scoreGroups[uniqueScores[1]].length : 0;
+
+                // Get number of students in 3rd place
+                const thirdPlaceCount = uniqueScores[2] ? scoreGroups[uniqueScores[2]].length : 0;
+
+                const winningsBase = Number(
+                (
+                    weekChallengeWinningsTotalPrizeCoins /
+                    (
+                    weekChallengeWinningsWeights.firstPlace * firstPlaceCount +
+                    weekChallengeWinningsWeights.secondPlace * secondPlaceCount +
+                    weekChallengeWinningsWeights.thirdPlace * thirdPlaceCount
+                    )
+                ).toFixed(2)
+                );
+
+                if (winningsBase > 0) {
+                    let winningsForFirstPlace;
+                    let winningsForSecondPlace;
+                    let winningsForThirdPlace;
+
+                    if (firstPlaceCount > 0) {
+                        winningsForFirstPlace = Number((winningsBase * weekChallengeWinningsWeights.firstPlace).toFixed(2))
+                    } else {
+                        winningsForFirstPlace = 0
+                    }
+                    if (secondPlaceCount > 0) {
+                        winningsForSecondPlace = Number((winningsBase * weekChallengeWinningsWeights.secondPlace).toFixed(2))
+                    } else {
+                        winningsForSecondPlace = 0
+                    }
+                    if (thirdPlaceCount > 0) {
+                        winningsForThirdPlace = Number((winningsBase * weekChallengeWinningsWeights.thirdPlace).toFixed(2))
+                    } else {
+                        winningsForThirdPlace = 0
+                    }
+
+                    renderPodiumRewards(winningsForFirstPlace, winningsForSecondPlace, winningsForThirdPlace);
+                }
             });
 
             function renderStudent(placeClass, studentIndex) {
@@ -3506,6 +3556,23 @@ if (classDataCache.weekChlWinnerStudentId && classDataCache.weekChlWinnerStudent
     let lastPosition = null;
     let medalIndex = -1;
 
+    const winningsBase = Number(
+    (
+        weekChallengeWinningsTotalPrizeCoins /
+        (
+        weekChallengeWinningsWeights.firstPlace  * (winnersByPosition["1"] ?? 0) +
+        weekChallengeWinningsWeights.secondPlace * (winnersByPosition["2"] ?? 0) +
+        weekChallengeWinningsWeights.thirdPlace  * (winnersByPosition["3"] ?? 0)
+        )
+    ).toFixed(2)
+    );
+
+    console.log(winningsBase, winnersByPosition)
+
+    if (winningsBase <= 0) {
+        return
+    }
+
     for (const winner of sortedWinners) {
         const student = allStudents.find(s => s && s.id === winner.id);
         if (!student) {
@@ -3519,14 +3586,10 @@ if (classDataCache.weekChlWinnerStudentId && classDataCache.weekChlWinnerStudent
         }
 
         // Determine winnings based on position
-        let baseWinnings = 0;
-        if (winner.position === 1) baseWinnings = weekChallengeWinnings.firstPlace;
-        else if (winner.position === 2) baseWinnings = weekChallengeWinnings.secondPlace;
-        else if (winner.position === 3) baseWinnings = weekChallengeWinnings.thirdPlace;
-
-        const numberOfWinners = winnersByPosition[winner.position] || 1;
-        let winnings = Math.floor(baseWinnings / numberOfWinners);
-        if (winnings < 1) winnings = 1;
+        let winnings;
+        if (winner.position === 1) winnings = Number((winningsBase * weekChallengeWinningsWeights.firstPlace).toFixed(2));
+        else if (winner.position === 2) winnings = Number((winningsBase * weekChallengeWinningsWeights.secondPlace).toFixed(2));
+        else if (winner.position === 3) winnings = Number((winningsBase * weekChallengeWinningsWeights.thirdPlace).toFixed(2));
 
         // Create card
         const lastWinnerCard = document.createElement('div');
