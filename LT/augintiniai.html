@@ -10839,6 +10839,10 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
                     btn.className = 'use-btn';
                 }
             }
+
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
         });
 
         if (asset.position && asset.position.length === 0) {
