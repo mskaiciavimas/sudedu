@@ -8704,25 +8704,53 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
             return;
         }
 
+        // Success!
         buttons.forEach(btn => {
             btn.disabled = false;
             btn.style.opacity = '1';
         });
 
-        // Success! Add animation
+        // Add animation
         btn.innerHTML = '<svg class="tick-svg" viewBox="0 0 24 24" width="24" height="24"><path class="tick" d="M4 12l6 6 10-10"></path></svg>';
         const tick = btn.querySelector('.tick');
         requestAnimationFrame(() => {
             tick.classList.add('draw');
         });
-        
-        document.querySelectorAll('.purchase-btn').forEach(b => {
-            b.disabled = true;
-        });
-        
-        setTimeout(() => {
-            restoreShopState(currentState);
-        }, 500);
+
+        // If item is oneOfKind, immediately mark as owned
+        if (item.oneOfKind) {
+            const itemDiv = btn.closest('.shop-item');
+            if (itemDiv) {
+                itemDiv.classList.add('owned');
+                const previewHolder = itemDiv.querySelector('.item-preview-holder');
+                
+                // Remove preview button if exists
+                const previewButton = previewHolder?.querySelector('.furniture-preview-button');
+                if (previewButton) {
+                    previewButton.remove();
+                }
+                
+                // Add owned badge
+                if (previewHolder && !previewHolder.querySelector('.owned-badge')) {
+                    const ownedBadge = document.createElement('div');
+                    ownedBadge.className = 'owned-badge';
+                    ownedBadge.innerHTML = '<span class="owned-badge-icon"><img src="../images/icons/icon-check.svg"></span>';
+                    previewHolder.appendChild(ownedBadge);
+                }
+                
+                // Update button
+                btn.classList.add('owned');
+                setTimeout(() => {
+                    btn.innerHTML = 'Nupirkta';
+                    btn.disabled = true;
+                }, 500);
+            }
+        } else {
+            // For non-oneOfKind items, restore shop state after animation
+            setTimeout(() => {
+                restoreShopState(currentState);
+            }, 500);
+        }
         
     } catch (error) {
         console.error('Purchase error:', error);
@@ -9178,7 +9206,7 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
 
     // Collect owned assets
     for (const key in userObjectAssets) {
-        const assetIndex = userObjectAssets[key].assetIndex;
+        const assetIndex = parseInt(userObjectAssets[key].assetIndex);
         ownedIndexes.add(assetIndex);
         const cssClassStr = gameAssetIndex[assetIndex]?.['css-class'];
         if (cssClassStr) cssClassStr.split(' ').forEach(cls => ownedCssClasses.add(cls));
@@ -9191,7 +9219,7 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
             if (pet.skins) {
                 for (const skinId in pet.skins) {
                     const skin = pet.skins[skinId];
-                    const assetIndex = skin.assetIndex;
+                    const assetIndex = parseInt(skin.assetIndex);
                     ownedIndexes.add(assetIndex);
                     const cssClassStr = gameAssetIndex[assetIndex]?.['css-class'];
                     if (cssClassStr) cssClassStr.split(' ').forEach(cls => ownedCssClasses.add(cls));
@@ -9204,7 +9232,7 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
     if (userPetAssets.supplies) {
         for (const supplyId in userPetAssets.supplies) {
             const supply = userPetAssets.supplies[supplyId];
-            const assetIndex = supply.assetIndex;
+            const assetIndex = parseInt(supply.assetIndex);
             ownedIndexes.add(assetIndex);
             const cssClassStr = gameAssetIndex[assetIndex]?.['css-class'];
             if (cssClassStr) cssClassStr.split(' ').forEach(cls => ownedCssClasses.add(cls));
@@ -9590,6 +9618,43 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
         return { canPurchase, unmetRequirements };
     }
 
+    // Helper function to check if item is currently owned (checks live data)
+    function isItemOwned(assetIndex) {
+        assetIndex = parseInt(assetIndex);
+        
+        // Check object assets
+        for (const key in userObjectAssets) {
+            if (parseInt(userObjectAssets[key].assetIndex) === assetIndex) {
+                return true;
+            }
+        }
+        
+        // Check pet skins
+        if (userPetAssets.pets) {
+            for (const petId in userPetAssets.pets) {
+                const pet = userPetAssets.pets[petId];
+                if (pet.skins) {
+                    for (const skinId in pet.skins) {
+                        if (parseInt(pet.skins[skinId].assetIndex) === assetIndex) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Check supplies
+        if (userPetAssets.supplies) {
+            for (const supplyId in userPetAssets.supplies) {
+                if (parseInt(userPetAssets.supplies[supplyId].assetIndex) === assetIndex) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+
     // --- Render grouped items ---
     for (const title in groupedItems) {
         const variants = groupedItems[title];
@@ -9616,7 +9681,7 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
         previewHolder.className = 'item-preview-holder';
         previewHolder.appendChild(previewDiv);
 
-        const isOwned = ownedIndexes.has(parseInt(selectedVariant.key)) && selectedVariant.item.oneOfKind;
+        const isOwned = selectedVariant.item.oneOfKind && ownedIndexes.has(parseInt(selectedVariant.key));
         
         if (!isOwned && selectedVariant.item['css-class'] && selectedVariant.item['css-class'].includes("previewable")) {
             previewHolder.appendChild(createPreviewButton(selectedVariant.key));
@@ -9716,7 +9781,7 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
                 
                 previewDiv.className = `item-preview ${selectedVariant.item['css-class']}`;
                 
-                const newIsOwned = ownedIndexes.has(parseInt(selectedVariant.key)) && selectedVariant.item.oneOfKind;
+                const newIsOwned = selectedVariant.item.oneOfKind && isItemOwned(selectedVariant.key);
                 itemDiv.classList.toggle('owned', newIsOwned);
                 
                 // Remove existing price/requirements sections
@@ -9862,7 +9927,7 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
             
             previewDiv.className = `item-preview ${selectedVariant.item['css-class']}`;
             
-            const newIsOwned = ownedIndexes.has(parseInt(selectedVariant.key)) && selectedVariant.item.oneOfKind;
+            const newIsOwned = selectedVariant.item.oneOfKind && isItemOwned(selectedVariant.key);
             itemDiv.classList.toggle('owned', newIsOwned);
             
             // Remove ALL existing price/requirements/button from BOTH infoDiv AND itemDiv
@@ -10000,7 +10065,7 @@ ungroupedItems.forEach(({ key, item }) => {
     previewHolder.className = 'item-preview-holder';
     previewHolder.appendChild(previewDiv);
 
-    const isOwned = ownedIndexes.has(assetIndex) && item.oneOfKind;
+    const isOwned = item.oneOfKind && ownedIndexes.has(assetIndex);
     
     if (!isOwned && item['css-class'] && item['css-class'].includes("previewable")) {
         previewHolder.appendChild(createPreviewButton(key));
