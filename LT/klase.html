@@ -3189,29 +3189,24 @@ if (storedCacheExpiry) {
     async function getChallengeByTaskId(taskId) {
         try {
             const response = await apiFetch(apiBase + 'class/getChallenge', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ taskId })
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ taskId })
             });
 
-            if (!response) return null;
-
-            if (!response.ok) {
-                throw new Error(`Server error ${response.status}: ${response.statusText}`);
-            }
+            if (!response?.ok) return null;
 
             const data = await response.json();
 
-            if (data.success) {
-                return {
-                    challenge: data.challenge,
-                    duration: data.duration,
-                    weekDuration: data.weekDuration
-                };
-            } else {
-                console.warn("Challenge not found:", data.error);
-                return null;
-            }
+            if (!data.success) return null;
+
+            return {
+                challenge: data.challenge,
+                duration: data.duration,
+                weekDuration: data.weekDuration,
+                isActive: data.isActive
+            };
+
         } catch (error) {
             console.error("Error fetching challenge:", error);
             return null;
@@ -3318,260 +3313,278 @@ let weekChallengeInfo;
 
 async function renderClassWeekChallenge () {
     weekChallengeInfo  = await getChallengeByTaskId(classDataCache.weekChlId)
-    const formattedWeekChallengeDescription = formatWeekChallengeDescription(weekChallengeInfo)
+    
     
     const timeLeftDiv = document.getElementById("class-challenge-time")
-    const today = new Date();
-    const day = today.getDay(); // Sunday = 0, Monday = 1, ..., Saturday = 6
-    const daysLeft = (8 - day) % 7 || 7; // ensures Sunday → 1, Monday → 7, etc.
-    let dayLabel;
 
-    if (day === 1) {
-        dayLabel = "diena";
-    } else {
-        dayLabel = "dienos";
-    }
+    if (!weekChallengeInfo || weekChallengeInfo.isActive === false) {
+        timeLeftDiv.innerHTML = "Iššūkis baigtas";
 
-    timeLeftDiv.innerHTML = `Liko ${daysLeft} ${dayLabel}`;
-
-    if (classDataCache && classDataCache.requestingStudent) {
-        document.querySelector("#class-challenge-user-points").innerHTML = ""
-        const points = classDataCache.requestingStudentWeekChlScore;
-        const pointsLabel = pointsLabelDeterminator(points);
-        document.querySelector("#class-challenge-user-points").innerHTML = `${points} ${pointsLabel}`
-    } else {
         document.querySelector(".class-challenge-action-box").style.display = "none";
-        document.querySelector(".class-challenge-content-grid").style.gap = "0px";
+        document.querySelector("#complete-task-btn").style.display = "none";
 
-    }
+        document.querySelector(".podium-container-outer").style.display = "none";
+        document.querySelector(".section-title").style.display = "none";
+        document.querySelector('.class-challenge-content-grid').style.gap = '0';
 
-    if (classDataCache.top3WeekChl.length === 0) {
-            document.querySelector(".podium-container-outer").style.display = "none";
-            document.querySelector(".section-title").style.display = "none";
+    } else {
+
+        document.querySelector('.class-challenge-content-grid').style.gap = '20px';
+
+        const today = new Date();
+        const day = today.getDay(); // Sunday = 0, Monday = 1, ..., Saturday = 6
+        const daysLeft = (8 - day) % 7 || 7; // ensures Sunday → 1, Monday → 7, etc.
+        let dayLabel;
+
+        if (day === 1) {
+            dayLabel = "diena";
         } else {
-            const allStudents = classDataCache.remainingStudents.concat(classDataCache.requestingStudent);
-            
-            // Group students by score
-            const scoreGroups = {};
-            classDataCache.top3WeekChl.forEach(student => {
-                if (!scoreGroups[student.weekChlScore]) {
-                    scoreGroups[student.weekChlScore] = [];
-                }
-                scoreGroups[student.weekChlScore].push(student);
-            });
+            dayLabel = "dienos";
+        }
 
-            // Sort scores and get top 3 unique scores
-            const uniqueScores = Object.keys(scoreGroups)
-                .map(Number)
-                .sort((a, b) => b - a)
-                .slice(0, 3);
+        timeLeftDiv.innerHTML = `Liko ${daysLeft} ${dayLabel}`;
 
-            const placeClasses = ['first', 'second', 'third'];
-            const placeNumbers = ['1', '2', '3'];
-            const carouselStates = {};
+        const formattedWeekChallengeDescription = formatWeekChallengeDescription(weekChallengeInfo)
 
-            const placeCounts = {};
-            uniqueScores.forEach((score, index) => {
-                const students = scoreGroups[score];
-                const placeClass = placeClasses[index];
-                const placeNumber = placeNumbers[index];
-                placeCounts[placeNumber] = students.length;
+        if (classDataCache && classDataCache.requestingStudent) {
+            document.querySelector("#class-challenge-user-points").innerHTML = ""
+            const points = classDataCache.requestingStudentWeekChlScore;
+            const pointsLabel = pointsLabelDeterminator(points);
+            document.querySelector("#class-challenge-user-points").innerHTML = `${points} ${pointsLabel}`
+        } else {
+            document.querySelector(".class-challenge-action-box").style.display = "none";
+            document.querySelector(".class-challenge-content-grid").style.gap = "0px";
 
-                const podiumPlaceDiv = document.querySelector(`.podium-place.${placeClass}`);
-                if (!podiumPlaceDiv) return;
+        }
 
-                // Clear any existing carousel controls
-                const existingControls = podiumPlaceDiv.querySelector('.carousel-controls');
-                if (existingControls) {
-                    existingControls.remove();
-                }
-
-                // Clear any existing tied count badge
-                const existingTiedCount = podiumPlaceDiv.querySelector('.tied-count');
-                if (existingTiedCount) {
-                    existingTiedCount.remove();
-                }
-
-                const podiumStudentDiv = podiumPlaceDiv.querySelector('.podium-student');
-                const pedestalDiv = podiumPlaceDiv.querySelector('.pedestal');
-
-                // Initialize carousel state
-                carouselStates[placeClass] = {
-                    currentIndex: 0,
-                    students: students,
-                    allStudents: allStudents
-                };
-
-                // Add carousel controls if more than 1 student
-                if (students.length > 1) {
-                    const controls = document.createElement('div');
-                    controls.className = 'carousel-controls';
-
-                    const prevBtn = document.createElement('button');
-                    prevBtn.className = 'carousel-btn';
-                    prevBtn.innerHTML = '‹';
-                    prevBtn.onclick = () => navigateCarousel(placeClass, -1);
-
-                    const dotsContainer = document.createElement('div');
-                    dotsContainer.className = 'carousel-dots';
-                    
-                    for (let i = 0; i < students.length; i++) {
-                        const dot = document.createElement('div');
-                        dot.className = `carousel-dot ${i === 0 ? 'active' : ''}`;
-                        dot.onclick = () => goToSlide(placeClass, i);
-                        dotsContainer.appendChild(dot);
+        if (classDataCache.top3WeekChl.length === 0) {
+                document.querySelector(".podium-container-outer").style.display = "none";
+                document.querySelector(".section-title").style.display = "none";
+            } else {
+                const allStudents = classDataCache.remainingStudents.concat(classDataCache.requestingStudent);
+                
+                // Group students by score
+                const scoreGroups = {};
+                classDataCache.top3WeekChl.forEach(student => {
+                    if (!scoreGroups[student.weekChlScore]) {
+                        scoreGroups[student.weekChlScore] = [];
                     }
-
-                    const nextBtn = document.createElement('button');
-                    nextBtn.className = 'carousel-btn';
-                    nextBtn.innerHTML = '›';
-                    nextBtn.onclick = () => navigateCarousel(placeClass, 1);
-
-                    controls.appendChild(prevBtn);
-                    controls.appendChild(dotsContainer);
-                    controls.appendChild(nextBtn);
-
-                    podiumPlaceDiv.insertBefore(controls, podiumStudentDiv);
-
-                    // Add tied count badge
-                    const tiedCount = document.createElement('div');
-                    tiedCount.className = 'tied-count';
-                    tiedCount.innerHTML = `${students.length} lygiosios`;
-                    pedestalDiv.appendChild(tiedCount);
-                }
-
-                // Render first student
-                renderStudent(placeClass, 0);
-
-                // Get number of students in 1st place
-                const firstPlaceCount = uniqueScores[0] ? scoreGroups[uniqueScores[0]].length : 0;
-
-                // Get number of students in 2nd place
-                const secondPlaceCount = uniqueScores[1] ? scoreGroups[uniqueScores[1]].length : 0;
-
-                // Get number of students in 3rd place
-                const thirdPlaceCount = uniqueScores[2] ? scoreGroups[uniqueScores[2]].length : 0;
-
-                const winningsBase = Number(
-                (
-                    weekChallengeWinningsTotalPrizeCoins /
-                    (
-                    weekChallengeWinningsWeights.firstPlace * firstPlaceCount +
-                    weekChallengeWinningsWeights.secondPlace * secondPlaceCount +
-                    weekChallengeWinningsWeights.thirdPlace * thirdPlaceCount
-                    )
-                ).toFixed(2)
-                );
-
-                if (winningsBase > 0) {
-                    let winningsForFirstPlace;
-                    let winningsForSecondPlace;
-                    let winningsForThirdPlace;
-
-                    if (firstPlaceCount > 0) {
-                        winningsForFirstPlace = Number((winningsBase * weekChallengeWinningsWeights.firstPlace).toFixed(2))
-                    } else {
-                        winningsForFirstPlace = 0
-                    }
-                    if (secondPlaceCount > 0) {
-                        winningsForSecondPlace = Number((winningsBase * weekChallengeWinningsWeights.secondPlace).toFixed(2))
-                    } else {
-                        winningsForSecondPlace = 0
-                    }
-                    if (thirdPlaceCount > 0) {
-                        winningsForThirdPlace = Number((winningsBase * weekChallengeWinningsWeights.thirdPlace).toFixed(2))
-                    } else {
-                        winningsForThirdPlace = 0
-                    }
-
-                    renderPodiumRewards(winningsForFirstPlace, winningsForSecondPlace, winningsForThirdPlace);
-                }
-            });
-
-            function renderStudent(placeClass, studentIndex) {
-                const state = carouselStates[placeClass];
-                const topStudent = state.students[studentIndex];
-                const studentInfo = state.allStudents.find(s => s.id === topStudent.id);
-
-                const podiumPlaceDiv = document.querySelector(`.podium-place.${placeClass}`);
-                const podiumStudentDiv = podiumPlaceDiv.querySelector('.podium-student');
-
-                if (studentInfo) {
-                    podiumStudentDiv.innerHTML = '';
-
-                    const podiumAvatarWrap = document.createElement('div');
-                    podiumAvatarWrap.className = "podium-avatar-wrap";
-
-                    const podiumAvatar = document.createElement('div');
-                    podiumAvatar.className = "podium-avatar";
-                    if (studentInfo.avatarSvg) {
-                        podiumAvatar.innerHTML = studentInfo.avatarSvg;
-                    } else {
-                        podiumAvatar.innerHTML = `<div class="avatar-fallback-circle"></div>`;
-                    }
-
-                    if (classDataCache.requestingStudent && classDataCache.requestingStudent.id === studentInfo.id) {
-                        const isYouDiv = document.createElement('div');
-                        isYouDiv.className = "is-you-div-week-challenge";
-                        isYouDiv.innerHTML = "AŠ";
-                        podiumAvatarWrap.appendChild(isYouDiv);
-                    }
-
-                    const podiumName = document.createElement('div');
-                    podiumName.className = "podium-name";
-                    podiumName.innerHTML = studentInfo.nickname;
-
-                    const podiumId = document.createElement('div');
-                    podiumId.className = "podium-id";
-                    podiumId.innerHTML = `ID: ${studentInfo.id}`;
-
-                    const podiumPoints = document.createElement('div');
-                    podiumPoints.className = "podium-points";
-
-                    const points = topStudent.weekChlScore;
-                    const pointsLabel = pointsLabelDeterminator(points);
-
-                    podiumPoints.innerHTML = `${points} ${pointsLabel}`;
-
-                    podiumAvatarWrap.appendChild(podiumAvatar);
-                    podiumStudentDiv.appendChild(podiumAvatarWrap);
-                    podiumStudentDiv.appendChild(podiumName);
-                    podiumStudentDiv.appendChild(podiumId);
-                    podiumStudentDiv.appendChild(podiumPoints);
-                }
-            }
-
-            function navigateCarousel(placeClass, direction) {
-                const state = carouselStates[placeClass];
-                let newIndex = state.currentIndex + direction;
-
-                // Wrap around (loop)
-                if (newIndex < 0) {
-                    newIndex = state.students.length - 1;  // go to last
-                } else if (newIndex >= state.students.length) {
-                    newIndex = 0;  // go to first
-                }
-
-                goToSlide(placeClass, newIndex);
-            }
-
-
-            function goToSlide(placeClass, index) {
-                const state = carouselStates[placeClass];
-                state.currentIndex = index;
-
-                renderStudent(placeClass, index);
-
-                const podiumPlaceDiv = document.querySelector(`.podium-place.${placeClass}`);
-                const dots = podiumPlaceDiv.querySelectorAll('.carousel-dot');
-                dots.forEach((dot, i) => {
-                    dot.classList.toggle('active', i === index);
+                    scoreGroups[student.weekChlScore].push(student);
                 });
 
-                const prevBtn = podiumPlaceDiv.querySelector('.carousel-btn:first-of-type');
-                const nextBtn = podiumPlaceDiv.querySelector('.carousel-btn:last-of-type');
-            }
-        }   
+                // Sort scores and get top 3 unique scores
+                const uniqueScores = Object.keys(scoreGroups)
+                    .map(Number)
+                    .sort((a, b) => b - a)
+                    .slice(0, 3);
+
+                const placeClasses = ['first', 'second', 'third'];
+                const placeNumbers = ['1', '2', '3'];
+                const carouselStates = {};
+
+                const placeCounts = {};
+                uniqueScores.forEach((score, index) => {
+                    const students = scoreGroups[score];
+                    const placeClass = placeClasses[index];
+                    const placeNumber = placeNumbers[index];
+                    placeCounts[placeNumber] = students.length;
+
+                    const podiumPlaceDiv = document.querySelector(`.podium-place.${placeClass}`);
+                    if (!podiumPlaceDiv) return;
+
+                    // Clear any existing carousel controls
+                    const existingControls = podiumPlaceDiv.querySelector('.carousel-controls');
+                    if (existingControls) {
+                        existingControls.remove();
+                    }
+
+                    // Clear any existing tied count badge
+                    const existingTiedCount = podiumPlaceDiv.querySelector('.tied-count');
+                    if (existingTiedCount) {
+                        existingTiedCount.remove();
+                    }
+
+                    const podiumStudentDiv = podiumPlaceDiv.querySelector('.podium-student');
+                    const pedestalDiv = podiumPlaceDiv.querySelector('.pedestal');
+
+                    // Initialize carousel state
+                    carouselStates[placeClass] = {
+                        currentIndex: 0,
+                        students: students,
+                        allStudents: allStudents
+                    };
+
+                    // Add carousel controls if more than 1 student
+                    if (students.length > 1) {
+                        const controls = document.createElement('div');
+                        controls.className = 'carousel-controls';
+
+                        const prevBtn = document.createElement('button');
+                        prevBtn.className = 'carousel-btn';
+                        prevBtn.innerHTML = '‹';
+                        prevBtn.onclick = () => navigateCarousel(placeClass, -1);
+
+                        const dotsContainer = document.createElement('div');
+                        dotsContainer.className = 'carousel-dots';
+                        
+                        for (let i = 0; i < students.length; i++) {
+                            const dot = document.createElement('div');
+                            dot.className = `carousel-dot ${i === 0 ? 'active' : ''}`;
+                            dot.onclick = () => goToSlide(placeClass, i);
+                            dotsContainer.appendChild(dot);
+                        }
+
+                        const nextBtn = document.createElement('button');
+                        nextBtn.className = 'carousel-btn';
+                        nextBtn.innerHTML = '›';
+                        nextBtn.onclick = () => navigateCarousel(placeClass, 1);
+
+                        controls.appendChild(prevBtn);
+                        controls.appendChild(dotsContainer);
+                        controls.appendChild(nextBtn);
+
+                        podiumPlaceDiv.insertBefore(controls, podiumStudentDiv);
+
+                        // Add tied count badge
+                        const tiedCount = document.createElement('div');
+                        tiedCount.className = 'tied-count';
+                        tiedCount.innerHTML = `${students.length} lygiosios`;
+                        pedestalDiv.appendChild(tiedCount);
+                    }
+
+                    // Render first student
+                    renderStudent(placeClass, 0);
+
+                    // Get number of students in 1st place
+                    const firstPlaceCount = uniqueScores[0] ? scoreGroups[uniqueScores[0]].length : 0;
+
+                    // Get number of students in 2nd place
+                    const secondPlaceCount = uniqueScores[1] ? scoreGroups[uniqueScores[1]].length : 0;
+
+                    // Get number of students in 3rd place
+                    const thirdPlaceCount = uniqueScores[2] ? scoreGroups[uniqueScores[2]].length : 0;
+
+                    const winningsBase = Number(
+                    (
+                        weekChallengeWinningsTotalPrizeCoins /
+                        (
+                        weekChallengeWinningsWeights.firstPlace * firstPlaceCount +
+                        weekChallengeWinningsWeights.secondPlace * secondPlaceCount +
+                        weekChallengeWinningsWeights.thirdPlace * thirdPlaceCount
+                        )
+                    ).toFixed(2)
+                    );
+
+                    if (winningsBase > 0) {
+                        let winningsForFirstPlace;
+                        let winningsForSecondPlace;
+                        let winningsForThirdPlace;
+
+                        if (firstPlaceCount > 0) {
+                            winningsForFirstPlace = Number((winningsBase * weekChallengeWinningsWeights.firstPlace).toFixed(2))
+                        } else {
+                            winningsForFirstPlace = 0
+                        }
+                        if (secondPlaceCount > 0) {
+                            winningsForSecondPlace = Number((winningsBase * weekChallengeWinningsWeights.secondPlace).toFixed(2))
+                        } else {
+                            winningsForSecondPlace = 0
+                        }
+                        if (thirdPlaceCount > 0) {
+                            winningsForThirdPlace = Number((winningsBase * weekChallengeWinningsWeights.thirdPlace).toFixed(2))
+                        } else {
+                            winningsForThirdPlace = 0
+                        }
+
+                        renderPodiumRewards(winningsForFirstPlace, winningsForSecondPlace, winningsForThirdPlace);
+                    }
+                });
+
+                function renderStudent(placeClass, studentIndex) {
+                    const state = carouselStates[placeClass];
+                    const topStudent = state.students[studentIndex];
+                    const studentInfo = state.allStudents.find(s => s.id === topStudent.id);
+
+                    const podiumPlaceDiv = document.querySelector(`.podium-place.${placeClass}`);
+                    const podiumStudentDiv = podiumPlaceDiv.querySelector('.podium-student');
+
+                    if (studentInfo) {
+                        podiumStudentDiv.innerHTML = '';
+
+                        const podiumAvatarWrap = document.createElement('div');
+                        podiumAvatarWrap.className = "podium-avatar-wrap";
+
+                        const podiumAvatar = document.createElement('div');
+                        podiumAvatar.className = "podium-avatar";
+                        if (studentInfo.avatarSvg) {
+                            podiumAvatar.innerHTML = studentInfo.avatarSvg;
+                        } else {
+                            podiumAvatar.innerHTML = `<div class="avatar-fallback-circle"></div>`;
+                        }
+
+                        if (classDataCache.requestingStudent && classDataCache.requestingStudent.id === studentInfo.id) {
+                            const isYouDiv = document.createElement('div');
+                            isYouDiv.className = "is-you-div-week-challenge";
+                            isYouDiv.innerHTML = "AŠ";
+                            podiumAvatarWrap.appendChild(isYouDiv);
+                        }
+
+                        const podiumName = document.createElement('div');
+                        podiumName.className = "podium-name";
+                        podiumName.innerHTML = studentInfo.nickname;
+
+                        const podiumId = document.createElement('div');
+                        podiumId.className = "podium-id";
+                        podiumId.innerHTML = `ID: ${studentInfo.id}`;
+
+                        const podiumPoints = document.createElement('div');
+                        podiumPoints.className = "podium-points";
+
+                        const points = topStudent.weekChlScore;
+                        const pointsLabel = pointsLabelDeterminator(points);
+
+                        podiumPoints.innerHTML = `${points} ${pointsLabel}`;
+
+                        podiumAvatarWrap.appendChild(podiumAvatar);
+                        podiumStudentDiv.appendChild(podiumAvatarWrap);
+                        podiumStudentDiv.appendChild(podiumName);
+                        podiumStudentDiv.appendChild(podiumId);
+                        podiumStudentDiv.appendChild(podiumPoints);
+                    }
+                }
+
+                function navigateCarousel(placeClass, direction) {
+                    const state = carouselStates[placeClass];
+                    let newIndex = state.currentIndex + direction;
+
+                    // Wrap around (loop)
+                    if (newIndex < 0) {
+                        newIndex = state.students.length - 1;  // go to last
+                    } else if (newIndex >= state.students.length) {
+                        newIndex = 0;  // go to first
+                    }
+
+                    goToSlide(placeClass, newIndex);
+                }
+
+
+                function goToSlide(placeClass, index) {
+                    const state = carouselStates[placeClass];
+                    state.currentIndex = index;
+
+                    renderStudent(placeClass, index);
+
+                    const podiumPlaceDiv = document.querySelector(`.podium-place.${placeClass}`);
+                    const dots = podiumPlaceDiv.querySelectorAll('.carousel-dot');
+                    dots.forEach((dot, i) => {
+                        dot.classList.toggle('active', i === index);
+                    });
+
+                    const prevBtn = podiumPlaceDiv.querySelector('.carousel-btn:first-of-type');
+                    const nextBtn = podiumPlaceDiv.querySelector('.carousel-btn:last-of-type');
+                }
+            }  
+    } 
 
 if (classDataCache.weekChlWinnerStudentId && classDataCache.weekChlWinnerStudentId.length !== 0) {
     const medalPaths = [

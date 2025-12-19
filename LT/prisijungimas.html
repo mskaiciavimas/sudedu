@@ -703,11 +703,6 @@
 			window.location.href = './';
 		}
 
-
-		if (!controller) {
-			let controller = JSON.parse(localStorage.getItem('controller')) || {};
-		}
-
 		if (controller?.task && controller.taskCompleted === true) {
 			errorField.innerHTML = "Prisijunkite, kad rezultatai būtų išsaugoti.";
 			errorField.style.display = 'block';
@@ -844,10 +839,20 @@
 							toggleIsRegister();
 							
 							showSuccess(getMsg(data.code, emailVal));
+							
+							// IMPORTANT: Reset the flag before returning
+							isAuthenticating = false;
+							authBtn.innerText = 'Prisijungti'; // Reset button text too
+							
 							enableButtons();
 							return;
 						} else if (data.code === 'REG_003') {
 							showError(getMsg(data.code));
+							
+							// Reset here too
+							isAuthenticating = false;
+							authBtn.innerText = 'Prisiregistruoti';
+							
 							enableButtons();
 							return;
 						}
