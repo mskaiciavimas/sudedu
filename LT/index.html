@@ -1248,28 +1248,6 @@ body.popup-active {
 
 
 	<div class="container" id="template-container" hidden>		
-		<!-- POPUP ELEMENTS START -->
-		<div class="class-popup-modal" id="classPopup">
-			<div class="class-popup-content">
-                <button type="button" class="temp-login-btn" id="authBtn" onclick="window.location.href=getLoginPage()">
-                    Prisijunk
-                </button>
-                <div class="divider">
-                    <span>arba</span>
-                </div>
-                <select class="class-options" id="classSelect">
-                    <option value="" selected disabled>Pasirink savo klasę</option>
-                    <option value="0">Priešmokyklinė</option>
-                    <option value="1">1 klasė</option>
-                    <option value="2">2 klasė</option>
-                    <option value="3">3 klasė</option>
-                    <option value="4">4 klasė</option>
-                    <option value="5">Aukštesnė</option>
-                </select>
-                <button class="class-popup-button" id="classPopupButton" disabled>Pirmyn!</button>
-			</div>
-		</div>
-
         <div class="class-popup-modal" id="classPopupLoggedInClassConfirmation">
 			<div class="class-popup-content">
                 <select class="class-options" id="classLoggedInClassSelect">
@@ -1681,6 +1659,10 @@ body.popup-active {
         let userClass;
 
 		function submitSelection() {
+            if (!userData) {
+                window.location.href = "./prisijungimas.html";
+                return
+            }
             resetControllerTaskSettings();
 			let modeChoiceSelection = document.querySelector('#mode_choice').value;
 			if (localStorage.getItem('controller') !== null) {
@@ -1698,7 +1680,10 @@ body.popup-active {
 			if (controller.mode === "math") {
 				modeChoice1Selection = modeChoice1Element.value;
 				modeChoice2Selection = modeChoice2Element.value;
-				selectedNumbers = [selectedNumberElement.value, selectedNumber2Element.value].sort();
+				selectedNumbers = [
+                    Number(selectedNumberElement.value),
+                    Number(selectedNumber2Element.value)
+                ].sort((a, b) => a - b);
 				modeChoice3Selection = modeChoice3Element.value;
 				modeChoice5Selection = modeChoice5Element.value;
 				modeChoice6Selection = modeChoice6Element.value;
@@ -1853,48 +1838,6 @@ function getClassLocalStorage() {
     }
     
     return item.value;
-}
-
-function showClassPopup() {
-    const popup = document.getElementById('classPopup');
-    const nextButton = document.getElementById('classPopupButton');
-    const classSelect = document.getElementById('classSelect');
-    let selectedClass = null;
-
-    // Show popup
-    popup.classList.add('active');
-    document.body.classList.add('popup-active');
-
-    // Disable Next button initially
-    nextButton.disabled = true;
-
-    // Listen for changes in the dropdown
-    classSelect.addEventListener('change', function() {
-        selectedClass = Number(this.value);
-        nextButton.disabled = this.value === ""; // enable only if a real option is selected
-    });
-
-    // Next button click
-    nextButton.addEventListener('click', async function() {
-        if (selectedClass !== null && selectedClass !== undefined) {
-            // Set localStorage with selected class and expiration
-            setClassLocalStorage(selectedClass);
-
-            userClass = selectedClass;
-
-            if (userData) {
-                updateUserClass(userClass);
-                userData.knowledgeLvl = userClass;
-                localStorage.setItem('userData', JSON.stringify(userData));
-            }
-
-            // Close popup
-            popup.classList.remove('active');
-            document.body.classList.remove('popup-active');
-
-            await displayPersonalChl();
-        }
-    });
 }
 
 function showClassPopupLoggedInClassConfirmation() {
@@ -2960,6 +2903,11 @@ async function displayPersonalChl() {
 
 
 function completePersonalChlTask(challengeInfo, challengeDuration) {
+    if (!userData) {
+        window.location.href = "./prisijungimas.html";
+        return
+    }
+    
     resetControllerTaskSettings();
 
     const parsedCurrentTaskInstructions = challengeInfo;
@@ -3134,19 +3082,12 @@ window.addEventListener('load', checkWrap);
 async function handleKnowledgeLvlStatus () {
     const knowledgeLvlStatus = getClassLocalStorage();
 
-    if (!userData) {
-        if ((knowledgeLvlStatus !== null && knowledgeLvlStatus !== undefined  && knowledgeLvlStatus !== -1)) {
-            await displayPersonalChl();
-        } else {
-            showClassPopup();
-        }
-    } else {
+    if (userData) {
         if (userData.knowledgeLvl != null && userData.knowledgeLvl !== -1) {
             if (userData.accType !== "teacher" && userData.accType !== "admin") {
                 await displayPersonalChl();
             }
         } else {
-            console.log(userData.accType)
             if (userData.accType !== "teacher" && userData.accType !== "admin") {
                 showClassPopupLoggedInClassConfirmation();
             }
