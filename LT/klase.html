@@ -1998,6 +1998,12 @@
             "thirdPlace": 0.222
         }
 
+        const weekChallengeWinningsMaxCoinsPerPosition = {
+            "firstPlace": 40,
+            "secondPlace": 30,
+            "thirdPlace": 20
+        }
+
         let userData;
 
         if (userDataString) {
@@ -3481,19 +3487,33 @@ async function renderClassWeekChallenge () {
                         let winningsForThirdPlace;
 
                         if (firstPlaceCount > 0) {
-                            winningsForFirstPlace = Number((winningsBase * weekChallengeWinningsWeights.firstPlace).toFixed(2))
+                            winningsForFirstPlace = Number((winningsBase * weekChallengeWinningsWeights.firstPlace).toFixed(2));
+                            // NEW: Apply cap for single winner
+                            if (firstPlaceCount === 1) {
+                                winningsForFirstPlace = Math.min(winningsForFirstPlace, weekChallengeWinningsMaxCoinsPerPosition.firstPlace);
+                            }
                         } else {
-                            winningsForFirstPlace = 0
+                            winningsForFirstPlace = 0;
                         }
+                        
                         if (secondPlaceCount > 0) {
-                            winningsForSecondPlace = Number((winningsBase * weekChallengeWinningsWeights.secondPlace).toFixed(2))
+                            winningsForSecondPlace = Number((winningsBase * weekChallengeWinningsWeights.secondPlace).toFixed(2));
+                            // NEW: Apply cap for single winner
+                            if (secondPlaceCount === 1) {
+                                winningsForSecondPlace = Math.min(winningsForSecondPlace, weekChallengeWinningsMaxCoinsPerPosition.secondPlace);
+                            }
                         } else {
-                            winningsForSecondPlace = 0
+                            winningsForSecondPlace = 0;
                         }
+                        
                         if (thirdPlaceCount > 0) {
-                            winningsForThirdPlace = Number((winningsBase * weekChallengeWinningsWeights.thirdPlace).toFixed(2))
+                            winningsForThirdPlace = Number((winningsBase * weekChallengeWinningsWeights.thirdPlace).toFixed(2));
+                            // NEW: Apply cap for single winner
+                            if (thirdPlaceCount === 1) {
+                                winningsForThirdPlace = Math.min(winningsForThirdPlace, weekChallengeWinningsMaxCoinsPerPosition.thirdPlace);
+                            }
                         } else {
-                            winningsForThirdPlace = 0
+                            winningsForThirdPlace = 0;
                         }
 
                         renderPodiumRewards(winningsForFirstPlace, winningsForSecondPlace, winningsForThirdPlace);
@@ -3644,9 +3664,25 @@ if (classDataCache.weekChlWinnerStudentId && classDataCache.weekChlWinnerStudent
 
         // Determine winnings based on position
         let winnings;
-        if (winner.position === 1) winnings = Number((winningsBase * weekChallengeWinningsWeights.firstPlace).toFixed(2));
-        else if (winner.position === 2) winnings = Number((winningsBase * weekChallengeWinningsWeights.secondPlace).toFixed(2));
-        else if (winner.position === 3) winnings = Number((winningsBase * weekChallengeWinningsWeights.thirdPlace).toFixed(2));
+        if (winner.position === 1) {
+            winnings = Number((winningsBase * weekChallengeWinningsWeights.firstPlace).toFixed(2));
+            // NEW: Apply cap for single winner
+            if ((winnersByPosition["1"] ?? 0) === 1) {
+                winnings = Math.min(winnings, weekChallengeWinningsMaxCoinsPerPosition.firstPlace);
+            }
+        } else if (winner.position === 2) {
+            winnings = Number((winningsBase * weekChallengeWinningsWeights.secondPlace).toFixed(2));
+            // NEW: Apply cap for single winner
+            if ((winnersByPosition["2"] ?? 0) === 1) {
+                winnings = Math.min(winnings, weekChallengeWinningsMaxCoinsPerPosition.secondPlace);
+            }
+        } else if (winner.position === 3) {
+            winnings = Number((winningsBase * weekChallengeWinningsWeights.thirdPlace).toFixed(2));
+            // NEW: Apply cap for single winner
+            if ((winnersByPosition["3"] ?? 0) === 1) {
+                winnings = Math.min(winnings, weekChallengeWinningsMaxCoinsPerPosition.thirdPlace);
+            }
+        }
 
         // Create card
         const lastWinnerCard = document.createElement('div');
