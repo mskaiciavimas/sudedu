@@ -7305,7 +7305,10 @@ function displayTeacherHome(selectedGroupNames=null) {
 
         const selectedNumberElement = document.querySelector('#selected_number');
         const selectedNumber2Element = document.querySelector('#selected_number_2');
-        let selectedNumbers = [selectedNumberElement.value, selectedNumber2Element.value].sort();
+        let selectedNumbers = [
+                    Number(selectedNumberElement.value),
+                    Number(selectedNumber2Element.value)
+                ].sort((a, b) => a - b);
 
         let modeChoiceSelection = document.querySelector('#mode_choice').value;
         let mode = modeChoiceSelection;
@@ -7608,7 +7611,10 @@ let taskHistoryCurrentTask = null;
 
     const selectedNumberElement = document.querySelector('#selected_number');
     const selectedNumber2Element = document.querySelector('#selected_number_2');
-    let selectedNumbers = [selectedNumberElement.value, selectedNumber2Element.value].sort();
+    let selectedNumbers = [
+                    Number(selectedNumberElement.value),
+                    Number(selectedNumber2Element.value)
+                ].sort((a, b) => a - b);
 
     let modeChoiceSelection = document.querySelector('#mode_choice').value;
     let mode = modeChoiceSelection;

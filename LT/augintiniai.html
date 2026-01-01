@@ -284,6 +284,31 @@
             display: none; 
         }
 
+        .floor-plan-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border-radius: 15px;
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #floor-plan-container-title {
+            font-size: 1.5rem;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        #layout-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
         #roomGridContainer,
         #petContainer,
         #roomObjectsContainer {
@@ -597,9 +622,11 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
         }
 
         #content-outer-container {
+            position: relative;
             display: flex;
             align-items: start;
             justify-content: center;
@@ -2066,10 +2093,21 @@
     height: 24px;
 }
 
+#floor-plan-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+#floor-plan-btn {
+    padding-bottom: 0;
+}
+
 #toggle-expand-btn:active,
 #toggle-expand-btn:focus,
 #toggle-zoom-lock-btn:active,
-#toggle-zoom-lock-btn:focus {
+#toggle-zoom-lock-btn:focus,
+#floor-plan-btn:active,
+#floor-plan-btn:focus {
     outline: none;
 }
 
@@ -2260,9 +2298,9 @@
 }
 
 @keyframes redYellowBlink {
-    0%   { outline: 2px solid red; }
+    0%   { outline: 2px solid transparent; }
     50%  { outline: 2px solid yellow; }
-    100% { outline: 2px solid red; }
+    100% { outline: 2px solid transparent; }
 }
 
 #viewport-container {
@@ -2326,6 +2364,7 @@
     display: flex;
     justify-content: space-between;
     align-items: end;
+    gap: 15px;
 }
 
 .stats-and-upper-controls-holder.container-expanded  {
@@ -2966,9 +3005,14 @@
     }
 
     #toggle-zoom-lock-btn svg {
-    width: 36px;
-    height: 36px;
-}
+        width: 36px;
+        height: 36px;
+    }
+
+    #floor-plan-btn svg {
+        width: 36px;
+        height: 36px;
+    }
 
 #toggle-expand-btn svg {
     width: 32px;
@@ -3552,6 +3596,7 @@
 
     <div id="game-content" class="">
         <div id="content-outer-container" class="hide-scrollbar">
+
             <div id="pet-room-container" class="game-content-panel active">
 
             <div id="game-panel">
@@ -3609,6 +3654,18 @@
                     </div>
                 </div>
                 <div class="upper-controls-inner-holder">
+                    <button id="floor-plan-btn" class="viewport-control-btn">
+                        <span>
+                            <svg
+                                class="svg-icon"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 1024 800"
+                                aria-hidden="true"
+                            >
+                                <path d="M96 96v480h80V176h208v272h448v384H464V560h-80v128H96v80h288v144h528V96H96z m736 272H464V176h368v192z"/>
+                            </svg>
+                        </span>
+                    </button>
                     <button id="toggle-zoom-lock-btn" class="viewport-control-btn">
                         <span>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
@@ -3631,6 +3688,12 @@
             </div>
 
                 <div id="viewport-container">
+                    <div class="floor-plan-container" id="floor-plan-container">
+                        <div class="header">
+                            <div id="floor-plan-container-title">Namų planas</div>
+                        </div>
+                        <div id="layout-container"></div>
+                    </div>
                     <div id="scale-wrapper" style="transform-origin: 0 0;">
                         <div id="room-transform-wrapper">
                             <div id="room-container">
@@ -3930,8 +3993,18 @@
         const PLACING_INDEXES_TO_BE_IGNORED = new Set([5, 6, 9, 10, 14]);
         const COST_MULTIPLIER = 1
 
+        // PREVENTING EMPTY SPACE OF IMAGES FROM INTERFEREING OR MISFIRING CLICKS
         const topHalfClickBlockedItemClasses = ["bath-1"]
         const clickPassesTroughClasses = ["christmas-tree-1"];
+
+        // ITEMS WITH THESE PLACING INDEXES CAN OVERLAP OTHER INSTANCES OF THEMSELVES (THEY ALSO DO NOT BLOCK EACHOTHER WHEN MOVING ITEMS)
+        const objectsThatCanOverlapItSelf = new Set([16, 20, 23]);
+
+        // ITEMS WITH THESE PLACING INDEXES DO NOT BLOCK EACH OTHER FOR DRAGGING OR DELETION
+        const objectsThatDoNotBlockEachOtherForDraggingAndDeletion = [[22, 23]];
+
+        // ITEMS WITH THESE PLACING INDEXES CAN BE MOVED REGARDLESS OF OVERLAPS
+        const placingIndexesThatCanAlwaysBeMoved = [8, 18];
 
         if (!userData || userData?.accType === "teacher") {
             window.location.href = './';
@@ -4140,6 +4213,10 @@
             if (allPets[0]) {
                 displayPetStats(allPets[0].id);
             }
+
+            if (floorPlanDisplayed) {
+                toggleFloorPlanUpgrade();
+            }
         }
 
         let userObjectAssets = {};
@@ -4158,16 +4235,6 @@
 
         //[4.3, ...Array(20).fill(4.1),4.4] - border with edges and horizontal line filled to set number (20)
         //...Array(6).fill([4.2, ...Array(20).fill(2.0), 4.2]) - multiple rows of wall tiles with edges at the end 6 rows of 20 wall tiles and 2 borders at ends
-        
-        /*
-        const roomLayout = [
-          [4.31, ...Array(40).fill(4.1), 4.32],
-          ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2]),
-          [4.2, ...Array(40).fill(3.0), 4.2],
-          ...Array(20).fill([4.2, ...Array(40).fill(1.0), 4.2]),
-          [4.34, ...Array(40).fill(4.1), 4.33],
-        ];
-        */
 
         const roomLayoutLibrary = {
             1: [
@@ -4178,6 +4245,167 @@
                 [4.34, ...Array(40).fill(4.1), 4.33],
             ],
             2: [
+                [4.31, ...Array(40).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.32],
+                ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2]),
+                [4.2, ...Array(40).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2],
+                ...Array(2).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
+
+                // Part at the door of floor 2
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.2]),
+                ...Array(6).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2]),
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.2]),
+
+                // Lower part of floor 2
+                ...Array(10).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
+
+                // Entrance to stairs floor 2
+                [4.34, ...Array(81).fill(4.1), 4.33],
+            ],
+            3: [
+                [4.31, ...Array(40).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.41, ...Array(32).fill(4.1), 4.32],
+                ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2, ...Array(32).fill(2.0), 4.2]),
+                [4.2, ...Array(40).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2, ...Array(32).fill(3.0), 4.2],
+                ...Array(2).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2, ...Array(32).fill(1.0), 4.2]),
+
+                // Part at the door of floor 2
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.51, ...Array(32).fill(1.0), 4.2]),
+                ...Array(6).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 5.0, ...Array(32).fill(1.0), 4.2]),
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.53, ...Array(32).fill(1.0), 4.2]),
+
+                // Lower part of floor 2
+                [4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.44, ...Array(32).fill(4.1), 4.33],
+                ...Array(9).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2, ...Array(33).fill(7.0)]),
+
+                // Entrance to stairs floor 2
+                [4.34, ...Array(81).fill(4.1), 4.33, ...Array(33).fill(7.0)],
+            ],
+            4: [
+                // Top part of floor 2
+                [4.31, ...Array(40).fill(4.1), 4.32],
+                ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2]),
+                [4.2, ...Array(40).fill(3.0), 4.2],
+
+                ...Array(20).fill([4.2, ...Array(40).fill(1.0), 4.2]),
+
+                // Entrance to stairs floor 2
+                [4.34, ...Array(24).fill(4.1), 4.32, ...Array(6).fill(6.0), 4.31, ...Array(8).fill(4.1), 4.33],
+                
+                // Stairs and void
+                ...Array(8).fill([...Array(25).fill(7.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(7.0), ...Array(40).fill(7.0)]),
+
+                // Stairs and wall of floor 1
+                [4.31, ...Array(24).fill(4.1), 4.42, ...Array(6).fill(6.0), 4.44, ...Array(8).fill(4.1), 4.32],
+
+                // Top part of floor 1, stairs and wall
+                ...Array(12).fill([4.2, ...Array(24).fill(2.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(2.0), 4.2]),
+                
+                // Top part of floor 1, stairs and boundary
+                [4.2, ...Array(24).fill(3.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(3.0), 4.2],
+
+                // Bottom part of floor 1
+                ...Array(20).fill([4.2, ...Array(40).fill(1.0), 4.2]),
+                [4.34, ...Array(40).fill(4.1), 4.33],
+            ],
+            5: [
+                // Top part of floor 2
+                [4.31, ...Array(40).fill(4.1), 4.32, ...Array(41).fill(7.0)],
+                ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2, ...Array(41).fill(7.0)]),
+                [4.2, ...Array(40).fill(3.0), 4.2, ...Array(41).fill(7.0)],
+
+                ...Array(20).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(41).fill(7.0)]),
+
+                // Entrance to stairs floor 2
+                [4.34, ...Array(24).fill(4.1), 4.32, ...Array(6).fill(6.0), 4.31, ...Array(8).fill(4.1), 4.33, ...Array(41).fill(7.0)],
+                
+                // Stairs and void
+                ...Array(8).fill([...Array(25).fill(7.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(7.0), ...Array(40).fill(7.0), ...Array(41).fill(7.0)]),
+                 // Stairs and wall of floor 1
+                [4.31, ...Array(24).fill(4.1), 4.42, ...Array(6).fill(6.0), 4.44, ...Array(8).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.32, ...Array(41).fill(7.0)],
+
+                // Top part of floor 1, stairs and wall
+                ...Array(12).fill([4.2, ...Array(24).fill(2.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2]),
+                
+                // Top part of floor 1, stairs and boundary
+                [4.2, ...Array(24).fill(3.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2],
+
+                // Part at the door of floor 1
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.2]),
+                ...Array(5).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2]),
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.2]),
+
+                // Bottom part of floor 1
+                ...Array(13).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
+                [4.34, ...Array(40).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33],
+            ],
+            6: [
+                [4.31, ...Array(40).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.32],
+                ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2]),
+                [4.2, ...Array(40).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2],
+                ...Array(2).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
+
+                // Part at the door of floor 2
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.2]),
+                ...Array(6).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2]),
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.2]),
+
+                // Lower part of floor 2
+                ...Array(10).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
+
+                // Entrance to stairs floor 2
+                [4.34, ...Array(24).fill(4.1), 4.32, ...Array(6).fill(6.0), 4.31, ...Array(8).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33],
+                
+                // Stairs and void
+                ...Array(8).fill([...Array(25).fill(7.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(7.0), ...Array(40).fill(7.0), ...Array(41).fill(7.0)]),
+
+                // Stairs and wall of floor 1
+                [4.31, ...Array(24).fill(4.1), 4.42, ...Array(6).fill(6.0), 4.44, ...Array(8).fill(4.1), 4.32, ...Array(41).fill(7.0)],
+
+                // Top part of floor 1, stairs and wall
+                ...Array(12).fill([4.2, ...Array(24).fill(2.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(2.0), 4.2, ...Array(41).fill(7.0)]),
+                
+                // Top part of floor 1, stairs and boundary
+                [4.2, ...Array(24).fill(3.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(3.0), 4.2, ...Array(41).fill(7.0)],
+
+                // Bottom part of floor 1
+                ...Array(20).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(41).fill(7.0)]),
+                [4.34, ...Array(40).fill(4.1), 4.33, ...Array(41).fill(7.0)],
+            ],
+            7: [
+                [4.31, ...Array(40).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.41, ...Array(32).fill(4.1), 4.32],
+                ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2, ...Array(32).fill(2.0), 4.2]),
+                [4.2, ...Array(40).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2, ...Array(32).fill(3.0), 4.2],
+                ...Array(2).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2, ...Array(32).fill(1.0), 4.2]),
+
+                // Part at the door of floor 2
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.51, ...Array(32).fill(1.0), 4.2]),
+                ...Array(6).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 5.0, ...Array(32).fill(1.0), 4.2]),
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.53, ...Array(32).fill(1.0), 4.2]),
+
+                // Lower part of floor 2
+                [4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.44, ...Array(32).fill(4.1), 4.33],
+                ...Array(9).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2, ...Array(33).fill(7.0)]),
+
+                // Entrance to stairs floor 2
+                [4.34, ...Array(24).fill(4.1), 4.32, ...Array(6).fill(6.0), 4.31, ...Array(8).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33, ...Array(33).fill(7.0)],
+                
+                // Stairs and void
+                ...Array(8).fill([...Array(25).fill(7.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(7.0), ...Array(40).fill(7.0), ...Array(41).fill(7.0), ...Array(33).fill(7.0)]),
+
+                // Stairs and wall of floor 1
+                [4.31, ...Array(24).fill(4.1), 4.42, ...Array(6).fill(6.0), 4.44, ...Array(8).fill(4.1), 4.32, ...Array(41).fill(7.0), ...Array(33).fill(7.0)],
+
+                // Top part of floor 1, stairs and wall
+                ...Array(12).fill([4.2, ...Array(24).fill(2.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(2.0), 4.2, ...Array(41).fill(7.0), ...Array(33).fill(7.0)]),
+                
+                // Top part of floor 1, stairs and boundary
+                [4.2, ...Array(24).fill(3.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(3.0), 4.2, ...Array(41).fill(7.0), ...Array(33).fill(7.0)],
+
+                // Bottom part of floor 1
+                ...Array(20).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(41).fill(7.0), ...Array(33).fill(7.0)]),
+                [4.34, ...Array(40).fill(4.1), 4.33, ...Array(41).fill(7.0), ...Array(33).fill(7.0)],
+            ],
+            
+            8: [
                 // Top part of floor 2
                 [4.31, ...Array(40).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.32],
                 ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2]),
@@ -4215,8 +4443,75 @@
                 // Bottom part of floor 1
                 ...Array(13).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
                 [4.34, ...Array(40).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33],
+            ],
+            
+            9: [
+                [4.31, ...Array(40).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.41, ...Array(32).fill(4.1), 4.32],
+                ...Array(12).fill([4.2, ...Array(40).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2, ...Array(32).fill(2.0), 4.2]),
+                [4.2, ...Array(40).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2, ...Array(32).fill(3.0), 4.2],
+                ...Array(2).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2, ...Array(32).fill(1.0), 4.2]),
+
+                // Part at the door of floor 2
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.51, ...Array(32).fill(1.0), 4.2]),
+                ...Array(6).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 5.0, ...Array(32).fill(1.0), 4.2]),
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.53, ...Array(32).fill(1.0), 4.2]),
+
+                // Lower part of floor 2
+                [4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.44, ...Array(32).fill(4.1), 4.33],
+                ...Array(9).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2, ...Array(33).fill(7.0)]),
+
+                // Entrance to stairs floor 2
+                [4.34, ...Array(24).fill(4.1), 4.32, ...Array(6).fill(6.0), 4.31, ...Array(8).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33, ...Array(33).fill(7.0)],
+                
+                // Stairs and void
+                ...Array(8).fill([...Array(25).fill(7.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(7.0), ...Array(42).fill(7.0), ...Array(33).fill(7.0)]),
+
+                // Stairs and wall of floor 1
+                [4.31, ...Array(24).fill(4.1), 4.42, ...Array(6).fill(6.0), 4.44, ...Array(8).fill(4.1), 4.41, ...Array(40).fill(4.1), 4.32, ...Array(33).fill(7.0)],
+
+                // Top part of floor 1, stairs and wall
+                ...Array(12).fill([4.2, ...Array(24).fill(2.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(2.0), 4.2, ...Array(40).fill(2.0), 4.2, ...Array(33).fill(7.0)]),
+                
+                // Top part of floor 1, stairs and boundary
+                [4.2, ...Array(24).fill(3.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2, ...Array(33).fill(7.0)],
+
+                // Part at the door of floor 1
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.2, ...Array(33).fill(7.0)]),
+                ...Array(5).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2, ...Array(33).fill(7.0)]),
+                ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.2, ...Array(33).fill(7.0)]),
+
+                // Bottom part of floor 1
+                ...Array(13).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2, ...Array(33).fill(7.0)]),
+                [4.34, ...Array(40).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33, ...Array(33).fill(7.0)],
             ]
         }
+
+        const roomLayoutPossibleUpgrades = {
+            1: [2, 4],
+            2: [3, 6],
+            3: [7],
+            4: [5, 6],
+            5: [8],
+            6: [7, 8],
+            7: [9],
+            8: [9],
+            9: [],
+        }
+
+        const floorPlanUpgradePrices = {
+            '1-2': 500 * COST_MULTIPLIER,
+            '1-4': 500 * COST_MULTIPLIER,
+            '2-3': 300 * COST_MULTIPLIER,
+            '2-6': 500 * COST_MULTIPLIER,
+            '3-7': 500 * COST_MULTIPLIER,
+            '4-5': 500 * COST_MULTIPLIER,
+            '4-6': 500 * COST_MULTIPLIER,
+            '5-8': 500 * COST_MULTIPLIER,
+            '6-7': 300 * COST_MULTIPLIER,
+            '6-8': 500 * COST_MULTIPLIER,
+            '7-9': 500 * COST_MULTIPLIER,
+            '8-9': 300 * COST_MULTIPLIER,
+        };
 
         const roomGrid = document.getElementById('roomGrid');
         const ctx = roomGrid.getContext('2d');
@@ -4515,6 +4810,8 @@ async function initGame() {
     allPets.forEach(pet => {
         managePetActions(pet);
     });
+
+    renderFloorLayoutUpgrade();
 }
 
 async function validateAndFixObjectPositions() {
@@ -5011,11 +5308,109 @@ const objectInteractions = {
     'food-bowl': (obj) => displayFoodOptions(obj),
     'water-bowl': (obj) => displayWaterBowlFillingOptions(obj),
     'music-player': (obj) => toggleMusicPlayer(obj),
-    'bath': (obj) => displayBathFillingOption (obj)
-
+    'bath': (obj) => displayBathFillingOption(obj),
+    'sink': (obj) => toggleSinkTap(obj),
+    'fireplace': (obj) => toggleFireplace(obj),
+    'oven': (obj) => toggleOven(obj),
+    'washing-machine': (obj) => toggleWashingMachine(obj),
 };
 
+function toggleWashingMachine(obj) {
+    if (!taxesData.electricityTax.paid) {
+        room.classList.add("dark");
+        messageToTheUser("Nėra elektros! Sumokėk elektros mokestį.")
+    }
+    
+    const isTogglingOn = !obj.classList.contains('on');
+    obj.classList.toggle('on');
+    
+    if (isTogglingOn) {
+        // Attach listener when turning ON
+        obj._editModeListener = () => {
+            obj.classList.remove('on');
+        };
+        toggleEditSaveBtn.addEventListener("click", obj._editModeListener);
+    } else {
+        // Remove listener when turning OFF
+        if (obj._editModeListener) {
+            toggleEditSaveBtn.removeEventListener("click", obj._editModeListener);
+            obj._editModeListener = null;
+        }
+    }
+}
+
+function toggleOven(obj) {
+    if (!taxesData.electricityTax.paid) {
+        room.classList.add("dark");
+        messageToTheUser("Nėra elektros! Sumokėk elektros mokestį.")
+    }
+    
+    const isTogglingOn = !obj.classList.contains('on');
+    obj.classList.toggle('on');
+    
+    if (isTogglingOn) {
+        // Attach listener when turning ON
+        obj._editModeListener = () => {
+            obj.classList.remove('on');
+        };
+        toggleEditSaveBtn.addEventListener("click", obj._editModeListener);
+    } else {
+        // Remove listener when turning OFF
+        if (obj._editModeListener) {
+            toggleEditSaveBtn.removeEventListener("click", obj._editModeListener);
+            obj._editModeListener = null;
+        }
+    }
+}
+
+function toggleFireplace(obj) {
+    const isTogglingOn = !obj.classList.contains('fire');
+    obj.classList.toggle('fire');
+    
+    if (isTogglingOn) {
+        // Attach listener when turning ON
+        obj._editModeListener = () => {
+            obj.classList.remove('fire');
+        };
+        toggleEditSaveBtn.addEventListener("click", obj._editModeListener);
+    } else {
+        // Remove listener when turning OFF
+        if (obj._editModeListener) {
+            toggleEditSaveBtn.removeEventListener("click", obj._editModeListener);
+            obj._editModeListener = null;
+        }
+    }
+}
+
+function toggleSinkTap(obj) {
+    if (!taxesData.waterTax.paid) {
+        messageToTheUser("Nėra vandens. Sumokėk vandens mokestį!","error");
+        return
+    }
+    
+    const isTogglingOn = !obj.classList.contains('tap-running');
+    obj.classList.toggle('tap-running');
+    
+    if (isTogglingOn) {
+        // Attach listener when turning ON
+        obj._editModeListener = () => {
+            obj.classList.remove('tap-running');
+        };
+        toggleEditSaveBtn.addEventListener("click", obj._editModeListener);
+    } else {
+        // Remove listener when turning OFF
+        if (obj._editModeListener) {
+            toggleEditSaveBtn.removeEventListener("click", obj._editModeListener);
+            obj._editModeListener = null;
+        }
+    }
+}
+
 function toggleMusicPlayer(obj) {
+    if (!taxesData.electricityTax.paid) {
+        room.classList.add("dark");
+        messageToTheUser("Nėra elektros! Sumokėk elektros mokestį.")
+    }
     const musicPlayerAutoOff = 4000; // milliseconds
     const pets = document.querySelectorAll('.pet');
 
@@ -5041,6 +5436,23 @@ function toggleMusicPlayer(obj) {
         setObjectAnimation(obj, "musicPlayerOn");
         initUserTriggeredAction("music", obj);
 
+        // Attach listener when turning ON
+        obj._editModeListener = () => {
+            if (obj.objectOn) {
+                obj.objectOn = false;
+                setObjectAnimation(obj, "musicPlayerOff");
+                
+                // Cancel pending auto-off
+                if (obj._autoOffTimer) {
+                    clearTimeout(obj._autoOffTimer);
+                    obj._autoOffTimer = null;
+                }
+                
+                stopPetsDancing();
+            }
+        };
+        toggleEditSaveBtn.addEventListener("click", obj._editModeListener);
+
         // Cancel any existing auto-off timer
         if (obj._autoOffTimer) {
             clearTimeout(obj._autoOffTimer);
@@ -5057,6 +5469,12 @@ function toggleMusicPlayer(obj) {
 
             // Pet handling (same as original)
             stopPetsDancing();
+            
+            // Remove listener when auto-turning off
+            if (obj._editModeListener) {
+                toggleEditSaveBtn.removeEventListener("click", obj._editModeListener);
+                obj._editModeListener = null;
+            }
 
         }, musicPlayerAutoOff);
 
@@ -5073,6 +5491,12 @@ function toggleMusicPlayer(obj) {
 
         // Pet handling (same as original)
         stopPetsDancing();
+        
+        // Remove listener when turning OFF
+        if (obj._editModeListener) {
+            toggleEditSaveBtn.removeEventListener("click", obj._editModeListener);
+            obj._editModeListener = null;
+        }
     }
 }
 
@@ -5276,7 +5700,9 @@ function removeObjectsMarkedForRemoval() {
 
         const isExempt = PLACING_INDEXES_TO_BE_IGNORED.has(placingIndex);
 
-        if (hasBlockingObjects(obj) && !isExempt) {
+        const blockingObjects = getBlockingObjects(obj)
+
+        if (blockingObjects.length > 0 && !isExempt) {
             // can't delete yet → save for second check
             needsSecondCheck.push(obj);
         } else {
@@ -5300,11 +5726,33 @@ function removeObjectsMarkedForRemoval() {
 
         const isExempt = PLACING_INDEXES_TO_BE_IGNORED.has(placingIndex);
 
-        if (hasBlockingObjects(obj) && !isExempt) {
+        const blockingObjects = getBlockingObjects(obj)
+
+        if (blockingObjects.length > 0 && !isExempt) {
             // still blocked → warn + blink
             messageToTheUser("Šiuos daiktus galėsi išnešti tik nukėlęs nuo jų kitus!");
-            obj.classList.add("blinking-warning");
-            setTimeout(() => obj.classList.remove("blinking-warning"), 6000);
+            
+            blockingObjects.forEach(obj => {
+                // Add the blinking class
+                obj.classList.add("blinking-warning");
+
+                // Start the timeout and store its ID
+                const warningTimeout = setTimeout(() => {
+                    obj.classList.remove("blinking-warning");
+                }, 6000);
+
+                // Add click listener to cancel the timeout and remove the class immediately
+                obj.addEventListener("click", function handleClick() {
+                    // Remove the class
+                    obj.classList.remove("blinking-warning");
+
+                    // Cancel the timeout
+                    clearTimeout(warningTimeout);
+
+                    // Remove this listener so it doesn’t stay attached
+                    obj.removeEventListener("click", handleClick);
+                });
+            });
         } else {
             // becomes free → delete now
             const el = document.getElementById(obj.id);
@@ -5336,18 +5784,15 @@ function removeObjectsMarkedForRemoval() {
     rerenderObjectAssetListIfNoItemsInSelectedCategory(sidebar=true)
 }
 
-
-
-
 document.querySelector("#delete-selected-item-button").addEventListener("click", () => {
     removeObjectsMarkedForRemoval()
     clearPlacementHighlights();
 });;
 
-function hasBlockingObjects(target) {
+function getBlockingObjects(target) {
     const unitSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--unit-size'));
     const targetCoords = getObjectCoordinates(target.id);
-    if (!targetCoords) return false;
+    if (!targetCoords) return [];
 
     const [baseX, baseY] = targetCoords;
 
@@ -5363,10 +5808,35 @@ function hasBlockingObjects(target) {
         }
     }
 
+    const blockingObjects = [];
+
     // Compare against all other objects
-    const allObjects = document.querySelectorAll('.room-object');
+    const allObjects = Array.from(document.querySelectorAll('.room-object'));
+    
+    // Get target's DOM position for comparison
+    const targetDOMIndex = allObjects.indexOf(target);
+    
     for (let other of allObjects) {
         if (other === target) continue;
+
+        const targetPlacingIndex = gameAssetIndex[userObjectAssets[target.id]?.assetIndex]?.placingIndex;
+        const otherPlacingIndex = gameAssetIndex[userObjectAssets[other.id]?.assetIndex]?.placingIndex;
+
+        if (placingIndexesThatCanAlwaysBeMoved.includes(targetPlacingIndex)) continue;
+
+        // Check if these objects are in the non-blocking list
+        const isNonBlocking = objectsThatDoNotBlockEachOtherForDraggingAndDeletion.some(pair => 
+            (pair[0] === targetPlacingIndex && pair[1] === otherPlacingIndex) ||
+            (pair[1] === targetPlacingIndex && pair[0] === otherPlacingIndex)
+        );
+
+        if (isNonBlocking) continue;
+
+        // Allow dragging if both have the same placing index that can overlap itself
+        const isAllowed = (targetPlacingIndex === otherPlacingIndex && 
+                          objectsThatCanOverlapItSelf.has(targetPlacingIndex));
+
+        if (isAllowed) continue;
 
         const otherCoords = getObjectCoordinates(other.id);
         if (!otherCoords) continue;
@@ -5383,18 +5853,30 @@ function hasBlockingObjects(target) {
             }
         }
 
-        // ✅ Check if any tile overlaps
-        for (let t of targetTiles) {
-            for (let o of otherTiles) {
-                if (t[0] === o[0] && t[1] === o[1] && otherZ > targetZ) {
-                    return true;
+        // Check if any tile overlaps and other is "above" target
+        let overlaps = false;
+        
+        // Determine if other is on top using z-index first, then DOM order as tiebreaker
+        const otherDOMIndex = allObjects.indexOf(other);
+        const isOtherOnTop = otherZ > targetZ || (otherZ === targetZ && otherDOMIndex > targetDOMIndex);
+        
+        if (isOtherOnTop) {
+            for (let t of targetTiles) {
+                for (let o of otherTiles) {
+                    if (t[0] === o[0] && t[1] === o[1]) {
+                        overlaps = true;
+                        break;
+                    }
                 }
+                if (overlaps) break;
             }
         }
-    }
-    return false;
-}
 
+        if (overlaps) blockingObjects.push(other);
+    }
+
+    return blockingObjects;
+}
 
 function enableObjectDragging() {
     const objects = document.querySelectorAll('.room-object');
@@ -5443,8 +5925,32 @@ if (isTouchDevice) {
             const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || 
                                 gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
 
-            if (hasBlockingObjects(obj) && !PLACING_INDEXES_TO_BE_IGNORED.has(objPlacingOrder)) {
-                messageToTheUser("Šį daikta galėsi pajudinti tik nuėmęs nuo jo kitus!");
+            const blockingObjects = getBlockingObjects(obj)
+
+            if (blockingObjects.length > 0 && !PLACING_INDEXES_TO_BE_IGNORED.has(objPlacingOrder)) {
+                messageToTheUser("Šį daiktą galėsi pajudinti tik nuėmęs nuo jo kitus!");
+                blockingObjects.forEach(obj => {
+                    // Add the blinking class
+                    obj.classList.add("blinking-warning");
+
+                    // Start the timeout and store its ID
+                    const warningTimeout = setTimeout(() => {
+                        obj.classList.remove("blinking-warning");
+                    }, 6000);
+
+                    // Add click listener to cancel the timeout and remove the class immediately
+                    obj.addEventListener("click", function handleClick() {
+                        // Remove the class
+                        obj.classList.remove("blinking-warning");
+
+                        // Cancel the timeout
+                        clearTimeout(warningTimeout);
+
+                        // Remove this listener so it doesn’t stay attached
+                        obj.removeEventListener("click", handleClick);
+                    });
+                });
+
                 cleanup();
                 return;
             }
@@ -5582,8 +6088,31 @@ if (isTouchDevice) {
                         const objPlacingOrder = gameAssetIndex[userObjectAssets[obj.id]?.assetIndex]?.placingIndex || 
                                             gameAssetIndex[furniturePreviewDict[obj.id]?.assetIndex]?.placingIndex;
                         
-                        if (hasBlockingObjects(obj) && !PLACING_INDEXES_TO_BE_IGNORED.has(objPlacingOrder)) {
+                        const blockingObjects = getBlockingObjects(obj)
+
+                        if (blockingObjects.length > 0 && !PLACING_INDEXES_TO_BE_IGNORED.has(objPlacingOrder)) {
                             messageToTheUser("Šį daiktą galėsi pajudinti tik nuėmęs nuo jo kitus!");
+                            blockingObjects.forEach(obj => {
+                                // Add the blinking class
+                                obj.classList.add("blinking-warning");
+
+                                // Start the timeout and store its ID
+                                const warningTimeout = setTimeout(() => {
+                                    obj.classList.remove("blinking-warning");
+                                }, 6000);
+
+                                // Add click listener to cancel the timeout and remove the class immediately
+                                obj.addEventListener("click", function handleClick() {
+                                    // Remove the class
+                                    obj.classList.remove("blinking-warning");
+
+                                    // Cancel the timeout
+                                    clearTimeout(warningTimeout);
+
+                                    // Remove this listener so it doesn’t stay attached
+                                    obj.removeEventListener("click", handleClick);
+                                });
+                            });
                             clearPlacementHighlights();
                             cancelDrag();
                             return;
@@ -5997,11 +6526,11 @@ function movePetToTile(pet, startCoord, endCoord) {
     const path = findPath(startCol, startRow, endCol, endRow, pet.id);
     
     if (!path || path.length === 0) {
-        return Promise.resolve();
+        return Promise.resolve(false);
     }
 
     if (startCoord.length === endCoord.length && startCoord.every((val, i) => val === endCoord[i])) {
-        return Promise.resolve();
+        return Promise.resolve(true);
     }
     
     return new Promise((resolve) => {
@@ -6160,14 +6689,14 @@ function moveObjectAlongPath(objectId, path, onComplete) {
         cleanupTimeout: null  // Track cleanup timeout too
     });
 
-    function moveToNextStep() {
+function moveToNextStep() {
     const movement = activeMovements.get(objectId);
     if (!movement || movement.id !== movementId) return;
 
     if (currentStep >= path.length) {
         object.style.transition = '';
         activeMovements.delete(objectId);
-        onComplete?.();
+        onComplete?.(true);
         return;
     }
 
@@ -6362,33 +6891,51 @@ function setRoomObjectZIndexes() {
                 const placedTiles = getTilesOccupiedByObject(placedCoords, placedWidth, placedHeight)
                 const maxY = Math.max(...placedTiles.map(c => c[1]));
                 const placedBottomRowTiles = placedTiles.filter(c => c[1] === maxY);
+                const placedAsset = getAsset(placed);
+                const placedPlacingIndex = placedAsset.placingIndex;
+                const surfaceAsset = getAsset(surface);
+                const surfacePlacingIndex = surfaceAsset.placingIndex;
 
-                const placedObjectIsInSurfacesAllowedTiles = areAllBottomRowTilesOnSurfaceAllowedTiles(generatePlacementMap(placed.id), placedBottomRowTiles, surface.id)
+                // PREVENT RESETING OF Z-INDEXES OF ITEMS THAT ARE ALLOWED TO OVERLAP ON TOP OR BOTTOM (LIKE CHAIRS (23))
+                if (placedPlacingIndex === 23 && surfacePlacingIndex  === 23) {
+                    return
+                }
+
+                const placementMap = generatePlacementMap(placed.id);
+
+                const placedObjectIsInSurfacesAllowedTiles = areAllBottomRowTilesHavePlacingIndex(
+                    placementMap, 
+                    placedBottomRowTiles, 
+                    surfacePlacingIndex
+                );
+
                 if (placedObjectIsInSurfacesAllowedTiles) {
                     const z = window.getComputedStyle(surface).zIndex;
                     const surfaceZindex = z === 'auto' ? 0 : parseInt(z, 10);
-                    placed.style.zIndex = surfaceZindex + 1;
+                    placed.style.zIndex = surfaceZindex; // Same z-index as surface
+                    
+                    // Ensure placed item comes after surface in DOM for proper stacking
+                    if (surface.nextSibling !== placed) {
+                        surface.parentNode.insertBefore(placed, surface.nextSibling);
+                    }
                 }
             }
         }
     });
 
-    function areAllBottomRowTilesOnSurfaceAllowedTiles(placementMap, placedBottomRowTiles, expectedSurfaceId) {
-        // Check each tile in placedBottomRowTiles
+    function areAllBottomRowTilesHavePlacingIndex(placementMap, placedBottomRowTiles, expectedPlacingIndex) {
         for (const tile of placedBottomRowTiles) {
             const [row, col] = tile;
             
-            // Ensure coordinates are within bounds
             if (col >= placementMap.length || row >= placementMap[0].length) {
-                console.log(`Tile at [${col}, ${row}] is out of bounds`);
                 return false;
             }
             
             const placementTile = placementMap[col][row];
             const surfaceArray = placementTile.surface;
             
-            // Check if this tile's surface array contains the expected surface ID
-            if (!surfaceArray.includes(expectedSurfaceId)) {
+            // Check if this tile's surface array contains the expected placing index
+            if (!surfaceArray.includes(expectedPlacingIndex)) {
                 return false;
             }
         }
@@ -6415,9 +6962,6 @@ function setRoomObjectZIndexes() {
 
         const allObjects = document.querySelectorAll('.room-object');
         
-        // Fast lookup set for ignored placing indexes
-        const ignoredIndexes = new Set([5, 6, 9, 10, 15]);
-        
         // Filter objects and get their assets upfront
         const validObjects = [];
         allObjects.forEach(obj => {
@@ -6425,7 +6969,7 @@ function setRoomObjectZIndexes() {
             if (!assetSource || assetSource.assetIndex == null) return;
             
             const asset = gameAssetIndex[assetSource.assetIndex];
-            if (!asset || ignoredIndexes.has(asset.placingIndex)) return;
+            if (!asset || PLACING_INDEXES_TO_BE_IGNORED.has(asset.placingIndex)) return;
             
             validObjects.push(obj);
         });
@@ -6493,7 +7037,6 @@ function findOverlappingItems(targetItem) {
     const targetRect = targetItem.getBoundingClientRect();
     
     const allObjects = document.querySelectorAll('.room-object');
-    const ignoredIndexes = new Set([5, 6, 9, 10, 15]);
     
     allObjects.forEach(obj => {
         if (obj.id === targetItem.id) return;
@@ -6502,7 +7045,7 @@ function findOverlappingItems(targetItem) {
         if (!assetSource || assetSource.assetIndex == null) return;
         
         const asset = gameAssetIndex[assetSource.assetIndex];
-        if (!asset || ignoredIndexes.has(asset.placingIndex)) return;
+        if (!asset || PLACING_INDEXES_TO_BE_IGNORED.has(asset.placingIndex)) return;
         
         const objRect = obj.getBoundingClientRect();
         
@@ -6557,6 +7100,26 @@ function updateSingleItemZIndex(itemId) {
     
     // Update cache for moved item
     itemOverlapCache.set(itemId, currentOverlapIds);
+    
+    // Update caches for items that are no longer overlapping
+    previousOverlaps.forEach(prevId => {
+        if (!currentOverlapIds.has(prevId)) {
+            // This item is no longer overlapping with the moved item
+            const prevCache = itemOverlapCache.get(prevId) || new Set();
+            prevCache.delete(itemId);
+            itemOverlapCache.set(prevId, prevCache);
+        }
+    });
+    
+    // Update caches for newly overlapping items
+    currentOverlapIds.forEach(currId => {
+        if (!previousOverlaps.has(currId)) {
+            // This item is newly overlapping with the moved item
+            const currCache = itemOverlapCache.get(currId) || new Set();
+            currCache.add(itemId);
+            itemOverlapCache.set(currId, currCache);
+        }
+    });
     
     // Recalculate z-index for all affected items using same logic as main function
     affectedItemIds.forEach(id => {
@@ -6653,7 +7216,7 @@ function updateSingleItemZIndex(itemId) {
             placed = itemB;
             surface = itemA;
         }
-        
+
         if (aCanBeOnB || bCanBeOnA) {
             const wallOnlyItems = checkIfWallOnly(surface);
             
@@ -6662,19 +7225,43 @@ function updateSingleItemZIndex(itemId) {
                 const placedWidth = Math.ceil(placed.offsetWidth / unitSize);
                 const placedHeight = Math.ceil(placed.offsetHeight / unitSize);
                 const placedTiles = getTilesOccupiedByObject(placedCoords, placedWidth, placedHeight);
-                const maxY = Math.max(...placedTiles.map(c => c[1]));
-                const placedBottomRowTiles = placedTiles.filter(c => c[1] === maxY);
+                const placedAsset = getAsset(placed);
+                const placedPlacingIndex = placedAsset.placingIndex;
+                const surfaceAsset = getAsset(surface);
+                const surfacePlacingIndex = surfaceAsset.placingIndex;
+
+                // PREVENT RESETING OF Z-INDEXES OF ITEMS THAT ARE ALLOWED TO OVERLAP ON TOP OR BOTTOM (LIKE CHAIRS (23))
+                if (placedPlacingIndex === 23 && surfacePlacingIndex  === 23) {
+                    return
+                }
                 
-                const placedObjectIsInSurfacesAllowedTiles = areAllBottomRowTilesOnSurfaceAllowedTiles(
-                    generatePlacementMap(placed.id), 
-                    placedBottomRowTiles, 
-                    surface.id
+                // For hanging objects (placingIndex 18), check top row. For others, check bottom row.
+                let checkRowTiles;
+                if (placedAsset && placedPlacingIndex === 18) {
+                    const minY = Math.min(...placedTiles.map(c => c[1]));
+                    checkRowTiles = placedTiles.filter(c => c[1] === minY);
+                } else {
+                    const maxY = Math.max(...placedTiles.map(c => c[1]));
+                    checkRowTiles = placedTiles.filter(c => c[1] === maxY);
+                }
+                
+                const placementMap = generatePlacementMap(placed.id);
+
+                const placedObjectIsInSurfacesAllowedTiles = areAllBottomRowTilesHavePlacingIndex(
+                    placementMap, 
+                    checkRowTiles, 
+                    surfacePlacingIndex
                 );
-                
+
                 if (placedObjectIsInSurfacesAllowedTiles) {
                     const z = window.getComputedStyle(surface).zIndex;
                     const surfaceZindex = z === 'auto' ? 0 : parseInt(z, 10);
-                    placed.style.zIndex = surfaceZindex + 1;
+                    placed.style.zIndex = surfaceZindex; // Same z-index as surface
+                    
+                    // Ensure placed item comes after surface in DOM for proper stacking
+                    if (surface.nextSibling !== placed) {
+                        surface.parentNode.insertBefore(placed, surface.nextSibling);
+                    }
                 }
             }
         }
@@ -6736,18 +7323,19 @@ function updateSingleItemZIndex(itemId) {
         return isWallOnly;
     }
     
-    function areAllBottomRowTilesOnSurfaceAllowedTiles(placementMap, placedBottomRowTiles, expectedSurfaceId) {
+    function areAllBottomRowTilesHavePlacingIndex(placementMap, placedBottomRowTiles, expectedPlacingIndex) {
         for (const tile of placedBottomRowTiles) {
             const [row, col] = tile;
             
-            if (col >= placementMap.length || row  >= placementMap[0].length) {
+            if (col >= placementMap.length || row >= placementMap[0].length) {
                 return false;
             }
             
             const placementTile = placementMap[col][row];
             const surfaceArray = placementTile.surface;
             
-            if (!surfaceArray.includes(expectedSurfaceId)) {
+            // Check if this tile's surface array contains the expected placing index
+            if (!surfaceArray.includes(expectedPlacingIndex)) {
                 return false;
             }
         }
@@ -6818,7 +7406,9 @@ function generateWalkabilityMap() {
             const isWalkable = (tileType === 1.0 || tileType === 3.0 || tileType === 5.0 || tileType === 6.0);
             map[row][col] = {
                 walkable: isWalkable,
-                allowedDirections: [true, true, true, true] // up, right, down, left
+                allowedDirections: [true, true, true, true], // up, right, down, left
+                blockedByAsset: false, // Track if blocked by an asset
+                directionsBlockedByAsset: [false, false, false, false] // Track which directions blocked by assets
             };
         }
     }
@@ -6866,8 +7456,6 @@ function generateWalkabilityMap() {
         }
     }
 
-
-
     // Set directional movement restrictions (with safety checks)
     for (let row = 0; row < roomLayout.length; row++) {
         for (let col = 0; col < roomLayout[0].length; col++) {
@@ -6901,6 +7489,7 @@ function generateWalkabilityMap() {
                             col < assetX + assetWidth
                         ) {
                             map[row][col].allowedDirections[2] = false; // down
+                            map[row][col].directionsBlockedByAsset[2] = true;
                         }
 
                         // Block movement on tile beneath the bowl
@@ -6910,6 +7499,7 @@ function generateWalkabilityMap() {
                             col < assetX + assetWidth
                         ) {
                             map[row][col].allowedDirections[0] = false; // up
+                            map[row][col].directionsBlockedByAsset[0] = true;
                         }
                     }
 
@@ -6925,6 +7515,8 @@ function generateWalkabilityMap() {
                             ) {
                                 map[row][col].allowedDirections[0] = false; // up
                                 map[row][col].allowedDirections[2] = false; // down
+                                map[row][col].directionsBlockedByAsset[0] = true;
+                                map[row][col].directionsBlockedByAsset[2] = true;
                             }
                         } else {
                             // Block up on bottom tile
@@ -6934,6 +7526,7 @@ function generateWalkabilityMap() {
                                 col < assetX + assetWidth
                             ) {
                                 map[row][col].allowedDirections[0] = false; // up
+                                map[row][col].directionsBlockedByAsset[0] = true;
                             }
 
                             // Block down on tile above bottom
@@ -6943,11 +7536,12 @@ function generateWalkabilityMap() {
                                 col < assetX + assetWidth
                             ) {
                                 map[row][col].allowedDirections[2] = false; // down
+                                map[row][col].directionsBlockedByAsset[2] = true;
                             }
                         }
                     }
 
-                    // --- NON-STEPPABLE ASSET LOGIC ---------------------------------
+                    // --- NON-WALK-BEHIND ASSET LOGIC ---------------------------------
                     if (!assetData.walkBehind) {
 
                         for (let r = topRowOfAsset; r <= bottomRowOfAsset; r++) {
@@ -6959,9 +7553,103 @@ function generateWalkabilityMap() {
                                 if (r === topRowOfAsset) {
                                     // Top row: block only downward
                                     map[r][c].allowedDirections[2] = false;
+                                    map[r][c].directionsBlockedByAsset[2] = true;
                                 } else {
                                     // Other rows: cannot stand or walk here
                                     map[r][c].walkable = false;
+                                    map[r][c].blockedByAsset = true;
+                                }
+                            }
+                        }
+
+                   // --- WALK-BEHIND ASSET LOGIC ---------------------------------
+                    } else {
+                        if (assetData.walkBehindLimit && Array.isArray(assetData.walkBehindLimit)) {
+                            // First, mark all asset tiles as non-walkable by default
+                            // But DON'T set blockedByAsset yet - we'll apply ranges first
+                            for (let r = topRowOfAsset; r <= bottomRowOfAsset; r++) {
+                                if (!map[r]) continue;
+                                for (let c = assetX; c < assetX + assetWidth; c++) {
+                                    if (!map[r][c]) continue;
+                                    // Only block if not already blocked by another asset
+                                    if (!map[r][c].blockedByAsset) {
+                                        map[r][c].walkable = false;
+                                    }
+                                }
+                            }
+                            
+                            // Then apply each range
+                            assetData.walkBehindLimit.forEach(range => {
+                                const [xStart, xEnd, yStart, yEnd] = range;
+                                
+                                // Convert relative coordinates to absolute map coordinates
+                                // X is relative to asset's left edge
+                                const absXStart = assetX + xStart;
+                                const absXEnd = assetX + xEnd;
+                                // Y is relative to asset's bottom (bottomRowOfAsset is y=0)
+                                const absYStart = bottomRowOfAsset - yEnd;
+                                const absYEnd = bottomRowOfAsset - yStart;
+                                
+                                for (let r = absYStart; r <= absYEnd; r++) {
+                                    if (!map[r]) continue;
+                                    
+                                    for (let c = absXStart; c <= absXEnd; c++) {
+                                        if (!map[r][c]) continue;
+                                        
+                                        // Check if this is a wall tile - never make walls walkable
+                                        const tileType = roomLayout[r][c];
+                                        const isFloorTile = (tileType === 1.0 || tileType === 3.0 || tileType === 5.0 || tileType === 6.0);
+                                        
+                                        if (!isFloorTile) continue; // Skip wall tiles
+                                        
+                                        // Only make walkable if it wasn't already blocked by another asset
+                                        if (!map[r][c].blockedByAsset) {
+                                            map[r][c].walkable = true;
+                                        }
+                                        
+                                        // Bottom row of this range (but not the asset's actual bottom): block downward movement
+                                        if (r === absYEnd && r !== bottomRowOfAsset) {
+                                            // Only block if not already managed by another asset
+                                            if (!map[r][c].directionsBlockedByAsset[2]) {
+                                                map[r][c].allowedDirections[2] = false; // block down
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                            
+                            // After applying ranges, mark any remaining non-walkable tiles as blocked by this asset
+                            for (let r = topRowOfAsset; r <= bottomRowOfAsset; r++) {
+                                if (!map[r]) continue;
+                                for (let c = assetX; c < assetX + assetWidth; c++) {
+                                    if (!map[r][c]) continue;
+                                    if (!map[r][c].walkable) {
+                                        map[r][c].blockedByAsset = true;
+                                    }
+                                }
+                            }
+                            
+                            // Ensure the actual bottom row of the asset is always walkable with all directions except up
+                            for (let c = assetX; c < assetX + assetWidth; c++) {
+                                if (!map[bottomRowOfAsset] || !map[bottomRowOfAsset][c]) continue;
+                                
+                                // Check if this is a wall tile
+                                const tileType = roomLayout[bottomRowOfAsset][c];
+                                const isFloorTile = (tileType === 1.0 || tileType === 3.0 || tileType === 5.0 || tileType === 6.0);
+                                
+                                if (!isFloorTile) continue; // Skip wall tiles
+                                
+                                // Only make walkable if it wasn't already blocked by another asset
+                                if (!map[bottomRowOfAsset][c].blockedByAsset) {
+                                    map[bottomRowOfAsset][c].walkable = true;
+                                }
+                                
+                                map[bottomRowOfAsset][c].allowedDirections[0] = false; // block up
+                                map[bottomRowOfAsset][c].directionsBlockedByAsset[0] = true;
+                                
+                                // Only allow down if it wasn't already blocked by another asset
+                                if (!map[bottomRowOfAsset][c].directionsBlockedByAsset[2]) {
+                                    map[bottomRowOfAsset][c].allowedDirections[2] = true; // allow down
                                 }
                             }
                         }
@@ -6974,7 +7662,6 @@ function generateWalkabilityMap() {
 
     return map;
 }
-
 
 function isOverlapping(petObject, targetObject) {
     const overlappingObjects = detectTileCollision(petObject.id);
@@ -7393,72 +8080,119 @@ let editing = false;
 
 let preEditUserObjectAssets;
 
-toggleEditSaveBtn.addEventListener("click", () => {
-    if (!editing) {
-    // switch to Save mode
-        preEditUserObjectAssets = JSON.parse(JSON.stringify(userObjectAssets)); //deep copy
-        toggleEditSaveBtn.textContent = "Išsaugoti";
-        toggleEditSaveBtn.classList.remove("edit");
-        toggleEditSaveBtn.classList.add("save");
-        cancelEditBtn.classList.remove("hidden");
-        deleteSelectedItemBtn.classList.remove("hidden");
-        const petElements = document.querySelectorAll('.pet');
-        petElements.forEach(pet => {
-            pet.style.display = 'none';
-        });
-        updateStatsBeforeRerunningInitGameAndRenderPets();
-        enableObjectDragging();
-        initializeRoomZIndexes();
-        makeSelectedClickable();
-        displaySidebar();
-        renderObjectAssetsDropdown(sidebar=true);
-        editing = true;
-    } else {
-        updateObjectPositionChanges();
-        const petElements = document.querySelectorAll('.pet');
-        petElements.forEach(pet => {
-            setPetZIndex(pet);
-        });
-        preEditUserObjectAssets = JSON.parse(JSON.stringify(userObjectAssets));
+toggleEditSaveBtn.addEventListener("click", async () => {
+    if (toggleEditSaveBtn.disabled) return;
+    
+    // Disable all action buttons
+    toggleEditSaveBtn.disabled = true;
+    cancelEditBtn.disabled = true;
+    deleteSelectedItemBtn.disabled = true;
+    document.querySelectorAll('.sidebar button').forEach(btn => btn.disabled = true);
+    
+    try {
+        if (!editing) {
+        // switch to Save mode
+            preEditUserObjectAssets = JSON.parse(JSON.stringify(userObjectAssets)); //deep copy
+            toggleEditSaveBtn.textContent = "Išsaugoti";
+            toggleEditSaveBtn.classList.remove("edit");
+            toggleEditSaveBtn.classList.add("save");
+            cancelEditBtn.classList.remove("hidden");
+            deleteSelectedItemBtn.classList.remove("hidden");
+            const petElements = document.querySelectorAll('.pet');
+            petElements.forEach(pet => {
+                pet.style.display = 'none';
+            });
+
+            // REMOVE FILLED FROM ALL BATHS TO RESET ACTION
+            document.querySelectorAll('.room-object.bath').forEach(obj => {
+                obj.classList.remove('filled'); // remove if present
+                obj._full = false;
+            });
+            
+            updateStatsBeforeRerunningInitGameAndRenderPets();
+            enableObjectDragging();
+            initializeRoomZIndexes();
+            makeSelectedClickable();
+            displaySidebar();
+            renderObjectAssetsDropdown(sidebar=true);
+            editing = true;
+
+            document.querySelector("#floor-plan-btn").style.opacity = "0";
+            document.querySelector("#floor-plan-btn").disabled = true;
+        } else {
+            await updateObjectPositionChanges();
+            const petElements = document.querySelectorAll('.pet');
+            petElements.forEach(pet => {
+                setPetZIndex(pet);
+            });
+            preEditUserObjectAssets = JSON.parse(JSON.stringify(userObjectAssets));
+            updateStatsBeforeRerunningInitGameAndRenderPets();
+            renderPets();
+            enablePetDragging();
+            initializeRoomZIndexes();
+            resetEditButtonToggle();
+            blockTopHalfOfSelectedDivsClickEvents();
+            makeSelectedClickThrough();
+            const allPets = document.querySelectorAll("#petContainer .pet");
+            if (allPets[0]) {
+                displayPetStats(allPets[0].id);
+            }
+            clearPlacementHighlights()
+            removeAllDeleteItemHighlights();
+            hideSidebar();
+
+            document.querySelector("#floor-plan-btn").style.opacity = "1";
+            document.querySelector("#floor-plan-btn").disabled = false;
+        }
+    } finally {
+        // Re-enable all action buttons
+        toggleEditSaveBtn.disabled = false;
+        cancelEditBtn.disabled = false;
+        deleteSelectedItemBtn.disabled = false;
+        document.querySelectorAll('.sidebar button').forEach(btn => btn.disabled = false);
+    }
+});
+
+cancelEditBtn.addEventListener("click", async () => {
+    if (cancelEditBtn.disabled) return;
+    
+    // Disable all action buttons
+    toggleEditSaveBtn.disabled = true;
+    cancelEditBtn.disabled = true;
+    deleteSelectedItemBtn.disabled = true;
+    document.querySelectorAll('.sidebar button').forEach(btn => btn.disabled = true);
+    
+    try {
+        if (editing && preEditUserObjectAssets) {
+            userObjectAssets = JSON.parse(JSON.stringify(preEditUserObjectAssets));
+        }
+        renderRoomObjects();
+        resetEditButtonToggle();
         updateStatsBeforeRerunningInitGameAndRenderPets();
         renderPets();
         enablePetDragging();
-        initializeRoomZIndexes();
-        resetEditButtonToggle();
         blockTopHalfOfSelectedDivsClickEvents();
         makeSelectedClickThrough();
+        clearPlacementHighlights()
+        removeAllDeleteItemHighlights();
+        hideSidebar();
+        initializeRoomZIndexes();
+        
         const allPets = document.querySelectorAll("#petContainer .pet");
         if (allPets[0]) {
             displayPetStats(allPets[0].id);
         }
-        clearPlacementHighlights()
-        removeAllDeleteItemHighlights();
-        hideSidebar();
+    } finally {
+        // Re-enable all action buttons
+        toggleEditSaveBtn.disabled = false;
+        cancelEditBtn.disabled = false;
+        deleteSelectedItemBtn.disabled = false;
+        document.querySelectorAll('.sidebar button').forEach(btn => btn.disabled = false);
     }
-});
 
-cancelEditBtn.addEventListener("click", () => {
-    if (editing && preEditUserObjectAssets) {
-        userObjectAssets = JSON.parse(JSON.stringify(preEditUserObjectAssets));
-    }
-    renderRoomObjects();
-    resetEditButtonToggle();
-    updateStatsBeforeRerunningInitGameAndRenderPets();
-    renderPets();
-    enablePetDragging();
-    blockTopHalfOfSelectedDivsClickEvents();
-    makeSelectedClickThrough();
-    clearPlacementHighlights()
-    removeAllDeleteItemHighlights();
-    hideSidebar();
-    initializeRoomZIndexes();
-    
-    const allPets = document.querySelectorAll("#petContainer .pet");
-    if (allPets[0]) {
-        displayPetStats(allPets[0].id);
-    }
+    document.querySelector("#floor-plan-btn").style.opacity = "1";
+    document.querySelector("#floor-plan-btn").disabled = false;
 });
-
 
 function updateStatsBeforeRerunningInitGameAndRenderPets() {
     const allPets = document.querySelectorAll("#petContainer .pet");
@@ -7483,7 +8217,7 @@ function resetEditButtonToggle() {
     deleteSelectedItemBtn.classList.add("hidden");
     editing = false;
 }
-
+    
 function getFirstRowOfTileType(number) {
   return roomLayout.findIndex(row => row.includes(number));
 }
@@ -7567,51 +8301,6 @@ function buildTileOccupancyMap() {
     }
 }
 
-// Get cached first row of floor tiles (type 1) - expensive operation
-function getCachedFirstRow1() {
-    if (placementCache.firstRowTileType1 === null) {
-        placementCache.firstRowTileType1 = getFirstRowOfTileType(1);
-    }
-    return placementCache.firstRowTileType1;
-}
-
-// Get cached first row of boundary tiles (type 3) - expensive operation
-function getCachedFirstRow3() {
-    if (placementCache.firstRowTileType3 === null) {
-        placementCache.firstRowTileType3 = getFirstRowOfTileType(3);
-    }
-    return placementCache.firstRowTileType3;
-}
-
-/**
- * PRE-COMPUTE PLACEMENT MAP FOR A SPECIFIC OBJECT
- * This function contains the ORIGINAL placement logic with caching optimizations
- * 
- * Tile types in roomLayout:
- * 1.0 = Floor
- * 2.0 = Wall  
- * 3.0 = Boundary (wall-floor transition line)
- * 4.0-4.6 = Various obstacle tiles (cannot place on)
- * >= 4 && < 8 = All obstacle tiles
- * 
- * Placing Index Guide:
- * 0: Objects you cannot place on
- * 1: Floor
- * 2: Wall
- * 3: Boundary (items that can have top at the boundary)
- * 4: Boundary-wall (items that can bottom at boundary and overlap wall)
- * 5: Flooring (goes under everything)
- * 6: Carpets (goes under floor objects)
- * 7: Objects that can have smaller things placed on ANY part (tables, window-sills)
- * 8: Small objects that can be placed on other bigger objects (flower pots)
- * 9: Wallpapers (z-index: 1)
- * 10: Wall ornaments that can be placed on walls/windows/windowsills/shelves (z-index: 5)
- * 11: Windows (z-index: 3)
- * 12: Shelves, window sills (z-index: 4)
- * 13: Drapes (z-index: 4)
- * 14: Objects that can have smaller things placed on TOP ROW ONLY (fridges)
- * 15: Baseboards / grindjuostes (z-index: 2)
- */
 function precomputePlacementMap(objectId) {
     // Validate game data is loaded
     if (!gameAssetIndex || !userObjectAssets) {
@@ -7646,14 +8335,14 @@ function precomputePlacementMap(objectId) {
     const objectHeight = Math.ceil(draggedElement.offsetHeight / unitSize);
     
     // Get the object's placement rules and type
+    const draggedAssetCssClasses = draggedAssetData["css-class"] || "";
     const draggedAssetPlacingRules = draggedAssetData.canBePlacedOn || [];
     const draggedAssetPlacingIndex = draggedAssetData.placingIndex || 0;
     const draggedPlacingBuffer = draggedAssetData.placingBuffer || [];
 
     // Room layout reference and dimensions
-    const rl = roomLayout;
-    const roomRows = rl.length;
-    const roomCols = rl[0].length;
+    const roomRows = roomLayout.length;
+    const roomCols = roomLayout[0].length;
 
     // Initialize placement map (grid with two-tier system)
     const placementMap = [];
@@ -7685,6 +8374,32 @@ function precomputePlacementMap(objectId) {
         placingIndexCache.set(id, idx);
 
         return idx;
+    }
+
+    // Helper to find the nearest boundary row above a given row in a specific column
+    function findNearestBoundaryAbove(col, startRow) {
+        for (let searchY = startRow; searchY >= 0; searchY--) {
+            const tile = roomLayout[searchY][col];
+            const type = tile.type ?? tile;
+            if (type === 3.0) {
+                return searchY;
+            }
+        }
+        return -1; // No boundary found above
+    }
+
+    // Helper to find the first floor row below a specific boundary row in a column
+    function findFirstFloorBelowBoundary(col, boundaryRow) {
+        if (boundaryRow === -1) return -1;
+        
+        for (let searchY = boundaryRow + 1; searchY < roomRows; searchY++) {
+            const tile = roomLayout[searchY][col];
+            const type = tile.type ?? tile;
+            if (type === 1.0) {
+                return searchY;
+            }
+        }
+        return -1; // No floor found below this boundary
     }
 
     // Helper: Get placing index for an object (with caching)
@@ -7777,69 +8492,137 @@ function precomputePlacementMap(objectId) {
         }
     }
 
-    // Helper to get valid placement tiles with buffer applied
+    // ADD BUFFER TILES AND CHECK IF ITEM CAN BE PLACED ON THOSE TILES
     function addBufferToSection(validTiles) {
-        // Apply buffer RECTANGULARLY (fixes corners)
-        if (draggedPlacingBuffer && draggedPlacingBuffer.length === 4) {
-            const [top, right, bottom, left] = draggedPlacingBuffer;
+        const [top, right, bottom, left] = draggedPlacingBuffer;
 
-            let minX = Infinity, maxX = -Infinity;
-            let minY = Infinity, maxY = -Infinity;
+        let minX = Infinity, maxX = -Infinity;
+        let minY = Infinity, maxY = -Infinity;
 
-            // Bounding box of ranged tiles
-            for (const [x, y] of validTiles) {
-                minX = Math.min(minX, x);
-                maxX = Math.max(maxX, x);
-                minY = Math.min(minY, y);
-                maxY = Math.max(maxY, y);
-            }
-
-            // Expand by buffer
-            minX -= left;
-            maxX += right;
-            minY -= top;
-            maxY += bottom;
-
-            // Clamp to room bounds
-            minX = Math.max(0, minX);
-            minY = Math.max(0, minY);
-            maxX = Math.min(roomCols - 1, maxX);
-            maxY = Math.min(roomRows - 1, maxY);
-
-            const bufferedTiles = [];
-
-            // Fill full rectangle (includes corners)
-            for (let y = minY; y <= maxY; y++) {
-                for (let x = minX; x <= maxX; x++) {
-                    bufferedTiles.push([x, y]);
-                }
-            }
-
-            return bufferedTiles;
+        // Bounding box of original tiles
+        for (const [x, y] of validTiles) {
+            minX = Math.min(minX, x);
+            maxX = Math.max(maxX, x);
+            minY = Math.min(minY, y);
+            maxY = Math.max(maxY, y);
         }
 
-        return validTiles;
+        // Expand by buffer
+        minX -= left;
+        maxX += right;
+        minY -= top;
+        maxY += bottom;
+
+        // Clamp to room bounds
+        minX = Math.max(0, minX);
+        minY = Math.max(0, minY);
+        maxX = Math.min(roomCols - 1, maxX);
+        maxY = Math.min(roomRows - 1, maxY);
+
+        // Create a set of original tiles for fast lookup
+        const originalSet = new Set(
+            validTiles.map(([x, y]) => `${x},${y}`)
+        );
+
+        const bufferedTiles = [];
+        const bufferOnlyTiles = [];
+
+        // Fill rectangle
+        for (let y = minY; y <= maxY; y++) {
+            for (let x = minX; x <= maxX; x++) {
+                const key = `${x},${y}`;
+                bufferedTiles.push([x, y]);
+
+                // Tile exists ONLY because of buffer
+                if (!originalSet.has(key)) {
+                    bufferOnlyTiles.push([x, y]);
+                }
+            }
+        }
+
+        for (const tile of bufferOnlyTiles) {
+
+            const tileType = roomLayout[tile[1]]?.[tile[0]];
+
+            // PREVENTS BUFFER FROM GOING INTO ROOMS EDGES
+            if (!tileType || tileType > 3) {
+                return []
+            }
+
+            let objectsAtTile = getObjectsAtTileFast(tile[0], tile[1]);
+                    
+            for (const existingObj of objectsAtTile) {
+                const existingPlacingIndex = getPlacingIndex(existingObj);
+
+                if (PLACING_INDEXES_TO_BE_IGNORED.has(existingPlacingIndex)) continue
+
+                // PREVENTS SAME TYPE OF OBJECTS BEING PLACED ON TOP OF EACH OTHER (WITH EXCEPTIONS)
+                // ALSO PREVENTS SMALL STANDING ITEMS (8) AND SMALL HANGING ITEMS (18) FROM OVERLAPPING
+                const sameAssetBlocked =
+                    draggedAssetPlacingIndex === existingPlacingIndex &&
+                    !objectsThatCanOverlapItSelf.has(draggedAssetPlacingIndex);
+
+                const is8And18Pair =
+                    (draggedAssetPlacingIndex === 8 && existingPlacingIndex === 18) ||
+                    (draggedAssetPlacingIndex === 18 && existingPlacingIndex === 8);
+
+                if (sameAssetBlocked || is8And18Pair) {
+                    return []
+                }
+
+                if (!draggedAssetPlacingRules.includes(existingPlacingIndex) && (draggedAssetPlacingIndex !== 8 && draggedAssetPlacingIndex !== 18)) {
+                    return []
+                }
+            }
+        }
+        return bufferedTiles
     }
+
 
     // ========== MAIN PLACEMENT LOGIC LOOP ==========
     for (let row = 0; row < roomRows; row++) {
         for (let col = 0; col < roomCols; col++) {
             let rightEndofSection = col + objectWidth - 1;
-            let topOfSection = row;
-            let bottomOfSection = topOfSection + objectHeight - 1;
+            let topOfSection;
+            let bottomOfSection;
+            let isHangingObject = false;
 
-            if (rightEndofSection >= roomCols || bottomOfSection >= roomRows) {
+            if (draggedAssetPlacingIndex === 18) {
+                // Hanging objects: section goes DOWN from the anchor point
+                isHangingObject = true;
+                topOfSection = row;
+                bottomOfSection = topOfSection + objectHeight - 1;
+            } else {
+                // Normal objects: section goes UP from the anchor point
+                topOfSection = row;
+                bottomOfSection = topOfSection + objectHeight - 1;
+            }
+
+            // IF ITEM NEEDS BUFFERING, FIRST CHECK IF IT CAN FIT ANYWHERE IF IT DID NOT NEED BUFFERING
+            // THE AVAILABILITY OF SPACE FOR BUFFER WILL BE CHECKED AFTERWARDS
+            if (draggedPlacingBuffer && draggedPlacingBuffer.length === 4) { 
+                const [top, right, bottom, left] = draggedPlacingBuffer;
+                rightEndofSection = rightEndofSection - right - left;
+                bottomOfSection = bottomOfSection - top - bottom;
+                
+                if (rightEndofSection < 0 || bottomOfSection < 0) {
+                    continue;
+                }
+            }
+
+            // Bounds check
+            if (rightEndofSection >= roomCols || bottomOfSection >= roomRows || topOfSection < 0) {
                 continue;
             }
 
             let sectionAllowed = true;
 
-            for (let y = row; y <= bottomOfSection; y++) {
+            // Loop through all tiles in the section
+            for (let y = topOfSection; y <= bottomOfSection; y++) {
                 for (let x = col; x <= rightEndofSection; x++) {
                     let tileAllowed = true;
-                    const tile = rl[y][x];
+                    const tile = roomLayout[y][x];
                     const tileType = tile.type ?? tile;
-
 
                     // RULE 1: Cannot place on obstacle tiles (type 4-7)
                     if (tileType >= 4 && tileType < 8) {
@@ -7851,29 +8634,149 @@ function precomputePlacementMap(objectId) {
                             tileAllowed = false;
                         }
                     }
-                    // RULE 3: Wall/Boundary tiles
-                    else if (tileType === 2.0 || tileType === 3.0) {
+
+                     else if (tileType === 2.0) {
                         if (!draggedAssetPlacingRules.includes(2)) {
-                            if (draggedAssetPlacingRules.includes(4)) {
-                                const bottomSupportTile = rl[bottomOfSection][x];
-                                if (
-                                    (bottomSupportTile === 1 && draggedAssetPlacingRules.includes(1)) ||
-                                    (bottomSupportTile === 3 && draggedAssetPlacingRules.includes(3))
-                                ) {
-                                    tileAllowed = true;
-                                } else {
-                                    tileAllowed = false;
-                                }
-                            } else {
-                                if (tileType === 3.0 && draggedAssetPlacingRules.includes(3)) {
-                                    tileAllowed = true;
-                                } else {
-                                    tileAllowed = false;
-                                }
-                            }
-                        } else {
-                            tileAllowed = true;
+                            tileAllowed = false;
                         }
+                    }
+
+                     else if (tileType === 3.0) {
+                        if (!draggedAssetPlacingRules.includes(3)) {
+                            tileAllowed = false;
+                        }
+                    }
+
+                    // RULE 3: Wall, boundary tiles as well as wall-boundary item rules (4) - items that are on floor but can
+                    // overlapp wall and boundary
+
+                    if (!draggedAssetPlacingRules.includes(2)) {
+                        
+                        if (draggedAssetPlacingRules.includes(4)) {
+                            const bottomSupportTile = roomLayout[bottomOfSection][x];
+                            let tileAboveBottomSupport = null;
+                            if (
+                                bottomOfSection - 1 >= 0 &&
+                                bottomOfSection - 1 < roomLayout.length &&
+                                x >= 0 &&
+                                x < roomLayout[0].length
+                            ) {
+                                tileAboveBottomSupport = roomLayout[bottomOfSection - 1][x];
+                            }
+                            if (
+                                (bottomSupportTile === 1 && tileAboveBottomSupport !== 3 && draggedAssetPlacingRules.includes(1)) ||
+                                (bottomSupportTile === 3 && draggedAssetPlacingRules.includes(3))
+                            ) {
+                                tileAllowed = true;
+                            } else {
+                                tileAllowed = false;
+                            }
+                        }
+                    }
+
+
+                    // Add helper function inside precomputePlacementMap with other helpers
+                    function getFloorRowsBelowBoundaryInColumn(col, bottomRow) {
+                        // Start from bottomRow and search upward to find the nearest boundary
+                        let boundaryRow = -1;
+                        
+                        // Find the nearest boundary tile (type 3) at or above bottomRow
+                        for (let searchY = bottomRow; searchY >= 0; searchY--) {
+                            const tile = roomLayout[searchY][col];
+                            const type = tile.type ?? tile;
+                            if (type === 3.0) {
+                                boundaryRow = searchY;
+                                break;
+                            }
+                        }
+                        
+                        if (boundaryRow === -1) return null; // No boundary found
+                        
+                        // Now find the two floor tiles immediately below this boundary
+                        let firstFloorBelowBoundary = -1;
+                        let secondFloorBelowBoundary = -1;
+                        
+                        for (let searchY = boundaryRow + 1; searchY < roomRows; searchY++) {
+                            const tile = roomLayout[searchY][col];
+                            const type = tile.type ?? tile;
+                            
+                            if (type === 1.0) {
+                                if (firstFloorBelowBoundary === -1) {
+                                    firstFloorBelowBoundary = searchY;
+                                } else if (secondFloorBelowBoundary === -1) {
+                                    secondFloorBelowBoundary = searchY;
+                                    break;
+                                }
+                            } else if (type === 3.0) {
+                                // Hit another boundary, stop searching
+                                break;
+                            }
+                        }
+                        
+                        // Need both floor rows to be valid
+                        if (firstFloorBelowBoundary === -1 || secondFloorBelowBoundary === -1) {
+                            return null;
+                        }
+                        
+                        return {
+                            boundary: boundaryRow,
+                            firstFloor: firstFloorBelowBoundary,
+                            secondFloor: secondFloorBelowBoundary
+                        };
+                    }
+
+                    // SPECIAL CASE D: FIREPLACES (17)
+                    if (draggedAssetPlacingIndex === 17) {
+                        // Get the floor rows for the boundary above the bottom of this section
+                        const floorInfo = getFloorRowsBelowBoundaryInColumn(x, bottomOfSection);
+                        
+                        // If no valid floor configuration exists, reject
+                        if (!floorInfo) {
+                            tileAllowed = false;
+                        }
+                        // Bottom of section must align with second floor row
+                        else if (bottomOfSection !== floorInfo.secondFloor) {
+                            tileAllowed = false;
+                        }
+                        // Check each tile based on its row
+                        else if (y === floorInfo.secondFloor) {
+                            // Second floor row must be FLOOR
+                            if (tileType !== 1.0) {
+                                tileAllowed = false;
+                            }
+                        }
+                        else if (y === floorInfo.firstFloor) {
+                            // First floor row must be FLOOR
+                            if (tileType !== 1.0) {
+                                tileAllowed = false;
+                            }
+                        }
+                        else if (y < floorInfo.firstFloor && y > floorInfo.boundary) {
+                            // Between boundary and first floor should not exist for fireplace
+                            tileAllowed = false;
+                        }
+                        else if (y <= floorInfo.boundary) {
+                            // At or above boundary must be WALL or BOUNDARY
+                            if (tileType !== 2.0 && tileType !== 3.0) {
+                                tileAllowed = false;
+                            }
+                        }
+                        else {
+                            // Below second floor - shouldn't happen
+                            tileAllowed = false;
+                        }
+                    }
+
+                    // SPECIAL CASE E: HANGING OBJECTS (18)
+                    if (draggedAssetPlacingIndex === 18) {
+                        // Top row must be WALL or BOUNDARY (anchor point)
+                        if (y === topOfSection) {
+                            if (tileType !== 2.0 && tileType !== 3.0) {
+                                tileAllowed = false;
+                            }
+                        }
+                        // All rows below top can be floor, wall, or boundary
+                        // (adjust based on your specific requirements)
                     }
 
                     // OBJECT-OBJECT INTERACTION CHECKS
@@ -7883,14 +8786,23 @@ function precomputePlacementMap(objectId) {
                     if (!PLACING_INDEXES_TO_BE_IGNORED.has(draggedAssetPlacingIndex)) {
                         
                         let objectsAtTile = getObjectsAtTileFast(x, y);
-
+                        
                         for (const existingObj of objectsAtTile) {
                             const existingPlacingIndex = getPlacingIndex(existingObj);
 
-                            if (PLACING_INDEXES_TO_BE_IGNORED.has(existingPlacingIndex)) continue
+                            if (PLACING_INDEXES_TO_BE_IGNORED.has(existingPlacingIndex)) continue;
 
-                            // PREVENTS SAME TYPE OF OBJECTS BEING PLACED ON TOP OF EACH OTHER
-                            if (draggedAssetPlacingIndex === existingPlacingIndex) {
+                            // PREVENTS SAME TYPE OF OBJECTS BEING PLACED ON TOP OF EACH OTHER (WITH EXCEPTIONS)
+                            // ALSO PREVENTS SMALL STANDING ITEMS (8) AND SMALL HANGING ITEMS (18) FROM OVERLAPPING
+                            const sameAssetBlocked =
+                                draggedAssetPlacingIndex === existingPlacingIndex &&
+                                !objectsThatCanOverlapItSelf.has(draggedAssetPlacingIndex);
+
+                            const is8And18Pair =
+                                (draggedAssetPlacingIndex === 8 && existingPlacingIndex === 18) ||
+                                (draggedAssetPlacingIndex === 18 && existingPlacingIndex === 8);
+
+                            if (sameAssetBlocked || is8And18Pair) {
                                 tileAllowed = false;
                                 break;
                             }
@@ -7898,16 +8810,26 @@ function precomputePlacementMap(objectId) {
                             // ENABLE OFVERLAP OF WALL ITEMS BY BOUNDARY-WALL ITEMS - ENABLE BOUNDARY TILES
                             if ((draggedAssetPlacingRules.includes(4)) && 
                                 !draggedAssetPlacingRules.includes(2)) {
-                                if (tileType === 2.0) {
-                                    if (draggedAssetPlacingRules.includes(3)) {
-                                        if (getCachedFirstRow3() - (objectHeight - 1) <= row) {
-                                            tileAllowed = true;
-                                            break;
-                                        }
-                                    } else if (draggedAssetPlacingRules.includes(1)) {
-                                        if (getCachedFirstRow1() - (objectHeight - 1) <= row) {
-                                            tileAllowed = true;
-                                            break;
+                                
+                                const bottomOfSectionTileType = roomLayout[bottomOfSection][x];
+                                
+                                if (draggedAssetPlacingRules.includes(bottomOfSectionTileType)) {
+                                
+                                    const nearestBoundary = findNearestBoundaryAbove(x, bottomOfSection);
+                                    if (nearestBoundary !== -1) {
+                                        const firstFloorBelowBoundary = findFirstFloorBelowBoundary(x, nearestBoundary);
+                                        if (tileType === 2.0) {
+                                            if (draggedAssetPlacingRules.includes(3)) {
+                                                if (nearestBoundary - (objectHeight - 1) <= row) {
+                                                    tileAllowed = true;
+                                                    break;
+                                                }
+                                            } else if (draggedAssetPlacingRules.includes(1)) {
+                                                if (firstFloorBelowBoundary - (objectHeight - 1) <= row) {
+                                                    tileAllowed = true;
+                                                    break;
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -7918,7 +8840,8 @@ function precomputePlacementMap(objectId) {
                                 tileAllowed = false;
                                 break;
                             } else {
-                                // SPECIAL CASE A: Shelves/Window Sills (12) on Windows (11) - ONLY BOTTOM TO ROWS ARE ALLOWED
+                                
+                                // SPECIAL CASE A: Shelves/Window Sills (12) on Windows (11) - ONLY BOTTOM TWO ROWS ARE ALLOWED
                                 if (existingPlacingIndex === 11 && draggedAssetPlacingIndex === 12) {
                                     const coords = getObjectCoordinates(existingObj.id);
                                     const w = Math.ceil(existingObj.offsetWidth / unitSize);
@@ -7959,9 +8882,125 @@ function precomputePlacementMap(objectId) {
                                         tileAllowed = false;
                                         break;
                                     }
+
+                                // SPECIAL CASE C: KITCHEN COUNTERS (16)
+                                } else if (
+                                    (existingPlacingIndex === 16 && draggedAssetPlacingIndex === 16) ||
+                                    (existingPlacingIndex === 20 && draggedAssetPlacingIndex === 20)
+                                ) {
+                                    const coords = getObjectCoordinates(existingObj.id);
+                                    const w = Math.ceil(existingObj.offsetWidth / unitSize);
+                                    const h = Math.ceil(existingObj.offsetHeight / unitSize);
+
+                                    const tilesOccupiedByCounter =
+                                        getTilesOccupiedByObject(coords, w, h) || [];
+
+                                    // Collect all X values
+                                    const xs = tilesOccupiedByCounter.map(c => c[0]);
+
+                                    const minX = Math.min(...xs);
+                                    const maxX = Math.max(...xs);
+
+                                    // Tiles in the 2 leftmost and 2 rightmost columns
+                                    const relevantTiles = tilesOccupiedByCounter.filter(c =>
+                                        c[0] === minX ||
+                                        c[0] === minX + 1 ||
+                                        c[0] === maxX ||
+                                        c[0] === maxX - 1
+                                    );
+
+                                    if (relevantTiles.some(c => c[0] === x && c[1] === y)) {
+                                        tileAllowed = true;
+                                    } else {
+                                        tileAllowed = false;
+                                        break;
+                                    }
+                                
+                                // SPECIAL CASE F: TABLES (22) AND CHAIRS (23)
+                                } else if (
+                                    (existingPlacingIndex === 22 && draggedAssetPlacingIndex === 23)
+                                ) {
+                                    const coords = getObjectCoordinates(existingObj.id);
+                                    const w = Math.ceil(existingObj.offsetWidth / unitSize);
+                                    const h = Math.ceil(existingObj.offsetHeight / unitSize);
+
+                                    const tilesOccupiedByTable =
+                                        getTilesOccupiedByObject(coords, w, h) || [];
+
+                                    if (draggedAssetCssClasses.includes("chair-down")) {
+                                        const minY = Math.min(...tilesOccupiedByTable.map(c => c[1]));
+                                        const topRowTiles = tilesOccupiedByTable.filter(c => c[1] === minY);
+
+                                        // add the row below (minY + 1) if any tiles exist there
+                                        const rowBelowTiles = tilesOccupiedByTable.filter(c => c[1] === minY + 1);
+
+                                        const validTiles = [...topRowTiles, ...rowBelowTiles];
+
+                                        
+                                        // DO NOT CALL getValidPlacementTiles() FOR ITEMS THAT HAVE PLACEMENT RANGES AND SPECIAL RULES
+                                        // LIKE THIS
+
+                                        if (validTiles.some(c => c[0] === x && c[1] === y)) {
+                                            tileAllowed = true;
+                                        } else {
+                                            tileAllowed = false;
+                                            break;
+                                        }
+                                    } else if (draggedAssetCssClasses.includes("chair-up")) {
+                                        const maxY = Math.max(...tilesOccupiedByTable.map(c => c[1]));
+                                        const bottomRowTiles = tilesOccupiedByTable.filter(c => c[1] === maxY);
+                                        const oneAboveBottomRowTiles = tilesOccupiedByTable.filter(c => c[1] === maxY - 1);
+                                        const validTiles = [...bottomRowTiles, ...oneAboveBottomRowTiles];
+                                        
+                                        // DO NOT CALL getValidPlacementTiles() FOR ITEMS THAT HAVE PLACEMENT RANGES AND SPECIAL RULES
+                                        // LIKE THIS
+
+                                        if (validTiles.some(c => c[0] === x && c[1] === y)) {
+                                            tileAllowed = true;
+                                        } else {
+                                            tileAllowed = false;
+                                            break;
+                                        }
+                                    } else if (draggedAssetCssClasses.includes("chair-right")) {
+                                        const xs = tilesOccupiedByTable.map(c => c[0]);
+                                        const ys = tilesOccupiedByTable.map(c => c[1]);
+
+                                        const minX = Math.min(...xs);
+                                        const maxY = Math.max(...ys); // bottom row
+
+                                        const validTiles = tilesOccupiedByTable.filter(c =>
+                                            (c[0] === minX || c[0] === minX + 1) &&
+                                            c[1] !== maxY
+                                        );
+
+                                        if (validTiles.some(c => c[0] === x && c[1] === y)) {
+                                            tileAllowed = true;
+                                        } else {
+                                            tileAllowed = false;
+                                            break;
+                                        }
+                                    } else if (draggedAssetCssClasses.includes("chair-left")) {
+                                        const xs = tilesOccupiedByTable.map(c => c[0]);
+                                        const ys = tilesOccupiedByTable.map(c => c[1]);
+
+                                        const maxX = Math.max(...xs);
+                                        const maxY = Math.max(...ys); // bottom row
+
+                                        const validTiles = tilesOccupiedByTable.filter(c =>
+                                            (c[0] === maxX || c[0] === maxX - 1) &&
+                                            c[1] !== maxY
+                                        );
+
+                                        if (validTiles.some(c => c[0] === x && c[1] === y)) {
+                                            tileAllowed = true;
+                                        } else {
+                                            tileAllowed = false;
+                                            break;
+                                        }
+                                    }
                                 }
 
-                                // GENERAL CASE A: ITEMS THAT CAN BE PLACED ON OTHER ITEMS WITHOUT PROTRUDING
+                                // GENERAL CASE A: ITEMS THAT CAN BE PLACED ON OTHER ITEMS WITHOUT PROTRUSION
                                 else if (draggedAssetPlacingRules.includes(existingPlacingIndex)) {
                                     const coords = getObjectCoordinates(existingObj.id);
                                     const w = Math.ceil(existingObj.offsetWidth / unitSize);
@@ -7974,7 +9013,7 @@ function precomputePlacementMap(objectId) {
                                     
                                     if (validTiles.some(c => c[0] === x && c[1] === y)) {
                                         tileAllowed = true;
-                                        placementMap[y][x].surface.push(existingObj.id);
+                                        placementMap[y][x].surface.push(existingPlacingIndex);
                                     } else {
                                         tileAllowed = false;
                                         break;
@@ -7983,55 +9022,136 @@ function precomputePlacementMap(objectId) {
                             }
                         }
 
-                        // GENERAL CASE: ITEMS THAT CAN BE PLACED ON OTHER ITEMS WITH PROTRUDING
+                        // GENERAL CASE: ITEMS THAT CAN BE PLACED ON OTHER ITEMS WITH PROTRUSION
 
-                        let objectsAtTileAtThisColumnBottomofSection = getObjectsAtTileFast(x, bottomOfSection);
+                        // For hanging objects, check at topOfSection (anchor). For normal objects, check at bottomOfSection.
+                        const checkRow = isHangingObject ? topOfSection : bottomOfSection;
+                        let objectsAtTileAtThisColumnCheckRow = getObjectsAtTileFast(x, checkRow);
 
-                        for (const existingObj of objectsAtTileAtThisColumnBottomofSection) {
+                        // ORDER OBJECTS BASED ON THEIR BOTTOM ROW (INCREASING), THIS PREVENTS INVALID PLACEMENT RULES OF 
+                        // OBJECTS ON THE WALL FROM OVERWRITING VALID PLACEMENT RULES OF FLOOR-BASED ITEMS
+                        objectsAtTileAtThisColumnCheckRow.sort((a, b) => {
+                            const aCoords = getObjectCoordinates(a.id);
+                            const bCoords = getObjectCoordinates(b.id);
+
+                            // Handle missing objects safely
+                            if (!aCoords && !bCoords) return 0;
+                            if (!aCoords) return 1;
+                            if (!bCoords) return -1;
+
+                            const aBottomRow = aCoords[1];
+                            const bBottomRow = bCoords[1];
+
+                            // Lower Y (higher row) comes first
+                            return aBottomRow - bBottomRow;
+                        });
+
+                        for (const existingObj of objectsAtTileAtThisColumnCheckRow) {
 
                             const existingPlacingIndex = getPlacingIndex(existingObj);
 
-                            if (draggedAssetPlacingIndex === existingPlacingIndex) {
+                            // EXCLUDING SPECIAL CASES
+                            if (
+                                (existingPlacingIndex === draggedAssetPlacingIndex && 
+                                objectsThatCanOverlapItSelf.has(existingPlacingIndex)) ||
+                                existingPlacingIndex === 11 && draggedAssetPlacingIndex === 13 ||
+                                existingPlacingIndex === 11 && draggedAssetPlacingIndex === 12 ||
+                                existingPlacingIndex === 22 && draggedAssetPlacingIndex === 23
+                            ) {
+                                continue;
+                            }
+
+                            // PREVENTS SAME TYPE OF OBJECTS BEING PLACED ON TOP OF EACH OTHER
+                            // ALSO PREVENTS SMALL STANDING ITEMS (8) AND SMALL HANGING ITEMS (18) FROM OVERLAPPING
+                            const sameAssetBlocked =
+                                draggedAssetPlacingIndex === existingPlacingIndex
+
+                            const is8And18Pair =
+                                (draggedAssetPlacingIndex === 8 && existingPlacingIndex === 18) ||
+                                (draggedAssetPlacingIndex === 18 && existingPlacingIndex === 8);
+
+                            if (sameAssetBlocked || is8And18Pair) {
                                 tileAllowed = false;
                                 break;
                             }
                             
-                            if (PLACING_INDEXES_TO_BE_IGNORED.has(existingPlacingIndex)) continue
+                            if (PLACING_INDEXES_TO_BE_IGNORED.has(existingPlacingIndex)) continue;
 
-                            const existingItemProtrsuionSetting = getProtrusionSetting(existingObj);
+                            const existingItemProtrusionSetting = getProtrusionSetting(existingObj);
 
-                            if (existingItemProtrsuionSetting) {
-                                // PREVENTS SAME TYPE OF OBJECTS BEING PLACED ON TOP OF EACH OTHER
-                                if (draggedAssetPlacingIndex === existingPlacingIndex) {
-                                    tileAllowed = false;
-                                    break;
-                                }
-
+                            if (existingItemProtrusionSetting) {
+                            
                                 if (draggedAssetPlacingRules.includes(existingPlacingIndex)) {
                                     const coords = getObjectCoordinates(existingObj.id);
                                     const w = Math.ceil(existingObj.offsetWidth / unitSize);
                                     const h = Math.ceil(existingObj.offsetHeight / unitSize);
                                     const tilesOccupiedByObj = getTilesOccupiedByObject(coords, w, h) || [];
-                                
+
                                     const validTiles = getValidPlacementTiles(
                                         existingObj, tilesOccupiedByObj, coords, w, h, existingPlacingIndex
                                     );
 
-                                    const minY = Math.min(...validTiles.map(c => c[1]));
-                                    const protrusionYLimit = minY - existingItemProtrsuionSetting;
+                                    // THIS MAKES SURE THAT ITEMS THAT CAN PARTIALLY OVERLAP (LIKE KITCHEN COUNTERS) DO NOT NEGATE
+                                    // EACH OTHER'S PLACEMENT RANGES - THIS CREATES COMMON PLACABLE AREA WITHOUT GAPS
+                                    if (objectsThatCanOverlapItSelf.has(existingPlacingIndex)) {
+                                        const otherSameIndexObjects = objectsAtTileAtThisColumnCheckRow.filter(obj =>
+                                            obj !== existingObj && getPlacingIndex(obj) === existingPlacingIndex
+                                        );
 
-                                    if (topOfSection >= protrusionYLimit) {
-                                        if (validTiles.some(c => c[0] === x && c[1] === bottomOfSection)) {
-                                            tileAllowed = true;
-                                            placementMap[y][x].surface.push(existingObj.id);
-                                        } else {
-                                            tileAllowed = false;
-                                            break;
+                                        for (const otherObj of otherSameIndexObjects) {
+                                            const otherCoords = getObjectCoordinates(otherObj.id);
+                                            const otherW = Math.ceil(otherObj.offsetWidth / unitSize);
+                                            const otherH = Math.ceil(otherObj.offsetHeight / unitSize);
+                                            const otherTilesOccupied =
+                                                getTilesOccupiedByObject(otherCoords, otherW, otherH) || [];
+
+                                            const otherValidTiles = getValidPlacementTiles(
+                                                otherObj,
+                                                otherTilesOccupied,
+                                                otherCoords,
+                                                otherW,
+                                                otherH,
+                                                existingPlacingIndex
+                                            );
+
+                                            // merge tiles (avoid duplicates)
+                                            for (const tile of otherValidTiles) {
+                                                if (!validTiles.some(v => v[0] === tile[0] && v[1] === tile[1])) {
+                                                    validTiles.push(tile);
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (isHangingObject) {
+                                        // For hanging objects: protrusion extends DOWNWARD from the top anchor point
+                                        const minY = Math.min(...validTiles.map(c => c[1]));
+                                        const protrusionYLimit = minY + existingItemProtrusionSetting;
+
+                                        if (bottomOfSection <= protrusionYLimit) {
+                                            if (validTiles.some(c => c[0] === x && c[1] === topOfSection)) {
+                                                tileAllowed = true;
+                                                placementMap[y][x].surface.push(existingPlacingIndex);
+                                            } else {
+                                                tileAllowed = false;
+                                            }
+                                        }
+                                    } else {
+                                        // For normal objects: protrusion extends UPWARD from the bottom anchor point
+                                        const minY = Math.min(...validTiles.map(c => c[1]));
+                                        const protrusionYLimit = minY - existingItemProtrusionSetting;
+
+                                        if (topOfSection >= protrusionYLimit) {
+                                            if (validTiles.some(c => c[0] === x && c[1] === bottomOfSection)) {
+                                                tileAllowed = true;
+                                                placementMap[y][x].surface.push(existingPlacingIndex);
+                                            } else {
+                                                tileAllowed = false;
+                                            }
                                         }
                                     }
                                 }
                             }
-
                         }
                     } else {
                         let objectsAtTile = getObjectsAtTileFast(x, y);
@@ -8063,52 +9183,64 @@ function precomputePlacementMap(objectId) {
                 if (!sectionAllowed) break;
             }
 
-            // Replace the end of your main loop with this corrected version:
-
             if (sectionAllowed) {
                 // Collect all valid tiles in this section BEFORE buffering
                 const validSectionTiles = [];
-                for (let y = row; y <= bottomOfSection; y++) {
+                for (let y = topOfSection; y <= bottomOfSection; y++) {
                     for (let x = col; x <= rightEndofSection; x++) {
                         validSectionTiles.push([x, y]);
                     }
                 }
                 
-                // Find surface IDs that appear in ALL tiles
+                // Find placing indexes that appear in ALL tiles
                 const commonSurfaceIds = [];
                 if (validSectionTiles.length > 0) {
-                    // Get surface IDs from first tile as candidates
+                    // Get placing indexes from first tile as candidates
                     const firstTile = validSectionTiles[0];
-                    const candidateIds = placementMap[firstTile[1]][firstTile[0]].surface || [];
+                    const candidateIndexes = placementMap[firstTile[1]][firstTile[0]].surface || [];
                     
-                    // Check each candidate ID to see if it appears in all tiles
-                    for (const candidateId of candidateIds) {
+                    // Check each candidate placing index to see if it appears in all tiles
+                    for (const candidateIdx of candidateIndexes) {
                         let appearsInAll = true;
                         for (const [x, y] of validSectionTiles) {
                             const surfaceArray = placementMap[y][x].surface || [];
-                            if (!surfaceArray.includes(candidateId)) {
+                            if (!surfaceArray.includes(candidateIdx)) {
                                 appearsInAll = false;
                                 break;
                             }
                         }
                         if (appearsInAll) {
-                            commonSurfaceIds.push(candidateId);
+                            commonSurfaceIds.push(candidateIdx);
                         }
                     }
                 }
                 
+                let finalTiles;
                 // Apply buffer and get all tiles (original + buffer)
-                const allTilesWithBuffer = addBufferToSection(validSectionTiles);
+                if (draggedPlacingBuffer && draggedPlacingBuffer.length === 4) {
+                    finalTiles = addBufferToSection(validSectionTiles);
+                } else {
+                    finalTiles = validSectionTiles;
+                }
                 
                 // Determine which rows in the ORIGINAL section have canPlace vs canOccupy
                 const canPlaceRows = new Set([bottomOfSection]);
                 const canOccupyRows = new Set();
-                for (let y = row; y < bottomOfSection; y++) {
-                    canOccupyRows.add(y);
+                
+                if (isHangingObject) {
+                    // For hanging objects: topOfSection is the anchor (wall), bottomOfSection is where object ends (canPlace)
+                    for (let y = topOfSection; y < bottomOfSection; y++) {
+                        canOccupyRows.add(y);
+                    }
+                } else {
+                    // For normal objects: bottomOfSection is the anchor (floor/base), rows above can be occupied
+                    for (let y = topOfSection; y < bottomOfSection; y++) {
+                        canOccupyRows.add(y);
+                    }
                 }
                 
                 // Mark buffered tiles appropriately
-                for (const [x, y] of allTilesWithBuffer) {
+                for (const [x, y] of finalTiles) {
                     if (y < 0 || y >= roomRows || x < 0 || x >= roomCols) continue;
                     
                     const wasInOriginalSection = validSectionTiles.some(([ox, oy]) => ox === x && oy === y);
@@ -8125,7 +9257,7 @@ function precomputePlacementMap(objectId) {
                             placementMap[y][x].canPlace = true;
                         } else if (y > bottomOfSection) {
                             placementMap[y][x].canPlace = true;
-                        } else if (y < row) {
+                        } else if (y < topOfSection) {
                             if (y + 1 < roomRows && placementMap[y + 1][x].canPlace) {
                                 placementMap[y][x].canPlace = true;
                             } else {
@@ -8139,10 +9271,10 @@ function precomputePlacementMap(objectId) {
                             }
                         }
                         
-                        // Propagate all common surface IDs to buffer tiles
-                        for (const surfaceId of commonSurfaceIds) {
-                            if (!placementMap[y][x].surface.includes(surfaceId)) {
-                                placementMap[y][x].surface.push(surfaceId);
+                        // Propagate all common surface placing indexes to buffer tiles
+                        for (const surfaceIdx of commonSurfaceIds) {
+                            if (!placementMap[y][x].surface.includes(surfaceIdx)) {
+                                placementMap[y][x].surface.push(surfaceIdx);
                             }
                         }
                     }
@@ -8150,7 +9282,6 @@ function precomputePlacementMap(objectId) {
             }
         }
     }
-
     return placementMap;
 }
 
@@ -9187,6 +10318,8 @@ async function previewFurniture (key) {
         document.getElementById(tempDivId).remove();
         if (gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex].placingIndex === 13 || gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex]["css-class"].includes("window-sill")) {
             messageToTheUser("Nėra tinkamo dydžio lango arba jį užstoja kiti daiktai!")
+        } else if (gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex].placingIndex === 17 || gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex]["css-class"].includes("fireplace")) {
+            messageToTheUser("Nepakanka vietos! Židiniai gali būti pastatyti tik prie laisvos sienos!")
         } else {
             messageToTheUser("Nepakanka vietos!")
         }
@@ -10653,12 +11786,24 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
 
                 updateSingleItemZIndex(tempDivId)
             } else {
+                // Item couldn't be placed - clean up and keep it in inventory
                 userObjectAssets[tempDivId].position = [];
-                document.getElementById(tempDivId).remove();
+                const tempDiv = document.getElementById(tempDivId);
+                if (tempDiv) {
+                    tempDiv.remove();
+                }
                 delete userObjectAssets[tempDivId];
+                
+                // Re-render sidebar to show the item is still available
+                if (sidebar) {
+                    renderObjectAssets(selectedCategory, unusedOnly, sidebar);
+                }
+                
                 if (gameAssetIndex[parseInt(assetIndex)].placingIndex === 13 || 
                     gameAssetIndex[parseInt(assetIndex)]["css-class"].includes("window-sill")) {
                     messageToTheUser("Nėra tinkamo dydžio lango arba jį užstoja kiti daiktai!");
+                } else if (gameAssetIndex[parseInt(assetIndex)].placingIndex === 17 || gameAssetIndex[parseInt(assetIndex)]["css-class"].includes("fireplace")) {
+                    messageToTheUser("Nepakanka vietos! Židiniai gali būti pastatyti tik prie laisvos sienos!")
                 } else {
                     messageToTheUser("Nepakanka vietos!");
                 }
@@ -10816,28 +11961,31 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
 
                 updateSingleItemZIndex(tempDivId)
             } else {
+                // Item couldn't be placed - reset position and remove from DOM
                 userObjectAssets[tempDivId].position = [];
-                document.getElementById(tempDivId).remove();
+                const tempDiv = document.getElementById(tempDivId);
+                if (tempDiv) {
+                    tempDiv.remove();
+                }
+                
+                // Re-render sidebar to restore the button state
+                if (sidebar) {
+                    renderObjectAssets(selectedCategory, unusedOnly, sidebar);
+                }
+                
                 if (gameAssetIndex[userObjectAssets[tempDivId].assetIndex].placingIndex === 13 || 
                     gameAssetIndex[userObjectAssets[tempDivId].assetIndex]["css-class"].includes("window-sill")) {
                     messageToTheUser("Nėra tinkamo dydžio lango arba jį užstoja kiti daiktai!");
+                } else if (gameAssetIndex[userObjectAssets[tempDivId].assetIndex].placingIndex === 17 || gameAssetIndex[userObjectAssets[tempDivId].assetIndex]["css-class"].includes("fireplace")) {
+                    messageToTheUser("Nepakanka vietos! Židiniai gali būti pastatyti tik prie laisvos sienos!")
                 } else {
                     messageToTheUser("Nepakanka vietos!");
                 }
             }
 
-            itemDiv.classList.add("in-use");
-
-            if (sidebar) {
-                if (userObjectAssets[tempDivId].position && userObjectAssets[tempDivId].position.length > 0) {
-                    btn.textContent = 'Naudojama';
-                    btn.disabled = true;
-                    btn.className = 'use-btn used';
-                } else {
-                    btn.textContent = 'Naudoti';
-                    btn.disabled = false;
-                    btn.className = 'use-btn';
-                }
+            // Only update UI state if not re-rendering sidebar
+            if (!sidebar) {
+                itemDiv.classList.add("in-use");
             }
 
             if (window.innerWidth <= 768) {
@@ -11228,7 +12376,7 @@ function renderPetSupplies(selectedCategory = 'all', selectedPetType = null) {
             const quantityInputHolder = document.createElement('div');
             quantityInputHolder.className = 'pet-supply-use-quantity-holder input-wrapper';
 
-            const quantityInput = document.createElement('input');
+            quantityInput = document.createElement('input');
             quantityInput.type = 'number';
             quantityInput.min = 1;
             quantityInput.max = asset.quantity; // don't allow more than owned
@@ -11298,21 +12446,21 @@ function renderPetSupplies(selectedCategory = 'all', selectedPetType = null) {
             // Consumable items
             btn.textContent = 'Naudoti';
             if (!item.stackable && item.oneOfKind) {
-            // Non-consumable items (like beds, toys)
-            btn.textContent = 'Naudoti';
-            btn.addEventListener('click', () => {
-                usePetSupply(key);
-            });
-        } else {
-            // Consumable items with quantity support
-            btn.textContent = 'Naudoti';
-            btn.addEventListener('click', () => {
-                const useQuantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
-                if (asset.quantity >= useQuantity) {
-                    usePetSupply(key, useQuantity);
-                }
-            });
-        }
+                // Non-consumable items (like beds, toys)
+                btn.textContent = 'Naudoti';
+                btn.addEventListener('click', () => {
+                    usePetSupply(key);
+                });
+            } else {
+                // Consumable items with quantity support
+                btn.textContent = 'Naudoti';
+                btn.addEventListener('click', () => {
+                    const useQuantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
+                    if (asset.quantity >= useQuantity) {
+                        usePetSupply(key, useQuantity);
+                    }
+                });
+            }
         }
 
         previewHolder.appendChild(previewDiv);
@@ -11952,12 +13100,11 @@ function increasePetStatsInDatabase(petId, stat, amount) {
 
     let newAmount = currentPet._stats[stat] + amount;
     if (newAmount > 10) newAmount = 10;
+    if (newAmount < 0) newAmount = 0;
     currentPet._stats[`${stat}New`] = newAmount
     currentPet._stats.date = Math.floor(Date.now() / 1000 / 60);
     sendPetStatsUpdateToDatabase(petId);
 }
-
-
 
 function increasePetStatsInDisplay(petId, stat) {
     const pet = document.getElementById(petId)
@@ -12090,7 +13237,6 @@ function displayWaterBowlFillingOptions(obj) {
                 return
             }
             
-            obj.classList.add("full")
             initUserTriggeredAction("water", obj)
         });
 
@@ -12126,11 +13272,7 @@ function displayBathFillingOption(obj) {
                 messageToTheUser("Nėra vandens. Sumokėk vandens mokestį!","error");
                 return
             }
-            
-            obj._full = true;
 
-            const bathType = Array.from(obj.classList).find(cls => cls.startsWith("bath-"))
-            setObjectAnimation(obj, `${bathType}-filled`)
             initUserTriggeredAction("bath", obj)
         });
 
@@ -12337,16 +13479,9 @@ function displayFoodOptions(obj) {
                 const useQuantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
                 if (!item["provides"]) return
                 if (supply.quantity >= useQuantity) {
-                    supply.quantity -= useQuantity;
-                    if (supply.quantity <= 0) {
-                        delete userPetAssets.supplies[key];
-                    } else {
-                        userPetAssets.supplies[key]["quantity"] = supply.quantity;
-                    }
-                    sendPetAssetsUpdateToDatabase();
                     closeObjectPopup();
-                    obj.classList.add("full");
                     obj._foodContent = [item["provides"], useQuantity];
+                    obj._foodToRemoveFromUser = [supply, key]
                     initUserTriggeredAction("food", obj);
                 }
             });
@@ -12780,10 +13915,10 @@ async function petHappy(pet, quantity, signal) {
 }
 
 async function petEats(pet, object, signal) {
-        if (signal.aborted) {
-            cancelMovement(pet.id)
-            throw new DOMException("Aborted", "AbortError");
-        }
+    if (signal.aborted) {
+        cancelMovement(pet.id)
+        throw new DOMException("Aborted", "AbortError");
+    }
 
     if (!object) return;
 
@@ -12806,8 +13941,6 @@ async function petEats(pet, object, signal) {
         objectInteractivePart = [0, 0];
     }
 
-    console.log()
-
     let ableToPostitionToInteract = canPlaceObjectAt(objectInteractiveCoords[0], objectInteractiveCoords[1], pet.offsetWidth, pet.offsetHeight, globalWalkabilityMap);
 
     let objectWidthInTiles = Math.ceil(object.offsetWidth / unitSize);
@@ -12817,16 +13950,59 @@ async function petEats(pet, object, signal) {
     let objectInteractiveBottomRightCoords = [objectCoords[0] + objectWidthInTiles - objectInteractivePart[0] - petWidthInTiles, objectCoords[1] - objectInteractivePart[1]];
     let ableToPostitionToInteractReverse = canPlaceObjectAt(objectInteractiveBottomRightCoords[0], objectInteractiveBottomRightCoords[1], pet.offsetWidth, pet.offsetHeight, globalWalkabilityMap);
 
-        if (signal.aborted) {
-            cancelMovement(pet.id)
-            throw new DOMException("Aborted", "AbortError");
-        }
+    if (signal.aborted) {
+        cancelMovement(pet.id)
+        throw new DOMException("Aborted", "AbortError");
+    }
 
     if ((ableToPostitionToInteract && !ableToPostitionToInteractReverse) ||
         (ableToPostitionToInteract && petCoords[0] - objectCoords[0] >= 0)) {
 
-        await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveCoords, signal);
-            if (signal.aborted) {
+        const [provides, useQuantity] = object._foodContent;
+        const [supply, key] = object._foodToRemoveFromUser;
+        supply.quantity -= useQuantity;
+        if (supply.quantity <= 0) {
+            delete userPetAssets.supplies[key];
+        } else {
+            userPetAssets.supplies[key]["quantity"] = supply.quantity;
+        }
+        await sendPetAssetsUpdateToDatabase();
+
+        const providesQuantity = provides[2] * useQuantity;
+        await increasePetStatsInDatabase(pet.id, "food", providesQuantity)
+        
+        object.classList.add("full");
+
+        const walking = await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveCoords, signal);
+
+        if (!walking) {
+            // If the supply was deleted, recreate it
+            if (!userPetAssets.supplies[key]) {
+                userPetAssets.supplies[key] = {
+                    ...supply,
+                    quantity: 0
+                };
+            }
+
+            // Restore quantity
+            userPetAssets.supplies[key].quantity += useQuantity;
+
+            // Sync local reference if needed
+            supply.quantity = userPetAssets.supplies[key].quantity;
+
+            // Persist
+            await sendPetAssetsUpdateToDatabase();
+
+            await increasePetStatsInDatabase(pet.id, "food", -1 * providesQuantity)
+
+            // Optional UI rollback
+            object.classList.remove("full");
+
+            messageToTheUser(`Augintinis negali prieiti prie maisto. Perstatyk baldus!`);
+            return
+        }
+
+        if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
         }
@@ -12913,16 +14089,23 @@ async function petDrinks(pet, object, signal) {
     let objectInteractiveBottomRightCoords = [objectCoords[0] + objectWidthInTiles - objectInteractivePart[0] - petWidthInTiles, objectCoords[1] - objectInteractivePart[1]];
     let ableToPostitionToInteractReverse = canPlaceObjectAt(objectInteractiveBottomRightCoords[0], objectInteractiveBottomRightCoords[1], pet.offsetWidth, pet.offsetHeight, globalWalkabilityMap);
 
-        if (signal.aborted) {
-            cancelMovement(pet.id)
-            throw new DOMException("Aborted", "AbortError");
-        }
+    if (signal.aborted) {
+        cancelMovement(pet.id)
+        throw new DOMException("Aborted", "AbortError");
+    }
 
     if ((ableToPostitionToInteract && !ableToPostitionToInteractReverse) ||
         (ableToPostitionToInteract && petCoords[0] - objectCoords[0] >= 0)) {
 
-        await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveCoords, signal);
-            if (signal.aborted) {
+        object.classList.add("full")
+        const walking = await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveCoords, signal);
+        if (!walking) {
+            object.classList.remove("full")
+            messageToTheUser(`Augintinis negali prieiti prie vandens. Perstatyk baldus!`);
+            return
+        }
+        
+        if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
         }
@@ -12971,7 +14154,7 @@ async function petDrinks(pet, object, signal) {
         managePetActions(pet);
 
     } else {
-        messageToTheUser(`Augintiniai negali prieiti prie maisto. Perstatyk baldus!`);
+        messageToTheUser(`Augintiniai negali prieiti prie vandens. Perstatyk baldus!`);
         pendingPetActions[pet.id].shift();
         managePetActions(pet);
     }
@@ -13018,20 +14201,31 @@ async function petBathes(pet, object, signal) {
 
     if (finalBathInteractionCoords) {
 
+        const bathType = Array.from(object.classList).find(cls => cls.startsWith("bath-")).split("-").slice(0, 2).join("-") // bath-1 etc.
+
         if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
         }
 
-        await movePetToTile(pet, getObjectCoordinates(pet.id), finalBathInteractionCoords, signal);
-            if (signal.aborted) {
+        object.classList.add('filled');
+        object._full = true;
+
+        const walking = await movePetToTile(pet, getObjectCoordinates(pet.id), finalBathInteractionCoords, signal);
+        
+        if (!walking) {
+            object.classList.remove('filled');
+            object._full = false;
+            messageToTheUser(`Augintinis negali prieiti prie vonios. Perstatyk baldus!`);
+            return
+        }
+        
+        if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
         }
 
         pet.style.visibility = "hidden";
-
-        const bathType = Array.from(object.classList).find(cls => cls.startsWith("bath-"))
 
         const skins = userPetAssets.pets[pet.id].skins;
 
@@ -13048,20 +14242,26 @@ async function petBathes(pet, object, signal) {
 
         object.classList.add(equippedSkinSecondClass);
 
-        setObjectAnimation(object, `${bathType}-with-pet`)
+        const petInBathImageUrl = `images/pet-game/${bathType}-cat-1-1.png`
+
+        object.style.setProperty("--overlay", `url('${petInBathImageUrl}')`);
+
         pendingPetActions[pet.id].shift();
         pet._busy = true;
 
         await cancellableWait(5000, signal);
-            if (signal.aborted) {
+        
+        if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
         }
 
         pet.style.visibility = "visible";
 
-        setObjectAnimation(object, `${bathType}-empty`);
+        object.style.removeProperty("--overlay");
         object._full = false;
+        object.classList.remove('filled');
+
         pet._busy = false;
 
         managePetActions(pet);
@@ -13073,10 +14273,10 @@ async function petBathes(pet, object, signal) {
 }
 
 async function petSleeps(pet, signal) {
-        if (signal.aborted) {
-            cancelMovement(pet.id)
-            throw new DOMException("Aborted", "AbortError");
-        }
+    if (signal.aborted) {
+        cancelMovement(pet.id)
+        throw new DOMException("Aborted", "AbortError");
+    }
 
     const objectContainer = document.getElementById("roomObjectsContainer");
     const allObjects = objectContainer.querySelectorAll("*");
@@ -13568,7 +14768,6 @@ function initUserTriggeredAction(type, object) {
         const petDivs = petContainer.querySelectorAll("div.pet");
 
         const providesFor = provides[0][1];
-        const providesQuantity = provides[0][2] * provides[1];
 
         const suitablePets = Array.from(petDivs).filter(div =>
         Array.from(div.classList).some(cls =>
@@ -13605,7 +14804,6 @@ function initUserTriggeredAction(type, object) {
             pendingPetActions[selectedPet.id] = [];
         }
 
-        increasePetStatsInDatabase(selectedPet.id, "food", providesQuantity)
         pendingPetActions[selectedPet.id].unshift([petEats, [selectedPet, object]]);
         managePetActions(selectedPet);
     
@@ -13686,7 +14884,7 @@ function initUserTriggeredAction(type, object) {
         const suitablePets = Array.from(petDivs).filter(div => {
             const petSpecies = div.id.split("-")[0];
 
-            // Check if petSpecies is a substring of any bowl class
+            // Check if petSpecies is a substring of any bath class
             return bathClasses.some(cls => cls.includes(petSpecies));
         });
 
@@ -13695,9 +14893,6 @@ function initUserTriggeredAction(type, object) {
         }
 
         let selectedPet = suitablePets[Math.floor(Math.random() * suitablePets.length)];
-
-        const objectsClass = getAppliedBackgroundImageSelector(object)
-        preloadBackgroundImageForSelectors(objectsClass, `.${selectedPet.classList[1]}`)
 
         if (!pendingPetActions[selectedPet.id]) {
             pendingPetActions[selectedPet.id] = [];
@@ -15088,6 +16283,65 @@ toggleZoomLockBtn.addEventListener("click", () => {
     updateZoomLockButton();
 });
 
+const floorPlanBtn = document.getElementById("floor-plan-btn");
+
+floorPlanBtn.addEventListener("click", () => {
+    toggleFloorPlanUpgrade();
+});
+
+var floorPlanDisplayed = false
+function toggleFloorPlanUpgrade () {
+
+    if (!floorPlanDisplayed) {
+        floorPlanBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 900 900" fill="#currentColor">
+                    <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                </svg>
+            `;
+
+        
+        document.querySelector("#room-transform-wrapper").style.opacity = "0";
+
+        document.querySelector("#toggle-expand-btn").style.opacity = "0";
+        document.querySelector("#toggle-expand-btn").disabled = true;
+
+        document.querySelector("#toggle-zoom-lock-btn").style.opacity = "0";
+        document.querySelector("#toggle-zoom-lock-btn").disabled = true;
+
+        document.querySelector("#toggle-edit-save-btn").style.opacity = "0";
+        document.querySelector("#toggle-edit-save-btn").disabled = true;
+
+        document.querySelector("#floor-plan-container").style.display = "flex";
+
+        floorPlanDisplayed = true;
+    } else {
+        floorPlanBtn.innerHTML = `
+            <svg
+                class="svg-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 1024 800"
+                aria-hidden="true"
+            >
+                <path d="M96 96v480h80V176h208v272h448v384H464V560h-80v128H96v80h288v144h528V96H96z m736 272H464V176h368v192z"/>
+            </svg>`;
+
+        document.querySelector("#room-transform-wrapper").style.opacity = "1";
+        
+        document.querySelector("#toggle-expand-btn").style.opacity = "1";
+        document.querySelector("#toggle-expand-btn").disabled = false;
+
+        document.querySelector("#toggle-zoom-lock-btn").style.opacity = "1";
+        document.querySelector("#toggle-zoom-lock-btn").disabled = false;
+
+        document.querySelector("#toggle-edit-save-btn").style.opacity = "1";
+        document.querySelector("#toggle-edit-save-btn").disabled = false;
+
+        document.querySelector("#floor-plan-container").style.display = "none";
+
+        floorPlanDisplayed = false;
+    }
+}
+
 function updateZoomLockButton() {
     const btn = document.getElementById("toggle-zoom-lock-btn");
 
@@ -15357,6 +16611,300 @@ function toggleRoomExpansion() {
     }
 }
 
+function isEdge(val) {
+      return val >= 4.1 && val < 5.0;
+    }
+
+    function cellsMatch(cell1, cell2) {
+      if (cell1 === 7.0 && cell2 === 7.0) return true;
+      if (cell1 === 7.0 || cell2 === 7.0) return false;
+      if (isEdge(cell1) && isEdge(cell2)) return true;
+      return false;
+    }
+
+    function getNewRoomBounds(upgradeNum) {
+      const upgradeLayout = roomLayoutLibrary[upgradeNum];
+      const currentLayoutData = roomLayoutLibrary[roomLayoutNumber];
+      
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      
+      upgradeLayout.forEach((row, y) => {
+        row.forEach((cell, x) => {
+          if (cell !== 7.0 && isEdge(cell)) {
+            const isOwned = y < currentLayoutData.length && 
+                           x < currentLayoutData[y].length && 
+                           cellsMatch(currentLayoutData[y][x], cell);
+            
+            if (!isOwned) {
+              minX = Math.min(minX, x);
+              maxX = Math.max(maxX, x);
+              minY = Math.min(minY, y);
+              maxY = Math.max(maxY, y);
+            }
+          }
+        });
+      });
+
+      return { centerX: (minX + maxX) / 2, centerY: (minY + maxY) / 2 };
+    }
+
+    function renderFloorLayoutUpgrade() {
+  const finalLayout = roomLayoutLibrary[9];
+  const currentLayoutData = roomLayoutLibrary[roomLayoutNumber];
+  const cellSize = 4;
+  const upgrades = roomLayoutPossibleUpgrades[roomLayoutNumber];
+
+  // Track bounds for tight SVG
+  let minX = Infinity, minY = Infinity;
+  let maxX = -Infinity, maxY = -Infinity;
+
+  // Merge rects into paths
+  let ownedPath = '';
+  let unownedPath = '';
+
+  finalLayout.forEach((row, y) => {
+    row.forEach((cell, x) => {
+      if (!isEdge(cell)) return;
+
+      const px = x * cellSize;
+      const py = y * cellSize;
+
+      minX = Math.min(minX, px);
+      minY = Math.min(minY, py);
+      maxX = Math.max(maxX, px + cellSize);
+      maxY = Math.max(maxY, py + cellSize);
+
+      const isOwned =
+        y < currentLayoutData.length &&
+        x < currentLayoutData[y].length &&
+        cellsMatch(currentLayoutData[y][x], cell);
+
+      const pathRect = `M${px} ${py}h${cellSize}v${cellSize}h${-cellSize}Z`;
+      if (isOwned) {
+        ownedPath += pathRect;
+      } else {
+        unownedPath += pathRect;
+      }
+    });
+  });
+
+  const width = maxX - minX;
+  const height = maxY - minY;
+
+  // Padding in coordinate units
+  const padding = 10;
+  const paddedMinX = minX - padding;
+  const paddedMinY = minY - padding;
+  const paddedWidth = width + 2 * padding;
+  const paddedHeight = height + 2 * padding;
+
+  // Build upgrade buttons markup
+  let upgradeButtonsMarkup = '';
+  upgrades.forEach(upgradeNum => {
+    const bounds = getNewRoomBounds(upgradeNum);
+    const priceKey = `${roomLayoutNumber}-${upgradeNum}`;
+    const price = floorPlanUpgradePrices[priceKey];
+    const canAfford = userMoney >= price;
+
+// Constants
+const circleRadius = 20;         // smaller circle
+const coinSize = 24;             // coin image size
+const verticalSpacing = 12;      // vertical gap between circle and coin+price
+const spacing = 4;               // horizontal gap between coin and price
+const fontSize = 16;             // price font size
+
+const circleCenterX = bounds.centerX * cellSize;
+const circleCenterY = bounds.centerY * cellSize;
+
+// Approximate price width for horizontal centering
+const priceWidth = price.toString().length * fontSize * 0.6;
+const totalWidth = coinSize + spacing + priceWidth;
+
+// Circle + plus sign
+upgradeButtonsMarkup += `
+  <circle 
+    cx="${circleCenterX}" 
+    cy="${circleCenterY}" 
+    r="${circleRadius}"
+    fill="${canAfford ? '#32ac93' : '#6b7280'}"
+    style="cursor:${canAfford ? 'pointer' : 'not-allowed'}"
+    onclick="${canAfford ? `purchaseRoomConfirm(${upgradeNum})` : ''}"
+  />
+
+  <text 
+    x="${circleCenterX}" 
+    y="${circleCenterY - 2}"
+    text-anchor="middle"
+    dominant-baseline="central"
+    fill="white"
+    font-size="28"
+    font-weight="bold"
+    style="pointer-events:none"
+  >+</text>
+
+  <!-- Coin + price horizontally aligned, vertically centered -->
+  <g transform="translate(${circleCenterX - totalWidth/2}, ${circleCenterY + circleRadius + verticalSpacing})">
+    <image 
+      href="../images/icons/icon-sudedu-coin.png"
+      x="0" 
+      y="${-coinSize/2}" 
+      width="${coinSize}" 
+      height="${coinSize}"
+      style="pointer-events:none"
+    />
+    <text 
+      x="${coinSize + spacing}" 
+      y="0"
+      text-anchor="start"
+      dominant-baseline="middle"
+      fill="#92400e"
+      font-size="${fontSize}"
+      font-weight="bold"
+      style="pointer-events:none"
+    >${price}</text>
+  </g>
+`;
+
+
+  });
+
+  // Create SVG element
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', `${paddedMinX} ${paddedMinY} ${paddedWidth} ${paddedHeight}`);
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+  // Responsive + max width
+  const maxSvgWidth = 500; // px
+  svg.style.width = '100%';
+  svg.style.height = 'auto';
+  svg.style.maxWidth = `${maxSvgWidth}px`;
+  svg.style.display = 'block';
+
+  // Inject paths + upgrades
+  svg.innerHTML = `
+    <path d="${unownedPath}" fill="#374151" opacity="0.25"/>
+    <path d="${ownedPath}" fill="#3b82f6"/>
+    ${upgradeButtonsMarkup}
+  `;
+
+  // Mount to container
+  const container = document.getElementById('layout-container');
+  container.innerHTML = '';
+  container.appendChild(svg);
+}
+
+
+async function sendRoomLayoutUpdateToDatabase(newRoomLayout) {
+    try {
+        const response = await apiFetch(apiBase + 'petGame/roomLayout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ studentId: userData.userId, roomLayout: newRoomLayout })
+        });
+
+        if (!response) return false;
+
+        if (response.ok && response.status === 204) {
+            return true;
+        } else {
+            messageToTheUser("Nepavyko atnaujinti namų plano. Bandyk vėl vėliau.", 'error');
+            console.error(`Failed to update room layout: ${response.status}`);
+            return false;
+        }
+    } catch (error) {
+        messageToTheUser("Nepavyko atnaujinti namų plano. Bandyk vėl vėliau.", 'error');
+        console.error('Error sending room layout update:', error);
+        return false;
+    }
+}
+
+function purchaseRoomConfirm (upgradeNum) {
+    const price = floorPlanUpgradePrices[`${roomLayoutNumber}-${upgradeNum}`];
+    showCustomConfirm(`Ar tikrai nori pristatyti naują kambarį?
+    <div class="coin-display-delete-confirm">
+        <span class="coin-icon">
+            <img src="../images/icons/icon-sudedu-coin.png">
+        </span>
+        <span class="coin-amount">${price}</span>
+    </div>`, 
+    purchaseRoom, [upgradeNum]);
+}
+
+async function purchaseRoom(upgradeNum) {
+    const priceKey = `${roomLayoutNumber}-${upgradeNum}`;
+    const price = floorPlanUpgradePrices[priceKey];
+
+    const buttons = document.querySelectorAll('circle');
+
+    buttons.forEach(btn => {
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+    });
+
+    // Check if user has enough money (local check first)
+    if (userMoney < price) {
+        messageToTheUser("Nepakanka pinigų!", 'error');
+        buttons.forEach(btn => {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        });
+        return;
+    }
+
+
+    if (userMoney >= price) {
+        // 1. Deduct money from server
+        const moneySuccess = await sendMoneyTransactionToDatabase(price, 'subtract');
+        
+        if (!moneySuccess) {
+            buttons.forEach(btn => {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            });
+            
+            messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
+            return;
+        }
+        
+        // 2. Update local money only after server confirms
+        userMoney -= price;
+        updateCoinAmounts(userMoney);
+        
+        // 3. Update assets on server
+        assetUpdateSuccess = await sendRoomLayoutUpdateToDatabase(upgradeNum);
+
+        if (!assetUpdateSuccess) {
+            // Asset update failed - revert everything including money
+            console.error('Critical error: Money deducted but asset update failed');
+            
+            // Try to refund money on server
+            await sendMoneyTransactionToDatabase(price, 'add');
+            
+            // Revert local state
+            userMoney += price;
+            updateCoinAmounts(userMoney);
+
+            buttons.forEach(btn => {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            });
+
+            messageToTheUser("Nepavyko susisiekti su serveriu. Bandyk vėl vėliau.", 'error');
+            return;
+        } else {
+            roomLayoutNumber = upgradeNum;
+            attemptGameInit();
+        }
+
+        // Success!
+        buttons.forEach(btn => {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        });
+    }
+}
 
 
 // FUNCTIONS TO HELP DEVELOPMENT START
@@ -15431,11 +16979,11 @@ function createDirectionOverlay(tileDiv, direction, color) {
     tileDiv.appendChild(overlay);
 }
 
-/*
+
 setTimeout(() => {
     highlightWalkabilityMap(globalWalkabilityMap);
 }, 2000);
-*/
+
 
 // Z-Index Assignment System for Room Layout
 

@@ -59,7 +59,7 @@
 }
 
 .small-plant-1 {
-    width: calc(var(--unit-size) * 4);
+    width: calc(var(--unit-size) * 3);
     height: calc(var(--unit-size) * 4);
     background-image: url('images/pet-game/small-plant-1.png');
     background-repeat: no-repeat;
@@ -108,10 +108,10 @@
     z-index: 14;
 }
 
-.medium-table-1 {
-    width: calc(var(--unit-size) * 4);
-    height: calc(var(--unit-size) * 6);
-    background-image: url('images/pet-game/medium-table-1.png');
+.table-1-m {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 9);
+    background-image: url('images/pet-game/table-1-m.png');
         background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
@@ -239,9 +239,9 @@
 }
 
 .fridge-1 {
-    width: calc(var(--unit-size) * 6);
+    width: calc(var(--unit-size) * 5);
     height: calc(var(--unit-size) * 10);
-    background-image: url('images/pet-game/fridge-1.png');
+    background-image: url('images/pet-game/fridge-1-1.png');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
@@ -308,23 +308,21 @@
     z-index: 14;
 }
 
-.gramophone-1 {
-    width: calc(var(--unit-size) * 6);
-    height: calc(var(--unit-size) * 8);
-    background-image: url('images/pet-game/gramophone-1.png');
+.boombox-1-1 {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 4);
+    background-image: url('images/pet-game/boombox-1-1.png');
     background-repeat: no-repeat;
-    background-size: calc(var(--unit-size) * 6 * 2) calc(var(--unit-size) * 8 * 2); /* sprite sheet total size */
+    background-size: calc(var(--unit-size) * 5 * 2) calc(var(--unit-size) * 4 * 2); /* sprite sheet total size */
     animation: musicPlayerOff 1s steps(1) infinite;
     z-index: 14;
 }
 
-.gramophone-1.item-preview {
-    width: calc(var(--unit-size) *6);
-    height: calc(var(--unit-size) * 8);
-    background-image: url('images/pet-game/gramophone-1-preview.png');
+.boombox-1-1.item-preview {
+    background-image: url('images/pet-game/boombox-1-1.png');
+    background-size: 200% 200%; /* 2 frames wide 2 frames tall */
     background-repeat: no-repeat;
-    animation: none;
-    z-index: 14;
+    background-position: 0 0;
 }
 
 @keyframes musicPlayerOff {
@@ -332,8 +330,8 @@
 }
 
 @keyframes musicPlayerOn {
-    0%, 50% { background-position: 0 calc(var(--unit-size) * 8 * -1); } /* Bottom-left frame */
-    50.01%, 100% { background-position: calc(var(--unit-size) * 6 * -1) calc(var(--unit-size) * 8 * -1); } /* Bottom-right frame */
+    0%, 50% { background-position: 0 calc(var(--unit-size) * 4 * -1); } /* Bottom-left frame */
+    50.01%, 100% { background-position: calc(var(--unit-size) * 5 * -1) calc(var(--unit-size) * 4 * -1); } /* Bottom-right frame */
 }
 
 .bath-1-1 {
@@ -341,46 +339,57 @@
     height: calc(var(--unit-size) * 10);
     background-image: url('images/pet-game/bath-1-1.png');
     background-repeat: no-repeat;
-    background-size: calc(var(--unit-size) * 10 * 7) calc(var(--unit-size) * 10 * 3);
-    animation: bath-1-empty 1s steps(1) infinite;
+    background-position: center center;
+    background-size: cover;
+    background-size: calc(var(--unit-size) * 10 * 7) calc(var(--unit-size) * 2 * 10);
+    background-position: 0 0;
+    animation: none;
     z-index: 14;
 }
 
-.bath-1-1.cat-1-1 {
+.bath-1-1.filled {
     width: calc(var(--unit-size) * 10);
     height: calc(var(--unit-size) * 10);
-    background-image: url('images/pet-game/bath-1-1-cat-1-1.png');
+    background-image: url('images/pet-game/bath-1-1.png');
     background-repeat: no-repeat;
-    background-size: calc(var(--unit-size) * 10 * 7) calc(var(--unit-size) * 10 * 3);
-    animation: bath-1-empty 1s steps(1) infinite;
+    background-position: center center;
+    background-size: cover;
+    background-size: calc(var(--unit-size) * 10 * 7) calc(var(--unit-size) * 2 * 10);
+    animation: bath-1-full 2s steps(7) infinite;
     z-index: 14;
+}
+
+.bath-1-1::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--overlay, none);
+  background-repeat: no-repeat;
+  background-size: calc(var(--unit-size) * 10 * 7)
+                   calc(var(--unit-size) * 2 * 10);
+  background-position: 0 calc(-1 * var(--unit-size) * 2 * 10);
+  animation: bath-1-full 1s steps(7) infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+
+@keyframes bath-1-full {
+    from {
+        background-position: 0 calc(-1 * var(--unit-size) * 10);
+    }
+    to {
+        background-position: calc(7 * -10 * var(--unit-size)) calc(-1 * var(--unit-size) * 10);
+    }
 }
 
 .bath-1-1.item-preview {
-    width: calc(var(--unit-size) * 10);
-    height: calc(var(--unit-size) * 6);
-    background-image: url('images/pet-game/bath-1-1-preview.png');
-    animation: none;
+    background-image: url(images/pet-game/bath-1-1.png);
+    background-size: 600% 200%;
     background-repeat: no-repeat;
-}
-
-
-/* --- Empty --- */
-@keyframes bath-1-empty {
-    from { background-position: 0 calc(0 * var(--unit-size) * -10); }
-    to   { background-position: calc(-6 * var(--unit-size) * 10) calc(0 * var(--unit-size) * -10); }
-}
-
-/* --- Filled --- */
-@keyframes bath-1-filled {
-    from { background-position: 0 calc(-1 * var(--unit-size) * 10); }
-    to   { background-position: calc(-6 * var(--unit-size) * 10) calc(-1 * var(--unit-size) * 10); }
-}
-
-/* --- With pet --- */
-@keyframes bath-1-with-pet {
-    from { background-position: 0 calc(-2 * var(--unit-size) * 10); }
-    to   { background-position: calc(-6 * var(--unit-size) * 10) calc(-2 * var(--unit-size) * 10); }
+    background-position: 0 0;
+    margin-left: 15%;
+    margin-bottom: 25%;
 }
 
 .cat-food-1 {
@@ -411,7 +420,7 @@
 }
 
 .christmas-tree-1 {
-    width: calc(var(--unit-size) * 10);
+    width: calc(var(--unit-size) * 8);
     height: calc(var(--unit-size) * 13);
     background-image: url('images/pet-game/christmas-tree-1.png');
     background-repeat: no-repeat;
@@ -442,13 +451,632 @@
 }
 
 .christmas-lights-1.item-preview {
-    width: calc(var(--unit-size) * 8);
-    height: calc(var(--unit-size) * 2);
     background-image: url('images/pet-game/christmas-lights-1.png');
+    background-size: 200% 100%; /* 5 frames wide 2 frames tall */
+    background-repeat: no-repeat;
+    background-position: 0 0;
+}
+
+.small-plant-2 {
+    width: calc(var(--unit-size) * 3);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/small-plant-2.png');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
-    background-size: calc(var(--unit-size) * 8 * 2) calc(var(--unit-size) * 2);
-    animation:  none;
-    z-index: 5;
+    z-index: 14;
+}
+
+.small-plant-3 {
+    width: calc(var(--unit-size) * 3);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/small-plant-3.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.small-plant-4 {
+    width: calc(var(--unit-size) * 3);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/small-plant-4.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.kitchen-base-cabinet-1-1 {
+    width: calc(var(--unit-size) * 7);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/kitchen-base-cabinet-1-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+@keyframes bath-1-full {
+    from {
+        background-position: 0 calc(-1 * var(--unit-size) * 10);
+    }
+    to {
+        background-position: calc(7 * -10 * var(--unit-size)) calc(-1 * var(--unit-size) * 10);
+    }
+}
+
+.fireplace-1 {
+    width: calc(var(--unit-size) * 8);
+    height: calc(var(--unit-size) * 7);
+    background-image: url('images/pet-game/fireplace-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-size: calc(var(--unit-size) * 8 * 5) calc(var(--unit-size) * 2 * 7);
+    background-position: 0 0;
+    animation: none;
+}
+
+.fireplace-1.fire {
+    width: calc(var(--unit-size) * 8);
+    height: calc(var(--unit-size) * 7);
+    background-image: url('images/pet-game/fireplace-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-size: calc(var(--unit-size) * 8 * 5) calc(var(--unit-size) * 2 * 7);
+    animation: fireplace-1-fire 0.85s steps(5) infinite;
+}
+
+.fireplace-1.item-preview{
+    background-image: url('images/pet-game/fireplace-1.png');
+    background-size: 500% 200%; /* 5 frames wide 2 frames tall */
+    background-repeat: no-repeat;
+    background-position: 0 0;
+}
+
+@keyframes fireplace-1-fire {
+    from {
+        background-position: 0 calc(-1 * var(--unit-size) * 7);
+    }
+    to {
+        background-position: calc(5 * -8 * var(--unit-size)) calc(-1 * var(--unit-size) * 7);
+    }
+}
+
+.hanging-plant-1-1 {
+    width: calc(var(--unit-size) * 4);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/hanging-plant-1-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.hanging-plant-1-2 {
+    width: calc(var(--unit-size) * 4);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/hanging-plant-1-2.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.kitchen-base-cabinet-2-1 {
+    width: calc(var(--unit-size) * 7);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/kitchen-base-cabinet-2-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.kitchen-base-cabinet-3-1 {
+    width: calc(var(--unit-size) * 7);
+    height: calc(var(--unit-size) * 8);
+    background-image: url('images/pet-game/kitchen-base-cabinet-3-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.kitchen-wall-cabinet-1-1 {
+    width: calc(var(--unit-size) * 7);
+    height: calc(var(--unit-size) * 4);
+    background-image: url('images/pet-game/kitchen-wall-cabinet-1-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 3;
+}
+
+.kitchen-wall-cabinet-2-1 {
+    width: calc(var(--unit-size) * 7);
+    height: calc(var(--unit-size) * 4);
+    background-image: url('images/pet-game/kitchen-wall-cabinet-2-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 3;
+}
+
+.fridge-2-1 {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 10);
+    background-image: url('images/pet-game/fridge-2-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.sink-1-1 {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 4);
+    background-image: url('images/pet-game/sink-1-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-size: calc(var(--unit-size) * 5 * 4) calc(var(--unit-size) * 4 * 2);
+    background-position: 0 0;
+    animation: none;
+    z-index: 14;
+}
+
+.sink-1-1.tap-running {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 4);
+    background-image: url('images/pet-game/sink-1-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-size: calc(var(--unit-size) * 5 * 4) calc(var(--unit-size) * 4 * 2);
+    animation: sink-1-tap-running 0.4s steps(4) infinite;
+    z-index: 14;
+}
+
+.sink-1-1.item-preview {
+    background-image: url('images/pet-game/sink-1-1.png');
+    background-size: 400% 200%; /* 4 frames wide 2 frames tall */
+    background-repeat: no-repeat;
+    background-position: 0 0;
+}
+
+.sink-1-2 {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 4);
+    background-image: url('images/pet-game/sink-1-2.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-size: calc(var(--unit-size) * 5 * 4) calc(var(--unit-size) * 4 * 2);
+    background-position: 0 0;
+    animation: none;
+    z-index: 14;
+}
+
+.sink-1-2.tap-running {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 4);
+    background-image: url('images/pet-game/sink-1-2.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-size: calc(var(--unit-size) * 5 * 4) calc(var(--unit-size) * 4 * 2);
+    animation: sink-1-tap-running 0.4s steps(4) infinite;
+    z-index: 14;
+}
+
+.sink-1-2.item-preview {
+    background-image: url('images/pet-game/sink-1-2.png');
+    background-size: 400% 200%; /* 4 frames wide 2 frames tall */
+    background-repeat: no-repeat;
+    background-position: 0 0;
+}
+
+@keyframes sink-1-tap-running {
+    from {
+        background-position: 0 calc(-4 * var(--unit-size));
+    }
+    to {
+        background-position: calc(4 * -5 * var(--unit-size)) calc(-4 * var(--unit-size));
+    }
+}
+
+.oven-1-1 {
+    width: calc(var(--unit-size) * 7);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/oven-1-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+    background-size: calc(var(--unit-size) * 7 * 6) calc(var(--unit-size) * 6 * 2);
+    background-position: 0 0;
+    animation: none;
+}
+
+.oven-1-1.on {
+    width: calc(var(--unit-size) * 7);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/oven-1-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+    background-size: calc(var(--unit-size) * 7 * 6) calc(var(--unit-size) * 6 * 2);
+    animation: oven-1-on 2s steps(6) infinite;
+}
+
+.oven-1-1.item-preview {
+    background-image: url('images/pet-game/oven-1-1.png');
+    background-size: 600% 200%; /* 5 frames wide 2 frames tall */
+    background-repeat: no-repeat;
+    background-position: 0 0;
+}
+
+@keyframes oven-1-on {
+    from {
+        background-position: 0 calc(-6 * var(--unit-size));
+    }
+    to {
+        background-position: calc(6 * -7 * var(--unit-size)) calc(-6 * var(--unit-size));
+    }
+}
+
+.bathroom-base-cabinet-1-1 {
+    width: calc(var(--unit-size) * 7);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/bathroom-base-cabinet-1-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.bathroom-base-cabinet-2-1 {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 8);
+    background-image: url('images/pet-game/bathroom-base-cabinet-2-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.bathroom-wall-cabinet-1-1 {
+    width: calc(var(--unit-size) * 7);
+    height: calc(var(--unit-size) * 4);
+    background-image: url('images/pet-game/bathroom-wall-cabinet-1-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 3;
+}
+
+.toilet-1-1 {
+    width: calc(var(--unit-size) * 4);
+    height: calc(var(--unit-size) * 7);
+    background-image: url('images/pet-game/toilet-1-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.washing-machine-1-1 {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 7);
+    background-image: url('images/pet-game/washing-machine-1-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-size: calc(var(--unit-size) * 7 * 5) calc(var(--unit-size) * 5 * 2);
+    animation: none;
+    background-position: 0 0;
+    z-index: 14;
+}
+
+.washing-machine-1-1.on {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 7);
+    background-image: url('images/pet-game/washing-machine-1-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-size: calc(var(--unit-size) * 7 * 5) calc(var(--unit-size) * 5 * 2);
+    background-position: 0 0;
+    animation: washing-machine-1-on 1s steps(5) infinite;
+    z-index: 14;
+}
+
+.washing-machine-1-1.item-preview {
+    background-image: url(images/pet-game/washing-machine-1-1.png);
+    background-size: 500% 200%; /* 5 frames wide 2 frames tall */
+    background-repeat: no-repeat;
+    background-position: 0 0;
+}
+
+@keyframes washing-machine-1-on {
+    from {
+        background-position: 0 calc(-7 * var(--unit-size));
+    }
+    to {
+        background-position: calc(5 * -5 * var(--unit-size)) calc(-7 * var(--unit-size));
+    }
+}
+
+.chair-1-1-down {
+    width: calc(var(--unit-size) * 3);
+    height: calc(var(--unit-size) * 5);
+    background-image: url('images/pet-game/chair-1-1-down.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.chair-1-1-up {
+    width: calc(var(--unit-size) * 3);
+    height: calc(var(--unit-size) * 4);
+    background-image: url('images/pet-game/chair-1-1-up.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.chair-1-1-right {
+    width: calc(var(--unit-size) * 3);
+    height: calc(var(--unit-size) * 5);
+    background-image: url('images/pet-game/chair-1-1-right.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.chair-1-1-left {
+    width: calc(var(--unit-size) * 3);
+    height: calc(var(--unit-size) * 5);
+    background-image: url('images/pet-game/chair-1-1-left.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.chair-2-1-down {
+    width: calc(var(--unit-size) * 3);
+    height: calc(var(--unit-size) * 5);
+    background-image: url('images/pet-game/chair-2-1-down.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.chair-2-1-up {
+    width: calc(var(--unit-size) * 3);
+    height: calc(var(--unit-size) * 4);
+    background-image: url('images/pet-game/chair-2-1-up.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.chair-2-1-right {
+    width: calc(var(--unit-size) * 3);
+    height: calc(var(--unit-size) * 5);
+    background-image: url('images/pet-game/chair-2-1-right.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.chair-2-1-left {
+    width: calc(var(--unit-size) * 3);
+    height: calc(var(--unit-size) * 5);
+    background-image: url('images/pet-game/chair-2-1-left.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.sofa-1-1-down {
+    width: calc(var(--unit-size) * 10);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/sofa-1-1-down.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.sofa-1-1-up {
+    width: calc(var(--unit-size) * 10);
+    height: calc(var(--unit-size) * 5);
+    background-image: url('images/pet-game/sofa-1-1-up.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.sofa-1-1-right {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 9);
+    background-image: url('images/pet-game/sofa-1-1-right.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.sofa-1-1-left {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 9);
+    background-image: url('images/pet-game/sofa-1-1-left.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.sofa-2-1-down {
+    width: calc(var(--unit-size) * 10);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/sofa-2-1-down.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.sofa-2-1-up {
+    width: calc(var(--unit-size) * 10);
+    height: calc(var(--unit-size) * 5);
+    background-image: url('images/pet-game/sofa-2-1-up.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.sofa-2-1-right {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 9);
+    background-image: url('images/pet-game/sofa-2-1-right.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.sofa-2-1-left {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 9);
+    background-image: url('images/pet-game/sofa-2-1-left.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.armchair-1-1-down {
+    width: calc(var(--unit-size) * 6);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/armchair-1-1-down.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.armchair-1-1-up {
+    width: calc(var(--unit-size) * 6);
+    height: calc(var(--unit-size) * 5);
+    background-image: url('images/pet-game/armchair-1-1-up.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.armchair-1-1-right {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/armchair-1-1-right.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.armchair-1-1-left {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/armchair-1-1-left.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.armchair-2-1-down {
+    width: calc(var(--unit-size) * 6);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/armchair-2-1-down.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.armchair-2-1-up {
+    width: calc(var(--unit-size) * 6);
+    height: calc(var(--unit-size) * 5);
+    background-image: url('images/pet-game/armchair-2-1-up.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.armchair-2-1-right {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/armchair-2-1-right.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.armchair-2-1-left {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/armchair-2-1-left.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.coffee-table-1-m-1 {
+    width: calc(var(--unit-size) * 5);
+    height: calc(var(--unit-size) * 3);
+    background-image: url('images/pet-game/coffee-table-1-m-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.coffee-table-1-s-1 {
+    width: calc(var(--unit-size) * 3);
+    height: calc(var(--unit-size) * 2.5);
+    background-image: url('images/pet-game/coffee-table-1-s-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
+}
+
+.bed-1-1 {
+    width: calc(var(--unit-size) * 8);
+    height: calc(var(--unit-size) * 10);
+    background-image: url('images/pet-game/bed-1-1.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: 14;
 }

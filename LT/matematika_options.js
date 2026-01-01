@@ -971,7 +971,10 @@ function updateControllerCustomTaskChoices () {
     if (controller.mode === "math") {
         modeChoice1Selection = modeChoice1Element.value;
         modeChoice2Selection = modeChoice2Element.value;
-        selectedNumbers = [selectedNumberElement.value, selectedNumber2Element.value].sort();
+        selectedNumbers = [
+                    Number(selectedNumberElement.value),
+                    Number(selectedNumber2Element.value)
+                ].sort((a, b) => a - b);
         modeChoice3Selection = modeChoice3Element.value;
         modeChoice5Selection = modeChoice5Element.value;
         modeChoice6Selection = modeChoice6Element.value;
