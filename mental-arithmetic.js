@@ -664,15 +664,24 @@ async function sendSetTaskResultsToDatabase() {
       const mistakes = controller.mistakesTracker || 1; // avoid dividing by 0
 
       function calculateTotalScoreForTextComp(list) {
+        // define mistake → multiplier rules per difficulty
+        const difficultyRules = {
+          C58: [1, 0.5],               // 0, 1 mistakes
+          C59: [1, 0.5, 0.25],         // 0–2 mistakes
+          C60: [1, 0.5, 0.25, 0.1]     // 0–3 mistakes
+        };
+
+        const rules = difficultyRules[controller.modeChoiceLtDifficulty] || [];
+
         const total = list.reduce((sum, [, mistakes]) => {
-          let score = 1 - mistakes * 0.25;
-          score = Math.max(0, score); // prevent negatives
-          return sum + score;
+          const multiplier = rules[mistakes] ?? 0;
+          return sum + multiplier;
         }, 0);
 
         // round final result to 2 decimals
         return Number(total.toFixed(2));
       }
+
 
       let resultsData;
 
@@ -925,11 +934,23 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
 
       pointsEarned = await calculateTasksPerCorrectAnswerPoints("controller");
 
-      pointsEarned = 
-          (IDsOfTextsWithZeroMistakes.length * pointsEarned * 1)
-        + (IDsOfTextsWithOneMistake.length * pointsEarned * 0.75)
-        + (IDsOfTextsWithTwoMistakes.length * pointsEarned * 0.5)
-        + (IDsOfTextsWithThreeMistakes.length * pointsEarned * 0.25);
+      if (controller.modeChoiceLtDifficulty === "C58") {
+        pointsEarned = 
+            (IDsOfTextsWithZeroMistakes.length * pointsEarned * 1)
+          + (IDsOfTextsWithOneMistake.length * pointsEarned * 0.5)
+      } else if (controller.modeChoiceLtDifficulty === "C59") {
+        pointsEarned = 
+            (IDsOfTextsWithZeroMistakes.length * pointsEarned * 1)
+          + (IDsOfTextsWithOneMistake.length * pointsEarned * 0.5)
+          + (IDsOfTextsWithTwoMistakes.length * pointsEarned * 0.25)
+      } else if (controller.modeChoiceLtDifficulty === "C60") {
+        pointsEarned = 
+            (IDsOfTextsWithZeroMistakes.length * pointsEarned * 1)
+          + (IDsOfTextsWithOneMistake.length * pointsEarned * 0.5)
+          + (IDsOfTextsWithTwoMistakes.length * pointsEarned * 0.25)
+          + (IDsOfTextsWithThreeMistakes.length * pointsEarned * 0.1);
+      }
+
 
     } else {
       pointsEarned = await calculateTasksPerCorrectAnswerPoints("controller");
@@ -4161,11 +4182,24 @@ async function calculateTasksPerCorrectAnswerPoints(type, selectedTextInfo = nul
 
               const mistakes = mistakesMap.get(textId) ?? 0;
 
-              let multiplier =
+              let multiplier;
+
+              if (difficulty === "C58") {
+                multiplier =
                   mistakes === 0 ? 1 :
-                  mistakes === 1 ? 0.75 :
-                  mistakes === 2 ? 0.5 :
-                  mistakes === 3 ? 0.25 : 0;
+                  mistakes === 1 ? 0.5 : 0
+              } else if (difficulty === "C59") {
+                multiplier =
+                  mistakes === 0 ? 1 :
+                  mistakes === 1 ? 0.5 :
+                  mistakes === 2 ? 0.25 : 0
+              } else if (difficulty === "C60") {
+                multiplier =
+                  mistakes === 0 ? 1 :
+                  mistakes === 1 ? 0.5 :
+                  mistakes === 2 ? 0.25 :
+                  mistakes === 3 ? 0.1 : 0;
+              }
 
               customTextsTotal += perTextTotal * multiplier;
           }
