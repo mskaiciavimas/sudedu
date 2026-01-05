@@ -10275,6 +10275,12 @@ async function previewFurniture (key) {
     
     let tempDivId = renderTemporaryRoomObject(key);
 
+    document.querySelector(`#${tempDivId}`).style.opacity = "0";
+
+    const gameContainer = document.getElementById("gameContainer");
+    gameContainer.inert = true;
+    gameContainer.style.opacity = "0.6";
+
     document.querySelectorAll('.game-content-panel').forEach(p => p.classList.remove('active'));
     document.getElementById('pet-room-container').classList.add('active');
 
@@ -10288,6 +10294,7 @@ async function previewFurniture (key) {
     updateStatsBeforeRerunningInitGameAndRenderPets();
     
     await initGame();
+
     const placementMap = generatePlacementMap(tempDivId);
 
     const validPosition = findValidPosition(placementMap, tempDivId);
@@ -10308,11 +10315,11 @@ async function previewFurniture (key) {
         document.querySelector("#end-preview-button").classList.remove("hidden")
         document.querySelector("#toggle-edit-save-btn").classList.add("hidden")
         document.querySelector("#cancel-edit-btn").classList.add("hidden")
+        document.querySelector("#delete-selected-item-button").classList.add("hidden")
         hideSidebar();
 
         centerViewportOnObject("furniture-preview")
 
-        
     } else {
         furniturePreviewDict["furniture-preview"].position = [];
         document.getElementById(tempDivId).remove();
@@ -10325,6 +10332,13 @@ async function previewFurniture (key) {
         }
         furniturePreviewDict["furniture-preview"].assetIndex = null;
     }
+
+    if (document.querySelector(`#${tempDivId}`)) {
+        document.querySelector(`#${tempDivId}`).style.opacity = "1";
+    }
+
+    gameContainer.inert = false;
+    gameContainer.style.opacity = "1";
 }
 
 const selectedVariantState = {};
@@ -11744,6 +11758,11 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
 
             let tempDivId = renderSingleRoomObject(newKey);
 
+            document.querySelector(`#${tempDivId}`).style.opacity = "0";
+
+            gameContainer.inert = true;
+            gameContainer.style.opacity = "0.6";
+
             if (!sidebar) {
                 document.querySelectorAll('.game-content-panel').forEach(p => p.classList.remove('active'));
                 document.getElementById('pet-room-container').classList.add('active');
@@ -11808,6 +11827,13 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
                     messageToTheUser("Nepakanka vietos!");
                 }
             }
+
+            if (document.querySelector(`#${tempDivId}`)) {
+                document.querySelector(`#${tempDivId}`).style.opacity = "1";
+            }
+            
+            gameContainer.inert = false;
+            gameContainer.style.opacity = "1";
 
             if (window.innerWidth <= 768) {
                 closeSidebar();
@@ -11922,6 +11948,11 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
 
             userObjectAssets[tempDivId].position = getObjectCoordinates(tempDivId);
 
+            document.querySelector(`#${tempDivId}`).style.opacity = "0";
+
+            gameContainer.inert = true;
+            gameContainer.style.opacity = "0.6";
+
             if (!sidebar) {
                 document.querySelectorAll('.game-content-panel').forEach(p => p.classList.remove('active'));
                 document.getElementById('pet-room-container').classList.add('active');
@@ -11982,6 +12013,13 @@ function renderObjectAssets(selectedCategory = 'all', unusedOnly = false, sideba
                     messageToTheUser("Nepakanka vietos!");
                 }
             }
+
+            if (document.querySelector(`#${tempDivId}`)) {
+                document.querySelector(`#${tempDivId}`).style.opacity = "1";
+            }
+
+            gameContainer.inert = false;
+            gameContainer.style.opacity = "1";
 
             // Only update UI state if not re-rendering sidebar
             if (!sidebar) {
