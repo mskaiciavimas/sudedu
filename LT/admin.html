@@ -1084,17 +1084,36 @@
                     <button class="btn" onclick="modifyMoneyAll()">Apply</button>
                 </div>
 
+                <!-- Increase Knowledge Level -->
+                <div class="operation-card">
+                    <h3>📚 Increase Knowledge Level</h3>
+                    <p style="color: #666; margin-bottom: 15px;">
+                        Increase knowledge level by 1 for all students (0→1, 1→2, etc., max 5). Students with "Class Unassigned" (-1) will be skipped.
+                    </p>
+                    <div id="knowledge-message"></div>
+                    <button class="btn" onclick="increaseKnowledgeLevel()">Increase For All Students</button>
+                </div>
+
                 <div class="operation-card">
                     <h3>⏰ Delete Inactive Users</h3>
                     <div class="form-group">
                         <label for="inactive-months">Months of Inactivity</label>
                         <input type="number" id="inactive-months" placeholder="e.g., 6" min="1">
                         <small style="color: #666; display: block; margin-top: 5px;">
-                            Users who haven't logged in for this many months (or never logged in) will be deleted. Admin accounts will not be deleted.
+                            Users who logged in but haven't been active for this many months will be deleted. Admin accounts will not be deleted. This does NOT include users who never logged in.
                         </small>
                     </div>
                     <div id="inactive-message"></div>
                     <button class="btn btn-danger" onclick="deleteInactiveUsers()">Delete Inactive Users</button>
+                </div>
+
+                <div class="operation-card">
+                    <h3>🚫 Delete Never Logged In Users</h3>
+                    <p style="color: #666; margin-bottom: 15px;">
+                        Delete all user accounts that have never logged in (lastLogIn is null). Admin accounts will not be deleted.
+                    </p>
+                    <div id="never-logged-message"></div>
+                    <button class="btn btn-danger" onclick="deleteNeverLoggedInUsers()">Delete Never Logged In Users</button>
                 </div>
 
                 <div class="operation-card">
@@ -1583,14 +1602,36 @@
                     ${item.cost !== undefined 
                         ? `<div class="item-property"><strong>Cost:</strong> ${item.cost} 💰</div>` 
                         : ''}
-                    <div class="item-property"><strong>Passable:</strong> ${item.passable ? '✅' : '❌'}</div>
-                    <div class="item-property"><strong>Steppable:</strong> ${item.steppable ? '✅' : '❌'}</div>
-                    <div class="item-property"><strong>One of Kind:</strong> ${item.oneOfKind ? '✅' : '❌'}</div>
-                    <div class="item-property"><strong>Stackable:</strong> ${item.stackable ? '✅' : '❌'}</div>
-                    <div class="item-property"><strong>Purchasable:</strong> ${item.purchasable ? '✅' : '❌'}</div>
+                    ${item.passable !== undefined
+                        ? `<div class="item-property"><strong>Passable:</strong> ${item.passable ? '✅' : '❌'}</div>`
+                        : ''}
+                    ${item.steppable !== undefined
+                        ? `<div class="item-property"><strong>Steppable:</strong> ${item.steppable ? '✅' : '❌'}</div>`
+                        : ''}
+                    ${item.walkOn !== undefined
+                        ? `<div class="item-property"><strong>Walk On:</strong> ${item.walkOn ? '✅' : '❌'}</div>`
+                        : ''}
+                    ${item.walkBehind !== undefined
+                        ? `<div class="item-property"><strong>Walk Behind:</strong> ${item.walkBehind ? '✅' : '❌'}</div>`
+                        : ''}
+                    ${item.oneOfKind !== undefined
+                        ? `<div class="item-property"><strong>One of Kind:</strong> ${item.oneOfKind ? '✅' : '❌'}</div>`
+                        : ''}
+                    ${item.stackable !== undefined
+                        ? `<div class="item-property"><strong>Stackable:</strong> ${item.stackable ? '✅' : '❌'}</div>`
+                        : ''}
+                    ${item.purchasable !== undefined
+                        ? `<div class="item-property"><strong>Purchasable:</strong> ${item.purchasable ? '✅' : '❌'}</div>`
+                        : ''}
+                    ${item.pet !== undefined
+                        ? `<div class="item-property"><strong>Pet:</strong> ${item.pet ? '✅' : '❌'}</div>`
+                        : ''}
+                    ${item.petAsset !== undefined
+                        ? `<div class="item-property"><strong>Pet Asset:</strong> ${item.petAsset ? '✅' : '❌'}</div>`
+                        : ''}
                 </div>
 
-                ${item.placingIndex != null 
+                ${item.placingIndex !== null && item.placingIndex !== undefined
                     ? `<div style="margin-top: 15px"><strong>Placing Index:</strong> ${item.placingIndex}</div>` 
                     : ''}
 
@@ -1598,16 +1639,40 @@
                     ? `<div style="margin-top: 15px"><strong>Can Be Placed On:</strong> ${item.canBePlacedOn.join(', ')}</div>` 
                     : ''}
 
+                ${item.placementRanges?.length 
+                    ? `<div style="margin-top: 15px"><strong>Placement Ranges:</strong> ${JSON.stringify(item.placementRanges)}</div>` 
+                    : ''}
+
+                ${item.placingBuffer?.length 
+                    ? `<div style="margin-top: 15px"><strong>Placing Buffer:</strong> ${item.placingBuffer.join(', ')}</div>` 
+                    : ''}
+
+                ${item.walkBehindLimit?.length 
+                    ? `<div style="margin-top: 15px"><strong>Walk Behind Limit:</strong> ${JSON.stringify(item.walkBehindLimit)}</div>` 
+                    : ''}
+
+                ${item.protruding !== undefined && item.protruding !== null
+                    ? `<div style="margin-top: 15px"><strong>Protruding:</strong> ${item.protruding}</div>` 
+                    : ''}
+
                 ${item.requires?.length 
-                    ? `<div style="margin-top: 15px"><strong>Requires:</strong> ${item.requires.join(', ')}</div>` 
+                    ? `<div style="margin-top: 15px"><strong>Requires:</strong> ${JSON.stringify(item.requires)}</div>` 
                     : ''}
 
                 ${item.provides?.length 
-                    ? `<div style="margin-top: 15px"><strong>Provides:</strong> ${item.provides.join(', ')}</div>` 
+                    ? `<div style="margin-top: 15px"><strong>Provides:</strong> ${JSON.stringify(item.provides)}</div>` 
                     : ''}
 
                 ${item['interactive-spot']?.length 
-                    ? `<div style="margin-top: 15px"><strong>Interactive Spot:</strong> ${item['interactive-spot']}</div>`
+                    ? `<div style="margin-top: 15px"><strong>Interactive Spot:</strong> ${item['interactive-spot'].join(', ')}</div>`
+                    : ''}
+
+                ${item.variant?.length 
+                    ? `<div style="margin-top: 15px"><strong>Variant:</strong> ${item.variant.join(', ')}</div>` 
+                    : ''}
+
+                ${item.petName
+                    ? `<div style="margin-top: 15px"><strong>Pet Name:</strong> ${item.petName}</div>` 
                     : ''}
 
                 <div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
@@ -1618,15 +1683,6 @@
             
             return html;
         }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -2015,6 +2071,10 @@
                             <input type="number" id="edit-money" value="${user.petGame.money}" min="0">
                         </div>
                         <div class="info-item">
+                            <strong>Room Layout</strong>
+                            <input type="number" id="edit-room-layout" value="${user.petGame.roomLayout}" min="1">
+                        </div>
+                        <div class="info-item">
                             <strong>Pet on Walk</strong>
                             ${user.petGame.petOnWalk || 'None'}
                         </div>
@@ -2212,12 +2272,13 @@
         // Update pet game
         async function updatePetGame(userId) {
             const money = parseInt(document.getElementById('edit-money').value);
+            const roomLayout = parseInt(document.getElementById('edit-room-layout').value);
 
             try {
                 const response = await apiFetch(`${apiBase}admin/user/${userId}/petgame`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ money })
+                    body: JSON.stringify({ money, roomLayout })
                 });
 
                 if (!response || !response.ok) throw new Error('Failed to update pet game');
@@ -2419,7 +2480,7 @@
             }
         }
 
-        // Delete inactive users
+        // Delete inactive users (has logged in but inactive)
         async function deleteInactiveUsers() {
             const months = document.getElementById('inactive-months').value;
             if (!months || months < 1) {
@@ -2427,7 +2488,13 @@
                 return;
             }
 
-            if (!confirm(`Delete all users inactive for ${months}+ months (including users who never logged in)?\n\nAdmin accounts will not be deleted.`)) return;
+            if (!confirm(`Delete all users who logged in but haven't been active for ${months}+ months?\n\nThis will NOT delete users who never logged in.\nAdmin accounts will not be deleted.`)) return;
+
+            // Show initial loading message
+            showMessage('inactive-message', 
+                `<div class="loading">Starting deletion process...<br>This may take a while. Please do not close this page.</div>`, 
+                'info'
+            );
 
             try {
                 const response = await apiFetch(`${apiBase}admin/inactive?inactivePeriod=${months}`, {
@@ -2441,12 +2508,60 @@
                 }
 
                 const data = await response.json();
-                showMessage('inactive-message', 
-                    `${data.message}<br>Deleted ${data.deletedCount} users<br>Threshold: ${data.inactiveThresholdMonths} months`, 
-                    'success'
-                );
+                
+                let message = `✅ Deletion complete!<br><br>` +
+                            `Deleted: ${data.deletedCount} users<br>` +
+                            `Failed: ${data.failedCount} users<br>` +
+                            `Total processed: ${data.totalProcessed} users<br>` +
+                            `Threshold: ${data.inactiveThresholdMonths} months`;
+                
+                if (data.failedUsers && data.failedUsers.length > 0) {
+                    message += `<br><br>⚠️ ${data.warning}`;
+                }
+                
+                showMessage('inactive-message', message, data.failedCount > 0 ? 'info' : 'success');
+                
             } catch (error) {
-                showMessage('inactive-message', error.message, 'error');
+                showMessage('inactive-message', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Delete users who never logged in
+        async function deleteNeverLoggedInUsers() {
+            if (!confirm(`Delete ALL users who have NEVER logged in?\n\nThis action cannot be undone.\nAdmin accounts will not be deleted.`)) return;
+
+            // Show initial loading message
+            showMessage('never-logged-message', 
+                `<div class="loading">Starting deletion process...<br>This may take a while. Please do not close this page.</div>`, 
+                'info'
+            );
+
+            try {
+                const response = await apiFetch(`${apiBase}admin/never-logged-in`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (!response || !response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.message || 'Failed to delete never-logged-in users');
+                }
+
+                const data = await response.json();
+                
+                let message = `✅ Deletion complete!<br><br>` +
+                            `Deleted: ${data.deletedCount} users<br>` +
+                            `Failed: ${data.failedCount} users<br>` +
+                            `Total processed: ${data.totalProcessed} users`;
+                
+                if (data.failedUsers && data.failedUsers.length > 0) {
+                    message += `<br><br>⚠️ ${data.warning}`;
+                }
+                
+                showMessage('never-logged-message', message, data.failedCount > 0 ? 'info' : 'success');
+                
+            } catch (error) {
+                showMessage('never-logged-message', `❌ Error: ${error.message}`, 'error');
             }
         }
 
@@ -2529,6 +2644,42 @@
                 document.getElementById('money-amount').value = '';
             } catch (error) {
                 showMessage('money-message', error.message, 'error');
+            }
+        }
+
+        // Increase knowledge level for all students
+        async function increaseKnowledgeLevel() {
+            if (!confirm('Increase knowledge level by 1 for all students?\n\nThis will:\n- Move 0 → 1, 1 → 2, 2 → 3, etc.\n- Keep level 5 students at 5\n- Skip unassigned students (-1)')) return;
+
+            // Show loading message
+            showMessage('knowledge-message', 
+                '<div class="loading">Processing knowledge level increases...</div>', 
+                'info'
+            );
+
+            try {
+                const response = await apiFetch(`${apiBase}admin/bulk/increase-knowledge`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (!response || !response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.message || 'Failed to increase knowledge levels');
+                }
+
+                const data = await response.json();
+                
+                let message = `✅ ${data.message}<br><br>` +
+                            `Updated: ${data.updatedCount} students<br>` +
+                            `Already at max (5): ${data.alreadyMaxCount} students<br>` +
+                            `Unassigned (skipped): ${data.unassignedCount} students<br>` +
+                            `Total processed: ${data.totalProcessed} students`;
+                
+                showMessage('knowledge-message', message, 'success');
+                
+            } catch (error) {
+                showMessage('knowledge-message', `❌ Error: ${error.message}`, 'error');
             }
         }
 
@@ -3489,6 +3640,10 @@ function displayStatistics(stats) {
                         <span class="stat-value">${stats.activity.activeLastDay} (${calcPercentage(stats.activity.activeLastDay, stats.users.total)}%)</span>
                     </div>
                     <div class="stat-item">
+                        <span class="stat-label">Active Last 2 Days:</span>
+                        <span class="stat-value">${stats.activity.activeLast2Days} (${calcPercentage(stats.activity.activeLast2Days, stats.users.total)}%)</span>
+                    </div>
+                    <div class="stat-item">
                         <span class="stat-label">Active Last Week:</span>
                         <span class="stat-value">${stats.activity.activeLastWeek} (${calcPercentage(stats.activity.activeLastWeek, stats.users.total)}%)</span>
                     </div>
@@ -3535,8 +3690,12 @@ function displayStatistics(stats) {
                 <h3>📝 Task Assignment</h3>
                 <div class="stat-items">
                     <div class="stat-item">
+                        <span class="stat-label">Teachers with Students:</span>
+                        <span class="stat-value">${stats.tasks.teachersWithStudents.length}</span>
+                    </div>
+                    <div class="stat-item">
                         <span class="stat-label">Teachers with Tasks:</span>
-                        <span class="stat-value">${stats.tasks.teachersWithTasks} (${calcPercentage(stats.tasks.teachersWithTasks, stats.tasks.totalTeachers)}%)</span>
+                        <span class="stat-value">${stats.tasks.teachersWithTasks} (${calcPercentage(stats.tasks.teachersWithTasks, stats.tasks.teachersWithStudents.length)}%)</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">Avg Tasks per Teacher:</span>
