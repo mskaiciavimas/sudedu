@@ -14064,8 +14064,51 @@ async function petEats(pet, object, signal) {
         managePetActions(pet);
 
     } else if (ableToPostitionToInteractReverse) {
-        await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveBottomRightCoords, signal);
-            if (signal.aborted) {
+        const [provides, useQuantity] = object._foodContent;
+        const [supply, key] = object._foodToRemoveFromUser;
+        supply.quantity -= useQuantity;
+        if (supply.quantity <= 0) {
+            delete userPetAssets.supplies[key];
+        } else {
+            userPetAssets.supplies[key]["quantity"] = supply.quantity;
+        }
+        await sendPetAssetsUpdateToDatabase();
+
+        const providesQuantity = provides[2] * useQuantity;
+        await increasePetStatsInDatabase(pet.id, "food", providesQuantity)
+        
+        object.classList.add("full");
+
+        const walking = await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveBottomRightCoords, signal);
+        
+        if (!walking) {
+            // If the supply was deleted, recreate it
+            if (!userPetAssets.supplies[key]) {
+                userPetAssets.supplies[key] = {
+                    ...supply,
+                    quantity: 0
+                };
+            }
+
+            // Restore quantity
+            userPetAssets.supplies[key].quantity += useQuantity;
+
+            // Sync local reference if needed
+            supply.quantity = userPetAssets.supplies[key].quantity;
+
+            // Persist
+            await sendPetAssetsUpdateToDatabase();
+
+            await increasePetStatsInDatabase(pet.id, "food", -1 * providesQuantity)
+
+            // Optional UI rollback
+            object.classList.remove("full");
+
+            messageToTheUser(`Augintinis negali prieiti prie maisto. Perstatyk baldus!`);
+            return
+        }
+
+        if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
         }
@@ -14076,7 +14119,7 @@ async function petEats(pet, object, signal) {
         }
 
         await cancellableWait(5000, signal);
-            if (signal.aborted) {
+        if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
         }
@@ -14087,7 +14130,6 @@ async function petEats(pet, object, signal) {
 
         pendingPetActions[pet.id].shift();
         managePetActions(pet);
-
     } else {
         messageToTheUser(`Augintiniai negali prieiti prie maisto. Perstatyk baldus!`);
         pendingPetActions[pet.id].shift();
@@ -14167,8 +14209,17 @@ async function petDrinks(pet, object, signal) {
         managePetActions(pet);
 
     } else if (ableToPostitionToInteractReverse) {
-        await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveBottomRightCoords, signal);
-            if (signal.aborted) {
+        object.classList.add("full");
+        
+        const walking = await movePetToTile(pet, getObjectCoordinates(pet.id), objectInteractiveBottomRightCoords, signal);
+        
+        if (!walking) {
+            object.classList.remove("full");
+            messageToTheUser(`Augintinis negali prieiti prie vandens. Perstatyk baldus!`);
+            return
+        }
+        
+        if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
         }
@@ -14179,7 +14230,7 @@ async function petDrinks(pet, object, signal) {
         }
 
         await cancellableWait(5000, signal);
-            if (signal.aborted) {
+        if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
         }
@@ -14190,7 +14241,6 @@ async function petDrinks(pet, object, signal) {
 
         pendingPetActions[pet.id].shift();
         managePetActions(pet);
-
     } else {
         messageToTheUser(`Augintiniai negali prieiti prie vandens. Perstatyk baldus!`);
         pendingPetActions[pet.id].shift();
