@@ -1973,11 +1973,6 @@
                                     <option value="teacher">Mokytojas</option>
                                 </select>
                             </div>
-
-                            <div class="field" id="knowledge-level-display" style="display: none;">
-                                <label class="user-info-section-label">Klasė</label>
-                                <div class="field-display" id="userClassDisplay"></div>
-                            </div>
                             
                             <div class="action-buttons">
                                 <button class="edit-btn" id="editBtn">Redaguoti profilį</button>
@@ -2373,11 +2368,6 @@
             document.getElementById('nameDisplay').textContent = userData.nickname || 'Nepavadinta';
             document.getElementById('fullName').value = userData.nickname || '';
             document.getElementById('userIdDisplay').textContent = userData.userId || '';
-            document.getElementById('userClassDisplay').textContent = userData.knowledgeLvl || '';
-
-            if (userData.accType === "student") {
-                document.getElementById('knowledge-level-display').style.display = "flex";
-            }
 
             // Set account type
             const accountSelect = document.getElementById('accountTypeSelect');
