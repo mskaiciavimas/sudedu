@@ -3377,6 +3377,7 @@ function getOptionTextFromValues(values, taskDuration, forTeacher = false) {
                     final_results.push(parameterDictionary[values[5]]["decodedParameterText"]);
                     final_results.push(parameterDictionary[values[6]]["decodedParameterText"]);
                 }
+                final_results.push(parameterDictionary[values[3]]["decodedParameterText"]);
                 final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
             } else if (values[4] === "C84") {
                 if (forTeacher) {
@@ -3391,10 +3392,13 @@ function getOptionTextFromValues(values, taskDuration, forTeacher = false) {
 
                     outerDiv.innerHTML = htmlItems;
                     final_results.push(outerDiv.outerHTML);
+                    final_results.push(parameterDictionary[values[3]]["decodedParameterText"]);
                 } else {
+                    final_results.push(parameterDictionary[values[3]]["decodedParameterText"]);
                     final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1].length.toString()));
                 }
             }
+
         } else if (result[0] === "GRAMATIKA") {
           final_results.push(result[2]);
           if (result[1] === "RAŠYBA") {
