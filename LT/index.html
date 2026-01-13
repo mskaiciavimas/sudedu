@@ -1247,7 +1247,22 @@ body.popup-active {
     </nav>
 
 
-	<div class="container" id="template-container" hidden>		
+	<div class="container" id="template-container" hidden>	
+        <div class="class-popup-modal" id="classPopupLoggedInClassConfirmation2">
+			<div class="class-popup-content">
+                <select class="class-options" id="classLoggedInClassSelect2">
+                    <option value="" selected disabled>Patvirtink savo klasę</option>
+                    <option value="0">Priešmokyklinė</option>
+                    <option value="1">1 klasė</option>
+                    <option value="2">2 klasė</option>
+                    <option value="3">3 klasė</option>
+                    <option value="4">4 klasė</option>
+                    <option value="5">Aukštesnė</option>
+                </select>
+                <button class="class-popup-button" id="classPopupLoggedInClassConfirmation2Button" disabled>Pirmyn!</button>
+			</div>
+		</div>
+        	
         <div class="class-popup-modal" id="classPopupLoggedInClassConfirmation">
 			<div class="class-popup-content">
                 <select class="class-options" id="classLoggedInClassSelect">
@@ -1749,6 +1764,22 @@ body.popup-active {
         	controller.modeChoice4 = modeChoice4Element.value
 			localStorage.setItem('controller', JSON.stringify(controller))
 
+            if (controller.modeChoice2 === "C8" && 
+                (
+                    userData.knowledgeLvl === 2 || 
+                    userData.knowledgeLvl === 3 || 
+                    userData.knowledgeLvl === 4 || 
+                    userData.knowledgeLvl === 5
+                )
+            ) {
+                const confirmedRecently = getClassConfirmationLocalStorage()
+
+                if (!confirmedRecently) {
+                    showClassPopupLoggedInClassConfirmation2();
+                    return
+                }
+            }
+
 			if (controller.modeChoice4 === "C39") {
 				startQuestionsTimer()
 			} else if (controller.modeChoice4 = "C40") {
@@ -1805,22 +1836,22 @@ body.popup-active {
 //POPUP SCRIPT START
 
 // Function to set value in localStorage with expiration
-function setClassLocalStorage(classValue) {
+function setClassConfirmationLocalStorage() {
     const now = new Date();
     // Set expiration to 2 months from now
     const expiration = new Date(now.setMonth(now.getMonth() + 2));
     
     const item = {
-        value: classValue,
+        value: true,
         expiration: expiration.getTime()
     };
     
-    localStorage.setItem("userClassNotLoggedIn", JSON.stringify(item));
+    localStorage.setItem("userClassConfirmed", JSON.stringify(item));
 }
 
 // Function to get value from localStorage and check expiration
-function getClassLocalStorage() {
-    const itemStr = localStorage.getItem("userClassNotLoggedIn");
+function getClassConfirmationLocalStorage() {
+    const itemStr = localStorage.getItem("userClassConfirmed");
     
     // If the item doesn't exist, return null
     if (!itemStr) {
@@ -1833,11 +1864,54 @@ function getClassLocalStorage() {
     // Compare the expiration time with the current time
     if (now.getTime() > item.expiration) {
         // If the item is expired, delete it and return null
-        localStorage.removeItem("userClassNotLoggedIn");
+        localStorage.removeItem("userClassConfirmed");
         return null;
     }
     
     return item.value;
+}
+
+function showClassPopupLoggedInClassConfirmation2() {
+    const popup = document.getElementById('classPopupLoggedInClassConfirmation2');
+    const nextButton = document.getElementById('classPopupLoggedInClassConfirmation2Button');
+    const classSelect = document.getElementById('classLoggedInClassSelect2');
+    let selectedClass = null;
+
+    // Show popup
+    popup.classList.add('active');
+    document.body.classList.add('popup-active');
+
+    // Disable Next button initially
+    nextButton.disabled = true;
+
+    // Listen for changes in the dropdown
+    classSelect.addEventListener('change', function() {
+        selectedClass = Number(this.value);
+        nextButton.disabled = this.value === ""; // enable only if a real option is selected
+    });
+
+    // Next button click
+    nextButton.addEventListener('click', async function() {
+        if (selectedClass !== null && selectedClass !== undefined) {
+            // Set localStorage with selected class and expiration
+            setClassConfirmationLocalStorage();
+
+            userClass = selectedClass;
+
+            if (userData) {
+                updateUserClass(userClass);
+                userData.knowledgeLvl = userClass;
+                localStorage.setItem('userData', JSON.stringify(userData));
+            }
+
+            // Close popup
+            popup.classList.remove('active');
+            document.body.classList.remove('popup-active');
+
+            await displayPersonalChl();
+            displayCustomTaskPotentialEarnings();
+        }
+    });
 }
 
 function showClassPopupLoggedInClassConfirmation() {
@@ -1914,6 +1988,13 @@ async function updateUserClass (userClassSelection) {
 //POPUP SCRIPT END
       
 const messagesToUsers = [
+        {
+            title: "Patikrinkite savo / mokinių klasę",
+            text: `⚠️ LABAI SVARBU: pasitikrinkite, ar pasirinkote teisingą klasę!`,
+            fullText: `Savo klasę mokiniai gali patikrinti puslapyje „KLASĖ“, skiltyje „PROFILIS“. Jei klasė nurodyta neteisingai, pasakykite savo mokytojui arba parašykite mums el. laišką. Mokytojai gali patikrinti mokinių klasę (žinių lygį) puslapyje „UŽDUOTYS“, paspaudę ant mokinio vardo. Pastebėjome, kad didelė dalis 2, 3 ir 4 klasių mokinių dažnai atlieka sudėties iki 10 užduotis, o tai gali reikšti, kad mokiniams yra neteisingai nustatyta klasė. Teisingas klasės pasirinkimas yra svarbus mokinio taškų ir uždarbio (SUDEDU monetų) skaičiavimui (plačiau <a href="apie.html#ziniu-lygis">čia</a>).`,
+            date: "2026-01-13",
+            target: ["all"]
+        },
         {   
             title: "Patvitinkite naujas paskyras",
             text: `❗❗❗Visos paskyros sukurtos po 2026 metų sausio 1 d. ir nepatvirtintos iki 2026 metų sausio 18 d. bus ištrintos!`,
@@ -2705,7 +2786,7 @@ async function displayPersonalChl() {
     const indicatorsContainer = document.getElementById('chlIndicators');
     const prevBtn = document.getElementById('chlNavPrev');
     const nextBtn = document.getElementById('chlNavNext');
-    const userClass = userData?.knowledgeLvl ?? getClassLocalStorage() ?? 2; // 0 (for priesmokykline) is treated as faulty unless ?? is used instead of ||
+    const userClass = userData?.knowledgeLvl ?? 2; // 0 (for priesmokykline) is treated as faulty unless ?? is used instead of ||
 
     if (!personalChlDict[userClass][getLithuanianSchoolPeriod()]) {
         displayArea.innerHTML = '<p style="text-align: center; color: rgba(0,0,0,0.5);">Nėra prieinamų iššūkių</p>';
@@ -3087,8 +3168,6 @@ window.addEventListener('resize', checkWrap);
 window.addEventListener('load', checkWrap);
 
 async function handleKnowledgeLvlStatus () {
-    const knowledgeLvlStatus = getClassLocalStorage();
-
     if (userData) {
         if (userData.knowledgeLvl != null && userData.knowledgeLvl !== -1) {
             if (userData.accType !== "teacher" && userData.accType !== "admin") {

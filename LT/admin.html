@@ -1109,8 +1109,15 @@
 
                 <div class="operation-card">
                     <h3>🚫 Delete Never Logged In Users</h3>
+                    <div class="form-group">
+                        <label for="never-logged-days">Minimum Account Age (Days)</label>
+                        <input type="number" id="never-logged-days" placeholder="e.g., 30" min="1" value="30">
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            Only delete accounts that were created this many days ago or earlier. Accounts created more recently will be kept.
+                        </small>
+                    </div>
                     <p style="color: #666; margin-bottom: 15px;">
-                        Delete all user accounts that have never logged in (lastLogIn is null). Admin accounts will not be deleted.
+                        Delete user accounts that have never logged in and are older than the specified number of days. Admin accounts will not be deleted.
                     </p>
                     <div id="never-logged-message"></div>
                     <button class="btn btn-danger" onclick="deleteNeverLoggedInUsers()">Delete Never Logged In Users</button>
@@ -2526,9 +2533,15 @@
             }
         }
 
-        // Delete users who never logged in
+        // Delete users who never logged in (with age threshold)
         async function deleteNeverLoggedInUsers() {
-            if (!confirm(`Delete ALL users who have NEVER logged in?\n\nThis action cannot be undone.\nAdmin accounts will not be deleted.`)) return;
+            const days = document.getElementById('never-logged-days').value;
+            if (!days || days < 1) {
+                showMessage('never-logged-message', 'Please enter a valid number of days', 'error');
+                return;
+            }
+
+            if (!confirm(`Delete all users who have NEVER logged in and whose accounts are ${days}+ days old?\n\nThis action cannot be undone.\nAdmin accounts will not be deleted.\nAccounts created within the last ${days} days will be kept.`)) return;
 
             // Show initial loading message
             showMessage('never-logged-message', 
@@ -2537,7 +2550,7 @@
             );
 
             try {
-                const response = await apiFetch(`${apiBase}admin/never-logged-in`, {
+                const response = await apiFetch(`${apiBase}admin/never-logged-in?olderThanDays=${days}`, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' }
                 });
@@ -2552,7 +2565,8 @@
                 let message = `✅ Deletion complete!<br><br>` +
                             `Deleted: ${data.deletedCount} users<br>` +
                             `Failed: ${data.failedCount} users<br>` +
-                            `Total processed: ${data.totalProcessed} users`;
+                            `Total processed: ${data.totalProcessed} users<br>` +
+                            `Age threshold: ${data.daysThreshold} days`;
                 
                 if (data.failedUsers && data.failedUsers.length > 0) {
                     message += `<br><br>⚠️ ${data.warning}`;
@@ -2564,7 +2578,6 @@
                 showMessage('never-logged-message', `❌ Error: ${error.message}`, 'error');
             }
         }
-
         // Send gift
         async function sendGift() {
             const itemId = parseInt(document.getElementById('gift-itemid').value);
