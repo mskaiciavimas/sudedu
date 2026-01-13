@@ -488,7 +488,7 @@ body.popup-active {
 
 .message-board-outer {
     width: 100%;
-    height: 100%;
+    height: calc(100% - 20px * 2);
 }
 
         .message-board-personal-chl-container {
@@ -511,14 +511,12 @@ body.popup-active {
             min-height: 250px;
         }
 
-        .message-board-container {
-            flex: 1;
-        }
 
         .message-board-container {
             display: flex;
+            flex: 1;
+            justify-content: space-between;
             flex-direction: column;
-            flex: 1 1 auto;
             min-height: 0;
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
@@ -1812,7 +1810,7 @@ body.popup-active {
                 displayCustomTaskPotentialEarnings();
             }
 
-            if (userData?.accType === "teacher") {
+            if (!userData || userData?.accType === "teacher") {
                 document.querySelector(".personal-chl-container").style.display = "none";
             }
             
