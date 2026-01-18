@@ -4329,12 +4329,13 @@
                 [4.2, ...Array(24).fill(3.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2],
 
                 // Part at the door of floor 1
+                ...Array(2).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
                 ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.2]),
-                ...Array(5).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2]),
+                ...Array(6).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2]),
                 ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.2]),
 
                 // Bottom part of floor 1
-                ...Array(13).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
+                ...Array(10).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
                 [4.34, ...Array(40).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33],
             ],
             6: [
@@ -4436,12 +4437,13 @@
                 [4.2, ...Array(24).fill(3.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2],
 
                 // Part at the door of floor 1
+                ...Array(2).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
                 ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.2]),
-                ...Array(5).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2]),
+                ...Array(6).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2]),
                 ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.2]),
 
                 // Bottom part of floor 1
-                ...Array(13).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
+                ...Array(10).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2]),
                 [4.34, ...Array(40).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33],
             ],
             
@@ -4476,12 +4478,13 @@
                 [4.2, ...Array(24).fill(3.0), 4.2, ...Array(6).fill(6.0), 4.2, ...Array(8).fill(3.0), 4.2, ...Array(40).fill(3.0), 4.2, ...Array(33).fill(7.0)],
 
                 // Part at the door of floor 1
+                ...Array(2).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2, ...Array(33).fill(7.0)]),
                 ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.51, ...Array(40).fill(1.0), 4.2, ...Array(33).fill(7.0)]),
-                ...Array(5).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2, ...Array(33).fill(7.0)]),
+                ...Array(6).fill([4.2, ...Array(40).fill(1.0), 5.0, ...Array(40).fill(1.0), 4.2, ...Array(33).fill(7.0)]),
                 ...Array(1).fill([4.2, ...Array(40).fill(1.0), 4.53, ...Array(40).fill(1.0), 4.2, ...Array(33).fill(7.0)]),
 
                 // Bottom part of floor 1
-                ...Array(13).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2, ...Array(33).fill(7.0)]),
+                ...Array(10).fill([4.2, ...Array(40).fill(1.0), 4.2, ...Array(40).fill(1.0), 4.2, ...Array(33).fill(7.0)]),
                 [4.34, ...Array(40).fill(4.1), 4.43, ...Array(40).fill(4.1), 4.33, ...Array(33).fill(7.0)],
             ]
         }
@@ -8625,9 +8628,10 @@ function precomputePlacementMap(objectId) {
                     const tileType = tile.type ?? tile;
 
                     // RULE 1: Cannot place on obstacle tiles (type 4-7)
-                    if (tileType >= 4 && tileType < 8) {
+                    if (tileType >= 4 && tileType < 8 && tileType !== 5) {
                         tileAllowed = false;
                     }
+
                     // RULE 2: Floor tiles
                     else if (tileType === 1.0) {
                         if (!draggedAssetPlacingRules.includes(1)) {
@@ -8635,20 +8639,26 @@ function precomputePlacementMap(objectId) {
                         }
                     }
 
-                     else if (tileType === 2.0) {
+                    else if (tileType === 2.0) {
                         if (!draggedAssetPlacingRules.includes(2)) {
                             tileAllowed = false;
                         }
                     }
 
-                     else if (tileType === 3.0) {
+                    else if (tileType === 3.0) {
                         if (!draggedAssetPlacingRules.includes(3)) {
                             tileAllowed = false;
                         }
                     }
 
+                    else if (tileType === 5.0) {
+                        if (!draggedAssetPlacingRules.includes(5)) {
+                            tileAllowed = false;
+                        }
+                    }
+
                     // RULE 3: Wall, boundary tiles as well as wall-boundary item rules (4) - items that are on floor but can
-                    // overlapp wall and boundary
+                    // overlap wall and boundary
 
                     if (!draggedAssetPlacingRules.includes(2)) {
                         
@@ -8663,11 +8673,36 @@ function precomputePlacementMap(objectId) {
                             ) {
                                 tileAboveBottomSupport = roomLayout[bottomOfSection - 1][x];
                             }
-                            if (
+                            
+                            // Check if basic placement rules allow this tile
+                            const basicPlacementAllowed = 
                                 (bottomSupportTile === 1 && tileAboveBottomSupport !== 3 && draggedAssetPlacingRules.includes(1)) ||
-                                (bottomSupportTile === 3 && draggedAssetPlacingRules.includes(3))
-                            ) {
-                                tileAllowed = true;
+                                (bottomSupportTile === 3 && draggedAssetPlacingRules.includes(3));
+                            
+                            if (basicPlacementAllowed) {
+                                const draggedProtrusionSetting = draggedAssetData.protruding || 0;
+                                
+                                // If checking a wall tile and item has protrusion setting
+                                if (draggedProtrusionSetting > 0 && tileType === 2.0) {
+                                    // Check if there's a boundary within the allowed protrusion range below this wall tile
+                                    let foundBoundaryInRange = false;
+                                    for (let checkY = y + 1; checkY <= y + draggedProtrusionSetting && checkY < roomRows; checkY++) {
+                                        const checkTile = roomLayout[checkY][x];
+                                        const checkType = checkTile.type ?? checkTile;
+                                        if (checkType === 3.0) {
+                                            foundBoundaryInRange = true;
+                                            break;
+                                        }
+                                    }
+                                    
+                                    if (foundBoundaryInRange) {
+                                        tileAllowed = true;
+                                    } else {
+                                        tileAllowed = false;
+                                    }
+                                } else {
+                                    tileAllowed = true;
+                                }
                             } else {
                                 tileAllowed = false;
                             }
@@ -8819,15 +8854,59 @@ function precomputePlacementMap(objectId) {
                                     if (nearestBoundary !== -1) {
                                         const firstFloorBelowBoundary = findFirstFloorBelowBoundary(x, nearestBoundary);
                                         if (tileType === 2.0) {
+                                            const draggedProtrusionSetting = draggedAssetData.protruding || 0;
+                                            
                                             if (draggedAssetPlacingRules.includes(3)) {
                                                 if (nearestBoundary - (objectHeight - 1) <= row) {
-                                                    tileAllowed = true;
-                                                    break;
+                                                    // If item has protrusion setting, check if boundary is in range
+                                                    if (draggedProtrusionSetting > 0) {
+                                                        let foundBoundaryInRange = false;
+                                                        for (let checkY = y + 1; checkY <= y + draggedProtrusionSetting && checkY < roomRows; checkY++) {
+                                                            const checkTile = roomLayout[checkY][x];
+                                                            const checkType = checkTile.type ?? checkTile;
+                                                            if (checkType === 3.0) {
+                                                                foundBoundaryInRange = true;
+                                                                break;
+                                                            }
+                                                        }
+                                                        
+                                                        if (foundBoundaryInRange) {
+                                                            tileAllowed = true;
+                                                            break;
+                                                        } else {
+                                                            tileAllowed = false;
+                                                            break;
+                                                        }
+                                                    } else {
+                                                        tileAllowed = true;
+                                                        break;
+                                                    }
                                                 }
                                             } else if (draggedAssetPlacingRules.includes(1)) {
                                                 if (firstFloorBelowBoundary - (objectHeight - 1) <= row) {
-                                                    tileAllowed = true;
-                                                    break;
+                                                    // If item has protrusion setting, check if boundary is in range
+                                                    if (draggedProtrusionSetting > 0) {
+                                                        let foundBoundaryInRange = false;
+                                                        for (let checkY = y + 1; checkY <= y + draggedProtrusionSetting && checkY < roomRows; checkY++) {
+                                                            const checkTile = roomLayout[checkY][x];
+                                                            const checkType = checkTile.type ?? checkTile;
+                                                            if (checkType === 3.0) {
+                                                                foundBoundaryInRange = true;
+                                                                break;
+                                                            }
+                                                        }
+                                                        
+                                                        if (foundBoundaryInRange) {
+                                                            tileAllowed = true;
+                                                            break;
+                                                        } else {
+                                                            tileAllowed = false;
+                                                            break;
+                                                        }
+                                                    } else {
+                                                        tileAllowed = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -13939,7 +14018,7 @@ async function petHappy(pet, quantity, signal) {
 
     setObjectAnimation(pet, `${pet.id}-happy`);
 
-    await cancellableWait(2000, signal);
+    await cancellableWait(1650, signal);
         if (signal.aborted) {
             cancelMovement(pet.id)
             throw new DOMException("Aborted", "AbortError");
