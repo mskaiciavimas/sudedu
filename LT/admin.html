@@ -3690,47 +3690,45 @@ function displayStatistics(stats) {
             </div>
 
             <div class="stat-card">
-                <h3>🎮 Pet Game Activity</h3>
-                <div class="stat-items">
-                    <div class="stat-item">
-                        <span class="stat-label">Total Games:</span>
-                        <span class="stat-value">${stats.petGame.totalGames}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Ever Active:</span>
-                        <span class="stat-value">${stats.petGame.everActivePetGames} (${calcPercentage(stats.petGame.everActivePetGames, stats.petGame.totalGames)}%)</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Average Money:</span>
-                        <span class="stat-value">${Number(stats.petGame.averageMoney).toFixed(0)} 💰</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Avg Money (Active Week):</span>
-                        <span class="stat-value">${Number(stats.petGame.averageMoneyActiveWeek).toFixed(0)} 💰</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Active Last Day:</span>
-                        <span class="stat-value">${stats.petGame.activeLastDay} (${calcPercentage(stats.petGame.activeLastDay, stats.petGame.totalGames)}%)</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Active Last 2 Days:</span>
-                        <span class="stat-value">${stats.petGame.activeLast2Days} (${calcPercentage(stats.petGame.activeLast2Days, stats.petGame.totalGames)}%)</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Active Last 2 Days (of ever-active):</span>
-                        <span class="stat-value">${stats.petGame.activeLast2DaysOfEverActive} (${stats.petGame.percentActiveLast2DaysOfEverActive}%)</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Active Last 2 Days (of monthly-active):</span>
-                        <span class="stat-value">${stats.petGame.activeLast2DaysOfMonthlyActive} (${stats.petGame.percentActiveLast2DaysOfMonthlyActive}%)</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Active Last Week:</span>
-                        <span class="stat-value">${stats.petGame.activeLastWeek} (${calcPercentage(stats.petGame.activeLastWeek, stats.petGame.totalGames)}%)</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Active Last Month:</span>
-                        <span class="stat-value">${stats.petGame.activeLastMonth} (${calcPercentage(stats.petGame.activeLastMonth, stats.petGame.totalGames)}%)</span>
+                <div class="stat-card">
+                    <h3>🎮 Pet Game Activity</h3>
+                    <div class="stat-items">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Games:</span>
+                            <span class="stat-value">${stats.petGame.totalGames}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Ever Active:</span>
+                            <span class="stat-value">${stats.petGame.everActivePetGames} (${calcPercentage(stats.petGame.everActivePetGames, stats.petGame.totalGames)}%)</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Active Last 2 Days (of ever-active):</span>
+                            <span class="stat-value">${stats.petGame.activeLast2DaysOfEverActive} (${stats.petGame.percentActiveLast2DaysOfEverActive}%)</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Avg Money (of weekly-active, Mean):</span>
+                            <span class="stat-value">${Number(stats.petGame.averageMoneyActiveWeekMean).toFixed(0)} 💰</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Avg Money (of weekly-active, Median):</span>
+                            <span class="stat-value">${Number(stats.petGame.averageMoneyActiveWeekMedian).toFixed(0)} 💰</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Active Last Day (of monthly-active):</span>
+                            <span class="stat-value">${stats.petGame.activeLastDayOfMonthly} (${calcPercentage(stats.petGame.activeLastDayOfMonthly, stats.petGame.activeLastMonth)}%)</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Active Last 2 Days (of monthly-active):</span>
+                            <span class="stat-value">${stats.petGame.activeLast2DaysOfMonthlyActive} (${stats.petGame.percentActiveLast2DaysOfMonthlyActive}%)</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Active Last Week (of monthly-active):</span>
+                            <span class="stat-value">${stats.petGame.activeLastWeek} (${calcPercentage(stats.petGame.activeLastWeek, stats.petGame.activeLastMonth)}%)</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Active Last Month:</span>
+                            <span class="stat-value">${stats.petGame.activeLastMonth} (${calcPercentage(stats.petGame.activeLastMonth, stats.petGame.totalGames)}%)</span>
+                        </div>
                     </div>
                 </div>
             </div>
