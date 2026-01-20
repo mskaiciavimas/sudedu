@@ -1245,22 +1245,7 @@ body.popup-active {
     </nav>
 
 
-	<div class="container" id="template-container" hidden>	
-        <div class="class-popup-modal" id="classPopupLoggedInClassConfirmation2">
-			<div class="class-popup-content">
-                <select class="class-options" id="classLoggedInClassSelect2">
-                    <option value="" selected disabled>Patvirtink savo klasę</option>
-                    <option value="0">Priešmokyklinė</option>
-                    <option value="1">1 klasė</option>
-                    <option value="2">2 klasė</option>
-                    <option value="3">3 klasė</option>
-                    <option value="4">4 klasė</option>
-                    <option value="5">Aukštesnė</option>
-                </select>
-                <button class="class-popup-button" id="classPopupLoggedInClassConfirmation2Button" disabled>Pirmyn!</button>
-			</div>
-		</div>
-        	
+	<div class="container" id="template-container" hidden>	        	
         <div class="class-popup-modal" id="classPopupLoggedInClassConfirmation">
 			<div class="class-popup-content">
                 <select class="class-options" id="classLoggedInClassSelect">
@@ -1762,22 +1747,6 @@ body.popup-active {
         	controller.modeChoice4 = modeChoice4Element.value
 			localStorage.setItem('controller', JSON.stringify(controller))
 
-            if (controller.modeChoice2 === "C8" && 
-                (
-                    userData.knowledgeLvl === 2 || 
-                    userData.knowledgeLvl === 3 || 
-                    userData.knowledgeLvl === 4 || 
-                    userData.knowledgeLvl === 5
-                )
-            ) {
-                const confirmedRecently = getClassConfirmationLocalStorage()
-
-                if (!confirmedRecently) {
-                    showClassPopupLoggedInClassConfirmation2();
-                    return
-                }
-            }
-
 			if (controller.modeChoice4 === "C39") {
 				startQuestionsTimer()
 			} else if (controller.modeChoice4 = "C40") {
@@ -1832,86 +1801,6 @@ body.popup-active {
 });
 
 //POPUP SCRIPT START
-
-// Function to set value in localStorage with expiration
-function setClassConfirmationLocalStorage() {
-    const now = new Date();
-    // Set expiration to 2 months from now
-    const expiration = new Date(now.setMonth(now.getMonth() + 2));
-    
-    const item = {
-        value: true,
-        expiration: expiration.getTime()
-    };
-    
-    localStorage.setItem("userClassConfirmed", JSON.stringify(item));
-}
-
-// Function to get value from localStorage and check expiration
-function getClassConfirmationLocalStorage() {
-    const itemStr = localStorage.getItem("userClassConfirmed");
-    
-    // If the item doesn't exist, return null
-    if (!itemStr) {
-        return null;
-    }
-    
-    const item = JSON.parse(itemStr);
-    const now = new Date();
-    
-    // Compare the expiration time with the current time
-    if (now.getTime() > item.expiration) {
-        // If the item is expired, delete it and return null
-        localStorage.removeItem("userClassConfirmed");
-        return null;
-    }
-    
-    return item.value;
-}
-
-function showClassPopupLoggedInClassConfirmation2() {
-    const popup = document.getElementById('classPopupLoggedInClassConfirmation2');
-    const nextButton = document.getElementById('classPopupLoggedInClassConfirmation2Button');
-    const classSelect = document.getElementById('classLoggedInClassSelect2');
-    let selectedClass = null;
-
-    // Show popup
-    popup.classList.add('active');
-    document.body.classList.add('popup-active');
-
-    // Disable Next button initially
-    nextButton.disabled = true;
-
-    // Listen for changes in the dropdown
-    classSelect.addEventListener('change', function() {
-        selectedClass = Number(this.value);
-        nextButton.disabled = this.value === ""; // enable only if a real option is selected
-    });
-
-    // Next button click
-    nextButton.addEventListener('click', async function() {
-        if (selectedClass !== null && selectedClass !== undefined) {
-            // Set localStorage with selected class and expiration
-            setClassConfirmationLocalStorage();
-
-            userClass = selectedClass;
-
-            if (userData) {
-                updateUserClass(userClass);
-                userData.knowledgeLvl = userClass;
-                localStorage.setItem('userData', JSON.stringify(userData));
-            }
-
-            // Close popup
-            popup.classList.remove('active');
-            document.body.classList.remove('popup-active');
-
-            await displayPersonalChl();
-            displayCustomTaskPotentialEarnings();
-        }
-    });
-}
-
 function showClassPopupLoggedInClassConfirmation() {
     const popup = document.getElementById('classPopupLoggedInClassConfirmation');
     const nextButton = document.getElementById('classPopupLoggedInClassConfirmationButton');
