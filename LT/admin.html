@@ -3048,6 +3048,8 @@
                     const expirationDate = new Date(msg.giftExpiration);
                     const isExpired = expirationDate < new Date();
                     
+                    const sentToAllLabel = msg.sentToAll ? '🌐 SENT TO ALL' : `👥 ${recipientCount} specific users`;
+
                     html += `
                         <div class="message-item">
                             <div style="flex: 1;">
@@ -3055,7 +3057,7 @@
                                 <small>
                                     ${msg.giftId ? `Gift ID: ${msg.giftId} | Qty: ${msg.quantity} | ` : ''}
                                     Expires: ${expirationDate.toLocaleString()} ${isExpired ? '⚠️ EXPIRED' : ''}<br>
-                                    Recipients: ${recipientCount} users
+                                    ${sentToAllLabel}
                                 </small>
                             </div>
                             <button class="btn btn-danger small-btn" onclick="deleteMessage(${msg.id})">Delete</button>
