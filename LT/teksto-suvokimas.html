@@ -111,6 +111,17 @@
           backdrop-filter: blur(10px);
           border-radius: 5px;
           white-space: pre-line;
+          transform: translateZ(0);
+        }
+
+        .dragging-clone {
+          will-change: transform;
+          transform: translateZ(0);
+        }
+
+        .sidebar-wrapper {
+          will-change: transform;
+          transform: translateZ(0);
         }
 
         /* Ensure the drop targets fill the column */
@@ -1083,6 +1094,10 @@
     const answersFieldEnd = document.getElementById('answers-field-end');
     const titleField = document.getElementById('title-field');
     const optionsField = document.getElementById('options-field');
+    const trackerTimerHolder = document.querySelector(".tracker-timer-holder");
+    const fieldsRow = document.getElementById("fields-row");
+    const finalMessageRow = document.getElementById("final-message-row");
+    const helpAndCheckButtonHolder = document.querySelector(".help-and-check-button-holder");
     var selectedItem;
     let questionNumberTracker = document.getElementById('question-number-tracker');
     let mistakesTracker = document.getElementById('mistakes-tracker'); 
@@ -1280,6 +1295,13 @@ function loadNextTextBatch() {
     }
 
     function displayQuestion() {
+      clearInputFields();
+      // Disconnect all observers temporarily
+      if (window.dragDropObservers) {
+        window.dragDropObservers.forEach(obs => obs.disconnect());
+        window.dragDropObservers = [];
+      }
+
       styleTextComprahensionPage();
 
       // Initialize seed if needed
@@ -1406,6 +1428,8 @@ function loadNextTextBatch() {
       //helpDiv.innerHTML = `Panaudota pagalba: ${helpTracker}`;
 
       resetHelpButton();
+
+      updateSortables();
     }
 
     function splitParagraphToSentences(paragraph) {
@@ -1866,14 +1890,50 @@ function loadNextTextBatch() {
     }
 
     function clearInputFields() {
-      answersField.innerHTML = 'Tekstas';
-      answersFieldStart.innerHTML = 'Pradžia';
-      answersFieldMiddle.innerHTML = 'Įvykio raida';
-      answersFieldEnd.innerHTML = 'Pabaiga';
-      titleField.innerHTML = 'Pavadinimas';
-      optionsField.innerHTML = '';
+      // First, clean up any orphaned dragging clones
+      document.querySelectorAll('.dragging-clone').forEach(clone => clone.remove());
+      
+      // Reset any ongoing drag operations
+      if (isDragging) {
+        endDrag();
+      }
+      
+      // Disconnect all observers temporarily
+      if (window.dragDropObservers) {
+        window.dragDropObservers.forEach(obs => obs.disconnect());
+        window.dragDropObservers = [];
+      }
+      
+      // Remove draggable initialization flags from ALL items
+      document.querySelectorAll('.item').forEach(item => {
+        delete item.dataset.draggableInitialized;
+        item.style.opacity = '';
+        item.style.backgroundColor = '';
+      });
+      
+      // Then clear containers
+      const containers = [
+        answersField, answersFieldStart, answersFieldMiddle, 
+        answersFieldEnd, titleField, optionsField
+      ];
+      
+      containers.forEach(container => {
+        if (container) {
+          while (container.firstChild) {
+            container.removeChild(container.firstChild);
+          }
+        }
+      });
+      
+      // Set placeholder text
+      answersField.textContent = 'Tekstas';
+      answersFieldStart.textContent = 'Pradžia';
+      answersFieldMiddle.textContent = 'Įvykio raida';
+      answersFieldEnd.textContent = 'Pabaiga';
+      titleField.textContent = 'Pavadinimas';
+      
       nextQuestionBtn.style.display = 'none';
-      checkAnswerBtn.style.display = "flex"
+      checkAnswerBtn.style.display = "flex";
       helpBtn.disabled = true;
       checkAnswerBtn.disabled = false;
     }
@@ -1912,9 +1972,9 @@ function loadNextTextBatch() {
           nextQuestionBtn.disabled = false;
 
           if (window.matchMedia("(max-width: 767px), (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)").matches) {
-              document.querySelector(".tracker-timer-holder").style.paddingLeft = "30px";
+              trackerTimerHolder.style.paddingLeft = "30px";
           } else {
-              document.querySelector(".tracker-timer-holder").style.paddingLeft = "15px";
+              trackerTimerHolder.style.paddingLeft = "15px";
           }
 
           // NEW: Reset seed system and lazy loading
@@ -1946,9 +2006,9 @@ function loadNextTextBatch() {
           }
           mistakesTracker.innerHTML = `Klaidos: ${controller.mistakesTracker}`;
 
-          document.getElementById("fields-row").style.display = "flex";
-          document.getElementById("final-message-row").style.display = "none";
-          document.querySelector(".help-and-check-button-holder").style.display = "flex"
+          fieldsRow.style.display = "flex";
+          finalMessageRow.style.display = "none";
+          helpAndCheckButtonHolder.style.display = "flex"
 
           controller.taskCompleted = false;
           controller.taskRecorded = false;
@@ -2000,17 +2060,6 @@ if (toggleTab) {
     toggleTab.addEventListener('click', toggleSidebar);
 }
 
-// Close sidebar on window resize if it becomes desktop size
-window.addEventListener('resize', () => {
-    if (window.matchMedia("(max-width: 767px), (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)").matches) {
-      document.querySelector(".tracker-timer-holder").style.paddingLeft = "30px";
-    } else {
-      document.querySelector(".tracker-timer-holder").style.paddingLeft = "15px";
-    }
-    if (window.innerWidth > 768) {
-        closeSidebar();
-    }
-});
 // Simple vanilla JS drag and drop implementation
 // No external dependencies needed!
 
@@ -2063,7 +2112,6 @@ function initializeDragDrop() {
 
 // MutationObserver to watch for dynamically added items
 function observeContainer(container) {
-  // First, make any existing items draggable
   const existingItems = container.querySelectorAll('.item');
   existingItems.forEach(item => {
     if (!item.dataset.draggableInitialized) {
@@ -2073,16 +2121,20 @@ function observeContainer(container) {
   });
   
   const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      mutation.addedNodes.forEach((node) => {
+    const fragment = document.createDocumentFragment();
+    let needsUpdate = false;
+    
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
         if (node.nodeType === 1 && node.classList.contains('item')) {
           if (!node.dataset.draggableInitialized) {
             makeDraggable(node);
             node.dataset.draggableInitialized = 'true';
+            needsUpdate = true;
           }
         }
-      });
-    });
+      }
+    }
   });
   
   observer.observe(container, {
@@ -2090,7 +2142,6 @@ function observeContainer(container) {
     subtree: false
   });
   
-  // Store observer for cleanup
   if (!window.dragDropObservers) {
     window.dragDropObservers = [];
   }
@@ -2098,27 +2149,27 @@ function observeContainer(container) {
 }
 
 function makeDraggable(element) {
-  // Skip if already initialized
-  if (element.dataset.draggableInitialized === 'true') {
+  // Skip if not an actual element or already being dragged
+  if (!element || !element.nodeType || element.classList.contains('dragging-clone')) {
     return;
   }
   
-  // Remove any existing listeners first to prevent duplicates
+  // Skip if already initialized AND still in a valid container
+  if (element.dataset.draggableInitialized === 'true' && 
+      element.parentElement && 
+      element.parentElement.classList.contains('drop-container')) {
+    return;
+  }
+  
+  // Remove any existing listeners BEFORE adding new ones
   element.removeEventListener('mousedown', handleDragStart);
   element.removeEventListener('touchstart', handleTouchStart);
   
-  // Always add mouse events for desktop/laptop
+  // Now add fresh listeners
   element.addEventListener('mousedown', handleDragStart);
-  
-  // Also add touch events for touch-capable devices
   element.addEventListener('touchstart', handleTouchStart, { passive: false });
   
   element.style.cursor = 'grab';
-  if (!element.classList.contains('item')) {
-    element.classList.add('item');
-  }
-  
-  // Mark as initialized
   element.dataset.draggableInitialized = 'true';
 }
 
@@ -2129,25 +2180,20 @@ function handleTouchStart(e) {
   startX = touch.clientX;
   startY = touch.clientY;
   
-  // Visual feedback
   element.classList.add('hold-indicator');
   
-  // Prevent any scrolling during hold
   let holdStarted = false;
   
-  // 300ms hold delay for touch devices
   touchHoldTimer = setTimeout(() => {
     holdStarted = true;
-    e.preventDefault(); // Prevent scrolling once hold is confirmed
+    e.preventDefault();
     startDrag(element, touch.clientX, touch.clientY);
     
-    // Add touch move and end listeners
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
     document.addEventListener('touchend', handleTouchEnd);
     document.addEventListener('touchcancel', handleTouchEnd);
   }, 300);
   
-  // Cancel if touch moves too much during hold
   const cancelHold = (cancelEvent) => {
     if (!cancelEvent.touches || cancelEvent.touches.length === 0) {
       clearTimeout(touchHoldTimer);
@@ -2268,21 +2314,37 @@ function startDrag(element, clientX, clientY) {
   updateDragPosition(clientX, clientY);
 }
 
+let dragUpdateFrame = null;
+
 function updateDragPosition(clientX, clientY) {
   if (!draggedClone) return;
   
-  currentX = clientX - offsetX;
-  currentY = clientY - offsetY;
+  // Cancel previous animation frame
+  if (dragUpdateFrame) {
+    cancelAnimationFrame(dragUpdateFrame);
+  }
   
-  draggedClone.style.left = currentX + 'px';
-  draggedClone.style.top = currentY + 'px';
-  
-  // Check what's under the cursor
-  draggedClone.style.pointerEvents = 'none';
-  const elementBelow = document.elementFromPoint(clientX, clientY);
-  draggedClone.style.pointerEvents = 'none';
-  
-  checkDropTarget(elementBelow, clientX, clientY);
+  // Schedule update for next frame
+  dragUpdateFrame = requestAnimationFrame(() => {
+    if (!draggedClone || !isDragging) {
+      dragUpdateFrame = null;
+      return;
+    }
+
+    currentX = clientX - offsetX;
+    currentY = clientY - offsetY;
+
+    draggedClone.style.left = currentX + 'px';
+    draggedClone.style.top = currentY + 'px';
+
+    draggedClone.style.pointerEvents = 'none';
+    const elementBelow = document.elementFromPoint(clientX, clientY);
+    draggedClone.style.pointerEvents = 'none';
+
+    checkDropTarget(elementBelow, clientX, clientY);
+
+    dragUpdateFrame = null;
+  });
 }
 
 function checkDropTarget(element, clientX, clientY) {
@@ -2297,23 +2359,27 @@ function checkDropTarget(element, clientX, clientY) {
   
   isOverValidContainer = false;
   
-  // Traverse up to find valid container
   let current = element;
   while (current && current !== document.body) {
     if (validContainers.includes(current.id)) {
       isOverValidContainer = true;
-      
-      // Find insertion point
       const container = current;
+      
       const items = Array.from(container.children).filter(child => 
         child.classList.contains('item') && child !== currentDraggedItem
       );
       
       let insertBefore = null;
-      for (let item of items) {
+      
+      const itemPositions = items.map(item => {
         const rect = item.getBoundingClientRect();
-        const midY = rect.top + rect.height / 2;
-        
+        return {
+          item,
+          midY: rect.top + rect.height / 2
+        };
+      });
+      
+      for (let {item, midY} of itemPositions) {
         if (clientY < midY) {
           insertBefore = item;
           break;
@@ -2367,6 +2433,11 @@ function makeContainerDroppable(container) {
 }
 
 function cleanupDragDrop() {
+  if (dragUpdateFrame) {
+    cancelAnimationFrame(dragUpdateFrame);
+    dragUpdateFrame = null;
+  }
+  
   document.removeEventListener('mousemove', handleMouseMove);
   document.removeEventListener('mouseup', handleMouseUp);
   document.removeEventListener('touchmove', handleTouchMove);
@@ -2377,7 +2448,6 @@ function cleanupDragDrop() {
     draggedClone.remove();
   }
   
-  // Disconnect all observers
   if (window.dragDropObservers) {
     window.dragDropObservers.forEach(observer => observer.disconnect());
     window.dragDropObservers = [];
@@ -2456,21 +2526,29 @@ function reinitializeAllItems() {
   });
 }
 
-// Initialize on load
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', updateDragDropInstances);
-} else {
-  updateDragDropInstances();
-}
+const trackerTimerHolder = document.querySelector(".tracker-timer-holder");
 
-// Also try initializing after a short delay to catch any dynamically loaded content
-setTimeout(() => {
-  reinitializeAllItems();
-}, 500);
+let resizeTimeout;
+window.addEventListener('resize', () => {
+  if (window.matchMedia("(max-width: 767px), (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait)").matches) {
+    if (trackerTimerHolder) {
+      trackerTimerHolder.style.paddingLeft = "30px";
+    }
+  } else {
+    if (trackerTimerHolder) {
+      trackerTimerHolder.style.paddingLeft = "15px";
+    }
+  }
+  if (window.innerWidth > 768) {
+    closeSidebar();
+  }
+  
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    updateDragDropInstances();
+  }, 250);
+});
 
-window.addEventListener('resize', updateDragDropInstances);
-
-// Clean up on page unload
 window.addEventListener('beforeunload', cleanupDragDrop);
 
   </script>

@@ -4620,14 +4620,14 @@ async function renderPetOnWalk () {
   if (!userData.petOnWalk || userData.petOnWalk === "") return;
 
   function petOnWalkIsHappy () {
-    const [recordedFoodAmount, recordedWaterAmount, recordedLoveAmount, recordedTime] = userData.petStats
+    const [recordedFoodAmount, recordedWaterAmount, recordedLoveAmount, recordedTime] = JSON.parse(userData.petStats)
     const currentTime = Math.floor(Date.now() / 1000 / 60);
     const timeElapsed = currentTime - recordedTime;
     const statDecrease = Math.floor(timeElapsed * PET_STATS_EXPIRATION);
 
-    const foodAmount = recordedFoodAmount - statDecrease;
-    const waterAmount = recordedWaterAmount - statDecrease;
-    const loveAmount = recordedLoveAmount - statDecrease;
+    const foodAmount = Math.max(0, recordedFoodAmount - statDecrease);
+    const waterAmount = Math.max(0, recordedWaterAmount - statDecrease);
+    const loveAmount = Math.max(0, recordedLoveAmount - statDecrease);
 
     const happinesIndex = Math.round(((foodAmount + waterAmount + loveAmount) / 30) * 100) / 100;
 
@@ -4648,6 +4648,7 @@ async function renderPetOnWalk () {
     const randomPosition = await getRandomLeft();
     petOnWalkDiv.style.left = `${randomPosition}px`
     const petEl = document.querySelector("#pet-on-walk");
+    if (!petEl || !petEl._petType) return;
     setObjectAnimation(petEl, `${petEl._petType}-hidden`);
 
     // Start walking once the DOM is ready
@@ -4751,6 +4752,8 @@ let ongoingTransition = null; // Store abort controller for transitions
  * Play a single animation once and wait for completion
  */
 async function playAnimationOnce(petEl, animationName, abortSignal) {
+  if (!petEl || !petEl._petType) return;
+
   const animKey = `${petEl._petType}-${animationName}`;
   const animData = animationStepsAndDurationNumberDict[animKey];
   
@@ -4805,6 +4808,7 @@ async function playAnimationOnce(petEl, animationName, abortSignal) {
  * If duration is null, plays animation once and waits for completion
  */
 async function playTransitionAnimation(petEl, animationName, duration, abortSignal) {
+  if (!petEl || !petEl._petType) return;
   const animKey = `${petEl._petType}-${animationName}`;
   
   if (duration === null) {
@@ -5013,11 +5017,8 @@ function restartPetOnWalkActions() {
  */
 async function walkToRandomPosition() {
   const petEl = document.querySelector("#pet-on-walk");
-  
-  if (!petEl) {
-    console.error('Pet element not found!');
-    return;
-  }
+
+  if (!petEl || !petEl._petType) return;
   
   const newLeft = await getRandomLeft();
   const currentLeft = petEl.offsetLeft;
@@ -5131,7 +5132,7 @@ async function walkToRandomPosition() {
 
 //Switch animation dynamically with JavaScript
 function setObjectAnimation(object, animationName, iterations = 'infinite') {
-    object.style.animation = `${animationName} ${animationStepsAndDurationNumberDict[animationName][1]}s steps(${animationStepsAndDurationNumberDict[animationName][0]}) ${iterations}`;
+  object.style.animation = `${animationName} ${animationStepsAndDurationNumberDict[animationName][1]}s steps(${animationStepsAndDurationNumberDict[animationName][0]}) ${iterations}`;
 }
 
 function redirectToAppropriateLanguage(targetFolder) {
