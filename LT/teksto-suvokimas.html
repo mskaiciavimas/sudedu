@@ -2198,6 +2198,8 @@ function handleTouchStart(e) {
     if (!cancelEvent.touches || cancelEvent.touches.length === 0) {
       clearTimeout(touchHoldTimer);
       element.classList.remove('hold-indicator');
+      // CRITICAL FIX: Also reset background color
+      element.style.backgroundColor = '';
       document.removeEventListener('touchmove', cancelHold);
       return;
     }
@@ -2210,6 +2212,8 @@ function handleTouchStart(e) {
       if (!holdStarted) {
         clearTimeout(touchHoldTimer);
         element.classList.remove('hold-indicator');
+        // CRITICAL FIX: Also reset background color
+        element.style.backgroundColor = '';
         document.removeEventListener('touchmove', cancelHold);
       }
     }
@@ -2240,9 +2244,20 @@ function handleTouchEnd(e) {
     endDrag();
   }
   
+  // CRITICAL FIX: Clean up hold indicator and background from current item
   if (currentDraggedItem) {
     currentDraggedItem.classList.remove('hold-indicator');
+    currentDraggedItem.style.backgroundColor = '';
   }
+  
+  // CRITICAL FIX: Also clean up any orphaned hold indicators
+  // This catches cases where the element reference was lost
+  const items = document.querySelectorAll('.item.hold-indicator');
+  items.forEach(item => {
+    item.classList.remove('hold-indicator');
+    item.style.backgroundColor = '';
+    item.style.opacity = '';
+  });
 }
 
 function handleDragStart(e) {
@@ -2405,14 +2420,31 @@ function endDrag() {
   document.body.style.overflow = '';
   document.body.style.touchAction = '';
   
-  // Remove clone
-  if (draggedClone && draggedClone.parentNode) {
-    draggedClone.remove();
+  // CRITICAL FIX: More robust clone removal
+  if (draggedClone) {
+    try {
+      // Try standard remove first
+      if (draggedClone.parentNode) {
+        draggedClone.parentNode.removeChild(draggedClone);
+      } else {
+        // If no parent, try direct remove
+        draggedClone.remove();
+      }
+    } catch (e) {
+      // Last resort: force hide it
+      if (draggedClone) {
+        draggedClone.style.display = 'none';
+        draggedClone.style.visibility = 'hidden';
+        draggedClone.style.opacity = '0';
+        draggedClone.style.pointerEvents = 'none';
+      }
+    }
+    draggedClone = null;
   }
-  draggedClone = null;
   
-  // Restore original opacity
+  // CRITICAL FIX: Clean up ALL visual states from original element
   currentDraggedItem.style.opacity = '';
+  currentDraggedItem.style.backgroundColor = '';  // NEW: Ensure any background color is removed
   currentDraggedItem.classList.remove('hold-indicator');
   
   // If not over valid container, return to options-field
@@ -2444,8 +2476,37 @@ function cleanupDragDrop() {
   document.removeEventListener('touchend', handleTouchEnd);
   clearTimeout(touchHoldTimer);
   
-  if (draggedClone && draggedClone.parentNode) {
-    draggedClone.remove();
+  // CRITICAL FIX: More robust clone cleanup
+  if (draggedClone) {
+    try {
+      if (draggedClone.parentNode) {
+        draggedClone.parentNode.removeChild(draggedClone);
+      } else {
+        draggedClone.remove();
+      }
+    } catch (e) {
+      // Force hide if removal fails
+      if (draggedClone) {
+        draggedClone.style.display = 'none';
+        draggedClone.style.visibility = 'hidden';
+      }
+    }
+    draggedClone = null;
+  }
+  
+  // CRITICAL FIX: Clean up ALL items with visual indicators
+  const items = document.querySelectorAll('.item.hold-indicator');
+  items.forEach(item => {
+    item.classList.remove('hold-indicator');
+    item.style.backgroundColor = '';
+    item.style.opacity = '';
+  });
+  
+  // Clean up current dragged item if it exists
+  if (currentDraggedItem) {
+    currentDraggedItem.style.opacity = '';
+    currentDraggedItem.style.backgroundColor = '';
+    currentDraggedItem.classList.remove('hold-indicator');
   }
   
   if (window.dragDropObservers) {
