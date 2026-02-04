@@ -4620,7 +4620,11 @@ async function renderPetOnWalk () {
   if (!userData.petOnWalk || userData.petOnWalk === "") return;
 
   function petOnWalkIsHappy () {
-    const [recordedFoodAmount, recordedWaterAmount, recordedLoveAmount, recordedTime] = JSON.parse(userData.petStats)
+    const petStatsData =
+      typeof userData.petStats === "string"
+        ? JSON.parse(userData.petStats)
+        : userData.petStats;
+    const [recordedFoodAmount, recordedWaterAmount, recordedLoveAmount, recordedTime] = petStatsData
     const currentTime = Math.floor(Date.now() / 1000 / 60);
     const timeElapsed = currentTime - recordedTime;
     const statDecrease = Math.floor(timeElapsed * PET_STATS_EXPIRATION);
