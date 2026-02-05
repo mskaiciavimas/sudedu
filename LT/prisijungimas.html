@@ -667,7 +667,7 @@
 		let isAuthenticating = false;
 
 
-		function getMsg(code, emailValue = '') {
+		function getMsg(code, emailValue = '', retryAfter = null) {
 			const MESSAGES = {
 				'REG_001': `Paskyra sukurta el. pašto adresu ${emailValue}! Patikrinkite el. paštą, kad ją patvirtintumėte.`,
 				'REG_002': `Patvirtinimo el. laiškas išsiųstas ${emailValue}. Patikrinkite savo el. paštą.`,
@@ -687,9 +687,29 @@
 				'RESET_004': 'Atkūrimo nuoroda nebegalioja arba neteisinga.',
 				'RESET_005': 'Nuoroda galioja.',
 				'ERR_001': 'Serverio klaida. Bandykite vėliau.',
-				'ERR_002': 'Trūksta duomenų'
+				'ERR_002': 'Trūksta duomenų',
+				'ERR_003': retryAfter 
+				? `Per didelis prašymų srautas. Bandykite vėliau (anksčiausiai po ${formatRetryTime(retryAfter)}).`
+				: 'Per didelis prašymų srautas. Bandykite vėliau.'
 			};
 			return MESSAGES[code] || 'Nežinoma klaida';
+		}
+
+		function formatRetryTime(seconds) {
+			const minutes = Math.ceil(seconds / 60);
+			
+			if (minutes < 60) {
+				return `${minutes} min.`;
+			}
+			
+			const hours = Math.floor(minutes / 60);
+			const remainingMinutes = minutes % 60;
+			
+			if (remainingMinutes === 0) {
+				return `${hours} val.`;
+			}
+			
+			return `${hours} val. ${remainingMinutes} min.`;
 		}
 
 		function redirectToIndex() {
@@ -750,189 +770,192 @@
 		}
 
 		async function authenticate(e) {
-			e.preventDefault();
-			const emailVal = email.value.trim();
-			const passVal = password.value.trim();
-			const nicknameVal = nickname.value.trim();
-			const isTeacherVal = isTeacher.checked;
-			const classValue = Number(classSelectDropdown.value);
+		e.preventDefault();
+		const emailVal = email.value.trim();
+		const passVal = password.value.trim();
+		const nicknameVal = nickname.value.trim();
+		const isTeacherVal = isTeacher.checked;
+		const classValue = Number(classSelectDropdown.value);
 
-			if (!emailVal) { 
-				showError('Įveskite elektroninį paštą'); 
-				return; 
+		if (!emailVal) { 
+			showError('Įveskite elektroninį paštą'); 
+			return; 
+		}
+		if (!passVal) { 
+			showError('Įveskite slaptažodį'); 
+			return; 
+		}
+		if ((passVal.length < 6 || passVal.length > 20) && isRegistration) {
+			showError('Slaptažodis turi būti nuo 6 iki 20 simbolių'); 
+			return;
+		}
+		if (!emailVal.includes('@')) { 
+			showError('Neteisingas elektroninio pašto formatas'); 
+			return; 
+		}
+		if (!nicknameVal && isRegistration) { 
+			showError('Įveskite vardą'); 
+			return; 
+		}
+		if (nicknameVal.length > 30 && isRegistration) { 
+			showError('Maksimalus vardo ilgis yra 30 simbolių'); 
+			return; 
+		}
+		if (isRegistration && !isTeacherVal && classValue === -1) {
+			showError('Pasirink savo klasę'); 
+			return;
+		}
+
+		if (isLoading || isAuthenticating) return;
+
+		errorField.innerHTML = '';
+		errorField.style.display = 'none';
+		isAuthenticating = true;
+		authBtn.innerText = 'Tikrinama...';
+		
+		disableButtons();
+
+		// RETRY LOGIC
+		const maxRetries = 2;
+		let lastError = null;
+		
+		for (let attempt = 0; attempt < maxRetries; attempt++) {
+			try {
+			let response;
+			
+			if (isRegistration) {
+				response = await fetch(apiBase + 'auth/register', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ 
+					username: emailVal, 
+					password: passVal, 
+					nickname: nicknameVal, 
+					isTeacher: isTeacherVal,
+					class: isTeacherVal ? null : classValue
+				}),
+				signal: AbortSignal.timeout(10000)
+				});
+			} else {
+				response = await fetch(apiBase + 'auth/login', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ username: emailVal, password: passVal }),
+				signal: AbortSignal.timeout(10000)
+				});
 			}
-			if (!passVal) { 
-				showError('Įveskite slaptažodį'); 
-				return; 
-			}
-			if ((passVal.length < 6 || passVal.length > 20) && isRegistration) {
-				showError('Slaptažodis turi būti nuo 6 iki 20 simbolių'); 
+			
+			const data = await response.json();
+
+			// Check for errors FIRST (before success)
+			if (data.code === 'ERR_003' || data.code === 'ERR_001' || data.code === 'ERR_002') {
+				showError(getMsg(data.code, emailVal, data.retryAfter));
+				isAuthenticating = false;
+				authBtn.innerText = isRegistration ? 'Prisiregistruoti' : 'Prisijungti';
+				enableButtons();
 				return;
 			}
-			if (!emailVal.includes('@')) { 
-				showError('Neteisingas elektroninio pašto formatas'); 
-				return; 
-			}
-			if (!nicknameVal && isRegistration) { 
-				showError('Įveskite vardą'); 
-				return; 
-			}
-			if (nicknameVal.length > 30 && isRegistration) { 
-				showError('Maksimalus vardo ilgis yra 30 simbolių'); 
-				return; 
-			}
-			if (isRegistration && !isTeacherVal && classValue === -1) {
-				showError('Pasirink savo klasę'); 
+
+			// SUCCESS - process response
+			if (isRegistration) {
+				if (data.code === 'REG_001' || data.code === 'REG_002') {
+				email.value = ''; 
+				password.value = ''; 
+				nickname.value = ''; 
+				isTeacher.checked = false;
+				classSelectDropdown.value = '-1';
+				
+				toggleIsRegister();
+				
+				showSuccess(getMsg(data.code, emailVal));
+				
+				isAuthenticating = false;
+				authBtn.innerText = 'Prisijungti';
+				
+				enableButtons();
 				return;
-			}
-
-			if (isLoading || isAuthenticating) return;
-
-			errorField.innerHTML = '';
-			errorField.style.display = 'none';
-			isAuthenticating = true;
-			authBtn.innerText = 'Tikrinama...';
-			
-			disableButtons();
-
-			// RETRY LOGIC
-			const maxRetries = 2;
-			let lastError = null;
-			
-			for (let attempt = 0; attempt < maxRetries; attempt++) {
-				try {
-					let response;
-					
-					if (isRegistration) {
-						response = await fetch(apiBase + 'auth/register', {
-							method: 'POST',
-							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify({ 
-								username: emailVal, 
-								password: passVal, 
-								nickname: nicknameVal, 
-								isTeacher: isTeacherVal,
-								class: isTeacherVal ? null : classValue
-							}),
-							signal: AbortSignal.timeout(10000)
-						});
-					} else {
-						response = await fetch(apiBase + 'auth/login', {
-							method: 'POST',
-							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify({ username: emailVal, password: passVal }),
-							signal: AbortSignal.timeout(10000)
-						});
-					}
-					
-					const data = await response.json();
-
-					// SUCCESS - process response
-					if (isRegistration) {
-						if (data.code === 'REG_001' || data.code === 'REG_002') {
-							email.value = ''; 
-							password.value = ''; 
-							nickname.value = ''; 
-							isTeacher.checked = false;
-							classSelectDropdown.value = '-1';
-							
-							toggleIsRegister();
-							
-							showSuccess(getMsg(data.code, emailVal));
-							
-							// IMPORTANT: Reset the flag before returning
-							isAuthenticating = false;
-							authBtn.innerText = 'Prisijungti'; // Reset button text too
-							
-							enableButtons();
-							return;
-						} else if (data.code === 'REG_003') {
-							showError(getMsg(data.code));
-							
-							// Reset here too
-							isAuthenticating = false;
-							authBtn.innerText = 'Prisiregistruoti';
-							
-							enableButtons();
-							return;
-						}
-					}
-
-					if (data.token) {
-						if (!data.emailVerified) {
-							if (data.isNewAccount) {
-								showError(`
-									${getMsg('LOGIN_002', emailVal)}
-									<br/>
-									<button class="btn-link" id="resend-confirmation-btn" onclick="resendVerification('${emailVal}')" style="margin-top: 8px;">
-										Siųsti patvirtinimo el. laišką dar kartą
-									</button>
-								`);
-							} else {
-								window.tempUserData = data;
-								
-								showError(`
-									${getMsg('LOGIN_003')}
-									<br/>
-									<button class="btn-link" id="resend-confirmation-btn" onclick="resendVerification('${emailVal}')" style="margin-top: 8px;">
-										Siųsti patvirtinimo el. laišką dar kartą
-									</button>
-									<br/>
-									<button class="btn-link" onclick="continueAnywayFromTemp()" style="margin-top: 4px;">
-										Tęsti be patvirtinimo
-									</button>
-								`);
-							}
-						} else {
-							const userData = {
-								token: data.token,
-								userId: data.userId,
-								nickname: data.nickname,
-								accType: data.accType,
-								teacher: data.teacher || '',
-								avatarCode: data.avatarCode || 'w63060003',
-								emailVerified: data.emailVerified,
-								petOnWalk: data.petOnWalk || '',
-								petStats: data.petStats || '[]',
-								knowledgeLvl: data.knowledgeLvl !== undefined ? data.knowledgeLvl : -1
-							};
-							
-							localStorage.setItem('userData', JSON.stringify(userData));
-							localStorage.setItem('refreshToken', data.refreshToken);
-							
-							window.location.href = './';
-						}
-					} else {
-						handleLoginError(data, emailVal);
-					}
-					
-					// If we got here, success - break out of retry loop
-					break;
-
-				} catch (err) {
-					lastError = err;
-					console.log(`Attempt ${attempt + 1}/${maxRetries} failed:`, err.message);
-					
-					// Only retry on connection errors
-					if (attempt < maxRetries - 1 && 
-						(err.name === 'TypeError' || err.message.includes('Failed to fetch'))) {
-						// Wait 1 second before retry
-						await new Promise(resolve => setTimeout(resolve, 1000));
-						authBtn.innerText = 'Bandoma dar kartą...';
-						continue;
-					}
-					
-					// Last attempt or non-retryable error
-					showError('Nepavyko pasiekti duomenų. Bandykite vėl vėliau.');
-					console.log('Error fetching auth:', err);
+				} else if (data.code === 'REG_003') {
+				showError(getMsg(data.code));
+				
+				isAuthenticating = false;
+				authBtn.innerText = 'Prisiregistruoti';
+				
+				enableButtons();
+				return;
 				}
 			}
+
+			if (data.token) {
+				if (!data.emailVerified) {
+				if (data.isNewAccount) {
+					showError(`
+					${getMsg('LOGIN_002', emailVal)}
+					<br/>
+					<button class="btn-link" id="resend-confirmation-btn" onclick="resendVerification('${emailVal}')" style="margin-top: 8px;">
+						Siųsti patvirtinimo el. laišką dar kartą
+					</button>
+					`);
+				} else {
+					window.tempUserData = data;
+					
+					showError(`
+					${getMsg('LOGIN_003')}
+					<br/>
+					<button class="btn-link" id="resend-confirmation-btn" onclick="resendVerification('${emailVal}')" style="margin-top: 8px;">
+						Siųsti patvirtinimo el. laišką dar kartą
+					</button>
+					<br/>
+					<button class="btn-link" onclick="continueAnywayFromTemp()" style="margin-top: 4px;">
+						Tęsti be patvirtinimo
+					</button>
+					`);
+				}
+				} else {
+				const userData = {
+					token: data.token,
+					userId: data.userId,
+					nickname: data.nickname,
+					accType: data.accType,
+					teacher: data.teacher || '',
+					avatarCode: data.avatarCode || 'w63060003',
+					emailVerified: data.emailVerified,
+					petOnWalk: data.petOnWalk || '',
+					petStats: data.petStats || '[]',
+					knowledgeLvl: data.knowledgeLvl !== undefined ? data.knowledgeLvl : -1
+				};
+				
+				localStorage.setItem('userData', JSON.stringify(userData));
+				localStorage.setItem('refreshToken', data.refreshToken);
+				
+				window.location.href = './';
+				}
+			} else {
+				handleLoginError(data, emailVal);
+			}
 			
-			// FINALLY block
-			isAuthenticating = false;
-			authBtn.innerText = isRegistration ? 'Prisiregistruoti' : 'Prisijungti';
-			enableButtons();
+			break;
+
+			} catch (err) {
+			lastError = err;
+			console.log(`Attempt ${attempt + 1}/${maxRetries} failed:`, err.message);
+			
+			if (attempt < maxRetries - 1 && 
+				(err.name === 'TypeError' || err.message.includes('Failed to fetch'))) {
+				await new Promise(resolve => setTimeout(resolve, 1000));
+				authBtn.innerText = 'Bandoma dar kartą...';
+				continue;
+			}
+			
+			showError('Nepavyko pasiekti duomenų. Bandykite vėl vėliau.');
+			console.log('Error fetching auth:', err);
+			}
 		}
+		
+		isAuthenticating = false;
+		authBtn.innerText = isRegistration ? 'Prisiregistruoti' : 'Prisijungti';
+		enableButtons();
+		}
+
 
 		function showError(message) {
 			errorField.innerHTML = message;
@@ -1013,32 +1036,34 @@
 			}
 
 			document.getElementById('requestPasswordResetBtn').disabled = true;
-
 			disableButtons();
 
 			try {
 				const response = await fetch(apiBase + 'auth/forgot-password', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ username: emailVal })
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ username: emailVal })
 				});
 
 				const data = await response.json();
 				
-				// Add slideUp animation class
+				// Hide the forgot password form with animation
 				const forgotPassDiv = document.getElementById('forgotPassDiv');
 				forgotPassDiv.style.animation = 'slideUp 0.3s ease-out forwards';
 				
-				// Wait for animation to complete, then hide and reset
 				setTimeout(() => {
-					forgotPassDiv.style.display = 'none';
-					forgotPassDiv.style.animation = ''; // Reset animation for next time
-					document.getElementById('forgotPassBtn').style.display = 'block';
-					document.getElementById('forgotPassEmail').value = '';
+				forgotPassDiv.style.display = 'none';
+				forgotPassDiv.style.animation = '';
+				document.getElementById('forgotPassBtn').style.display = 'block';
+				document.getElementById('forgotPassEmail').value = '';
 				}, 300);
 				
-				// Show success message
-				showSuccess(getMsg(data.code, emailVal));
+				// Check for errors
+				if (data.code === 'ERR_003' || data.code === 'ERR_001' || data.code === 'ERR_002' || data.code === 'RESET_002') {
+					showError(getMsg(data.code, emailVal, data.retryAfter));
+				} else {
+					showSuccess(getMsg(data.code, emailVal));
+				}
 			} catch (err) {
 				showError('Nepavyko pasiekti serverio.');
 			} finally {
@@ -1051,12 +1076,18 @@
 			disableButtons();
 			try {
 				const response = await fetch(apiBase + 'auth/resend-verification', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ username: emailVal })
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ username: emailVal })
 				});
 				const data = await response.json();
+				
+				// Check for errors first
+				if (data.code === 'ERR_003' || data.code === 'ERR_001' || data.code === 'ERR_002') {
+				showError(getMsg(data.code, '', data.retryAfter));
+				} else {
 				showSuccess(getMsg(data.code));
+				}
 			} catch (err) {
 				showError('Nepavyko išsiųsti patvirtinimo laiško.');
 			} finally {
