@@ -432,10 +432,16 @@ function handleModeChoice8Change() {
         toggleVisibility(modeChoice11DivElement, true);
         if (classChoiceSelection === "C75") {
             toggleVisibility(modeChoice13Element, true);
+            modeChoice13Element.innerHTML = "";
+            modeChoice13Element.innerHTML += '<option value="3">RETESNI ATVEJAI</option>';
+            modeChoice13Element.innerHTML += '<option value="1">DAŽNESNI ATVEJAI</option>';
             toggleVisibility(modeChoice12Element, false);
             rasybaOptionsLabelTextGaluneElement.innerHTML = "ŽODŽIO PABAIGA:";
         } else {
-            toggleVisibility(modeChoice13Element, false);
+            toggleVisibility(modeChoice13Element, true);
+            modeChoice13Element.innerHTML = "";
+            modeChoice13Element.innerHTML += '<option value="1">DAŽNESNI ATVEJAI</option>';
+            modeChoice13Element.innerHTML += '<option value="3">RETESNI ATVEJAI</option>';
             toggleVisibility(modeChoice12Element, true);
             rasybaOptionsLabelTextGaluneElement.innerHTML = "ŽODŽIO PABAIGA:";
         }
@@ -611,15 +617,6 @@ function getSelectedRasybaConditions() {
             conditions[key] = conditions[key].concat(value[key]);
         });
     });
-    
-    // Handle special case for C66
-    const isIsidmetinaChecked = document.getElementById("C66")?.checked;
-    
-    if (isIsidmetinaChecked) {
-        conditions["C66"] = classChoiceElement.value === "C75" ? ["2kl"] : ["4kl"];
-    } else {
-        delete conditions["C66"];
-    }
     
     return conditions;
 }
@@ -1033,11 +1030,7 @@ function updateControllerCustomTaskChoices () {
 
         controller.result = ['', '', '', '', ''];
         controller.modeChoiceLtDifficulty = document.getElementById('mode_choice_10').value;
-        if (controller.classChoice === "C75") {
-            controller.questionFrequency = Number(modeChoice13Selection);
-        } else {
-            controller.questionFrequency = 1;
-        }
+        controller.questionFrequency = Number(modeChoice13Selection);
         controller.task = null;
         controller.taskCompleted = false;
 	    controller.taskRecorded = false;

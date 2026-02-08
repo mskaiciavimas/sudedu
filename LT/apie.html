@@ -342,6 +342,22 @@
             font-size: 16px;
         }
 
+        /* Active TOC link highlighting */
+        .content-list-link.active {
+            background: linear-gradient(135deg, rgba(50, 172, 147, 0.2), rgba(50, 172, 147, 0.1));
+            color: #32ac93;
+            font-weight: 700;
+            border-left: 3px solid #32ac93;
+            padding-left: 12px;
+            box-shadow: 0 2px 8px rgba(50, 172, 147, 0.1);
+            border-radius: 4px;
+        }
+
+        /* Smooth scrolling for sidebar */
+        .sidebar {
+            scroll-behavior: smooth;
+        }
+
         .subsubtitle {
             margin: 5px 0;
             font-weight: 700;
@@ -1150,7 +1166,7 @@
                 <a href="uzduotys.html" class="main-nav-link">Užduotys</a>
                 <a href="klase.html" class="main-nav-link">Klasė</a>
                 <a href="augintiniai.html" class="main-nav-link">Augintiniai</a>
-                <a href="apie.html" class="main-nav-link main-nav-link-active">Apie SUDEDU</a>
+                <a href="apie.html" class="main-nav-link main-nav-link-active">Instrukcijos</a>
                 
                 <div class="main-nav-language-dropdown" id="languageDropdown">
                     <button class="main-nav-language-btn" id="languageBtn">
@@ -1188,7 +1204,7 @@
                 <a href="uzduotys.html" class="main-nav-mobile-link">Užduotys</a>
                 <a href="klase.html" class="main-nav-mobile-link">Klasė</a>
                 <a href="augintiniai.html" class="main-nav-mobile-link">Augintiniai</a>
-                <a href="apie.html" class="main-nav-mobile-link active">Apie SUDEDU</a>
+                <a href="apie.html" class="main-nav-mobile-link active">Instrukcijos</a>
                 
                 <div class="main-nav-mobile-language">
                     <button class="language-option language-option-LT selected" onclick="setLanguage('LT')">LT</button>
@@ -2396,7 +2412,7 @@
                     
                     <div id="rasyba-1-2-kategorijos" class="stressed-text-black">Užduočių kategorijos:</div>
                     <ul class="compact-items">
-                        <li>Žodžio pabaiga: 
+                        <li><strong>Žodžio pabaiga</strong>: 
                             <ol>
                                 <li>
                                    Daiktavardžių vienaskaitos galininkas (ką vieną?). 
@@ -2410,8 +2426,12 @@
                                 </li>
                             </ol>
                         </li>
-                        <li>Įsidėmėtinos rašybos žodžiai</li>
-                        <li>Panašiai skambančios priebalsės (k–g, p–b, t–d, ž–š, z–s) be priebalsių supanašėjimo</li>
+                        <li><strong>Įsidėmėtinos rašybos žodžiai</strong></li>
+                        <li><strong>Panašiai skambančios priebalsės</strong> (k–g, p–b, t–d, ž–š, z–s) be priebalsių supanašėjimo</li>
+                        <li><strong>H - CH - F</strong> (žodžiai su šiomis priebalsėmis)</li>
+                        <li><strong>Minkštumo ženklas</strong> (ne prieš dvibalsius)</li>
+                        <li><strong>Balsių poros</strong> (e - ė, i - y, u - ū)</li>
+                        <li><strong>Dvibalsiai</strong> (be minkštumo ženklo)</li>
                     </ul>
                     
                     <div id="rasyba-1-2-sudetingumas" class="stressed-text-black">Sudėtingumas:</div>
@@ -2422,12 +2442,15 @@
                     </ul>
                     
                     <div id="rasyba-1-2-pagalba" class="stressed-text-black">Pagalba:</div>
-                    <p class="compact-items">Pagalbos mygtukas atsiranda tik tuomet, kai pagalba galima bent vienam žodžiui su nežinomomis raidėmis:</p>
                     
                     <ul class="compact-items">
-                        <li><strong>Žodžio pabaiga:</strong> klausimai, padedantys nustatyti žodžio galūnę</li>
-                        <li><strong>Įsidėmėtina rašyba:</strong> pagalba neteikiama</li>
-                        <li><strong>Panašiai skambančios priebalsės:</strong> panašiai skambančių priebalsių pora rodoma visą laiką</li>
+                        <li><strong>Žodžio pabaiga:</strong> klausimai, padedantys nustatyti žodžio galūnę (pvz., „ką vieną?“)</li>
+                        <li><strong>Įsidėmėtina rašyba:</strong> keli galimi atsakymo variantai (pvz., „e|ę|ė|ia“)</li>
+                        <li><strong>Panašiai skambančios priebalsės:</strong> panašiai skambančių priebalsių pora (pvz., „t|d“) - rodoma visą laiką</li>
+                        <li><strong>H - CH - F:</strong> galimi atsakymų variantai („h|ch|f“)</li>
+                        <li><strong>Minkštumo ženklas:</strong> keli galimi atsakymo variantai (pvz., „u|iu|ū|iū“)</li>
+                        <li><strong>Balsių poros:</strong> balsių pora (pvz., „i|y“)</li>
+                        <li><strong>Dvibalsiai:</strong> visi dvibalsiai („ai|au|ei|ie|ui|uo“)</li>
                     </ul>
                     
                     <div class="example-sentence">
@@ -2438,17 +2461,17 @@
                     
                     <div id="rasyba-3-4-kategorijos" class="stressed-text-black">Užduočių kategorijos:</div>
                     <ul class="compact-items">
-                        <li>Žodžio pabaiga (daiktavardžio, būdvardžio, prieveiksmio, veiksmažodžio)</li>
-                        <li>Įsidėmėtinos rašybos žodžiai</li>
-                        <li>Sudurtiniai žodžiai</li>
-                        <li>Priebalsių supanašėjimas</li>
-                        <li>Mišrieji dvigarsiai</li>
-                        <li>Priešdėliai</li>
-                        <li>Priesagos (kartais gali pasitaikyti ir šaknies balsių)</li>
+                        <li><strong>Žodžio pabaiga</strong> (daiktavardžio, būdvardžio, prieveiksmio, veiksmažodžio)</li>
+                        <li><strong>Įsidėmėtinos rašybos žodžiai</strong></li>
+                        <li><strong>Sudurtiniai žodžiai</strong></li>
+                        <li><strong>Priebalsių supanašėjimas</strong></li>
+                        <li><strong>Dvibalsiai</strong> (su ir be minkštumo ženklo)</li>
+                        <li><strong>Mišrieji dvigarsiai</strong> (su ir be minkštumo ženklo)</li>
+                        <li><strong>Priešdėliai</strong> („iš-“, „į-“, „už-“, „at-“, „ap-“)</li>
                     </ul>
                     
                     <div id="rasyba-3-4-sudetingumas" class="stressed-text-black">Sudėtingumas:</div>
-                    <p class="compact-items"Rašybos užduotyse galima pasirinkti lengvesnes arba sunkesnes žodžių su nežinomomis pabaigomis kombinacijas:</p>
+                    <p class="compact-items">Rašybos užduotyse galima pasirinkti lengvesnes arba sunkesnes žodžių su nežinomomis pabaigomis kombinacijas:</p>
                     <ul class="compact-items">
                         <li><strong>Lengvesnės kombinacijos:</strong> tik vienas iš greta esančių daiktavardžių/būdvardžių gali būti pateikiamas su trūkstama pabaiga.</li>
                         <li><strong>Sunkesnės kombinacijos:</strong> gali būti pateikta užduočių, reikalaujančių įrašyti gretimų daiktavardžių/būdvardžių pabaigas.</li>
@@ -2460,64 +2483,86 @@
                         LENGVESNĖS KOMBINACIJOS: „Gil__ baloje gyven__ vėžliukas." ARBA „Gilioje bal__ gyven__ vėžliukas.“<br>
                         SUNKESNĖS KOMBINACIJOS: „Gil__ bal__ gyven__ vėžliukas.“
                     </div>
+
+                    <p class="compact-items">Galima pasirinkti retesnius arba dažnesnius atvejus:</p>
+                    <ul class="compact-items">
+                        <li><strong>Retesni atvejai:</strong> maksimalus žodžių, su nežinomomis raidėmis, skaičius yra tris kartus mažesnis nei žodžių skaičius sakinyje (pvz., šešių žodžių sakinyje gali būti du žodžiai su nežinomomis raidėmis).</li>
+                        <li><strong>Dažnesni atvejai:</strong> kiekvienas žodis sakinyje gali turėti nežinomą raidę.</li>
+                    </ul>
                     
                     <div id="rasyba-3-4-pagalba" class="stressed-text-black">Pagalba:</div>
-                    <p class="compact-items">Pagalbos mygtukas atsiranda tik tuomet, kai pagalba galima bent vienam žodžiui su nežinomomis raidėmis:</p>
                     
                     <ul class="compact-items">
                         <li><strong>Žodžio pabaiga:</strong>
+                            Pateikiama žodžio morfologinė informacija (pvz., „dkt., N., vns., mot.g.“).
+                            <br>
+                            <p class="compact-items">Gramatinių pažymų žodynas:</p>
+                            <ul>
+                                <li><strong>dkt.</strong>: daiktavardis</li>
+                                <li><strong>tikr.dkt.</strong>: tikrinis daiktavardis</li>
+                                <li><strong>bdv.</strong>: būdvardis</li>
+                                <li><strong>vksm.</strong>: veiksmažodis</li>
+                                <li><strong>prv.</strong>: prieveiksmis</li>
+                                <li><strong>vns.</strong>: vienaskaita</li>
+                                <li><strong>dgs.</strong>: daugiskaita</li>
+                                <li><strong>Ia.</strong>: pirmas asmuo</li>
+                                <li><strong>IIa.</strong>: antras asmuo</li>
+                                <li><strong>IIIa.</strong>: trečias asmuo</li>
+                                <li><strong>es.l.</strong>: esamasis laikas</li>
+                                <li><strong>būt.k.l.</strong>: būtasis kartinis laikas</li>
+                                <li><strong>būt.d.l.</strong>: būtasis dažninis laikas</li>
+                                <li><strong>būs.l.</strong>: būsimasis laikas</li>
+                                <li><strong>vyr.g.</strong>: vyriškoji giminė</li>
+                                <li><strong>mot.g.</strong>: moteriškoji giminė</li>
+                                <li><strong>V.</strong>: vardininkas</li>
+                                <li><strong>K.</strong>: kilmininkas</li>
+                                <li><strong>N.</strong>: naudininkas</li>
+                                <li><strong>G.</strong>: galininkas</li>
+                                <li><strong>Įn.</strong>: įnagininkas</li>
+                                <li><strong>Vt.</strong>: vietininkas</li>
+                                <li><strong>Š.</strong>: šauksmininkas</li>
+                            </ul>
+
+                            <div class="warning-box knowledge-level">
+                                Kadangi kompiuteriai nesupranta konteksto, tik originaliame tekste numatytos galūnės bus užskaitytos kaip teisingos.
+                                Tais atvejais, kai keli galūnių variantai yra gramatiškai teisingi, atsakymą, kuris bus priimtas kaip teisingas, galima išsiaiškinti naudojantis pagalba.
+                                Tokių atvejų pavyzdžius galite rasti žemiau.
+                            </div>
+                                                        
                             <ol>
                                  <li>
-                                    <strong>vns. (vienaskaita); dgs. (daugiskaita)</strong> 
-                                    – nurodo žodžio (daiktavardžio arba būdvardžio), kurio pabaigą reikia įrašyti, skaičių.
                                     <div class="example-sentence">
-                                        <strong>Pavyzdys:</strong> „Gelton__ (vns.) ir raudon__ (vns.) obuoliai guli ant stalo.“<br>
-                                        Šiuo atveju, ir pabaiga „-as“ („Geltonas ir raudonas obuoliai guli ant stalo.“), ir „-i“ 
-                                        („Geltoni ir raudoni obuoliai guli ant stalo.“) gramatiškai būtų teisingos. 
-                                        Tačiau, kaip minėta ankščiau, raidės atitinkančios originalų tekstą, bus užskaitytos kaip teisingos.
+                                        <strong>Pavyzdys:</strong> „Gelton__ (bdv.,V.,vns.,vyr.g.) ir raudon__ (bdv.,V.,vns.,vyr.g.) obuoliai guli ant stalo.“<br>
                                     </div>
+                                    Šiuo atveju, ir pabaiga „-as“ („Geltonas ir raudonas obuoliai guli ant stalo.“), ir „-i“ 
+                                    („Geltoni ir raudoni obuoliai guli ant stalo.“) gramatiškai būtų teisingos. Naudojantis pagalba, galima nustatyti, 
+                                    kad originaliame tekste šie žodžiai su nežinomomis galūnėmis yra vienaskaitiniai („vns.“), todėl teisingas atsakymas
+                                    abiem žodžiams yra „-as“.
                                 </li>
                                 <li>
-                                    <strong>vns.? dgs.? (vienaskaita arba daugiskaita); vns.? prv.? (vienaskaita arba prieveiksmis)</strong>
-                                    – identifikuoja atvejus, kai gramatiškai žodis gali būti vartojamas ir vienaskaita, ir daugiskaita, priklausomai nuo linksnio, arba, kai žodis gali būti vienaskaitos būdvardis arba prieveiksmis.
                                     <div class="example-sentence">
-                                        <strong>Pavyzdys:</strong> „Juodas debes__ (vns.? dgs.?) ram__ (vns.? prv.?) slinko link mūsų.“<br>
-                                        Kadangi žodžio „debesis“ vienaskaitos vardininko forma „debesìs“ ir daugiskaitos galininko forma „dẽbesis“ rašomos 
-                                        lygiai taip pat, kompiuteris, nesuprasdamas konteksto, negali nustatyti, kuri forma yra teisinga, todėl pagalba nurodo, 
-                                        kad abu variantai galimi. Analogiška situacija žodžiui „ramiai“ – jis gali būti arba būdvardžio vienaskaitos naudininko 
-                                        forma „rãmiai“ (pavydužiui, „ramiai mergaitei“) arba prieveiksmis „ramiai̇̃“ (pavyzdžiui, „ramiai sėdėjo“).
+                                        <strong>Pavyzdys:</strong> „Mokytoj__ (dkt.,V.,vns.,vyr.g.) padėjo knygą ant stalo.“<br>
                                     </div>
+                                    Šiuo atveju, žodis su nežinoma galūne gramatiškai gali būti ir vyriškosios, ir moteriškosios giminės.
+                                    Naudojantis pagalba, galima nustatyti, kad žodis yra vyriškosios giminės („vyr.g.“), tad atsakymas, kuris bus priimtas kaip teisingas, yra „Mokytojas“, ne „Mokytoja“.         
                                 </li>
-                                <li><strong>vyr.g. (vyriškoji giminė); mot.g. (moteriškoji giminė)</strong> 
-                                    – nurodo žodžio giminę. Padeda išsiaiškinti atsakymą, kuris bus priimtas kaip teisingas, kai 
-                                    žodis su nežinoma galūne gramatiškai gali būti ir vyriškosios, ir moteriškosios giminės.
-                                    <div class="example-sentence">
-                                        <strong>Pavyzdys:</strong> „Mokytoj__ (vyr.g.) padėjo knygą ant stalo.“<br>
-                                        Šiuo atveju, pagalba nurodo, kad atsakymas, kuris bus priimtas kaip teisingas, yra „Mokytojas“, ne „Mokytoja“.
-                                    </div>
-                                </li>
-                                <li><strong>
-                                    laikas (būs.l. (būsimasis laikas); es.l. (esamasis laikas); būt.k.l. (būtasis kartinis laikas); būt.d.l. (būtasis dažninis laikas)),<br>
-                                    skaičius (vns. (vienaskaita); dgs. (daugiskaita)),<br>
-                                    asmuo (Ia. (pirmas asmuo); IIa. (antras asmuo), IIIa. (trečias amuo))
-                                </strong> – tokia informacija pateikimiama šalia veiksmažodžių, kurių galūnes reikia įrašyti.</li>
+                                <li>
                                 <div class="example-sentence">
-                                    <strong>Pavyzdys:</strong> „Tebenešioj__ (es.l.,vns.,Ia.) tavo dovanotas apyrankes su savimi.“<br>
-                                    Šiuo atveju pagalba nurodo, kad teisingas atsakymas, kuris bus užskaitytas, yra esamojo laiko vienaskaitos 
-                                    pirmo asmens forma „Tebenešioju“, o ne kiti gramatiškai teisingi variantai, kaip „Tebenešiojau“, „Tebenešiojame“, 
-                                    „Tebenešiojo“.
+                                    <strong>Pavyzdys:</strong> „Tebenešioj__ (vksm.,es.l.,vns.,Ia.) tavo dovanotas apyrankes su savimi.“<br>
                                 </div>
+                                    Šiuo atveju pagalba nurodo, kad teisingas atsakymas, kuris bus užskaitytas, yra esamojo laiko („es.l“) vienaskaitos („vns.“) 
+                                    pirmo asmens („Ia.“) forma „Tebenešioju“, o ne kiti gramatiškai teisingi variantai, kaip „Tebenešiojau“, „Tebenešiojame“, 
+                                    „Tebenešiojo“.
                             </ol>
                         </li>
 
-                        <li><strong>Įsidėmėtinos rašybos žodžiai:</strong> pagalba neteikiama.</li>
-                        <li><strong>Sudurtiniai žodžiai</strong> pagalba neteikiama.</li>
-                        <li><strong>Priebalsių supanašėjimas:</strong> pagalba neteikiama.</li>
-                        <li><strong>Mišrieji dvigarsiai:</strong> pagalba neteikiama.</li>
-                        <li><strong>Priešdėliai:</strong> pagalba neteikiama.</li>
-                        <li><strong>Priesagos:</strong> pagalba neteikiama.</li>
+                        <li><strong>Įsidėmėtinos rašybos žodžiai:</strong> keli galimi atsakymo variantai (pvz., „e|ę|ė|ia“)</li>
+                        <li><strong>Sudurtiniai žodžiai</strong> keli galimi atsakymo variantai (pvz., „a|ą|ia|e|ė“)</li>
+                        <li><strong>Priebalsių supanašėjimas:</strong> priebalsių pora (pvz., „ž|š“)</li>
+                        <li><strong>Dvibalsiai:</strong> nurodoma, kad atsakymas yra dvibalsis, galimai su minkštumo ženklu - „i?dvib.“</li>
+                        <li><strong>Mišrieji dvigarsiai:</strong> nurodoma, kad atsakymas yra mišrusis dvigarsis, galimai su minkštumo ženklu - „i?m.dvig.“</li>
+                        <li><strong>Priešdėliai:</strong> keli galimi atsakymo variantai (pvz., „i|į|y“)</li>
                          
-
                     </ul>
                     
                     <div class="section-header" id="teisingi-atsakymai">Teisingi atsakymai</div>
@@ -2546,7 +2591,18 @@
                 <div class="info-card">
                     <div class="text-title" id="kontaktai" style="margin-top: 0;">SUSISIEKITE SU MUMIS</div>
                     <p>Turite klausimų ar pasiūlymų? Parašykite mums!</p>
-                    <p class="stressed-text" style="font-size: 1.3rem;">El. paštas: <a href="mailto:sudedult@gmail.com">sudedult@gmail.com</a></p>
+                    <p class="stressed-text" style="font-size: 1.3rem;">
+                        El. paštas: <a href="mailto:sudedult@gmail.com">sudedult@gmail.com</a>
+                    </p>
+                    <p style="margin-top: 1rem;">
+                        <a href="https://www.facebook.com/profile.php?id=100095287010276" target="_blank" rel="noopener noreferrer" 
+                           style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                            Raskite mus „Facebook“ platformoje!
+                        </a>
+                    </p>
                 </div>
                 </div>
             </div>
@@ -2692,6 +2748,172 @@
                 return true;
             }
         });
+
+// ===== TABLE OF CONTENTS AUTO-SCROLL AND HIGHLIGHT =====
+const contentContainer = document.querySelector('.content-text-container-outer');
+const sidebar = document.getElementById('sidebar');
+const tocLinks = document.querySelectorAll('.content-list-link[href^="#"]');
+
+// Get all sections with IDs that have corresponding TOC links
+const sections = Array.from(document.querySelectorAll('[id]')).filter(el => {
+    return Array.from(tocLinks).some(link => {
+        const href = link.getAttribute('href');
+        return href && href.startsWith('#') && href === `#${el.id}`;
+    });
+}).sort((a, b) => a.offsetTop - b.offsetTop); // Sort by position on page
+
+let currentActiveId = null;
+let isUserClicking = false;
+
+// Function to find currently visible section
+function getCurrentSection() {
+    // Check if scrolled to bottom
+    const isAtBottom = Math.abs(contentContainer.scrollHeight - contentContainer.scrollTop - contentContainer.clientHeight) < 5;
+    if (isAtBottom) {
+        return 'kontaktai';
+    }
+    
+    const containerRect = contentContainer.getBoundingClientRect();
+    const containerTop = containerRect.top;
+    const containerBottom = containerRect.bottom;
+    const offset = 80; // The anchor point - same as used in smooth scroll (line 2706)
+    const anchorPoint = containerTop + offset;
+    
+    let closestSection = null;
+    let closestDistance = Infinity;
+    
+    // Find section whose title is closest to the anchor point
+    sections.forEach(section => {
+        const rect = section.getBoundingClientRect();
+        const sectionTop = rect.top;
+        
+        // Calculate distance from anchor point
+        const distance = Math.abs(sectionTop - anchorPoint);
+        
+        if (distance < closestDistance) {
+            closestDistance = distance;
+            closestSection = section.id;
+        }
+    });
+    
+    // If the closest section is below the anchor point and not in view yet, use the closest section above
+    if (closestSection) {
+        const closestRect = document.getElementById(closestSection).getBoundingClientRect();
+        
+        // If closest section is below anchor AND not visible in viewport yet
+        if (closestRect.top > anchorPoint && closestRect.top > containerBottom) {
+            // Find the closest section that's above the anchor point
+            let closestAbove = null;
+            let closestAboveDistance = Infinity;
+            
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                const sectionTop = rect.top;
+                
+                if (sectionTop <= anchorPoint) {
+                    const distance = anchorPoint - sectionTop;
+                    if (distance < closestAboveDistance) {
+                        closestAboveDistance = distance;
+                        closestAbove = section.id;
+                    }
+                }
+            });
+            
+            if (closestAbove) {
+                return closestAbove;
+            }
+        }
+    }
+    
+    // Fallback to first section
+    return closestSection || sections[0]?.id || null;
+}
+
+// Function to scroll sidebar to center a link
+function centerLinkInSidebar(link) {
+    const sidebarRect = sidebar.getBoundingClientRect();
+    const linkRect = link.getBoundingClientRect();
+    const offset = linkRect.top - sidebarRect.top - (sidebarRect.height / 2) + (linkRect.height / 2);
+    
+    sidebar.scrollBy({
+        top: offset,
+        behavior: 'smooth'
+    });
+}
+
+// Function to update active link and scroll sidebar
+function updateActiveTOCLink() {
+    const newActiveId = getCurrentSection();
+    
+    // Only update if changed
+    if (newActiveId === currentActiveId) return;
+    currentActiveId = newActiveId;
+    
+    if (!currentActiveId) return;
+    
+    // Remove all active classes
+    tocLinks.forEach(link => link.classList.remove('active'));
+    
+    // Find and activate current link
+    const activeLink = Array.from(tocLinks).find(link => 
+        link.getAttribute('href') === `#${currentActiveId}`
+    );
+    
+    if (activeLink) {
+        activeLink.classList.add('active');
+        
+        // Center in sidebar
+        if (!isUserClicking) {
+            centerLinkInSidebar(activeLink);
+        }
+    }
+}
+
+// Use requestAnimationFrame for smooth real-time updates during scroll
+let ticking = false;
+contentContainer.addEventListener('scroll', () => {
+    // Skip if user is clicking
+    if (isUserClicking) return;
+    
+    if (!ticking) {
+        requestAnimationFrame(() => {
+            updateActiveTOCLink();
+            ticking = false;
+        });
+        ticking = true;
+    }
+});
+
+// Update on click - set active and center immediately
+tocLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        const href = link.getAttribute('href');
+        if (href && href.startsWith('#')) {
+            const targetId = href.substring(1);
+            
+            // Freeze automatic updates
+            isUserClicking = true;
+            
+            // Manually set active
+            currentActiveId = targetId;
+            tocLinks.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+            
+            // Center the clicked link in sidebar immediately
+            centerLinkInSidebar(link);
+            
+            // Unfreeze after delay
+            setTimeout(() => {
+                isUserClicking = false;
+            }, 1500);
+        }
+    });
+});
+
+// Initial update
+setTimeout(() => {
+    updateActiveTOCLink();
+}, 100);
     </script>
 </body>
 </html>

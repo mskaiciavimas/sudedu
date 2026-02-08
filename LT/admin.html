@@ -1883,7 +1883,10 @@
                         </div>
                         <div class="info-item">
                             <strong>Email Verified</strong>
-                            ${user.emailVerified ? '✅ Yes' : '❌ No'}
+                            <select id="edit-emailverified">
+                                <option value="true" ${user.emailVerified ? 'selected' : ''}>✅ Yes</option>
+                                <option value="false" ${!user.emailVerified ? 'selected' : ''}>❌ No</option>
+                            </select>
                         </div>
                     </div>
 
@@ -2233,7 +2236,8 @@
         async function updateUser(userId) {
             const updates = {
                 nickname: document.getElementById('edit-nickname').value,
-                accType: document.getElementById('edit-acctype').value
+                accType: document.getElementById('edit-acctype').value,
+                emailVerified: document.getElementById('edit-emailverified').value === 'true'
             };
 
             try {

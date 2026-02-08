@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>El. pašto patvirtinimas - sudEdu</title>
+	<title>SUDEDU - el. pašto patvirtinimas</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
 	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -419,7 +419,9 @@
 
 		<!-- Resend Section -->
 		<div id="resendSection" class="resend-section" style="display:none;">
-			<p style="margin-bottom: 16px; color: #2c3e50;">Patvirtinimo nuoroda nebegalioja.</p>
+			<p style="margin-bottom: 16px; color: #2c3e50;">
+				Išsiųsti patvirtinimo laišką pakartotinai:
+			</p>
 			<div class="form-group">
 				<input type="email" id="emailInput" placeholder="Įveskite el. paštą" />
 			</div>
@@ -440,17 +442,37 @@
 	<script src="../mental-arithmetic-combinations.js"></script>
 
 	<script>
-		const MESSAGES = {
-			'VERIFY_001': 'El. paštas sėkmingai patvirtintas! Galite prisijungti.',
-			'VERIFY_002': 'El. paštas jau buvo patvirtintas.',
-			'VERIFY_003': 'Vartotojas nerastas.',
-			'VERIFY_004': 'Patvirtinimo nuoroda nebegalioja.',
-			'ERR_001': 'Serverio klaida. Bandykite vėliau.',
-			'ERR_002': 'Trūksta duomenų.'
-		};
-
-		function getMsg(code) {
+		function getMsg(code, emailValue = '', retryAfter = null) {
+			const MESSAGES = {
+				'VERIFY_001': 'El. paštas sėkmingai patvirtintas! Galite prisijungti.',
+				'VERIFY_002': 'El. paštas jau buvo patvirtintas.',
+				'VERIFY_003': 'Vartotojas nerastas.',
+				'VERIFY_004': 'Patvirtinimo nuoroda nebegalioja.',
+				'REG_002': `Patvirtinimo el. laiškas išsiųstas ${emailValue} (galioja 24 valandas). Patikrinkite savo el. paštą.`,
+				'ERR_001': 'Serverio klaida. Bandykite vėliau.',
+				'ERR_002': 'Trūksta duomenų.',
+				'ERR_003': retryAfter 
+					? `Per didelis prašymų srautas. Bandykite vėliau (anksčiausiai po ${formatRetryTime(retryAfter)}).`
+					: 'Per didelis prašymų srautas. Bandykite vėliau.'
+			};
 			return MESSAGES[code] || 'Nežinoma klaida';
+		}
+
+		function formatRetryTime(seconds) {
+			const minutes = Math.ceil(seconds / 60);
+			
+			if (minutes < 60) {
+				return `${minutes} min.`;
+			}
+			
+			const hours = Math.floor(minutes / 60);
+			const remainingMinutes = minutes % 60;
+			
+			if (remainingMinutes === 0) {
+				return `${hours} val.`;
+			}
+			
+			return `${hours} val. ${remainingMinutes} min.`;
 		}
 
 		const params = new URLSearchParams(window.location.search);
@@ -530,9 +552,17 @@
 				});
 				const data = await response.json();
 				
-				message.textContent = getMsg(data.code);
-				messageContainer.className = 'status-message success';
-				resendSection.style.display = 'none';
+				if (data.code === 'ERR_003') {
+					message.textContent = getMsg(data.code, '', data.retryAfter);
+					messageContainer.className = 'status-message error';
+					resendBtn.disabled = false;
+					resendBtnText.textContent = 'Siųsti naują nuorodą';
+					resendBtnSpinner.style.display = 'none';
+				} else {
+					message.textContent = getMsg(data.code, emailVal);  // ← Pass emailVal here
+					messageContainer.className = 'status-message success';
+					resendSection.style.display = 'none';
+				}
 			} catch (err) {
 				message.textContent = 'Nepavyko išsiųsti patvirtinimo laiško.';
 				messageContainer.className = 'status-message error';

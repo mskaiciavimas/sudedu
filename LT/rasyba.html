@@ -23,7 +23,7 @@
 	</script>	
 	<script src="../refresh-token.js"></script>
 		
-	<style>
+	<style id="main-styles">
         * {
           -webkit-user-select: none;
           -webkit-tap-highlight-color: transparent;
@@ -383,6 +383,10 @@
 	}
 
 	#next-question {
+		display: none;
+	}
+
+	.pagalba-span {
 		display: none;
 	}
 
@@ -873,7 +877,7 @@
 			<div id="timer"></div>
 
 			<div class="help-toggle-holder">
-				<label class="switch"><input type="checkbox" id="help-toggle" class="help-toggle" checked>
+				<label class="switch"><input type="checkbox" id="help-toggle" class="help-toggle">
 					<span class="switch-slider">
 						<span class="switch-text switch-text-object">
 							Pagalba
@@ -994,14 +998,12 @@ window.stopQuestionsCloseActions = function () {
 			'../databases/1_2_klase_gramatika_tekstai.json',
 			'../databases/rasyba_suitable_words.json',
 			'../databases/rasyba_suitable_words_patterns.json',
-			'../databases/rasyba_suitable_words_linguistic_info.json'
 		];
 	} else if (controller.classChoice === "C76") {
 		jsonFiles = [
 			'../databases/3_4_klase_gramatika_tekstai.json',
 			'../databases/rasyba_suitable_words.json',
 			'../databases/rasyba_suitable_words_patterns.json',
-			'../databases/rasyba_suitable_words_linguistic_info.json'
 		];
 	}
 	Promise.all(jsonFiles.map(file => fetch(file).then(response => {
@@ -1012,12 +1014,18 @@ window.stopQuestionsCloseActions = function () {
 	}).catch(error => {
 		console.error('Error:', error);
 		return null; // Return null or empty object in case of error
-	}))).then(([textsForGrammar, suitableWords, suitableWordPatterns, wordLinguisticInfo]) => {
+	}))).then(([textsForGrammar, suitableWords, suitableWordPatterns]) => {
 
-		const MIN_SENTENCE_CHARACTER_NUMBER_FOR_GRADES_0_to_1 = 45;
+		const MAX_SENTENCE_CHARACTER_NUMBER_FOR_GRADES_0_to_1 = 45;
 		const MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_0_to_1 = 3;
 		const MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_2_to_5 = 4;
 		const PRIORITIZED_TASK_CATEGORIES = ["C66-C76", "C66-C75", "C64"]
+		const TASK_FREQUENCY = {
+			"C91-4": 0.35,
+			"C91-5": 0.35,
+			"C91-6": 0.35,
+		};
+		let pagalbaRule;
 		let questionsToDisplay = 1;
 		let sakiniai = [];
 		let sakiniaiAndAtsakymai = [];
@@ -1055,7 +1063,8 @@ window.stopQuestionsCloseActions = function () {
 
 		const precomputedWordPatterns = {};
 
-		for (const [word, wordsPattern] of Object.entries(suitableWords)) {
+		for (const [word, wordData] of Object.entries(suitableWords)) {
+			const wordsPattern = wordData.suitableTasks;
 			precomputedWordPatterns[word] = {};
 
 		for (const [conditionKey, patternIds] of Object.entries(wordsPattern)) {
@@ -1308,15 +1317,14 @@ function processAdjacentEndlessWords(words, rng) {
             continue;
         }
         
-        const hasC61 = 'C61' in patterns;
+        // Only check for C62/C63
         const hasC62C63 = 'C62' in patterns || 'C63' in patterns;
         
-        if (!hasC61 && !hasC62C63) {
+        if (!hasC62C63) {
             i++;
             continue;
         }
         
-        const sequenceType = hasC61 ? 'C61' : 'C62C63';
         let sequenceIndices = [i];
         let j = i + 1;
         
@@ -1331,13 +1339,10 @@ function processAdjacentEndlessWords(words, rng) {
                 break;
             }
             
-            const nextHasC61 = 'C61' in nextPatterns;
+            // Only check for C62/C63
             const nextHasC62C63 = 'C62' in nextPatterns || 'C63' in nextPatterns;
             
-            const matches = (sequenceType === 'C61' && nextHasC61) || 
-                            (sequenceType === 'C62C63' && nextHasC62C63);
-            
-            if (!matches) {
+            if (!nextHasC62C63) {
                 break;
             }
             
@@ -1356,7 +1361,6 @@ function processAdjacentEndlessWords(words, rng) {
                 if (shouldRemove) {
                     const wordIdx = sequenceIndices[k];
                     const p = result[wordIdx].suitablePatterns;
-                    delete p.C61;
                     delete p.C62;
                     delete p.C63;
                     if (Object.keys(p).length === 0) {
@@ -1477,32 +1481,53 @@ function addSentenceToCategorisedSentences(sentence, categoryList, sentenceAnswe
 
 function drainAllCategories(categories, items) {
     const finalSentences = [];
+    
+    // Initialize category counters for frequency-based selection
+    const categoryCounters = new Map();
+    for (const [category] of categories) {
+        categoryCounters.set(category, 0);
+    }
 
     while (true) {
         let progress = false;
 
         for (const [category, set] of categories) {
             if (set.size > 0) {
-                const uniqueID = set.values().next().value;
-                const entry = items.get(uniqueID);
+                // Get the frequency for this category (default to 1)
+                const frequency = TASK_FREQUENCY[category] || 1;
+                
+                // Check if we should pick from this category based on frequency
+                const counter = categoryCounters.get(category);
+                const shouldPick = counter >= (1 / frequency);
+                
+                if (shouldPick) {
+                    const uniqueID = set.values().next().value;
+                    const entry = items.get(uniqueID);
 
-                if (!entry) continue;
+                    if (!entry) continue;
 
-                const sentenceHTML = entry.sentence;
-                const answersForSentence = entry.sentenceAnswers;
+                    const sentenceHTML = entry.sentence;
+                    const answersForSentence = entry.sentenceAnswers;
 
-                // Remove from all categories
-                for (const cat of entry.categories) {
-                    categories.get(cat).delete(uniqueID);
+                    // Remove from all categories
+                    for (const cat of entry.categories) {
+                        categories.get(cat).delete(uniqueID);
+                    }
+                    items.delete(uniqueID);
+
+                    finalSentences.push({
+                        sentenceHTML,
+                        answers: answersForSentence
+                    });
+
+                    // Reset counter for this category
+                    categoryCounters.set(category, 0);
+                    progress = true;
+                } else {
+                    // Increment counter
+                    categoryCounters.set(category, counter + 1);
+                    progress = true;
                 }
-                items.delete(uniqueID);
-
-                finalSentences.push({
-                    sentenceHTML,
-                    answers: answersForSentence
-                });
-
-                progress = true;
             }
         }
 
@@ -1518,7 +1543,7 @@ function processSentences(extractedSentences, sessionSeed, passNumber, config, s
         precomputedWordPatterns,
         conditionsSet,
         allowAdjacentEndlessWords,
-        MIN_SENTENCE_CHARACTER_NUMBER_FOR_GRADES_0_to_1,
+        MAX_SENTENCE_CHARACTER_NUMBER_FOR_GRADES_0_to_1,
         MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_0_to_1,
         MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_2_to_5,
         PRIORITIZED_TASK_CATEGORIES,
@@ -1548,7 +1573,7 @@ function processSentences(extractedSentences, sessionSeed, passNumber, config, s
     
     for (const [sentence, coords] of shuffledSentences) {
         if (controller.classChoice === "C75" && (userInPreSchool || userInFirstGrade)) {
-            if (sentence.length > MIN_SENTENCE_CHARACTER_NUMBER_FOR_GRADES_0_to_1) {
+            if (sentence.length > MAX_SENTENCE_CHARACTER_NUMBER_FOR_GRADES_0_to_1) {
                 continue;
             }
         }
@@ -1575,7 +1600,8 @@ function processSentences(extractedSentences, sessionSeed, passNumber, config, s
                 for (const condKey in wordConditions) {
                     if (conditionsSet.has(condKey)) {
                         wordIsSuitable = true;
-                        matchedConditionsHelpSpans[condKey] = generateHelpSpans(word, condKey);
+						let [startIdx, endIdx, answerLetters] = wordConditions[condKey][0];
+                        matchedConditionsHelpSpans[condKey] = generateHelpSpans(word, condKey, answerLetters);
                         matchedPatterns[condKey] = wordConditions[condKey];
                     }
                 }
@@ -1637,12 +1663,12 @@ function processSentences(extractedSentences, sessionSeed, passNumber, config, s
                     });
                 }
 
-                const wordEnd = item.word.slice(endIdx);
+                const wordEnd = item.word.slice(endIdx).replace(/\d+/g, '');
 
 				let wordHTML;
 
-				if (selectedCategory === "C67" || selectedCategory === "C68") {
-					const constantHelpSpan = generateConstantHelpSpansForC67andC68(answerLetters[0])
+				if (selectedCategory === "C67") {
+					const constantHelpSpan = generateConstantHelpSpans(answerLetters[0], "C67")
 					wordHTML = `<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${wordStart}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="6" id="id-${currentQuestionId}" class="question-input middle"></textarea>${wordEnd}<span class="pagalba-div-constant">${constantHelpSpan}</span></span>`;
 				} else {
 					wordHTML = `<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${wordStart}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="6" id="id-${currentQuestionId}" class="question-input middle"></textarea>${wordEnd}<span class="pagalba-div">${item.helpSpans[selectedCategory]}</span></span>`;
@@ -1655,6 +1681,10 @@ function processSentences(extractedSentences, sessionSeed, passNumber, config, s
                 currentQuestionId++;
 
                 sentenceDiv = sentenceDiv.replace(item.word, wordHTML);
+				sentenceDiv = sentenceDiv.replace(
+					/(\p{L}+)(\d+)(?![^<]*>)/gu,
+					'$1'
+				);
             }
         }
 
@@ -1698,7 +1728,30 @@ async function prepareSentences(sessionSeed, passNumber, targetFormattedSentence
             } else {
                 conditions.push("C87-2");
             }
-		} else {
+		} else if (key === "C88") {
+			conditions.push("C88-1");
+			conditions.push("C88-2");
+		} else if (key === "C89") {
+			conditions.push("C89-1");
+			conditions.push("C89-2");
+		} else if (key === "C90") {
+			conditions.push("C90-1");
+			conditions.push("C90-2");
+		} else if (key === "C91") {
+			conditions.push("C91-1");
+			conditions.push("C91-2");
+			conditions.push("C91-3");
+			conditions.push("C91-4");
+			conditions.push("C91-5");
+			conditions.push("C91-6");
+		} if (key === "C68") {
+            if (controller.classChoice === "C75") {
+                conditions.push("C68-1");
+            } else if (controller.classChoice === "C76") {
+                conditions.push("C68-1");
+				conditions.push("C68-2");
+            }
+        } else {
             conditions.push(key);
         }
     });
@@ -1713,7 +1766,15 @@ async function prepareSentences(sessionSeed, passNumber, targetFormattedSentence
     let processedTextCount = 0;
     const BATCH_SIZE = 50;
     
-    while (state.sakiniaiAndAtsakymai.length < targetFormattedSentences && processedTextCount < shuffledTextIds.length) {
+    // Calculate how much more we need to generate to account for frequency weighting
+	const maxFrequency = Math.max(...conditions.map(condition => {
+		const baseCondition = condition.split('-')[0];
+		return TASK_FREQUENCY[baseCondition] || 1;
+	}), 1);
+
+	const adjustedTarget = Math.ceil(targetFormattedSentences * maxFrequency);
+
+	while (state.sakiniaiAndAtsakymai.length < adjustedTarget && processedTextCount < shuffledTextIds.length) {
         const batchTextIds = shuffledTextIds.slice(processedTextCount, processedTextCount + BATCH_SIZE);
         const batchTexts = {};
         batchTextIds.forEach(id => {
@@ -1748,7 +1809,7 @@ async function prepareSentencesWrapper(sessionSeed, passNumber = 0, targetFormat
         precomputedWordPatterns,
         conditionsSet: null,
         allowAdjacentEndlessWords,
-        MIN_SENTENCE_CHARACTER_NUMBER_FOR_GRADES_0_to_1,
+        MAX_SENTENCE_CHARACTER_NUMBER_FOR_GRADES_0_to_1,
         MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_0_to_1,
         MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_2_to_5,
         PRIORITIZED_TASK_CATEGORIES,
@@ -1776,74 +1837,162 @@ async function prepareSentencesWrapper(sessionSeed, passNumber = 0, targetFormat
 }
 
 
-		function generateHelpSpans (word, condKey) {
+		function generateHelpSpans (word, condKey, answerLetters) {
 			let pagalbaText = "";
 			let valuesToShow = [];
+			let joiner = "|";
 	
-			if (condKey === "C62" || condKey === "C63" || condKey === "C65") {
-			const pagalbaIndex = {
-				"vns": "vns.",
-				"dgs": "dgs.",
-				"1-a": "Ia.",
-				"2-a": "IIa.",
-				"3-a": "IIIa.",
-				"es-l": "es.l.",
-				"b-k-l": "būt.k.l.",
-				"b-d-l": "būt.d.l.",
-				"būs-l": "būs.l.",
-				"vyr-g": "vyr.g.",
-				"mot-g": "mot.g.",
-				"prv": "prv.",
-			};
+			if (condKey === "C62" || condKey === "C63" || condKey === "C65" || condKey === "C92") {
+				joiner = " ,";
+				const pagalbaIndex = {
+					"dkt.": "dkt.",
+					"tikr. dkt.": "tikr.dkt.",
+					"bdv.": "bdv.",
+					"vksm.": "vksm.",
+					"prv.": "prv.",
+					"vns.": "vns.",
+					"dgs.": "dgs.",
+					"1 asm.": "Ia.",
+					"2 asm.": "IIa.",
+					"3 asm.": "IIIa.",
+					"es. l.": "es.l.",
+					"būt. k. l.": "būt.k.l.",
+					"būt. d. l.": "būt.d.l.",
+					"būs. l.": "būs.l.",
+					"vyr. g.": "vyr.g.",
+					"mot. g.": "mot.g.",
+					"V.": "V.", 
+					"K.": "K.",
+					"N.": "N.",
+					"G.": "G.",
+					"Įn.": "Įn.",
+					"Vt.": "Vt.",
+					"Š.": "Š."
+				};
 
-
-			if (wordLinguisticInfo[word].includes("vks")) {
-				if (wordLinguisticInfo[word].includes("3-a")) {
-					valuesToCheck = ["es-l", "b-k-l", "b-d-l", "būs-l", "3-a"];
-				} else {
-					valuesToCheck = ["es-l", "b-k-l", "b-d-l", "būs-l", "vns", "dgs", "1-a", "2-a", "3-a"];
-				}
+				if (suitableWords[word]["morphInfo"].includes("vksm.")) {
+					if (suitableWords[word]["morphInfo"].includes("3 asm.")) {
+						valuesToCheck = ["vksm.", "es. l.", "būt. k. l.", "būt. d. l.", "būs. l.", "3 asm."];
+					} else {
+						valuesToCheck = ["vksm.", "es. l.", "būt. k. l.", "būt. d. l.", "būs. l.", "vns.", "dgs.", "1 asm.", "2 asm."];
+					}
 					valuesToCheck.forEach(value => {
-							if (wordLinguisticInfo[word].includes(value)) {  // If wordInfo has the specific value set to true
+							if (suitableWords[word]["morphInfo"].includes(value)) {
 									valuesToShow.push(pagalbaIndex[value]);
 							}
 					});
-			} else if (wordLinguisticInfo[word].includes("dkt") || wordLinguisticInfo[word].includes("bdv")) {
-					valuesToCheck = ["vns", "dgs"];
-					if (wordLinguisticInfo[word].includes("vns") && wordLinguisticInfo[word].includes("dgs")) {
-						valuesToShow.push(`${pagalbaIndex["vns"]}?, ${pagalbaIndex["dgs"]}?`);
-					} else if (wordLinguisticInfo[word].includes("vns")) {
-						valuesToShow.push(pagalbaIndex["vns"]);
-					} else if (wordLinguisticInfo[word].includes("dgs")) {
-						valuesToShow.push(pagalbaIndex["dgs"]);
-					}
-
-					if (wordLinguisticInfo[word].includes("prv")) {
-						valuesToShow.push("prv.?");
-					}
-
-					if (wordLinguisticInfo[word].includes("vyr-g") && wordLinguisticInfo[word].includes("mot-g")) {
-						valuesToShow.push(`${pagalbaIndex["vyr-g"]}?, ${pagalbaIndex["mot-g"]}?`);
-					} else if (wordLinguisticInfo[word].includes("vyr-g")) {
-						valuesToShow.push(pagalbaIndex["vyr-g"]);
-					} else if (wordLinguisticInfo[word].includes("mot-g")) {
-						valuesToShow.push(pagalbaIndex["mot-g"]);
-					}
-			}
-			} else if (condKey === "C85" || condKey === "C86" || condKey === "C87") {
-				if (wordLinguisticInfo[word].includes("vns") && wordLinguisticInfo[word].includes("dgs") && wordLinguisticInfo[word].includes("g") && wordLinguisticInfo[word].includes("k")) {
-					valuesToShow.push("ką vieną? | ko daug?")
-				} else if (wordLinguisticInfo[word].includes('g')) {
+				} else if (suitableWords[word]["morphInfo"].includes("dkt.") || suitableWords[word]["morphInfo"].includes("tikr. dkt.") || suitableWords[word]["morphInfo"].includes("bdv.")) {
+					valuesToCheck = ["dkt.", "tikr. dkt.", "bdv.", "V.", "K.", "N.", "G.", "Įn.", "Vt.", "Š.", "vns.", "dgs.", "mot. g.", "vyr. g."];
+					valuesToCheck.forEach(value => {
+							if (suitableWords[word]["morphInfo"].includes(value)) { 
+									valuesToShow.push(pagalbaIndex[value]);
+							}
+					});
+				} else if (suitableWords[word]["morphInfo"].includes("prv.")) {
+					valuesToShow.push("prv.");
+				}
+			} else if (condKey === "C85" || condKey === "C86" || condKey.startsWith("C87")) {
+				if (suitableWords[word]["morphInfo"].includes('G.') && suitableWords[word]["morphInfo"].includes("vns.")) {
 					valuesToShow.push("ką vieną?")
-				} else if (wordLinguisticInfo[word].includes('k')) {
+				} else if (suitableWords[word]["morphInfo"].includes('K.') && suitableWords[word]["morphInfo"].includes("dgs.")) {
 					valuesToShow.push("ko daug?")
-				} else if (wordLinguisticInfo[word].includes('vt')) {
+				} else if (suitableWords[word]["morphInfo"].includes('Vt.')) {
 					valuesToShow.push("kur?")
 				}
+			} else if (condKey.startsWith("C88")) {
+				valuesToShow.push("e|ė")
+			} else if (condKey.startsWith("C89")) {
+				valuesToShow.push("i|y")
+			} else if (condKey.startsWith("C90")) {
+				valuesToShow.push("u|ū")
+			} else if (condKey.startsWith("C68")) {
+				if (controller.classChoice === "C75") {
+					valuesToShow.push("ai|au|ei|ie|ui|uo")
+				} else if (controller.classChoice === "C76") {
+					valuesToShow.push("i?dvib.")
+				}
+			} else if (condKey.startsWith("C72")) {
+				valuesToShow.push("i?m.dvig.")
+			} else if (condKey.startsWith("C91")) {
+				removedLetterOptionIndex = {
+					"ia": ["a", "ia", "e"],
+					"a": ["a", "ia", "e"],
+					"e": ["a", "ia", "e"],
+					"io": ["o", "io"],
+					"o": ["o", "io"],
+					"iu": ["u", "iu", "ū", "iū"],
+					"u": ["u", "iu", "ū", "iū"],
+					"iū": ["u", "iu", "ū", "iū"],
+					"ū": ["u", "iu", "ū", "iū"]
+				};
+				valuesToShow.push(...removedLetterOptionIndex[answerLetters])
+			} else if (condKey.startsWith("C66")) {
+				removedLetterOptionIndex = {
+					"u": ["u", "ū", "ų"],
+					"ū": ["u", "ū", "ų"],
+					"ų": ["u", "ū", "ų"],
+					"a": ["a", "ą"],
+					"ą": ["a", "ą"],
+					"i": ["i", "į", "y"],
+					"į": ["i", "į", "y"],
+					"y": ["i", "į", "y"],
+					"uo": ["o", "uo"],
+					"ie": ["e", "ė", "ei", "ie"],
+					"e": ["e", "ę", "ė", "ia"],
+					"ę": ["e", "ę", "ė", "ia"],
+					"ė": ["e", "ę", "ė", "ia"],
+					"ia": ["e", "ę", "ia"],
+					"y": ["i", "į", "y"],
+					"ž": ["š", "ž"],
+					"j": ["i", "j"]
+				};
+				valuesToShow.push(...removedLetterOptionIndex[answerLetters])
+			} else if (condKey.startsWith("C71")) {
+				removedLetterOptionIndex = {
+					"b": ["b", "p"],
+					"p": ["b", "p"],
+					"d": ["d", "t"],
+					"t": ["d", "t"],
+					"g": ["g", "k"],
+					"k": ["g", "k"],
+					"z": ["z", "s"],
+					"s": ["z", "s"],
+					"ž": ["ž", "š"],
+					"š": ["ž", "š"],
+					"c": ["c", "dz"],
+					"č": ["č", "dž"]
+				};
+				valuesToShow.push(...removedLetterOptionIndex[answerLetters])
+			} else if (condKey.startsWith("C69")) {
+				removedLetterOptionIndex = {
+					"i": ["i", "į", "y"],
+					"į": ["i", "į", "y"],
+					"š": ["ž", "š"],
+					"ž": ["ž", "š"],
+					"t": ["d", "t"],
+					"p": ["b", "p"],
+				};
+				valuesToShow.push(...removedLetterOptionIndex[answerLetters])
+			} else if (condKey.startsWith("C64")) {
+				removedLetterOptionIndex = {
+					"ia": ["a", "ą", "ia", "e", "ė"],
+					"a": ["a", "ą", "ia", "e", "ė"],
+					"e": ["a", "ą", "ia", "e", "ė"],
+					"ė": ["a", "ą", "ia", "e", "ė"],
+					"ū": ["u", "ų", "ū",],
+				};
+				valuesToShow.push(...removedLetterOptionIndex[answerLetters])
+			} else if (condKey.startsWith("C61")) {
+				removedLetterOptionIndex = {
+					"h": ["h", "ch", "f"],
+					"ch": ["h", "ch", "f"],
+					"f": ["h", "ch", "f"],
+				};
+				valuesToShow.push(...removedLetterOptionIndex[answerLetters])
 			}
 
 			if (valuesToShow.length > 0) {
-				const valuesToShowString = valuesToShow.join(', ');
+				const valuesToShowString = valuesToShow.join(joiner);
 				const helpSpanHTML = `<span class="pagalba-span">(${valuesToShowString})</span>`
 				return helpSpanHTML
 			} else {
@@ -1851,37 +2000,41 @@ async function prepareSentencesWrapper(sessionSeed, passNumber = 0, targetFormat
 			}
 		}
 
-		function generateConstantHelpSpansForC67andC68 (letter) {
-			if (!letter) return '';
+		function generateConstantHelpSpans (letter, taskID) {
+			if (!letter || !taskID) return '';
 			
 			let pagalbaText = "";
 			let valuesToShow = [];
+
+			let removedLetterOptionIndex = {}
 	
-			removedLetterOptionIndex = {
-				"k": ["k", "g"],
-				"g": ["k", "g"],
-				"p": ["p", "b"],
-				"b": ["p", "b"],
-				"t": ["t", "d"],
-				"d": ["t", "d"],
-				"ž": ["ž", "š"],
-				"z": ["z", "s"],
-				"s": ["z", "s"],
-				"š": ["ž", "š"],
-				"e": ["e", "ė"],
-				"ė": ["e", "ė"],
-				"i": ["i", "y"],
-				"y": ["i", "y"],
-				"u": ["u", "ū"],
-				"ū": ["u", "ū"],
-			};
+			if (taskID === "C67") {
+				removedLetterOptionIndex = {
+					"k": ["k", "g"],
+					"g": ["k", "g"],
+					"p": ["p", "b"],
+					"b": ["p", "b"],
+					"t": ["t", "d"],
+					"d": ["t", "d"],
+					"ž": ["ž", "š"],
+					"z": ["z", "s"],
+					"s": ["z", "s"],
+					"š": ["ž", "š"],
+					"e": ["e", "ė"],
+					"ė": ["e", "ė"],
+					"i": ["i", "y"],
+					"y": ["i", "y"],
+					"u": ["u", "ū"],
+					"ū": ["u", "ū"],
+				};
+			}
 
 			if (letter.toLowerCase() in removedLetterOptionIndex) {
 				valuesToShow = removedLetterOptionIndex[letter.toLowerCase()];
 			}
 
 			if (valuesToShow.length > 0) {
-				const valuesToShowString = valuesToShow.join('/');
+				const valuesToShowString = valuesToShow.join('|');
 				const helpSpanHTML = `<span class="pagalba-span-perm ">(${valuesToShowString})</span>`
 				return helpSpanHTML
 			} else {
@@ -1933,9 +2086,7 @@ async function prepareSentencesWrapper(sessionSeed, passNumber = 0, targetFormat
 			if (questionsToDisplay < 5) {
 				questionsToDisplay++;
 				await displaySentences();
-				document.getElementById('help-toggle').checked = false;
 				adjustFieldForTexts();
-				helpToggle();
 			} else {
 				focusFirstInput();
 			}
@@ -1953,9 +2104,7 @@ async function prepareSentencesWrapper(sessionSeed, passNumber = 0, targetFormat
 			if (questionsToDisplay > 1) {
 				questionsToDisplay--;
 				await displaySentences();
-				document.getElementById('help-toggle').checked = false;
 				adjustFieldForTexts();
-				helpToggle();
 			} else {
 				focusFirstInput();
 			}
@@ -2008,7 +2157,6 @@ async function restoresakiniaiAndAtsakymaiPosition(targetSentenceHTML, maxAttemp
 
 async function displaySentences() {
     styleGrammarPage();
-    document.getElementById('help-toggle').checked = true;
     allAnswersCorrect = false;
     currentAnswerAttempts = 0;
     document.getElementById('check-answers').disabled = false;
@@ -2116,21 +2264,30 @@ async function displaySentences() {
     setupDynamicListeners();
 }
 
-		function toggleHelpButton() {
-			const helpToggle = document.getElementById("help-toggle");
-			if (helpToggle.checked) {
-				helpToggle.checked = false;
-			} else {
-				helpToggle.checked = true;
-			}
-	
-			const pagalbaSpans = document.querySelectorAll(".pagalba-span");
+function getPagalbaRule() {
+  if (pagalbaRule) return pagalbaRule;
 
-			let isAnySpanNonEmpty = Array.from(pagalbaSpans).some(span => span.innerHTML.trim() !== "");
+  const sheet = document.getElementById('main-styles').sheet;
 
-			helpToggle.style.disabled = isAnySpanNonEmpty ? "visible" : "hidden";
-		}
+  for (const rule of sheet.cssRules) {
+    if (rule.selectorText === '.pagalba-span') {
+      pagalbaRule = rule;
+      return rule;
+    }
+  }
+}
 
+getPagalbaRule()
+
+function helpToggle() {
+  const helpState = document.getElementById("help-toggle").checked;
+  const rule = getPagalbaRule();
+
+  rule.style.display = helpState ? 'inline-block' : 'none';
+
+  adjustFieldForTexts();
+  focusFirstInput();
+}
 
 async function initiateTheProgram() {
     if (!controller.questionsStopped) {
@@ -2144,8 +2301,6 @@ async function initiateTheProgram() {
         await prepareSentencesWrapper(currentSeed, currentPassNumber);
 
         await displaySentences();
-        toggleHelpButton();
-        helpToggle();
 
         if (!controller.questionsStopped) {
             if (controller.modeChoice4 === "C39") {
@@ -2483,21 +2638,6 @@ function showAnswers() {
   checkAnswers();
 }
 
-function helpToggle() {
-	const elements = document.querySelectorAll('.pagalba-span');
-    
-    // Loop through each element and toggle the display property
-    elements.forEach(element => {
-        if (element.style.display === 'none') {
-            element.style.display = 'inline-block'; // Set display to flex if it's none
-        } else {
-            element.style.display = 'none'; // Set display to none if it's not none
-        }
-    });
-	adjustFieldForTexts();
-	focusFirstInput();
-}
-
 
 			async function nextQuestion() {
 				if (controller.modeChoice4 === "C40") {
@@ -2511,12 +2651,8 @@ function helpToggle() {
 				
 				if (!controller.questionsStopped) {
 					await displaySentences()
-					toggleHelpButton();
 					document.getElementById('check-answers').style.display = "flex"
 					nextQuestionButton.style.display = "none";
-					document.querySelectorAll('.pagalba-span').forEach(element => {
-					element.style.display = 'none';
-					});
 					firstTimeChecking = true;
 				}
 			}

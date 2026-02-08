@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>sudedu - prisijungimas</title>
+	<title>SUDEDU - prisijungimas</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
 	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -669,8 +669,8 @@
 
 		function getMsg(code, emailValue = '', retryAfter = null) {
 			const MESSAGES = {
-				'REG_001': `Paskyra sukurta el. pašto adresu ${emailValue}! Patikrinkite el. paštą, kad ją patvirtintumėte.`,
-				'REG_002': `Patvirtinimo el. laiškas išsiųstas ${emailValue}. Patikrinkite savo el. paštą.`,
+				'REG_001': `Paskyra sukurta el. pašto adresu ${emailValue}! Jums išsiųsta patvirtinimo nuoroda (galioja 24 valandas).`,
+				'REG_002': `Patvirtinimo el. laiškas išsiųstas ${emailValue} (galioja 24 valandas). Patikrinkite savo el. paštą.`,
 				'REG_003': 'Elektroninis paštas jau užimtas',
 				'LOGIN_001': '',
 				'LOGIN_002': `Paskyra el. paštu ${emailValue} jau sukurta! Patikrinkite el. paštą, kad ją patvirtintumėte.`,
@@ -681,7 +681,7 @@
 				'VERIFY_002': 'El. paštas jau patvirtintas.',
 				'VERIFY_003': 'Vartotojas nerastas',
 				'VERIFY_004': 'Patvirtinimo nuoroda nebegalioja.',
-				'RESET_001': `Slaptažodžio atkūrimo nuoroda išsiųsta el. pašto adresu ${emailValue} (galioja 15 minučių).`,
+				'RESET_001': `Slaptažodžio atkūrimo nuoroda išsiųsta el. pašto adresu ${emailValue} (galioja 1 valandą).`,
 				'RESET_002': 'Vartotojas su tokiu el. paštu nerastas',
 				'RESET_003': '✅ Slaptažodis sėkmingai pakeistas! Galite prisijungti.',
 				'RESET_004': 'Atkūrimo nuoroda nebegalioja arba neteisinga.',
@@ -689,7 +689,7 @@
 				'ERR_001': 'Serverio klaida. Bandykite vėliau.',
 				'ERR_002': 'Trūksta duomenų',
 				'ERR_003': retryAfter 
-				? `Per didelis prašymų srautas. Bandykite vėliau (anksčiausiai už ${formatRetryTime(retryAfter)}).`
+				? `Per didelis prašymų srautas. Bandykite vėliau (anksčiausiai po ${formatRetryTime(retryAfter)}).`
 				: 'Per didelis prašymų srautas. Bandykite vėliau.'
 			};
 			return MESSAGES[code] || 'Nežinoma klaida';

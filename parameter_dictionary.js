@@ -241,15 +241,15 @@ const parameterDictionary = {
     },
     "C61": {
         "parameter": "j-c",
-        "decodedParameterText": "ŽODŽIAI SU „J“"
+        "decodedParameterText": "H - CH - F"
     },
     "C62": {
         "parameter": "dkt",
-        "decodedParameterText": "DAIKTAVARDŽIO PABAIGA"
+        "decodedParameterText": "DAIKTAVARDŽIO GALŪNĖ"
     },
     "C63": {
-        "parameter": "bdv-prv",
-        "decodedParameterText": "BŪDVARDŽIO IR PRIEVEIKSMIO PABAIGOS"
+        "parameter": "bdv",
+        "decodedParameterText": "BŪDVARDŽIO GALŪNĖ"
     },
     "C64": {
         "parameter": "sudr",
@@ -257,7 +257,7 @@ const parameterDictionary = {
     },
     "C65": {
         "parameter": "vks",
-        "decodedParameterText": "VEIKSMAŽODŽIO PABAIGA"
+        "decodedParameterText": "VEIKSMAŽODŽIO GALŪNĖ"
     },
     "C66": {
         "parameter": "įsi-r",
@@ -269,7 +269,7 @@ const parameterDictionary = {
     },
     "C68": {
         "parameter": "fsc-vow",
-        "decodedParameterText": "BALSĖS IR DVIBALSĖS"
+        "decodedParameterText": "DVIBALSIAI"
     },
     "C69": {
         "parameter": "prš",
@@ -349,14 +349,22 @@ const parameterDictionary = {
     },
     "C88": {
         "parameter": "vow-e-c",
-        "decodedParameterText": "E — Ė"
+        "decodedParameterText": "E - Ė"
     },
     "C89": {
         "parameter": "vow-i-c",
-        "decodedParameterText": "I — Y"
+        "decodedParameterText": "I - Y"
     },
     "C90": {
         "parameter": "vow-u-c",
-        "decodedParameterText": "U — Ū"
+        "decodedParameterText": "U - Ū"
     },
+    "C91": {
+        "parameter": "soft-sign",
+        "decodedParameterText": "MINKŠTUMO ŽENKLAS"
+    },
+    "C92": {
+        "parameter": "prv",
+        "decodedParameterText": "PRIEVEIKSMIO PABAIGA"
+    }
 }
