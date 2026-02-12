@@ -1835,15 +1835,42 @@
                     throw new Error(data.message || 'Failed to search users');
                 }
 
-                if (!data.user) {
+                if (data.users) {
+                    displayUserSelectionList(data.users);
+                } else if (data.user) {
+                    displayUserDetails(data.user);
+                } else {
                     resultsDiv.innerHTML = '<div class="message info">No user found</div>';
-                    return;
                 }
-
-                displayUserDetails(data.user);
             } catch (error) {
                 resultsDiv.innerHTML = `<div class="message error">${error.message}</div>`;
             }
+        }
+
+        function displayUserSelectionList(users) {
+            const resultsDiv = document.getElementById('lookup-results');
+            let html = `
+                <div class="user-card">
+                    <h3>Multiple users found (${users.length}) — select one to view:</h3>
+                    <div class="asset-list">
+            `;
+            users.forEach(user => {
+                // Safely serialize user to pass into onclick
+                const userJson = JSON.stringify(user).replace(/'/g, "\\'");
+                html += `
+                    <div class="asset-item" style="cursor: pointer;" onclick='displayUserDetails(${JSON.stringify(user)})'>
+                        <div>
+                            <strong>${user.username}</strong>
+                            &nbsp;|&nbsp; Nickname: ${user.nickname}
+                            &nbsp;|&nbsp; ID: ${user.id}
+                            &nbsp;|&nbsp; Type: ${user.accType}
+                            &nbsp;|&nbsp; Last login: ${user.lastLogIn ? new Date(user.lastLogIn).toLocaleString() : 'Never'}
+                        </div>
+                    </div>
+                `;
+            });
+            html += `</div></div>`;
+            resultsDiv.innerHTML = html;
         }
 
         // Display user details with edit form
@@ -1861,6 +1888,11 @@
                         <div class="info-item">
                             <strong>ID</strong>
                             ${user.id}
+                        </div>
+
+                        <div class="info-item">
+                            <strong>Email / Username</strong>
+                            <input type="text" id="edit-username" value="${user.username}">
                         </div>
 
                         <div class="info-item">
@@ -2235,6 +2267,7 @@
         // Update user basic info
         async function updateUser(userId) {
             const updates = {
+                username: document.getElementById('edit-username').value.trim(),
                 nickname: document.getElementById('edit-nickname').value,
                 accType: document.getElementById('edit-acctype').value,
                 emailVerified: document.getElementById('edit-emailverified').value === 'true'
