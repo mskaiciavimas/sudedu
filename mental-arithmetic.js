@@ -98,6 +98,19 @@ const animationStepsAndDurationNumberDict = {
     "bath-1-empty": [1, 1],
     "bath-1-filled": [6 ,1],
     "bath-1-with-pet": [6, 1],
+
+    "ghost-1-invisible": [1, 1],
+    "ghost-1-appears": [4, 0.5],
+    "ghost-1-disappears": [4, 0.5],
+    "ghost-1-stands-idle": [12, 1.5],
+    "ghost-1-stands-idle": [12, 1.5],
+    "ghost-1-walks-downwards": [12, 1.5],
+    "ghost-1-walks-upwards": [12, 1.5],
+    "ghost-1-walks-sideways": [12, 1.5],
+    "ghost-1-scares": [24, 1.5],
+    "ghost-1-chats": [12, 1.5],
+    "ghost-1-surprised": [12, 1.5],
+    "ghost-1-haunting": [24, 1.5],
 }
 
 function resetControllerTaskSettings () {
@@ -907,11 +920,12 @@ async function sendTaskResults(taskId, resultsData) {
 async function updateStudentPointsAndStatistics(coinMultiplier=1) {
   let pointsEarned = 0;
   let coinsEarned = 0;
+  let pointsPerCorrectAnswer;
   let statType = 'c'; // default to consistency
 
   // Calculate points and coins
   if (controller.modeChoice7 === "C84") {
-    pointsEarned = await calculateTasksPerCorrectAnswerPoints(
+    pointsEarned, pointsPerCorrectAnswer = await calculateTasksPerCorrectAnswerPoints(
         "selectedTexts",
         {
           taskSettings: [controller.mode, controller.modeChoice1, controller.modeChoice2, controller.modeChoice6, controller.modeChoice7],
@@ -924,6 +938,7 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
       const IDsOfTextsWithOneMistake = [];
       const IDsOfTextsWithTwoMistakes = [];
       const IDsOfTextsWithThreeMistakes = [];
+      controller.correctAnswersTracker = 0
 
       controller.currentMistakes.forEach(([id, value]) => {
           if (value === 0) IDsOfTextsWithZeroMistakes.push(id);
@@ -933,27 +948,44 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
       });
 
       pointsEarned = await calculateTasksPerCorrectAnswerPoints("controller");
+      pointsPerCorrectAnswer = pointsEarned
 
       if (controller.modeChoiceLtDifficulty === "C58") {
         pointsEarned = 
             (IDsOfTextsWithZeroMistakes.length * pointsEarned * 1)
           + (IDsOfTextsWithOneMistake.length * pointsEarned * 0.5)
+
+        controller.correctAnswersTracker = 
+            (IDsOfTextsWithZeroMistakes.length * 1)
+          + (IDsOfTextsWithOneMistake.length * 0.5)
       } else if (controller.modeChoiceLtDifficulty === "C59") {
         pointsEarned = 
             (IDsOfTextsWithZeroMistakes.length * pointsEarned * 1)
           + (IDsOfTextsWithOneMistake.length * pointsEarned * 0.5)
           + (IDsOfTextsWithTwoMistakes.length * pointsEarned * 0.25)
+
+        controller.correctAnswersTracker = 
+            (IDsOfTextsWithZeroMistakes.length * 1)
+          + (IDsOfTextsWithOneMistake.length * 0.5)
+          + (IDsOfTextsWithTwoMistakes.length * 0.25)
       } else if (controller.modeChoiceLtDifficulty === "C60") {
         pointsEarned = 
             (IDsOfTextsWithZeroMistakes.length * pointsEarned * 1)
           + (IDsOfTextsWithOneMistake.length * pointsEarned * 0.5)
           + (IDsOfTextsWithTwoMistakes.length * pointsEarned * 0.25)
           + (IDsOfTextsWithThreeMistakes.length * pointsEarned * 0.1);
+
+        controller.correctAnswersTracker = 
+            (IDsOfTextsWithZeroMistakes.length * 1)
+          + (IDsOfTextsWithOneMistake.length * 0.5)
+          + (IDsOfTextsWithTwoMistakes.length * 0.25)
+          + (IDsOfTextsWithThreeMistakes.length * 0.1);
       }
 
 
     } else {
       pointsEarned = await calculateTasksPerCorrectAnswerPoints("controller");
+      pointsPerCorrectAnswer = pointsEarned
       pointsEarned = pointsEarned * controller.correctAnswersTracker
     } 
   }
@@ -984,6 +1016,7 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
         correctAnswers: controller.correctAnswersTracker,
         mistakes: controller.mistakesTracker,
         totalAnswers: controller.answeredQuestionTracker,
+        pointsPerCorrectAnswer: pointsPerCorrectAnswer || 0,
       })
     });
 
@@ -4116,6 +4149,7 @@ async function calculateTasksPerCorrectAnswerPoints(type, selectedTextInfo = nul
           let taskInfoArray = [];
           let selectedTextIDs = [];
           let mistakesMap = new Map();
+          controller.correctAnswersTracker = 0
 
           // Handle both call styles
           if (Array.isArray(selectedTextInfo.taskSettings[0])) {
@@ -4205,10 +4239,14 @@ async function calculateTasksPerCorrectAnswerPoints(type, selectedTextInfo = nul
                   mistakes === 3 ? 0.1 : 0;
               }
 
+              controller.correctAnswersTracker += multiplier
+
               customTextsTotal += perTextTotal * multiplier;
           }
 
-          return Number(customTextsTotal.toFixed(2));
+          const perCorrectAnserPointAverage = customTextsTotal / controller.correctAnswersTracker
+
+          return [Number(customTextsTotal.toFixed(2)), Number(perCorrectAnserPointAverage.toFixed(2))];
       } else {
         const parsedCurrentTaskInstructions = type;
         let tempController = {};
