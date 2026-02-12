@@ -4246,6 +4246,7 @@ button:disabled.cancel-btn::before {
         let chart = null;
 
         let studentList;
+        let globalErrorThresholds;
         let tasksList;
         let currentTaskId;
         let currentTaskInstructions;
@@ -6938,11 +6939,48 @@ function displayTeacherHome(selectedGroupNames=null) {
                 }
 
                 if (!response.ok) {
-                    const errorData  = await response.json().catch(() => ({}));
+                    const errorData = await response.json().catch(() => ({}));
                     throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
                 }
 
-                studentList = await response.json().catch(() => ({}));
+                const responseData = await response.json();
+                
+                // Handle both old format (array) and new format (object with students + thresholds)
+                if (Array.isArray(responseData)) {
+                    // Old format - just students array
+                    studentList = responseData;
+                    globalErrorThresholds = { m: undefined, t: undefined, g: undefined };
+                } else {
+                    // New format - object with students and globalErrorThresholds
+                    studentList = responseData.students || [];
+                    globalErrorThresholds = responseData.globalErrorThresholds || { m: undefined, t: undefined, g: undefined };
+                }
+                
+                studentList.forEach(student => {
+                    // EXCLUDE CURRENT WEEK
+                    if (student.stats) {
+                        // Remove last entry from consistency array
+                        if (student.stats.c && student.stats.c.length > 0) {
+                            student.stats.c = student.stats.c.slice(0, -1);
+                        }
+                        // Remove last entry from math stats
+                        if (student.stats.m && student.stats.m.length > 0) {
+                            student.stats.m = student.stats.m.slice(0, -1);
+                        }
+                        // Remove last entry from text stats
+                        if (student.stats.t && student.stats.t.length > 0) {
+                            student.stats.t = student.stats.t.slice(0, -1);
+                        }
+                        // Remove last entry from grammar stats
+                        if (student.stats.g && student.stats.g.length > 0) {
+                            student.stats.g = student.stats.g.slice(0, -1);
+                        }
+                        // Adjust date to previous week (subtract 7 days)
+                        if (student.stats.d) {
+                            student.stats.d = student.stats.d - 7;
+                        }
+                    }
+                });
                 success = true;
 
                 populateTaskGroupDropdown();
@@ -6956,7 +6994,7 @@ function displayTeacherHome(selectedGroupNames=null) {
                     messageToTheUser('Nepavyko pasiekti duomenų. Bandykite vėl vėliau.');
                 }
             } finally {
-                 // Cancel showing the message if not yet displayed
+                // Cancel showing the message if not yet displayed
                 clearTimeout(showMessageTimeout);
 
                 // Close message if it was displayed
