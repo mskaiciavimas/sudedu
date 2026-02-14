@@ -29,6 +29,34 @@
 <script src="../refresh-token.js"></script>
 
 <style>
+    .temp.ghost-1-1.item-preview {
+        background-image: url(../images/pet-game/ghost-1-1.png);
+        background-size: 2400% 1000%;
+        background-repeat: no-repeat;
+        background-position: 0 0;
+    }
+
+    .ghost-1-1 {
+        width: calc(var(--unit-size) * 6);
+        height: calc(var(--unit-size) * 6);
+        background-image: url(images/pet-game/ghost-1-1.png);
+        background-repeat: no-repeat;
+        background-size: calc(var(--unit-size) * 6 * 24) calc(var(--unit-size) * 6 * 10);
+        z-index: 14;
+        opacity: 0.8;
+        background-position: 0px 0px;
+        animation: 1.5s steps(12) 0s infinite normal none running ghost-1-stands-idle;
+    }
+
+    @keyframes ghost-1-stands-idle {
+        from {
+            background-position: 0 calc(-6 * var(--unit-size) * 5);
+        }
+        to {
+            background-position: calc(-6 * var(--unit-size) * 12) calc(-6 * var(--unit-size) * 5);
+        }
+    }
+
 	* {
 		-webkit-user-select: none;
 		-webkit-tap-highlight-color: transparent;
@@ -581,6 +609,10 @@ body.popup-active {
             transition: all 0.2s ease;
             border-radius: 8px;
             padding: 8px;
+        }
+
+        .board-message.recent {
+            font-weight: bold;
         }
 
         .board-message:hover {
@@ -1895,6 +1927,23 @@ async function updateUserClass (userClassSelection) {
       
 const messagesToUsers = [
         {
+            title: `SUDEDU augintinio namų konkursas!`,
+            text: `👻 KONKURSAS: skelbiame SUDEDU augintinio namų konkursą!`,
+            fullText: `Kviečiame šių metų vasario 14–28 dienomis dalyvauti <strong>SUDEDU augintinio namų konkurse</strong>. PRIZAS – paslaptingas draugas tavo augintiniui – vaiduoklis Deduokliukas!
+                    <br>
+                    <div class="temp item-preview ghost-1 ghost-1-1 auto-pet previewable" style="--scale: 1;"></div>
+                    <strong>Konkurso kriterijai</strong>:<br>
+                    1. Uždarbis ir tvarumas (kiek uždirbai SUDEDU monetų ir kaip protingai jas panaudojai, pvz., nupirkai daiktų, kurie augintiniui teikia dėmesio, meilės ir kt.)<br>
+                    3. Kambarių paskirtis (ar kambariai turi paskirtį, pvz., miegamasis, virtuvė ir t. t.)<br>
+                    4. Patogumas (ar augintiniui patogu jame gyventi, pvz., pakankamai vietos judėti ir kt.)<br>
+                    5. Estetika (ar namai įrengti gražiai, skoningai, tvarkingai ir kt.)<br>
+                    <br>
+                    Jei pageidauji dalyvauti konkurse, padaryk savo augintinio namų ekrano nuotrauką ir atsiųsk ją mums <strong>sudedult@gmail.com</strong>. Laiško temoje parašyk <strong>„Konkursas“</strong>.
+                    `,
+            date: "2026-02-14",
+            target: ["all"]
+        },
+        {
             title: `Naujos ir patobulintos gramatikos užduotys!`,
             text: `✨ NAUJIENA: išbandykite naujas lietuvių kalbos gramatikos užduotis (skaitykite <span class="fake-link">čia</span>)!`,
             fullText: `Pristatome naujas gramatikos užduotis, kurios padės mokiniams dar geriau įtvirtinti svarbias 
@@ -1965,7 +2014,6 @@ function displayMessages () {
     const messageBoard = document.getElementById('messageBoard');
     const currentDateEl = document.getElementById('currentDate');
 
-    // Set current date (full long form)
     const today = new Date();
     const dateStr = today.toLocaleDateString('lt-LT', { 
         year: 'numeric', 
@@ -1976,12 +2024,10 @@ function displayMessages () {
 
     const userType = userData?.accType || 'all';
 
-    // Filter messages for this user type
     const visibleMessages = messagesToUsers.filter(msg =>
         msg.target.includes('all') || msg.target.includes(userType)
     );
 
-    // Clear board before populating
     messageBoard.innerHTML = '';
 
     const lithuanianMonths = [
@@ -1989,31 +2035,37 @@ function displayMessages () {
       'Liep.', 'Rugp.', 'Rugs.', 'Spal.', 'Lap.', 'Gruod.'
     ];
 
-    // Populate messages
     if (visibleMessages.length > 0) {
         visibleMessages.forEach(msg => {
             const messageEl = document.createElement('div');
             messageEl.className = 'board-message';
 
-            // Use msg.date if available, otherwise fallback to today
-            // Safely parse YYYY-MM-DD to avoid timezone problems
             let msgDate;
             if (msg.date && typeof msg.date === 'string') {
                 const parts = msg.date.split('-').map(Number);
                 if (parts.length === 3 && !Number.isNaN(parts[0])) {
-                    // new Date(year, monthIndex, day)
                     msgDate = new Date(parts[0], (parts[1] || 1) - 1, parts[2] || 1);
                 } else {
-                    msgDate = new Date(msg.date); // fallback
+                    msgDate = new Date(msg.date);
                 }
             } else {
                 msgDate = new Date();
             }
 
-            const day = msgDate.getDate();
-            const monthIndex = msgDate.getMonth(); // 0–11
+            // 🔹 Normalize both dates to midnight (avoid time issues)
+            const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            const msgMidnight = new Date(msgDate.getFullYear(), msgDate.getMonth(), msgDate.getDate());
 
-            // day first, then short month (e.g. "20 Sau.")
+            const diffInMs = todayMidnight - msgMidnight;
+            const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+
+            // 🔹 Add "recent" class if within last 3 days
+            if (diffInDays >= 0 && diffInDays <= 3) {
+                messageEl.classList.add('recent');
+            }
+
+            const day = msgDate.getDate();
+            const monthIndex = msgDate.getMonth();
             const formattedDate = `${lithuanianMonths[monthIndex]} ${day}`;
 
             messageEl.innerHTML = `
@@ -2021,14 +2073,17 @@ function displayMessages () {
                 <div class="message-meta">${formattedDate}</div>
             `;
 
-            // Open full popup when clicked
-            messageEl.addEventListener('click', () => openObjectPopup(msg.fullText, msg.title, msg.date) );
+            messageEl.addEventListener('click', () => 
+                openObjectPopup(msg.fullText, msg.title, msg.date)
+            );
+
             messageBoard.appendChild(messageEl);
         });
     } else {
         messageBoard.innerHTML = '<div class="empty-message">Naujienų nėra!</div>';
     }
 }
+
 
 
 displayMessages();

@@ -1120,3 +1120,121 @@
     background-size: cover;
     z-index: 1;
 }
+
+.ghost-1-1 {
+    width: calc(var(--unit-size) * 6);
+    height: calc(var(--unit-size) * 6);
+    background-image: url('images/pet-game/ghost-1-1.png');
+    background-repeat: no-repeat;
+    background-size: calc(var(--unit-size) * 6 * 24) calc(var(--unit-size) * 6 * 10);
+    background-position: 0 0;
+    animation: ghost-1-stands-idle 1.5s steps(12) infinite;
+    z-index: 14;
+    opacity: 0.8;
+}
+
+.ghost-1-1.item-preview {
+    background-image: url('images/pet-game/ghost-1-1.png');
+    background-size: 2400% 1000%;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+}
+
+@keyframes ghost-1-invisible {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: 0 0;
+    }
+}
+
+@keyframes ghost-1-appears {
+    from {
+        background-position: 0 calc(-6 * var(--unit-size) * 1);
+    }
+    to {
+        background-position: calc(-6 * var(--unit-size) * 4) calc(-6 * var(--unit-size) * 1);
+    }
+}
+
+@keyframes ghost-1-disappears {
+    from {
+        background-position: 0 calc(-6 * var(--unit-size) * 2);
+    }
+    to {
+        background-position: calc(-6 * var(--unit-size) * 4) calc(-6 * var(--unit-size) * 2);
+    }
+}
+
+@keyframes ghost-1-stands-idle {
+    from {
+        background-position: 0 calc(-6 * var(--unit-size) * 5);
+    }
+    to {
+        background-position: calc(-6 * var(--unit-size) * 12) calc(-6 * var(--unit-size) * 5);
+    }
+}
+
+@keyframes ghost-1-walks-downwards {
+    from {
+        background-position: 0 calc(-6 * var(--unit-size) * 3);
+    }
+    to {
+        background-position: calc(-6 * var(--unit-size) * 12) calc(-6 * var(--unit-size) * 3);
+    }
+}
+
+@keyframes ghost-1-walks-upwards {
+    from {
+        background-position: 0 calc(-6 * var(--unit-size) * 4);
+    }
+    to {
+        background-position: calc(-6 * var(--unit-size) * 12) calc(-6 * var(--unit-size) * 4);
+    }
+}
+
+@keyframes ghost-1-walks-sideways {
+    from {
+        background-position: 0 calc(-6 * var(--unit-size) * 5);
+    }
+    to {
+        background-position: calc(-6 * var(--unit-size) * 12) calc(-6 * var(--unit-size) * 5);
+    }
+}
+
+@keyframes ghost-1-scares {
+    from {
+        background-position: 0 calc(-6 * var(--unit-size) * 6);
+    }
+    to {
+        background-position: calc(-6 * var(--unit-size) * 24) calc(-6 * var(--unit-size) * 6);
+    }
+}
+
+@keyframes ghost-1-chats {
+    from {
+        background-position: 0 calc(-6 * var(--unit-size) * 7);
+    }
+    to {
+        background-position: calc(-6 * var(--unit-size) * 12) calc(-6 * var(--unit-size) * 7);
+    }
+}
+
+@keyframes ghost-1-surprised {
+    from {
+        background-position: 0 calc(-6 * var(--unit-size) * 8);
+    }
+    to {
+        background-position: calc(-6 * var(--unit-size) * 12) calc(-6 * var(--unit-size) * 8);
+    }
+}
+
+@keyframes ghost-1-haunting {
+    from {
+        background-position: 0 calc(-6 * var(--unit-size) * 9);
+    }
+    to {
+        background-position: calc(-6 * var(--unit-size) * 24) calc(-6 * var(--unit-size) * 9);
+    }
+}

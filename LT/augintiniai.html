@@ -3987,6 +3987,7 @@
 
     <script src="../mental-arithmetic.js"></script>
     <script src="../main-nav-bar.js"></script>
+    <script src="../autonomous-pets.js"></script>
     <script>
         
         // ITEMS THAT ARE IGNORED WHEN DETERMINED PLACEMENT / ITEM REMOVAL etc. (such as flooring, carpets, wallpapers)
@@ -4075,15 +4076,131 @@
             return [pets, supplies];
         }
 
-        function renderPets() {
+        function petStartSleeping (petNumber) {
+            const pet = document.getElementById(petNumber);
+            const petSpecies = petNumber.split('-')[0]
+            const matchingBeds = Array.from(roomObjectsContainer.querySelectorAll("*")).filter(el => {
+                const classStr = el.className; // full class string
+                return classStr.includes("bed") && classStr.includes(petSpecies) && !classStr.includes("furniture-preview") && !el._occupied;
+            });
+
+            if (matchingBeds.length > 0) {
+                const randomIndex = Math.floor(Math.random() * matchingBeds.length);
+                object = matchingBeds[randomIndex];
+                object._occupied = petNumber;
+                addEnterLeaveListener(object, pet);
+                
+                let objectInteractivePart = gameAssetIndex[userObjectAssets[object.id]?.assetIndex]?.["interactive-spot"];
+
+                let objectCoords = getObjectCoordinates(object.id);
+
+                [petStartingPosLeft, petStaringPosTop] = [...objectCoords]; // base coordinates
+
+                if (Array.isArray(objectInteractivePart) && objectInteractivePart.length >= 2) {
+                    petStartingPosLeft += objectInteractivePart[0];
+                    petStaringPosTop  -= objectInteractivePart[1];
+                }
+
+            } else {
+                const validCoords = findValidPlacements(globalWalkabilityMap, pet);
+
+                if (validCoords.length === 0) {
+                    return;
+                }
+
+                // Pick a random coordinate
+                const randomIndex = Math.floor(Math.random() * validCoords.length);
+                const randomCoord = validCoords[randomIndex];
+                const petPos = getObjectCoordinates(pet.id)
+
+                petStartingPosLeft = randomCoord[0];
+                petStaringPosTop = randomCoord[1];
+            }
+
+
+            pet.style.top = `calc((${petStaringPosTop} * var(--unit-size)) - (var(--pet-size) - var(--unit-size)))`;
+            pet.style.left = `calc(${petStartingPosLeft} * var(--unit-size))`;
+
+            setPetZIndex(pet);
+
+            setObjectAnimation(pet, `${petNumber}-sleeps`)
+            startingActions[petNumber] = []
+            startingActions[petNumber].push(startSleeping)
+        }
+
+        function petStartChatting (petNumber) {
+            let actionFailed = false;
+            const pet = document.getElementById(petNumber);
+
+            const autoPets = Array.from(roomObjectsContainer.querySelectorAll(".auto-pet")).filter(el => {
+                return !el._busy;
+            });
+
+            if (autoPets.length > 0) {
+                const randomIndex = Math.floor(Math.random() * autoPets.length);
+                const autoPet = autoPets[randomIndex];
+                autoPet._busy = true;
+
+                const suitableWalkingTiles = globalWalkabilityMap;
+                let validCoords = findValidPlacements(suitableWalkingTiles, pet);
+
+                if (validCoords.length !== 0) {
+                    visibleCoords = getVisibleTiles(validCoords, 20);
+
+                    let randomCoords;
+                    if (visibleCoords.length !== 0) {
+                        const randomIndex = Math.floor(Math.random() * visibleCoords.length);
+                        randomCoords = visibleCoords[randomIndex];
+                    } else {
+                        const randomIndex = Math.floor(Math.random() * validCoords.length);
+                        randomCoords = validCoords[randomIndex];
+                    }
+                    const [x, y] = randomCoords;
+
+                    pet.style.left = `calc(${x} * var(--unit-size))`;
+                    pet.style.top = `calc((${y + 1} * var(--unit-size)) - ${pet.offsetHeight}px)`;
+                    pet.classList.remove("pet-left");
+                    pet.classList.add("pet-right");
+
+                    const petWidth = Math.ceil(pet.offsetWidth / unitSize);
+
+                    autoPetStartChattingPreConditioning(autoPet, [x + petWidth, y])
+                } else {
+                    actionFailed = true
+                }
+
+                setPetZIndex(pet)
+
+                setObjectAnimation(pet, `${petNumber}-stands-idle`)
+                startingActions[petNumber] = []
+                startingActions[petNumber].push(startChatting)
+            } else {
+                actionFailed = true
+            }
+
+            if (actionFailed) {
+                const actionDict = petStartingCondition[petNumber];
+
+                if (!actionDict) return;
+
+                const functionName = pickWeightedRandom(actionDict);
+                const handler = window[functionName];
+
+                if (typeof handler === "function") {
+                    handler(petNumber);
+                } else {
+                    console.warn("Missing initiation handler:", functionName);
+                }
+            }
+        }
+
+        async function renderPets() {
             const petContainer = document.getElementById("petContainer");
 
             if (!petContainer) return;
             petContainer.innerHTML = ''; // clear existing content
 
             const pets = userPetAssets.pets;
-
-            let itemsInUse = [];
 
             globalWalkabilityMap = generateWalkabilityMap();
 
@@ -4094,13 +4211,6 @@
                 let petStaringPosTop;
                 let petStartingPosLeft;
                 
-                
-                const petSpecies = petNumber.split('-')[0]
-                const matchingBeds = Array.from(roomObjectsContainer.querySelectorAll("*")).filter(el => {
-                    const classStr = el.className; // full class string
-                    return classStr.includes("bed") && classStr.includes(petSpecies) && !classStr.includes("furniture-preview") && !itemsInUse.includes(el.id);
-                });
-
                 let equippedSkin = Object.values(skins).find(skin => skin.equiped);
                 
                 if (!equippedSkin) {
@@ -4113,49 +4223,22 @@
                 const petDiv = document.createElement('div');
                 const petClasses = gameAssetIndex[equippedSkin.assetIndex]["css-class"];
                 petDiv.id = petClasses.split(' ')[0];
+                petDiv._petType = petClasses.split(' ')[0];
                 petDiv.className = petClasses;
                 petContainer.appendChild(petDiv);
-                
-                if (matchingBeds.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * matchingBeds.length);
-                    object = matchingBeds[randomIndex];
-                    itemsInUse.push(object.id);
-                    
-                    let objectInteractivePart = gameAssetIndex[userObjectAssets[object.id]?.assetIndex]?.["interactive-spot"];
 
-                    let objectCoords = getObjectCoordinates(object.id);
+                const actionDict = petStartingCondition[petNumber];
 
-                    [petStartingPosLeft, petStaringPosTop] = [...objectCoords]; // base coordinates
+                if (!actionDict) return;
 
-                    if (Array.isArray(objectInteractivePart) && objectInteractivePart.length >= 2) {
-                        petStartingPosLeft += objectInteractivePart[0];
-                        petStaringPosTop  -= objectInteractivePart[1];
-                    }
+                const functionName = pickWeightedRandom(actionDict);
+                const handler = window[functionName];
 
+                if (typeof handler === "function") {
+                    handler(petNumber);
                 } else {
-                    const pet = document.getElementById(petNumber);
-                    const validCoords = findValidPlacements(globalWalkabilityMap, pet);
-
-                    if (validCoords.length === 0) {
-                        return;
-                    }
-
-                    // Pick a random coordinate
-                    const randomIndex = Math.floor(Math.random() * validCoords.length);
-                    const randomCoord = validCoords[randomIndex];
-                    const petPos = getObjectCoordinates(pet.id)
-
-                    petStartingPosLeft = randomCoord[0];
-                    petStaringPosTop = randomCoord[1];
+                    console.warn("Missing initiation handler:", functionName);
                 }
-
-
-                petDiv.style.top = `calc((${petStaringPosTop} * var(--unit-size)) - (var(--pet-size) - var(--unit-size)))`;
-                petDiv.style.left = `calc(${petStartingPosLeft} * var(--unit-size))`;
-
-                setPetZIndex(petDiv);
-
-                setObjectAnimation(petDiv, `${petNumber}-sleeps`)
             }
 
             Object.entries(petStatsList).forEach(([petId, stats]) => {
@@ -4733,7 +4816,7 @@ function renderRoomObjects() {
             const [x, y] = asset.position;
             const div = document.createElement("div");
             roomObjectsContainer.appendChild(div);
-            div.className = `room-object ${gameAssetIndex[asset.assetIndex]["css-class"]}`;
+            div.className = `${gameAssetIndex[asset.assetIndex]["css-class"]} room-object `;
             div.id = key;
             div.style.left = `calc(${x} * var(--unit-size))`;
             div.style.top = `calc((${y + 1} * var(--unit-size)) - ${div.offsetHeight}px)`;
@@ -4745,7 +4828,7 @@ function renderRoomObjects() {
             const [x, y] = furniturePreviewDict["furniture-preview"].position;
             const div = document.createElement("div");
             roomObjectsContainer.appendChild(div);
-            div.className = `room-object furniture-preview ${gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex]["css-class"]}`;
+            div.className = `${gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex]["css-class"]} room-object furniture-preview `;
             div.id = 'furniture-preview';
             div.style.left = `calc(${x} * var(--unit-size))`;
             div.style.top = `calc((${y + 1} * var(--unit-size)) - ${div.offsetHeight}px)`;
@@ -4789,7 +4872,9 @@ async function initGame() {
     
     // NO VALIDATION HERE - let placement logic run first
     
-    renderPets();
+    await initiateAutonomousPets();
+    await renderPets();
+    await selectAutonomousPetStartingActions();
     enablePetDragging();
     updateCoinAmounts(userMoney);
     taxesNavChoiceIndicator();
@@ -4808,11 +4893,6 @@ async function initGame() {
 
     petControllers = {};
     pendingPetActions = {};
-
-    const allPets = document.querySelectorAll("#petContainer .pet");
-    allPets.forEach(pet => {
-        managePetActions(pet);
-    });
 
     renderFloorLayoutUpgrade();
 }
@@ -4904,6 +4984,13 @@ async function attemptGameInit() {
         
         initAttempts = 0;
         console.log("Game initialized successfully");
+
+        const allPets = document.querySelectorAll("#petContainer .pet");
+        allPets.forEach(pet => {
+            managePetActions(pet);
+        });
+
+        initiateAutonomousPetStartingActions();
         
         hideRoomLoading();
         
@@ -4927,7 +5014,7 @@ async function verifyObjectPositionsMatchData() {
     const roomObjectsContainer = document.getElementById('roomObjectsContainer');
     if (!roomObjectsContainer) return true;
     
-    const objects = roomObjectsContainer.querySelectorAll('.room-object:not(.furniture-preview)');
+    const objects = roomObjectsContainer.querySelectorAll('.room-object:not(.furniture-preview, .auto-pet)');
     let discrepanciesFound = false;
     
     for (const obj of objects) {
@@ -5033,7 +5120,9 @@ async function validatePetPositions() {
     if (anyInvalid) {
         console.warn("Invalid pet positions detected, reloading pets");
         updateStatsBeforeRerunningInitGameAndRenderPets();
-        renderPets();
+        await initiateAutonomousPets();
+        await renderPets();
+        await selectAutonomousPetStartingActions();
         enablePetDragging();
     }
     
@@ -6374,20 +6463,27 @@ function isBottomRowWalkable(walkMap, startRow, startCol, width) {
 
 function findClosestWalkablePosition(walkMap, startRow, startCol, petWidth) {
     let minDist = Infinity;
-    let closest = null;
+    let candidates = []; // Store all positions with same minimum distance
 
     for (let row = 0; row < walkMap.length; row++) {
         for (let col = 0; col <= walkMap[0].length - petWidth; col++) {
             if (isBottomRowWalkable(walkMap, row, col, petWidth)) {
                 const dist = Math.abs(startRow - row) + Math.abs(startCol - col);
+                
                 if (dist < minDist) {
+                    // Found a closer position, reset candidates
                     minDist = dist;
-                    closest = { row, col };
+                    candidates = [{ row, col }];
+                } else if (dist === minDist) {
+                    // Found equally close position, add to candidates
+                    candidates.push({ row, col });
                 }
             }
         }
     }
-    return closest;
+    
+    // Randomly pick from candidates
+    return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
 function validateAndResetPosition(object) {
@@ -6677,6 +6773,7 @@ const activeMovements = new Map();
 function moveObjectAlongPath(objectId, path, onComplete) {
     const speed = 150
     const object = document.getElementById(objectId);
+    const mainPetClass = object.className.split(' ')[0];
     if (!object || !path?.length) {
         onComplete?.();
         return;
@@ -6710,11 +6807,11 @@ function moveToNextStep() {
 
     // Animation logic
     if (deltaRow > 0) {
-        setObjectAnimation(object, `${objectId}-walks-downwards`);
+        setObjectAnimation(object, `${mainPetClass}-walks-downwards`);
     } else if (deltaRow < 0) {
-        setObjectAnimation(object, `${objectId}-walks-upwards`);
+        setObjectAnimation(object, `${mainPetClass}-walks-upwards`);
     } else if (deltaCol !== 0) {
-        setObjectAnimation(object, `${objectId}-walks-sideways`);
+        setObjectAnimation(object, `${mainPetClass}-walks-sideways`);
         
         if (deltaCol < 0) {
             object.classList.remove("pet-right");
@@ -6745,7 +6842,7 @@ function moveToNextStep() {
                 object.style.transition = '';
                 activeMovements.delete(objectId);
                 setPetZIndex(object); // ✅ Final z-index update
-                setObjectAnimation(object, `${objectId}-stands-idle`);
+                setObjectAnimation(object, `${mainPetClass}-stands-idle`);
                 onComplete?.();
             }
         }, speed);
@@ -6782,7 +6879,7 @@ function setRoomObjectZIndexes() {
     const rowZIndexMap = generateRowZIndexMap(roomLayout);
     
     // Get all room objects
-    const allObjects = document.querySelectorAll('.room-object');
+    const allObjects = document.querySelectorAll('.room-object:not(.auto-pet)');
     
     // First pass: categorize and set basic z-indexes
     const wallOnlyItems = [];
@@ -6963,7 +7060,7 @@ function setRoomObjectZIndexes() {
                     rectA.top >= rectB.bottom);
         }
 
-        const allObjects = document.querySelectorAll('.room-object');
+        const allObjects = document.querySelectorAll('.room-object:not(.auto-pet)');
         
         // Filter objects and get their assets upfront
         const validObjects = [];
@@ -7029,7 +7126,7 @@ function setRoomObjectZIndexes() {
         return pairs;
     } 
     
-    document.querySelectorAll('.room-object').forEach(obj => {
+    document.querySelectorAll('.room-object:not(.auto-pet)').forEach(obj => {
         updateOverlapCache(obj.id);
     });
 }
@@ -7039,7 +7136,7 @@ function findOverlappingItems(targetItem) {
     const overlapping = [];
     const targetRect = targetItem.getBoundingClientRect();
     
-    const allObjects = document.querySelectorAll('.room-object');
+    const allObjects = document.querySelectorAll('.room-object:not(.auto-pet)');
     
     allObjects.forEach(obj => {
         if (obj.id === targetItem.id) return;
@@ -7732,6 +7829,7 @@ function findPetOverlapClusters(data) {
 
 function cancelMovement(objectId) {
     const object = document.getElementById(objectId);
+    const mainPetClass = object.className.split(' ')[0];
     if (activeMovements.has(objectId)) {
         const movement = activeMovements.get(objectId);
         clearTimeout(movement.interval);
@@ -7740,10 +7838,10 @@ function cancelMovement(objectId) {
         }
         activeMovements.delete(objectId);
         if (object && object.classList.contains("pet")) {
-            setObjectAnimation(object, `${object.id}-stands-idle`);
+            setObjectAnimation(object, `${mainPetClass}-stands-idle`);
         }
     } else {
-        setObjectAnimation(object, `${object.id}-stands-idle`);
+        setObjectAnimation(object, `${mainPetClass}-stands-idle`);
     }
 }
 
@@ -7789,7 +7887,7 @@ function detectTileCollision(objectId) {
     const overlappingObjects = [];
 
     // Get all room objects (excluding the moving object)
-    const allObjects = document.querySelectorAll('.room-object');
+    const allObjects = document.querySelectorAll('.room-object:not(.auto-pet)');
 
     // Check against all other objects
     allObjects.forEach(targetObj => {
@@ -8106,6 +8204,8 @@ toggleEditSaveBtn.addEventListener("click", async () => {
                 pet.style.display = 'none';
             });
 
+            disableAutoPets();
+
             // REMOVE FILLED FROM ALL BATHS TO RESET ACTION
             document.querySelectorAll('.room-object.bath').forEach(obj => {
                 obj.classList.remove('filled'); // remove if present
@@ -8130,7 +8230,9 @@ toggleEditSaveBtn.addEventListener("click", async () => {
             });
             preEditUserObjectAssets = JSON.parse(JSON.stringify(userObjectAssets));
             updateStatsBeforeRerunningInitGameAndRenderPets();
-            renderPets();
+            await initiateAutonomousPets();
+            await renderPets();
+            await selectAutonomousPetStartingActions();
             enablePetDragging();
             initializeRoomZIndexes();
             resetEditButtonToggle();
@@ -8140,6 +8242,7 @@ toggleEditSaveBtn.addEventListener("click", async () => {
             if (allPets[0]) {
                 displayPetStats(allPets[0].id);
             }
+            initiateAutonomousPetStartingActions();
             clearPlacementHighlights()
             removeAllDeleteItemHighlights();
             hideSidebar();
@@ -8172,7 +8275,9 @@ cancelEditBtn.addEventListener("click", async () => {
         renderRoomObjects();
         resetEditButtonToggle();
         updateStatsBeforeRerunningInitGameAndRenderPets();
-        renderPets();
+        await initiateAutonomousPets();
+        await renderPets();
+        await selectAutonomousPetStartingActions();
         enablePetDragging();
         blockTopHalfOfSelectedDivsClickEvents();
         makeSelectedClickThrough();
@@ -8185,6 +8290,8 @@ cancelEditBtn.addEventListener("click", async () => {
         if (allPets[0]) {
             displayPetStats(allPets[0].id);
         }
+
+        initiateAutonomousPetStartingActions();
     } finally {
         // Re-enable all action buttons
         toggleEditSaveBtn.disabled = false;
@@ -9580,7 +9687,7 @@ const navButtons = document.querySelectorAll('.nav-item');
 const contentPanels = document.querySelectorAll('.game-content-panel');
 
 navButtons.forEach((button) => {
-    button.addEventListener('click', () => {
+    button.addEventListener('click', async () => {
         const targetId = button.dataset.target;
 
         const previouslyActivePanel = document.querySelector(".game-content-panel.active");
@@ -9625,14 +9732,7 @@ navButtons.forEach((button) => {
             }
             document.getElementById('shopHeader').classList.remove('compact');
         } else if (targetId === 'pet-room-container') {
-            const allPets = document.querySelectorAll("#petContainer .pet");
-            if (allPets[0]) {
-                displayPetStats(allPets[0].id);
-            }
-            allPets.forEach(pet => {
-                managePetActions(pet);
-            });
-            toggleRoomDarknessBasedOnElectricityTax();
+            await clickPetRoomSection(targetId)
         } else if (targetId === 'pet-asset-container') {
             const departmentBtns = document.querySelectorAll('#pet-asset-container .department-btn');
             const foodBtn = Array.from(departmentBtns).find(btn => {
@@ -9654,6 +9754,13 @@ navButtons.forEach((button) => {
         }
     });
 });
+
+async function clickPetRoomSection (button=null) {
+    if (button !== 'pet-room-container') {
+        document.getElementById("pet-room-button").click();
+    }
+    await attemptGameInit();
+}
 
 function navigationResponsiveLayout() {
     const gameContainer = document.getElementById("gameContainer");
@@ -9687,7 +9794,7 @@ window.addEventListener("resize", async () => {
     hideSidebar()
 
     if (document.getElementById("pet-room-container").classList.contains("active")) {
-        await initGame();
+        await attemptGameInit();
         document.querySelector("#end-preview-button").classList.add("hidden")
         resetEditButtonToggle();
     }
@@ -9884,7 +9991,9 @@ async function handlePurchase(item, assetIndex, quantity, selectedCategory, btn)
             const isPet = itemDetails["pet"] === true;
             if (assetUpdateSuccess && isPet) {
                 updateStatsBeforeRerunningInitGameAndRenderPets();
-                renderPets();
+                await initiateAutonomousPets();
+                await renderPets();
+                await selectAutonomousPetStartingActions();
                 enablePetDragging();
                 createPetButtons();
             }
@@ -10322,7 +10431,8 @@ let furniturePreviewDict = {
 document.querySelector("#end-preview-button").addEventListener("click", async () => {
     endPreview();
     updateStatsBeforeRerunningInitGameAndRenderPets();
-    await initGame();
+    await attemptGameInit()
+    initiateAutonomousPetStartingActions();
 });;
 
 function endPreview() {
@@ -10351,7 +10461,6 @@ function endPreview() {
 }
 
 async function previewFurniture (key) {
-    
     let tempDivId = renderTemporaryRoomObject(key);
 
     document.querySelector(`#${tempDivId}`).style.opacity = "0";
@@ -10372,7 +10481,7 @@ async function previewFurniture (key) {
 
     updateStatsBeforeRerunningInitGameAndRenderPets();
     
-    await initGame();
+    await attemptGameInit();
 
     const placementMap = generatePlacementMap(tempDivId);
 
@@ -12170,7 +12279,7 @@ function renderSingleRoomObject(assetId) {
     const item = gameAssetIndex[asset.assetIndex];
 
     const div = document.createElement("div");
-    div.className = `room-object ${item["css-class"]}`;
+    div.className = `${item["css-class"]} room-object`;
     div.id = assetId;
     roomObjectsContainer.appendChild(div);
 
@@ -12598,7 +12707,7 @@ function renderPetSupplies(selectedCategory = 'all', selectedPetType = null) {
     scalePreview();
 }
 
-function usePetSupply (itemIndex, useQuantity=1) {
+async function usePetSupply (itemIndex, useQuantity=1) {
     selectedConsumable = [itemIndex, useQuantity];
     const item = userPetAssets["supplies"][itemIndex]
     const itemInfo = gameAssetIndex[item.assetIndex]
@@ -12609,7 +12718,7 @@ function usePetSupply (itemIndex, useQuantity=1) {
     const provides = providesData[0]
     const providesFor = providesData[1]
     if (provides === "food") {
-        document.getElementById("pet-room-button").click();
+        await clickPetRoomSection()
         selectFullSpeciesBowls (providesFor)
 
     } else if (provides === "love") {
@@ -12871,7 +12980,7 @@ function renderPetListForPetSection() {
     }
 }
 
-function deletePetConfirmed(petId) {
+async function deletePetConfirmed(petId) {
     delete userPetAssets["pets"][petId];
     
     // Reset selectedPet if the deleted pet was selected
@@ -12889,7 +12998,9 @@ function deletePetConfirmed(petId) {
     deletePetStatsInDatabase(petId)
     renderUsersPetAssets();
     updateStatsBeforeRerunningInitGameAndRenderPets();
-    renderPets();
+    await initiateAutonomousPets();
+    await renderPets();
+    await selectAutonomousPetStartingActions();
     enablePetDragging();
     createPetButtons();
 }
@@ -13424,19 +13535,13 @@ function displayFoodOptions(obj) {
 
         obj.classList.add("full");
         obj._foodContent = [selectedFoodInfo["provides"], selectedConsumable[1]];
+        obj._foodToRemoveFromUser = [userPetAssets["supplies"][selectedConsumable[0]], selectedConsumable[0]]
 
         initUserTriggeredAction("food", obj);
 
-        const updatedQuantity = userPetAssets["supplies"][selectedConsumable[0]]["quantity"] - selectedConsumable[1];
-        if (updatedQuantity <= 0) {
-            delete userPetAssets.supplies[selectedConsumable[0]];
-        } else {
-            userPetAssets.supplies[selectedConsumable[0]]["quantity"] = updatedQuantity;
-        }
         selectedConsumable = [];
         clearPlacementHighlights();
         clearSpecificPlacementHighlights();
-        sendPetAssetsUpdateToDatabase();
     } else {
         selectedConsumable = [];
         const matchedSupplies = [];
@@ -13843,11 +13948,6 @@ document.addEventListener('visibilitychange', function() {
 });
 
 let autonomousPetActionCounter = 1;
-let startingActions = {
-    "cat-1": [startSleeping],
-    "cat-2": [startSleeping]
-};
-
 
 async function startSleeping(pet, signal) {
         if (signal.aborted) {
@@ -13881,6 +13981,31 @@ async function startSleeping(pet, signal) {
         }
 
     managePetActions(pet);
+}
+
+async function startChatting(pet, signal) {
+    if (signal.aborted) {
+        cancelMovement(pet.id)
+        throw new DOMException("Aborted", "AbortError");
+    }
+    
+    setObjectAnimation(pet, `${pet.id}-stands-idle`);
+
+    await cancellableWait(2000, signal);
+
+    if (signal.aborted) {
+        cancelMovement(pet.id)
+        throw new DOMException("Aborted", "AbortError");
+    }
+
+    await playTransitionAnimation(pet, "surprised", null, signal)
+
+    if (signal.aborted) {
+        cancelMovement(pet.id)
+        throw new DOMException("Aborted", "AbortError");
+    }
+
+    petWalksAround(pet, signal)
 }
 
 function managePetActions(pet) {
@@ -14077,6 +14202,7 @@ async function petEats(pet, object, signal) {
 
         const [provides, useQuantity] = object._foodContent;
         const [supply, key] = object._foodToRemoveFromUser;
+
         supply.quantity -= useQuantity;
         if (supply.quantity <= 0) {
             delete userPetAssets.supplies[key];
@@ -14601,7 +14727,6 @@ function endCoordsValidityChecker (startCol, startRow, endCol, endRow, objectId,
         return false;
     }
     if (!canPlaceObjectAt(endCol, endRow, objWidth, objHeight, walkabilityMap)) {
-        console.log(endCol, endRow)
         return false;
     }
     return true;
@@ -14905,25 +15030,45 @@ function cancellableWait(ms, signal) {
     });
 }
 
+function pickWeightedRandom(weightMap) {
+  const entries = Object.entries(weightMap);
+
+  const totalWeight = entries.reduce(
+    (sum, [, weight]) => sum + weight,
+    0
+  );
+
+  let r = Math.random() * totalWeight;
+
+  for (const [key, weight] of entries) {
+    r -= weight;
+    if (r <= 0) {
+      return key;
+    }
+  }
+}
 
 const petAutonomousActions = {
-    "cat-1": ["petStandsIdle", "petSitsIdle", "petLaysIdle", "petSleeps", "petTalks", "cat1LicksPaw"],
-    "cat-2": ["petStandsIdle", "petSitsIdle", "petLaysIdle", "petSleeps", "petTalks", "cat1LicksPaw"]
+        "cat-1": ["petStandsIdle", "petSitsIdle", "petLaysIdle", "petSleeps", "petTalks", "cat1LicksPaw"]
     }
 
-const petAutonomousActionsSituational = {
-    "cat-1": {
-        "hungry": ["cat1Hungry"],
-        "thirsty": [],
-        "sad": ["cat1Cries", "cat1Sad"],
-        "angry": ["cat1Angry", "cat1Angry2"]
-        },
-    "cat-2": {
-        "hungry": ["cat1Hungry"],
-        "thirsty": [],
-        "sad": ["cat1Cries", "cat1Sad"],
-        "angry": ["cat1Angry", "cat1Angry2"]
+const petStartingCondition = {
+        "cat-1": {
+            "petStartSleeping": 9, 
+            "petStartChatting": 1,
         }
+    }
+
+// ALL ACTIONS WILL BE CARRIED OUT
+let startingActions = {};
+
+const petAutonomousActionsSituational = {
+        "cat-1": {
+            "hungry": ["cat1Hungry"],
+            "thirsty": [],
+            "sad": ["cat1Cries", "cat1Sad"],
+            "angry": ["cat1Angry", "cat1Angry2"]
+            }
     }
 
 
@@ -15916,7 +16061,9 @@ async function handleReceivedMessagesAndGifts(gifts) {
         // If it’s a pet, trigger pet-related updates
         if (isPet) {
           updateStatsBeforeRerunningInitGameAndRenderPets();
-          renderPets();
+        await initiateAutonomousPets();
+        await renderPets();
+        await selectAutonomousPetStartingActions();
           enablePetDragging();
           createPetButtons();
         }
@@ -16683,6 +16830,41 @@ function isObjectVisibleInViewport(objectId) {
   );
   
   return isVisible;
+}
+
+function getVisibleTiles(coordinates, bufferTiles = 10) {
+  const viewport = document.getElementById('viewport-container');
+  
+  if (!viewport) {
+    console.error('No viewport found!');
+    return [];
+  }
+  
+  const objectsContainer = document.getElementById('roomObjectsContainer');
+  if (!objectsContainer) {
+    console.error('No roomObjectsContainer found!');
+    return [];
+  }
+  
+  const viewportRect = viewport.getBoundingClientRect();
+  const containerRect = objectsContainer.getBoundingClientRect();
+  const bufferPixels = bufferTiles * unitSize;
+  
+  const filtered = coordinates.filter(([x, y]) => {
+    const screenLeft = containerRect.left + (x * unitSize);
+    const screenTop = containerRect.top + (y * unitSize);
+    const screenRight = screenLeft + unitSize;
+    const screenBottom = screenTop + unitSize;
+    
+    return !(
+      screenRight < viewportRect.left + bufferPixels ||
+      screenLeft > viewportRect.right - bufferPixels ||
+      screenBottom < viewportRect.top + bufferPixels ||
+      screenTop > viewportRect.bottom - bufferPixels
+    );
+  });
+  
+  return filtered;
 }
 
 function centerViewportOnObject(objectId) {
