@@ -1179,6 +1179,7 @@
         }
 
         .item-preview-holder {
+            box-sizing: content-box !important;
             position: relative;
             width: 125px;
             height: 75px;
@@ -4147,22 +4148,63 @@
                 if (validCoords.length !== 0) {
                     visibleCoords = getVisibleTiles(validCoords, 20);
 
+                    // Get pet and autoPet dimensions in tiles
+                    const petWidth = Math.ceil(pet.offsetWidth / unitSize);
+                    const autoPetWidth = Math.ceil(autoPet.offsetWidth / unitSize);
+                    
+                    // Get room boundaries
+                    const maxCol = globalWalkabilityMap[0].length;
+                    const maxRow = globalWalkabilityMap.length;
+
+                    // Filter coordinates to ensure both pet and autoPet fit inside room and on walkable tiles
+                    let validPairCoords = validCoords.filter(([x, y]) => {
+                        // Check if autoPet position would be within bounds
+                        const autoPetX = x + petWidth;
+                        const autoPetEndX = autoPetX + autoPetWidth;
+                        
+                        // AutoPet must fit within room boundaries
+                        if (autoPetX < 0 || autoPetEndX > maxCol || y < 0 || y >= maxRow) {
+                            return false;
+                        }
+                        
+                        // Check if all tiles under autoPet are walkable
+                        for (let c = autoPetX; c < autoPetEndX; c++) {
+                            if (c >= maxCol || !globalWalkabilityMap[y][c] || !globalWalkabilityMap[y][c].walkable) {
+                                return false;
+                            }
+                        }
+                        
+                        return true;
+                    });
+
+                    if (validPairCoords.length === 0) {
+                        // No valid pair positions found, try again with all valid coords
+                        validPairCoords = validCoords;
+                    }
+
+                    // Select coordinates preferring visible ones
                     let randomCoords;
-                    if (visibleCoords.length !== 0) {
-                        const randomIndex = Math.floor(Math.random() * visibleCoords.length);
-                        randomCoords = visibleCoords[randomIndex];
+                    const visiblePairCoords = getVisibleTiles(validPairCoords, 20);
+                    
+                    if (visiblePairCoords.length !== 0) {
+                        const randomIndex = Math.floor(Math.random() * visiblePairCoords.length);
+                        randomCoords = visiblePairCoords[randomIndex];
                     } else {
-                        const randomIndex = Math.floor(Math.random() * validCoords.length);
-                        randomCoords = validCoords[randomIndex];
+                        const randomIndex = Math.floor(Math.random() * validPairCoords.length);
+                        randomCoords = validPairCoords[randomIndex];
                     }
                     const [x, y] = randomCoords;
 
+                    // Position the pet
                     pet.style.left = `calc(${x} * var(--unit-size))`;
                     pet.style.top = `calc((${y + 1} * var(--unit-size)) - ${pet.offsetHeight}px)`;
                     pet.classList.remove("pet-left");
                     pet.classList.add("pet-right");
 
-                    const petWidth = Math.ceil(pet.offsetWidth / unitSize);
+                    // Position the autoPet next to the pet
+                    const autoPetX = x + petWidth;
+                    autoPet.style.left = `calc(${autoPetX} * var(--unit-size))`;
+                    autoPet.style.top = `calc((${y + 1} * var(--unit-size)) - ${autoPet.offsetHeight}px)`;
 
                     autoPetStartChattingPreConditioning(autoPet, [x + petWidth, y])
                 } else {
@@ -4175,10 +4217,6 @@
                 startingActions[petNumber] = []
                 startingActions[petNumber].push(startChatting)
             } else {
-                actionFailed = true
-            }
-
-            if (actionFailed) {
                 const actionDict = petStartingCondition[petNumber];
 
                 if (!actionDict) return;
@@ -15054,8 +15092,8 @@ const petAutonomousActions = {
 
 const petStartingCondition = {
         "cat-1": {
-            "petStartSleeping": 9, 
-            "petStartChatting": 1,
+            "petStartSleeping": 8, 
+            "petStartChatting": 2,
         }
     }
 
