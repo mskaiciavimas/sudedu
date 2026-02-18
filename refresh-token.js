@@ -108,6 +108,18 @@ async function apiFetch(url, options = {}) {
     }
   }
 
+  if (!response.ok && response.status >= 500) {
+    const MAX_RETRIES = 3;
+    const DELAY_MS = 500;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      console.warn(`Server error ${response.status}, retry attempt ${attempt}...`);
+      await new Promise(resolve => setTimeout(resolve, DELAY_MS * attempt));
+      response = await fetch(url, options);
+      if (response.ok || response.status < 500) break;
+    }
+  }
+
   return response;
 }
 
