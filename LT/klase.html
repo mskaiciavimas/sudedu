@@ -2123,6 +2123,15 @@
                     child.style.pointerEvents = "auto";
                     child.style.opacity = "1";
                 });
+
+                const allStudents = classDataCache.remainingStudents.length + (classDataCache.requestingStudent ? 1 : 0);
+                if (!classDataCache.teacher.id || allStudents < 2) {
+                const issukisButton = document.querySelector('button.nav-item[data-target="issukis"]');
+                if (issukisButton) {
+                    issukisButton.style.pointerEvents = "none";
+                    issukisButton.style.opacity = "0.5";
+                }
+                }
                 messageToTheUser("Mokytojas pridėtas sėkmingai.")
                 location.reload();
             }
@@ -3055,15 +3064,20 @@ async function fetchClassData() {
       child.style.opacity = "1";
     });
 
+    const totalStudents = classDataCache.remainingStudents.length + (classDataCache.requestingStudent ? 1 : 0);
+    if (!classDataCache.teacher.id || totalStudents < 2) {
+      const issukisButton = document.querySelector('button.nav-item[data-target="issukis"]');
+      if (issukisButton) {
+        issukisButton.style.pointerEvents = "none";
+        issukisButton.style.opacity = "0.5";
+      }
+    }
+
   } catch (error) {
     console.error('Error fetching students:', error);
     // ✅ Display backend error or fallback message
     
-    if (error.message === 'Student is not associated with any teacher') {
-        await handleNoTeacherMessage();
-    } else {
-        messageToTheUser('Nepavyko pasiekti klasės narių duomenų. Bandykite vėl vėliau.');
-    }
+    messageToTheUser('Nepavyko pasiekti klasės narių duomenų. Bandykite vėl vėliau.');
   } finally {
     clearTimeout(showMessageTimeout);
     if (closer) setTimeout(() => closer(), 0);
@@ -3074,6 +3088,7 @@ async function fetchClassData() {
 
 async function updateClassStats() {
   if (!classDataCache) return;
+  if (!classDataCache.teacher.id) return;
 
   try {
     const response = await apiFetch(apiBase + 'class/updateStudentStats', {
@@ -3111,36 +3126,31 @@ async function updateClassStats() {
 
   } catch (err) {
     console.error('Error updating class stats:', err);
-    // ✅ Optional: show specific error if relevant
-    if (err.message === 'Student is not associated with any teacher') {
-      await handleNoTeacherMessage();
-    }
   }
 }
 
 
 // When you receive message that student is not associated with any teacher:
 async function handleNoTeacherMessage() {
-    // 1️⃣ FULLY REVERSE: Re-enable all children of contentContainer
+// 1️⃣ FULLY REVERSE: Re-enable all children of contentContainer
 Array.from(document.getElementById("contentContainer").children).forEach(child => {
     child.style.pointerEvents = "auto";
     child.style.opacity = "1";
 });
 
-// 2️⃣ DISABLE ALL except teacher-info-div and its children
-const teacherInfoDiv = document.querySelector('.teacher-info-div');
+// Also re-enable issukis button first (in case it was previously disabled),
+// so the targeted disable below starts from a clean state
+const issukisButtonReset = document.querySelector('button.nav-item[data-target="issukis"]');
+if (issukisButtonReset) {
+    issukisButtonReset.style.pointerEvents = "auto";
+    issukisButtonReset.style.opacity = "1";
+}
 
-Array.from(document.getElementById("contentContainer").children).forEach(child => {
-    // Check if this child is the teacher-info-div or contains it
-    const isTeacherDiv = child.classList.contains('teacher-info-div');
-    const containsTeacherDiv = child.contains(teacherInfoDiv);
-    
-    // Only disable if it's NOT the teacher div and does NOT contain it
-    if (!isTeacherDiv && !containsTeacherDiv) {
-        child.style.pointerEvents = "none";
-        child.style.opacity = "0.5";
-    }
-});
+const issukisButton = document.querySelector('button.nav-item[data-target="issukis"]');
+if (issukisButton) {
+    issukisButton.style.pointerEvents = "none";
+    issukisButton.style.opacity = "0.5";
+}
 
 const storedClassCache = localStorage.getItem('classDataCache');
 const storedCacheExpiry = localStorage.getItem('classDataCacheExpiry');

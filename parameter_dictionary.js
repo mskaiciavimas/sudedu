@@ -191,6 +191,10 @@ const parameterDictionary = {
         "parameter": "stulpeliu",
         "decodedParameterText": "STULPELIU / KAMPU"
     },
+    "C47-C48": {
+        "parameter": "eilute-stulpeliu",
+        "decodedParameterText": "EILUTE ARBA STULPELIU / KAMPU"
+    },
     "C49": {
         "parameter": "text-comprehension",
         "decodedParameterText": "TEKSTO SUPRATIMAS"
@@ -294,6 +298,10 @@ const parameterDictionary = {
     "C74": {
         "parameter": "sunkesnes",
         "decodedParameterText": "SUNKESNĖS ŽODŽIŲ PABAIGŲ KOMBINACIJOS"
+    },
+    "C73-C74": {
+        "parameter": "sunkesnes-ir-sunkesnes",
+        "decodedParameterText": "LENGVESNĖS IR SUNKESNĖS ŽODŽIŲ PABAIGŲ KOMBINACIJOS"
     },
     "C75": {
         "parameter": "pirma-antra",

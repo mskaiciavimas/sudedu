@@ -2400,15 +2400,15 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
       const summaryTable = document.createElement("table");
       if (controller.language === 'LT') {
           summaryTable.innerHTML = `
-              <tr>
+              <thead>
                   <th>Veiksmai</th>
-                  <th>${usePercentage ? 'Suklysta (%)' : 'Suklysta (kartai)'}</th>
+                  <th>${usePercentage ? 'Klaidų kiekis<br>(% visų klaidų)' : 'Suklysta (kartai)'}</th>
                   <th></th>
-              </tr>
+              </thead>
               ${summaryData
                   .map(
                         (row) => {
-                            const displayValue = usePercentage ? row["Percentage"] + '%' : row["Suklysta (kartai)"];
+                            const displayValue = usePercentage ? `${row["Suklysta (kartai)"]}` + ' (' + row["Percentage"] + '%)' : row["Suklysta (kartai)"];
                             let barWidth, barColor;
                             
                             if (usePercentage) {
@@ -2613,7 +2613,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
     
     // Mistakes header
     const countHeader = document.createElement('th');
-    countHeader.textContent = isLT ? 'Suklysta (kartai)' : 'Mistakes';
+    countHeader.innerHTML = usePercentage ? 'Klaidų kiekis<br>(% visų klaidų)' : 'Suklysta (kartai)';
     
     // Bar header (empty)
     const barHeader = document.createElement('th');
@@ -2628,7 +2628,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
     
     const tbody = document.createElement('tbody');
         tbody.innerHTML = tableData.map(item => {
-            const displayValue = usePercentage ? item.percentage + '%' : item.count;
+            const displayValue = usePercentage ?  item.count + ' (' + item.percentage + '%)' :  item.count;
             let barWidth, barColor;
             
             if (usePercentage) {
@@ -3237,7 +3237,8 @@ function startQuestionsNumber () {
 	redirectToQuestions();
 }
 
-function getOptionTextFromValues(values, taskDuration, forTeacher = false) {
+function getOptionTextFromValues(values, taskDuration, forTeacher = false, compact=false) {
+    let compactDescription = []
     // Helper function to get the Lithuanian plural form based on number
     function getLithuanianPlural(number, forms) {
         const num = parseInt(number);
@@ -3325,49 +3326,97 @@ function getOptionTextFromValues(values, taskDuration, forTeacher = false) {
         result.push(values[9]);
 
         final_results.push(result[0]);
+        compactDescription.push([result[0], "primary"])
 
         if (result[0] === "SUDĖTIS" || result[0] === "ATIMTIS" || result[0] === "SUDĖTIS IR ATIMTIS") {
             final_results.push(result[1]);
             final_results.push(result[2]);
             final_results.push(result[3]);
-            if (result[4] === "SKAITINĖ LYGYBĖ") {
-                final_results.push(result[5]);
-            } else if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+
+            compactDescription.push([result[1], "primary"])
+            compactDescription.push([result[2], "primary"])
+
+            if (result[3] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
                 final_results.push(result[4]);
+
+                compactDescription.push(["SU NEŽINOMUOJU", "primary"])
+                compactDescription.push([result[4], "secondary"])
             }
+
             final_results.push(result[5]);
-            final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+            compactDescription.push([result[5], "secondary"])
+
+            if (taskDuration) {
+              final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+            }
         } else if (result[0] === "DAUGYBA") {
             final_results.push(result[1]);
+            compactDescription.push([result[1], "primary"])
+
             if (result[1] === "DAUGYBOS LENTELĖ") {
                 final_results.push(`NUO ${result[6][0]} IKI ${result[6][1]}`);
+                compactDescription.push([`NUO ${result[6][0]} IKI ${result[6][1]}`, "primary"])
             }
             final_results.push(result[3]);
-            if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
-                final_results.push(result[5]);
+            if (result[3] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
+                final_results.push(result[4]);
+
+                compactDescription.push(["SU NEŽINOMUOJU", "primary"])
+                compactDescription.push([result[4], "secondary"])
             }
+
             final_results.push(result[5]);
-            final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+            compactDescription.push([result[5], "secondary"])
+
+            if (taskDuration) {
+              final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+            }
         } else if (result[0] === "DALYBA" || result[0] === "DAUGYBA IR DALYBA") {
             final_results.push(result[1]);
+            compactDescription.push([result[1], "primary"])
+
             if (result[1] === "DAUGYBOS LENTELĖ") {
                 final_results.push(`NUO ${result[6][0]} IKI ${result[6][1]}`);
+                compactDescription.push([`NUO ${result[6][0]} IKI ${result[6][1]}`, "primary"])
             }
+
             final_results.push(result[7]);
+
+            if (result[3] === "DALYBA SU LIEKANA") {
+              compactDescription.push(["SU LIEKANA", "primary"])
+            }
+
             final_results.push(result[3]);
             if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
                 final_results.push(result[4]);
+
+                compactDescription.push(["SU NEŽINOMUOJU", "primary"])
+                compactDescription.push([result[4], "secondary"])
             }
             final_results.push(result[5]);
-            final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+            compactDescription.push([result[5], "secondary"])
+
+            if (taskDuration) {
+              final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+            }
         } else if (result[0] === "ĮVAIRŪS VEIKSMAI") {
             final_results.push(result[1]);
             final_results.push(result[3]);
+
+            compactDescription.push([result[1], "primary"])
+
             if (result[4] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
                 final_results.push(result[4]);
+
+                compactDescription.push(["SU NEŽINOMUOJU", "primary"])
+                compactDescription.push([result[4], "secondary"])
             }
             final_results.push(result[5]);
-            final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+            compactDescription.push([result[5], "secondary"])
+
+            if (taskDuration) {
+              final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+            }
         }
     } else if (values[0] === "lang") {
         result.push(parameterDictionary[values[1]]["decodedParameterText"]);
@@ -3390,11 +3439,19 @@ function getOptionTextFromValues(values, taskDuration, forTeacher = false) {
             outerLiItem.appendChild(grammarParamsList);
             result.push(outerLiItem.outerHTML);
             result.push(parameterDictionary[values[5]]["decodedParameterText"]);
-            result.push(values[6] === 1 ? "DAŽNESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI" : "RETESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI");
+            if (values[6] === 0) {
+              result.push("RETESNI IR DAŽNESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
+            } else if (values[6] === 1) {
+                result.push("DAŽNESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
+            } else if (values[6] === 3) {
+                result.push("RETESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
+            }
         }
 
         final_results.push(result[0]);
         final_results.push(result[1]);
+
+        compactDescription.push([result[1], "primary"])
 
         if (result[0] === "TEKSTO SUPRATIMAS") {
             if (values[4] === "C82") {
@@ -3405,43 +3462,72 @@ function getOptionTextFromValues(values, taskDuration, forTeacher = false) {
                     final_results.push(parameterDictionary[values[5]]["decodedParameterText"]);
                     final_results.push(parameterDictionary[values[6]]["decodedParameterText"]);
                     final_results.push(parameterDictionary[values[4]]["decodedParameterText"]);
+
+                    compactDescription.push([parameterDictionary[values[5]]["decodedParameterText"], "primary"])
+                    compactDescription.push([parameterDictionary[values[6]]["decodedParameterText"], "primary"])
+
                 } else {
                     result.push(parameterDictionary[values[6]]["decodedParameterText"]);
                     final_results.push(parameterDictionary[values[5]]["decodedParameterText"]);
                     final_results.push(parameterDictionary[values[6]]["decodedParameterText"]);
                 }
                 final_results.push(parameterDictionary[values[3]]["decodedParameterText"]);
-                final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+
+                if (parameterDictionary[values[3]]["decodedParameterText"] === "BE DISTRAKTORIAUS") {
+                  compactDescription.push([parameterDictionary[values[3]]["decodedParameterText"], "secondary"])
+                } else {
+                  compactDescription.push([parameterDictionary[values[3]]["decodedParameterText"], "primary"])
+                }
+
+                if (taskDuration) {
+                  final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+                }
             } else if (values[4] === "C84") {
                 if (forTeacher) {
                     final_results.push(parameterDictionary[values[4]]["decodedParameterText"]);
 
+                    compactDescription.push([parameterDictionary[values[4]]["decodedParameterText"], "primary"])
+
                     const outerDiv = document.createElement("div");
                     outerDiv.classList = "selected-text-task-info-for-teachers-list";
 
-                    const htmlItems = taskDuration[1]
-                        .map(id => `<span class="selected-text-task-info-for-teachers-item" id="${id}" onclick="openTextBrowser(${id})">ID: ${id}</span>`)
-                        .join(", ");
+                    if (taskDuration) {
+                      const htmlItems = taskDuration[1]
+                          .map(id => `<span class="selected-text-task-info-for-teachers-item" id="${id}" onclick="openTextBrowser(${id})">ID: ${id}</span>`)
+                          .join(", ");
 
-                    outerDiv.innerHTML = htmlItems;
+                      outerDiv.innerHTML = htmlItems;
+                    }
                     final_results.push(outerDiv.outerHTML);
                     final_results.push(parameterDictionary[values[3]]["decodedParameterText"]);
+
+                    compactDescription.push([parameterDictionary[values[3]]["decodedParameterText"], "primary"])
                 } else {
                     final_results.push(parameterDictionary[values[3]]["decodedParameterText"]);
-                    final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1].length.toString()));
+
+                    compactDescription.push([parameterDictionary[values[3]]["decodedParameterText"], "primary"])
+                    
+                    if (taskDuration) {
+                      final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1].length.toString()));
+                    }
                 }
             }
 
         } else if (result[0] === "GRAMATIKA") {
           final_results.push(result[2]);
+          compactDescription.push([result[2], "primary"])
+
           if (result[1] === "RAŠYBA") {
+            let compactParams = []
             let outerLiItem = document.createElement('li');
                 outerLiItem.textContent = "RAŠYBOS NUSTATYMAI:"; // Add a label for the outer <li>
                 let grammarParamsList = document.createElement('ul');
                 grammarParamsList.classList.add('grammar-params-list');
                 Object.keys(values[4]).forEach(key => {
+                    const param = parameterDictionary[key]["decodedParameterText"]
+                    compactParams.push(param)
                     let listItem = document.createElement('li');
-                    listItem.innerHTML = parameterDictionary[key]["decodedParameterText"]; // Use innerHTML instead of textContent
+                    listItem.innerHTML = param;
                     grammarParamsList.appendChild(listItem);
                 });
 
@@ -3451,26 +3537,41 @@ function getOptionTextFromValues(values, taskDuration, forTeacher = false) {
                 result.push(outerLiItem.outerHTML);
                 result.push(parameterDictionary[values[5]]["decodedParameterText"])
 
-                if (values[6] === 1) {
+                if (values[6] === 0) {
+                  result.push("RETESNI IR DAŽNESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
+                } else if (values[6] === 1) {
                     result.push("DAŽNESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
-                } else {
+                } else if (values[6] === 3) {
                     result.push("RETESNI NEŽINOMŲ ŽODŽIŲ ATVEJAI")
                 }
             
             final_results.push(result[3]);
+            compactDescription.push([compactParams, "grammar-params"])
+
             if (result[2] === "3-4 KLASĖ") {
                 if ("C62" in values[4] || "C63" in values[4] || "C65" in values[4]) {
                     final_results.push(result[4]);
+
+                    compactDescription.push([result[4], "secondary"])
                 }
-            } else {
-                final_results.push(result[5]);
             }
-            final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+
+            final_results.push(result[5]);
+            compactDescription.push([result[5], "secondary"])
+
+            if (taskDuration) {
+              final_results.push(determineQuestionNumberTimeLabelEnding(taskDuration[0], taskDuration[1]));
+            }
           }
       }
     }
     
-    return final_results;
+    if (compact) {
+      return compactDescription
+    } else {
+      return final_results;
+    }
+    
 }
 
 //TASK INFO COLLECTION START
@@ -3740,97 +3841,301 @@ async function processSelectedTexts() {
     return recordsList;
 }
 
-// Cache for task averages - shared across all students for same task combination
-const taskAverageCache = new Map();
-const retrievedInfoCache = {};
-
-// Frontend function to fetch task stats with caching for multiple tasks
 async function fetchTaskStats(studentId, taskInfoList) {
-  try {
-    // taskInfoList should be an array of taskInfo objects
-    // e.g., [taskInfo1, taskInfo2, taskInfo3]
-    
-    if (!Array.isArray(taskInfoList) || taskInfoList.length === 0) {
-      console.error('taskInfoList must be a non-empty array');
-      return null;
+    try {
+        if (!Array.isArray(taskInfoList) || taskInfoList.length === 0) {
+            console.error('taskInfoList must be a non-empty array');
+            return null;
+        }
+
+        const allStudentIds = Array.from(
+            document.querySelectorAll('.outer-student-list-entry-item .student-name')
+        ).map(el => Number(el.dataset.studentId));
+
+        await ensureAllStudentsCached(allStudentIds);
+
+        return buildGraphDataFromCache(studentId, taskInfoList);
+
+    } catch (error) {
+        messageToTheUser("Nepavyko pasiekti duomenų. Bandykite vėl vėliau.");
+        console.error('Error fetching task stats:', error);
+        return null;
     }
+}
 
-    // Create a stable cache key by sorting and stringifying the task list
-    const sortedTaskList = [...taskInfoList].sort((a, b) => 
-      JSON.stringify(a).localeCompare(JSON.stringify(b))
-    );
-    const cacheKey = JSON.stringify(sortedTaskList);
-
-    // Initialize per-student cache if needed
-    retrievedInfoCache[studentId] ??= {};
-
-    // Return fully cached task data if available
-    if (retrievedInfoCache[studentId][cacheKey]) {
-      console.log('Using fully cached data for student', studentId, 'with', taskInfoList.length, 'tasks');
-      return retrievedInfoCache[studentId][cacheKey];
-    }
-
-    // Check if averages are already cached for this task combination
-    const cachedAverage = taskAverageCache.get(cacheKey);
-
-    // Build URL with task list and optional skipAverages flag
-    const taskInfoListString = JSON.stringify(taskInfoList);
-    const url = `${apiBase}students/task-stats/${studentId}?taskInfoList=${encodeURIComponent(taskInfoListString)}`
-      + (cachedAverage ? `&skipAverages=true` : `&skipAverages=false`);
-
-    // Fetch student data (and possibly averages)
-    const response = await apiFetch(url, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
+async function ensureAllStudentsCached(studentIds) {
+    const now = Date.now();
+    const missing = studentIds.filter(id => {
+        const cached = taskArchiveCache[id];
+        return !cached || (now - cached.cachedAt) >= TASK_ARCHIVE_CACHE_TTL;
     });
 
-    if (!response || !response.ok) {
-      console.error('Failed to fetch task stats');
-      return null;
-    }
-
-    const data = await response.json();
-
-    // If averages were already cached, apply them to the response
-    if (cachedAverage) {
-      console.log('Using cached average data for', taskInfoList.length, 'tasks combined');
-      data.averageDates = cachedAverage.averageDates;
-      data.averageMistakeFrequency = cachedAverage.averageMistakeFrequency;
-      data.averageAnswerRate = cachedAverage.averageAnswerRate;
-    } else {
-      // First fetch - cache the averages for this task combination
-      console.log('Caching average data for', taskInfoList.length, 'tasks combined');
-      taskAverageCache.set(cacheKey, {
-        averageDates: data.averageDates,
-        averageMistakeFrequency: data.averageMistakeFrequency,
-        averageAnswerRate: data.averageAnswerRate
-      });
-    }
-
-    // Cache the complete data for this student
-    retrievedInfoCache[studentId][cacheKey] = data;
-
-    return data;
-
-  } catch (error) {
-    messageToTheUser("Nepavyko pasiekti duomenų. Bandykite vėl vėliau.");
-    console.error('Error fetching task stats:', error);
-    return null;
-  }
+    await Promise.all(missing.map(async (id) => {
+        try {
+            const response = await apiFetch(`${apiBase}students/task-history/${id}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (response && response.ok) {
+                taskArchiveCache[id] = { rows: await response.json(), cachedAt: now };
+            }
+        } catch (e) {
+            console.error(`Failed to cache student ${id}:`, e);
+        }
+    }));
 }
 
-
-// Clear cache when needed (e.g., when switching between different task combinations)
-function clearTaskAverageCache() {
-    taskAverageCache.clear();
-    console.log('Cleared all task average cache');
+function getCategory(taskInfoStr) {
+    try {
+        const parsed = JSON.parse(taskInfoStr);
+        if (parsed[0] === 'math') return 'math';
+        if (parsed[0] === 'lang' && parsed[1] === 'C49') return 'text';
+        if (parsed[0] === 'lang' && parsed[1] === 'C83') return 'grammar';
+        return 'other';
+    } catch (e) { return 'other'; }
 }
 
-function clearStudentTaskCache(studentId) {
-    if (retrievedInfoCache[studentId]) {
-        delete retrievedInfoCache[studentId];
-        console.log('Cleared cache for student', studentId);
+function upperOutlierThreshold(values) {
+    if (values.length < 4) return Infinity;
+    const sorted = [...values].sort((a, b) => a - b);
+    const q1 = sorted[Math.floor(sorted.length * 0.25)];
+    const q3 = sorted[Math.floor(sorted.length * 0.75)];
+    const iqr = q3 - q1;
+    return q3 + 1.5 * iqr;
+}
+
+function removeOutliers(values) {
+    if (values.length < 4) return values;
+    const sorted = [...values].sort((a, b) => a - b);
+    const q1 = sorted[Math.floor(sorted.length * 0.25)];
+    const q3 = sorted[Math.floor(sorted.length * 0.75)];
+    const iqr = q3 - q1;
+    const lower = q1 - 1.5 * iqr;
+    const upper = q3 + 1.5 * iqr;
+    return sorted.filter(v => v >= lower && v <= upper);
+}
+
+function isOutlierIndex(values) {
+    if (values.length < 4) return values.map(() => false);
+    const sorted = [...values].sort((a, b) => a - b);
+    const q1 = sorted[Math.floor(sorted.length * 0.25)];
+    const q3 = sorted[Math.floor(sorted.length * 0.75)];
+    const iqr = q3 - q1;
+    const lower = q1 - 1.5 * iqr;
+    const upper = q3 + 1.5 * iqr;
+    return values.map(v => v < lower || v > upper);
+}
+
+function median(values) {
+    if (values.length === 0) return null;
+    const sorted = [...values].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 !== 0
+        ? sorted[mid]
+        : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+function filterOutlierRows(rows) {
+    if (rows.length < 4) return rows.filter(r => r.answerRate > 0);
+
+    const validRows = rows.filter(r => r.answerRate > 0);
+
+    // Per-category upper-only mistake threshold
+    const catMistakes = {};
+    validRows.forEach(r => {
+        const cat = getCategory(r.taskInfo);
+        if (!catMistakes[cat]) catMistakes[cat] = [];
+        catMistakes[cat].push(r.totalAnswers > 0 ? (r.mistakes / r.totalAnswers) * 100 : 0);
+    });
+    const catThresholds = {};
+    Object.entries(catMistakes).forEach(([cat, vals]) => {
+        catThresholds[cat] = upperOutlierThreshold(vals);
+    });
+
+    // Speed — symmetric IQR
+    const speedVals = validRows.map(r => r.answerRate);
+    const sOutliers = isOutlierIndex(speedVals);
+
+    return validRows.filter((r, i) => {
+        if (sOutliers[i]) return false;
+        const cat = getCategory(r.taskInfo);
+        const mistakePct = r.totalAnswers > 0 ? (r.mistakes / r.totalAnswers) * 100 : 0;
+        if (mistakePct > catThresholds[cat]) return false;
+        return true;
+    });
+}
+
+function buildGraphDataFromCache(studentId, taskInfoList) {
+    const taskInfoStrings = new Set(taskInfoList.map(t => JSON.stringify(t)));
+    const filterRows = rows => rows.filter(row => taskInfoStrings.has(row.taskInfo));
+
+    const studentCache = taskArchiveCache[studentId];
+    if (!studentCache) return null;
+
+    const rawStudentRows = filterRows(studentCache.rows)
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+    if (rawStudentRows.length === 0) return {
+        studentDates: [], mistakeFrequency: [], answerRate: [],
+        averageDates: [], averageMistakeFrequency: [], averageAnswerRate: []
+    };
+
+    const cleanStudentRows = filterOutlierRows(rawStudentRows);
+
+    if (cleanStudentRows.length < 5) return { insufficient: true };
+
+    const graphData = {
+        studentDates: cleanStudentRows.map(r => r.date),
+        mistakeFrequency: cleanStudentRows.map(r =>
+            r.totalAnswers > 0 ? Math.round((r.mistakes / r.totalAnswers) * 100) : 0
+        ),
+        answerRate: cleanStudentRows.map(r => r.answerRate),
+        averageDates: [],
+        averageMistakeFrequency: [],
+        averageAnswerRate: []
+    };
+
+    const allDataPoints = [];
+    Object.entries(taskArchiveCache).forEach(([cachedId, cached]) => {
+        const cleanRows = filterOutlierRows(filterRows(cached.rows));
+        cleanRows.forEach(row => {
+            allDataPoints.push({
+                date: row.date,
+                timestamp: new Date(row.date).getTime(),
+                mistakeFreq: row.totalAnswers > 0 ? (row.mistakes / row.totalAnswers) * 100 : 0,
+                answerRate: row.answerRate,
+                studentId: Number(cachedId)
+            });
+        });
+    });
+
+    if (allDataPoints.length >= 2) {
+        const WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+        const TIME_DECAY = 0.15;
+        const totalStudents = Object.keys(taskArchiveCache).length;
+        const MIN_STUDENTS = Math.max(3, Math.ceil(totalStudents * 0.3));
+        const allDates = [...new Set(allDataPoints.map(dp => dp.date))].sort();
+
+        // Full date range: union of all student dates and average dates
+        const allRelevantDates = [...new Set([
+            ...cleanStudentRows.map(r => r.date),
+            ...allDates
+        ])].sort();
+
+        const averages = { dates: [], mistakeFrequency: [], answerRate: [] };
+
+        allDates.forEach(dateStr => {
+            const target = new Date(dateStr).getTime();
+            const window = allDataPoints.filter(dp => Math.abs(dp.timestamp - target) <= WINDOW_MS);
+
+            const byStudent = new Map();
+            window.forEach(dp => {
+                if (!byStudent.has(dp.studentId)) byStudent.set(dp.studentId, []);
+                byStudent.get(dp.studentId).push(dp);
+            });
+
+            if (byStudent.size < MIN_STUDENTS) return;
+
+            const studentMistakes = [];
+            const studentAnswerRates = [];
+
+            byStudent.forEach(points => {
+                let wMistake = 0, wAnswerRate = 0, wTotal = 0;
+                points.forEach(dp => {
+                    const w = Math.exp(-TIME_DECAY * Math.abs(dp.timestamp - target) / (24 * 60 * 60 * 1000));
+                    wMistake += dp.mistakeFreq * w;
+                    wAnswerRate += dp.answerRate * w;
+                    wTotal += w;
+                });
+                if (wTotal > 0) {
+                    studentMistakes.push(wMistake / wTotal);
+                    studentAnswerRates.push(wAnswerRate / wTotal);
+                }
+            });
+
+            const medMistake = median(removeOutliers(studentMistakes));
+            const medAnswerRate = median(removeOutliers(studentAnswerRates));
+
+            if (medMistake !== null && medAnswerRate !== null) {
+                averages.dates.push(dateStr);
+                averages.mistakeFrequency.push(medMistake);
+                averages.answerRate.push(medAnswerRate);
+            }
+        });
+
+        if (averages.dates.length > 1) {
+
+            // Compute linear trendline over known average points
+            function trendlineValue(dates, values, targetDate) {
+                const xs = dates.map((d, i) => i);
+                const ys = values;
+                const n = xs.length;
+                const sumX = xs.reduce((a, b) => a + b, 0);
+                const sumY = ys.reduce((a, b) => a + b, 0);
+                const sumXY = xs.reduce((a, x) => a + x * ys[xs.indexOf(x)], 0);
+                const sumXX = xs.reduce((a, x) => a + x * x, 0);
+                const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+                const intercept = (sumY - slope * sumX) / n;
+
+                // Find where targetDate falls relative to known dates
+                const knownTimestamps = dates.map(d => new Date(d).getTime());
+                const targetTs = new Date(targetDate).getTime();
+                const firstTs = knownTimestamps[0];
+                const lastTs = knownTimestamps[knownTimestamps.length - 1];
+                const totalSpan = lastTs - firstTs || 1;
+                const x = (targetTs - firstTs) / totalSpan * (n - 1);
+                return slope * x + intercept;
+            }
+
+            // Fill all relevant dates: interpolate between known points, extrapolate outside
+            function fillSeries(knownDates, knownValues, targetDates) {
+                return targetDates.map(dateStr => {
+                    const knownIdx = knownDates.indexOf(dateStr);
+                    if (knownIdx !== -1) return knownValues[knownIdx];
+
+                    const targetTs = new Date(dateStr).getTime();
+                    const knownTs = knownDates.map(d => new Date(d).getTime());
+                    const firstKnownTs = knownTs[0];
+                    const lastKnownTs = knownTs[knownTs.length - 1];
+
+                    if (targetTs < firstKnownTs || targetTs > lastKnownTs) {
+                        // Extrapolate using trendline
+                        return trendlineValue(knownDates, knownValues, dateStr);
+                    }
+
+                    // Interpolate between surrounding known points
+                    let prevIdx = -1, nextIdx = -1;
+                    for (let i = 0; i < knownTs.length; i++) {
+                        if (knownTs[i] <= targetTs) prevIdx = i;
+                        if (knownTs[i] >= targetTs && nextIdx === -1) nextIdx = i;
+                    }
+
+                    if (prevIdx === -1) return knownValues[0];
+                    if (nextIdx === -1) return knownValues[knownValues.length - 1];
+                    if (prevIdx === nextIdx) return knownValues[prevIdx];
+
+                    const t = (targetTs - knownTs[prevIdx]) / (knownTs[nextIdx] - knownTs[prevIdx]);
+                    return knownValues[prevIdx] + t * (knownValues[nextIdx] - knownValues[prevIdx]);
+                });
+            }
+
+            const filledMistake = fillSeries(averages.dates, averages.mistakeFrequency, allRelevantDates);
+            const filledAnswerRate = fillSeries(averages.dates, averages.answerRate, allRelevantDates);
+
+            // 3-point moving average smooth
+            const smoothed = arr => arr.map((_, i) => {
+                const s = Math.max(0, i - 1), e = Math.min(arr.length, s + 3);
+                const w = arr.slice(s, e);
+                return w.reduce((a, b) => a + b, 0) / w.length;
+            });
+
+            graphData.averageDates = allRelevantDates;
+            graphData.averageMistakeFrequency = smoothed(filledMistake).map(v => Math.round(v));
+            graphData.averageAnswerRate = smoothed(filledAnswerRate).map(v => Number(v.toFixed(1)));
+        }
     }
+
+    return graphData;
 }
 
 function messageToTheUser(message, errorMessage=true, extendedMessage=false) {

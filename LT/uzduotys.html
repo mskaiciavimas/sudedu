@@ -13,6 +13,7 @@
 	<link rel="stylesheet" type="text/css" href="../summary.css">
     <link rel="stylesheet" type="text/css" href="../index.css">
     <link rel="stylesheet" href="../main-nav-bar.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-96Q83PW8XY"></script>
@@ -584,7 +585,6 @@
         }
 
         th:first-child, th:nth-child(2) {
-            padding-top: 12.5px;
             text-align: center;
         }
 
@@ -1461,7 +1461,7 @@ button:disabled.cancel-btn::before {
 }
 
 #browse-task-history-button::before {
-    content: "Rezultatų istorija";
+    content: "Rezultatų archyvas";
 }
 
 #frequent-mistakes-btn::before {
@@ -1494,10 +1494,6 @@ button:disabled.cancel-btn::before {
 #frequent-mistakes-btn:hover::before {
   opacity: 1;
   transform: translateX(-60%) translateY(-4px); /* optional slight slide */
-}
-
-#browse-task-history-button {
-    display: none !important;
 }
 
 /*OVERRIDE HOVER ON MOBILE AS IT STAYS THERE UNTILL NEXT CLICK*/
@@ -1809,6 +1805,7 @@ button:disabled.cancel-btn::before {
     display: flex;
     gap: 10px;
     margin-bottom: 5px;
+    max-width: 100%;
 }
 
 .item-display-none-lock {
@@ -1974,6 +1971,7 @@ button:disabled.cancel-btn::before {
 
 .task-history-date-input {
     padding: 10px 16px;
+    padding-right: 36px;
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -1983,6 +1981,69 @@ button:disabled.cancel-btn::before {
     color: #333;
     transition: all 0.2s;
     font-family: inherit; /* ADD THIS */
+    cursor: pointer;
+    caret-color: transparent;
+}
+
+.lt-date-input-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+}
+
+.lt-date-input-wrapper .task-history-date-input {
+    width: 100%;
+}
+
+.lt-date-calendar-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    opacity: 0.45;
+    display: flex;
+    align-items: center;
+}
+
+/* Customize month/year header font size via this class */
+.lt-date-month-year {
+    font-size: 1.15rem;
+}
+
+.lt-date-btn-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 8px 4px;
+}
+
+.lt-date-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.lt-date-btn-today {
+    background: rgba(50, 136, 172, 0.15);
+    color: #286D8A;
+}
+
+.lt-date-btn-today:hover {
+    background: rgba(50, 136, 172, 0.28);
+}
+
+.lt-date-btn-clear {
+    background: rgba(0, 0, 0, 0.07);
+    color: #555;
+}
+
+.lt-date-btn-clear:hover {
+    background: rgba(0, 0, 0, 0.13);
 }
 
 .task-history-date-input::-webkit-calendar-picker-indicator {
@@ -2127,6 +2188,20 @@ button:disabled.cancel-btn::before {
 .latest-mistakes-summary-holder {
     max-height: 50vh;
     overflow-y: auto;
+}
+
+.task-label-expandable {
+    cursor: pointer;
+}
+
+.task-label-expand-icon {
+    opacity: 0.5;
+    font-size: 1rem;
+}
+
+.task-label-grammar {
+    opacity: 0.75;
+    font-style: italic;
 }
 
 
@@ -2379,7 +2454,6 @@ button:disabled.cancel-btn::before {
     }
     
     .task-history-chart-wrapper {
-        height: 300px;
         padding: 15px;
         border-radius: 15px;
         background: rgba(255, 255, 255, 0.8);
@@ -2478,8 +2552,16 @@ button:disabled.cancel-btn::before {
         }
 
         .task-history-chart-wrapper {
-            height: 250px;
             padding: 10px;
+        }
+
+        th:first-child, 
+        th:nth-child(2) {
+            width: 37%;
+        }
+
+        th:nth-child(3) {
+            width: 26%;
         }
 
     }
@@ -2952,6 +3034,109 @@ button:disabled.cancel-btn::before {
     margin-right: 6px;
 }
 
+#history-view-tabs {
+    display: none;
+    width: 100%;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 0 4px;
+}
+
+.history-tab-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+
+.history-tab-btn.active-tab {
+    background: rgba(255,255,255,0.45);
+}
+
+#task-archive-table-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 500px;
+    border-radius: 20px;
+}
+
+#task-archive-table-container table {
+    table-layout: auto;
+}
+
+#task-archive-table-container th,
+#task-archive-table-container td {
+    white-space: nowrap;
+    text-align: center;
+    padding: 6px 6px;
+}
+
+#task-archive-table-container td:nth-child(2) {
+    white-space: normal;
+    text-align: left;
+    max-width: 180px;
+    overflow-wrap: break-word;
+}
+
+.task-archive-empty {
+    text-align: center;
+    padding: 20px;
+    opacity: 0.6;
+    font-style: italic;
+}
+
+#task-archive-date-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+#task-archive-view {
+    flex-direction: column;
+    width: 100%;
+}
+
+#task-archive-view {
+    flex-direction: column;
+    width: 100%;
+    min-height: 0;
+}
+
+#task-archive-table-container {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+#task-archive-table-container thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: rgba(255, 200, 150, 0.85);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+#task-archive-table-container table {
+    table-layout: auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: visible;
+    height: auto;
+}
+
+#task-archive-table-container tbody td::before {
+    display: none;
+}
+
 @keyframes dropdownSlide {
     from {
         opacity: 0;
@@ -3011,6 +3196,21 @@ button:disabled.cancel-btn::before {
 
     .txt-browser-main-title {
         font-size: 1.25rem;
+    }
+
+    #task-archive-table-container thead th {
+        background: rgba(255, 200, 150, 1);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
+    .history-tab-btn.active-tab {
+        background: rgba(255, 200, 150, 1);
+        border: 1px solid rgba(255, 200, 150, 0.3);
+    }
+
+    thead tr:first-child th {
+        background-color: rgba(255, 200, 150, 0.85);
     }
 }
 
@@ -3483,6 +3683,11 @@ button:disabled.cancel-btn::before {
             <aside class="sidebar hide-scrollbar-mobile" id="sidebar">
                 <div class="sidebar-content" id="sidebarContent">
                     <div id="dynamic-teacher-content">
+                        <div id="history-view-tabs" style="display: none;">
+                            <button class="history-tab-btn" id="history-tab-istorija" onclick="switchHistoryTab('istorija')">Užduočių istorija</button>
+                            <button class="history-tab-btn active-tab" id="history-tab-progresas" onclick="switchHistoryTab('progresas')">Mokinių progresas</button>
+                        </div>
+
                         <!-- New Task Options Container -->
                         <div id="new-task-options-container" style="display: none;">
                             <div class="new-task-input-holder">
@@ -3862,11 +4067,17 @@ button:disabled.cancel-btn::before {
                                     <div class="task-history-date-selector">
                                         <div class="task-history-date-group">
                                             <label class="task-history-date-label">Nuo</label>
-                                            <input type="date" class="task-history-date-input" id="taskHistoryStartDate">
+                                            <div class="lt-date-input-wrapper">
+                                                <input class="task-history-date-input" id="taskHistoryStartDate">
+                                                <span class="lt-date-calendar-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
+                                            </div>
                                         </div>
                                         <div class="task-history-date-group">
                                             <label class="task-history-date-label">Iki</label>
-                                            <input type="date" class="task-history-date-input" id="taskHistoryEndDate">
+                                            <div class="lt-date-input-wrapper">
+                                                <input class="task-history-date-input" id="taskHistoryEndDate">
+                                                <span class="lt-date-calendar-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -3876,6 +4087,32 @@ button:disabled.cancel-btn::before {
                                 <div class="task-history-chart-wrapper">
                                     <canvas id="taskHistoryChart"></canvas>
                                 </div>
+                                <div id="task-history-description-box" style="display:none; margin: 10px 4px 4px 4px; padding: 10px 14px; background: rgba(255,255,255,0.18); border-radius: 12px; border: 1px solid rgba(255,255,255,0.25); font-size: 0.88rem; color: #222;">
+                                    <div style="font-weight:600; margin-bottom:4px; opacity:0.7; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em;">Užduoties aprašymas</div>
+                                    <div id="task-history-description-content"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="task-archive-view" style="display: none;">
+                            <div id="task-archive-date-controls">
+                                <div class="task-history-date-group">
+                                    <label class="task-history-date-label">Nuo</label>
+                                    <div class="lt-date-input-wrapper">
+                                        <input class="task-history-date-input" id="archiveStartDate">
+                                        <span class="lt-date-calendar-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
+                                    </div>
+                                </div>
+                                <div class="task-history-date-group">
+                                    <label class="task-history-date-label">Iki</label>
+                                    <div class="lt-date-input-wrapper">
+                                        <input class="task-history-date-input" id="archiveEndDate">
+                                        <span class="lt-date-calendar-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="task-archive-table-container">
+                                <div class="task-archive-empty">Pasirinkite mokinį iš sąrašo.</div>
                             </div>
                         </div>
 
@@ -4234,6 +4471,11 @@ button:disabled.cancel-btn::before {
     <script src="../main-nav-bar.js"></script>
     <script src="matematika_options.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- Lithuanian locale -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/lt.js"></script>
 
 	<script>
         const redCircleColorCode = '#D57E7E';
@@ -4568,79 +4810,6 @@ button:disabled.cancel-btn::before {
             return (ratios.reduce((a, b) => a + b, 0) / ratios.length).toFixed(2);
         }
 
-        const statTypesKeys = {
-            "c": "nuoseklumas",
-            "m": "matematika",
-            "t": "teksto suvokimas",
-            "g": "rašyba",
-        }
-
-        const statKeys = {
-            0: "taškai",
-            1: "teisingi atsakymai",
-            2: "klaidos",
-            3: "atsakyti klausimai"
-        }
-
-        const statsToBeExpressedAsPercetnge = [1, 2];
-
-function transformStudentStats(stats) {
-  const result = {};
-
-    if (stats.d) {
-        studentStatisticsLastRecord = stats.d
-    }
-
-  // Handle "c" as a list of percentages
-  if (stats.c) {
-    result.c = {
-      title: statTypesKeys.c,
-      values: stats.c.map(val => +(val * 100).toFixed(2))
-    };
-  }
-
-  // Handle other keys
-  for (const [key, sublists] of Object.entries(stats)) {
-    if (key === "c" || key === "d") continue;
-
-    const subjectTitle = statTypesKeys[key] || key;
-    const valuesObj = {};
-
-    // Initialize entries for each metric
-    Object.entries(statKeys).forEach(([i, metricTitle]) => {
-      valuesObj[i] = { title: metricTitle, values: [] };
-    });
-
-    // Fill in values from sublists
-    sublists.forEach((sub) => {
-      const total = sub[3] ?? 0;
-
-      sub.forEach((val, i) => {
-        let value;
-
-        if (i === 0 || i === 3) {
-          // Absolute number, no division
-          value = val;
-        } else {
-          // Calculate ratio (safe for 0 total)
-          const ratio = total === 0 ? 0 : val / total;
-
-          // Convert to percentage if needed
-          value = statsToBeExpressedAsPercetnge.includes(Number(i))
-            ? +(ratio * 100).toFixed(2)
-            : +ratio.toFixed(2);
-        }
-
-        valuesObj[i].values.push(value);
-      });
-    });
-
-    result[key] = { title: subjectTitle, values: valuesObj };
-  }
-
-  return result;
-}
-
 let studentStatisticsLastRecord;
 
 function processStudentTasks(studentTasks) {
@@ -4735,12 +4904,585 @@ function countTaskStatuses(studentTasks, category = null) {
 
  // STATS PART START
 
+const statTypesKeys = {
+    "c": "nuoseklumas",
+    "m": "matematika",
+    "t": "teksto suvokimas",
+    "g": "rašyba",
+}
+
+const statKeys = {
+    0: "rezultatyvumas",
+    1: "taškai",
+    2: "teisingi atsakymai",
+    3: "klaidų dažnis",
+    4: "atsakyti klausimai",
+    5: "santykinis sudėtingumas"
+}
+
+const statsToBeExpressedAsPercetnge = [2, 3];
+
+/**
+ * --- CORE SCORING ENGINE ---
+ * Error rate: 0 mistakes = full points, 75th percentile = 0 points
+ */
+function calculatePerformanceIndex(student, allClassRecords, overrides = {}) {
+    if (!student || !student.totalAnswers) return 0;
+
+    const ENABLE_DIFFICULTY_SCALING = true; 
+    const PENALTY_FOR_VOLUME_BELOW_THRESHOLD = 0.25;
+
+    const MAX_VOL_PTS = 20;
+    const MAX_FIRST_TRY_PTS = 40;
+    const MAX_NO_MISTAKE_PTS = 40;
+
+    let volLower = overrides.vol25;
+    let volUpper = overrides.vol75;
+    let medPPA = overrides.medianPPA;
+    let errorRate75 = overrides.errorRate75;
+
+    if (volLower === undefined || volUpper === undefined) {
+        volLower = student.totalAnswers * 0.7;
+        volUpper = student.totalAnswers * 1.3;
+    }
+    if (volUpper <= volLower) volUpper = volLower + 1;
+    
+    // Effort Score
+    let rawVolScore = 0;
+    if (student.totalAnswers >= volUpper) {
+        rawVolScore = MAX_VOL_PTS;
+    } else if (student.totalAnswers <= volLower) {
+        rawVolScore = (student.totalAnswers / volLower) * (MAX_VOL_PTS * 0.25);
+    } else {
+        const progress = (student.totalAnswers - volLower) / (volUpper - volLower);
+        rawVolScore = (MAX_VOL_PTS * 0.6) + (MAX_VOL_PTS * 0.4 * progress);
+    }
+
+    // Check if student meets minimum volume threshold
+    const meetsVolumeThreshold = student.totalAnswers >= volLower;
+    
+    // Set caps based on threshold
+    const effectiveMaxFirstTry = meetsVolumeThreshold ? MAX_FIRST_TRY_PTS : MAX_FIRST_TRY_PTS * PENALTY_FOR_VOLUME_BELOW_THRESHOLD;
+    const effectiveMaxMistake = meetsVolumeThreshold ? MAX_NO_MISTAKE_PTS : MAX_NO_MISTAKE_PTS * PENALTY_FOR_VOLUME_BELOW_THRESHOLD;
+
+    // Mastery Scores - First Try
+    const rawFirstTryScore = effectiveMaxFirstTry * (student.correctFirstAttempt / student.totalAnswers);
+
+    // Mastery Scores - Mistakes (NORMALIZED)
+    let rawMistakeScore;
+    const studentErrorRate = student.mistakes / student.totalAnswers;
+    
+    if (errorRate75 !== undefined && errorRate75 > 0) {
+        
+        let normalizedScore;
+        
+        if (studentErrorRate <= 0) {
+            normalizedScore = 1.0;
+        } else if (studentErrorRate >= errorRate75) {
+            normalizedScore = 0.0;
+        } else {
+            normalizedScore = 1.0 - (studentErrorRate / errorRate75);
+        }
+        
+        rawMistakeScore = effectiveMaxMistake * normalizedScore;
+    } else {
+        rawMistakeScore = effectiveMaxMistake * Math.max(0, 1 - studentErrorRate);
+    }
+
+    // Difficulty Scaling
+    let difficultyScale = 1.0;
+    if (ENABLE_DIFFICULTY_SCALING) {
+        const studentPPA = student.pointsPerAnswer || 0;
+        
+        if (medPPA > 0 && studentPPA > 0) {
+            difficultyScale = Math.min(1.5, studentPPA / medPPA);
+        }
+    }
+
+    const finalFirst = Math.min(effectiveMaxFirstTry, rawFirstTryScore * difficultyScale);
+    const finalMistake = Math.min(effectiveMaxMistake, rawMistakeScore * difficultyScale);
+
+    const totalScore = Math.round(rawVolScore + finalFirst + finalMistake);
+
+    return totalScore;
+}
+/**
+ * --- DATA TRANSFORMATION ---
+ * Calculates weekly error rate 75th percentile with intelligent fallbacks
+ */
+function transformStudentStats(studentStats, classStats) {
+    const DEFAULT_ERROR_THRESHOLDS = {
+        m: 0.35,  // Math: 35%
+        t: 0.40,  // Text/Reading: 40%
+        g: 0.30   // Grammar: 30%
+    };
+
+    const result = {};
+
+    if (studentStats.d) studentStatisticsLastRecord = studentStats.d;
+
+    // Handle Consistency (c) separately
+    if (studentStats.c) {
+        result.c = {
+            title: statTypesKeys.c,
+            values: studentStats.c.map(v => +(v * 100).toFixed(2))
+        };
+    }
+
+    // Helper function for percentile calculation
+    const getPercentile = (arr, p) => {
+        const idx = (arr.length - 1) * p;
+        const lower = Math.floor(idx);
+        const upper = Math.ceil(idx);
+        const weight = idx - lower;
+        return arr[lower] * (1 - weight) + arr[upper] * weight;
+    };
+
+    const hasSpread = (values) => {
+        if (values.length < 5) return false;
+        
+        const sorted = [...values].sort((a, b) => a - b);
+        const q1 = getPercentile(sorted, 0.25);
+        const q3 = getPercentile(sorted, 0.75);
+        const iqr = q3 - q1;
+        
+        // Only require IQR > 0 (some variation exists)
+        return iqr > 0;
+    };
+
+    function getVolumeThreshold(classHistory, weekIndex, category) {
+        const MIN_STUDENTS_RATIO = 0.35; // At least 35% of class must be active
+        
+        // Default volume thresholds by category
+        const DEFAULT_VOLUME_THRESHOLDS = {
+            m: [100, 250],  // Math: 0-25 questions
+            t: [1, 10],  // Text/Reading: 0-30 questions
+            g: [20, 40]   // Grammar: 0-20 questions
+        };
+        
+        // Check how many students were active this week
+        const allStudentsThisWeek = classHistory
+            .map(studentHistory => studentHistory[weekIndex])
+            .filter(record => record !== undefined && record[3] > 0);
+        
+        const totalClassSize = classHistory.length;
+        const activeThisWeek = allStudentsThisWeek.length;
+        
+        // LEVEL 1: If at least half the class was active this week, use weekly thresholds
+        if (activeThisWeek >= totalClassSize * MIN_STUDENTS_RATIO && activeThisWeek >= 5) {
+            const weekVolumes = allStudentsThisWeek.map(r => r[3] || 0);
+            
+            if (weekVolumes.length > 0) {
+                const sortedVols = [...weekVolumes].sort((a, b) => a - b);
+                
+                // Trim extreme outliers (5% on each end)
+                const start = Math.floor(sortedVols.length * 0.05);
+                const end = Math.ceil(sortedVols.length * 0.95);
+                const clippedVols = sortedVols.slice(start, end);
+                
+                if (clippedVols.length > 0) {
+                    const lower = getPercentile(clippedVols, 0.3);
+                    const upper = getPercentile(clippedVols, 0.7);
+                    
+                    return [lower, upper];
+                }
+            }
+        }
+        
+        // LEVEL 2: Not enough students active this week - use all-weeks upper threshold, set lower to 0
+        if (classHistory.length > 0) {
+            const allVolumes = [];
+            
+            classHistory.forEach((studentHistory) => {
+                studentHistory.forEach(weekRecord => {
+                    if (weekRecord && weekRecord[3] > 0) {
+                        allVolumes.push(weekRecord[3]);
+                    }
+                });
+            });
+            
+            if (allVolumes.length >= 5) {
+                const sortedVols = [...allVolumes].sort((a, b) => a - b);
+                
+                // Trim extreme outliers (5% on each end)
+                const start = Math.floor(sortedVols.length * 0.05);
+                const end = Math.ceil(sortedVols.length * 0.95);
+                const clippedVols = sortedVols.slice(start, end);
+                
+                if (clippedVols.length > 0) {
+                    const upper = getPercentile(clippedVols, 0.7);
+                    return [0, upper]; // Lower threshold is 0
+                }
+            }
+        }
+        
+        // LEVEL 3: Fallback - use category-specific defaults
+        return DEFAULT_VOLUME_THRESHOLDS[category] || [0, 30];
+    }
+       
+    function getErrorRateThreshold (classHistory, weekIndex, category) {
+        const MIN_STUDENTS = 10;
+        const MIN_TOTAL_DATA_POINTS = 15;
+        
+        // LEVEL 1: Try weekly data from class
+        if (classHistory.length >= MIN_STUDENTS) {
+            const allStudentsThisWeek = classHistory
+                .map(studentHistory => studentHistory[weekIndex])
+                .filter(record => record !== undefined && record[3] > 0);
+            
+            if (allStudentsThisWeek.length >= MIN_STUDENTS) {
+                const totalTasksThisWeek = allStudentsThisWeek.reduce((sum, r) => sum + (r[3] || 0), 0);
+                
+                if (totalTasksThisWeek >= MIN_TOTAL_DATA_POINTS) {
+                    const errorRates = allStudentsThisWeek.map(r => {
+                        const studentTotal = r[3] || 0;
+                        const studentMistakes = r[2] || 0;
+                        return studentTotal > 0 ? studentMistakes / studentTotal : 0;
+                    });
+                    
+                    const mean = errorRates.reduce((sum, v) => sum + v, 0) / errorRates.length;
+                    
+                    // Special case: Very low mean error rate (class doing great!)
+                    if (mean < 0.01) {
+                        const sortedErrors = [...errorRates].sort((a, b) => a - b);
+                        const threshold = Math.max(
+                            getPercentile(sortedErrors, 0.75),
+                            0.02
+                        );
+                        return threshold;
+                    }
+                    
+                    // Check if weekly data has any variation
+                    if (hasSpread(errorRates)) {
+                        // Calculate IQR for this week
+                        const sortedWeekly = [...errorRates].sort((a, b) => a - b);
+                        const weeklyQ1 = getPercentile(sortedWeekly, 0.25);
+                        const weeklyQ3 = getPercentile(sortedWeekly, 0.75);
+                        const weeklyIQR = weeklyQ3 - weeklyQ1;
+                        
+                        // Calculate IQR for EACH week in history
+                        const weeklyIQRs = [];
+                        const numWeeks = Math.max(...classHistory.map(sh => sh.length));
+                        
+                        for (let w = 0; w < numWeeks; w++) {
+                            const studentsThisWeek = classHistory
+                                .map(sh => sh[w])
+                                .filter(record => record && record[3] > 0);
+                            
+                            if (studentsThisWeek.length >= MIN_STUDENTS) {
+                                const weekErrorRates = studentsThisWeek.map(r => {
+                                    const total = r[3] || 0;
+                                    const mistakes = r[2] || 0;
+                                    return total > 0 ? mistakes / total : 0;
+                                });
+                                
+                                const sorted = [...weekErrorRates].sort((a, b) => a - b);
+                                const q1 = getPercentile(sorted, 0.25);
+                                const q3 = getPercentile(sorted, 0.75);
+                                const iqr = q3 - q1;
+                                
+                                if (iqr > 0) {
+                                    weeklyIQRs.push(iqr);
+                                }
+                            }
+                        }
+                        
+                        // Need at least 3 historical weeks to compare
+                        if (weeklyIQRs.length >= 3) {
+                            const sortedIQRs = [...weeklyIQRs].sort((a, b) => a - b);
+                            const iqrThreshold = getPercentile(sortedIQRs, 0.20); // Bottom 20%
+                            
+                            // If this week's IQR is above the 20th percentile of historical IQRs, use it
+                            if (weeklyIQR >= iqrThreshold) {
+                                const weeklyThreshold = getPercentile(sortedWeekly, 0.75);
+                                return weeklyThreshold;
+                            }
+                            // Otherwise this week has unusually low variation - fall back to all-weeks
+                        }
+                    }
+                }
+            }
+        }
+        
+        // LEVEL 2: Try all weeks combined from class
+        if (classHistory.length > 0) {
+            const allErrorRates = [];
+            const studentsWithData = new Set();
+            
+            classHistory.forEach((studentHistory, studentIndex) => {
+                let studentHasData = false;
+                studentHistory.forEach(weekRecord => {
+                    if (weekRecord && weekRecord[3] > 0) {
+                        const total = weekRecord[3];
+                        const mistakes = weekRecord[2] || 0;
+                        allErrorRates.push(mistakes / total);
+                        studentHasData = true;
+                    }
+                });
+                if (studentHasData) {
+                    studentsWithData.add(studentIndex);
+                }
+            });
+            
+            const totalTasks = classHistory.reduce((sum, studentHistory) => {
+                return sum + studentHistory.reduce((s, record) => s + (record?.[3] || 0), 0);
+            }, 0);
+            
+            if (studentsWithData.size >= MIN_STUDENTS && 
+                totalTasks >= MIN_TOTAL_DATA_POINTS && 
+                allErrorRates.length >= MIN_STUDENTS) {
+                
+                const mean = allErrorRates.reduce((sum, v) => sum + v, 0) / allErrorRates.length;
+                
+                // Special case for very low error rates
+                if (mean < 0.01) {
+                    const sortedErrors = [...allErrorRates].sort((a, b) => a - b);
+                    return Math.max(getPercentile(sortedErrors, 0.75), 0.02);
+                }
+                
+                if (hasSpread(allErrorRates)) {
+                    const sortedErrors = [...allErrorRates].sort((a, b) => a - b);
+                    return getPercentile(sortedErrors, 0.75);
+                }
+            }
+        }
+        
+        // LEVEL 3: Fall back to global threshold
+        return globalErrorThresholds?.[category] ?? DEFAULT_ERROR_THRESHOLDS[category] ?? 0.35;
+    };
+        
+
+    // Process Subject Stats (m, t, g)
+    for (const [key, studentWeeks] of Object.entries(studentStats)) {
+        if (key === "c" || key === "d") continue;
+
+        const subjectTitle = statTypesKeys[key] || key;
+        const valuesObj = {};
+
+        // Initialize metric arrays
+        Object.keys(statKeys).forEach((i) => {
+            valuesObj[i] = { title: statKeys[i], values: [] };
+        });
+
+        // Add threshold tracking arrays
+        valuesObj['volumeThresholdLower'] = { title: 'Volume Lower Threshold', values: [] };
+        valuesObj['errorThresholdUpper'] = { title: 'Error Upper Threshold', values: [] };
+
+        const classHistory = classStats && classStats[key] ? classStats[key] : [];
+
+        // PROCESS WEEKLY DATA
+        studentWeeks.forEach((weekData, index) => {
+            const total = weekData[3] ?? 0;
+            const studentObj = {
+                points: weekData[0],
+                correctFirstAttempt: weekData[1],
+                mistakes: weekData[2],
+                totalAnswers: total,
+                pointsPerAnswer: weekData[4] || 0
+            };
+
+            // --- Calculate WEEKLY volume thresholds (keep as is - use class data always) ---
+            let weeklyVolLower = 0;
+            let weeklyVolUpper = 0;
+            
+            if (classHistory.length > 0) {
+                const allStudentsThisWeek = classHistory
+                    .map(studentHistory => studentHistory[index])
+                    .filter(record => record !== undefined);
+                
+                const weekVolumes = allStudentsThisWeek.map(r => r[3] || 0).filter(v => v > 0);
+                
+                if (weekVolumes.length > 0) {
+                    const sortedVols = [...weekVolumes].sort((a, b) => a - b);
+                    
+                    // Trim extreme outliers (5% on each end)
+                    const start = Math.floor(sortedVols.length * 0.05);
+                    const end = Math.ceil(sortedVols.length * 0.95);
+                    const clippedVols = sortedVols.slice(start, end);
+
+
+                    
+                    if (clippedVols.length > 0) {
+                        const thresholds = getVolumeThreshold(classHistory, index, key)
+                        weeklyVolLower = thresholds[0];
+                        weeklyVolUpper = thresholds[1];
+                    }
+                }
+            }
+
+            // --- Calculate error rate 75th percentile with intelligent fallbacks ---
+            const weeklyErrorRate75 = getErrorRateThreshold(classHistory, index, key);
+
+            // --- Calculate Relative Difficulty ---
+            let weeklyMedPPA = 0;
+            let hasDifficultyData = false;
+            let classDidTasks = false;
+
+            if (classHistory.length > 0) {
+                const classSize = classHistory.length;
+                const MIN_PPA_STUDENTS = Math.floor(classSize / 2);
+
+                let combinedPPAs = [];
+                let uniqueContributors = new Set();
+
+                // Track if anyone did tasks this week
+                const thisWeekRecords = classHistory
+                    .map(studentHistory => studentHistory[index])
+                    .filter(r => r !== undefined);
+
+                classDidTasks = thisWeekRecords.some(r => r[3] > 0);
+
+                let weekPointer = index;
+
+                while (weekPointer >= 0 && uniqueContributors.size < MIN_PPA_STUDENTS) {
+
+                    classHistory.forEach((studentHistory, studentIndex) => {
+                        const record = studentHistory[weekPointer];
+
+                        if (record && record[3] > 0 && record[4] !== undefined) {
+                            combinedPPAs.push(record[4]);
+                            uniqueContributors.add(studentIndex);
+                        }
+                    });
+
+                    weekPointer--;
+                }
+
+                hasDifficultyData = combinedPPAs.length > 0;
+
+                if (hasDifficultyData) {
+                    weeklyMedPPA = getMedian(combinedPPAs);
+                }
+            }
+
+            const studentPPA = weekData[4] || 0;
+            const studentHasPPAData = weekData[4] !== undefined; // ADD THIS
+            const studentDidTasks = total > 0;
+            let relDifficulty;
+
+            // Case 1: No difficulty data available
+            if (!hasDifficultyData) {
+                relDifficulty = 1.0;
+            }
+            // Case 2: Student did no tasks
+            else if (!studentDidTasks) {
+                relDifficulty = 1.0;
+            }
+            // NEW Case: Student has tasks but PPA wasn't tracked for them yet
+            else if (!studentHasPPAData) {
+                relDifficulty = 1.0;  // Neutral — data not collected yet
+            }
+            // Case 3: Student did tasks but PPA is 0
+            else if (studentPPA === 0 && studentDidTasks) {
+                relDifficulty = 0;
+            }
+            // Case 4: Class median is 0
+            else if (weeklyMedPPA === 0) {
+                // If class didn't do tasks at all, neutral difficulty
+                if (!classDidTasks) {
+                    relDifficulty = 1.0;
+                }
+                // Class did tasks but median PPA is 0
+                else {
+                    // Student has PPA > 0, so they're doing better than the class
+                    relDifficulty = 1.5; // Max difficulty scaling
+                    // Note: if studentPPA is also 0, it's already handled by Case 3
+                }
+            }
+            // Case 5: Normal case - calculate ratio
+            else {
+                relDifficulty = +(studentPPA / weeklyMedPPA).toFixed(2);
+            }
+
+            valuesObj[5].values.push(relDifficulty !== null ? relDifficulty : undefined);
+
+            // --- Calculate Performance Index with error threshold ---
+            const perfIndex = total > 0 
+                ? calculatePerformanceIndex(studentObj, [], { 
+                    vol25: weeklyVolLower, 
+                    vol75: weeklyVolUpper,
+                    medianPPA: hasDifficultyData ? weeklyMedPPA : 0,
+                    errorRate75: weeklyErrorRate75
+                }, key) 
+                : 0;
+            
+            valuesObj[0].values.push(perfIndex);
+
+            // Store thresholds for chart display
+            valuesObj['volumeThresholdLower'].values.push(weeklyVolLower);
+            valuesObj['errorThresholdUpper'].values.push(weeklyErrorRate75 * 100); // Convert to percentage
+
+            // --- Populate Standard Metrics (Indices 1-4) ---
+            weekData.forEach((val, i) => {
+                if (i > 3) return; 
+
+                let value;
+                if (i === 0 || i === 3) {
+                    value = val;
+                } else {
+                    const ratio = total === 0 ? 0 : val / total;
+                    value = statsToBeExpressedAsPercetnge.includes(i + 1) ? +(ratio * 100).toFixed(2) : +ratio.toFixed(2);
+                }
+                
+                valuesObj[i + 1].values.push(value);
+            });
+        });
+
+        result[key] = { title: subjectTitle, values: valuesObj };
+    }
+
+    return result;
+}
+
+
+// --- SHARED UTILITIES ---
+
+function getMedian(values) {
+    if (values.length === 0) return 0;
+    const sorted = [...values].sort((a, b) => a - b);
+    const half = Math.floor(sorted.length / 2);
+    if (sorted.length % 2) return sorted[half];
+    return (sorted[half - 1] + sorted[half]) / 2.0;
+}
+
+function getDistribution(arr) {
+    if (arr.length === 0) return { median: 0, mad: 0 };
+    const medianVal = getMedian(arr);
+    const deviations = arr.map(x => Math.abs(x - medianVal));
+    const madVal = getMedian(deviations);
+    return { median: medianVal, mad: madVal === 0 ? 0.001 : madVal };
+}
+
+function calculateClassStatistics(records, taskType) {
+    const valid = records.filter(r => r.totalAnswers >= 2);
+    if (valid.length < 5) return getTaskReference(taskType);
+
+    return {
+        count: valid.length,
+        firstTryRate: getDistribution(valid.map(r => r.correctFirstAttempt / r.totalAnswers)),
+        errorRate: getDistribution(valid.map(r => r.mistakes / r.totalAnswers)),
+        avgPointsPerAnswer: getDistribution(valid.map(r => r.points / r.totalAnswers)),
+    };
+}
+
+function getClassBenchmarks(records) {
+    const valid = records.filter(r => r.totalAnswers > 0);
+    if (valid.length === 0) return { medianVolume: 0, medianPPA: 0 };
+    return {
+        medianVolume: getMedian(valid.map(r => r.totalAnswers)),
+        medianPPA: getMedian(valid.map(r => r.points / r.totalAnswers))
+    };
+}
+
+
 var lithuanianMonths = ['Saus.', 'Vas.', 'Kov.', 'Bal.', 'Geg.', 'Birž.', 'Liep.', 'Rugp.', 'Rugs.', 'Spal.', 'Lap.', 'Gruod.'];
 
-var metricColors = ['#286D8A', '#32ac93', '#e74c3c', '#F28C28', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
+var metricColors = ['#32ac93', '#e74c3c', '#F28C28', '#8b5cf6', '#286D8A', '#ec4899', '#06b6d4', '#84cc16'];
 
 var selectedSubject = null;
 var selectedMetrics = [];
+var lastSelectedSubject = null;
+var lastSelectedMetrics = [];
 var availableMetrics = [];
 var previousDatasets = [];
 
@@ -4781,12 +5523,16 @@ function formatLithuanianDate(date) {
 
 function isPercentageMetric(metricTitle) {
     var lower = metricTitle.toLowerCase();
-    return lower.indexOf('atsakym') !== -1 || lower.indexOf('klaid') !== -1 || lower.indexOf('nuosekl') !== -1;
+    return lower.indexOf('atsakym') !== -1 || lower.indexOf('klaid') !== -1 || lower.indexOf('nuosekl') !== -1 || lower.indexOf('rezultatyvum') !== -1;
 }
 
 function extractMetricsFromData() {
     var metrics = [];
     var keys = Object.keys(processedStudentStats);
+    
+    // Define metrics to exclude
+    var excludedMetrics = ["taškai", "teisingi atsakymai"];
+    var excludedKeys = ["volumeThresholdLower", "errorThresholdUpper"]; // Exclude threshold data keys
     
     for (var i = 0; i < keys.length; i++) {
         var key = keys[i];
@@ -4797,8 +5543,22 @@ function extractMetricsFromData() {
             var metricKeys = Object.keys(subjectValues);
             for (var j = 0; j < metricKeys.length; j++) {
                 var metricKey = metricKeys[j];
+                
+                // Skip threshold keys
+                if (excludedKeys.indexOf(metricKey) !== -1) {
+                    continue;
+                }
+                
                 var metricData = subjectValues[metricKey];
+                
+                // Check if this metric should be excluded
+                if (excludedMetrics.includes(metricData.title)) {
+                    continue;
+                }
+                
                 var isPercent = isPercentageMetric(metricData.title);
+                var isRezultatyvumas = metricData.title.toLowerCase().indexOf('rezultatyvum') !== -1;
+                var isSudetingumas = metricData.title.toLowerCase().indexOf('sudėtingum') !== -1;
                 
                 var existing = false;
                 for (var k = 0; k < metrics.length; k++) {
@@ -4809,12 +5569,29 @@ function extractMetricsFromData() {
                 }
                 
                 if (!existing) {
+                    var metricType;
+                    var yAxisID;
+                    
+                    if (isSudetingumas) {
+                        metricType = 'sudetingumas';
+                        yAxisID = 'y-sudetingumas';
+                    } else if (isRezultatyvumas) {
+                        metricType = 'rezultatyvumas';
+                        yAxisID = 'y-rezultatyvumas';
+                    } else if (isPercent) {
+                        metricType = 'percentage';
+                        yAxisID = 'y-percent';
+                    } else {
+                        metricType = 'absolute';
+                        yAxisID = 'y-absolute-' + metricKey;
+                    }
+                    
                     metrics.push({
                         id: metricKey,
                         title: metricData.title,
-                        type: isPercent ? 'percentage' : 'absolute',
+                        type: metricType,
                         color: metricColors[metrics.length % metricColors.length],
-                        yAxisID: isPercent ? 'y-percent' : 'y-absolute-' + metricKey
+                        yAxisID: yAxisID
                     });
                 }
             }
@@ -4896,6 +5673,9 @@ function selectSubject(key) {
     
     updateMetricsDropdownDisplay();
     updateChart();
+
+    lastSelectedSubject = key;
+    lastSelectedMetrics = selectedMetrics.slice();
 }
 
 function updateMetricsDropdownDisplay() {
@@ -4948,6 +5728,7 @@ function toggleMetric(id) {
     }
     
     updateChart();
+    lastSelectedMetrics = selectedMetrics.slice();
 }
 
 function initializeButtons() {
@@ -5081,7 +5862,15 @@ function initializeButtons() {
         }
     });
     
-    if (firstKey) {
+    // Check if we should restore previous selection
+    if (lastSelectedSubject && processedStudentStats[lastSelectedSubject]) {
+        selectSubject(lastSelectedSubject);
+        if (lastSelectedMetrics.length > 0 && lastSelectedSubject !== 'c') {
+            selectedMetrics = lastSelectedMetrics.slice();
+            updateMetricsDropdownDisplay();
+            updateChart();
+        }
+    } else if (firstKey) {
         selectSubject(firstKey);
     }
 }
@@ -5139,8 +5928,8 @@ function updateChart() {
             tension: 0.3,
             borderWidth: 3,
             borderDash: [],
-            pointRadius: 4, // Smaller points for mobile
-            pointHoverRadius: 4,
+            pointRadius: 0,
+            pointHoverRadius: 0,
             pointBackgroundColor: '#10b981',
             pointBorderColor: 'transparent',
             pointBorderWidth: 0,
@@ -5153,6 +5942,17 @@ function updateChart() {
             }
         });
     } else {
+        // Define metrics that should ALWAYS have solid lines
+        var solidLineMetrics = ['rezultatyvumas', 'klaidų dažnis', 'atsakyti klausimai', 'santykinis sudėtingumas'];
+        
+        // Track which metrics are being displayed and their axes
+        var showVolumeThreshold = false;
+        var showErrorThreshold = false;
+        var volumeMetricColor = null;
+        var errorMetricColor = null;
+        var volumeAxisID = null;
+        var errorMetricIndex = -1; // Track the dataset index instead of axis
+        
         for (var i = 0; i < selectedMetrics.length; i++) {
             var metricId = selectedMetrics[i];
             var metric = null;
@@ -5176,7 +5976,37 @@ function updateChart() {
                     }
                 }
                 
-                var yAxisId = metric.type === 'percentage' ? metric.yAxisID : getAxisIdForAbsoluteMetric(metricId, selectedMetrics, subjectData);
+                var yAxisId;
+                if (metric.type === 'sudetingumas') {
+                    yAxisId = 'y-sudetingumas';
+                } else if (metric.type === 'rezultatyvumas') {
+                    yAxisId = metric.yAxisID;
+                } else if (metric.type === 'percentage') {
+                    yAxisId = metric.yAxisID;
+                } else {
+                    yAxisId = getAxisIdForAbsoluteMetric(metricId, selectedMetrics, subjectData);
+                }
+                
+                // Check if this is a volume or error metric and store its info
+                if (datasetLabel.toLowerCase().indexOf('atsakyti klausimai') !== -1) {
+                    showVolumeThreshold = true;
+                    volumeMetricColor = metric.color;
+                    volumeAxisID = yAxisId;
+                }
+                if (datasetLabel.toLowerCase().indexOf('klaidų dažnis') !== -1) {
+                    showErrorThreshold = true;
+                    errorMetricColor = metric.color;
+                    errorMetricIndex = datasets.length; // Store the index where this dataset will be
+                }
+                
+                // Check if this metric should have a solid line
+                var shouldBeSolid = false;
+                for (var s = 0; s < solidLineMetrics.length; s++) {
+                    if (datasetLabel.toLowerCase().indexOf(solidLineMetrics[s]) !== -1) {
+                        shouldBeSolid = true;
+                        break;
+                    }
+                }
                 
                 datasets.push({
                     label: datasetLabel,
@@ -5185,7 +6015,7 @@ function updateChart() {
                     backgroundColor: metric.color + '20',
                     tension: 0.3,
                     borderWidth: 3,
-                    borderDash: [],
+                    borderDash: shouldBeSolid ? [] : null,
                     pointRadius: 0,
                     pointHoverRadius: 0,
                     pointBackgroundColor: metric.color,
@@ -5194,6 +6024,7 @@ function updateChart() {
                     pointHoverBorderWidth: 0,
                     pointStyle: 'circle',
                     yAxisID: yAxisId,
+                    forceSolid: shouldBeSolid,
                     animation: wasShown ? false : {
                         duration: 750,
                         easing: 'easeInOutQuart'
@@ -5201,6 +6032,28 @@ function updateChart() {
                 });
             }
         }
+        
+        // Add volume lower threshold line (only if atsakyti klausimai is displayed)
+        if (showVolumeThreshold && subjectData.values['volumeThresholdLower'] && volumeAxisID) {
+            var lighterVolumeColor = volumeMetricColor ? hexToRgba(volumeMetricColor, 0.4) : 'rgba(128, 128, 128, 0.4)';
+            
+            datasets.push({
+                label: 'minimali atsakytų klausimų riba',
+                data: subjectData.values['volumeThresholdLower'].values,
+                borderColor: lighterVolumeColor,
+                backgroundColor: 'transparent',
+                tension: 0.3,
+                borderWidth: 2,
+                borderDash: [8, 4],
+                pointRadius: 0,
+                pointHoverRadius: 0,
+                yAxisID: volumeAxisID, // Use the same axis as the volume metric
+                forceSolid: false,
+                isThreshold: true,
+                animation: false
+            });
+        }
+
     }
 
     var dashPatterns = [
@@ -5218,7 +6071,15 @@ function updateChart() {
         var datasetsNeedDashes = new Array(datasets.length).fill(false);
         
         for (var i = 0; i < datasets.length; i++) {
+            if (datasets[i].forceSolid || datasets[i].isThreshold) {
+                continue;
+            }
+            
             for (var j = i + 1; j < datasets.length; j++) {
+                if (datasets[j].forceSolid || datasets[j].isThreshold) {
+                    continue;
+                }
+                
                 if (doDatasetsOverlap(datasets[i], datasets[j])) {
                     datasetsNeedDashes[i] = true;
                     datasetsNeedDashes[j] = true;
@@ -5230,7 +6091,12 @@ function updateChart() {
         var pointStyleIndex = 0;
         
         for (var i = 0; i < datasets.length; i++) {
-            if (datasetsNeedDashes[i]) {
+            if (datasets[i].forceSolid) {
+                datasets[i].borderDash = [];
+                datasets[i].pointStyle = 'circle';
+            } else if (datasets[i].isThreshold) {
+                continue;
+            } else if (datasetsNeedDashes[i]) {
                 datasets[i].borderDash = dashPatterns[dashIndex % dashPatterns.length];
                 datasets[i].pointStyle = pointStyles[pointStyleIndex % pointStyles.length];
                 dashIndex++;
@@ -5239,11 +6105,6 @@ function updateChart() {
                 datasets[i].borderDash = [];
                 datasets[i].pointStyle = 'circle';
             }
-        }
-        
-        if (datasetsNeedDashes[0] && datasets.length > 1) {
-            datasets[0].borderDash = dashPatterns[0];
-            datasets[0].pointStyle = pointStyles[0];
         }
     }
 
@@ -5278,18 +6139,30 @@ function updateChart() {
     if (subjectData.isConsistency) {
         percentageMetrics.push({ title: processedStudentStats.c.title, maxValue: Math.max.apply(null, subjectData.values), color: '#10b981' });
     }
-    
+        
     for (var i = 0; i < selectedMetrics.length; i++) {
         var metricId = selectedMetrics[i];
         for (var j = 0; j < availableMetrics.length; j++) {
             if (availableMetrics[j].id === metricId) {
                 var metric = availableMetrics[j];
-                var yAxisId = metric.type === 'percentage' ? metric.yAxisID : getAxisIdForAbsoluteMetric(metricId, selectedMetrics, subjectData);
+                var yAxisId;
                 
-                if (!usedAxisTypes[yAxisId]) {
-                    usedAxisTypes[yAxisId] = [];
+                if (metric.type === 'sudetingumas') {
+                    yAxisId = 'y-sudetingumas';
+                } else if (metric.type === 'rezultatyvumas') {
+                    yAxisId = metric.yAxisID;
+                } else if (metric.type === 'percentage') {
+                    yAxisId = metric.yAxisID;
+                } else {
+                    yAxisId = getAxisIdForAbsoluteMetric(metricId, selectedMetrics, subjectData);
                 }
-                usedAxisTypes[yAxisId].push(metric);
+                
+                if (metric.type !== 'rezultatyvumas' && metric.type !== 'sudetingumas') {
+                    if (!usedAxisTypes[yAxisId]) {
+                        usedAxisTypes[yAxisId] = [];
+                    }
+                    usedAxisTypes[yAxisId].push(metric);
+                }
                 
                 if (metric.type === 'percentage') {
                     var metricData = subjectData.values[metricId];
@@ -5313,6 +6186,7 @@ function updateChart() {
         }
     }
 
+    // This loop reassigns axes for >100% metrics
     for (var i = 0; i < datasets.length; i++) {
         var dataset = datasets[i];
         if (dataset.yAxisID === 'y-percent') {
@@ -5328,9 +6202,146 @@ function updateChart() {
         }
     }
 
+    // NOW add the error threshold AFTER we know the final axis assignment
+    if (showErrorThreshold && subjectData.values['errorThresholdUpper'] && errorMetricIndex >= 0) {
+        var lighterErrorColor = errorMetricColor ? hexToRgba(errorMetricColor, 0.4) : 'rgba(128, 128, 128, 0.4)';
+        var errorDataset = datasets[errorMetricIndex];
+        var finalErrorAxisID = errorDataset ? errorDataset.yAxisID : 'y-percent';
+        
+        datasets.push({
+            label: 'maksimali klaidų riba',
+            data: subjectData.values['errorThresholdUpper'].values,
+            borderColor: lighterErrorColor,
+            backgroundColor: 'transparent',
+            tension: 0.3,
+            borderWidth: 2,
+            borderDash: [8, 4],
+            pointRadius: 0,
+            pointHoverRadius: 0,
+            yAxisID: finalErrorAxisID, // Use the same axis as the error metric actually ended up on
+            forceSolid: false,
+            isThreshold: true,
+            animation: false
+        });
+    }
+
     var yAxes = {};
     var axisColorInfo = {};
+
+    var sudetingumasMetrics = [];
+    for (var i = 0; i < selectedMetrics.length; i++) {
+        var metricId = selectedMetrics[i];
+        for (var j = 0; j < availableMetrics.length; j++) {
+            if (availableMetrics[j].id === metricId && availableMetrics[j].type === 'sudetingumas') {
+                var metricData = subjectData.values[metricId];
+                sudetingumasMetrics.push({
+                    title: availableMetrics[j].title,
+                    color: availableMetrics[j].color,
+                    id: metricId
+                });
+                break;
+            }
+        }
+    }
+
+    var rezultatyvumasMetrics = [];
+    for (var i = 0; i < selectedMetrics.length; i++) {
+        var metricId = selectedMetrics[i];
+        for (var j = 0; j < availableMetrics.length; j++) {
+            if (availableMetrics[j].id === metricId && availableMetrics[j].type === 'rezultatyvumas') {
+                var metricData = subjectData.values[metricId];
+                rezultatyvumasMetrics.push({
+                    title: availableMetrics[j].title,
+                    color: availableMetrics[j].color,
+                    id: metricId
+                });
+                break;
+            }
+        }
+    }
+
+    var axisKeys = Object.keys(usedAxisTypes);
+    var primaryGridAxis = null;
     
+    if (sudetingumasMetrics.length > 0) {
+        primaryGridAxis = 'y-sudetingumas';
+    } else if (rezultatyvumasMetrics.length > 0) {
+        primaryGridAxis = 'y-rezultatyvumas';
+    } else if (subjectData.isConsistency || percentageMetrics.length > 0) {
+        primaryGridAxis = 'y-percent';
+    } else if (over100Metrics.length > 0) {
+        primaryGridAxis = 'y-percent-' + over100Metrics[0].id;
+    } else if (axisKeys.length > 0) {
+        primaryGridAxis = axisKeys[0];
+    }
+
+    if (sudetingumasMetrics.length > 0) {
+        var sudetingumasColors = [];
+        for (var i = 0; i < sudetingumasMetrics.length; i++) {
+            sudetingumasColors.push(sudetingumasMetrics[i].color);
+        }
+        
+        axisColorInfo['y-sudetingumas'] = sudetingumasColors;
+        yAxes['y-sudetingumas'] = {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            title: { display: false },
+            min: 0,
+            max: 2.0,
+            ticks: { 
+                stepSize: 0.25,
+                callback: function(value) { 
+                    return value.toFixed(2); 
+                },
+                color: '#666'
+            },
+            grid: {
+                drawOnChartArea: primaryGridAxis === 'y-sudetingumas',
+                color: function(context) {
+                    if (context.tick.value === 1.0) {
+                        return 'rgba(0, 0, 0, 0.3)';
+                    }
+                    return 'rgba(0, 0, 0, 0.1)';
+                },
+                lineWidth: function(context) {
+                    if (context.tick.value === 1.0) {
+                        return 2;
+                    }
+                    return 1;
+                }
+            },
+            border: { display: false }
+        };
+    }
+
+    if (rezultatyvumasMetrics.length > 0) {
+        var rezultatyvumasColors = [];
+        for (var i = 0; i < rezultatyvumasMetrics.length; i++) {
+            rezultatyvumasColors.push(rezultatyvumasMetrics[i].color);
+        }
+        
+        axisColorInfo['y-rezultatyvumas'] = rezultatyvumasColors;
+        yAxes['y-rezultatyvumas'] = {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            title: { display: false },
+            min: 0,
+            max: 100,
+            ticks: { 
+                stepSize: 10,
+                callback: function(value) { return value.toFixed(0); },
+                color: '#666'
+            },
+            grid: {
+                drawOnChartArea: primaryGridAxis === 'y-rezultatyvumas',
+                color: 'rgba(0, 0, 0, 0.1)'
+            },
+            border: { display: false }
+        };
+    }
+
     if (percentageMetrics.length > 0) {
         var percentColors = [];
         for (var i = 0; i < percentageMetrics.length; i++) {
@@ -5338,7 +6349,7 @@ function updateChart() {
         }
         
         axisColorInfo['y-percent'] = percentColors;
-        if (selectedSubject === 'c') { // only for nuoseklumas
+        if (selectedSubject === 'c') {
             yAxes['y-percent'] = {
                 type: 'linear',
                 display: true,
@@ -5347,12 +6358,12 @@ function updateChart() {
                 min: 0,
                 max: 100,
                 ticks: { 
-                    stepSize: 10, // ticks every 10
-                    callback: function(value) { return value <= 100 ? value.toFixed(0) + '%' : ''; },
+                    stepSize: 10,
+                    callback: function(value) { return value.toFixed(0) + '%'; },
                     color: '#666'
                 },
                 grid: {
-                    drawOnChartArea: true,
+                    drawOnChartArea: primaryGridAxis === 'y-percent',
                     color: 'rgba(0, 0, 0, 0.1)'
                 },
                 border: { display: false }
@@ -5368,10 +6379,12 @@ function updateChart() {
                 min: 0,
                 max: 100,
                 ticks: { 
+                    stepSize: 10,
                     callback: function(value) { return value.toFixed(0) + '%'; },
                     color: '#666'
                 },
                 grid: {
+                    drawOnChartArea: primaryGridAxis === 'y-percent',
                     color: 'rgba(0, 0, 0, 0.1)'
                 },
                 border: {
@@ -5399,7 +6412,7 @@ function updateChart() {
                 color: '#666'
             },
             grid: { 
-                drawOnChartArea: true,
+                drawOnChartArea: primaryGridAxis === axisId,
                 color: 'rgba(0, 0, 0, 0.1)'
             },
             border: {
@@ -5409,10 +6422,9 @@ function updateChart() {
     }
 
     var rightAxisCount = 0;
-    var axisKeys = Object.keys(usedAxisTypes);
     for (var i = 0; i < axisKeys.length; i++) {
         var axisId = axisKeys[i];
-        if (axisId !== 'y-percent' && !axisId.startsWith('y-percent-')) {
+        if (axisId !== 'y-percent' && !axisId.startsWith('y-percent-') && axisId !== 'y-rezultatyvumas' && axisId !== 'y-sudetingumas') {
             var metricsOnAxis = usedAxisTypes[axisId];
             var axisColors = metricsOnAxis.map(function(m) { return m.color; });
             
@@ -5422,16 +6434,16 @@ function updateChart() {
                 type: 'linear',
                 display: true,
                 min: 0,
-                position: percentageMetrics.length > 0 || over100Metrics.length > 0 || rightAxisCount > 0 ? 'right' : 'left',
+                position: percentageMetrics.length > 0 || over100Metrics.length > 0 || rezultatyvumasMetrics.length > 0 || sudetingumasMetrics.length > 0 || rightAxisCount > 0 ? 'right' : 'left',
                 title: { 
                     display: false
                 },
                 ticks: {
-                    callback: function(value) { return value.toFixed(1); },
+                    callback: function(value) { return value.toFixed(0); },
                     color: '#666'
                 },
                 grid: { 
-                    drawOnChartArea: rightAxisCount === 0 && percentageMetrics.length === 0 && over100Metrics.length === 0,
+                    drawOnChartArea: primaryGridAxis === axisId,
                     color: 'rgba(0, 0, 0, 0.1)'
                 },
                 border: {
@@ -5459,7 +6471,7 @@ function updateChart() {
             },
             plugins: {
                 legend: {
-                    display: false // We're using our custom legend
+                    display: false
                 },
                 tooltip: {
                     callbacks: {
@@ -5469,17 +6481,35 @@ function updateChart() {
                                 label += ': ';
                             }
                             var yAxisId = context.dataset.yAxisID;
-                            if (yAxisId === 'y-percent' || yAxisId.indexOf('y-percent-') === 0) {
-                                label += context.parsed.y.toFixed(2) + '%';
-                            } else {
+                            
+                            if (yAxisId === 'y-sudetingumas') {
                                 label += context.parsed.y.toFixed(2);
+                            } else if (yAxisId === 'y-percent' || yAxisId.indexOf('y-percent-') === 0) {
+                                label += context.parsed.y.toFixed(0) + '%';
+                            } else if (yAxisId === 'y-rezultatyvumas') {
+                                label += context.parsed.y.toFixed(0);
+                            } else {
+                                label += context.parsed.y.toFixed(0);
                             }
                             return label;
                         }
                     }
                 }
             },
-            scales: yAxes
+            scales: Object.assign({
+                x: {
+                    display: true,
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#666'
+                    },
+                    border: {
+                        display: false
+                    }
+                }
+            }, yAxes)
         },
         plugins: [{
             id: 'coloredAxisLines',
@@ -5661,10 +6691,48 @@ function displayComletedTextIdsForTextComp(textInfo, htmlContainer, showAverages
     htmlContainer.appendChild(ul);
 }
 
+let globalClassStatsCache = null;
+
+function assembleClassStats() {
+    // 1. Safety check: Ensure the global studentList exists and has data
+    if (!studentList || studentList.length === 0) {
+        console.warn("assembleClassStats: studentList is empty or undefined.");
+        return null;
+    }
+
+    const classStats = {};
+    
+    studentList.forEach(s => {
+        // 2. Critical Fix: Check if s.stats exists. 
+        // Some students (especially new ones) might have null/undefined stats.
+        if (!s.stats) return; 
+
+        for (const [key, weeks] of Object.entries(s.stats)) {
+            // Skip metadata keys
+            if (key === "c" || key === "d") continue;
+            
+            if (!classStats[key]) {
+                classStats[key] = [];
+            }
+            
+            // Push this student's history for this category into the class group
+            classStats[key].push(weeks);
+        }
+    });
+
+    return classStats;
+}
+
+
 let processedStudentStats;
 
+
 function displayStudentStatistics(student, studentTasks) {
-    processedStudentStats = transformStudentStats(student[3]);
+    if (!globalClassStatsCache) {
+        globalClassStatsCache = assembleClassStats();
+    }
+
+    processedStudentStats = transformStudentStats(student[3], globalClassStatsCache);
     const averageStudentScore = calculateAverageStudentScore(student[3]);
     const averageStudentConsistency = calculateAverageStudentsConsistency(student[3]);
 
@@ -5835,29 +6903,38 @@ function displayStudentStatistics(student, studentTasks) {
     }
 }
 
-
-function calculateClassMedianStats(students) {
+function calculateClassMeanStats(students) {
     if (!students || students.length === 0) {
-        return {
-            c: [],
-            m: [],
-            t: [],
-            g: [],
-            d: 0
-        };
+        return { c: [], m: [], t: [], g: [], d: 0 };
     }
 
-    // Helper function to calculate median
-    function median(arr) {
+    /**
+     * Filters outliers using the Interquartile Range (IQR) method
+     * and calculates the arithmetic mean of the remaining values.
+     */
+    function calculateCleanMean(arr) {
         if (arr.length === 0) return 0;
+        if (arr.length <= 2) return arr.reduce((a, b) => a + b, 0) / arr.length;
+
         const sorted = [...arr].sort((a, b) => a - b);
-        const mid = Math.floor(sorted.length / 2);
-        return sorted.length % 2 === 0
-            ? (sorted[mid - 1] + sorted[mid]) / 2
-            : sorted[mid];
+        
+        // Calculate Quartiles
+        const q1 = sorted[Math.floor((sorted.length / 4))];
+        const q3 = sorted[Math.floor((sorted.length * (3 / 4)))];
+        const iqr = q3 - q1;
+
+        // Define Bounds
+        const lowerBound = q1 - 1.5 * iqr;
+        const upperBound = q3 + 1.5 * iqr;
+
+        // Filter and Average
+        const validValues = sorted.filter(v => v >= lowerBound && v <= upperBound);
+        
+        // If IQR filtering removes everything (rare), fallback to original array
+        const finalSet = validValues.length > 0 ? validValues : sorted;
+        return finalSet.reduce((a, b) => a + b, 0) / finalSet.length;
     }
 
-    // Find the maximum length for each stat type
     const maxLengths = {
         c: Math.max(...students.map(s => s.stats.c?.length || 0)),
         m: Math.max(...students.map(s => s.stats.m?.length || 0)),
@@ -5865,9 +6942,8 @@ function calculateClassMedianStats(students) {
         g: Math.max(...students.map(s => s.stats.g?.length || 0))
     };
 
-    // Calculate median for consistency (c) - simple array of numbers
-    // Align from right to left (most recent data)
-    const medianC = [];
+    // Calculate Clean Mean for consistency (c)
+    const meanC = [];
     for (let i = 0; i < maxLengths.c; i++) {
         const values = students
             .map(s => {
@@ -5875,20 +6951,18 @@ function calculateClassMedianStats(students) {
                 const index = arr.length - maxLengths.c + i;
                 return index >= 0 ? arr[index] : null;
             })
-            .filter(v => v !== undefined && v !== null);
+            .filter(v => v !== null && v !== undefined);
+        
         if (values.length > 0) {
-            medianC.push(median(values));
+            meanC.push(calculateCleanMean(values));
         }
     }
 
-    // Calculate median for math (m), text (t), grammar (g) - arrays of arrays with 4 values
-    // Align from right to left (most recent data)
-    function calculateMedianForCategory(category, maxLength) {
+    // Calculate Clean Mean for multi-value categories (m, t, g)
+    function calculateMeanForCategory(category, maxLength) {
         const result = [];
         for (let i = 0; i < maxLength; i++) {
-            const medianEntry = [0, 0, 0, 0];
-            
-            // For each of the 4 positions in the inner array
+            const meanEntry = [0, 0, 0, 0];
             for (let j = 0; j < 4; j++) {
                 const values = students
                     .map(s => {
@@ -5896,32 +6970,144 @@ function calculateClassMedianStats(students) {
                         const index = arr.length - maxLength + i;
                         return index >= 0 ? arr[index]?.[j] : null;
                     })
-                    .filter(v => v !== undefined && v !== null);
-                
+                    .filter(v => v !== null && v !== undefined);
+
                 if (values.length > 0) {
-                    medianEntry[j] = median(values);
+                    meanEntry[j] = calculateCleanMean(values);
                 }
             }
-            
-            result.push(medianEntry);
+            result.push(meanEntry);
         }
         return result;
     }
 
-    const medianM = calculateMedianForCategory('m', maxLengths.m);
-    const medianT = calculateMedianForCategory('t', maxLengths.t);
-    const medianG = calculateMedianForCategory('g', maxLengths.g);
-
-    // Find maximum d (date in days)
-    const maxD = Math.max(...students.map(s => s.stats.d || 0));
-
     return {
-        c: medianC,
-        m: medianM,
-        t: medianT,
-        g: medianG,
-        d: maxD
+        c: meanC,
+        m: calculateMeanForCategory('m', maxLengths.m),
+        t: calculateMeanForCategory('t', maxLengths.t),
+        g: calculateMeanForCategory('g', maxLengths.g),
+        d: Math.max(...students.map(s => s.stats.d || 0))
     };
+}
+
+function averageTransformedStats(transformedStatsArray) {
+    if (!transformedStatsArray || transformedStatsArray.length === 0) {
+        return {};
+    }
+
+    // Helper function
+    function winsorizedMean(values, percentile = 0.90) {
+        if (values.length === 0) return 0;
+        
+        const sorted = [...values].sort((a, b) => a - b);
+        const capIndex = Math.floor(sorted.length * percentile);
+        const cap = sorted[Math.max(0, capIndex - 1)];
+        
+        const winsorized = values.map(v => Math.min(v, cap));
+        return winsorized.reduce((a, b) => a + b, 0) / winsorized.length;
+    }
+
+    const result = {};
+
+    for (const key in transformedStatsArray[0]) {
+        if (key === 'd') {
+            result[key] = Math.max(...transformedStatsArray.map(s => s[key] || 0));
+            continue;
+        }
+
+        const subjectData = transformedStatsArray[0][key];
+        
+        if (key === 'c') {
+            // Consistency metric
+            result[key] = {
+                title: subjectData.title,
+                values: []
+            };
+            
+            const maxLength = Math.max(...transformedStatsArray.map(s => 
+                s[key]?.values?.length || 0
+            ));
+            
+            for (let weekIdx = 0; weekIdx < maxLength; weekIdx++) {
+                const weekValues = transformedStatsArray.map(s => {
+                    const arr = s[key]?.values || [];
+                    const index = arr.length - maxLength + weekIdx;
+                    return index >= 0 ? (arr[index] || 0) : 0;
+                });
+
+                const mean = winsorizedMean(weekValues);
+                result[key].values.push(mean);
+            }
+        } else {
+            // Subject metrics
+            result[key] = { 
+                title: subjectData.title, 
+                values: {} 
+            };
+
+            for (const metricIdx in subjectData.values) {
+                const metricData = subjectData.values[metricIdx];
+                result[key].values[metricIdx] = {
+                    title: metricData.title,
+                    values: []
+                };
+
+                const maxLength = Math.max(...transformedStatsArray.map(s => 
+                    s[key]?.values?.[metricIdx]?.values?.length || 0
+                ));
+
+                for (let weekIdx = 0; weekIdx < maxLength; weekIdx++) {
+                    // Relative difficulty index (usually 5)
+                    if (parseInt(metricIdx, 10) === 5) {
+                        result[key].values[metricIdx].values.push(1); // Always 1
+                        continue;
+                    }
+
+                    // Total Answers metric
+                    if (parseInt(metricIdx, 10) === 4) {
+                        const classSize = transformedStatsArray.length;
+                        let totalSum = 0;
+                        let studentsReached = 0;
+
+                        for (let studentIdx = 0; studentIdx < classSize; studentIdx++) {
+                            const student = transformedStatsArray[studentIdx];
+                            const arr = student[key]?.values?.[metricIdx]?.values || [];
+                            const index = arr.length - maxLength + weekIdx;
+                            const val = index >= 0 ? (arr[index] || 0) : 0;
+                            totalSum += val;
+                            if (val > 0) studentsReached++;
+                        }
+
+                        const weekValues = transformedStatsArray.map(s => {
+                            const arr = s[key]?.values?.[metricIdx]?.values || [];
+                            const index = arr.length - maxLength + weekIdx;
+                            return index >= 0 ? (arr[index] || 0) : 0;
+                        });
+
+                        const mean = winsorizedMean(weekValues, 0.90);
+
+                        const fractionReached = studentsReached / classSize;
+                        const adjustedMean = mean * fractionReached;
+
+                        result[key].values[metricIdx].values.push(adjustedMean);
+                        continue;
+                    }
+
+                    // Normal case for other metrics
+                    const weekValues = transformedStatsArray.map(s => {
+                        const arr = s[key]?.values?.[metricIdx]?.values || [];
+                        const index = arr.length - maxLength + weekIdx;
+                        return index >= 0 ? (arr[index] || 0) : 0;
+                    });
+
+                    const mean = winsorizedMean(weekValues, 0.90);
+                    result[key].values[metricIdx].values.push(mean);
+                }
+            }
+        }
+    }
+
+    return result;
 }
 
 function mergeAllStudentTasks(students) {
@@ -5967,6 +7153,10 @@ function mergeAllStudentTasks(students) {
 }
 
 function displayTeacherHome(selectedGroupNames=null) {
+    if (!globalClassStatsCache) {
+        globalClassStatsCache = assembleClassStats();
+    }
+
     // Deep copy studentList
     studentListFiltered = JSON.parse(JSON.stringify(studentList));
     
@@ -5994,7 +7184,13 @@ function displayTeacherHome(selectedGroupNames=null) {
 
     const knowledgeSelect = document.getElementById("knowledge-level-select");
 
-    processedStudentStats = transformStudentStats(calculateClassMedianStats(studentListFiltered));
+    // Calculate transformed stats for each student first
+    const allTransformedStats = studentListFiltered.map(student => 
+        transformStudentStats(student.stats, globalClassStatsCache)
+    );
+
+    // Now average the ALREADY-TRANSFORMED relative difficulties
+    processedStudentStats = averageTransformedStats(allTransformedStats);
 
     if (processedStudentStats?.c?.values?.length > 2) {
         initializeButtons();
@@ -6091,6 +7287,7 @@ function displayTeacherHome(selectedGroupNames=null) {
             currentTaskDuration = JSON.parse(task.duration);
 
             const parsedTaskDescription = JSON.parse(currentTaskInstructions);
+
             const formattedTaskDescription = getOptionTextFromValues(parsedTaskDescription, currentTaskDuration, forTeacher=true);
             studentTaskStudentName.innerHTML = `
                 <span class="student-name-id-holder"><span id="student-name">${student[1]}</span><span id='student-id'>(ID: ${student[0]})</span></span>
@@ -6288,8 +7485,8 @@ function displayTeacherHome(selectedGroupNames=null) {
                     let parsedTaskInfo = JSON.parse(task.taskInstructions)
                     if (parsedTaskInfo[0] === "lang" && parsedTaskInfo[1] === "C49" && parsedTaskInfo[4] === "C84") {
                         potentialEarnings = await calculateTasksPerCorrectAnswerPoints("selectedTexts", {taskSettings: [parsedTaskInfo,numberOfQuestions]});
-                        if (potentialEarnings != null) {
-                            potentialEarnings = Number(potentialEarnings.toFixed(2))
+                        if (potentialEarnings != null && potentialEarnings[0] != null) {
+                            potentialEarnings = Number(potentialEarnings[0].toFixed(2))
                         }
                     } else {
                         potentialEarnings = await calculateTasksPerCorrectAnswerPoints(JSON.parse(task.taskInstructions));
@@ -6694,29 +7891,36 @@ function displayTeacherHome(selectedGroupNames=null) {
                 if (!browsingHistory) {
                     document.querySelector(`#tasks-${student.id}`).style.display = "block";
                 } else {
-                    if (taskHistoryCurrentTask) {
-                        await retrieveTaskHistoryInformation(student.id, taskHistoryCurrentTask)
+                    const isIstorijaTab = document.getElementById("history-tab-istorija").classList.contains("active-tab");
+                    if (isIstorijaTab) {
+                        currentHistoryStudentId = student.id;
+                        loadTaskArchive();
+                    } else if (taskHistoryCurrentTask && document.getElementById('new-search-button').disabled === false) {
+                        taskHistoryState.isClassAverageView = false;
+                        await retrieveTaskHistoryInformation(student.id, taskHistoryCurrentTask);
                     }
                 }
             } else {
                 if (!browsingHistory) {
                     if (studentName.classList.contains("selected-option"))
-                    document.querySelector(`#tasks-${student.id}`).style.display = "none";
+                        document.querySelector(`#tasks-${student.id}`).style.display = "none";
                 } else {
-                    if (taskHistoryCurrentTask) {
+                    const isIstorijaTab = document.getElementById("history-tab-istorija").classList.contains("active-tab");
+                    if (isIstorijaTab) {
+                        currentHistoryStudentId = student.id;
+                        loadTaskArchive();
+                    } else if (taskHistoryCurrentTask && document.getElementById('new-search-button').disabled === false) {
+                        taskHistoryState.isClassAverageView = false;
                         await retrieveTaskHistoryInformation(student.id, taskHistoryCurrentTask);
                     }
                 }
             }
 
-            // Remove 'selected-option' class from all task names
             document.querySelectorAll('.selection-option').forEach(name => {
                 name.classList.remove('selected-option');
             });
 
-            document.querySelector(".teacher-home-button").classList.remove('selected-option')
-
-            // Add 'selected-option' class to the clicked task
+            document.querySelector(".teacher-home-button").classList.remove('selected-option');
             studentName.classList.add('selected-option');
 
             // Display task info
@@ -7010,7 +8214,6 @@ function displayTeacherHome(selectedGroupNames=null) {
             }
         }
 
-
         async function fetchDataForStudents() {
             let success = false;
             let showMessageTimeout;
@@ -7140,6 +8343,9 @@ function displayTeacherHome(selectedGroupNames=null) {
 
     function toggleBrowseHistory() {
         browsingHistory = !browsingHistory
+        updateModeChoice7();
+        updateModeChoice13();
+        updateModeChoice12();
         toggleStudentListLabel();
         const dropdown = document.getElementById("task-group-sorting");
         if (browsingHistory) {
@@ -7174,19 +8380,27 @@ function displayTeacherHome(selectedGroupNames=null) {
             behavior: 'smooth'
             });
         });
-            newTaskOptions.style.display = 'flex';
-            document.querySelector("#group_name").style.display = "none";
 
             document.querySelector("#mode_choice_15").classList.add("item-display-none-lock");
             document.querySelector("#mode_choice_4").classList.add("item-display-none-lock");
             document.querySelector(".timer-question-number-div").classList.add("item-display-none-lock");
 
+            // Show tabs immediately, default to Istorija
+            document.getElementById("history-view-tabs").style.display = "flex";
+            document.getElementById("history-tab-istorija").classList.add("active-tab");
+            document.getElementById("history-tab-progresas").classList.remove("active-tab");
+            document.getElementById("confirm-button").style.display = "none";
+            newTaskOptions.style.display = 'none';
+            document.querySelector("#student-task-history-container").style.display = "none";
+            document.getElementById("task-archive-view").style.display = "flex";
+
+            // Set default date range (today back 2 weeks) - handled by flatpickr defaultDate
+
             document.getElementById("new-search-button").disabled = true;
+            taskHistoryState.isClassAverageView = false;
         } else {
             taskHistoryCurrentTask = null;
             retrievedDataInstance = null;
-            taskContainerVisible = false;
-            toggleTaskVisibility();
             document.querySelector(".txt-browser-wrapper").style.display = 'block'; 
             studentTaskInfoContainer.style.display = 'flex'; 
             document.querySelectorAll('.student-checkbox').forEach(checkbox => {
@@ -7195,6 +8409,12 @@ function displayTeacherHome(selectedGroupNames=null) {
             });
             newTaskOptions.style.display = 'none';
             document.querySelector("#student-task-history-container").style.display = "none";
+            document.getElementById("history-view-tabs").style.display = "none";
+            document.getElementById("task-archive-view").style.display = "none";
+            document.getElementById("history-tab-progresas").classList.remove("active-tab");
+            document.getElementById("history-tab-istorija").classList.remove("active-tab");
+            document.getElementById("confirm-button").style.display = "";
+            currentHistoryStudentId = null;
             dropdown.disabled = false;
             toggleMainBrowser(closeMainBrowser=true);
             isSelectionModeEnabled = false;
@@ -7203,11 +8423,15 @@ function displayTeacherHome(selectedGroupNames=null) {
             document.querySelector("#mode_choice_15").classList.remove("item-display-none-lock");
             document.querySelector("#mode_choice_4").classList.remove("item-display-none-lock");
             document.querySelector(".timer-question-number-div").classList.remove("item-display-none-lock");
+
+            document.querySelector(".teacher-home-button").style.opacity = "";
+            document.querySelector(".teacher-home-button").style.pointerEvents = "";
         }
     }
 
     document.getElementById("new-search-button").addEventListener("click", () => {
         startNewTaskHistorySearch();
+        openSidebar();
     });
 
     function startNewTaskHistorySearch () {
@@ -7217,8 +8441,13 @@ function displayTeacherHome(selectedGroupNames=null) {
 
         document.getElementById('confirm-button').disabled = false;
         document.getElementById("new-search-button").disabled = true;
-        newTaskOptions.style.display = 'flex';
+        // Switch to Progresas tab, show task selector
+        document.getElementById("history-tab-progresas").classList.add("active-tab");
+        document.getElementById("history-tab-istorija").classList.remove("active-tab");
         document.querySelector("#student-task-history-container").style.display = "none";
+        document.getElementById("task-archive-view").style.display = "none";
+        newTaskOptions.style.display = 'flex';
+        document.querySelector("#group_name").style.display = "none";
     }
 
     function toggleDeleteTask() {
@@ -7396,11 +8625,13 @@ function displayTeacherHome(selectedGroupNames=null) {
         const modeChoiceElementSelection = document.querySelector('#mode_choice').value;
         let task = [];
         let taskDuration = [];
+
         if (mode === "math") {
+            const modeChoice8Selection = document.querySelector('#mode_choice_8')?.value || "C79";
             task = [
                 mode, modeChoice1, modeChoice2, modeChoice3, 
                 modeChoice5, modeChoice6, modeChoice7, selectedNumbers, 
-                remainderInput, "C79"
+                remainderInput, modeChoice8Selection
             ];
             taskDuration = [
                 modeChoice4, durationType
@@ -7621,36 +8852,284 @@ function displayTeacherHome(selectedGroupNames=null) {
     }
 
 function expandTaskForHistoryBrowsing(task) {
-    const tasks = [];
-
-    if (task.includes("C18")) {
-        const range = task[7];
-        if (!Array.isArray(range) || range.length < 2) {
-            tasks.push(task);
-            return tasks;
-        }
-
-        const start = parseInt(range[0], 10);
-        const end = parseInt(range[1], 10);
-
-        // Generate all combinations: first <= second, both in [start,end]
-        for (let first = start; first <= end; first++) {
-            for (let second = first; second <= end; second++) {
-                const newTask = JSON.parse(JSON.stringify(task));
-                newTask[7][0] = first.toString();
-                newTask[7][1] = second.toString();
-                tasks.push(newTask);
-            }
-        }
-
-    } else {
-        tasks.push(task);
+  // ---------- Hierarchical Expansion Rules ----------
+  const expansionRules = {
+    "C3": { "C1": {}, "C2": {} },
+    "C6": { "C4": {}, "C5": {} },
+    "C7": {
+      "C1": {
+        "C31": ["C8"],
+        "C32": ["C8", "C9", "C10", "C17"],
+        "C33": ["C9", "C10", "C11", "C12", "C17"],
+        "C34": ["C11", "C12", "C13"],
+        "C35": ["C14"],
+        "C36": ["C15"],
+        "C43": ["C43", "C44", "C45", "C46"],
+        "C44": ["C43", "C44", "C45", "C46"],
+        "C45": ["C43", "C44", "C45", "C46"],
+        "C46": ["C43", "C44", "C45", "C46"]
+      },
+      "C2": {
+        "C31": ["C8"],
+        "C32": ["C8", "C9", "C10", "C17"],
+        "C33": ["C9", "C10", "C11", "C12", "C17"],
+        "C34": ["C11", "C12", "C13"],
+        "C35": ["C14"],
+        "C36": ["C15", "C16"],
+        "C43": ["C43", "C44", "C45", "C46"],
+        "C44": ["C43", "C44", "C45", "C46"],
+        "C45": ["C43", "C44", "C45", "C46"],
+        "C46": ["C43", "C44", "C45", "C46"]
+      },
+      "C3": {
+        "C31": ["C8"],
+        "C32": ["C8", "C9", "C10", "C17"],
+        "C33": ["C9", "C10", "C11", "C12", "C17"],
+        "C34": ["C11", "C12", "C13"],
+        "C35": ["C14"],
+        "C36": ["C15"],
+        "C43": ["C43", "C44", "C45", "C46"],
+        "C44": ["C43", "C44", "C45", "C46"],
+        "C45": ["C43", "C44", "C45", "C46"],
+        "C46": ["C43", "C44", "C45", "C46"]
+      },
+      "C4": {
+        "C33": ["C18"],
+        "C34": ["C19", "C20"],
+        "C35": ["C20", "C21", "C28", "C29"],
+        "C36": ["C21", "C22", "C23", "C24", "C25", "C26", "C29", "C30"]
+      },
+      "C5": {
+        "C33": ["C18"],
+        "C34": ["C19", "C20"],
+        "C35": ["C20", "C21", "C28", "C29", "C30"],
+        "C36": ["C21", "C22", "C23", "C24", "C25", "C26", "C29", "C30"]
+      },
+      "C6": {
+        "C33": ["C18"],
+        "C34": ["C19", "C20"],
+        "C35": ["C20", "C21", "C28", "C29"],
+        "C36": ["C21", "C22", "C23", "C24", "C25", "C26", "C29"]
+      }
     }
+  };
 
-    return tasks;
+  const clone = obj => JSON.parse(JSON.stringify(obj));
+
+  // ---------- Helper: Extract numeric suffix from Cxxx codes ----------
+  const getCNum = key => {
+    const m = key.match(/^C(\d+)$/);
+    return m ? parseInt(m[1], 10) : Infinity;
+  };
+
+  // ---------- Helper: Generate all non-empty subsets, sorted by numeric code ----------
+  function getAllSubsets(keys) {
+    const sorted = [...keys].sort((a, b) => getCNum(a) - getCNum(b));
+    const subsets = [];
+    const total = 1 << sorted.length;
+    for (let mask = 1; mask < total; mask++) {
+      const subset = [];
+      for (let bit = 0; bit < sorted.length; bit++) {
+        if (mask & (1 << bit)) subset.push(sorted[bit]);
+      }
+      subsets.push(subset);
+    }
+    subsets.sort((a, b) => {
+      if (a.length !== b.length) return a.length - b.length;
+      for (let i = 0; i < a.length; i++) {
+        const diff = getCNum(a[i]) - getCNum(b[i]);
+        if (diff !== 0) return diff;
+      }
+      return 0;
+    });
+    return subsets;
+  }
+
+  // ---------- Helper: Generic paired-code expander ----------
+  // Replaces any occurrence of `token` in a task with `codeA` (one variant)
+  // and `codeB` (another variant), recursively handling multiple occurrences.
+  function expandPairedCode(tasks, token, codeA, codeB) {
+    const expanded = [];
+    for (const t of tasks) {
+      let found = false;
+      for (let i = 0; i < t.length; i++) {
+        if (t[i] === token) {
+          found = true;
+          const tA = clone(t);
+          tA[i] = codeA;
+          const tB = clone(t);
+          tB[i] = codeB;
+          expanded.push(...expandPairedCode([tA], token, codeA, codeB));
+          expanded.push(...expandPairedCode([tB], token, codeA, codeB));
+          break;
+        }
+      }
+      if (!found) expanded.push(t);
+    }
+    return expanded;
+  }
+
+  // ---------- STEP 0: Split tasks where index 6 === 0 into variants with 1 and 3 ----------
+  function expandZeroAtIndex6(tasks) {
+    const expanded = [];
+    for (const t of tasks) {
+      if (t.length > 6 && typeof t[6] === "number" && t[6] === 0) {
+        const t1 = clone(t);
+        t1[6] = 1;
+        expanded.push(t1);
+        const t3 = clone(t);
+        t3[6] = 3;
+        expanded.push(t3);
+      } else {
+        expanded.push(t);
+      }
+    }
+    return expanded;
+  }
+
+  // ---------- STEP 0b: Expand C50 using dict at position 4 ----------
+  function expandC50(tasks) {
+    const expanded = [];
+    for (const t of tasks) {
+      if (!t.includes("C50")) {
+        expanded.push(t);
+        continue;
+      }
+      const dict = t[4];
+      if (!dict || typeof dict !== "object" || Array.isArray(dict)) {
+        expanded.push(t);
+        continue;
+      }
+      const keys = Object.keys(dict);
+      if (keys.length === 0) {
+        expanded.push(t);
+        continue;
+      }
+      const subsets = getAllSubsets(keys);
+      for (const subset of subsets) {
+        const tVariant = clone(t);
+        const newDict = {};
+        for (const key of subset) {
+          newDict[key] = dict[key];
+        }
+        tVariant[4] = newDict;
+        expanded.push(tVariant);
+      }
+    }
+    return expanded;
+  }
+
+  // ---------- Apply all pre-expansions in order ----------
+  let initialTasks = expandZeroAtIndex6([clone(task)]);                          // 1. 0 → 1 and 3
+  initialTasks = expandPairedCode(initialTasks, "C47-C48", "C47", "C48");        // 2. C47-C48 split
+  initialTasks = expandPairedCode(initialTasks, "C73-C74", "C73", "C74");        // 3. C73-C74 split
+  initialTasks = expandC50(initialTasks);                                         // 4. C50 dict subsets
+
+  const results = [...initialTasks];
+  let primaryVariants = [];
+
+  // ---------- STEP 1: Primary → Secondary ----------
+  for (const baseTask of initialTasks) {
+    for (let i = 0; i < baseTask.length; i++) {
+      const value = baseTask[i];
+      if (!expansionRules[value]) continue;
+
+      for (const [primaryReplacement, secondaryRules] of Object.entries(expansionRules[value])) {
+        const tPrimary = clone(baseTask);
+        tPrimary[i] = primaryReplacement;
+
+        // Boolean fix for C4
+        if (primaryReplacement === "C4") {
+          const boolIndex = tPrimary.length - 2;
+          if (typeof tPrimary[boolIndex] === "boolean") tPrimary[boolIndex] = false;
+        }
+
+        // ---------- Collect all positions to replace ----------
+        const positions = [];
+        for (let j = 0; j < tPrimary.length; j++) {
+          const secValue = tPrimary[j];
+          if (secondaryRules[secValue]) {
+            positions.push({ index: j, replacements: secondaryRules[secValue] });
+          }
+        }
+
+        // ---------- Generate all combinations of secondary replacements ----------
+        const combine = (posIndex = 0, current = clone(tPrimary)) => {
+          if (posIndex >= positions.length) {
+            // Also expand any paired codes that may have survived into secondary expansion
+            let expanded = expandPairedCode([current], "C47-C48", "C47", "C48");
+            expanded = expandPairedCode(expanded, "C73-C74", "C73", "C74");
+            primaryVariants.push(...expanded);
+            return;
+          }
+          const { index, replacements } = positions[posIndex];
+          for (const r of replacements) {
+            const next = clone(current);
+            next[index] = r;
+            if (r === "C18") next[7] = [1, 10];
+            combine(posIndex + 1, next);
+          }
+        };
+
+        if (positions.length > 0) {
+          combine();
+        } else {
+          let expanded = expandPairedCode([tPrimary], "C47-C48", "C47", "C48");
+          expanded = expandPairedCode(expanded, "C73-C74", "C73", "C74");
+          primaryVariants.push(...expanded);
+        }
+      }
+    }
+  }
+
+  results.push(...primaryVariants);
+
+  // ---------- STEP 2: Swap C37 <-> C38 for primary C1/C2/C3 ----------
+  const swapVariants = [];
+  for (const t of results) {
+    const primaryCode = t[1];
+    if (["C1", "C2", "C3"].includes(primaryCode)) {
+      for (let i = 0; i < t.length; i++) {
+        if (t[i] === "C37") {
+          const swapped = clone(t);
+          swapped[i] = "C38";
+          swapVariants.push(swapped);
+        } else if (t[i] === "C38") {
+          const swapped = clone(t);
+          swapped[i] = "C37";
+          swapVariants.push(swapped);
+        }
+      }
+    }
+  }
+  results.push(...swapVariants);
+
+  // ---------- STEP 3: Expand C18 ranges ----------
+  const finalTasks = [];
+  for (const t of results) {
+    if (t.includes("C18")) {
+      const range = t[7];
+      if (!Array.isArray(range) || range.length < 2) {
+        finalTasks.push(t);
+        continue;
+      }
+      const start = parseInt(range[0], 10);
+      const end = parseInt(range[1], 10);
+      for (let first = start; first <= end; first++) {
+        for (let second = first; second <= end; second++) {
+          const tRange = clone(t);
+          tRange[7][0] = first;
+          tRange[7][1] = second;
+          finalTasks.push(tRange);
+        }
+      }
+    } else {
+      finalTasks.push(t);
+    }
+  }
+
+  return [clone(task), ...finalTasks.filter(t => t !== task)];
 }
-
-
 
 let taskHistoryCurrentTask = null;
     
@@ -7721,12 +9200,9 @@ let taskHistoryCurrentTask = null;
         const modeChoice15Selection = document.getElementById('mode_choice_15').value;
 
         let questionFrequency;
-        if (classChoice === "C75") {
-            let modeChoice13Selection = document.querySelector('#mode_choice_13').value;
-            questionFrequency = Number(modeChoice13Selection);
-        } else {
-            questionFrequency = 1;
-        }
+
+        let modeChoice13Selection = document.querySelector('#mode_choice_13').value;
+        questionFrequency = Number(modeChoice13Selection);
         
         if (modeChoice1 === "C49") {
             task = [
@@ -7744,14 +9220,7 @@ let taskHistoryCurrentTask = null;
 
     const expandedTasks = expandTaskForHistoryBrowsing(task);
 
-    if (taskHistoryCurrentTask) {
-        if (!arraysEqual(taskHistoryCurrentTask, expandedTasks)) {
-            clearTaskAverageCache();
-            taskHistoryCurrentTask = JSON.parse(JSON.stringify(expandedTasks));
-        }
-    } else {
-        taskHistoryCurrentTask = JSON.parse(JSON.stringify(expandedTasks));
-    }
+    taskHistoryCurrentTask = JSON.parse(JSON.stringify(expandedTasks));
 
     // Check if a student is selected, if not select the first one
     let selectedStudent = document.querySelector(".outer-student-list-entry-item .student-name.selected-option");
@@ -7773,7 +9242,6 @@ let taskHistoryCurrentTask = null;
 
     const selectedStudentId = Number(selectedStudent.dataset.studentId);
 
-    console.log(expandedTasks)
     retrieveTaskHistoryInformation(selectedStudentId, expandedTasks);
 }
 
@@ -7787,27 +9255,54 @@ let taskHistoryCurrentTask = null;
             el.style.cursor = "default";     // change cursor
         });
 
-        console.log(tasks)
         let retrievedDataInstance = await fetchTaskStats(studentId, tasks);
 
-        if (retrievedDataInstance) {
+        if (retrievedDataInstance && retrievedDataInstance.insufficient) {
             enableConfirmationButtons();
             enableTeacherControlPannel();
             document.getElementById("task-group-sorting").disabled = true;
             enableNewTaskContainer();
-            document.querySelector(`.student-name[data-student-id="${studentId}"]`).classList.add("selected-option");;
-
+            document.querySelector(`.student-name[data-student-id="${studentId}"]`).classList.add("selected-option");
             document.querySelectorAll(".student-name").forEach(el => {
-                el.style.pointerEvents = "auto"; // restore clicks
+                el.style.pointerEvents = "auto";
                 el.style.opacity = "1";
                 el.style.cursor = "pointer";
             });
-
+            currentHistoryStudentId = studentId;
+            document.getElementById('confirm-button').disabled = true;
+            newTaskOptions.style.display = 'none';
+            document.getElementById("task-archive-view").style.display = "none";
+            document.getElementById("history-tab-progresas").classList.add("active-tab");
+            document.getElementById("history-tab-istorija").classList.remove("active-tab");
+            document.querySelector("#student-task-history-container").style.display = "flex";
+            document.getElementById("new-search-button").disabled = false;
+            document.querySelector('.sidebar').scrollTo({ top: 0, behavior: 'smooth' });
+            // Show message in chart area
+            document.querySelector('.task-history-chart-wrapper').innerHTML =
+                '<div class="task-history-empty">Nepakanka duomenų šiai užduočiai (reikia bent 5 įrašų).</div>';
+            renderTaskHistoryDescription();
+        } else if (retrievedDataInstance) {
+            enableConfirmationButtons();
+            enableTeacherControlPannel();
+            document.getElementById("task-group-sorting").disabled = true;
+            enableNewTaskContainer();
+            document.querySelector(`.student-name[data-student-id="${studentId}"]`).classList.add("selected-option");
+            document.querySelectorAll(".student-name").forEach(el => {
+                el.style.pointerEvents = "auto";
+                el.style.opacity = "1";
+                el.style.cursor = "pointer";
+            });
+            currentHistoryStudentId = studentId;
             initTaskHistoryGraph(retrievedDataInstance);
             document.getElementById('confirm-button').disabled = true;
             newTaskOptions.style.display = 'none';
+            document.getElementById("task-archive-view").style.display = "none";
+            document.getElementById("history-tab-progresas").classList.add("active-tab");
+            document.getElementById("history-tab-istorija").classList.remove("active-tab");
             document.querySelector("#student-task-history-container").style.display = "flex";
             document.getElementById("new-search-button").disabled = false;
+            document.querySelector('.sidebar').scrollTo({ top: 0, behavior: 'smooth' });
+            renderTaskHistoryDescription();
         } else {
             toggleBrowseHistory();
             taskContainerVisible = true;
@@ -7819,34 +9314,252 @@ let taskHistoryCurrentTask = null;
     }
 
     document.querySelector(".teacher-home-button").addEventListener('click', () => {
-        document.querySelectorAll('.selection-option').forEach(task => {
-            task.classList.remove('selected-option');
-        });
+        if (browsingHistory) {
+            const isIstorija = document.getElementById("history-tab-istorija").classList.contains("active-tab");
+            if (isIstorija) return;
 
-        document.querySelector(".teacher-home-button").classList.add('selected-option');
+            // Only act if a graph has actually been loaded
+            const graphLoaded = document.getElementById('new-search-button').disabled === false;
+            if (!graphLoaded) return;
 
-        // Display task info
-        displayTeacherHome();
-
-        if (currentAction !== "new-task") {
-            openSidebar();
+            const isShowingClassAvg = document.querySelector(".teacher-home-button").classList.contains("selected-option");
+            if (isShowingClassAvg) {
+                document.querySelector(".teacher-home-button").classList.remove('selected-option');
+                if (currentHistoryStudentId) {
+                    const selectedStudent = document.querySelector(`.student-name[data-student-id="${currentHistoryStudentId}"]`);
+                    if (selectedStudent) selectedStudent.classList.add('selected-option');
+                }
+                taskHistoryState.isClassAverageView = false;
+                initTaskHistoryGraph(taskHistoryState.rawData);
+            } else {
+                document.querySelectorAll('.selection-option').forEach(el => el.classList.remove('selected-option'));
+                document.querySelector(".teacher-home-button").classList.add('selected-option');
+                renderClassAverageOnly();
+            }
+            return;
         }
 
+        document.querySelectorAll('.selection-option').forEach(task => task.classList.remove('selected-option'));
+        document.querySelector(".teacher-home-button").classList.add('selected-option');
+        displayTeacherHome();
+        if (currentAction !== "new-task") openSidebar();
         toggleMainBrowser(true);
-        const sidebar = document.querySelector('.sidebar');
-        sidebar.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
+        document.querySelector('.sidebar').scrollTo({ top: 0, behavior: 'smooth' });
     });
+    
+    // HISTORY VIEW TABS
 
-    // TASK HISTORY GRAPH START
+let currentHistoryStudentId = null;
+const taskArchiveCache = {};
+const TASK_ARCHIVE_CACHE_TTL = 30 * 60 * 1000;
 
+function switchHistoryTab(tab) {
+    document.getElementById("history-tab-progresas").classList.toggle("active-tab", tab === 'progresas');
+    document.getElementById("history-tab-istorija").classList.toggle("active-tab", tab === 'istorija');
+
+    if (tab === 'progresas') {
+        document.getElementById("task-archive-view").style.display = "none";
+        document.getElementById("confirm-button").style.display = "";
+        document.getElementById('new-search-button').style.display = 'flex';
+        document.querySelector(".teacher-home-button").style.opacity = "";
+        document.querySelector(".teacher-home-button").style.pointerEvents = "";
+        const graphLoaded = document.getElementById('new-search-button').disabled === false;
+        if (graphLoaded) {
+            document.querySelector("#student-task-history-container").style.display = "flex";
+            newTaskOptions.style.display = 'none';
+        } else {
+            document.querySelector("#student-task-history-container").style.display = "none";
+            newTaskOptions.style.display = 'flex';
+            document.querySelector("#group_name").style.display = "none";
+            enableNewTaskContainer();
+        }
+    } else {
+        document.querySelector("#student-task-history-container").style.display = "none";
+        newTaskOptions.style.display = 'none';
+        document.getElementById("confirm-button").style.display = "none";
+        document.getElementById("task-archive-view").style.display = "flex";
+        document.getElementById('new-search-button').style.display = 'none';
+        document.querySelector(".teacher-home-button").style.opacity = "0.35";
+        document.querySelector(".teacher-home-button").style.pointerEvents = "none";
+        if (currentHistoryStudentId) loadTaskArchive();
+    }
+}
+
+function renderClassAverageOnly() {
+    if (!taskHistoryState.rawData || !taskHistoryState.rawData.averageDates || taskHistoryState.rawData.averageDates.length === 0) {
+        document.querySelector('.task-history-chart-wrapper').innerHTML =
+            '<div class="task-history-empty">Nepakanka klasės duomenų.</div>';
+        document.querySelector("#student-task-history-container").style.display = "flex";
+        return;
+    }
+
+    const data = taskHistoryState.rawData;
+    const classOnlyData = {
+        studentDates: data.averageDates,
+        mistakeFrequency: data.averageMistakeFrequency,
+        answerRate: data.averageAnswerRate,
+        averageDates: [],
+        averageMistakeFrequency: [],
+        averageAnswerRate: [],
+        isClassAverageView: true
+    };
+
+    taskHistoryState.isClassAverageView = true;
+
+    const savedRaw = taskHistoryState.rawData;
+    const savedStart = taskHistoryState.startDate;
+    const savedEnd = taskHistoryState.endDate;
+
+    taskHistoryState.startDate = data.averageDates[0];
+    taskHistoryState.endDate = data.averageDates[data.averageDates.length - 1];
+    taskHistoryState.rawData = classOnlyData;
+
+    document.querySelector("#student-task-history-container").style.display = "flex";
+    initTaskHistoryGraph(classOnlyData);
+
+    taskHistoryState.rawData = savedRaw;
+    taskHistoryState.startDate = savedStart;
+    taskHistoryState.endDate = savedEnd;
+}
+
+async function loadTaskArchive() {
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    // Check if a student is selected, if not select the first one
+    let selectedStudent = document.querySelector(".outer-student-list-entry-item .student-name.selected-option");
+    if (!selectedStudent) {
+        selectedStudent = document.querySelector(".outer-student-list-entry-item .student-name");
+        if (selectedStudent) {
+            document.querySelector(".teacher-home-button").classList.remove('selected-option');
+            selectedStudent.classList.add('selected-option');
+        }
+    }
+
+    if (!selectedStudent) {
+        document.getElementById("task-archive-table-container").innerHTML = '<div class="task-archive-empty">Nėra mokinių.</div>';
+        return;
+    }
+
+    currentHistoryStudentId = Number(selectedStudent.dataset.studentId);
+
+    const startDate = document.getElementById("archiveStartDate").value;
+    const endDate = document.getElementById("archiveEndDate").value;
+    const container = document.getElementById("task-archive-table-container");
+
+    try {
+        let allRows;
+        const cached = taskArchiveCache[currentHistoryStudentId];
+        const now = Date.now();
+
+        if (cached && (now - cached.cachedAt) < TASK_ARCHIVE_CACHE_TTL) {
+            allRows = cached.rows;
+        } else {
+            container.innerHTML = '<div class="task-archive-empty">Kraunama...</div>';
+            const url = `${apiBase}students/task-history/${currentHistoryStudentId}`;
+            const response = await apiFetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+
+            if (!response || !response.ok) {
+                container.innerHTML = '<div class="task-archive-empty">Klaida gaunant duomenis.</div>';
+                return;
+            }
+
+            allRows = await response.json();
+            taskArchiveCache[currentHistoryStudentId] = { rows: allRows, cachedAt: now };
+        }
+
+        // Filter by date range client-side
+        let rows = allRows.filter(row => {
+            if (startDate && row.date < startDate) return false;
+            if (endDate && row.date > endDate) return false;
+            return true;
+        });
+
+        rows = filterOutlierRows(rows);
+
+        if (!rows.length) {
+            container.innerHTML = '<div class="task-archive-empty">Nėra duomenų šiam laikotarpiui.</div>';
+            return;
+        }
+
+        let tableHtml = `<table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Užduotis</th>
+                    <th>Atsakyta<br>iš viso</th>
+                    <th>Teisingai iš<br>pirmo karto</th>
+                    <th>Klaidos</th>
+                    <th>Greitis<br>(ats./min.)</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+        const subjectColors = {
+            'TURINIO KOMPONAVIMAS': '#32ac93',
+            'STRUKTŪROS IŠDĖSTYMAS': '#32ac93',
+            'RAŠYBA': '#F28C28',
+            'default': '#286D8A', // ALL MATH TASKS
+        };
+
+        rows.forEach(row => {
+            const parsedTaskDesc = JSON.parse(row.taskInfo);
+            const formattedTaskDesc = getOptionTextFromValues(parsedTaskDesc, null, forTeacher=true, compact=true);
+
+            const primary = formattedTaskDesc.filter(([_, t]) => t === 'primary').map(([v]) => v);
+            const secondary = formattedTaskDesc.filter(([_, t]) => t === 'secondary').map(([v]) => v);
+            const grammarParams = formattedTaskDesc.filter(([_, t]) => t === 'grammar-params').map(([v]) => Array.isArray(v) ? v.join(' | ') : v);
+
+            const firstColor = subjectColors[primary[0]] || subjectColors['default'];
+            const firstItem = primary[0] ? `<span style="color:${firstColor || 'inherit'}; font-weight:600;">${primary[0]}</span>` : '';
+            const restItems = primary.slice(1).join(' • ');
+            const primaryStr = firstItem + (restItems ? ` • ${restItems}` : '');
+
+            const hasSecondary = secondary.length > 0 || grammarParams.length > 0;
+            const secondaryContent = [
+                ...secondary,
+                ...(grammarParams.length ? [`[${grammarParams.join(' | ')}]`] : [])
+            ].join(' • ');
+            const secondaryStr = hasSecondary ? `<span class="task-label-secondary" style="display:none;"> • ${secondaryContent}</span>` : '';
+            const expandIcon = hasSecondary ? ` <span class="task-label-expand-icon">›</span>` : '';
+
+            const taskLabel = `<span class="task-label-wrapper${hasSecondary ? ' task-label-expandable' : ''}" ${hasSecondary ? `onclick="
+                const sec = this.querySelector('.task-label-secondary');
+                const icon = this.querySelector('.task-label-expand-icon');
+                const expanded = sec.style.display !== 'none';
+                sec.style.display = expanded ? 'none' : 'inline';
+                icon.style.display = expanded ? 'inline' : 'none';
+            "` : ''}>${primaryStr}${expandIcon}${secondaryStr}</span>`;
+
+            const mistakePct = row.totalAnswers > 0
+                ? Math.round((row.mistakes / row.totalAnswers) * 100)
+                : 0;
+
+            const correctPct = row.totalAnswers > 0
+                ? Math.round((row.correct / row.totalAnswers) * 100)
+                : 0;
+
+            tableHtml += `<tr>
+                <td>${row.date}</td>
+                <td style="text-align:left;">${taskLabel}</td>
+                <td>${row.totalAnswers}</td>
+                <td>${row.correct} (${correctPct}%)</td>
+                <td>${row.mistakes} (${mistakePct}%)</td>
+                <td>${row.answerRate}</td>
+            </tr>`;
+        });
+
+        tableHtml += '</tbody></table>';
+        container.innerHTML = tableHtml;
+
+    } catch (e) {
+        container.innerHTML = '<div class="task-archive-empty">Klaida.</div>';
+    }
+}
 // Graph state management
 const taskHistoryState = {
-    selectedMetrics: ['mistakeFrequency'], // Default: show mistake frequency
+    selectedMetrics: ['mistakeFrequency', 'answerRate'],
     startDate: null,
     endDate: null,
+    dataMaxDate: null,
     chart: null,
     rawData: null
 };
@@ -7854,18 +9567,18 @@ const taskHistoryState = {
 // Available metrics configuration
 const taskHistoryMetrics = [
     {
-        id: 'mistakeFrequency',
-        label: 'Klaidų dažnis',
-        color: '#ef4444',
-        yAxisID: 'y-percent',
-        isPercent: true
-    },
-    {
         id: 'answerRate',
-        label: 'Sprendimų greitis',
+        label: 'sprendimų greitis',
         color: '#3b82f6',
         yAxisID: 'y-rate',
         isPercent: false
+    },
+    {
+        id: 'mistakeFrequency',
+        label: 'klaidų dažnis',
+        color: '#ef4444',
+        yAxisID: 'y-percent',
+        isPercent: true
     }
 ];
 
@@ -7992,13 +9705,18 @@ function initTaskHistoryDateInputs(data) {
         return;
     }
 
-    const startInput = document.getElementById('taskHistoryStartDate');
-    const endInput = document.getElementById('taskHistoryEndDate');
-
     // Find actual min/max dates from ALL data (student + averages)
     const allDates = [...data.studentDates, ...data.averageDates].sort();
     const minDate = allDates[0];
     const maxDate = allDates[allDates.length - 1];
+
+    // Global earliest across all students = earliest average date (class-wide)
+    const globalMinDate = (taskHistoryState.rawData && taskHistoryState.rawData.averageDates && taskHistoryState.rawData.averageDates.length > 0)
+        ? [...taskHistoryState.rawData.averageDates].sort()[0]
+        : minDate;
+
+    // Store data max so Išvalyti on iki can reset to it
+    taskHistoryState.dataMaxDate = maxDate;
 
     // Set default range if not already set (use full data range)
     if (!taskHistoryState.startDate) {
@@ -8009,32 +9727,82 @@ function initTaskHistoryDateInputs(data) {
     }
 
     const today = new Date().toISOString().split('T')[0];
-    startInput.setAttribute('max', today);
-    endInput.setAttribute('max', today);
 
-    startInput.value = taskHistoryState.startDate;
-    endInput.value = taskHistoryState.endDate;
+    // Destroy existing flatpickr instances if they exist
+    if (taskHistoryState._startFp) { taskHistoryState._startFp.destroy(); }
+    if (taskHistoryState._endFp) { taskHistoryState._endFp.destroy(); }
 
-    // Date change handlers
-    startInput.onchange = function(e) {
-        const newStart = e.target.value;
-        if (newStart > taskHistoryState.endDate) {
-            taskHistoryState.endDate = newStart;
-            endInput.value = newStart;
+    taskHistoryState._startFp = flatpickr("#taskHistoryStartDate", {
+        locale: "lt",
+        dateFormat: "Y-m-d",
+        allowInput: false,
+        clickOpens: true,
+        defaultDate: taskHistoryState.startDate,
+        minDate: globalMinDate,
+        maxDate: today,
+
+        onChange: function(selectedDates, dateStr) {
+            if (!dateStr) return;
+            const newStart = dateStr;
+            if (newStart > taskHistoryState.endDate) {
+                taskHistoryState.endDate = newStart;
+                taskHistoryState._endFp.setDate(newStart, false);
+            }
+            taskHistoryState.startDate = newStart;
+            renderTaskHistoryGraph();
+        },
+
+        onReady: function(selectedDates, dateStr, instance) {
+            lockYearInput(instance);
+            const clearBtn = document.createElement("button");
+            clearBtn.innerText = "Išvalyti";
+            clearBtn.type = "button";
+            clearBtn.className = "lt-date-btn lt-date-btn-clear";
+            clearBtn.onclick = function() {
+                instance.setDate(minDate, true);
+            };
+            const btnRow = document.createElement("div");
+            btnRow.className = "lt-date-btn-row";
+            btnRow.appendChild(clearBtn);
+            instance.calendarContainer.appendChild(btnRow);
         }
-        taskHistoryState.startDate = newStart;
-        renderTaskHistoryGraph();
-    };
+    });
 
-    endInput.onchange = function(e) {
-        const newEnd = e.target.value;
-        if (newEnd < taskHistoryState.startDate) {
-            taskHistoryState.startDate = newEnd;
-            startInput.value = newEnd;
+    taskHistoryState._endFp = flatpickr("#taskHistoryEndDate", {
+        locale: "lt",
+        dateFormat: "Y-m-d",
+        allowInput: false,
+        clickOpens: true,
+        defaultDate: taskHistoryState.endDate,
+        maxDate: today,
+
+        onChange: function(selectedDates, dateStr) {
+            if (!dateStr) return;
+            const newEnd = dateStr;
+            if (newEnd < taskHistoryState.startDate) {
+                taskHistoryState.startDate = newEnd;
+                taskHistoryState._startFp.setDate(newEnd, false);
+            }
+            taskHistoryState.endDate = newEnd;
+            renderTaskHistoryGraph();
+        },
+
+        onReady: function(selectedDates, dateStr, instance) {
+            lockYearInput(instance);
+            const clearBtn = document.createElement("button");
+            clearBtn.innerText = "Išvalyti";
+            clearBtn.type = "button";
+            clearBtn.className = "lt-date-btn lt-date-btn-clear";
+            clearBtn.onclick = function() {
+                const resetDate = taskHistoryState.dataMaxDate || maxDate;
+                instance.setDate(resetDate, true);
+            };
+            const btnRow = document.createElement("div");
+            btnRow.className = "lt-date-btn-row";
+            btnRow.appendChild(clearBtn);
+            instance.calendarContainer.appendChild(btnRow);
         }
-        taskHistoryState.endDate = newEnd;
-        renderTaskHistoryGraph();
-    };
+    });
 }
 
 function filterTaskHistoryData(data) {
@@ -8042,26 +9810,21 @@ function filterTaskHistoryData(data) {
         return data;
     }
 
-    const start = new Date(taskHistoryState.startDate);
-    const end = new Date(taskHistoryState.endDate);
+    const start = new Date(taskHistoryState.startDate + 'T00:00:00Z');
+    const end = new Date(taskHistoryState.endDate + 'T00:00:00Z');
 
-    // Find the actual data boundaries (what dates have real data)
-    const studentDataStart = data.studentDates.length > 0 ? new Date(data.studentDates[0]) : null;
-    const studentDataEnd = data.studentDates.length > 0 ? new Date(data.studentDates[data.studentDates.length - 1]) : null;
+    const studentDataStart = data.studentDates.length > 0 ? new Date(data.studentDates[0] + 'T00:00:00Z') : null;
+    const studentDataEnd = data.studentDates.length > 0 ? new Date(data.studentDates[data.studentDates.length - 1] + 'T00:00:00Z') : null;
 
-    // Adjust display range to actual data boundaries
-    // Use the later of (selected start, actual data start)
-    // Use the earlier of (selected end, actual data end)
     const effectiveStart = studentDataStart && studentDataStart > start ? studentDataStart : start;
     const effectiveEnd = studentDataEnd && studentDataEnd < end ? studentDataEnd : end;
 
-    // Filter student data to effective range
     const filteredStudentDates = [];
     const filteredMistakeFreq = [];
     const filteredAnswerRate = [];
 
     data.studentDates.forEach(function(date, i) {
-        const d = new Date(date);
+        const d = new Date(date + 'T00:00:00Z');
         if (d >= effectiveStart && d <= effectiveEnd) {
             filteredStudentDates.push(date);
             filteredMistakeFreq.push(data.mistakeFrequency[i]);
@@ -8069,13 +9832,12 @@ function filterTaskHistoryData(data) {
         }
     });
 
-    // Filter average data to the same effective range for proper alignment
     const filteredAverageDates = [];
     const filteredAvgMistakeFreq = [];
     const filteredAvgAnswerRate = [];
 
     data.averageDates.forEach(function(date, i) {
-        const d = new Date(date);
+        const d = new Date(date + 'T00:00:00Z');
         if (d >= effectiveStart && d <= effectiveEnd) {
             filteredAverageDates.push(date);
             filteredAvgMistakeFreq.push(data.averageMistakeFrequency[i]);
@@ -8148,108 +9910,161 @@ function renderTaskHistoryGraph() {
     }
 
     if (!taskHistoryState.rawData) {
-        document.querySelector('.task-history-chart-wrapper').innerHTML = 
+        document.querySelector('.task-history-chart-wrapper').innerHTML =
             '<div class="task-history-empty">Nėra duomenų.</div>';
         return;
     }
 
-    // Check if there's any data at all for this task
-    const hasAnyData = taskHistoryState.rawData.studentDates.length > 0 || 
+    const hasAnyData = taskHistoryState.rawData.studentDates.length > 0 ||
                        taskHistoryState.rawData.averageDates.length > 0;
 
     if (!hasAnyData) {
-        document.querySelector('.task-history-chart-wrapper').innerHTML = 
-            '<div class="task-history-empty">Nėra duomenų šiai užduočiai.</div>';
+        document.querySelector('.task-history-chart-wrapper').innerHTML =
+            '<div class="task-history-empty">Nepakanka duomenų šiai užduočiai (reikia bent 5 įrašų).</div>';
         return;
     }
 
     const filteredData = filterTaskHistoryData(taskHistoryState.rawData);
 
     if (filteredData.studentDates.length === 0 && filteredData.averageDates.length === 0) {
-        document.querySelector('.task-history-chart-wrapper').innerHTML = 
+        document.querySelector('.task-history-chart-wrapper').innerHTML =
             '<div class="task-history-empty">Nėra duomenų pasirinktam laikotarpiui.</div>';
         return;
     }
 
-    // Ensure canvas exists
     let canvas = document.getElementById('taskHistoryChart');
     if (!canvas) {
-        document.querySelector('.task-history-chart-wrapper').innerHTML = 
+        document.querySelector('.task-history-chart-wrapper').innerHTML =
             '<canvas id="taskHistoryChart"></canvas>';
         canvas = document.getElementById('taskHistoryChart');
     }
 
+    const allDatesRaw = [...new Set([...filteredData.studentDates, ...filteredData.averageDates])].sort();
+
+    // Trim to actual data bounds: find first and last date where at least one dataset has a value
+    const studentDateSet = new Set(filteredData.studentDates);
+    const avgDateSet = new Set(filteredData.averageDates);
+    let firstDataIdx = 0;
+    let lastDataIdx = allDatesRaw.length - 1;
+    while (firstDataIdx <= lastDataIdx && !studentDateSet.has(allDatesRaw[firstDataIdx]) && !avgDateSet.has(allDatesRaw[firstDataIdx])) firstDataIdx++;
+    while (lastDataIdx >= firstDataIdx && !studentDateSet.has(allDatesRaw[lastDataIdx]) && !avgDateSet.has(allDatesRaw[lastDataIdx])) lastDataIdx--;
+    const allDates = allDatesRaw.slice(firstDataIdx, lastDataIdx + 1);
+
+    const xLabels = allDates.map(date => formatDateLabel(date));
     const datasets = [];
 
-    // Combine all dates and create unified x-axis
-    const allDates = [...new Set([...filteredData.studentDates, ...filteredData.averageDates])].sort();
-    const xLabels = allDates.map(date => formatDateLabel(date));
+    function computeTrendline(alignedData) {
+        // Step 1: backward-looking rolling average, window=3
+        // Each point is the average of itself and up to 2 preceding non-null values.
+        // This means the last point (potential outlier) is smoothed by recent history,
+        // and no future data is needed — causal and symmetric treatment across all points.
+        const smoothed = alignedData.map((v, i) => {
+            if (v === null) return null;
+            const window = [];
+            for (let j = i; j >= 0 && window.length < 2; j--) {
+                if (alignedData[j] !== null) window.push(alignedData[j]);
+            }
+            return window.reduce((a, b) => a + b, 0) / window.length;
+        });
 
-    // Add average trendlines FIRST (so they're underneath)
+        // Step 2: fit regression to smoothed series
+        const points = [];
+        smoothed.forEach((v, i) => { if (v !== null) points.push({ x: i, y: v }); });
+        if (points.length < 2) return alignedData.map(() => null);
+
+        const n = points.length;
+        const sumX = points.reduce((a, p) => a + p.x, 0);
+        const sumY = points.reduce((a, p) => a + p.y, 0);
+        const sumXY = points.reduce((a, p) => a + p.x * p.y, 0);
+        const sumXX = points.reduce((a, p) => a + p.x * p.x, 0);
+        const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+        const intercept = (sumY - slope * sumX) / n;
+
+        // Step 3: span from first to last raw non-null point so trendline is always full length
+        const rawIndices = alignedData.map((v, i) => v !== null ? i : null).filter(i => i !== null);
+        const firstIdx = rawIndices[0];
+        const lastIdx = rawIndices[rawIndices.length - 1];
+
+        return alignedData.map((_, i) => {
+            if (i < firstIdx || i > lastIdx) return null;
+            return Number((slope * i + intercept).toFixed(2));
+        });
+    }
+
+    const axisColorInfo = {};
+
     taskHistoryState.selectedMetrics.forEach(function(metricId) {
-        const metric = taskHistoryMetrics.find(function(m) { return m.id === metricId; });
+        const metric = taskHistoryMetrics.find(m => m.id === metricId);
         if (!metric) return;
 
         const avgDataKey = 'average' + metricId.charAt(0).toUpperCase() + metricId.slice(1);
         const avgData = filteredData[avgDataKey];
         const avgDates = filteredData.averageDates;
-
-        if (!avgData || avgData.length === 0 || !avgDates || avgDates.length === 0) return;
-
-        // Create sparse data array aligned to allDates
-        const alignedAvgData = allDates.map(date => {
-            const idx = avgDates.indexOf(date);
-            return idx !== -1 ? avgData[idx] : null;
-        });
-
-        const fadeColor = metric.color + '80';
-
-        datasets.push({
-            label: '', // IMPORTANT: empty string (not null)
-            data: alignedAvgData,
-            borderColor: fadeColor,
-            backgroundColor: 'transparent',
-            borderWidth: 2,
-            tension: 0.4,
-            pointRadius: 0,
-            pointHoverRadius: 0,
-            yAxisID: metric.yAxisID,
-            order: 2,
-            spanGaps: true,
-            isAverage: true  // Add flag to identify average datasets
-        });
-    });
-
-
-    // Add student data ON TOP with dashed lines
-    taskHistoryState.selectedMetrics.forEach(function(metricId) {
-        const metric = taskHistoryMetrics.find(function(m) { return m.id === metricId; });
-        if (!metric) return;
-
-        const dataKey = metricId;
-        const studentData = filteredData[dataKey];
+        const studentData = filteredData[metricId];
         const studentDates = filteredData.studentDates;
 
-        if (studentData && studentData.length > 0) {
-            // Create sparse data array aligned to allDates
-            const alignedData = allDates.map(date => {
-                const idx = studentDates.indexOf(date);
-                return idx !== -1 ? studentData[idx] : null;
-            });
+        const alignedStudentData = allDates.map(date => {
+            const idx = studentDates.indexOf(date);
+            return idx !== -1 ? studentData[idx] : null;
+        });
 
+        if (!axisColorInfo[metric.yAxisID]) axisColorInfo[metric.yAxisID] = [];
+        axisColorInfo[metric.yAxisID].push(metric.color);
+
+        // 1. Student trendline — bright solid, filled square in tooltip
+        const trendData = computeTrendline(alignedStudentData);
+        if (trendData.some(v => v !== null)) {
             datasets.push({
-                label: metric.label,
-                data: alignedData,
+                label: '_trend_' + metricId,
+                data: trendData,
                 borderColor: metric.color,
-                backgroundColor: metric.color + '20',
+                backgroundColor: metric.color,
                 borderWidth: 3,
-                borderDash: [8, 4],
+                tension: 0,
+                pointRadius: 0,
+                pointHoverRadius: 0,
+                yAxisID: metric.yAxisID,
+                order: 2,
+                spanGaps: false,
+                isTrendline: true
+            });
+        }
+
+        // 2. Class average — dashed, white-fill square in tooltip
+        if (avgData && avgData.length > 0 && avgDates && avgDates.length > 0) {
+            const alignedAvgData = allDates.map(date => {
+                const idx = avgDates.indexOf(date);
+                return idx !== -1 ? avgData[idx] : null;
+            });
+            datasets.push({
+                label: '_avg_' + metricId,
+                data: alignedAvgData,
+                borderColor: metric.color,
+                backgroundColor: 'rgba(255,255,255,0.8)',
+                borderWidth: 2,
+                borderDash: [6, 4],
+                tension: 0.4,
+                pointRadius: 0,
+                pointHoverRadius: 0,
+                yAxisID: metric.yAxisID,
+                order: 3,
+                spanGaps: true,
+                isAverage: true
+            });
+        }
+
+        // 3. Student data — faint solid, not in tooltip
+        if (studentData && studentData.length > 0) {
+            datasets.push({
+                label: '_data_' + metricId,
+                data: alignedStudentData,
+                borderColor: metric.color + '60',
+                backgroundColor: metric.color + '60',
+                borderWidth: 2,
                 tension: 0.3,
-                pointRadius: 5,
-                pointHoverRadius: 5,
+                pointRadius: 0,
+                pointHoverRadius: 4,
                 pointBackgroundColor: metric.color,
-                pointBorderColor: 'transparent',
-                pointBorderWidth: 0,
                 yAxisID: metric.yAxisID,
                 order: 1,
                 spanGaps: true
@@ -8259,7 +10074,6 @@ function renderTaskHistoryGraph() {
 
     const yAxes = {};
 
-    // Add percentage axis if needed
     if (taskHistoryState.selectedMetrics.indexOf('mistakeFrequency') !== -1) {
         yAxes['y-percent'] = {
             type: 'linear',
@@ -8269,27 +10083,20 @@ function renderTaskHistoryGraph() {
             suggestedMax: 100,
             title: {
                 display: true,
-                text: 'Procentai (%)',
+                text: 'Klaidų dažnis (%)',
                 color: '#666',
-                font: {
-                    size: 12,
-                    weight: 'bold'
-                }
+                font: { size: 12, weight: 'bold' }
             },
-            
             ticks: {
                 callback: function(value) { return Math.round(value); },
                 stepSize: 10,
                 color: '#666'
             },
-            grid: {
-                color: 'rgba(0, 0, 0, 0.1)'
-            },
+            grid: { color: 'rgba(0, 0, 0, 0.1)' },
             border: { display: false }
         };
     }
 
-    // Add rate axis if needed
     if (taskHistoryState.selectedMetrics.indexOf('answerRate') !== -1) {
         yAxes['y-rate'] = {
             type: 'linear',
@@ -8298,12 +10105,9 @@ function renderTaskHistoryGraph() {
             min: 0,
             title: {
                 display: true,
-                text: 'Ats. per min.',
+                text: 'Sprendimų greitis (ats./min.)',
                 color: '#666',
-                font: {
-                    size: 12,
-                    weight: 'bold'
-                }
+                font: { size: 12, weight: 'bold' }
             },
             ticks: {
                 callback: function(value) { return Math.round(value); },
@@ -8318,50 +10122,95 @@ function renderTaskHistoryGraph() {
         };
     }
 
+    const gray = '#888888';
     const ctx = canvas.getContext('2d');
+
     taskHistoryState.chart = new Chart(ctx, {
         type: 'line',
-        data: {
-            labels: xLabels,
-            datasets: datasets
-        },
+        data: { labels: xLabels, datasets },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            interaction: {
-                mode: 'index',
-                intersect: false
-            },
+            interaction: { mode: 'index', intersect: false },
             plugins: {
                 legend: {
                     display: true,
                     position: 'bottom',
                     labels: {
-                        usePointStyle: true,
+                        usePointStyle: false,
                         padding: 15,
-                        filter: function(legendItem, chartData) {
-                            return legendItem.text !== '';    // ← hides your average lines
+                        generateLabels: function() {
+                            const isClassView = taskHistoryState.isClassAverageView;
+                            const entries = [];
+                            const hasTrend = datasets.some(ds => ds.isTrendline);
+                            const hasData = datasets.some(ds => ds.label && ds.label.startsWith('_data_'));
+                            const hasAvg = datasets.some(ds => ds.isAverage);
+
+                            if (hasTrend) entries.push({
+                                text: isClassView ? 'Klasės tendencija' : 'Mokinio tendencija',
+                                fillStyle: gray,
+                                strokeStyle: gray,
+                                lineWidth: 3,
+                                lineDash: [],
+                                pointStyle: false,
+                                hidden: false
+                            });
+                            if (hasData) entries.push({
+                                text: isClassView ? 'Klasės duomenys' : 'Mokinio duomenys',
+                                fillStyle: gray + '60',
+                                strokeStyle: gray + '60',
+                                lineWidth: 2,
+                                lineDash: [],
+                                pointStyle: false,
+                                hidden: false
+                            });
+                            if (hasAvg) entries.push({
+                                text: 'Klasės tendencija',
+                                fillStyle: 'rgba(255,255,255,0.8)',
+                                strokeStyle: gray,
+                                lineWidth: 2,
+                                lineDash: [6, 4],
+                                pointStyle: false,
+                                hidden: false
+                            });
+                            return entries;
                         }
                     }
                 },
                 tooltip: {
+                    mode: 'index',
+                    intersect: false,
                     filter: function(tooltipItem) {
-                        // Hide average/trendline datasets from tooltip
-                        return !tooltipItem.dataset.isAverage;
+                        if (!tooltipItem.dataset.label) return false;
+
+                        const label = tooltipItem.dataset.label;
+                        const isStudentTrend = label.startsWith('_trend_');
+                        const isAvg = tooltipItem.dataset.isAverage;
+
+                        if (!isStudentTrend && !isAvg) return false;
+
+                        const trendDatasets = tooltipItem.chart.data.datasets.filter(
+                            ds => ds.label && ds.label.startsWith('_trend_')
+                        );
+                        const hasTrendData = trendDatasets.some(
+                            ds => ds.data[tooltipItem.dataIndex] !== null &&
+                                ds.data[tooltipItem.dataIndex] !== undefined
+                        );
+                        if (!hasTrendData) return false;
+
+                        return tooltipItem.dataset.data[tooltipItem.dataIndex] !== null &&
+                            tooltipItem.dataset.data[tooltipItem.dataIndex] !== undefined;
                     },
                     callbacks: {
                         label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) {
-                                label += ': ';
-                            }
-                            const yAxisId = context.dataset.yAxisID;
-                            if (yAxisId === 'y-percent') {
-                                label += Math.round(context.parsed.y) + '%';
-                            } else {
-                                label += Math.round(context.parsed.y);
-                            }
-                            return label;
+                            const metricId = context.dataset.label.replace('_avg_', '').replace('_trend_', '');
+                            const metric = taskHistoryMetrics.find(m => m.id === metricId);
+                            const label = metric ? (context.dataset.isAverage
+                                ? `${metric.label} (klasės tend.)`
+                                : `${metric.label} (mokinio tend.)`) : '';
+                            return (label ? label + ': ' : '') + (context.dataset.yAxisID === 'y-percent'
+                                ? Math.round(context.parsed.y) + '%'
+                                : Math.round(context.parsed.y * 10) / 10);
                         }
                     }
                 }
@@ -8369,26 +10218,110 @@ function renderTaskHistoryGraph() {
             scales: Object.assign({
                 x: {
                     type: 'category',
-                    ticks: {
-                        maxRotation: 45,
-                        minRotation: 0,
-                        autoSkip: true,
-                        maxTicksLimit: 10
-                    },
-                    grid: {
-                        display: false
-                    }
+                    ticks: { maxRotation: 45, minRotation: 0, autoSkip: true, maxTicksLimit: 10 },
+                    grid: { display: false }
                 }
             }, yAxes)
-        }
+        },
+        plugins: [{
+            id: 'coloredAxisLines',
+            afterDatasetsDraw: function(chart) {
+                const ctx = chart.ctx;
+                const chartArea = chart.chartArea;
+
+                Object.keys(axisColorInfo).forEach(function(scaleId) {
+                    const scale = chart.scales[scaleId];
+                    if (!scale) return;
+
+                    const colors = axisColorInfo[scaleId];
+                    if (!colors || colors.length === 0) return;
+
+                    const lineWidth = 3;
+                    const isLeft = scale.position === 'left';
+                    const x = isLeft ? scale.left : scale.right;
+                    const y1 = chartArea.top;
+                    const y2 = chartArea.bottom;
+                    const axisFullWidth = scale.width;
+
+                    colors.forEach(function(color, i) {
+                        const secondaryLineShift = i * lineWidth;
+                        ctx.save();
+                        ctx.strokeStyle = hexToRgba(color, 0.6);
+                        ctx.lineWidth = lineWidth;
+                        ctx.beginPath();
+                        const xPos = isLeft
+                            ? x + axisFullWidth - secondaryLineShift
+                            : x - axisFullWidth + secondaryLineShift;
+                        ctx.moveTo(xPos, y1);
+                        ctx.lineTo(xPos, y2);
+                        ctx.stroke();
+                        ctx.restore();
+                    });
+                });
+            }
+        }]
     });
 }
 
 function initTaskHistoryGraph(data) {
     taskHistoryState.rawData = data;
+    // Reset date range so it re-derives from the new student's actual data
+    taskHistoryState.startDate = null;
+    taskHistoryState.endDate = null;
+    taskHistoryState.dataMaxDate = null;
     initTaskHistoryDropdown();
     initTaskHistoryDateInputs(data);
     renderTaskHistoryGraph();
+}
+
+function renderTaskHistoryDescription() {
+    const box = document.getElementById('task-history-description-box');
+    const content = document.getElementById('task-history-description-content');
+    if (!box || !content) return;
+
+    const task = taskHistoryCurrentTask;
+    
+    if (!task || !task[0]) { box.style.display = 'none'; return; }
+
+    try {
+        // task may be an array of task arrays (expandedTasks) — use the first one
+        const taskArr = Array.isArray(task[0]) ? task[0] : task;
+
+        const formatted = getOptionTextFromValues(taskArr, null, true, true);
+
+        if (!formatted || formatted.length === 0) { box.style.display = 'none'; return; }
+
+        const primary = formatted.filter(([_, t]) => t === 'primary').map(([v]) => v);
+        const secondary = formatted.filter(([_, t]) => t === 'secondary').map(([v]) => v);
+        const grammarParams = formatted.filter(([_, t]) => t === 'grammar-params').map(([v]) => Array.isArray(v) ? v.join(' | ') : v);
+
+        const subjectColors = {
+            'TURINIO KOMPONAVIMAS': '#32ac93',
+            'STRUKTŪROS IŠDĖSTYMAS': '#32ac93',
+            'RAŠYBA': '#F28C28',
+            'default': '#286D8A',
+        };
+        const firstColor = subjectColors[primary[0]] || subjectColors['default'];
+
+        let html = '';
+        const allItems = [...primary, ...secondary, ...(grammarParams.length ? [`[${grammarParams.join(' | ')}]`] : [])];
+
+        if (allItems.length > 0) {
+            html += `<div style="margin-bottom:3px; opacity:0.85; font-size:0.9rem;">`;
+            allItems.forEach((item, i) => {
+                const color = i === 0 ? firstColor : 'inherit';
+                const weight = i === 0 ? '600' : '400';
+                html += `<span style="color:${color}; font-weight:${weight};">${item}</span>`;
+                if (i < allItems.length - 1) html += ` <span style="opacity:0.4;">•</span> `;
+            });
+            html += `</div>`;
+        }
+
+        content.innerHTML = html;
+        box.style.display = 'block';
+    } catch (e) {
+        box.style.display = 'none';
+    }
 }
 
 // TASK HISTORY GRAPH END
@@ -8559,16 +10492,13 @@ function showConfirmationButtons(action) {
             break;
         case 'browse-history':
             confirmLabel.textContent = 'Ieškoti';
-            cancelLabel.textContent = 'Uždaryti istoriją';
+            cancelLabel.textContent = 'Uždaryti archyvą';
             toggleBrowseHistory();
             break;
     }
     
     document.getElementById('action-buttons-container').style.display = 'none';
     document.getElementById('confirmation-buttons-container').style.display = 'flex';
-    if (action === "browse-history") {
-        document.getElementById('new-search-button').style.display = 'flex';
-    }
 }
 
 function hideConfirmationButtons() {
@@ -8610,6 +10540,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
      document.getElementById('browse-task-history-button').addEventListener('click', () => {
         showConfirmationButtons('browse-history');
+        loadTaskArchive();
     });
     
     // Confirmation buttons
@@ -8622,6 +10553,7 @@ document.addEventListener('DOMContentLoaded', () => {
             deleteStudents();
         } else if (currentAction === 'browse-history') {
             setTaskHistoryQuery();
+            openSidebar();
         }
     });
     
@@ -9601,6 +11533,106 @@ function toggleTextExpand(id) {
 
     applyFilters();
 }
+
+function lockYearInput(instance) {
+    const yearInput = instance.calendarContainer?.querySelector('.cur-year');
+    if (yearInput) {
+        yearInput.readOnly = true;
+        yearInput.style.pointerEvents = 'none';
+        yearInput.style.caretColor = 'transparent';
+    }
+    instance.calendarContainer.querySelector('.flatpickr-current-month')
+        .classList.add('lt-date-month-year');
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    function getTwoWeeksAgo() {
+        const d = new Date();
+        d.setDate(d.getDate() - 14);
+        return d;
+    }
+
+    const defaultDate = getTwoWeeksAgo();
+
+    flatpickr("#archiveStartDate", {
+        locale: "lt",
+        dateFormat: "Y-m-d",
+        allowInput: false,
+        clickOpens: true,
+        defaultDate: defaultDate,
+
+        onChange: function(selectedDates, dateStr, instance) {
+            loadTaskArchive();
+        },
+
+        onReady: function(selectedDates, dateStr, instance) {
+            lockYearInput(instance);
+
+            const todayBtn = document.createElement("button");
+            todayBtn.innerText = "Šiandien";
+            todayBtn.type = "button";
+            todayBtn.className = "lt-date-btn lt-date-btn-today";
+            todayBtn.onclick = function() {
+                instance.setDate(new Date(), true);
+            };
+
+            const clearBtn = document.createElement("button");
+            clearBtn.innerText = "Išvalyti";
+            clearBtn.type = "button";
+            clearBtn.className = "lt-date-btn lt-date-btn-clear";
+            clearBtn.onclick = function() {
+                instance.setDate(getTwoWeeksAgo(), true);
+            };
+
+            const btnRow = document.createElement("div");
+            btnRow.className = "lt-date-btn-row";
+            btnRow.appendChild(todayBtn);
+            btnRow.appendChild(clearBtn);
+            instance.calendarContainer.appendChild(btnRow);
+        }
+    });
+
+    flatpickr("#archiveEndDate", {
+        locale: "lt",
+        dateFormat: "Y-m-d",
+        allowInput: false,
+        clickOpens: true,
+        defaultDate: new Date(),
+        maxDate: new Date(),
+
+        onChange: function(selectedDates, dateStr, instance) {
+            loadTaskArchive();
+        },
+
+        onReady: function(selectedDates, dateStr, instance) {
+            lockYearInput(instance);
+
+            const todayBtn = document.createElement("button");
+            todayBtn.innerText = "Šiandien";
+            todayBtn.type = "button";
+            todayBtn.className = "lt-date-btn lt-date-btn-today";
+            todayBtn.onclick = function() {
+                instance.setDate(new Date(), true);
+            };
+
+            const clearBtn = document.createElement("button");
+            clearBtn.innerText = "Išvalyti";
+            clearBtn.type = "button";
+            clearBtn.className = "lt-date-btn lt-date-btn-clear";
+            clearBtn.onclick = function() {
+                instance.setDate(new Date(), true);
+            };
+
+            const btnRow = document.createElement("div");
+            btnRow.className = "lt-date-btn-row";
+            btnRow.appendChild(todayBtn);
+            btnRow.appendChild(clearBtn);
+            instance.calendarContainer.appendChild(btnRow);
+        }
+    });
+
+});
 
 	</script>
 </body>
