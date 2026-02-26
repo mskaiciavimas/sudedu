@@ -9336,6 +9336,7 @@ let taskHistoryCurrentTask = null;
                 document.querySelector(".teacher-home-button").classList.add('selected-option');
                 renderClassAverageOnly();
             }
+            openSidebar();
             return;
         }
 
@@ -9729,11 +9730,12 @@ function initTaskHistoryDateInputs(data) {
     const today = new Date().toISOString().split('T')[0];
 
     // Destroy existing flatpickr instances if they exist
-    if (taskHistoryState._startFp) { taskHistoryState._startFp.destroy(); }
-    if (taskHistoryState._endFp) { taskHistoryState._endFp.destroy(); }
+    if (taskHistoryState._startFp && typeof taskHistoryState._startFp.destroy === 'function') { taskHistoryState._startFp.destroy(); }
+    if (taskHistoryState._endFp && typeof taskHistoryState._endFp.destroy === 'function') { taskHistoryState._endFp.destroy(); }
 
     taskHistoryState._startFp = flatpickr("#taskHistoryStartDate", {
         locale: "lt",
+        disableMobile: true,
         dateFormat: "Y-m-d",
         allowInput: false,
         clickOpens: true,
@@ -9760,16 +9762,18 @@ function initTaskHistoryDateInputs(data) {
             clearBtn.className = "lt-date-btn lt-date-btn-clear";
             clearBtn.onclick = function() {
                 instance.setDate(minDate, true);
+                instance.close();
             };
             const btnRow = document.createElement("div");
             btnRow.className = "lt-date-btn-row";
             btnRow.appendChild(clearBtn);
-            instance.calendarContainer.appendChild(btnRow);
+            if (instance.calendarContainer) instance.calendarContainer.appendChild(btnRow);
         }
     });
 
     taskHistoryState._endFp = flatpickr("#taskHistoryEndDate", {
         locale: "lt",
+        disableMobile: true,
         dateFormat: "Y-m-d",
         allowInput: false,
         clickOpens: true,
@@ -9796,11 +9800,12 @@ function initTaskHistoryDateInputs(data) {
             clearBtn.onclick = function() {
                 const resetDate = taskHistoryState.dataMaxDate || maxDate;
                 instance.setDate(resetDate, true);
+                instance.close();
             };
             const btnRow = document.createElement("div");
             btnRow.className = "lt-date-btn-row";
             btnRow.appendChild(clearBtn);
-            instance.calendarContainer.appendChild(btnRow);
+            if (instance.calendarContainer) instance.calendarContainer.appendChild(btnRow);
         }
     });
 }
@@ -9813,19 +9818,13 @@ function filterTaskHistoryData(data) {
     const start = new Date(taskHistoryState.startDate + 'T00:00:00Z');
     const end = new Date(taskHistoryState.endDate + 'T00:00:00Z');
 
-    const studentDataStart = data.studentDates.length > 0 ? new Date(data.studentDates[0] + 'T00:00:00Z') : null;
-    const studentDataEnd = data.studentDates.length > 0 ? new Date(data.studentDates[data.studentDates.length - 1] + 'T00:00:00Z') : null;
-
-    const effectiveStart = studentDataStart && studentDataStart > start ? studentDataStart : start;
-    const effectiveEnd = studentDataEnd && studentDataEnd < end ? studentDataEnd : end;
-
     const filteredStudentDates = [];
     const filteredMistakeFreq = [];
     const filteredAnswerRate = [];
 
     data.studentDates.forEach(function(date, i) {
         const d = new Date(date + 'T00:00:00Z');
-        if (d >= effectiveStart && d <= effectiveEnd) {
+        if (d >= start && d <= end) {
             filteredStudentDates.push(date);
             filteredMistakeFreq.push(data.mistakeFrequency[i]);
             filteredAnswerRate.push(data.answerRate[i]);
@@ -9838,7 +9837,7 @@ function filterTaskHistoryData(data) {
 
     data.averageDates.forEach(function(date, i) {
         const d = new Date(date + 'T00:00:00Z');
-        if (d >= effectiveStart && d <= effectiveEnd) {
+        if (d >= start && d <= end) {
             filteredAverageDates.push(date);
             filteredAvgMistakeFreq.push(data.averageMistakeFrequency[i]);
             filteredAvgAnswerRate.push(data.averageAnswerRate[i]);
@@ -9939,16 +9938,15 @@ function renderTaskHistoryGraph() {
         canvas = document.getElementById('taskHistoryChart');
     }
 
-    const allDatesRaw = [...new Set([...filteredData.studentDates, ...filteredData.averageDates])].sort();
-
-    // Trim to actual data bounds: find first and last date where at least one dataset has a value
-    const studentDateSet = new Set(filteredData.studentDates);
-    const avgDateSet = new Set(filteredData.averageDates);
-    let firstDataIdx = 0;
-    let lastDataIdx = allDatesRaw.length - 1;
-    while (firstDataIdx <= lastDataIdx && !studentDateSet.has(allDatesRaw[firstDataIdx]) && !avgDateSet.has(allDatesRaw[firstDataIdx])) firstDataIdx++;
-    while (lastDataIdx >= firstDataIdx && !studentDateSet.has(allDatesRaw[lastDataIdx]) && !avgDateSet.has(allDatesRaw[lastDataIdx])) lastDataIdx--;
-    const allDates = allDatesRaw.slice(firstDataIdx, lastDataIdx + 1);
+    // X-axis bounds: driven by student dates if a student is selected, otherwise by average dates.
+    // This prevents class-average dates outside the student's range from creating x-axis gaps.
+    const hasStudentData = filteredData.studentDates.length > 0;
+    const boundingDates = hasStudentData ? filteredData.studentDates : filteredData.averageDates;
+    const axisStart = boundingDates[0];
+    const axisEnd = boundingDates[boundingDates.length - 1];
+    const allDates = [...new Set([...filteredData.studentDates, ...filteredData.averageDates])]
+        .sort()
+        .filter(d => d >= axisStart && d <= axisEnd);
 
     const xLabels = allDates.map(date => formatDateLabel(date));
     const datasets = [];
@@ -10265,9 +10263,7 @@ function renderTaskHistoryGraph() {
 
 function initTaskHistoryGraph(data) {
     taskHistoryState.rawData = data;
-    // Reset date range so it re-derives from the new student's actual data
-    taskHistoryState.startDate = null;
-    taskHistoryState.endDate = null;
+    // Preserve any user-set date range; only reset dataMaxDate so Išvalyti recalculates correctly
     taskHistoryState.dataMaxDate = null;
     initTaskHistoryDropdown();
     initTaskHistoryDateInputs(data);
@@ -11541,7 +11537,7 @@ function lockYearInput(instance) {
         yearInput.style.pointerEvents = 'none';
         yearInput.style.caretColor = 'transparent';
     }
-    instance.calendarContainer.querySelector('.flatpickr-current-month')
+    instance.calendarContainer?.querySelector('.flatpickr-current-month')
         .classList.add('lt-date-month-year');
 }
 
@@ -11557,6 +11553,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     flatpickr("#archiveStartDate", {
         locale: "lt",
+        disableMobile: true,
         dateFormat: "Y-m-d",
         allowInput: false,
         clickOpens: true,
@@ -11575,6 +11572,7 @@ document.addEventListener("DOMContentLoaded", function () {
             todayBtn.className = "lt-date-btn lt-date-btn-today";
             todayBtn.onclick = function() {
                 instance.setDate(new Date(), true);
+                instance.close();
             };
 
             const clearBtn = document.createElement("button");
@@ -11583,23 +11581,25 @@ document.addEventListener("DOMContentLoaded", function () {
             clearBtn.className = "lt-date-btn lt-date-btn-clear";
             clearBtn.onclick = function() {
                 instance.setDate(getTwoWeeksAgo(), true);
+                instance.close();
             };
 
             const btnRow = document.createElement("div");
             btnRow.className = "lt-date-btn-row";
             btnRow.appendChild(todayBtn);
             btnRow.appendChild(clearBtn);
-            instance.calendarContainer.appendChild(btnRow);
+            instance.calendarContainer?.appendChild(btnRow);
         }
     });
 
     flatpickr("#archiveEndDate", {
         locale: "lt",
+        disableMobile: true,
         dateFormat: "Y-m-d",
         allowInput: false,
         clickOpens: true,
-        defaultDate: new Date(),
-        maxDate: new Date(),
+        defaultDate: new Date().toISOString().split('T')[0],
+        maxDate: new Date().toISOString().split('T')[0],
 
         onChange: function(selectedDates, dateStr, instance) {
             loadTaskArchive();
@@ -11613,7 +11613,9 @@ document.addEventListener("DOMContentLoaded", function () {
             todayBtn.type = "button";
             todayBtn.className = "lt-date-btn lt-date-btn-today";
             todayBtn.onclick = function() {
-                instance.setDate(new Date(), true);
+                instance.setDate(new Date().toISOString().split('T')[0], true);
+                loadTaskArchive();
+                instance.close();
             };
 
             const clearBtn = document.createElement("button");
@@ -11621,14 +11623,16 @@ document.addEventListener("DOMContentLoaded", function () {
             clearBtn.type = "button";
             clearBtn.className = "lt-date-btn lt-date-btn-clear";
             clearBtn.onclick = function() {
-                instance.setDate(new Date(), true);
+                instance.setDate(new Date().toISOString().split('T')[0], true);
+                loadTaskArchive();
+                instance.close();
             };
 
             const btnRow = document.createElement("div");
             btnRow.className = "lt-date-btn-row";
             btnRow.appendChild(todayBtn);
             btnRow.appendChild(clearBtn);
-            instance.calendarContainer.appendChild(btnRow);
+            if (instance.calendarContainer) instance.calendarContainer.appendChild(btnRow);
         }
     });
 
