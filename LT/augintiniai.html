@@ -6956,7 +6956,9 @@ function setRoomObjectZIndexes() {
 
         // WALK-ON ITEMS (CAN STEP ALL OVER)
         if (asset.walkOn) {
-            obj.style.zIndex = 3;
+            const firstFloorRow = rowZIndexMap.findIndex(row => row.some(z => z != null));
+            const walkOnZ = firstFloorRow !== -1 ? firstFloorRow + 1 : 3;
+            obj.style.zIndex = walkOnZ;
             walkOnItems.push(obj.id);
             return;
         }
@@ -7022,7 +7024,7 @@ function setRoomObjectZIndexes() {
         }
         
         if (aCanBeOnB || bCanBeOnA) {
-            if (!wallOnlyItems.includes(surface)) {
+            if (!wallOnlyItems.includes(surface.id)) {
                 const placedCoords = getObjectCoordinates(placed.id);
                 const placedWidth = Math.ceil(placed.offsetWidth / unitSize);
                 const placedHeight = Math.ceil(placed.offsetHeight / unitSize);
@@ -7292,7 +7294,9 @@ function updateSingleItemZIndex(itemId) {
         
         // WALK-ON ITEMS
         if (asset.walkOn) {
-            obj.style.zIndex = 3;
+            const firstFloorRow = rowZIndexMap.findIndex(row => row.some(z => z != null));
+            const walkOnZ = firstFloorRow !== -1 ? firstFloorRow + 1 : 3;
+            obj.style.zIndex = walkOnZ;
             return;
         }
         
@@ -10936,6 +10940,19 @@ function renderShopItems(selectedCategory = 'all', department = 'pet-supplies', 
                 selectedValues[idx],
                 (newValue) => {
                     selectedValues[idx] = newValue;
+                    // If no variant matches the new combination, find one that has
+                    // this new value and adapt the other parameters to fit
+                    if (!getSelectedVariant()) {
+                        const fallback = variants.find(v => v.item.variant[idx] === newValue);
+                        if (fallback) {
+                            variantTypes.forEach((_, otherIdx) => {
+                                if (otherIdx !== idx) {
+                                    selectedValues[otherIdx] = fallback.item.variant[otherIdx];
+                                    dropdownControls[otherIdx]?.setSelected(selectedValues[otherIdx]);
+                                }
+                            });
+                        }
+                    }
                     updateDropdowns();
                     onChange(getSelectedVariant());
                 },
