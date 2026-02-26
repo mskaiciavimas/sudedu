@@ -381,7 +381,7 @@ function updateModeChoice7() {
         modeChoice7Element.innerHTML = '<option value="C47">EILUTE</option>';
     } else if (modeChoice5Selection === "C41" && modeChoice2Selection !== "C18" && modeChoice2Selection !== "C28" && modeChoice2Selection !== "C29") {
         modeChoice7Element.innerHTML = '';
-        if (browsingHistory) {
+        if (typeof browsingHistory !== "undefined" && browsingHistory) {
             modeChoice7Element.innerHTML += '<option value="C47-C48">EILUTE ARBA STULPELIU / KAMPU</option>';
         }
 
@@ -419,7 +419,7 @@ checkbox.addEventListener('change', updateModeChoice7);
 
 function updateModeChoice12 () {
     modeChoice12Element.innerHTML = "";
-    if (browsingHistory) {
+    if (typeof browsingHistory !== "undefined" && browsingHistory) {
         modeChoice12Element.innerHTML += '<option value="C73-C74">LENGVESNĖS IR SUNKESNĖS KOMBINACIJOS</option>';
     }
     modeChoice12Element.innerHTML += '<option value="C73">LENGVESNĖS KOMBINACIJOS</option>';
@@ -428,7 +428,7 @@ function updateModeChoice12 () {
 
 function updateModeChoice13 () {
     modeChoice13Element.innerHTML = "";
-    if (browsingHistory) {
+    if (typeof browsingHistory !== "undefined" && browsingHistory) {
         modeChoice13Element.innerHTML += '<option value="0">RETESNI IR DAŽNESNI ATVEJAI</option>';
     }
     modeChoice13Element.innerHTML += '<option value="3">RETESNI ATVEJAI</option>';
@@ -454,7 +454,7 @@ function handleModeChoice8Change() {
         if (classChoiceSelection === "C75") {
             toggleVisibility(modeChoice13Element, true);
             modeChoice13Element.innerHTML = "";
-            if (browsingHistory) {
+            if (typeof browsingHistory !== "undefined" && browsingHistory) {
                 modeChoice13Element.innerHTML += '<option value="0">RETESNI IR DAŽNESNI ATVEJAI</option>';
             }
             modeChoice13Element.innerHTML += '<option value="3">RETESNI ATVEJAI</option>';
@@ -464,7 +464,7 @@ function handleModeChoice8Change() {
         } else {
             toggleVisibility(modeChoice13Element, true);
             modeChoice13Element.innerHTML = "";
-            if (browsingHistory) {
+            if (typeof browsingHistory !== "undefined" && browsingHistory) {
                 modeChoice13Element.innerHTML += '<option value="0">RETESNI IR DAŽNESNI ATVEJAI</option>';
             }
             modeChoice13Element.innerHTML += '<option value="1">DAŽNESNI ATVEJAI</option>';
