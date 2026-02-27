@@ -4844,35 +4844,61 @@ window.addEventListener('resize', resizeCanvas);
             roomObjectsContainer.style.height = height + "px";
         }
 
-// Function to render assets into the container
 function renderRoomObjects() {
     const roomObjectsContainer = document.querySelector("#roomObjectsContainer");
     roomObjectsContainer.innerHTML = '';
 
+    const autoPetObjects = [];
+    const normalObjects = [];
+
+    // Split objects into two groups
     Object.entries(userObjectAssets).forEach(([key, asset]) => {
         if (asset.position.length !== 0) {
-            const [x, y] = asset.position;
-            const div = document.createElement("div");
-            roomObjectsContainer.appendChild(div);
-            div.className = `${gameAssetIndex[asset.assetIndex]["css-class"]} room-object `;
-            div.id = key;
-            div.style.left = `calc(${x} * var(--unit-size))`;
-            div.style.top = `calc((${y + 1} * var(--unit-size)) - ${div.offsetHeight}px)`;
+            const cssClass = gameAssetIndex[asset.assetIndex]["css-class"];
+            const isAutoPet = cssClass.includes("auto-pet");
+
+            if (isAutoPet) {
+                autoPetObjects.push([key, asset]);
+            } else {
+                normalObjects.push([key, asset]);
+            }
         }
     });
 
+    // Helper function to render objects
+    function renderObjects(objectList) {
+        objectList.forEach(([key, asset]) => {
+            const [x, y] = asset.position;
+            const div = document.createElement("div");
+            roomObjectsContainer.appendChild(div);
+
+            div.className = `${gameAssetIndex[asset.assetIndex]["css-class"]} room-object`;
+            div.id = key;
+            div.style.left = `calc(${x} * var(--unit-size))`;
+            div.style.top = `calc((${y + 1} * var(--unit-size)) - ${div.offsetHeight}px)`;
+        });
+    }
+
+    // Render normal objects FIRST
+    renderObjects(normalObjects);
+
+    // Then render auto-pet objects LAST
+    renderObjects(autoPetObjects);
+
+    // Render furniture preview (always last)
     if (furniturePreviewDict["furniture-preview"].assetIndex) {
         if (furniturePreviewDict["furniture-preview"].position.length !== 0) {
             const [x, y] = furniturePreviewDict["furniture-preview"].position;
             const div = document.createElement("div");
             roomObjectsContainer.appendChild(div);
-            div.className = `${gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex]["css-class"]} room-object furniture-preview `;
+
+            div.className = `${gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex]["css-class"]} room-object furniture-preview`;
             div.id = 'furniture-preview';
             div.style.left = `calc(${x} * var(--unit-size))`;
             div.style.top = `calc((${y + 1} * var(--unit-size)) - ${div.offsetHeight}px)`;
         }
     }
-    
+
     disableObjectDragging();
 }
 
