@@ -5443,9 +5443,34 @@ const objectInteractions = {
     'fireplace': (obj) => toggleFireplace(obj),
     'oven': (obj) => toggleOven(obj),
     'washing-machine': (obj) => toggleWashingMachine(obj),
+    'tv': (obj) => toggleTV(obj),
 };
 
 function toggleWashingMachine(obj) {
+    if (!taxesData.electricityTax.paid) {
+        room.classList.add("dark");
+        messageToTheUser("Nėra elektros! Sumokėk elektros mokestį.")
+    }
+    
+    const isTogglingOn = !obj.classList.contains('on');
+    obj.classList.toggle('on');
+    
+    if (isTogglingOn) {
+        // Attach listener when turning ON
+        obj._editModeListener = () => {
+            obj.classList.remove('on');
+        };
+        toggleEditSaveBtn.addEventListener("click", obj._editModeListener);
+    } else {
+        // Remove listener when turning OFF
+        if (obj._editModeListener) {
+            toggleEditSaveBtn.removeEventListener("click", obj._editModeListener);
+            obj._editModeListener = null;
+        }
+    }
+}
+
+function toggleTV(obj) {
     if (!taxesData.electricityTax.paid) {
         room.classList.add("dark");
         messageToTheUser("Nėra elektros! Sumokėk elektros mokestį.")

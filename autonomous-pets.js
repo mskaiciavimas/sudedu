@@ -258,6 +258,7 @@ async function ghostTogglesAppliances(autoPet) {
     'sink': (obj) => toggleSinkTap(obj),
     'oven': (obj) => toggleOven(obj),
     'washing-machine': (obj) => toggleWashingMachine(obj),
+    'tv': (obj) => toggleTV(obj),
   }
 
   const selector = Object.keys(suitableAppliances)
