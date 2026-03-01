@@ -5421,8 +5421,6 @@ async function walkToRandomPosition() {
       
       petEl._hasJumpedOn = true;
     }
-    
-    startRandomPetOnWalkAction();
   }
   
   // ===== SUBSEQUENT MOVEMENTS: WALK IF ENOUGH SPACE =====
@@ -5460,7 +5458,7 @@ async function walkToRandomPosition() {
           petEl.removeEventListener("transitionend", onTransitionEnd);
           resolve();
         }
-      }, duration + 100);
+      }, duration + 500);
       
       function onTransitionEnd(e) {
         if (e.propertyName === "left" && !resolved) {
@@ -5472,6 +5470,8 @@ async function walkToRandomPosition() {
       }
       petEl.addEventListener("transitionend", onTransitionEnd);
     });
+
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
   
   startRandomPetOnWalkAction();
