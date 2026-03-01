@@ -4794,20 +4794,26 @@ button:disabled.cancel-btn::before {
         }
 
         function calculateAverageStudentScore(stats) {
-            const validKeys = Object.keys(stats).filter(k => !['c', 'd'].includes(k));
-            let ratios = [];
+            const statTypes = ['m', 't', 'g'];
+            const weekTotals = {};
 
-            for (const key of validKeys) {
-                for (const sub of stats[key]) {
-                if (Array.isArray(sub) && sub.length >= 4) {
-                    const points = sub[0];
-                    ratios.push(points);
-                }
+            for (const type of statTypes) {
+                const arr = stats[type + 'Full'] || stats[type]; // fall back to normal if Full not present
+                if (arr && Array.isArray(arr)) {
+                    arr.forEach((weekData, weekIndex) => {
+                        if (Array.isArray(weekData) && weekData.length > 0) {
+                            weekTotals[weekIndex] = (weekTotals[weekIndex] || 0) + (weekData[0] || 0);
+                        }
+                    });
                 }
             }
 
-            if (ratios.length === 0) return 0;
-            return (ratios.reduce((a, b) => a + b, 0) / ratios.length).toFixed(2);
+            const weekCount = Object.keys(weekTotals).length;
+            if (weekCount === 0) return 0;
+
+            const totalPoints = Object.values(weekTotals).reduce((sum, val) => sum + val, 0);
+            const points = totalPoints / weekCount / statTypes.length;
+            return points > 0 ? +points.toFixed(1) : 0;
         }
 
 let studentStatisticsLastRecord;
@@ -7793,40 +7799,31 @@ function displayTeacherHome(selectedGroupNames=null) {
         });
 
         function medianStudentScore(students) {
-        const studentAverages = students.map(student => {
-            const stats = student.stats;
-            const validKeys = Object.keys(stats).filter(k => !['c', 'd'].includes(k));
+            const statTypes = ['m', 't', 'g'];
+            const studentAverages = students.map(student => {
+                const stats = student.stats;
+                const weekTotals = {};
 
-            let allRatios = [];
-
-            for (const key of validKeys) {
-            const statArray = stats[key];
-            if (Array.isArray(statArray)) {
-                for (const sub of statArray) {
-                if (Array.isArray(sub) && sub.length >= 4) {
-                    const points = sub[0];
-                    allRatios.push(points);
+                for (const type of statTypes) {
+                    const arr = stats[type + 'Full'] || stats[type];
+                    if (arr && Array.isArray(arr)) {
+                        arr.forEach((weekData, weekIndex) => {
+                            if (Array.isArray(weekData) && weekData.length > 0) {
+                                weekTotals[weekIndex] = (weekTotals[weekIndex] || 0) + (weekData[0] || 0);
+                            }
+                        });
+                    }
                 }
-                }
-            }
-            }
 
-            if (allRatios.length === 0) return 0;
-            const avg = allRatios.reduce((a, b) => a + b, 0) / allRatios.length;
-            return avg;
-        });
+                const weekCount = Object.keys(weekTotals).length;
+                if (weekCount === 0) return 0;
+                return Object.values(weekTotals).reduce((sum, val) => sum + val, 0) / weekCount / statTypes.length;
+            });
 
-        // Sort for median
-        const sorted = studentAverages.sort((a, b) => a - b);
-        const mid = Math.floor(sorted.length / 2);
-
-        const median =
-            sorted.length % 2 === 0
-            ? (sorted[mid - 1] + sorted[mid]) / 2
-            : sorted[mid];
-
-        // Express as percentage, rounded to 2 digits
-        return +median.toFixed(2);
+            const sorted = studentAverages.sort((a, b) => a - b);
+            const mid = Math.floor(sorted.length / 2);
+            const median = sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+            return +median.toFixed(2);
         }
         
 
@@ -8163,10 +8160,16 @@ function displayTeacherHome(selectedGroupNames=null) {
                 studentList.forEach(student => {
                     // EXCLUDE CURRENT WEEK
                     if (student.stats) {
+                        // Save full arrays (including current week) for points average
+                        student.stats.mFull = student.stats.m ? [...student.stats.m] : [];
+                        student.stats.tFull = student.stats.t ? [...student.stats.t] : [];
+                        student.stats.gFull = student.stats.g ? [...student.stats.g] : [];
+
                         // Remove last entry from consistency array
                         if (student.stats.c && student.stats.c.length > 0) {
                             student.stats.c = student.stats.c.slice(0, -1);
                         }
+
                         // Remove last entry from math stats
                         if (student.stats.m && student.stats.m.length > 0) {
                             student.stats.m = student.stats.m.slice(0, -1);

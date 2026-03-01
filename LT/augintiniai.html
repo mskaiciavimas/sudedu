@@ -2281,8 +2281,6 @@
 }
 
 .gift-preview {
-  width: 100px;
-  height: 100px;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -3989,6 +3987,7 @@
     <script src="../mental-arithmetic.js"></script>
     <script src="../main-nav-bar.js"></script>
     <script src="../autonomous-pets.js"></script>
+    <script src="../functional-objects.js"></script>
     <script>
         
         // ITEMS THAT ARE IGNORED WHEN DETERMINED PLACEMENT / ITEM REMOVAL etc. (such as flooring, carpets, wallpapers)
@@ -4844,7 +4843,7 @@ window.addEventListener('resize', resizeCanvas);
             roomObjectsContainer.style.height = height + "px";
         }
 
-function renderRoomObjects() {
+async function renderRoomObjects() {
     const roomObjectsContainer = document.querySelector("#roomObjectsContainer");
     roomObjectsContainer.innerHTML = '';
 
@@ -4930,7 +4929,9 @@ async function initGame() {
         throw new Error("Room layout not initialized");
     }
     
-    renderRoomObjects();
+    await renderRoomObjects();
+    await initFunctionalObjects();
+    
     blockTopHalfOfSelectedDivsClickEvents();
     makeSelectedClickThrough();
     
@@ -8365,7 +8366,8 @@ cancelEditBtn.addEventListener("click", async () => {
         if (editing && preEditUserObjectAssets) {
             userObjectAssets = JSON.parse(JSON.stringify(preEditUserObjectAssets));
         }
-        renderRoomObjects();
+        await renderRoomObjects();
+        await initFunctionalObjects();
         resetEditButtonToggle();
         updateStatsBeforeRerunningInitGameAndRenderPets();
         await initiateAutonomousPets();
@@ -10587,7 +10589,8 @@ async function previewFurniture (key) {
         await new Promise(resolve => requestAnimationFrame(resolve));
         renderRoomGrid();
         await setPetAndObjectContainersToGridDimentions();
-        renderRoomObjects();
+        await renderRoomObjects();
+        await initFunctionalObjects();
         toggleRoomDarknessBasedOnElectricityTax();
         updateSingleItemZIndex(tempDivId);
 
