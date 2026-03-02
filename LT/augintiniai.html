@@ -12967,15 +12967,27 @@ function renderPetSkins(selectedPetType = null) {
                 btn.textContent = 'Naudoti';
                 btn.className = 'use-btn';
                 btn.addEventListener('click', () => {
+                    // Check if this pet was on walk before changing skin
+                    const oldEquippedSkin = Object.values(pet.skins).find(s => s.equiped);
+                    const oldSkinName = oldEquippedSkin ? gameAssetIndex[oldEquippedSkin.assetIndex]["css-class"].split(" ")[1] : null;
+                    const thisPetWasOnWalk = petOnWalk === oldSkinName;
+
                     // Unequip other skins of the same pet type
                     for (const otherSkinKey in pet.skins) {
                         pet.skins[otherSkinKey].equiped = false;
                     }
                     // Equip this skin
                     skin.equiped = true;
-                    
+
+                    // If this pet was on walk, update petOnWalk to the new skin name
+                    if (thisPetWasOnWalk) {
+                        petOnWalk = gameAssetIndex[skin.assetIndex]["css-class"].split(" ")[1];
+                        sendPetOnWalkUpdateToServer();
+                    }
+
                     sendPetAssetsUpdateToDatabase();
                     renderUsersPetAssets();
+                    renderPetSkins(selectedPetType);
                 });
             }
 
