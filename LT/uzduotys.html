@@ -5260,7 +5260,7 @@ function transformStudentStats(studentStats, classStats) {
 
     // Process Subject Stats (m, t, g)
     for (const [key, studentWeeks] of Object.entries(studentStats)) {
-        if (key === "c" || key === "d") continue;
+        if (key === "c" || key === "d" || key === "mFull" || key === "tFull" || key === "gFull") continue;
 
         const subjectTitle = statTypesKeys[key] || key;
         const valuesObj = {};
