@@ -925,7 +925,7 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
 
   // Calculate points and coins
   if (controller.modeChoice7 === "C84") {
-    pointsEarned, pointsPerCorrectAnswer = await calculateTasksPerCorrectAnswerPoints(
+    [pointsEarned, pointsPerCorrectAnswer] = await calculateTasksPerCorrectAnswerPoints(
         "selectedTexts",
         {
           taskSettings: [controller.mode, controller.modeChoice1, controller.modeChoice2, controller.modeChoice6, controller.modeChoice7],

@@ -5000,8 +5000,10 @@ function calculatePerformanceIndex(student, allClassRecords, overrides = {}) {
     if (ENABLE_DIFFICULTY_SCALING) {
         const studentPPA = student.pointsPerAnswer || 0;
         
-        if (medPPA > 0 && studentPPA > 0) {
-            difficultyScale = Math.min(1.5, studentPPA / medPPA);
+        if (medPPA > 0 && student.hasPPAData) {
+            difficultyScale = studentPPA > 0
+                ? Math.min(1.5, studentPPA / medPPA)
+                : 0;
         }
     }
 
@@ -5279,12 +5281,17 @@ function transformStudentStats(studentStats, classStats) {
         // PROCESS WEEKLY DATA
         studentWeeks.forEach((weekData, index) => {
             const total = weekData[3] ?? 0;
+            
+            const studentHasPPAData = weekData[4] != null && !isNaN(weekData[4]);
+            const studentPPA = studentHasPPAData ? weekData[4] : 0;
+
             const studentObj = {
                 points: weekData[0],
                 correctFirstAttempt: weekData[1],
                 mistakes: weekData[2],
                 totalAnswers: total,
-                pointsPerAnswer: weekData[4] || 0
+                pointsPerAnswer: studentHasPPAData ? studentPPA : 0,
+                hasPPAData: studentHasPPAData
             };
 
             // --- Calculate WEEKLY volume thresholds (keep as is - use class data always) ---
@@ -5345,7 +5352,7 @@ function transformStudentStats(studentStats, classStats) {
                     classHistory.forEach((studentHistory, studentIndex) => {
                         const record = studentHistory[weekPointer];
 
-                        if (record && record[3] > 0 && record[4] !== undefined) {
+                        if (record && record[3] > 0 && record[4] != null && !isNaN(record[4])) {
                             combinedPPAs.push(record[4]);
                             uniqueContributors.add(studentIndex);
                         }
@@ -5361,8 +5368,6 @@ function transformStudentStats(studentStats, classStats) {
                 }
             }
 
-            const studentPPA = weekData[4] || 0;
-            const studentHasPPAData = weekData[4] !== undefined; // ADD THIS
             const studentDidTasks = total > 0;
             let relDifficulty;
 
@@ -5379,7 +5384,7 @@ function transformStudentStats(studentStats, classStats) {
                 relDifficulty = 1.0;  // Neutral — data not collected yet
             }
             // Case 3: Student did tasks but PPA is 0
-            else if (studentPPA === 0 && studentDidTasks) {
+            else if (studentPPA === 0 && studentDidTasks && studentHasPPAData) {
                 relDifficulty = 0;
             }
             // Case 4: Class median is 0
