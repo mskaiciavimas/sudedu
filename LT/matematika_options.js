@@ -438,6 +438,7 @@ function updateModeChoice13 () {
 function handleModeChoice8Change() { 
     let classChoiceSelection = classChoiceElement.value;
     let modeChoice8Selection = modeChoice8Element.value;
+    let modeChoice9Selection = modeChoice9Element.value;
     let modeChoice15Selection;
     if (modeChoice15Element) {
         modeChoice15Selection = modeChoice15Element.value;
@@ -480,6 +481,8 @@ function handleModeChoice8Change() {
         toggleVisibility(modeChoice13Element, false);
         modeChoice9Element.innerHTML += '<option value="C51">TURINIO KOMPONAVIMĄ</option>';
         modeChoice9Element.innerHTML += '<option value="C52">STRUKTŪROS IŠDĖSTYMĄ</option>';
+        modeChoice9Element.value = modeChoice9Selection
+
         if (modeChoice15Selection === "C82") {
             toggleVisibility(timerQuestionNumberDiv, true);
         } else if (modeChoice15Selection === "C84") {
