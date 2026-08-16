@@ -35,6 +35,7 @@ let controller = {
 
 const LONG_TERM_RECORDING_ENABLED = true;
 const PET_STATS_EXPIRATION = 0.0035 // EXPIRE FULLY IN 48 hrs
+const MAX_CURRENT_MISTAKES_STORED = 100;
 
 const animationStepsAndDurationNumberDict = {
     "cat-1-sits-idle": [10, 2],
@@ -433,7 +434,7 @@ async function recordGrammarFinalMistakes() {
 		controller.totalMistakes.push([mistakeRecords[key]["wordWithAnswer"], mistakeRecords[key]["wordGrammarType"], [mistakeRecords[key]["mistakesCounter"], mistakeRecords[key]["wrongAnswer"]], mistakeRecords[key]["wordId"]])
 	});
 
-	while (controller.currentMistakes.length > 29) {
+	while (controller.currentMistakes.length > MAX_CURRENT_MISTAKES_STORED) {
       controller.currentMistakes.splice(0, 1)
     }
 	
@@ -2109,7 +2110,7 @@ async function checkAnswer () {
       
 
     function recordMistakes () {
-    while (controller.currentMistakes.length > 29) {
+    while (controller.currentMistakes.length > MAX_CURRENT_MISTAKES_STORED) {
       controller.currentMistakes.splice(0, 1)
     }
     while (controller.totalMistakes.length > 29) {
@@ -3612,6 +3613,7 @@ async function recordTaskToLongTerm() {
 }
 
 async function controllerToTask() {
+    console.log(controller)
     const correctAnswers = controller.correctAnswersTracker;
     const mistakes = controller.mistakesTracker;
 
@@ -3651,7 +3653,8 @@ async function controllerToTask() {
             correct: correctAnswers,
             mistakes: mistakes,
             totalAnswers: totalAnswers,
-            answerRate: answerRate
+            answerRate: answerRate,
+            mistakesDetail: controller.currentMistakes
         }];
         
     } else if (mode === "lang") {
@@ -3673,7 +3676,8 @@ async function controllerToTask() {
                     correct: correctAnswers,
                     mistakes: mistakes,
                     totalAnswers: totalAnswers,
-                    answerRate: answerRate
+                    answerRate: answerRate,
+                    mistakesDetail: controller.currentMistakes
                 }];
                 
             } else if (controller.modeChoice7 === "C84") {
@@ -3699,7 +3703,8 @@ async function controllerToTask() {
                     correct: correctAnswers,
                     mistakes: mistakes,
                     totalAnswers: totalAnswers,
-                    answerRate: answerRate
+                    answerRate: answerRate,
+                    mistakesDetail: controller.currentMistakes
                 }];
             }
         }
@@ -3834,7 +3839,8 @@ async function processSelectedTexts() {
             correct: correctAnswers,
             mistakes: totalMistakes,
             totalAnswers: totalTexts,
-            answerRate: answerRate
+            answerRate: answerRate,
+            mistakesDetail: group.texts.map(t => [t.id, t.mistakes])
         });
     }
 
@@ -3965,6 +3971,38 @@ function filterOutlierRows(rows) {
     });
 }
 
+function aggregateRowsByDate(rows) {
+    const grouped = new Map();
+
+    rows.forEach(row => {
+        const key = row.date;
+        if (!grouped.has(key)) {
+            grouped.set(key, {
+                date: row.date,
+                totalMistakes: 0,
+                totalAnswers: 0,
+                correctSum: 0,
+                weightedAnswerRateSum: 0
+            });
+        }
+        const bucket = grouped.get(key);
+        bucket.totalMistakes += row.mistakes;
+        bucket.totalAnswers += row.totalAnswers;
+        bucket.correctSum += row.correct;
+        bucket.weightedAnswerRateSum += row.answerRate * row.totalAnswers;
+    });
+
+    return Array.from(grouped.values()).map(bucket => ({
+        date: bucket.date,
+        correct: Number(bucket.correctSum.toFixed(2)),
+        mistakes: bucket.totalMistakes,
+        totalAnswers: bucket.totalAnswers,
+        answerRate: bucket.totalAnswers > 0
+            ? Number((bucket.weightedAnswerRateSum / bucket.totalAnswers).toFixed(1))
+            : 0
+    }));
+}
+
 function buildGraphDataFromCache(studentId, taskInfoList) {
     const taskInfoStrings = new Set(taskInfoList.map(t => JSON.stringify(t)));
     const filterRows = rows => rows.filter(row => taskInfoStrings.has(row.taskInfo));
@@ -3972,7 +4010,7 @@ function buildGraphDataFromCache(studentId, taskInfoList) {
     const studentCache = taskArchiveCache[studentId];
     if (!studentCache) return null;
 
-    const rawStudentRows = filterRows(studentCache.rows)
+    const rawStudentRows = aggregateRowsByDate(filterRows(studentCache.rows))
         .sort((a, b) => a.date.localeCompare(b.date));
 
     if (rawStudentRows.length === 0) return {
@@ -3997,13 +4035,14 @@ function buildGraphDataFromCache(studentId, taskInfoList) {
 
     const allDataPoints = [];
     Object.entries(taskArchiveCache).forEach(([cachedId, cached]) => {
-        const cleanRows = filterOutlierRows(filterRows(cached.rows));
+        const cleanRows = filterOutlierRows(aggregateRowsByDate(filterRows(cached.rows)));
         cleanRows.forEach(row => {
             allDataPoints.push({
                 date: row.date,
                 timestamp: new Date(row.date).getTime(),
                 mistakeFreq: row.totalAnswers > 0 ? (row.mistakes / row.totalAnswers) * 100 : 0,
                 answerRate: row.answerRate,
+                totalAnswers: row.totalAnswers,
                 studentId: Number(cachedId)
             });
         });
@@ -4042,7 +4081,9 @@ function buildGraphDataFromCache(studentId, taskInfoList) {
             byStudent.forEach(points => {
                 let wMistake = 0, wAnswerRate = 0, wTotal = 0;
                 points.forEach(dp => {
-                    const w = Math.exp(-TIME_DECAY * Math.abs(dp.timestamp - target) / (24 * 60 * 60 * 1000));
+                    const timeWeight = Math.exp(-TIME_DECAY * Math.abs(dp.timestamp - target) / (24 * 60 * 60 * 1000));
+                    const sampleWeight = dp.totalAnswers || 1;
+                    const w = timeWeight * sampleWeight;
                     wMistake += dp.mistakeFreq * w;
                     wAnswerRate += dp.answerRate * w;
                     wTotal += w;
