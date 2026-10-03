@@ -1,6 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+        // EXPERIMENTAL FEATURES (elements with class "experimental-features", e.g. the Žaidimai section) are hidden
+        // from everyone except the approved tester teachers listed here (by user ID) and the students linked to them.
+        var EXPERIMENTAL_TESTER_TEACHER_IDS = [];
+        (function () {
+            try {
+                var u = JSON.parse(localStorage.getItem('userData')) || {};
+                var teacherId = u.accType === 'teacher' ? u.userId : (String(u.teacher || '').match(/ID:\s*(\d+)/) || [])[1];
+                if (teacherId != null && EXPERIMENTAL_TESTER_TEACHER_IDS.indexOf(Number(teacherId)) !== -1) {
+                    document.documentElement.classList.add('experimental-on');
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <style>html:not(.experimental-on) .experimental-features { display: none !important; }</style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUDEDU - klasė</title>
@@ -1254,6 +1269,12 @@
             z-index: 10;
             white-space: nowrap;
         }
+        
+        #zg-difficulty,
+        #zg-mode,
+        #zg-minutes {
+            font-weight: 500;
+        }
 
         @media (max-width: 800px) {
             .profile-grid {
@@ -1729,6 +1750,103 @@
         }
 
 
+        /* ---------- Žaidimai: class game lobbies (same glass, type scale and buttons as Iššūkis) ---------- */
+        #zaidimai [hidden] { display: none !important; }
+        .zg-panel { background: rgba(255, 255, 255, 0.42); border: 1px solid rgba(255, 255, 255, 0.65); border-radius: 16px; padding: 18px; margin-bottom: 8px; }
+        .zg-panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+        .zg-title { font-size: 1.75rem; font-weight: 800; }
+        .zg-host { font-weight: 700; font-size: 0.9rem; color: #718096; }
+        .zg-box { background: rgba(255, 255, 255, 0.22); border: 1px solid rgba(255, 255, 255, 0.55); border-radius: 16px; padding: 18px; }
+        .zg-box + .zg-box, .zg-lobby-grid + .zg-box { margin-top: 10px; }
+        .zg-label { font-size: 0.85rem; font-weight: 800; letter-spacing: 1.2px; margin-bottom: 10px; text-align: start; }
+        .zg-text { font-size: 0.9rem; font-weight: 500; margin: 0 0 12px; }
+        .zg-note { color: #718096; margin: 10px 0 0; }
+        .zg-btn { position: relative; background: linear-gradient(135deg, #3288AC, #286D8A); border: none; color: #F5F5F7; display: inline-flex; align-items: center; justify-content: center; padding: 12px 18px; border-radius: 20px; cursor: pointer; font: inherit; font-size: 1rem; letter-spacing: 0.01em; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); margin: 0; white-space: nowrap; }
+        .zg-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%); border-radius: 20px; pointer-events: none; transition: background 0.3s ease; }
+        .zg-btn:hover::before { background: rgba(255, 255, 255, 0.15); }
+        .zg-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .zg-btn.zg-btn-light { background: rgba(255, 255, 255, 0.55); color: #212529; border: 1px solid rgba(255, 255, 255, 0.65); }
+        .zg-btn.zg-btn-red { background: linear-gradient(135deg, #ff8073, #e74c3c); }
+        .zg-btn.zg-btn-green { background: linear-gradient(135deg, #A0C58F, #32ac93); }
+        .zg-btn.zg-btn-wide { width: 100%; margin-top: 12px; }
+        .zg-input { width: 100%; min-width: 0; box-sizing: border-box; border: 1px solid rgba(255, 255, 255, 0.65); background: rgba(255, 255, 255, 0.6); border-radius: 14px; padding: 10px 14px; font: inherit; font-size: 1rem; color: #212529; }
+        .zg-lobby-list, .zg-players, .zg-task-list { list-style: none; margin: 0; padding: 0; }
+        .zg-lobby-list { display: grid; gap: 8px; }
+        .zg-lobby-row { display: flex; align-items: center; gap: 14px; background: rgba(255, 255, 255, 0.22); border: 1px solid rgba(255, 255, 255, 0.55); border-radius: 16px; padding: 12px 14px; }
+        .zg-code { font-size: 1.4rem; font-weight: 800; letter-spacing: 3px; color: #3288AC; }
+        .zg-lobby-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+        .zg-lobby-info b { font-weight: 800; }
+        .zg-lobby-info span { font-size: 0.85rem; color: #718096; font-weight: 600; overflow-wrap: anywhere; }
+        .zg-lobby-row .zg-btn { font-size: 0.9rem; padding: 8px 14px; border-radius: 16px; }
+        .zg-lobby-row .zg-btn::before { border-radius: 16px; }
+        .zg-badge { font-style: normal; background: #32ac93; color: #F5F5F7; border-radius: 99px; padding: 1px 8px; font-size: 0.75rem; font-weight: 700; }
+        .zg-empty { background: rgba(255, 255, 255, 0.22); border: 1px solid rgba(255, 255, 255, 0.55); border-radius: 16px; padding: 14px; color: #718096; font-weight: 600; font-size: 0.9rem; text-align: center; }
+        .zg-join-box { margin-top: 10px; }
+        .zg-join { display: flex; gap: 8px; }
+        .zg-join .zg-input { flex: 1; }
+        .zg-games { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 10px; }
+        .zg-game-card { display: flex; gap: 16px; align-items: center; }
+        .zg-game-art { display: flex; align-items: flex-end; flex: none; background: linear-gradient(#cfe9b8, #93c66f); border-radius: 12px; padding: 6px 8px 0; }
+        .zg-game-art i { display: block; width: 70px; height: 130px; background-size: 400% 100%; background-position: 0 0; image-rendering: pixelated; }
+        .zg-game-art i.zg-six { background-size: 600% 100%; margin-left: -6px; }
+        .zg-game-name { font-size: 1.2rem; font-weight: 800; margin-bottom: 6px; }
+        .zg-settings-grid, .zg-lobby-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 10px; align-items: start; }
+        .zg-field { display: flex; flex-direction: column; gap: 5px; font-weight: 700; font-size: 0.9rem; margin-bottom: 10px; }
+        #zg-math select { display: block; width: 100%; max-width: 100%; box-sizing: border-box; margin: 0 0 8px; border: 1px solid rgba(255, 255, 255, 0.65); background: rgba(255, 255, 255, 0.6); border-radius: 14px; padding: 10px 14px; font-size: 0.95rem; color: #212529; white-space: normal; }
+        #zg-math .selected_numbers_inner_div { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        #zg-math #selected_number, #zg-math #selected_number_2 { width: auto; margin: 0; }
+        #zg-math label { font-weight: 700; font-size: 0.9rem; }
+        .zg-task-list { padding-left: 25px; }
+        .zg-task-list li { position: relative; padding: 5px 0; font-weight: 500; font-size: 0.9rem; }
+        .zg-task-list li::before { content: '✓'; position: absolute; left: -25px; top: 6px; width: 18px; height: 18px; background: #32ac93; color: #F5F5F7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; }
+        .zg-code-box { display: flex; flex-direction: column; }
+        .zg-big-code { font-size: 2.6rem; font-weight: 800; letter-spacing: 8px; color: #3288AC; line-height: 1.1; margin-bottom: 12px; }
+        .zg-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .zg-actions .zg-btn { flex: 1 1 auto; }
+        .zg-players { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+        .zg-player.off { opacity: 0.55; }
+        .zg-player .member-avatar { overflow: hidden; }
+        .zg-player .member-avatar svg { width: 100%; height: 100%; }
+        .zg-player .member-name { min-width: 0; overflow-wrap: anywhere; }
+        .zg-ready-mark { position: absolute; top: -2px; right: -6px; width: 26px; height: 26px; border-radius: 50%; background: #32ac93; color: #F5F5F7; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: bold; border: 2px solid #F5F5F7; }
+        .zg-player.ready .zg-state { color: #32ac93; font-weight: 600; }
+        .zg-players .zg-empty { grid-column: 1 / -1; }
+
+        @media (min-width: 768px) and (orientation: landscape) {
+            .zg-title { font-size: 1.4rem; }
+        }
+        @media (max-width: 1100px) {
+            .zg-settings-grid, .zg-lobby-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 767px) {
+            .zg-title { font-size: 1.25rem; }
+            .zg-panel { margin-bottom: 15px; }
+            .zg-panel-head { margin-bottom: 15px; }
+            .zg-games { grid-template-columns: 1fr; }
+            .zg-game-card { flex-direction: column; align-items: stretch; text-align: center; }
+            .zg-game-art { align-self: center; }
+            .zg-big-code { font-size: 2.2rem; letter-spacing: 6px; }
+            .zg-lobby-row { flex-wrap: wrap; gap: 8px 12px; }
+            .zg-lobby-row .zg-btn { width: 100%; }
+        }
+        @media (max-width: 578px) {
+            .zg-btn { font-size: 0.95rem; padding: 10px 14px; }
+            .zg-join { flex-direction: column; }
+            .zg-actions { flex-direction: column; }
+        }
+        /* portrait tablets: the same larger scale the rest of this page uses there */
+        @media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait) {
+            .zg-title { font-size: 2.5rem; }
+            .zg-label, .zg-host { font-size: 1.5rem; }
+            .zg-text, .zg-task-list li, .zg-field, #zg-math label, .zg-lobby-info span, .zg-empty { font-size: 1.25rem; }
+            .zg-btn { font-size: 1.5rem; }
+            .zg-lobby-row .zg-btn { font-size: 1.2rem; }
+            .zg-input, #zg-math select { font-size: 1.35rem; }
+            .zg-code { font-size: 2rem; }
+            .zg-big-code { font-size: 3.5rem; }
+            .zg-game-name { font-size: 1.75rem; }
+            .zg-task-list li::before { top: 9px; }
+        }
     </style>
 </head>
 <body>
@@ -1843,6 +1961,12 @@
                     </span>
                     <span class="nav-label">Iššūkis</span>
                 </button>
+                <button class="nav-item experimental-features" data-target="zaidimai">
+                    <span class="nav-icon">
+                        <img src="../images/icons/icon-games.svg">
+                    </span>
+                    <span class="nav-label">Žaidimai</span>
+                </button>
                 <button class="nav-item" data-target="profilis">
                     <span class="nav-icon">
                         <img src="../images/icons/icon-profile.svg">
@@ -1936,6 +2060,428 @@
                     </div>
                 </div>
 
+                <!-- Content Panel: class games -->
+                <div id="zaidimai" class="content-panel experimental-features">
+                    <!-- start: open lobbies of the class + the games that can be started -->
+                    <div id="zg-home">
+                        <div class="zg-panel">
+                            <div class="zg-panel-head">
+                                <div class="zg-title">Aktyvūs žaidimai</div>
+                                <button class="zg-btn zg-btn-light" id="zg-refresh" type="button" autocomplete="off">Atnaujinti</button>
+                            </div>
+                            <ul class="zg-lobby-list" id="zg-lobby-list">
+                                <li class="zg-empty">Paspausk „Atnaujinti“, kad pamatytum klasės žaidimus.</li>
+                            </ul>
+                            <div class="zg-box zg-join-box">
+                                <div class="zg-label">PRISIJUNGTI SU NUMERIU</div>
+                                <div class="zg-join">
+                                    <input id="zg-join-code" class="zg-input" inputmode="numeric" maxlength="4" placeholder="Žaidimo numeris" autocomplete="off">
+                                    <button class="zg-btn" id="zg-join-btn" type="button" autocomplete="off">Prisijungti</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="zg-panel" id="zg-games-panel" hidden>
+                            <div class="zg-panel-head"><div class="zg-title">Žaidimai</div></div>
+                            <div class="zg-games">
+                                <div class="zg-box zg-game-card">
+                                    <div class="zg-game-art" aria-hidden="true">
+                                        <i style="background-image:url('../images/tower-defence-game/playerUnits/mages/2 Idle/6.png')"></i>
+                                        <i class="zg-six" style="background-image:url('../images/tower-defence-game/playerUnits/archers/2 Idle/7.png')"></i>
+                                    </div>
+                                    <div class="zg-game-body">
+                                        <div class="zg-game-name">Kaimo gynyba</div>
+                                        <p class="zg-text">Kartu apginkite kaimą spręsdami matematikos užduotis!</p>
+                                        <button class="zg-btn" id="zg-play-td" type="button" autocomplete="off">Kurti</button>
+                                        <p class="zg-text zg-note" id="zg-play-note" hidden>Žaidimą mokytojas gali vesti tik didesnio ekrano įrenginuose.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- game settings: the same task choices as Praktika (math only) + game options -->
+                    <div id="zg-settings" hidden>
+                        <div class="zg-panel">
+                            <div class="zg-panel-head">
+                                <div class="zg-title">Kaimo gynyba</div>
+                                <button class="zg-btn zg-btn-light" id="zg-settings-back" type="button" autocomplete="off">Atgal</button>
+                            </div>
+                            <div class="zg-settings-grid">
+                                <div class="zg-box">
+                                    <div class="zg-label">UŽDUOTYS</div>
+                                    <div id="zg-math">
+                            <div class="ode_choice_div" style="display:none;">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice" id="mode_choice">
+                                    <option value="math">MATEMATIKĄ</option>
+                                    <option value="lang">LIETUVIŲ KALBĄ</option>
+                                </select>
+                            </div>
+
+                            <div class="mode_choice_1_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_1" id="mode_choice_1">
+                                    <option value="C1">SUDĖTĮ</option>
+                                    <option value="C2">ATIMTĮ</option>
+                                    <option value="C3">SUDĖTĮ IR ATIMTĮ</option>
+                                    <option value="C4">DAUGYBĄ</option>
+                                    <option value="C5">DALYBĄ</option>
+                                    <option value="C6">DAUGYBĄ IR DALYBĄ</option>
+                                    <option value="C7">ĮVAIRIUS VEIKSMUS</option>
+                                </select>
+                            </div>
+
+                            <div class="mode_choice_2_div">
+                                <div class="col-12 d-flex justify-content-center align-items-center mode_choice_2_div text-center" id="mode_choice_2_div">
+                                    <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_2" id="mode_choice_2">
+                                        <option value="C8">VIENAŽENKLIŲ SKAIČIŲ IKI 10</option>
+                                        <option value="C9">VIENAŽENKLIŲ SKAIČIŲ IKI 20 (LENTELINĖ SUDĖTIS)</option>
+                                        <option value="C10">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 20</option>
+                                        <option value="C11">DVIŽENKLIO IR VIENAŽENKLIO SKAIČIŲ IKI 100</option>
+                                        <option value="C12">DVIŽENKLIŲ SKAIČIŲ IKI 100</option>
+                                        <option value="C13">SKAIČIŲ IKI 1 000</option>
+                                        <option value="C14">SKAIČIŲ IKI 10 000</option>
+                                        <option value="C15">SKAIČIŲ IKI 1 000 000</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="selected_numbers_div">
+                                <div class="selected_numbers_inner_div">
+                                    <label class="number-choice-label-nuo" for="selected_number" id="number_label" style="display: none;">NUO</label>
+                                    <select class="btn btn-secondary dropdown-toggle dropdown text-center" name="selected_number" id="selected_number" style="display: none;">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+                                    </select>
+                                    <label class="number-choice-label-iki" for="selected_number_2" id="number_label_2" style="display: none;">IKI</label>
+                                    <select class="btn btn-secondary dropdown-toggle dropdown text-center" name="selected_number_2" id="selected_number_2" style="display: none;">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="remainder-div">
+                                <label id="remainder-option" style="display: none;">
+                                    <input id="remainder-input" type="checkbox" name="myCheckbox"> DALYBA SU LIEKANA
+                                </label>
+                            </div>
+
+                            <div class="mode_choice_3_div">
+                                <div class="col-12 d-flex justify-content-center align-items-center text-center mode_choice_3_div" id="mode_choice_3_div">
+                                    <select class="btn btn-secondary dropdown-toggle dropdown text-center" name="mode_choice_3" id="mode_choice_3">
+                                        <option value="C37">NEPERŽENGIANT DEŠIMTIES</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mode_choice_5_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_5" id="mode_choice_5">
+                                    <option value="C41">SKAITINĖ LYGYBĖ</option>
+                                    <option value="C42">SKAITINĖ LYGYBĖ SU NEŽINOMUOJU</option>
+                                </select>
+                            </div>
+
+                            <div class="mode_choice_6_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_6" id="mode_choice_6" style="display: none;">
+                                    <option value="C43">NEŽINOMAS DĖMUO</option>
+                                </select>
+                            </div>
+
+                            <div class="mode_choice_7_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_7" id="mode_choice_7" style="display: block;">
+                                    <option value="C47">EILUTE</option>
+                                    <option value="C48">STULPELIU / KAMPU</option>
+                                </select>
+                            </div>
+
+                            <div class="mode_choice_8_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_8" id="mode_choice_8" style="display: none;">
+                                    <option value="C49">TEKSTO SUPRATIMĄ</option>
+                                    <option value="C83">GRAMATIKĄ</option>
+                                </select>
+                            </div>
+
+                            <div class="mode_choice_9_div">
+                                <div class="col-12 d-flex justify-content-center align-items-center mode_choice_9_div text-center" id="mode_choice_9_div">
+                                    <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_9" id="mode_choice_9" style="display: none;">
+                                        <option value="C51">TURINIO KOMPONAVIMĄ</option>
+                                        <option value="C52">STRUKTŪROS IŠDĖSTYMĄ</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="class_choice_div">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="class_choice" id="class_choice" style="display: none;">
+                                    <option value="C75">1-2 KLASĖ</option>
+                                    <option value="C76">3-4 KLASĖ</option>
+                                </select>
+                            </div>
+
+                            <div class="mode_choice_10_div">
+                                <div class="col-12 d-flex justify-content-center align-items-center mode_choice_10_div text-center" id="mode_choice_10_div">
+                                    <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_10" id="mode_choice_10" style="display: none;">
+                                        <option value="C58">LENGVAS</option>
+                                        <option value="C59">VIDUTINIS</option>
+                                        <option value="C60">SUNKUS</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="rasyba-options-row">
+
+                                <!--
+                                    To add a new controlled section, you just need:
+                                    <input type="checkbox" class="r parent-toggle" value='NEW_CATEGORY' data-controls="new-div">
+                                    <div id="new-div" data-parent="NEW_CATEGORY">
+                                        child checkboxes here
+                                    </div>
+                                -->
+
+                                <div class="mode_choice_11_div" id="mode_choice_11_div" style="display: none;">
+                                    <label class="rasyba-options-label">
+                                        <input type="checkbox" class="r parent-toggle" name="r" value='GALŪNĖS' data-controls="galuniu-div" checked>
+                                        <span class="rasyba-options-label-text" id="rasyba-options-label-text-galune">ŽODŽIO PABAIGA:</span>
+                                    </label>
+                                    <br>
+                                    <div id="galuniu-div" data-parent="GALŪNĖS">
+                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                            <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C85": []}' checked>
+                                            <span class="rasyba-options-label-text">KĄ VIENĄ?</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                            <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C86": []}' checked>
+                                            <span class="rasyba-options-label-text">KO DAUG?</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                            <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C87": []}' checked>
+                                            <span class="rasyba-options-label-text">KUR KAME?</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C62": []}'>
+                                            <span class="rasyba-options-label-text">DAIKTAVARDŽIAI</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C63": []}'>
+                                            <span class="rasyba-options-label-text">BŪDVARDŽIAI</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C65": []}'>
+                                            <span class="rasyba-options-label-text">VEIKSMAŽODŽIAI</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                            <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C92": []}'>
+                                            <span class="rasyba-options-label-text">PRIEVEIKSMIAI</span>
+                                            <br>
+                                        </label>
+                                        <div class="mode_choice_12_div" id="mode_choice_12_div">
+                                            <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_12" id="mode_choice_12">
+                                                <option value="C73">LENGVESNĖS KOMBINACIJOS</option>
+                                                <option value="C74">SUNKESNĖS KOMBINACIJOS</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <label class="rasyba-options-label">
+                                        <input id="C66" type="checkbox" class="rasyba-options" name="rasyba-option" value='{"C66": []}' checked>
+                                        <span class="rasyba-options-label-text">ĮSIDĖMĖTINA RAŠYBA</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                        <input id="C64" type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C64": []}' checked>
+                                        <span class="rasyba-options-label-text">SUDURTINIAI ŽODŽIAI</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C71": []}'>
+                                        <span class="rasyba-options-label-text">PRIEBALSIŲ SUPANAŠĖJIMAS</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-first-second-classes" style="display: block;">
+                                        <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C67": []}' checked>
+                                        <span class="rasyba-options-label-text">PANAŠIAI SKAMBANČIOS PRIEBALSĖS</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-first-second-classes">
+                                        <input id="C66" type="checkbox" class="rasyba-options" name="rasyba-option" value='{"C61": []}' checked>
+                                        <span class="rasyba-options-label-text">H - CH - F</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-first-second-classes" style="display: block;">
+                                        <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C91": []}' checked>
+                                        <span class="rasyba-options-label-text">MINKŠTUMO ŽENKLAS</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-first-second-classes" style="display: block;">
+                                        <input type="checkbox" class="r parent-toggle" name="r" value='BALSĖS:' data-controls="balsiu-div" checked>
+                                        <span class="rasyba-options-label-text">BALSĖS</span>
+                                        <br>
+                                    </label>
+                                    <div id="balsiu-div" data-parent="BALSĖS">
+                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                            <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C88": []}' checked>
+                                            <span class="rasyba-options-label-text">E - Ė</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                            <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C89": []}' checked>
+                                            <span class="rasyba-options-label-text">I - Y</span>
+                                            <br>
+                                        </label>
+                                        <label class="rasyba-options-label options-for-first-second-classes">
+                                            <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C90": []}' checked>
+                                            <span class="rasyba-options-label-text">U - Ū</span>
+                                            <br>
+                                        </label>
+                                    </div>
+                                    <label class="rasyba-options-label options-for-first-second-classes" style="display: block;">
+                                        <input type="checkbox" class="rasyba-options options-for-first-second-classes-input" name="rasyba-option" value='{"C68": []}' checked>
+                                        <span class="rasyba-options-label-text">DVIBALSIAI</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C68": []}'>
+                                        <span class="rasyba-options-label-text">DVIBALSIAI</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C72": []}'>
+                                        <span class="rasyba-options-label-text">MIŠRIEJI DVIGARSIAI</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-third-fourth-classes" style="display: none;">
+                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C69": []}'>
+                                        <span class="rasyba-options-label-text">PRIEŠDĖLIAI</span>
+                                        <br>
+                                    </label>
+                                    <label class="rasyba-options-label options-for-third-fourth-classes temporarily-disabled" style="display: none;">
+                                        <input type="checkbox" class="rasyba-options options-for-third-fourth-classes-input" name="rasyba-option" value='{"C70": []}'>
+                                        <span class="rasyba-options-label-text">PRIESAGOS</span>
+                                        <br>
+                                    </label>
+                                </div>
+
+                                <div class="mode_choice_13_div">
+                                    <div class="row"></div>
+                                    <div class="col-12 d-flex justify-content-center align-items-center mode_choice_13_div text-center" id="mode_choice_13_div">
+                                        <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_13" id="mode_choice_13" style="display: none;">
+                                            <option value="3">RETESNI ATVEJAI</option>
+                                            <option value="1">DAŽNESNI ATVEJAI</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mode_choice_14_div">
+                                <div class="col-12 d-flex justify-content-center align-items-center mode_choice_14_div text-center" id="mode_choice_14_div">
+                                    <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="mode_choice_14" id="mode_choice_14" style="display: none;">
+                                        <option value="C80">BE DISTRAKTORIAUS</option>
+                                        <option value="C81">SU DISTRAKTORIUMI</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="modeChoice4_div" style="display:none;">
+                                <select class="btn btn-secondary dropdown-toggle dropdown dropdown-options" name="modeChoice4" id="mode_choice_4" style="display: block;">
+                                    <option value="C40">NUSTATYTI VEIKSMŲ KIEKĮ</option>
+                                    <option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>
+                                </select>
+                            </div>
+                                <div class="timer-question-number-div" style="display:none;">
+                                <div class="timer-input-div" id="timer-input-div" style="display: none;">
+                                    <div class="input-group">
+                                    <div class="input-wrapper">
+                                        <button class="control-btn timer-minus">−</button>
+                                        <input type="number" class="timer-input" id="timer-input" min="1" max="60" step="1" value="5" readonly>
+                                        <button class="control-btn timer-plus">+</button>
+                                    </div>
+                                    <h3 class="timer-choice-label">minutes</h3>
+                                    </div>
+                                </div>
+
+                                <div class="question-number-input-div" id="question-number-input-div">
+                                    <div class="input-group">
+                                    <div class="input-wrapper">
+                                        <button class="control-btn question-minus">−</button>
+                                        <input type="number" class="question-number-input" id="question-number-input" min="1" max="200" step="1" value="20" readonly>
+                                        <button class="control-btn question-plus">+</button>
+                                    </div>
+                                    <h3 class="answer-number-label">veiksmų</h3>
+                                    </div>
+                                </div>
+                                </div>
+                                    </div>
+                                </div>
+                                <div class="zg-box">
+                                    <div class="zg-label">ŽAIDIMAS</div>
+                                    <label class="zg-field"><span>Sunkumas</span>
+                                        <select id="zg-difficulty" class="zg-input">
+                                            <option value="easy">Lengvas</option>
+                                            <option value="normal" selected>Vidutinis</option>
+                                            <option value="hard">Sunkus</option>
+                                        </select>
+                                    </label>
+                                    <label class="zg-field"><span>Režimas</span>
+                                        <select id="zg-mode" class="zg-input">
+                                            <option value="timed">Atlaikyti nustatytą laiką</option>
+                                            <option value="endless">Atlaikyti kuo įmanoma ilgiau</option>
+                                        </select>
+                                    </label>
+                                    <label class="zg-field" id="zg-minutes-field"><span>Trukmė (minutės)</span>
+                                        <input type="number" id="zg-minutes" class="zg-input" min="1" max="60" value="5">
+                                    </label>
+                                    <button class="zg-btn zg-btn-wide" id="zg-create" type="button" autocomplete="off">Sukurti žaidimą</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- lobby: tasks, game number, players and their ready state -->
+                    <div id="zg-lobby" hidden>
+                        <div class="zg-panel">
+                            <div class="zg-panel-head">
+                                <div class="zg-title" id="zg-lobby-title">Klasės gynyba</div>
+                                <div class="zg-host" id="zg-lobby-host"></div>
+                            </div>
+                            <div class="zg-lobby-grid">
+                                <div class="zg-box">
+                                    <div class="zg-label">UŽDUOTIS</div>
+                                    <ul class="zg-task-list" id="zg-task-list"></ul>
+                                </div>
+                                <div class="zg-box zg-code-box">
+                                    <div class="zg-label">ŽAIDIMO NUMERIS</div>
+                                    <div class="zg-big-code" id="zg-lobby-code"></div>
+                                    <div class="zg-actions" id="zg-actions"></div>
+                                    <div class="zg-text zg-note" id="zg-action-note"></div>
+                                </div>
+                            </div>
+                            <div class="zg-box">
+                                <div class="zg-label" id="zg-players-label">PRISIJUNGĘ MOKINIAI</div>
+                                <ul class="zg-players" id="zg-players"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Content Panel 3 -->
                 <div id="profilis" class="content-panel">
                     <div class="personal-info-main-holder">
@@ -1995,6 +2541,15 @@
     <script src="../main-nav-bar.js"></script>
     <script src="../parameter_dictionary.js"></script>
     <script src="../mental-arithmetic-combinations.js"></script>
+    <!-- class games: lobby client, Praktika's task settings (math only here) and the Žaidimai section -->
+    <script src="../game-client.js"></script>
+    <script>
+        // Praktika's settings script and the task launcher expect these page globals (Praktika defines them itself)
+        var timerInputElement = document.querySelector('#timer-input');
+        var questionNumberInputElement = document.querySelector('#question-number-input');
+    </script>
+    <script src="matematika_options.js"></script>
+    <script src="../klase-games.js"></script>
     <script type="module">
         const weekChallengeWinningsTotalPrizeCoins = 90;
         const weekChallengeWinningsWeights = {

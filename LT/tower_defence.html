@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Klasės gynyba – maketas</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1f2a30;--mute:#3c4f59;--teal:#1d566e;--glass:rgba(255,255,255,.42);--glassB:rgba(255,255,255,.65);--tile:rgba(255,255,255,.62);--good:#2f9e5b;--bad:#d64545;--gold:#f2b632}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:linear-gradient(to top,#ffbf9c,#ffc074);color:var(--ink);font:600 15px/1.4 'Nunito',system-ui,sans-serif}
+main{max-width:1800px;margin:0 auto;padding:16px;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media (max-width:1000px){main{grid-template-columns:1fr}}
+.card{background:var(--glass);border:1px solid var(--glassB);border-radius:16px;padding:14px}
+.top{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.top h1{font-size:21px;font-weight:900;margin:0 auto 0 0;color:var(--teal)}
+.chip{background:var(--tile);border-radius:999px;padding:4px 12px;font-size:14px;font-weight:800}
+.btn{background:linear-gradient(#3288AC,#286D8A);color:#fff;border:0;border-radius:10px;padding:8px 14px;font:inherit;font-size:14px;font-weight:800;cursor:pointer}
+.btn.g{background:var(--tile);color:var(--ink)}
+.ctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;background:var(--tile);border-radius:12px;padding:8px 12px;margin-bottom:10px;font-size:14px;font-weight:800}
+.ctl label{display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.ctl input[type=range]{width:160px;accent-color:#286D8A}
+.ctl input[type=checkbox]{accent-color:#286D8A;width:16px;height:16px}
+.ctl .v{min-width:22px;color:var(--teal)}
+.seg{display:inline-flex;border-radius:10px;overflow:hidden;border:1px solid rgba(40,109,138,.35)}
+.seg button{border:0;background:transparent;font:inherit;font-size:14px;font-weight:800;padding:5px 12px;cursor:pointer;color:var(--ink)}
+.seg button.on{background:linear-gradient(#3288AC,#286D8A);color:#fff}
+.stage{border-radius:12px;overflow:hidden;border:3px solid #5b4a3a;background:#a9b04f;width:max-content;max-width:100%;margin:0 auto}
+canvas{display:block}
+.info{font-size:13px;color:var(--mute);margin:6px 2px 0;text-align:center}
+.hud{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.bar{height:14px;border-radius:99px;background:rgba(255,255,255,.55);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;transition:width .4s,background .4s}
+.lab{display:flex;justify-content:space-between;font-weight:800;font-size:14px;margin-bottom:4px}
+aside h2{font-size:13.5px;text-transform:uppercase;letter-spacing:.05em;font-weight:900;margin:0 0 8px;color:var(--teal)}
+aside .card+.card{margin-top:14px}
+.code{font-size:32px;font-weight:900;letter-spacing:6px;text-align:center;color:var(--teal)}
+.q{background:var(--tile);border-radius:10px;padding:10px;font-weight:900;font-size:17px}
+.q span{display:block;color:var(--mute);font-weight:700;font-size:13px}
+ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.lb li{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800}
+.dot{width:12px;height:12px;border-radius:3px;flex:none}
+.lb .n{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb .s{color:var(--mute)}
+.tw{max-height:330px;overflow:auto;padding-right:2px}
+.tw li{background:var(--tile);border-radius:10px;padding:6px 8px;font-size:13px}
+.tw .h{display:flex;align-items:center;gap:6px;font-weight:900}
+.tw .h .k{font-weight:700;color:var(--mute)}
+.tw .h .lv{margin-left:auto;font-size:12px;background:var(--teal);color:#fff;border-radius:99px;padding:0 8px;white-space:nowrap}
+.tw small{display:block;color:var(--mute);font-weight:700;font-size:12.5px;overflow-wrap:anywhere}
+.tw .pb{height:5px;border-radius:99px;background:rgba(0,0,0,.08);margin-top:4px;overflow:hidden}
+.tw .pb i{display:block;height:100%;background:var(--gold);transition:width .3s}
+.feed{font-size:13px;color:var(--mute);display:grid;gap:4px;min-height:100px;overflow-wrap:anywhere}
+.feed b{color:var(--ink)}
+/* host mode (opened from a class game lobby with ?code=): only the playing field, full window */
+body.host{background:#2f3d27;overflow:hidden}
+body.host main{display:flex;align-items:center;justify-content:center;min-height:100vh;max-width:none;padding:0}
+body.host aside,body.host .top,body.host .ctl,body.host .info,body.host .hud{display:none}
+body.host section.card{background:none;border:0;padding:0}
+body.host .stage{border:0;border-radius:6px}
+@font-face{font-family:"SFpro";src:url("../fonts/SF-Pro-Text-Regular.otf") format("opentype");font-weight:400}
+@font-face{font-family:"SFpro";src:url("../fonts/SF-Pro-Text-Semibold.otf") format("opentype");font-weight:600}
+.host-ui{font-family:'SFpro',sans-serif;color:#212529}
+.host-close{display:none;position:fixed;top:14px;right:14px;z-index:50;width:44px;height:44px;padding:0;border:none;border-radius:50%;background:rgba(245,245,247,.85);color:#212529;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25);transition:background .3s ease,transform .3s ease}
+.host-close svg{display:block;width:16px;height:16px;margin:auto}
+.host-close:hover{background:#F5F5F7;transform:rotate(90deg)}
+body.host .host-close{display:flex;align-items:center;justify-content:center}
+/* the site's confirm popup (index.css .modal) and info popup (.object-popup-panel) */
+.host-modal{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5)}
+.host-modal[hidden]{display:none}
+.host-modal-box{background:#F5F5F7;padding:20px 30px;border-radius:10px;text-align:center;max-width:400px;width:80%}
+.host-modal-box p{font-size:1.1rem;margin:0}
+.host-modal-buttons{margin-top:15px;display:flex;justify-content:space-around;gap:10px}
+.host-panel{background:#F5F5F7;border-radius:20px;padding:25px 24px 22px;width:515px;max-width:90%;box-shadow:0 8px 20px rgba(0,0,0,.2);text-align:center;animation:hostUp .25s ease-out}
+.host-panel h2{font-size:1.5rem;font-weight:600;margin:0 0 6px}
+.host-panel p{margin:0 0 18px;line-height:1.7}
+@keyframes hostUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.host-btn{position:relative;background:linear-gradient(135deg,#3288AC,#286D8A);border:none;color:#F5F5F7;padding:10px 18px;border-radius:20px;cursor:pointer;font:inherit;font-size:1rem}
+.host-btn.red{background:linear-gradient(135deg,#ff8073,#e74c3c)}
+.host-btn.grey{background:linear-gradient(135deg,#95a5a6,#aeb4b5)}
+</style>
+</head>
+<body>
+<button class="host-close host-ui" id="host-close" type="button" title="Baigti žaidimą" aria-label="Baigti žaidimą"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2L14 14M14 2L2 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+<div class="host-modal host-ui" id="host-confirm" hidden><div class="host-modal-box"><p>Ar tikrai norite baigti žaidimą?</p>
+  <div class="host-modal-buttons"><button class="host-btn red" id="host-confirm-yes" type="button">Taip</button><button class="host-btn grey" id="host-confirm-no" type="button">Ne</button></div></div></div>
+<div class="host-modal host-ui" id="host-end" hidden><div class="host-panel"><h2 id="host-end-title"></h2><p id="host-end-text"></p><button class="host-btn" id="host-end-btn" type="button">Grįžti į klasę</button></div></div>
+<main>
+  <section class="card">
+    <div class="top">
+      <h1>Klasės gynyba · 3b klasė</h1>
+      <span class="chip">Daugyba iki 100</span>
+      <span class="chip" id="wave">Banga 1 / 3</span>
+      <button class="btn g" id="pause">Pauzė</button>
+      <button class="btn" id="restart">Iš naujo</button>
+    </div>
+    <div class="ctl">
+      <label>Mokinių <input type="range" id="pn" min="1" max="64" step="1" value="15"><span class="v" id="pv">15</span></label>
+      <span class="seg"><button id="m1" class="on">Kompaktiškas</button><button id="m2">Platus 16:9</button></span>
+      <label><input type="checkbox" id="pair">Po 2 mokinius bokšte</label>
+    </div>
+    <div class="stage" id="stage"><canvas id="cv" aria-label="Žaidimo laukas"></canvas></div>
+    <div class="info" id="info"></div>
+    <div class="hud">
+      <div><div class="lab"><span>Kaimo gyvybės</span><span id="hpv">100</span></div><div class="bar"><i id="hp" style="width:100%;background:var(--good)"></i></div></div>
+      <div><div class="lab"><span>Nugalėta priešų</span><span id="killv">0</span></div><div class="bar"><i id="kill" style="width:0;background:var(--gold)"></i></div></div>
+    </div>
+  </section>
+
+  <aside>
+    <div class="card">
+      <h2>Prisijungimo kodas</h2>
+      <div class="code">4729</div>
+      <p style="text-align:center;margin:4px 0 0;color:var(--mute);font-size:13px">sudedu.lt/LT/klase · <span id="joined">15</span> mokinių prisijungė</p>
+    </div>
+    <div class="card">
+      <h2>Mokinių ekrane</h2>
+      <div class="q" id="q">Kiek yra 7 × 8?<span>Teisingas atsakymas = bokšto šūvis</span></div>
+    </div>
+    <div class="card">
+      <h2>Bokštai</h2>
+      <ul class="tw" id="tw"></ul>
+    </div>
+    <div class="card">
+      <h2>Geriausi mokiniai</h2>
+      <ul class="lb" id="lb"></ul>
+    </div>
+    <div class="card">
+      <h2>Kas vyksta</h2>
+      <div class="feed" id="feed"></div>
+    </div>
+  </aside>
+</main>
+
+<!-- class games: login token + real-time connection (only used when opened from a lobby) -->
+<script src="../refresh-token.js"></script>
+<script src="../game-client.js"></script>
+<script>
+(function(){
+'use strict';
+/* ---------- assets ---------- */
+var TS=32,BASE='../images/tower-defence-game/',FIELDS='themes/fields/background/',ENEMIES='themes/fields/enemies/ordinary/';
+var W=960,H=544,COLS,ROWS,MASK=[];
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d'),SC=0;
+var $=function(id){return document.getElementById(id)};
+function rnd(n){return Math.floor(Math.random()*n)}
+
+var IMGS=[];
+function img(p){var i=new Image();i.src=BASE+p.split('/').map(encodeURIComponent).join('/');IMGS.push(i);return i}
+var OBJ={};                                      // decoration objects by short name, e.g. OBJ['Decor/Tree1']
+var OBJDIR={Shadow:'1 Shadow',Fence:'2 Fence',Pointer:'3 Pointer',Stone:'4 Stone',Grass:'5 Grass',Flower:'6 Flower',Decor:'7 Decor',Camp:'8 Camp',Bush:'9 Bush'};
+function obj(p){if(!OBJ[p])OBJ[p]=img(FIELDS+'2 Objects/'+p.replace(/^(\w+)\//,function(m,d){return OBJDIR[d]+'/'})+'.png');return OBJ[p]}
+var TILESET=img(FIELDS+'1 Tiles/FieldsTileset.png');
+var ANIM={banner:img(FIELDS+'3 Animated Objects/1 Flag/1.png'),pole:img(FIELDS+'3 Animated Objects/1 Flag/5.png'),
+          smoke:img(FIELDS+'3 Animated Objects/2 Campfire/1.png'),fire:img(FIELDS+'3 Animated Objects/2 Campfire/2.png')};
+
+// tower kinds. Tower sheets: 70x130 frames (idle 4 frames for mages, 6 for archers), build/upgrade sheets 1-7 with 4 frames.
+// Unit sheets: 48x48 frames, idle 4 / attack 6, directions D(own) S(ide, faces left) U(p); archers also have a 1-frame "aim" pose.
+// LV per tower level (level 1 = idle sheet 3 ... level 4 = sheet 6): feet = where the unit stands in the tower frame,
+// rim = first row of the front wall (redrawn over the unit; level 1's mage platform has none),
+// roof = last roof row (redrawn over the unit), unit = sprite variant, dmg = damage per shot, reach = reach multiplier,
+// gain = what the upgrade to this level brings (shown over the tower)
+function towerKind(prefix,idleFrames,release,LV,aim){
+  var k={tf:idleFrames,release:release,LV:LV,aim:aim,tower:[null],upg:[null],unit:[null]},l,u;
+  for(l=3;l<=6;l++)k.tower.push(img(prefix+'2 Idle/'+l+'.png'));
+  for(l=1;l<=7;l++)k.upg.push(img(prefix+'1 Upgrade/'+l+'.png'));
+  for(u=1;u<=3;u++){var o={};['D','S','U'].forEach(function(d){var b=prefix+'3 Units/'+u+'/'+d+'_';o[d]={idle:img(b+'Idle.png'),atk:img(b+'Attack.png'),aim:aim?img(b+'Preattack.png'):null}});k.unit.push(o)}
+  return k}
+var KIND={
+  mage:towerKind('playerUnits/mages/',4,4,[null,
+    {feet:89,rim:130,unit:1,dmg:1,reach:1},{feet:83,rim:81,unit:2,dmg:1,reach:1.3,gain:'šaudo toliau'},{feet:79,rim:77,unit:3,dmg:2,reach:1.3,gain:'dvigubai stipresni šūviai'},{feet:73,rim:71,unit:3,dmg:3,reach:1.5,gain:'dar stipriau ir toliau'}],false),
+  archer:towerKind('playerUnits/archers/',6,5,[null,
+    {feet:84,rim:83,unit:1,dmg:1,reach:1},{feet:84,rim:83,roof:73,unit:2,dmg:1,reach:1.3,gain:'šaudo toliau'},{feet:82,rim:80,unit:3,dmg:2,reach:1.3,gain:'dvigubai stipresni šūviai'},{feet:82,rim:80,unit:3,dmg:3,reach:1.5,gain:'dar stipriau ir toliau'}],true)};
+KIND.mage.name='magai';KIND.archer.name='lankininkai';
+var ORB=[null],PCOL=[null,'#ffd34d','#ff5a4a','#c26bff'],u;
+for(u=1;u<=3;u++)ORB.push(img('playerUnits/mages/3 Units/Projectiles/'+u+'.png'));
+// arrows: quarter-turn rotation sets (pointing up .. pointing right), one length per archer level
+function arrowSet(a,b){var s=[];for(var n=a;n<=b;n++)s.push(img('playerUnits/archers/3 Units/Arrow/'+n+'.png'));return s}
+var ARROW=[null,arrowSet(23,27),arrowSet(14,22),arrowSet(1,13)];
+var LVUP=[0,0,8,20,36];               // correct answers needed for level n, for a 2-student tower (scaled by team size)
+var TOWER_FPS=6,UNIT_FPS=6,ATK_FPS=14,AIM_T=.18,UPG_FPS=8;
+
+var SCATTER=['Grass/1','Grass/2','Grass/3','Grass/4','Grass/5','Grass/6','Flower/1','Flower/2','Flower/3','Flower/4','Flower/5','Flower/6','Flower/7','Flower/8','Flower/9','Flower/10','Flower/11','Flower/12',
+  'Stone/1','Stone/2','Stone/3','Stone/4','Stone/5','Stone/6','Decor/Dirt1','Decor/Dirt3','Decor/Dirt4','Decor/Dirt5','Shadow/1','Shadow/4','Shadow/5'];
+var PROPS=['Decor/Tree1','Decor/Tree1','Decor/Tree1','Decor/Tree2','Bush/1','Bush/2','Bush/3','Bush/4','Bush/5','Bush/6','Stone/7','Stone/8','Stone/9','Stone/10','Stone/11','Stone/12','Stone/13','Stone/14','Stone/15','Stone/16',
+  'Decor/Log1','Decor/Log2','Decor/Log3','Decor/Log4','Decor/Box1','Decor/Box2','Decor/Box3','Decor/Box4','Decor/Lamp1','Decor/Lamp2','Decor/Lamp3','Fence/1','Fence/3','Camp/5','Camp/6','Decor/Dirt2','Decor/Dirt6'];
+SCATTER.concat(PROPS,['Shadow/6','Camp/1','Camp/2','Camp/3','Camp/4']).forEach(obj);
+
+/* ---------- enemies ---------- */
+// sheets: 48x48 frames, 6 per animation, directions D(own) S(ide, faces left) U(p); the feet sit at row 38 of the frame.
+// anims maps our animation names to the sprite files; aim = body centre above the feet (where shots hit);
+// top = sprite height (health bar sits above it); fly = drawn above the road with a shadow; split = on death plays its split animation and leaves two of that type
+function enemyKind(folder,anims,o){o.sheet={};for(var a in anims){o.sheet[a]={};
+  for(var d of['D','S','U'])o.sheet[a][d]=img(ENEMIES+folder+'/'+d+'_'+anims[a]+'.png')}return o}
+var ETYPE={
+  s:enemyKind(1,{walk:'Walk',death:'Special'},{name:'gleivė',hp:3,spd:50,castle:10,aim:7,top:14,split:'m',cols:['#c9d84e','#6f9a32']}),
+  m:enemyKind(1,{walk:'Walk2',death:'Death2'},{name:'gleivytė',hp:1,spd:66,castle:5,aim:5,top:10,cols:['#c9d84e','#6f9a32']}),
+  w:enemyKind(3,{walk:'Walk',death:'Death',attack:'Attack'},{name:'vilkas',hp:4,spd:76,castle:10,aim:9,top:21,cols:['#5b6f9e','#2c3557']}),
+  b:enemyKind(4,{walk:'Walk',death:'Death'},{name:'bitė',hp:3,spd:60,castle:10,aim:20,top:22,fly:12,cols:['#f0a23a','#fff']}),
+  o:enemyKind(2,{walk:'Walk',death:'Death',attack:'Attack'},{name:'goblinas',hp:9,spd:38,castle:20,aim:12,top:24,cols:['#9db84a','#b4553a']})};
+var EN_FPS=10,WAVE_BASE=[10,14,18],WAVE_MIX=[{s:.6,b:.4},{s:.35,b:.25,w:.4},{s:.25,b:.2,w:.3,o:.25}];
+
+var NAMES=["Rokas","Emilija","Jonas","Gabija","Lukas","Ugnė","Matas","Austėja","Dovydas","Kamilė","Nojus","Liepa","Ąžuolas","Rugilė","Titas","Benas",
+  "Lėja","Herkus","Amelija","Kajus","Sofija","Joris","Atėnė","Dominykas","Miglė","Pijus","Ema","Domas","Urtė","Augustas","Gustė","Tomas",
+  "Viltė","Kristupas","Smiltė","Arnas","Luknė","Simas","Ieva","Mantas","Elzė","Adomas","Saulė","Jokūbas","Goda","Martynas","Paulina","Vakaris",
+  "Agnė","Ignas","Kotryna","Danielius","Meda","Gabrielius","Rusnė","Elijus","Ona","Aronas","Marija","Leonas","Eglė","Vytautas","Indrė","Karolis"];
+function teamColor(i){return'hsl('+Math.round(i*137.5%360)+',70%,'+(i%2?46:54)+'%)'}
+
+/* ---------- nested ring maze generator ---------- */
+// Grid of a x b tower slots around a central castle. Roads run on the grid lines between slot rings; each ring road
+// funnels either to its top/bottom middle (TB) or left/right middle (LR) where a connector leads to the next ring in,
+// alternating so the innermost ring is LR and ends at the castle. Towers fill the rings nearest the castle first, spread out.
+// Enemies enter only through outer-edge gaps next to towers.
+// wide mode: the same nested-ring layout, but always more slot columns than rows, and never a grid whose outer ring
+// would stay empty (classes too small for that get a single ring). Picks the grid that can be drawn largest inside
+// a 16:9 box, with a cost for empty slots and for straying from 16:9 (sizes measured in world pixels)
+function chooseWideGrid(need,target){
+  var best=null;
+  for(var b=need<=8?2:4;b<=16;b+=2)for(var a=b+2;a<=24;a+=2){
+    var D=b/2,inner=D>1?a*b-(2*(a+b)-4):0;
+    if(a*b<need||need<=inner)continue;
+    var Wd=2*MARGIN+a*CELL+CENTER+2*D*ROAD,Hd=2*MARGIN+b*CELL+CENTER+2*D*ROAD,fit=Math.min(target/Wd,1/Hd);
+    var cost=-Math.log(fit)+.02*(a*b-need)+Math.abs(Math.log(Wd/Hd/target));
+    if(!best||cost<best.cost)best={a:a,b:b,cost:cost};
+  }
+  return best;
+}
+function chooseGrid(need,target){
+  if(target>1)return chooseWideGrid(need,target);
+  var best=null;
+  for(var a=4;a<=16;a+=2)for(var b=4;b<=a;b+=2){
+    if(a*b<need||a/b>2.5)continue;
+    var inner=a*b-(2*(a+b)-4),cost=(a*b-need)+20*Math.abs(Math.log(((a+2)/(b+2))/target));
+    if(need<=inner&&!(a===4&&b===4))cost+=60;
+    if(!best||cost<best.cost)best={a:a,b:b,cost:cost};
+  }
+  return best||{a:16,b:16};
+}
+function ringSlots(a,b){
+  var r=[],c,q;
+  for(c=0;c<a;c++)r.push([c,0]);
+  for(q=1;q<b;q++)r.push([a-1,q]);
+  for(c=a-2;c>=0;c--)r.push([c,b-1]);
+  for(q=b-2;q>=1;q--)r.push([0,q]);
+  return r;
+}
+// innermost ring first; in the rings outside it, first the left/right slots level with the inner ring (vertical middle
+// first), then the top/bottom rows; otherwise closest to the castle first (world-pixel distance). Mirror-image groups
+// of 4 keep the layout symmetric (a part-filled group takes diagonal opposites first)
+function place(a,b,need){
+  var D=b/2,xm=(a-1)/2,ym=(b-1)/2,placed=[],rem=need,cx=XW(xm),cy=YW(ym);
+  for(var k=D-1;k>=0&&rem>0;k--){
+    var groups=[];
+    for(var c=k;c<a/2;c++)for(var r=k;r<b/2;r++){
+      if(Math.min(c,r)!==k)continue;
+      var side=k<D-1&&c===k&&r>k;
+      groups.push({d:(side?0:1e6)+(side?Math.abs(YW(r)-cy):Math.hypot(XW(c)-cx,YW(r)-cy)),s:[[c,r],[a-1-c,b-1-r],[a-1-c,r],[c,b-1-r]]});
+    }
+    groups.sort(function(p,q){return p.d-q.d});
+    for(var i=0;i<groups.length&&rem>0;i++)for(var t=0;t<4&&rem>0;t++){placed.push(groups[i].s[t]);rem--}
+  }
+  return placed;
+}
+
+/* ---------- grid -> world pixels ---------- */
+// slot = 3 tiles, road = 2 tiles, the middle row/column band is 4 tiles wide to fit the castle; unused grid lines take no space
+var MARGIN=64,CELL=96,ROAD=64,CENTER=128;
+var M={};
+// cellW(k) lets removed rows take no space
+function axis(n,used,mid,cellW){var pos={},x=MARGIN;
+  for(var k=0;k<=n;k++){var g=k-.5,w=g===mid?CENTER:(used(g)?ROAD:0);pos[g]=x+w/2;x+=w;if(k<n){var cw=cellW?cellW(k):CELL;pos[k]=x+cw/2;x+=cw}}
+  return{pos:pos,len:x+MARGIN}}
+function XW(v){return v<-.5?0:v>M.a-.5?M.W:M.XP[Math.round(v*2)/2]}
+function YW(v){return v<-.5?0:v>M.b-.5?M.H:M.YP[Math.round(v*2)/2]}
+// when the outer ring has no towers in its top/bottom rows (M.sq), those rows are removed and the outer ring closes
+// onto the inner ring's top/bottom roads
+function ringRect(i){return M.sq&&i===0?{xL:-.5,xR:M.a-.5,yT:.5,yB:M.b-1.5}:{xL:i-.5,xR:M.a-i-.5,yT:i-.5,yB:M.b-i-.5}}
+// where enemies leave ring i for the next ring in: its top/bottom (TB) or left/right (LR) middles; a trimmed outer
+// ring hands over at the next ring's corners
+function gatesOf(i){var r=ringRect(i);
+  if(M.sq&&i===0){var q=ringRect(1);return[[q.xL,q.yT],[q.xR,q.yT],[q.xL,q.yB],[q.xR,q.yB]]}
+  return M.conv[i]==='TB'?[[M.xm,r.yT],[M.xm,r.yB]]:[[r.xL,M.ym],[r.xR,M.ym]]}
+
+function buildMap(n,target,pair){
+  // up to 4 towers (8 in compact mode): one ring around a 2-row field; the first towers take the 4 slots touching the
+  // castle, so enemies pass each tower on the outer lane and again on the castle lane, and every tower can still shoot
+  // at the castle gate. Wide mode switches to its own grids above 4 towers (6x2 single ring up to 8)
+  var per=pair?2:1,need=Math.ceil(n/per),gr=need<=4||(need<=8&&target<=1)?{a:target>1?6:4,b:2}:chooseGrid(need,target),a=gr.a,b=gr.b,D=b/2,xm=(a-1)/2,ym=(b-1)/2,i;
+  var conv=[];for(i=0;i<D;i++)conv[i]=((D-1-i)%2===0)?'LR':'TB';
+  var ax=axis(a,function(v){return v<=D-1.5||v>=a-D+.5},xm),ay=axis(b,function(v){return v<=D-1.5||v>=b-D+.5},ym);
+  M={n:n,per:per,need:need,a:a,b:b,D:D,xm:xm,ym:ym,conv:conv,XP:ax.pos,YP:ay.pos,W:ax.len,H:ay.len};
+  W=M.W;H=M.H;COLS=W/TS;ROWS=H/TS;
+  M.placed=place(a,b,need);
+  // outer ring without towers in its top/bottom rows: drop those rows and their roads
+  M.sq=D>1&&!M.placed.some(function(p){return p[1]===0||p[1]===b-1});
+  if(M.sq){ay=axis(b,function(v){return v>-.5&&v<b-.5&&(v<=D-1.5||v>=b-D+.5)},ym,function(k){return k===0||k===b-1?0:CELL});M.YP=ay.pos;M.H=ay.len;H=M.H;ROWS=H/TS}
+  var rowT=M.sq?1:0,rowB=M.sq?b-2:b-1;
+  // entry gaps on the outer edge of the field: active when both neighbouring slots have towers, and every outer tower gets one
+  var fs={};M.placed.forEach(function(p){fs[p.join()]=1});
+  var ring=ringSlots(a,rowB-rowT+1).map(function(s){return[s[0],s[1]+rowT]}),C=ring.length;
+  var gaps=ring.map(function(s,j){
+    var t=ring[(j+1)%C],mx=(s[0]+t[0])/2,my=(s[1]+t[1])/2,side,tail,hd,off;
+    if(s[1]===rowT&&t[1]===rowT){side='T';tail=[mx,-1.5];hd=[mx,rowT-.5];off=Math.abs(mx-xm)}
+    else if(s[1]===rowB&&t[1]===rowB){side='B';tail=[mx,b+.5];hd=[mx,rowB+.5];off=Math.abs(mx-xm)}
+    else if(s[0]===0&&t[0]===0){side='L';tail=[-1.5,my];hd=[-.5,my];off=Math.abs(my-ym)}
+    else{side='R';tail=[a+.5,my];hd=[a-.5,my];off=Math.abs(my-ym)}
+    return{side:side,tail:tail,hd:hd,off:off,act:!!(fs[s.join()]&&fs[t.join()])};
+  });
+  ring.forEach(function(s,j){
+    if(!fs[s.join()])return;
+    var g1=gaps[(j-1+C)%C],g2=gaps[j];
+    if(g1.act||g2.act)return;
+    var ch=g1.off<g2.off?g1:g2.off<g1.off?g2:(g1.side==='T'||g1.side==='B')?g1:g2;
+    ch.act=true;
+  });
+  // total spawns follow the class size (players - 1, at least 1); extra ones open next to the outer ring's
+  // connections into the next ring, nearest first, balanced between those connections
+  M.spawnTarget=Math.min(C,Math.max(1,n-1));
+  var r0=ringRect(0),L0=2*((r0.xR-r0.xL)+(r0.yB-r0.yT));
+  var gates0=gatesOf(0).map(function(g){return perim(r0,g[0],g[1])}),gn=gates0.length;
+  gaps.forEach(function(g){var p=perim(r0,g.hd[0],g.hd[1]);g.gd=1e9;
+    gates0.forEach(function(pg,k){var d=Math.abs(p-pg);d=Math.min(d,L0-d);if(d<g.gd){g.gd=d;g.gate=k}})});
+  // with a single ring the side-middle gaps lead straight to the castle, so extras go on the top/bottom edges nearest the middle
+  var key=D>1?function(g){return g.gd}:function(g){return(g.side==='L'||g.side==='R'?1e6:0)+g.off},
+      grp=D>1?function(g){return g.gate}:function(g){return g.side==='B'?1:0};
+  var perGrp=[0,0,0,0,0],act=0;gaps.forEach(function(g){if(g.act){perGrp[grp(g)]++;act++}});
+  while(act<M.spawnTarget){
+    var best=null;gaps.forEach(function(g){if(!g.act&&(!best||key(g)<key(best)-1e-9||(Math.abs(key(g)-key(best))<1e-9&&perGrp[grp(g)]<perGrp[grp(best)])))best=g});
+    best.act=true;best.extra=true;perGrp[grp(best)]++;act++}
+  M.spawns=gaps.filter(function(g){return g.act});M.gapCount=C;
+  // road segments (grid coords): every ring, the connectors between rings, the castle approach and the active entries
+  var segs=[];
+  for(i=0;i<D;i++){var r=ringRect(i);
+    segs.push([[r.xL,r.yT],[r.xR,r.yT]],[[r.xR,r.yT],[r.xR,r.yB]],[[r.xL,r.yB],[r.xR,r.yB]],[[r.xL,r.yT],[r.xL,r.yB]]);
+    if(i<D-1&&!(M.sq&&i===0)){var q=ringRect(i+1);
+      if(conv[i]==='TB')segs.push([[xm,r.yT],[xm,q.yT]],[[xm,r.yB],[xm,q.yB]]);
+      else segs.push([[r.xL,ym],[q.xL,ym]],[[r.xR,ym],[q.xR,ym]])}}
+  var inner=ringRect(D-1);segs.push([[inner.xL,ym],[xm,ym]],[[inner.xR,ym],[xm,ym]]);
+  M.spawns.forEach(function(s){segs.push([s.tail,s.hd])});
+  var rects=segs.map(function(s){var x1=XW(s[0][0]),y1=YW(s[0][1]),x2=XW(s[1][0]),y2=YW(s[1][1]);
+    return[Math.min(x1,x2)-ROAD/2,Math.min(y1,y2)-ROAD/2,Math.max(x1,x2)+ROAD/2,Math.max(y1,y2)+ROAD/2]});
+  MASK=[];for(var rr=0;rr<ROWS;rr++){MASK.push([]);for(var c=0;c<COLS;c++){var cx=c*TS+16,cy=rr*TS+16;
+    MASK[rr].push(rects.some(function(q){return cx>q[0]&&cx<q[2]&&cy>q[1]&&cy<q[3]}))}}
+  // tower slots
+  M.slots=[];var idx={};M.placed.forEach(function(p,k){idx[p.join()]=k});
+  for(c=0;c<a;c++)for(rr=rowT;rr<=rowB;rr++)M.slots.push({c:c,r:rr,x:XW(c),base:YW(rr)+44,tower:idx[c+','+rr]});
+  M.cx=XW(xm);M.cy=YW(ym);
+  M.graph=buildGraph(segs.map(function(sg){return[[XW(sg[0][0]),YW(sg[0][1])],[XW(sg[1][0]),YW(sg[1][1])]]}));
+  M.dist=castleDistances(M.graph,M.graph.key([M.cx,M.cy]));
+  // tower reach is a rectangle around each tower (|dx| <= RX, |dy| <= RY), sized per map so the innermost tower
+  // nearest the castle (top-left of it) reaches the corner of the inner ring road on its side and both castle gates,
+  // and vertically both the ring road above it and the castle lane below it; its mirror images cover the other corners
+  var ref={x:XW(a/2-1),y:YW(b/2-1)-16},ir=ringRect(D-1);
+  M.RX=Math.round(Math.max(ref.x-XW(ir.xL),M.cx+GATE_X-ref.x)+16);
+  M.RY=Math.round(Math.max(ref.y-YW(ir.yT),M.cy-ref.y)+16);
+  // pacing scales with the class size
+  M.spawnInt=Math.max(.3,Math.min(1.5,1.25*15/Math.max(n,4)));
+  makeBg();resize();reset();
+  $('info').textContent=a+' × '+(rowB-rowT+1)+' vietų tinklelis · '+D+' kelio žiedai'+(M.sq?' (išorinis žiedas be viršaus ir apačios)':'')+' · '+M.spawns.length+' iš '+C+' įėjimų aktyvūs (tarp bokštų: '+M.spawns.filter(function(s){return!s.extra}).length+', papildomi: '+M.spawns.filter(function(s){return s.extra}).length+') · bokštų: '+need+' · bokšto nuotolis ±'+M.RX+' × ±'+M.RY+' px (užveskite pelę ant bokšto)';
+  $('joined').textContent=n;
+}
+
+/* ---------- enemy routes ---------- */
+function perim(r,x,y){var w=r.xR-r.xL,h=r.yB-r.yT;
+  if(Math.abs(y-r.yT)<1e-9)return x-r.xL;if(Math.abs(x-r.xR)<1e-9)return w+(y-r.yT);if(Math.abs(y-r.yB)<1e-9)return w+h+(r.xR-x);return 2*w+h+(r.yB-y)}
+// road network: nodes at every road end, corner and junction; distances to the castle are worked out once per map
+function buildGraph(segs){
+  var pts={},adj={},key=function(p){return p[0]+','+p[1]};
+  function add(p){pts[key(p)]=p}
+  segs.forEach(function(sg){add(sg[0]);add(sg[1])});
+  segs.forEach(function(h){if(h[0][1]!==h[1][1])return;var y=h[0][1],x1=Math.min(h[0][0],h[1][0]),x2=Math.max(h[0][0],h[1][0]);
+    segs.forEach(function(v){if(v[0][0]!==v[1][0])return;var x=v[0][0],y1=Math.min(v[0][1],v[1][1]),y2=Math.max(v[0][1],v[1][1]);
+      if(x>=x1&&x<=x2&&y>=y1&&y<=y2)add([x,y])})});
+  var all=Object.keys(pts).map(function(k){return pts[k]});
+  segs.forEach(function(sg){var a=sg[0],b=sg[1],len=Math.hypot(b[0]-a[0],b[1]-a[1]);if(!len)return;
+    var on=all.filter(function(p){return Math.abs((p[0]-a[0])*(b[1]-a[1])-(p[1]-a[1])*(b[0]-a[0]))<.5&&
+      Math.min(a[0],b[0])-.5<=p[0]&&p[0]<=Math.max(a[0],b[0])+.5&&Math.min(a[1],b[1])-.5<=p[1]&&p[1]<=Math.max(a[1],b[1])+.5})
+      .sort(function(p,q){return(p[0]-a[0])*(b[0]-a[0])+(p[1]-a[1])*(b[1]-a[1])-((q[0]-a[0])*(b[0]-a[0])+(q[1]-a[1])*(b[1]-a[1]))});
+    for(var i=1;i<on.length;i++){var l=Math.hypot(on[i][0]-on[i-1][0],on[i][1]-on[i-1][1]);if(!l)continue;
+      var ka=key(on[i-1]),kb=key(on[i]);(adj[ka]=adj[ka]||[]).push({k:kb,l:l});(adj[kb]=adj[kb]||[]).push({k:ka,l:l})}});
+  return{pts:pts,adj:adj,key:key};
+}
+// shortest distance from every node to the castle (Dijkstra; the maps are small)
+function castleDistances(gr,target){
+  var dist={},done={},k;for(k in gr.pts)dist[k]=1e9;dist[target]=0;
+  for(;;){var best=null;for(k in dist)if(!done[k]&&(best===null||dist[k]<dist[best]))best=k;
+    if(best===null||dist[best]>=1e9)break;done[best]=1;
+    (gr.adj[best]||[]).forEach(function(n){if(dist[best]+n.l<dist[n.k])dist[n.k]=dist[best]+n.l})}
+  return dist}
+// enemies take the shortest road to the castle; where two ways are equally short they pick one at random
+function makeRoute(sp){
+  var gr=M.graph,k=gr.key([XW(sp.tail[0]),YW(sp.tail[1])]),pts=[gr.pts[k]],guard=0;
+  while(M.dist[k]>.5&&guard++<1000){var here=k,opts=(gr.adj[k]||[]).filter(function(n){return Math.abs(M.dist[n.k]+n.l-M.dist[here])<.5});
+    if(!opts.length)break;k=opts[rnd(opts.length)].k;pts.push(gr.pts[k])}
+  var prev=pts[pts.length-2]||pts[0];pts[pts.length-1]=[M.cx+(prev[0]<M.cx?-GATE_X:GATE_X),M.cy];   // stop at the village gate
+  var out=[pts[0]];pts.forEach(function(p){var l=out[out.length-1];if(Math.hypot(p[0]-l[0],p[1]-l[1])>.5)out.push(p)});
+  var segs=[],len=0;for(var j=1;j<out.length;j++){var l2=Math.hypot(out[j][0]-out[j-1][0],out[j][1]-out[j-1][1]);segs.push({a:out[j-1],b:out[j],s:len,l:l2});len+=l2}
+  return{segs:segs,len:len};
+}
+function routeAt(rt,d){d=Math.max(0,Math.min(rt.len,d));for(var i=0;i<rt.segs.length;i++){var s=rt.segs[i];if(d<=s.s+s.l){var t=(d-s.s)/s.l;return[s.a[0]+(s.b[0]-s.a[0])*t,s.a[1]+(s.b[1]-s.a[1])*t]}}var e=rt.segs[rt.segs.length-1].b;return e}
+
+/* ---------- background: autotiled ground + scenery ---------- */
+function isRoad(c,r){return MASK[Math.max(0,Math.min(ROWS-1,r))][Math.max(0,Math.min(COLS-1,c))]}
+// autotile: key = grass on N,E,S,W edges + grass in NE,SE,SW,NW inner corners -> tile numbers in FieldsTileset (1-based)
+var AUTOTILE={'00000000':[11,18,20,27],'00000001':[37],'00000010':[5],'00000011':[14],'00000100':[1],'00000101':[46],'00000110':[23],'00000111':[58],'00001000':[33],'00001001':[7],'00001010':[45],'00001011':[59],'00001100':[16],'00001101':[60],'00001110':[57],'00001111':[15],'00010000':[13,21,29],'00010100':[62],'00011000':[54],'00011100':[50],'00100000':[2,3,4],'00100001':[63],'00101000':[64],'00101001':[52],'00110000':[26],'00111000':[22],'01000000':[9,17,25],'01000001':[53],'01000010':[61],'01000011':[49],'01010000':[32,40,48],'01100000':[28],'01100001':[24],'01110000':[44],'10000000':[34,35,36],'10000010':[55],'10000100':[56],'10000110':[51],'10010000':[10],'10010100':[6],'10100000':[30,31,39],'10110000':[41],'11000000':[12],'11000010':[8],'11010000':[43],'11100000':[42],'11110000':[47]};
+var GRASS_TILE=38;
+function tileFor(c,r){
+  var g=function(dc,dr){return isRoad(c+dc,r+dr)?0:1},n=g(0,-1),e=g(1,0),s=g(0,1),w=g(-1,0);
+  var key=''+n+e+s+w+(!n&&!e&&g(1,-1)?1:0)+(!s&&!e&&g(1,1)?1:0)+(!s&&!w&&g(-1,1)?1:0)+(!n&&!w&&g(-1,-1)?1:0);
+  var opts=AUTOTILE[key];
+  if(!opts){var best=1e9;for(var k in AUTOTILE){var d=0;for(var j=0;j<8;j++)d+=k[j]!==key[j];if(d<best){best=d;opts=AUTOTILE[k]}}}
+  return opts[(c*7+r*13)%opts.length]}
+
+var BG=document.createElement('canvas'),FIRES=[];
+function makeBg(){
+  BG.width=W;BG.height=H;FIRES=[];
+  var g=BG.getContext('2d'),seed=M.a*131+M.b*17+M.need,x,y,n,tries;function rr(){seed=(seed*16807)%2147483647;return seed/2147483647}
+  for(var r=0;r<ROWS;r++)for(var c=0;c<COLS;c++){var t=(isRoad(c,r)?tileFor(c,r):GRASS_TILE)-1;g.drawImage(TILESET,(t%8)*TS,Math.floor(t/8)*TS,TS,TS,c*TS,r*TS,TS,TS)}
+  // keep scenery off the road, the tower slots and the village
+  var taken=[[M.cx-VHW-6,M.cy+VTOP-6,2*VHW+12,-2*VTOP+12]],items=[];
+  M.slots.forEach(function(s){taken.push([s.x-40,s.base-96,80,98])});
+  function free(x,y,w,h){if(x<0||y<0||x+w>W||y+h>H)return false;
+    for(var yy=Math.floor((y-3)/TS);yy<=Math.floor((y+h+3)/TS);yy++)for(var xx=Math.floor((x-3)/TS);xx<=Math.floor((x+w+3)/TS);xx++)if(yy>=0&&yy<ROWS&&xx>=0&&xx<COLS&&MASK[yy][xx])return false;
+    return!taken.some(function(t){return x<t[0]+t[2]&&x+w>t[0]&&y<t[1]+t[3]&&y+h>t[1]})}
+  function put(name,x,y,flat){var im=OBJ[name];items.push({im:im,x:x,y:y,flat:flat});taken.push([x,y,im.width,im.height]);
+    if(name==='Decor/Tree1')items.push({im:OBJ['Shadow/6'],x:x+33-47,y:y+44,flat:true})}
+  // a line of trees (with bushes in the gaps) along every border, partly outside the field; kept off the entrance roads
+  function edgeFree(x,y,w,h){var x0=Math.max(0,x),y0=Math.max(0,y),x1=Math.min(W,x+w),y1=Math.min(H,y+h);
+    return x1-x0>4&&y1-y0>4&&free(x0,y0,x1-x0,y1-y0)}
+  function edgeTree(x,y){var t=OBJ['Decor/Tree1'];if(edgeFree(x+12,y+30,t.width-24,t.height-30)){put('Decor/Tree1',x,y);return true}
+    var b=OBJ['Bush/'+(1+Math.floor(rr()*6))],bx=x+16,by=y+(y<H/2?44:20);if(edgeFree(bx,by,b.width,b.height))items.push({im:b,x:bx,y:by}),taken.push([bx,by,b.width,b.height]);return false}
+  for(x=-30;x<W;x+=44+Math.floor(rr()*26)){edgeTree(x,-46+Math.floor(rr()*12));edgeTree(x,H-34-Math.floor(rr()*12))}
+  for(y=10;y<H-60;y+=40+Math.floor(rr()*24)){edgeTree(-38+Math.floor(rr()*10),y);edgeTree(W-30-Math.floor(rr()*10),y)}
+  // camps: tents round an animated campfire with logs to sit on, as many as the free grass allows
+  var camps=1+Math.floor(W*H/300000);
+  for(n=0,tries=0;n<camps&&tries<600;tries++){x=Math.floor(rr()*(W-124));y=Math.floor(rr()*(H-104));
+    if(!free(x,y,124,100))continue;var flip=rr()<.5;
+    put(flip?'Camp/4':'Camp/2',flip?x+64:x,y);put(flip?'Camp/3':'Camp/1',flip?x+4:x+50,y+16);
+    put('Decor/Log3',x+18,y+86);FIRES.push({x:x+46,y:y+60,smoke:true,off:rr()});taken.push([x,y,124,100]);n++}
+  // smaller camps (one tent, a fire and a log) fit the narrower patches of grass
+  for(tries=0;n<camps*2&&tries<900;tries++){x=Math.floor(rr()*(W-96));y=Math.floor(rr()*(H-62));
+    if(!free(x,y,96,62))continue;var fl=rr()<.5;
+    put(fl?'Camp/3':'Camp/1',fl?x+40:x,y);put('Decor/Log1',fl?x+2:x+60,y+44);FIRES.push({x:fl?x+6:x+60,y:y+12,smoke:true,off:rr()});taken.push([x,y,96,62]);n++}
+  // a few lone campfires with a log beside them
+  for(n=0,tries=0;n<Math.max(2,camps)&&tries<600;tries++){x=Math.floor(rr()*(W-60));y=Math.floor(rr()*(H-50));
+    if(!free(x,y,60,44))continue;put(rr()<.5?'Decor/Log1':'Decor/Log2',x+28,y+16);FIRES.push({x:x,y:y+8,off:rr()});taken.push([x,y,60,44]);n++}
+  var big=Math.round(W*H/26000);
+  for(n=0,tries=0;n<big&&tries<3000;tries++){var name=PROPS[Math.floor(rr()*PROPS.length)],im=OBJ[name];x=Math.floor(rr()*W);y=Math.floor(rr()*H);
+    if(name==='Decor/Tree1'?!free(x-16,y,im.width+32,im.height+14):!free(x,y,im.width,im.height))continue;put(name,x,y,/Dirt/.test(name));n++}
+  var small=Math.round(W*H/5500);
+  for(n=0,tries=0;n<small&&tries<6000;tries++){name=SCATTER[Math.floor(rr()*SCATTER.length)];im=OBJ[name];x=Math.floor(rr()*W);y=Math.floor(rr()*H);
+    if(!free(x,y,im.width,im.height))continue;put(name,x,y,/^Shadow|Dirt/.test(name));n++}
+  items.sort(function(a,b){return(a.flat?0:1)-(b.flat?0:1)||(a.y+a.im.height)-(b.y+b.im.height)});
+  items.forEach(function(it){g.drawImage(it.im,it.x,it.y)});
+}
+// The village the class defends: a palisade around the centre band (5 x 10 tiles, the castle's old spot) with a gate on
+// the left and right where the road comes in, a house, a well, a wheelbarrow, a barrel, a lamp post and two villagers.
+// Palisade tileset (32 px tiles, 1-based): top wall 1-4 + 6 over 9-12 + 14 (1/9 top-left, 6/14 top-right corner),
+// left wall 17/25, right wall 22/30, bottom corners 33/41 (left) and 38/46 (right), gate frames in the side walls:
+// post, beam, beam, post = 18/26/34/42 (left) and 19/27/35/43 (right).
+var VIL='baseItems/village/',PALI=img(VIL+'1.1 Tiles/Tileset2.png'),GATE=img(VIL+'3 Animated Objects/DoubleDoor2.png');
+function vobj(p){return img(VIL+'2 Objects/'+p+'.png')}
+var VOBJ={house:vobj('7 House/1'),well:vobj('3 Decor/13'),lamp:vobj('3 Decor/9'),
+  barrow:vobj('3 Decor/2'),box:vobj('4 Box/1'),shadow:vobj('1 Shadow/5'),stone:vobj('2 Stone/1'),stone2:vobj('2 Stone/5')};
+var CITIZEN=[1,2].map(function(n){var b='baseItems/citizens/'+n+'/';return{walk:img(b+'S_Walk.png'),idle:img(b+'D_Idle.png')}});
+var VHW=80,VTOP=-160,GATE_X=92;   // fence half-width, fence top (from the centre); enemies stop GATE_X from the centre
+var VILLAGE=document.createElement('canvas');VILLAGE.width=2*VHW+32;VILLAGE.height=352;
+function makeVillage(){var g=VILLAGE.getContext('2d'),ox=VILLAGE.width/2,oy=176;g.imageSmoothingEnabled=false;
+  g.clearRect(0,0,VILLAGE.width,VILLAGE.height);
+  function t(n,x,y){g.drawImage(PALI,((n-1)%8)*32,Math.floor((n-1)/8)*32,32,32,ox+x,oy+y,32,32)}
+  function o(im,x,yBottom){g.drawImage(im,Math.round(ox+x),Math.round(oy+yBottom-im.height))}
+  var L=-VHW,R=VHW-32;
+  // back: the top wall, then the side walls and gate frames down to the street
+  [1,2,3,4,6].forEach(function(n,k){t(n,L+k*32,VTOP)});[9,10,11,12,14].forEach(function(n,k){t(n,L+k*32,VTOP+32)});
+  t(17,L,-96);t(22,R,-96);t(18,L,-64);t(19,R,-64);t(26,L,-32);t(27,R,-32);t(34,L,0);t(35,R,0);
+  // inside, back to front: a house above the street (its roof in front of the back wall); a wheelbarrow, the well and a barrel below it
+  o(VOBJ.house,-58,-34);o(VOBJ.lamp,40,-34);o(VOBJ.stone,-52,-30);
+  o(VOBJ.barrow,-52,84);o(VOBJ.box,-14,92);o(VOBJ.well,12,92);o(VOBJ.stone2,8,48);
+  // front: the side walls below the street and the bottom wall
+  t(42,L,32);t(43,R,32);t(25,L,64);t(30,R,64);
+  t(33,L,96);[2,3,4].forEach(function(n,k){t(n,L+32+k*32,96)});t(38,R,96);
+  t(41,L,128);[10,11,12].forEach(function(n,k){t(n,L+32+k*32,128)});t(46,R,128);
+}
+// the gates (6 frames: 0 = shut, seen edge-on ... 5 = wide open). They stand open while the towers are being built, swing
+// shut before the first enemies come, and open again if the village falls; a gate shakes when it is hit
+function drawVillage(){var cx=M.cx,cy=M.cy,shake=function(t){return t>0?Math.round(Math.sin(G.t*90)*2):0};
+  ctx.drawImage(VILLAGE,cx-VILLAGE.width/2,cy-176);
+  var want=G.phase==='build'||G.phase==='lose'?5:0,step=Math.max(0,G.anim-(G.gateA==null?G.anim:G.gateA))*8;
+  if(G.gate==null)G.gate=5;
+  G.gate=G.gate<want?Math.min(want,G.gate+step):Math.max(want,G.gate-step);G.gateA=G.anim;
+  var gf=Math.round(G.gate);
+  ctx.drawImage(GATE,gf*64,0,64,96,cx-VHW+shake(G.hitL),cy-60,64,96);
+  ctx.save();ctx.translate(cx+VHW-1+shake(G.hitR),cy-60);ctx.scale(-1,1);ctx.drawImage(GATE,gf*64,0,64,96,0,0,64,96);ctx.restore();
+  if(G.phase==='lose')return;
+  // one villager walks the street between the gates, one stands in front of the house
+  var c=CITIZEN[0],T=G.anim*12,span=70,p=T%(2*span),x=p<span?p-span/2:span*1.5-p,f=Math.floor(G.anim*8)%6;
+  ctx.save();ctx.translate(Math.round(cx+x),cy+8-32);if(p<span)ctx.scale(-1,1);ctx.drawImage(c.walk,f*48,0,48,48,-24,0,48,48);ctx.restore();
+  ctx.drawImage(CITIZEN[1].idle,(Math.floor(G.anim*5)%4)*48,0,48,48,cx-38-24,cy-30-32,48,48);
+}
+
+/* ---------- glow sprites for magic orbs ---------- */
+var GLOW=[null];
+for(u=1;u<=3;u++){var gc=document.createElement('canvas');gc.width=gc.height=32;var gg=gc.getContext('2d'),gr=gg.createRadialGradient(16,16,0,16,16,16);
+  gr.addColorStop(0,PCOL[u]);gr.addColorStop(1,'rgba(0,0,0,0)');gg.fillStyle=gr;gg.globalAlpha=.8;gg.fillRect(0,0,32,32);GLOW.push(gc)}
+
+/* ---------- host mode: a real class game started from a lobby (tower_defence.html?code=1234) ---------- */
+// The whole game runs here, in the teacher's browser. Students' pages only send "hit" (a correct answer: their unit
+// shoots) and "upgrade" (10 correct in a row: their tower goes up a level); the result is sent back at the end.
+var HOST=new URLSearchParams(location.search).get('code'),ROSTER=null,HS=null;
+// a correct answer shows the student's name over the tower at once and the shot follows a moment later,
+// so a student looking up from their device sees their own shot happen
+var SHOT_DELAY=.8;
+// enemy health and spacing per difficulty, tuned for a class answering roughly one task every 8 s per student
+var DIFF={easy:{hp:.45,gap:1.3,boost:.2},normal:{hp:.6,gap:1,boost:.35},hard:{hp:.8,gap:.8,boost:.5}};
+// Timed games: a small 'director' looks at the last few seconds every 5 s and nudges an intensity factor (>= 1).
+// Too easy (enemies die early on their road, the castle is untouched and students' shots are piling up) -> a little
+// more pressure; the castle getting hit -> back off at once and harder. The boost never goes below the chosen
+// difficulty and is capped per difficulty (easy +20%, normal +35%, hard +50%), so the teacher's choice still governs.
+function director(dt){
+  var D=G.dir||(G.dir={k:1,t:0,hp:G.hp,depth:[]});D.t+=dt;if(D.t<5)return;D.t=0;
+  var lost=D.hp-G.hp,depth=D.depth.length?D.depth.reduce(function(a,b){return a+b},0)/D.depth.length:1,
+      queued=towers.reduce(function(n,t){return n+t.units.reduce(function(m,u){return m+u.queue.length},0)},0)/Math.max(1,students.length);
+  if(lost>0)D.k-=.06*Math.min(3,lost/5);
+  else if(D.depth.length&&depth<.55&&(queued>.4||enemies.length<3))D.k+=.04;
+  D.k=Math.max(1,Math.min(1+diff().boost,D.k));D.hp=G.hp;D.depth=[]}
+function boost(){return G.dir?G.dir.k:1}
+function diff(){return DIFF[HS&&HS.difficulty]||DIFF.normal}
+// seconds between two enemies (all entrances together): about what the class can answer, adjusted by difficulty
+function hostGap(){return Math.max(.4,Math.min(6,40/Math.max(1,ROSTER.length)))*diff().gap}
+// enemy mix for a "strength" level (0 = start; 1 = end of a timed game or about wave 7)
+function pickType(lvl){var w={s:Math.max(.15,.55-.4*lvl),b:.3,w:lvl>.15?.15+.2*lvl:0,o:lvl>.45?.1+.25*(lvl-.45):0},sum=0,k;
+  for(k in w)sum+=w[k];var r=Math.random()*sum;for(k in w){r-=w[k];if(r<0)return k}return's'}
+function endlessWave(k){var n=Math.ceil((5+2.5*k)*Math.max(3,ROSTER.length)/12),out='';for(var i=0;i<n;i++)out+=pickType(Math.min(1.5,k/6));return out}
+
+/* ---------- state ---------- */
+var G,towers,students,enemies,corpses,shots,parts,floats,rings,waves,TOTAL,dirty=true;
+function reset(){
+  G={phase:'build',t:0,wave:0,spawnI:0,sched:[],hp:100,killed:0,paused:G&&G.paused,hitL:0,hitR:0,anim:G?G.anim:0,rr:0,spawnT:0,left:HS?HS.minutes*60:0,hpMul:1};
+  enemies=[];corpses=[];shots=[];parts=[];floats=[];rings=[];
+  waves=WAVE_BASE.map(function(base,w){var cnt=Math.ceil(base*Math.max(M.n,4)/15),s='',mix=WAVE_MIX[w];
+    for(var i=0;i<cnt;i++){var r=Math.random(),acc=0,pick='s';for(var k in mix){acc+=mix[k];if(r<acc){pick=k;break}}s+=pick}return s});
+  TOTAL=waves.join('').length;
+  if(HOST){waves=[];TOTAL=0}
+  students=[];for(var i=0;i<M.n;i++)students.push(ROSTER?{name:cleanName(ROSTER[i].name),id:ROSTER[i].id,i:i,correct:0,next:1e9,team:0}:{name:NAMES[i%NAMES.length],i:i,correct:0,next:2+Math.random()*5,team:0});
+  towers=M.placed.map(function(p,ti){
+    var team=[];for(var k=ti*M.per;k<Math.min(M.n,(ti+1)*M.per);k++){team.push(k);students[k].team=ti}
+    // mages and archers alternate across the grid like a chessboard, so neighbouring towers are never the same kind
+    var slot=M.slots.filter(function(s){return s.tower===ti})[0],kind=(slot.c+slot.r)%2?'archer':'mage';
+    return{i:ti,team:team,col:teamColor(ti),x:slot.x,base:slot.base,kind:kind,K:KIND[kind],level:1,want:1,correct:0,
+      state:'upg',upSeq:[1,2,3],upI:0,toLevel:1,delay:Math.min(2.5,ti*.12),t:0,idleT:Math.random()*2,phase:Math.random()*2,
+      // one unit per student: with two students they stand side by side in the tower and each fires on their own answers
+      units:team.map(function(si,k){return{si:si,off:team.length>1?(k?9:-9):0,dir:'D',flip:false,state:'idle',t:0,fired:false,target:null,shot:null,queue:[],phase:Math.random()*2}})}});
+  $('feed').innerHTML='';feed('Statomi bokštai…');buildTeamList();dirty=true;
+}
+
+/* ---------- helpers ---------- */
+function lv(tw){return tw.K.LV[tw.level]}
+function feetY(tw){return tw.base-130+lv(tw).feet}
+function chest(tw,u){return{x:tw.x+(u?u.off:0),y:feetY(tw)-18}}
+// rectangular reach, measured from a fixed point on the tower (so it doesn't change when the tower levels up)
+function inRange(tw,x,y){var r=lv(tw).reach||1;return Math.abs(x-tw.x)<=M.RX*r&&Math.abs(y-(tw.base-60))<=M.RY*r}
+function alive(e){return e&&!e.dead}
+function pickTarget(tw){var best=null,any=null;
+  enemies.forEach(function(e){if(e.dead||!inRange(tw,e.x,e.y))return;
+    var rem=e.rt.len-e.d;if(!any||rem<any.rt.len-any.d)any=e;if(e.hp-e.pending>0&&(!best||rem<best.rt.len-best.d))best=e});
+  return best||any}
+function face(tw,u,e){var c=chest(tw,u),dx=e.x-c.x,dy=e.y-6-c.y;
+  if(Math.abs(dy)>Math.abs(dx)*.75){u.dir=dy>0?'D':'U';u.flip=false}else{u.dir='S';u.flip=dx>0}}
+function handPos(tw,u){var f=feetY(tw),L=lv(tw),ox,oy;
+  if(tw.kind==='mage'){ox=u.dir==='D'?11:u.dir==='U'?-10:(u.flip?11:-11);oy=12}
+  else{ox=u.dir==='S'?(u.flip?14:-14):2;oy=u.dir==='U'?16:13}
+  return{x:tw.x+u.off+ox,y:f-(L.roof?8:oy)}}
+function floater(x,y,txt,col,size){floats.push({x:x,y:y,txt:txt,col:col||'#fff',size:size||12,life:0,max:1.2})}
+function burst(x,y,cols,n,spd){for(var i=0;i<n;i++){var a=Math.random()*Math.PI*2,s=spd*(.4+Math.random()*.8);parts.push({x:x,y:y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-40,col:cols[i%cols.length],life:0,max:.45+Math.random()*.3,sz:2+rnd(2)})}}
+function feed(h){var f=$('feed'),d=document.createElement('div');d.innerHTML=h;f.insertBefore(d,f.firstChild);while(f.children.length>6)f.removeChild(f.lastChild)}
+function teamNames(tw){return tw.team.map(function(si){return students[si].name})}
+// Student names come from their accounts and can be anything: no control characters or runs of spaces, at most 24
+// characters (then …), never empty. On the field a name is also cut to a pixel width; in the side lists it is escaped.
+function cleanName(n){n=String(n==null?'':n).replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028-\u202e]/g,'').replace(/\s+/g,' ').trim();
+  if(!n)n='Mokinys';return Array.from(n).length>24?Array.from(n).slice(0,23).join('').trim()+'…':n}
+function esc(t){return String(t).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+// cut text to maxPx in the given canvas font (adds …)
+function fitText(t,maxPx,font){ctx.save();ctx.font=font;var a=Array.from(t),out=t;
+  if(ctx.measureText(t).width>maxPx){while(a.length>1&&ctx.measureText(a.join('')+'…').width>maxPx)a.pop();out=a.join('').trim()+'…'}
+  ctx.restore();return out}
+var NAME_FONT='900 10px Nunito,system-ui,sans-serif',FLOAT_FONT=function(size){return'900 '+size+'px Nunito,system-ui,sans-serif'};
+function lvNeed(tw,l){return Math.ceil(LVUP[l]*tw.team.length/2)}
+
+/* ---------- simulation ---------- */
+function answer(s){
+  var tw=towers[s.team],a=2+rnd(8),b=2+rnd(8);
+  if(Math.random()>.82)return;                       // wrong answer: nothing happens on the big screen
+  s.correct++;tw.correct++;dirty=true;
+  var un=tw.units.filter(function(u){return u.si===s.i})[0];
+  if(un.queue.length<4)un.queue.push({si:s.i,eq:a+' × '+b+' = '+(a*b)});
+  floater(tw.x+un.off*2,feetY(tw)-36,fitText(s.name,90,FLOAT_FONT(11))+' ✓',tw.col,11);
+  for(var l=4;l>1;l--)if(tw.correct>=lvNeed(tw,l)){tw.want=Math.max(tw.want,l);break}
+}
+function atkFrame(tw,u){var pre=tw.K.aim?AIM_T:0;return u.t<pre?-1:Math.floor((u.t-pre)*ATK_FPS)}
+function updTower(tw,dt){
+  tw.idleT+=dt;
+  if(tw.state==='upg'){
+    if(tw.delay>0){tw.delay-=dt;return}
+    tw.t+=dt;if(tw.t*UPG_FPS>=4){tw.t=0;tw.upI++;
+      if(tw.upI>=tw.upSeq.length){tw.state='idle';tw.level=tw.toLevel;
+        if(tw.toLevel>1){floater(tw.x,feetY(tw)-68,'LYGIS '+tw.toLevel+'!','#ffd34d',16);floater(tw.x,feetY(tw)-52,lv(tw).gain,'#ffd34d',12);burst(tw.x,tw.base-60,['#ffd34d','#fff',tw.col],22,140);
+          feed('<b style="color:'+tw.col+'">'+esc(teamNames(tw).join(', '))+'</b> bokštas pasiekė '+tw.toLevel+' lygį!');dirty=true}}}
+    return;
+  }
+  // level up once no unit is mid-shot
+  if(tw.want>tw.level&&!tw.units.some(function(u){return u.state==='atk'})){tw.state='upg';tw.toLevel=tw.level+1;tw.upSeq=[tw.toLevel+2];tw.upI=0;tw.t=0;tw.delay=0;return}
+  tw.units.forEach(function(u){updUnit(tw,u,dt)});
+}
+function updUnit(tw,u,dt){
+  if(u.state==='atk'){
+    u.t+=dt;var f=atkFrame(tw,u);
+    if(u.target&&alive(u.target))face(tw,u,u.target);
+    if(f>=tw.K.release&&!u.fired){u.fired=true;release(tw,u)}
+    if(f>=6){u.state='idle';u.t=0}
+    return;
+  }
+  var tg=pickTarget(tw);
+  if(tg)face(tw,u,tg);else{u.dir='D';u.flip=false}
+  if(tg&&u.queue.length&&!(u.queue[0].at>G.anim)){u.shot=u.queue.shift();u.state='atk';u.t=0;u.fired=false;u.target=tg;tg.pending+=lv(tw).dmg}
+}
+function release(tw,u){
+  var L=lv(tw),dmg=L.dmg,tg=u.target;
+  if(!alive(tg)){tg=pickTarget(tw);if(!tg){u.queue.unshift(u.shot);return}tg.pending+=dmg;face(tw,u,tg)}
+  var h=handPos(tw,u);
+  shots.push({kind:tw.kind,x:h.x,y:h.y,vx:0,vy:0,tgt:tg,dmg:dmg,u:L.unit,trail:[],shot:u.shot,tw:tw,life:0,spd:tw.kind==='archer'?520:360});
+  if(tw.kind==='mage')burst(h.x,h.y,[PCOL[L.unit],'#fff'],5,60);
+}
+function updShot(p,dt){
+  p.life+=dt;
+  if(!alive(p.tgt)){var n=null,bd=1e9;enemies.forEach(function(e){if(e.dead)return;var d=Math.hypot(e.x-p.x,e.y-p.y);if(d<bd&&d<220){bd=d;n=e}});
+    if(!n||p.life>3){rings.push({x:p.x,y:p.y,col:p.kind==='mage'?PCOL[p.u]:'#fff',life:0,max:.2,r:6});return false}p.tgt=n;n.pending+=p.dmg}
+  var tx=p.tgt.x,ty=p.tgt.y+6-ETYPE[p.tgt.type].aim,dx=tx-p.x,dy=ty-p.y,d=Math.hypot(dx,dy),step=p.spd*dt;
+  p.trail.push([p.x,p.y]);if(p.trail.length>7)p.trail.shift();
+  if(d<=step+4){hit(p.tgt,p);return false}
+  p.vx=dx/d;p.vy=dy/d;p.x+=p.vx*step;p.y+=p.vy*step;return true;
+}
+function hit(e,p){
+  var T=ETYPE[e.type],mage=p.kind==='mage',ay=e.y+6-T.aim;
+  e.hp-=p.dmg;e.pending=Math.max(0,e.pending-p.dmg);e.hitT=.12;
+  rings.push({x:e.x,y:ay,col:mage?PCOL[p.u]:'#fff',life:0,max:mage?.3:.18,r:mage?16:9});
+  burst(e.x,ay,mage?[PCOL[p.u],'#fff']:['#fff','#c08a5a'],6,90);
+  if(e.hp<=0){kill(e);burst(e.x,ay,T.cols,10,110);floater(e.x,ay-14,'+1','#ffd34d',14);
+    var s=students[p.shot.si];feed('<b style="color:'+p.tw.col+'">'+esc(s.name)+'</b>'+(p.shot.eq?' ('+p.shot.eq+')':'')+' nugalėjo: '+T.name);dirty=true}
+}
+// a dead enemy leaves the fight at once and plays its death animation as a corpse; a slime splits into two little ones
+function kill(e){e.dead=true;G.killed++;corpses.push({e:e,t:0});if(G.dir)G.dir.depth.push(e.d/e.rt.len);
+  var T=ETYPE[e.type];if(T.split){TOTAL+=2;e.splitLeft=2}}
+function updCorpse(c,dt){c.t+=dt;var e=c.e,T=ETYPE[e.type];
+  if(e.splitLeft&&c.t*EN_FPS>=5){[-10,10].forEach(function(off){var m=ETYPE[T.split],d=Math.max(0,Math.min(e.rt.len-1,e.d+off)),p=routeAt(e.rt,d);
+      enemies.push({type:T.split,rt:e.rt,d:d,x:p[0],y:p[1],hp:m.hp,max:m.hp,spd:m.spd*(.92+Math.random()*.16),pending:0,t:Math.random(),hitT:0,dead:false,dir:e.dir,flip:e.flip,state:'walk'})});e.splitLeft=0}
+  return c.t*EN_FPS<6}
+// walk the route facing the way it goes; at the castle, enemies with an attack animation strike once before the damage lands
+function updEnemy(e,dt){
+  var T=ETYPE[e.type];e.t+=dt;if(e.hitT>0)e.hitT-=dt;
+  if(e.state==='attack'){if(e.t*EN_FPS>=6)hurtCastle(e);return}
+  e.d+=e.spd*dt;
+  if(e.d>=e.rt.len){e.d=e.rt.len;if(T.sheet.attack){e.state='attack';e.t=0;e.dir='S';e.flip=e.x<M.cx}else hurtCastle(e);return}
+  var p=routeAt(e.rt,e.d),q=routeAt(e.rt,e.d+3),dx=q[0]-p[0],dy=q[1]-p[1];e.x=p[0];e.y=p[1];
+  if(Math.abs(dx)>=Math.abs(dy)){e.dir='S';e.flip=dx>0}else{e.dir=dy>0?'D':'U';e.flip=false}
+}
+// in class games the castle takes half damage, so a class has time to recover from a few enemies slipping through
+function hurtCastle(e){var T=ETYPE[e.type],dmg=HOST?Math.ceil(T.castle/2):T.castle;e.dead=true;G.hp=Math.max(0,G.hp-dmg);G[e.x<M.cx?'hitL':'hitR']=.25;
+  feed('<b style="color:var(--bad)">'+T.name.charAt(0).toUpperCase()+T.name.slice(1)+' pasiekė kaimą! −'+dmg+'</b>');dirty=true}
+// a wave is shared out evenly between the entrances; each entrance sends its enemies at a steady pace, starting at a
+// slightly different moment and with a little jitter, so enemies arrive from everywhere at about the same rate
+function schedule(list){
+  var S=M.spawns.length,per=Math.ceil(list.length/S),dur=list.length*M.spawnInt,gap=dur/per,out=[];
+  var start=M.spawns.map(function(){return Math.random()*gap*.5});
+  var rot=rnd(S);   // which entrances get the odd extra enemy changes from wave to wave
+  for(var i=0;i<list.length;i++){var s=(i+rot)%S,k=Math.floor(i/S);out.push({type:list[i],sp:s,t:start[s]+k*gap+(Math.random()-.5)*gap*.3})}
+  return out.sort(function(a,b){return a.t-b.t})}
+function spawn(type,si,hpMul){var T=ETYPE[type],sp=M.spawns[si],rt=makeRoute(sp),p=routeAt(rt,0),hp=Math.max(1,Math.round(T.hp*(hpMul||1)));
+  enemies.push({type:type,rt:rt,d:0,x:p[0],y:p[1],hp:hp,max:hp,spd:T.spd*(.92+Math.random()*.16),pending:0,t:Math.random(),hitT:0,dead:false,dir:'D',flip:false,state:'walk'})}
+
+function update(dt){
+  G.t+=dt;G.anim+=dt;if(G.hitL>0)G.hitL-=dt;if(G.hitR>0)G.hitR-=dt;
+  var playing=G.phase==='intro'||G.phase==='spawn'||G.phase==='wave';
+  if(playing&&!HOST)students.forEach(function(s){s.next-=dt;if(s.next<=0){s.next=5+Math.random()*5;answer(s)}});
+  if(HOST&&hostUpdate(dt)){}
+  else if(G.phase==='build'&&towers.every(function(t){return t.state!=='upg'})){G.phase='intro';G.t=0;feed('Žaidimas prasidėjo. Sėkmės, klase!')}
+  else if(G.phase==='intro'&&G.t>2.2){G.phase='spawn';G.t=0;G.spawnI=0;G.sched=schedule(waves[G.wave])}
+  else if(G.phase==='spawn'){while(G.spawnI<G.sched.length&&G.sched[G.spawnI].t<=G.t){var q=G.sched[G.spawnI++];spawn(q.type,q.sp,G.hpMul)}if(G.spawnI>=G.sched.length)G.phase='wave'}
+  else if(G.phase==='wave'&&!enemies.length&&!corpses.some(function(c){return c.e.splitLeft})){G.wave++;G.t=0;if(G.wave<waves.length){G.phase='intro';dirty=true}else{G.phase='win';feed('<b style="color:var(--good)">Pergalė! Kaimas apgintas.</b>')}}
+  else if((G.phase==='win'||G.phase==='lose')&&G.t>5)reset();
+  if(G.hp<=0&&G.phase!=='lose'){G.phase='lose';G.t=0;feed('<b style="color:var(--bad)">Kaimas krito…</b>');if(HOST)finishHost('lose')}
+  towers.forEach(function(t){updTower(t,dt)});
+  enemies.forEach(function(e){if(!e.dead)updEnemy(e,dt)});
+  shots=shots.filter(function(p){return updShot(p,dt)});
+  enemies=enemies.filter(function(e){return!e.dead});
+  corpses=corpses.filter(function(c){return updCorpse(c,dt)});
+  parts=parts.filter(function(p){p.life+=dt;p.vy+=260*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;return p.life<p.max});
+  floats=floats.filter(function(f){f.life+=dt;f.y-=24*dt;return f.life<f.max});
+  rings=rings.filter(function(r){r.life+=dt;return r.life<r.max});
+}
+
+// host mode phases: build -> timed (continuous enemies until the time is up) or intro/spawn/wave forever (endless)
+function hostUpdate(dt){
+  if(G.phase==='build'){if(towers.every(function(t){return t.state!=='upg'})){G.t=0;
+    G.playing=true;G.played=0;
+    if(HS.mode==='timed')G.phase='timed';else{G.phase='intro';waves[0]=endlessWave(0);G.hpMul=diff().hp}
+    clockNow()}return true}
+  if(G.playing&&G.phase!=='win'&&G.phase!=='lose')G.played+=dt;
+  if(G.phase==='timed'){
+    G.left-=dt;G.spawnT+=dt;director(dt);var prog=Math.min(1,1-G.left/(HS.minutes*60)),k=boost(),gap=hostGap()*(1-.2*prog)/k;
+    if(G.spawnT>=gap){G.spawnT=(Math.random()-.5)*gap*.3;spawn(pickType(Math.min(1,prog+(k-1))),(G.rr++)%M.spawns.length,diff().hp*(1+.4*prog)*(1+(k-1)/2))}
+    if(G.left<=0){G.left=0;G.phase='win';G.t=0;finishHost('win')}
+    return true}
+  if(G.phase==='intro'&&G.t>2.2){M.spawnInt=hostGap();G.phase='spawn';G.t=0;G.spawnI=0;G.sched=schedule(waves[G.wave]);return true}
+  if(G.phase==='wave'&&!enemies.length&&!corpses.some(function(c){return c.e.splitLeft})){
+    G.wave++;G.t=0;waves[G.wave]=endlessWave(G.wave);G.hpMul=diff().hp*(1+.18*G.wave);G.phase='intro';return true}
+  if(G.phase==='win'||G.phase==='lose')return true;     // stay on the result; the end screen takes over
+  return false}
+// the students' timers follow this game's clock (time left in a timed game, time played until defeat)
+function sendClock(sk){if(!G.playing||G.sent)return;sk.emit('game:clock',HS.mode==='timed'?{leftMs:Math.round(G.left*1000)}:{elapsedMs:Math.round(G.played*1000)})}
+function clockNow(){SudGame.connect().then(sendClock).catch(function(){})}
+// a correct answer from a student: their unit in the tower gets one more shot to fire
+function hostShot(s){var tw=towers[s.team],un=tw.units.filter(function(u){return u.si===s.i})[0];
+  s.correct++;tw.correct++;if(un.queue.length<6)un.queue.push({si:s.i,eq:'',at:G.anim+SHOT_DELAY});
+  floater(tw.x+un.off*2,feetY(tw)-36,fitText(s.name,90,FLOAT_FONT(11))+' ✓',tw.col,11)}
+// ten correct in a row: the student's tower goes up a level (up to 4)
+function hostUpgrade(s){var tw=towers[s.team];if(tw.want<4){tw.want++;floater(tw.x,feetY(tw)-84,fitText(s.name,90,FLOAT_FONT(13))+': 10 iš eilės!','#ffd34d',13)}}
+function finishHost(result){
+  if(G.sent)return;G.sent=true;
+  SudGame.request('game:end',{result:result,wave:G.wave+1}).catch(function(){});
+  if(result==='stopped'){location.href='klase.html?tab=zaidimai';return}
+  setTimeout(function(){
+    $('host-end-title').textContent=result==='win'?'Pergalė!':'Kaimas krito…';
+    $('host-end-text').textContent=result==='win'?'Klasė atlaikė '+HS.minutes+' min. ir apgynė kaimą!':(HS.mode==='endless'?'Klasė atlaikė '+(G.wave+1)+' bangas.':'Šį kartą priešai buvo stipresni.');
+    $('host-end').hidden=false},2500)}
+// small overlay in the corner of the field: castle health and time left / wave
+function drawHud(){
+  var x=14,y=14,w=330,h=46;ctx.fillStyle='rgba(31,22,51,.72)';ctx.fillRect(x,y,w,h);
+  ctx.fillStyle='#1f1633';ctx.fillRect(x+10,y+28,w-20,10);ctx.fillStyle=G.hp>50?'#5ee36a':G.hp>25?'#ffd34d':'#ff5a4a';ctx.fillRect(x+11,y+29,Math.round((w-22)*G.hp/100),8);
+  ctx.font='900 14px Nunito,system-ui,sans-serif';ctx.textAlign='left';ctx.fillStyle='#fff';
+  var t=HS.mode==='timed'?'Liko '+Math.floor(G.left/60)+':'+('0'+Math.floor(G.left%60)).slice(-2):(G.wave+1)+' banga';
+  ctx.fillText('Kaimo vartų tvirtumas '+G.hp+'%',x+10,y+20);ctx.textAlign='right';ctx.fillText(t,x+w-10,y+20)}
+
+/* ---------- drawing ---------- */
+function label(txt,x,y,size,fill,stroke){ctx.font='900 '+size+'px Nunito,system-ui,sans-serif';ctx.textAlign='center';ctx.lineJoin='round';
+  ctx.lineWidth=Math.max(3,size/3.5);ctx.strokeStyle=stroke||'rgba(20,24,48,.85)';ctx.strokeText(txt,x,y);ctx.fillStyle=fill||'#fff';ctx.fillText(txt,x,y)}
+function strip(im,fw,fps,x,y,off){var n=Math.round(im.width/fw),f=Math.floor((G.anim+(off||0))*fps)%n;ctx.drawImage(im,f*fw,0,fw,im.height,x,y,fw,im.height)}
+function drawTower(tw){
+  var K=tw.K,ox=Math.round(tw.x-35),oy=Math.round(tw.base-130);
+  if(tw.state==='upg'){
+    var f=tw.delay>0?0:Math.min(3,Math.floor(tw.t*UPG_FPS));
+    ctx.drawImage(K.upg[tw.upSeq[tw.upI]],f*70,0,70,130,ox,oy,70,130);
+  }else{
+    var L=lv(tw),sheet=K.tower[tw.level],sx=(Math.floor(tw.idleT*TOWER_FPS)%Math.max(1,Math.floor(sheet.width/70)))*70;
+    ctx.drawImage(sheet,sx,0,70,130,ox,oy,70,130);
+    // the units, standing inside the tower
+    var my=oy+L.feet-33;
+    tw.units.forEach(function(u){
+      var U=K.unit[L.unit][u.dir],s,mf,af=u.state==='atk'?atkFrame(tw,u):null,ux=Math.round(tw.x+u.off);
+      if(af===null){s=U.idle;mf=Math.floor((tw.idleT+u.phase)*UNIT_FPS)%4}
+      else if(af<0){s=U.aim;mf=0}
+      else{s=U.atk;mf=Math.min(5,af)}
+      ctx.save();
+      if(u.flip){ctx.translate(ux+25,my);ctx.scale(-1,1);ctx.drawImage(s,mf*48,0,48,48,0,0,48,48)}
+      else ctx.drawImage(s,mf*48,0,48,48,ux-23,my,48,48);
+      ctx.restore()});
+    // redraw the tower's front wall (and roof) over the unit
+    if(L.rim<130)ctx.drawImage(sheet,sx,L.rim,70,130-L.rim,ox,oy+L.rim,70,130-L.rim);
+    if(L.roof)ctx.drawImage(sheet,sx,0,70,L.roof,ox,oy,70,L.roof);
+    // queued shots as little pips above the tower
+    var pipY=oy+(L.roof?L.roof-40:L.feet-46);
+    tw.units.forEach(function(u,k){for(var q=0;q<u.queue.length;q++){var px=tw.x-15+q*8,py=pipY-k*8;
+      ctx.fillStyle='#1f1633';ctx.fillRect(px,py-1,7,7);ctx.fillStyle=tw.kind==='mage'?PCOL[L.unit]:'#f3e2b5';ctx.fillRect(px+1,py,5,5)}});
+  }
+  // name plate on the dirt at the base: one name per line (two students share a tower), each cut to fit the tower
+  if(!tw.plate||tw.plate.key!==tw.team.join()){var lines=teamNames(tw).map(function(n){return fitText(n,76,NAME_FONT)});
+    ctx.save();ctx.font=NAME_FONT;tw.plate={key:tw.team.join(),lines:lines,w:Math.round(Math.max.apply(null,lines.map(function(l){return ctx.measureText(l).width}))+12)};ctx.restore()}
+  var P=tw.plate,ph=P.lines.length*11+3,px=Math.round(tw.x-P.w/2),py=Math.round(tw.base-14-ph/2);
+  ctx.fillStyle='#1f1633';ctx.fillRect(px-1,py-1,P.w+2,ph+2);ctx.fillStyle='rgba(58,44,40,.92)';ctx.fillRect(px,py,P.w,ph);
+  ctx.font=NAME_FONT;ctx.fillStyle='#fff';ctx.textAlign='center';
+  P.lines.forEach(function(l,k){ctx.fillText(l,tw.x,py+10+k*11)});
+}
+// anim: walk / attack / death; frame clamps on the last frame for one-shot animations
+function drawEnemy(e,anim,t){
+  var T=ETYPE[e.type],sheet=T.sheet[anim][e.dir],f=Math.floor(t*EN_FPS),fly=T.fly?T.fly+Math.round(Math.sin(t*6)*2):0;
+  f=anim==='walk'?f%6:Math.min(5,f);
+  var x=Math.round(e.x),y=Math.round(e.y+6-38-fly);
+  if(anim!=='death'||f<3){ctx.fillStyle='rgba(50,30,20,.22)';ctx.beginPath();ctx.ellipse(x,Math.round(e.y+6),fly?6:8,fly?2:3,0,0,Math.PI*2);ctx.fill()}
+  ctx.save();ctx.translate(x,y);if(e.flip)ctx.scale(-1,1);
+  ctx.drawImage(sheet,f*48,0,48,48,-24,0,48,48);
+  if(e.hitT>0){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.7;ctx.drawImage(sheet,f*48,0,48,48,-24,0,48,48)}
+  ctx.restore();
+  if(anim!=='death'&&e.hp<e.max){var bw=16,by=Math.round(e.y+6-fly-T.top-7);ctx.fillStyle='#1f1633';ctx.fillRect(x-bw/2-1,by,bw+2,5);
+    ctx.fillStyle=e.hp/e.max>.5?'#5ee36a':'#ff5a4a';ctx.fillRect(x-bw/2,by+1,Math.round(bw*e.hp/e.max),3)}
+}
+function drawArrow(p){
+  var a=Math.atan2(p.vy,p.vx)*180/Math.PI,fx=1,fy=1,set=ARROW[p.u];
+  if(a>90||a<-90){fx=-1;a=180-a;if(a>180)a-=360}
+  if(a>0){fy=-1;a=-a}
+  var im=set[Math.round((a+90)/(90/(set.length-1)))];
+  for(var i=p.trail.length-3;i<p.trail.length;i++){if(i<0)continue;ctx.globalAlpha=.25;ctx.fillStyle='#fff';ctx.fillRect(Math.round(p.trail[i][0]),Math.round(p.trail[i][1]),1,1)}
+  ctx.globalAlpha=1;ctx.save();ctx.translate(Math.round(p.x),Math.round(p.y));ctx.scale(fx,fy);ctx.drawImage(im,-Math.floor(im.width/2),-Math.floor(im.height/2));ctx.restore();
+}
+function drawOrb(p){
+  var c=PCOL[p.u];
+  ctx.globalCompositeOperation='lighter';ctx.imageSmoothingEnabled=true;ctx.drawImage(GLOW[p.u],p.x-14,p.y-14,28,28);ctx.imageSmoothingEnabled=false;
+  ctx.globalCompositeOperation='source-over';
+  p.trail.forEach(function(t,i){ctx.globalAlpha=(i+1)/p.trail.length*.6;ctx.fillStyle=c;var s=2+i*.5;ctx.fillRect(Math.round(t[0]-s/2),Math.round(t[1]-s/2),s,s)});
+  ctx.globalAlpha=1;ctx.drawImage(ORB[p.u],0,0,5,5,Math.round(p.x)-5,Math.round(p.y)-5,10,10);
+}
+function draw(){
+  ctx.setTransform(SC,0,0,SC,0,0);ctx.imageSmoothingEnabled=false;
+  ctx.drawImage(BG,0,0);
+  FIRES.forEach(function(f){if(f.smoke)strip(ANIM.smoke,32,7,f.x,f.y-32,f.off);strip(ANIM.fire,32,9,f.x,f.y,f.off)});
+  var list=[{y:M.cy+VTOP,f:drawVillage}];
+  towers.forEach(function(t){list.push({y:t.base-6,f:function(){drawTower(t)}})});
+  enemies.forEach(function(e){list.push({y:e.y+6,f:function(){drawEnemy(e,e.state==='attack'?'attack':'walk',e.t)}})});
+  corpses.forEach(function(c){list.push({y:c.e.y+5,f:function(){drawEnemy(c.e,'death',c.t)}})});
+  list.sort(function(a,b){return a.y-b.y}).forEach(function(d){d.f()});
+  shots.forEach(function(p){p.kind==='archer'?drawArrow(p):drawOrb(p)});
+  rings.forEach(function(r){var k=r.life/r.max;ctx.globalAlpha=1-k;ctx.strokeStyle=r.col;ctx.lineWidth=2;ctx.beginPath();ctx.arc(r.x,r.y,3+r.r*k,0,Math.PI*2);ctx.stroke()});
+  parts.forEach(function(p){ctx.globalAlpha=1-p.life/p.max;ctx.fillStyle=p.col;ctx.fillRect(Math.round(p.x),Math.round(p.y),p.sz,p.sz)});
+  ctx.globalAlpha=1;
+  floats.forEach(function(f){ctx.globalAlpha=Math.min(1,(f.max-f.life)*3);label(f.txt,f.x,f.y,f.size,f.col==='#ffd34d'?f.col:'#fff',f.col==='#ffd34d'?null:f.col)});
+  ctx.globalAlpha=1;
+  if(HOST&&ROSTER)drawHud();
+  var msg=G.phase==='timed'&&G.t<2.2?'Ginkite kaimą!':G.phase==='intro'?(G.wave+1)+' banga':G.phase==='win'?'Pergalė!':G.phase==='lose'?'Kaimas krito…':G.paused?'Pauzė':null;
+  if(msg){var bs=Math.max(36,Math.round(W/26));ctx.fillStyle='rgba(31,22,51,.55)';ctx.fillRect(0,H/2-bs,W,bs*1.9);label(msg,W/2,H/2+bs*.3,bs,G.phase==='lose'?'#ff8a80':'#fff')}
+}
+
+/* ---------- side panel ---------- */
+function buildTeamList(){$('tw').innerHTML=towers.map(function(t){return'<li><div class="h"><i class="dot" style="background:'+t.col+'"></i>Bokštas '+(t.i+1)+' <span class="k">· '+t.K.name+'</span><span class="lv" id="lv'+t.i+'"></span></div><small>'+esc(teamNames(t).join(', '))+'</small><div class="pb"><i id="pb'+t.i+'"></i></div></li>'}).join('')}
+function updDom(){
+  $('hpv').textContent=G.hp;var h=$('hp');h.style.width=G.hp+'%';h.style.background=G.hp>50?'var(--good)':G.hp>25?'var(--gold)':'var(--bad)';
+  $('killv').textContent=G.killed+' / '+TOTAL;$('kill').style.width=(TOTAL?G.killed/TOTAL*100:0)+'%';
+  $('wave').textContent='Banga '+Math.min(waves.length,G.wave+1)+' / '+waves.length;
+  towers.forEach(function(t){$('lv'+t.i).textContent=t.want+' lygis';
+    var cur=lvNeed(t,t.want),nx=t.want<4?lvNeed(t,t.want+1):0;$('pb'+t.i).style.width=(nx?Math.min(100,(t.correct-cur)/(nx-cur)*100):100)+'%'});
+  $('lb').innerHTML=students.slice().sort(function(a,b){return b.correct-a.correct}).slice(0,6).map(function(s){
+    return'<li><i class="dot" style="background:'+towers[s.team].col+'"></i><span class="n">'+esc(s.name)+'</span><span class="s">'+s.correct+' ✓</span></li>'}).join('');
+}
+setInterval(function(){var a=2+rnd(8),b=2+rnd(8);$('q').firstChild.nodeValue='Kiek yra '+a+' × '+b+'?'},4000);
+
+/* ---------- controls + loop ---------- */
+var target=1;
+function rebuild(){buildMap(+$('pn').value,target,$('pair').checked)}
+var rbT=0;
+$('pn').oninput=function(){$('pv').textContent=this.value;clearTimeout(rbT);rbT=setTimeout(rebuild,150)};
+$('pair').onchange=rebuild;
+$('m1').onclick=function(){target=1;$('m1').className='on';$('m2').className='';rebuild()};
+$('m2').onclick=function(){target=16/9;$('m2').className='on';$('m1').className='';rebuild()};
+// fit the whole field on screen: as wide as the card allows, but no taller than ~75% of the window
+function resize(){
+  var avail=$('stage').parentNode.clientWidth-34,dw=Math.max(200,Math.min(avail,window.innerHeight*.75*W/H));
+  if(HOST)dw=Math.max(200,Math.min(window.innerWidth-12,(window.innerHeight-12)*W/H));
+  cv.style.width=Math.round(dw)+'px';cv.style.height=Math.round(dw*H/W)+'px';
+  var k=Math.max(1,Math.ceil(dw*(window.devicePixelRatio||1)/W));
+  if(k!==SC||cv.width!==W*k||cv.height!==H*k){SC=k;cv.width=W*k;cv.height=H*k}}
+var last=0;
+function loop(t){var dt=Math.min(.05,(t-last)/1000||0);last=t;
+  if(!G.paused)update(dt);
+  draw();if(dirty){dirty=false;updDom()}
+  requestAnimationFrame(loop)}
+$('pause').onclick=function(){G.paused=!G.paused;this.textContent=G.paused?'Tęsti':'Pauzė'};
+$('restart').onclick=function(){reset()};
+// host: pick up the lobby, build the field for its players (wide layout; one tower each up to 8, then two per tower)
+function startHost(){
+  document.body.classList.add('host');
+  function fail(){$('host-end-title').textContent='Žaidimas nerastas';$('host-end-text').textContent='Šis žaidimas jau baigėsi arba buvo uždarytas.';$('host-end').hidden=false}
+  SudGame.request('game:host',{code:HOST}).then(function(r){
+    if(!r||!r.ok||!r.lobby.players.length){fail();return}
+    ROSTER=r.lobby.players;HS=r.lobby.settings;target=16/9;
+    var byId={};
+    buildMap(ROSTER.length,16/9,ROSTER.length>8);
+    students.forEach(function(st){byId[st.id]=st});
+    SudGame.on('game:hit',function(d){var st=byId[d.id];if(st&&towers&&G.phase!=='win'&&G.phase!=='lose')hostShot(st)});
+    SudGame.on('game:upgrade',function(d){var st=byId[d.id];if(st&&towers)hostUpgrade(st)});
+    // keep the game open: the server stops it for everyone if this page goes quiet (closed tab, lost connection)
+    setInterval(function(){if(!G.sent)SudGame.connect().then(function(sk){sk.emit('host:alive');sendClock(sk)}).catch(function(){})},5000);
+    SudGame.connect().then(function(sk){sk.io.on('reconnect',function(){if(G.sent)return;
+      SudGame.request('game:host',{code:HOST}).then(function(r2){if(!r2||!r2.ok)lostGame()})})});
+    SudGame.on('lobby:closed',function(d){if(!G.sent&&d.reason!=='ended')lostGame()});
+    requestAnimationFrame(loop);
+  }).catch(fail);
+  // the server closed the game meanwhile (this page was unreachable for too long): say so instead of playing on
+  function lostGame(){if(G.sent)return;G.sent=true;G.paused=true;$('host-end-title').textContent='Žaidimas nutrauktas';
+    $('host-end-text').textContent='Žaidimų serveris prarado šį žaidimą (pvz., serveris buvo paleistas iš naujo, nutrūko internetas arba kompiuteris buvo užmigęs), todėl mokiniams jis sustabdytas. Sukurkite naują žaidimą.';$('host-end').hidden=false}
+  $('host-close').onclick=function(){if(!G.sent)$('host-confirm').hidden=false};
+  $('host-confirm-no').onclick=function(){$('host-confirm').hidden=true};
+  $('host-confirm-yes').onclick=function(){$('host-confirm').hidden=true;finishHost('stopped')};
+  $('host-end-btn').onclick=function(){location.href='klase.html?tab=zaidimai'};
+}
+window.addEventListener('resize',resize);
+
+Promise.all(IMGS.map(function(im){return new Promise(function(res,rej){if(im.complete&&im.naturalWidth)res();else{im.onload=res;im.onerror=function(){rej(im.src)}}})}))
+  .then(function(){return document.fonts?document.fonts.load('900 12px Nunito').catch(function(){}):0})
+  .then(function(){makeVillage();if(HOST)startHost();else{rebuild();requestAnimationFrame(loop)}})
+  .catch(function(src){cv.width=W;cv.height=H;ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);ctx.fillStyle='#d64545';ctx.font='800 16px sans-serif';ctx.fillText('Nepavyko įkelti paveikslėlio: '+decodeURIComponent(src),20,40)});
+})();
+</script>
+</body>
+</html>
