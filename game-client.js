@@ -89,6 +89,10 @@
     // a touch of the game on the question panel (row tasks only)
     gameScene();
 
+    // game answers are not practice results: the task page must not write them to the student's long-term archive
+    // (it would when its own countdown reaches zero just before the game's end arrives)
+    if (typeof recordTaskToLongTerm === 'function') window.recordTaskToLongTerm = function () { return Promise.resolve(); };
+
     // "Grįžti" during a game goes back to the games section (the page's own back button would open Klasė's first section)
     window.addEventListener('click', function (e) {
       if (!e.target.closest || !e.target.closest('#desktopBackBtn, #mobileBackBtn')) return;
