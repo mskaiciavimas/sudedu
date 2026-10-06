@@ -108,8 +108,8 @@
       clearInterval(watch);
       if (typeof controller !== 'undefined') controller.questionsStopped = true;
       if (typeof timerInterval !== 'undefined') clearInterval(timerInterval);   // the game is over: the clock stops too
-      var title = result === 'win' ? 'Pergalė!' : result === 'lose' ? 'Kaimas krito…' : 'Žaidimas baigtas';
-      var text = result === 'win' ? 'Klasė apgynė kaimą. Puikiai padirbėjote!' : result === 'lose' ? 'Šį kartą priešai buvo stipresni. Pabandykite dar kartą!' :
+      var title = result === 'win' ? 'Pergalė!' : result === 'lose' ? 'Tvirtovė krito…' : 'Žaidimas baigtas';
+      var text = result === 'win' ? 'Klasė apgynė tvirtovę. Puikiai padirbėjote!' : result === 'lose' ? 'Šį kartą priešai buvo stipresni. Pabandykite dar kartą!' :
         reason === 'gone' ? 'Šis žaidimas jau nebevyksta.' : reason === 'host-gone' ? 'Žaidimas nutrauktas, nes vedėjo žaidimo langas užsidarė.' : 'Mokytojas sustabdė žaidimą.';
       var box = document.createElement('div');
       box.className = 'object-popup-overlay';

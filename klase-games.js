@@ -16,7 +16,7 @@
   var leavingForGame = false;         // the game started: navigating away must not close the lobby
   var GAME_NAMES = { td: 'Klasės gynyba' };
   var MODE_TEXT = { timed: 'Atlaikyti nustatytą laiką', endless: 'Atsilaikyti kuo ilgiau (vis stipresnės bangos)' };
-  var DIFF_TEXT = { easy: 'lengvas', normal: 'vidutinis', hard: 'sunkus' };
+  var DIFF_TEXT = { easy: 'lengvas', normal: 'vidutinis', hard: 'sunkus', extreme: 'labai sunkus' };
   var ERR = {
     NOT_FOUND: 'Šis žaidimas jau uždarytas. Sąrašas atnaujintas.', ALREADY_STARTED: 'Šis žaidimas jau prasidėjo.',
     FULL: 'Žaidime nebėra vietų.', IS_HOST: 'Tai tavo sukurtas žaidimas.', NOT_HOST: 'Šio žaidimo nebėra.',

@@ -52,6 +52,13 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .tw .pb i{display:block;height:100%;background:var(--gold);transition:width .3s}
 .feed{font-size:13px;color:var(--mute);display:grid;gap:4px;min-height:100px;overflow-wrap:anywhere}
 .feed b{color:var(--ink)}
+.ctl select{font:inherit;font-size:14px;font-weight:800;border:1px solid rgba(40,109,138,.35);border-radius:8px;background:#fff;padding:2px 4px}
+.dir{display:grid;gap:6px;font-size:13.5px}
+.dir .r{display:flex;justify-content:space-between;gap:8px}
+.dir .r span:last-child{font-weight:900;color:var(--teal);text-align:right}
+.dir .rng{position:relative;height:10px;border-radius:99px;background:linear-gradient(90deg,#5ee36a,#ffd34d,#ff5a4a);margin:2px 0 4px}
+.dir .rng i{position:absolute;top:-3px;width:4px;height:16px;margin-left:-2px;border-radius:2px;background:var(--ink)}
+.dir small{color:var(--mute);font-weight:700}
 /* host mode (opened from a class game lobby with ?code=): only the playing field, full window */
 body.host{background:#2f3d27;overflow:hidden}
 body.host main{display:flex;align-items:center;justify-content:center;min-height:100vh;max-width:none;padding:0}
@@ -99,10 +106,20 @@ body.host .host-close{display:flex;align-items:center;justify-content:center}
       <span class="seg"><button id="m1" class="on">Kompaktiškas</button><button id="m2">Platus 16:9</button></span>
       <label><input type="checkbox" id="pair">Po 2 mokinius bokšte</label>
     </div>
+    <div class="ctl">
+      <span class="seg" id="dseg"><button data-v="easy">Lengvas</button><button data-v="normal" class="on">Vidutinis</button><button data-v="hard">Sunkus</button><button data-v="extreme">Labai sunkus</button></span>
+      <span class="seg" id="mseg"><button data-v="timed" class="on">Nustatytą laiką</button><button data-v="endless">Kuo ilgiau</button></span>
+      <label>Trukmė <select id="mins"><option>2</option><option>3</option><option selected>5</option><option>8</option><option>10</option></select> min.</label>
+    </div>
+    <div class="ctl">
+      <label title="Vidutiniškai kas kiek sekundžių mokinys atsako (vieni greičiau, kiti lėčiau)">Atsakymas kas <input type="range" id="pace" min="2" max="25" step="1" value="6"><span class="v" id="pacev">6 s</span></label>
+      <label>Teisingai <input type="range" id="acc" min="40" max="100" step="5" value="85"><span class="v" id="accv">85 %</span></label>
+      <span class="seg" id="sseg"><button data-v="1" class="on">×1</button><button data-v="2">×2</button><button data-v="4">×4</button><button data-v="8">×8</button></span>
+    </div>
     <div class="stage" id="stage"><canvas id="cv" aria-label="Žaidimo laukas"></canvas></div>
     <div class="info" id="info"></div>
     <div class="hud">
-      <div><div class="lab"><span>Kaimo gyvybės</span><span id="hpv">100</span></div><div class="bar"><i id="hp" style="width:100%;background:var(--good)"></i></div></div>
+      <div><div class="lab"><span>Tvirtovės gyvybės</span><span id="hpv">100</span></div><div class="bar"><i id="hp" style="width:100%;background:var(--good)"></i></div></div>
       <div><div class="lab"><span>Nugalėta priešų</span><span id="killv">0</span></div><div class="bar"><i id="kill" style="width:0;background:var(--gold)"></i></div></div>
     </div>
   </section>
@@ -112,6 +129,10 @@ body.host .host-close{display:flex;align-items:center;justify-content:center}
       <h2>Prisijungimo kodas</h2>
       <div class="code">4729</div>
       <p style="text-align:center;margin:4px 0 0;color:var(--mute);font-size:13px">sudedu.lt/LT/klase · <span id="joined">15</span> mokinių prisijungė</p>
+    </div>
+    <div class="card">
+      <h2>Sunkumo valdymas</h2>
+      <div class="dir" id="dir"></div>
     </div>
     <div class="card">
       <h2>Mokinių ekrane</h2>
@@ -177,7 +198,6 @@ for(u=1;u<=3;u++)ORB.push(img('playerUnits/mages/3 Units/Projectiles/'+u+'.png')
 // arrows: quarter-turn rotation sets (pointing up .. pointing right), one length per archer level
 function arrowSet(a,b){var s=[];for(var n=a;n<=b;n++)s.push(img('playerUnits/archers/3 Units/Arrow/'+n+'.png'));return s}
 var ARROW=[null,arrowSet(23,27),arrowSet(14,22),arrowSet(1,13)];
-var LVUP=[0,0,8,20,36];               // correct answers needed for level n, for a 2-student tower (scaled by team size)
 var TOWER_FPS=6,UNIT_FPS=6,ATK_FPS=14,AIM_T=.18,UPG_FPS=8;
 
 var SCATTER=['Grass/1','Grass/2','Grass/3','Grass/4','Grass/5','Grass/6','Flower/1','Flower/2','Flower/3','Flower/4','Flower/5','Flower/6','Flower/7','Flower/8','Flower/9','Flower/10','Flower/11','Flower/12',
@@ -187,18 +207,30 @@ var PROPS=['Decor/Tree1','Decor/Tree1','Decor/Tree1','Decor/Tree2','Bush/1','Bus
 SCATTER.concat(PROPS,['Shadow/6','Camp/1','Camp/2','Camp/3','Camp/4']).forEach(obj);
 
 /* ---------- enemies ---------- */
-// sheets: 48x48 frames, 6 per animation, directions D(own) S(ide, faces left) U(p); the feet sit at row 38 of the frame.
-// anims maps our animation names to the sprite files; aim = body centre above the feet (where shots hit);
-// top = sprite height (health bar sits above it); fly = drawn above the road with a shadow; split = on death plays its split animation and leaves two of that type
-function enemyKind(folder,anims,o){o.sheet={};for(var a in anims){o.sheet[a]={};
-  for(var d of['D','S','U'])o.sheet[a][d]=img(ENEMIES+folder+'/'+d+'_'+anims[a]+'.png')}return o}
+// sheets: square frames (48 px, bosses 96 px), 6 per animation (the warlord's attack 8), directions D(own) S(ide, faces
+// left) U(p). anims maps our animation names to the sprite files: 'Walk' -> D_Walk / S_Walk / U_Walk, '!Attack1' -> one
+// file for every direction, 'Special_{d}_Walk' -> the direction goes in the middle. fs = frame size, feet = the frame row
+// the feet stand on; aim = body centre above the feet (where shots hit); top = sprite height (health bar sits above it);
+// fly = drawn above the road with a shadow; split = on death plays its split animation and leaves splitN (2) of that type;
+// reach = how far from the village wall it stands to strike the gate
+function enemyKind(folder,anims,o){o.sheet={};o.fs=o.fs||48;o.feet=o.feet||38;for(var a in anims){o.sheet[a]={};
+  for(var d of['D','S','U'])o.sheet[a][d]=img(folder+'/'+(anims[a].charAt(0)==='!'?anims[a].slice(1):anims[a].indexOf('{d}')>=0?anims[a].replace('{d}',d):d+'_'+anims[a])+'.png')}return o}
+var BOSSES='themes/fields/enemies/boses/';
 var ETYPE={
-  s:enemyKind(1,{walk:'Walk',death:'Special'},{name:'gleivė',hp:3,spd:50,castle:10,aim:7,top:14,split:'m',cols:['#c9d84e','#6f9a32']}),
-  m:enemyKind(1,{walk:'Walk2',death:'Death2'},{name:'gleivytė',hp:1,spd:66,castle:5,aim:5,top:10,cols:['#c9d84e','#6f9a32']}),
-  w:enemyKind(3,{walk:'Walk',death:'Death',attack:'Attack'},{name:'vilkas',hp:4,spd:76,castle:10,aim:9,top:21,cols:['#5b6f9e','#2c3557']}),
-  b:enemyKind(4,{walk:'Walk',death:'Death'},{name:'bitė',hp:3,spd:60,castle:10,aim:20,top:22,fly:12,cols:['#f0a23a','#fff']}),
-  o:enemyKind(2,{walk:'Walk',death:'Death',attack:'Attack'},{name:'goblinas',hp:9,spd:38,castle:20,aim:12,top:24,cols:['#9db84a','#b4553a']})};
-var EN_FPS=10,WAVE_BASE=[10,14,18],WAVE_MIX=[{s:.6,b:.4},{s:.35,b:.25,w:.4},{s:.25,b:.2,w:.3,o:.25}];
+  s:enemyKind(ENEMIES+1,{walk:'Walk',death:'Special'},{name:'gleivė',reach:9,hp:3,spd:50,castle:10,aim:7,top:14,split:'m',cols:['#c9d84e','#6f9a32']}),
+  m:enemyKind(ENEMIES+1,{walk:'Walk2',death:'Death2'},{name:'gleivytė',reach:7,hp:1,spd:66,castle:5,aim:5,top:10,cols:['#c9d84e','#6f9a32']}),
+  w:enemyKind(ENEMIES+3,{walk:'Walk',death:'Death',attack:'Attack'},{name:'vilkas',reach:14,hp:4,spd:76,castle:10,aim:9,top:21,cols:['#5b6f9e','#2c3557']}),
+  b:enemyKind(ENEMIES+4,{walk:'Walk',death:'Death'},{name:'bitė',reach:12,hp:3,spd:60,castle:10,aim:20,top:22,fly:12,cols:['#f0a23a','#fff']}),
+  o:enemyKind(ENEMIES+2,{walk:'Walk',death:'Death',attack:'Attack'},{name:'goblinas',reach:12,hp:9,spd:38,castle:20,aim:12,top:24,cols:['#9db84a','#b4553a']}),
+  // bosses (health set when they appear, from the class's firepower): the slime king bursts into four spiky slimelings;
+  // the queen bee flies and leaves hives on the road that hatch two bees each and crumble; the goblin warlord now and then
+  // charges on his wolf
+  K:enemyKind(BOSSES+1,{walk:'Walk',death:'!Death2',attack:'!Attack1'},{name:'gleivių karalius',reach:16,boss:1,bossS:4,minHp:12,spd:30,castle:40,aim:10,top:28,fs:96,feet:58,split:'k',splitN:4,cols:['#c9d84e','#6f9a32','#fff']}),
+  k:enemyKind(BOSSES+1,{walk:'Special_{d}_Walk',death:'!Special_Death'},{name:'dygliukas',reach:8,hp:2,spd:62,castle:5,aim:7,top:20,cols:['#c9d84e','#fff']}),
+  Q:enemyKind(BOSSES+2,{walk:'Fly',death:'Death',attack:'Attack'},{name:'bičių motinėlė',reach:18,boss:1,bossS:3,minHp:10,spd:40,castle:30,aim:22,top:44,fly:10,fs:96,feet:65,hives:1,cols:['#f0a23a','#fff','#7a4a2a']}),
+  h:enemyKind(BOSSES+2,{walk:'!Special_Idle',death:'!Special_Death',rise:'!Special_Rise'},{name:'avilys',hp:5,spd:0,castle:0,aim:18,top:42,fs:96,feet:68,hive:1,cols:['#a89a8a','#7a6a5a']}),
+  G:enemyKind(BOSSES+3,{walk:'Walk',death:'Death',attack:'Attack',charge:'Special'},{name:'goblinų vadas',reach:22,boss:1,bossS:5,minHp:16,spd:36,castle:50,aim:22,top:50,fs:96,feet:67,charge:1,cols:['#5b6f9e','#9db84a','#b4553a']})};
+var BOSS_ORDER=['K','Q','G'],EN_FPS=10;
 
 var NAMES=["Rokas","Emilija","Jonas","Gabija","Lukas","Ugnė","Matas","Austėja","Dovydas","Kamilė","Nojus","Liepa","Ąžuolas","Rugilė","Titas","Benas",
   "Lėja","Herkus","Amelija","Kajus","Sofija","Joris","Atėnė","Dominykas","Miglė","Pijus","Ema","Domas","Urtė","Augustas","Gustė","Tomas",
@@ -507,41 +539,122 @@ for(u=1;u<=3;u++){var gc=document.createElement('canvas');gc.width=gc.height=32;
 // The whole game runs here, in the teacher's browser. Students' pages only send "hit" (a correct answer: their unit
 // shoots) and "upgrade" (10 correct in a row: their tower goes up a level); the result is sent back at the end.
 var HOST=new URLSearchParams(location.search).get('code'),ROSTER=null,HS=null;
+// demo (no ?code=): the same game with simulated pupils; settings and pupils' pace come from the controls above the field
+var DEMO={pace:6,acc:.85,speed:1};
+if(!HOST)HS={difficulty:'normal',mode:'timed',minutes:5};
 // a correct answer shows the student's name over the tower at once and the shot follows a moment later,
 // so a student looking up from their device sees their own shot happen
 var SHOT_DELAY=.8;
-// enemy health and spacing per difficulty, tuned for a class answering roughly one task every 8 s per student
-var DIFF={easy:{hp:.45,gap:1.3,boost:.2},normal:{hp:.6,gap:1,boost:.35},hard:{hp:.8,gap:.8,boost:.5}};
-// Timed games: a small 'director' looks at the last few seconds every 5 s and nudges an intensity factor (>= 1).
-// Too easy (enemies die early on their road, the castle is untouched and students' shots are piling up) -> a little
-// more pressure; the castle getting hit -> back off at once and harder. The boost never goes below the chosen
-// difficulty and is capped per difficulty (easy +20%, normal +35%, hard +50%), so the teacher's choice still governs.
-function director(dt){
-  var D=G.dir||(G.dir={k:1,t:0,hp:G.hp,depth:[]});D.t+=dt;if(D.t<5)return;D.t=0;
-  var lost=D.hp-G.hp,depth=D.depth.length?D.depth.reduce(function(a,b){return a+b},0)/D.depth.length:1,
-      queued=towers.reduce(function(n,t){return n+t.units.reduce(function(m,u){return m+u.queue.length},0)},0)/Math.max(1,students.length);
-  if(lost>0)D.k-=.06*Math.min(3,lost/5);
-  else if(D.depth.length&&depth<.55&&(queued>.4||enemies.length<3))D.k+=.04;
-  D.k=Math.max(1,Math.min(1+diff().boost,D.k));D.hp=G.hp;D.depth=[]}
-function boost(){return G.dir?G.dir.k:1}
+/* ---------- difficulty ---------- */
+// Difficulty is a range of "pressure": enemy health sent per second ÷ the damage the class deals per second. The class's
+// firepower is measured from its correct answers (each one = damage × reach of that student's tower), so it follows the
+// class size, how hard the tasks are, how fast these children are and their towers' levels. Inside the range a director
+// steers the village's health toward a planned curve (ending at `end` %): more pressure while the village is doing
+// better than planned, less when it is behind, but never outside the chosen range, so Hard never turns into Easy.
+// Losing stays possible on every level: the measured firepower forgets slowly (a class that slows down keeps the
+// pressure it earned) and never drops below a minimum pace (`pace`: seconds per correct answer per student).
+// Only the towers near an enemy can shoot it, so enemies start getting through at about P 0.45-0.55 (measured in
+// simulated games with 6-28 pupils answering every 4-15 s) and swamp the village by about 0.7; the ranges sit around that.
+// castle = share of an enemy's damage the village takes; lvl = how early the stronger enemies come;
+// boss = seconds between bosses; bossHp = boss health multiplier.
+var DIFF={
+  easy:   {name:'Lengvas',     lo:.22,hi:.55,end:75,castle:.4,pace:16,lvl:0,  boss:150,bossHp:.7},
+  normal: {name:'Vidutinis',   lo:.3, hi:.6, end:50,castle:.5,pace:13,lvl:.1, boss:120,bossHp:.85},
+  hard:   {name:'Sunkus',      lo:.36,hi:.66,end:25,castle:.6,pace:11,lvl:.2, boss:95, bossHp:1},
+  extreme:{name:'Labai sunkus',lo:.42,hi:.72,end:8, castle:.7,pace:10,lvl:.35,boss:75, bossHp:1.2}};
 function diff(){return DIFF[HS&&HS.difficulty]||DIFF.normal}
-// seconds between two enemies (all entrances together): about what the class can answer, adjusted by difficulty
-function hostGap(){return Math.max(.4,Math.min(6,40/Math.max(1,ROSTER.length)))*diff().gap}
+// the director's state; firepower starts from a guess (one correct answer per student every 6 s) until answers come in
+function dirInit(){G.dir={adj:0,dps:students.length/6,ans:students.length/6,acc:0,nacc:0,t1:0,t5:0,x:0,P:diff().lo,leaked:0,hist:[],
+  strikes:3,n70:2,nGate:1,pend:0,calm:0,depth:[]}}
+// Damage the enemies now on the field are still expected to do to the gates (in % of the fortress), learnt from this
+// game: an enemy at a gate makes about D.strikes strikes before it falls (minus those already made); an enemy in the
+// last 30% of its road gets there as often as recently (D.nGate / D.n70) and then does the same.
+function pendingDamage(){var D=G.dir,reach=Math.min(1,D.nGate/Math.max(1,D.n70)),sum=0;
+  enemies.forEach(function(x){var T=ETYPE[x.type];if(x.dead||T.hive)return;var hit=T.castle*diff().castle*SIEGE_HIT;
+    if(x.state==='siege')sum+=hit*Math.max(.5,D.strikes-(x.strikes||0));
+    else if(x.d>x.rt.len*.7)sum+=hit*D.strikes*reach});
+  return sum}
+// A class whose pupils answer rarely gets less out of its firepower than the average suggests: its few towers by the
+// gates fire too seldom to clear a crowd there. So firepower counts fully at one answer per pupil every 6 s or faster,
+// and less below that (x0.5 at 15 s, never under x0.35); this puts the point where enemies swamp the village at about
+// the same pressure for quick and slow classes. A small class (under 12) has few towers, so the roads and gates are
+// thinly covered: its firepower counts less too (x0.7 with 6 pupils).
+function classDps(){var n=students.length,D=G.dir,every=n/Math.max(D.ans,n/diff().pace,.01);
+  return Math.max(D.dps,n/diff().pace)*Math.max(.35,Math.min(1,Math.pow(6/every,.75)))*Math.min(1,Math.sqrt(n/12))}
+// how far into the game we are, 0..1 (timed: share of the time; until defeat: the first 6 minutes)
+function gameProg(){return HS.mode==='timed'?Math.min(1,1-G.left/(HS.minutes*60)):Math.min(1,G.played/360)}
+// planned fortress health (now, or `ahead` seconds from now): high early on, sinking towards the difficulty's end
+// value (until defeat: stays there)
+function targetHp(ahead){var d=diff(),p=Math.min(1,gameProg()+(ahead||0)/(HS.mode==='timed'?HS.minutes*60:360));
+  return 100-(100-d.end)*Math.pow(p,HS.mode==='timed'?1.3:1)}
+function dirUpdate(dt){var D=G.dir,d=diff();
+  // firepower: rises within ~12 s when the class speeds up, forgets only over ~2.5 min when it slows down
+  // (the answer rate is followed the same way)
+  D.t1+=dt;if(D.t1>=1){var inst=D.acc/D.t1,na=D.nacc/D.t1;D.acc=0;D.nacc=0;D.t1=0;
+    D.dps+=(inst-D.dps)/(inst>D.dps?12:150);D.ans+=(na-D.ans)/(na>D.ans?12:150)}
+  // Every 2.5 s the director looks ahead, always from the *expected* health: health now minus the damage the enemies
+  // already on the field are still going to do (pendingDamage: those at a gate and those about to reach one).
+  //  - Heading below the planned end (at the loss rate of the last 30 s), below the planned curve, about to lose
+  //    clearly more in the next 30 s than planned, or a pile-up building near the gates -> back off (harder the worse).
+  //  - Ahead of plan, nothing got through for 15 s and enemies die well before the gates -> a little more pressure.
+  //  - Quiet for a while (no losses for 30 s, nothing at or near the gates) -> a little more pressure even when behind
+  //    plan, so after a rough patch the pressure comes back up instead of staying at the bottom.
+  D.calm+=dt;D.t5+=dt;if(D.t5>=2.5){D.t5=0;D.n70*=.95;D.nGate*=.95;
+    D.hist.push(G.hp);if(D.hist.length>13)D.hist.shift();
+    var rate=(D.hist[0]-G.hp)/(2.5*(D.hist.length-1)||1),left=HS.mode==='timed'?G.left:60,curve=targetHp(),
+        pend=pendingDamage(),exp=G.hp-pend,proj=exp-rate*left,e=exp-curve,
+        risk=pend+rate*30-1.5*Math.max(2,curve-targetHp(30)),
+        deep=D.depth.length?D.depth.reduce(function(a,b){return a+b},0)/D.depth.length:0,
+        crowd=0,near=0;D.depth=[];
+    enemies.forEach(function(x){if(x.dead||ETYPE[x.type].hive)return;if(x.state==='siege')crowd++;
+      if(x.state==='siege'||x.d>x.rt.len*.7)near+=x.hp});
+    var load=near/(classDps()*5),quiet=D.hist.length>=13&&rate<=0&&pend<1&&!crowd&&load<.4;
+    D.pend=pend;D.load=load;
+    if(quiet&&D.calm>15)D.adj+=e>5&&deep<.7?Math.min(.05,.015*e/10):.012;
+    else{var bad=Math.max(d.end-3-proj,-5-e,risk-3);
+      if(bad>0)D.adj-=Math.min(.25,.04+.03*bad/10);
+      if(crowd>=2||load>1.3)D.adj-=Math.min(.25,Math.max(.03*crowd,.05*load))}
+    // the correction never reaches past the ends of the range, so it can turn round at once (no wind-up), and adds
+    // at most 30% of the range on top of the drift: pressure only creeps towards the cliff where enemies flood through
+    var base=drift();D.adj=Math.max(-base,Math.min(1-base,.3,D.adj))}
+  D.x=Math.max(0,Math.min(1,drift()+D.adj));
+  // until defeat: from wave 9 on every wave adds 5% on top, so every class falls in the end
+  D.P=(d.lo+(d.hi-d.lo)*D.x)*(HS.mode==='endless'?1+.05*Math.max(0,G.wave-7):1)}
+// place in the range before the director's correction: a timed game starts at 30% and reaches 85% at 60% of its time
+// (so the first minute isn't idle while answers pile up); until defeat it goes from 15% to 80% over 6 minutes
+function drift(){var p=gameProg();return HS.mode==='timed'?.3+.55*Math.min(1,p/.6):.15+.65*p}
+// pressure comes in swells: 28 s building up, then 12 s of quiet (on average about 1)
+function swell(){var c=G.played%40;return c<28?.95+.4*c/28:.6}
 // enemy mix for a "strength" level (0 = start; 1 = end of a timed game or about wave 7)
 function pickType(lvl){var w={s:Math.max(.15,.55-.4*lvl),b:.3,w:lvl>.15?.15+.2*lvl:0,o:lvl>.45?.1+.25*(lvl-.45):0},sum=0,k;
   for(k in w)sum+=w[k];var r=Math.random()*sum;for(k in w){r-=w[k];if(r<0)return k}return's'}
-function endlessWave(k){var n=Math.ceil((5+2.5*k)*Math.max(3,ROSTER.length)/12),out='';for(var i=0;i<n;i++)out+=pickType(Math.min(1.5,k/6));return out}
+function strength(){return Math.min(1.4,(HS.mode==='timed'?gameProg():G.wave/7)+diff().lvl)}
+// health an enemy brings in total (a slime's little ones included)
+function cost(type){var T=ETYPE[type];return T.hp+(T.split?ETYPE[T.split].hp*(T.splitN||2):0)}
+// ordinary enemies get tougher over the game; with a very strong class they also get tougher instead of ever more of them
+function hpMul(){var rate=G.dir.P*classDps()/4.5;return Math.max(1+.4*gameProg(),rate/2.2)}
+function bossHp(type){var T=ETYPE[type];return Math.max(T.minHp,Math.round(classDps()*T.bossS*diff().bossHp))}
+// a boss "costs" its health plus what it brings along; ordinary enemies pause until most of that is paid back
+function bossCost(type){var T=ETYPE[type];return .7*bossHp(type)*(T.split?1.3:T.hives?1.5:1)}
+function nextBoss(){return BOSS_ORDER[(G.bossI++)%BOSS_ORDER.length]}
+// bosses come in through one of the entrances with the longest road, so the whole class gets a go at them
+function farSpawn(){var far=M.spawns.map(function(s){return M.dist[M.graph.key([XW(s.tail[0]),YW(s.tail[1])])]||0}),
+  top=Math.max.apply(null,far),best=[];far.forEach(function(d,i){if(d>=top-1)best.push(i)});return best[rnd(best.length)]}
+// until defeat: a wave holds about 22-42 s of pressure; every third wave brings a boss (and fewer ordinary enemies)
+// (a wave has at least 3 enemies; for a small class the wave then takes longer, so the pressure stays the same)
+function endlessWave(k){var flow=G.dir.P*classDps(),dur=22+2*Math.min(k,10),budget=flow*dur,list=[],hm=hpMul(),boss=(k+1)%3===0?nextBoss():null,spent=0;
+  if(boss){budget-=bossCost(boss);spent+=bossCost(boss)}
+  while(budget>0||list.length<3){var t=pickType(strength()),c=cost(t)*hm;list.push(t);budget-=c;spent+=c}
+  if(boss)list.splice(Math.floor(list.length/3),0,boss);
+  G.hpMul=hm;M.spawnInt=Math.max(dur,spent/flow)/list.length;return list}
 
 /* ---------- state ---------- */
-var G,towers,students,enemies,corpses,shots,parts,floats,rings,waves,TOTAL,dirty=true;
+var G,towers,students,enemies,corpses,shots,parts,floats,rings,waves,dirty=true;
 function reset(){
-  G={phase:'build',t:0,wave:0,spawnI:0,sched:[],hp:100,killed:0,paused:G&&G.paused,hitL:0,hitR:0,anim:G?G.anim:0,rr:0,spawnT:0,left:HS?HS.minutes*60:0,hpMul:1};
-  enemies=[];corpses=[];shots=[];parts=[];floats=[];rings=[];
-  waves=WAVE_BASE.map(function(base,w){var cnt=Math.ceil(base*Math.max(M.n,4)/15),s='',mix=WAVE_MIX[w];
-    for(var i=0;i<cnt;i++){var r=Math.random(),acc=0,pick='s';for(var k in mix){acc+=mix[k];if(r<acc){pick=k;break}}s+=pick}return s});
-  TOTAL=waves.join('').length;
-  if(HOST){waves=[];TOTAL=0}
-  students=[];for(var i=0;i<M.n;i++)students.push(ROSTER?{name:cleanName(ROSTER[i].name),id:ROSTER[i].id,i:i,correct:0,next:1e9,team:0}:{name:NAMES[i%NAMES.length],i:i,correct:0,next:2+Math.random()*5,team:0});
+  G={phase:'build',t:0,wave:0,spawnI:0,sched:[],hp:100,killed:0,paused:G&&G.paused,hitL:0,hitR:0,anim:G?G.anim:0,rr:0,left:HS.minutes*60,hpMul:1,budget:0,bossI:0,played:0};
+  enemies=[];corpses=[];shots=[];parts=[];floats=[];rings=[];waves=[];
+  // demo pupils answer at the class pace times their own speed (some quicker, some slower)
+  students=[];for(var i=0;i<M.n;i++)students.push(ROSTER?{name:cleanName(ROSTER[i].name),id:ROSTER[i].id,i:i,correct:0,team:0}:{name:NAMES[i%NAMES.length],i:i,correct:0,next:2+Math.random()*5,team:0,streak:0,speed:.6+Math.random()*.9});
   towers=M.placed.map(function(p,ti){
     var team=[];for(var k=ti*M.per;k<Math.min(M.n,(ti+1)*M.per);k++){team.push(k);students[k].team=ti}
     // mages and archers alternate across the grid like a chessboard, so neighbouring towers are never the same kind
@@ -584,17 +697,15 @@ function fitText(t,maxPx,font){ctx.save();ctx.font=font;var a=Array.from(t),out=
   if(ctx.measureText(t).width>maxPx){while(a.length>1&&ctx.measureText(a.join('')+'…').width>maxPx)a.pop();out=a.join('').trim()+'…'}
   ctx.restore();return out}
 var NAME_FONT='900 10px Nunito,system-ui,sans-serif',FLOAT_FONT=function(size){return'900 '+size+'px Nunito,system-ui,sans-serif'};
-function lvNeed(tw,l){return Math.ceil(LVUP[l]*tw.team.length/2)}
 
 /* ---------- simulation ---------- */
+// demo pupil: answers like a real student's page reports it (a correct answer = a shot, 10 in a row = an upgrade,
+// a mistake resets the streak); pace and accuracy come from the demo controls
 function answer(s){
-  var tw=towers[s.team],a=2+rnd(8),b=2+rnd(8);
-  if(Math.random()>.82)return;                       // wrong answer: nothing happens on the big screen
-  s.correct++;tw.correct++;dirty=true;
-  var un=tw.units.filter(function(u){return u.si===s.i})[0];
-  if(un.queue.length<4)un.queue.push({si:s.i,eq:a+' × '+b+' = '+(a*b)});
-  floater(tw.x+un.off*2,feetY(tw)-36,fitText(s.name,90,FLOAT_FONT(11))+' ✓',tw.col,11);
-  for(var l=4;l>1;l--)if(tw.correct>=lvNeed(tw,l)){tw.want=Math.max(tw.want,l);break}
+  s.next=DEMO.pace*s.speed*(.7+Math.random()*.6);
+  if(Math.random()>DEMO.acc){s.streak=0;return}      // wrong answer: nothing happens on the big screen
+  var a=2+rnd(8),b=2+rnd(8);hostShot(s,a+' × '+b+' = '+(a*b));
+  if(++s.streak>=10){s.streak=0;hostUpgrade(s)}
 }
 function atkFrame(tw,u){var pre=tw.K.aim?AIM_T:0;return u.t<pre?-1:Math.floor((u.t-pre)*ATK_FPS)}
 function updTower(tw,dt){
@@ -647,25 +758,79 @@ function hit(e,p){
   if(e.hp<=0){kill(e);burst(e.x,ay,T.cols,10,110);floater(e.x,ay-14,'+1','#ffd34d',14);
     var s=students[p.shot.si];feed('<b style="color:'+p.tw.col+'">'+esc(s.name)+'</b>'+(p.shot.eq?' ('+p.shot.eq+')':'')+' nugalėjo: '+T.name);dirty=true}
 }
-// a dead enemy leaves the fight at once and plays its death animation as a corpse; a slime splits into two little ones
-function kill(e){e.dead=true;G.killed++;corpses.push({e:e,t:0});if(G.dir)G.dir.depth.push(e.d/e.rt.len);
-  var T=ETYPE[e.type];if(T.split){TOTAL+=2;e.splitLeft=2}}
+// a dead enemy leaves the fight at once and plays its death animation as a corpse; a slime splits into little ones
+function kill(e){e.dead=true;G.killed++;corpses.push({e:e,t:0});
+  if(G.dir)G.dir.depth.push(Math.min(1,e.d/e.rt.len));
+  if(G.dir&&e.state==='siege')G.dir.strikes+=((e.strikes||0)-G.dir.strikes)*.15;   // how long enemies last at the gates
+  var T=ETYPE[e.type];if(T.split)e.splitLeft=T.splitN||2;
+  if(T.boss)burst(e.x,e.y-T.aim,['#ffd34d','#fff'].concat(T.cols),30,170)}
+// a new enemy on a route at distance d, of the same toughness (hm) as its parent
+function addEnemy(type,rt,d,hm,hp){var T=ETYPE[type],p=routeAt(rt,d);hp=hp||Math.max(1,Math.round(T.hp*hm));
+  var e={type:type,rt:rt,d:d,x:p[0],y:p[1],hp:hp,max:hp,hm:hm,spd:T.spd*(.92+Math.random()*.16),pending:0,t:Math.random(),hitT:0,dead:false,dir:'D',flip:false,state:'walk'};
+  enemies.push(e);return e}
 function updCorpse(c,dt){c.t+=dt;var e=c.e,T=ETYPE[e.type];
-  if(e.splitLeft&&c.t*EN_FPS>=5){[-10,10].forEach(function(off){var m=ETYPE[T.split],d=Math.max(0,Math.min(e.rt.len-1,e.d+off)),p=routeAt(e.rt,d);
-      enemies.push({type:T.split,rt:e.rt,d:d,x:p[0],y:p[1],hp:m.hp,max:m.hp,spd:m.spd*(.92+Math.random()*.16),pending:0,t:Math.random(),hitT:0,dead:false,dir:e.dir,flip:e.flip,state:'walk'})});e.splitLeft=0}
+  if(e.splitLeft&&c.t*EN_FPS>=5){var n=e.splitLeft;for(var k=0;k<n;k++){var off=(k-(n-1)/2)*(n>2?12:20),
+      m=addEnemy(T.split,e.rt,Math.max(0,Math.min(e.rt.len-1,e.d+off)),e.hm);m.dir=e.dir;m.flip=e.flip;
+      if(e.state==='siege'){m.x=e.x;m.y=e.y+off*.6}}e.splitLeft=0}            // at the gate: they start where it fell
   return c.t*EN_FPS<6}
-// walk the route facing the way it goes; at the castle, enemies with an attack animation strike once before the damage lands
+function frames(T,anim){return Math.max(1,Math.round(T.sheet[anim].S.width/T.fs))}
+// walk the route facing the way it goes; at the village they lay siege to the gate until they are shot down
 function updEnemy(e,dt){
   var T=ETYPE[e.type];e.t+=dt;if(e.hitT>0)e.hitT-=dt;
-  if(e.state==='attack'){if(e.t*EN_FPS>=6)hurtCastle(e);return}
-  e.d+=e.spd*dt;
-  if(e.d>=e.rt.len){e.d=e.rt.len;if(T.sheet.attack){e.state='attack';e.t=0;e.dir='S';e.flip=e.x<M.cx}else hurtCastle(e);return}
+  if(e.state==='siege'){siege(e,dt);return}
+  if(T.hive){updHive(e,dt);return}
+  // the queen bee leaves a hive on the road behind her every 8 s (at most two of hers at a time)
+  if(T.hives&&(e.hiveT=(e.hiveT==null?4:e.hiveT)-dt)<=0&&e.d<e.rt.len*.85){e.hiveT=8;
+    if(enemies.filter(function(h){return h.mom===e&&!h.dead}).length<2){var hv=addEnemy('h',e.rt,e.d,e.hm);hv.mom=e;hv.state='rise';hv.t=0;hv.bees=2;hv.beeT=1.5}}
+  // the warlord charges for 1.3 s every 5 s or so
+  if(T.charge){if(e.state==='charge'){if((e.ct-=dt)<=0)e.state='walk'}
+    else if((e.chT=(e.chT==null?2+Math.random()*3:e.chT)-dt)<=0){e.state='charge';e.ct=1.3;e.chT=4+Math.random()*2}}
+  e.d+=e.spd*(e.state==='charge'?2.4:1)*dt;
+  if(!e.p70&&e.d>e.rt.len*.7&&G.dir){e.p70=1;G.dir.n70++}
+  if(e.d>=e.rt.len-SIEGE_FROM){atGate(e);return}
   var p=routeAt(e.rt,e.d),q=routeAt(e.rt,e.d+3),dx=q[0]-p[0],dy=q[1]-p[1];e.x=p[0];e.y=p[1];
   if(Math.abs(dx)>=Math.abs(dy)){e.dir='S';e.flip=dx>0}else{e.dir=dy>0?'D':'U';e.flip=false}
 }
-// in class games the castle takes half damage, so a class has time to recover from a few enemies slipping through
-function hurtCastle(e){var T=ETYPE[e.type],dmg=HOST?Math.ceil(T.castle/2):T.castle;e.dead=true;G.hp=Math.max(0,G.hp-dmg);G[e.x<M.cx?'hitL':'hitR']=.25;
-  feed('<b style="color:var(--bad)">'+T.name.charAt(0).toUpperCase()+T.name.slice(1)+' pasiekė kaimą! −'+dmg+'</b>');dirty=true}
+// a hive rises out of the ground, hatches a bee every 3 s (two in all) and then crumbles by itself
+function updHive(e,dt){
+  if(e.state==='rise'){if(e.t*EN_FPS>=6){e.state='walk';e.t=0}return}
+  if((e.beeT-=dt)>0)return;
+  if(e.bees>0){e.bees--;e.beeT=3;addEnemy('b',e.rt,e.d,e.hm);burst(e.x,e.y-20,['#f0a23a','#fff'],6,60);return}
+  e.dead=true;corpses.push({e:e,t:0})}
+// An enemy that reaches the village takes a spot in the crowd before its gate: spread up and down the road and a
+// little way back from the gate (spots may overlap), facing the gate. It stays there and strikes the gate about once
+// a second until the towers shoot it down; each strike takes SIEGE_HIT of its castle value (scaled by the difficulty).
+var SIEGE_HIT=.12;
+// (the siege starts SIEGE_FROM px before the end of the road: from there the enemy walks to its own spot, always
+// towards the gate or along it, never back)
+var SIEGE_FROM=60;
+function atGate(e){var T=ETYPE[e.type],side=e.x<M.cx?-1:1;
+  e.state='siege';e.d=e.rt.len;e.side=side;e.arr=G.arrN=(G.arrN||0)+1;e.wait=14+Math.random()*22;
+  e.sy=M.cy+(Math.random()*2-1)*22;e.atkT=.3+Math.random()*.5;
+  if(G.dir){G.dir.leaked++;G.dir.nGate++;G.dir.calm=0}
+  feed('<b style="color:var(--bad)">'+T.name.charAt(0).toUpperCase()+T.name.slice(1)+' puola tvirtovės vartus!</b>');dirty=true}
+// Only the first GATE_FRONT enemies to reach each gate strike it; the rest crowd behind and wait, and step up to the
+// gate when one in front falls (so the damage a crowd does has a ceiling and the class can win it back)
+var GATE_FRONT=3;
+function siege(e,dt){var T=ETYPE[e.type],side=e.side,
+    // the first GATE_FRONT to arrive (still standing) are at the gate; the others wait a little further back
+    ahead=enemies.filter(function(o){return o!==e&&!o.dead&&o.state==='siege'&&o.side===side&&o.arr<e.arr}).length,
+    front=ahead<GATE_FRONT,want=VHW+T.reach+(front?0:e.wait),
+    tx=M.cx+side*Math.min(want,Math.abs(e.x-M.cx)),dx=tx-e.x,dy=e.sy-e.y,dist=Math.hypot(dx,dy);
+  // walk to the spot (facing the way it goes), then face the gate
+  e.mv=dist>.5;
+  if(e.mv){var step=Math.min(dist,T.spd*.7*dt);e.x+=dx/dist*step;e.y+=dy/dist*step;
+    if(Math.abs(dx)>=Math.abs(dy)){e.dir='S';e.flip=dx>0}else{e.dir=dy>0?'D':'U';e.flip=false}return}
+  e.dir='S';e.flip=side<0;
+  if(!front){e.atkT=Math.max(e.atkT,.4);return}
+  if((e.atkT-=dt)>0||G.phase==='win'||G.phase==='lose')return;
+  e.atkT=1+Math.random()*.3;e.t=0;e.strikes=(e.strikes||0)+1;   // e.t = 0 restarts the attack animation
+  G.hp=Math.max(0,G.hp-T.castle*diff().castle*SIEGE_HIT);G[e.x<M.cx?'hitL':'hitR']=.25;
+  burst(M.cx+(e.x<M.cx?-1:1)*(VHW-8),M.cy-20+Math.random()*30,['#c08a5a','#7a5a3a'],3,60);dirty=true}
+// time is up and the village held: every enemy still on the field falls at once
+function clearField(){corpses.forEach(function(c){c.e.splitLeft=0});
+  enemies.forEach(function(e){if(e.dead)return;e.dead=true;corpses.push({e:e,t:0});burst(e.x,e.y-ETYPE[e.type].aim,ETYPE[e.type].cols,8,100)});
+  enemies=[];dirty=true}
 // a wave is shared out evenly between the entrances; each entrance sends its enemies at a steady pace, starting at a
 // slightly different moment and with a little jitter, so enemies arrive from everywhere at about the same rate
 function schedule(list){
@@ -674,20 +839,15 @@ function schedule(list){
   var rot=rnd(S);   // which entrances get the odd extra enemy changes from wave to wave
   for(var i=0;i<list.length;i++){var s=(i+rot)%S,k=Math.floor(i/S);out.push({type:list[i],sp:s,t:start[s]+k*gap+(Math.random()-.5)*gap*.3})}
   return out.sort(function(a,b){return a.t-b.t})}
-function spawn(type,si,hpMul){var T=ETYPE[type],sp=M.spawns[si],rt=makeRoute(sp),p=routeAt(rt,0),hp=Math.max(1,Math.round(T.hp*(hpMul||1)));
-  enemies.push({type:type,rt:rt,d:0,x:p[0],y:p[1],hp:hp,max:hp,spd:T.spd*(.92+Math.random()*.16),pending:0,t:Math.random(),hitT:0,dead:false,dir:'D',flip:false,state:'walk'})}
+function spawn(type,si,hpMul){var T=ETYPE[type];return addEnemy(type,makeRoute(M.spawns[si]),0,hpMul||1,T.boss?bossHp(type):0)}
 
 function update(dt){
   G.t+=dt;G.anim+=dt;if(G.hitL>0)G.hitL-=dt;if(G.hitR>0)G.hitR-=dt;
-  var playing=G.phase==='intro'||G.phase==='spawn'||G.phase==='wave';
-  if(playing&&!HOST)students.forEach(function(s){s.next-=dt;if(s.next<=0){s.next=5+Math.random()*5;answer(s)}});
-  if(HOST&&hostUpdate(dt)){}
-  else if(G.phase==='build'&&towers.every(function(t){return t.state!=='upg'})){G.phase='intro';G.t=0;feed('Žaidimas prasidėjo. Sėkmės, klase!')}
-  else if(G.phase==='intro'&&G.t>2.2){G.phase='spawn';G.t=0;G.spawnI=0;G.sched=schedule(waves[G.wave])}
-  else if(G.phase==='spawn'){while(G.spawnI<G.sched.length&&G.sched[G.spawnI].t<=G.t){var q=G.sched[G.spawnI++];spawn(q.type,q.sp,G.hpMul)}if(G.spawnI>=G.sched.length)G.phase='wave'}
-  else if(G.phase==='wave'&&!enemies.length&&!corpses.some(function(c){return c.e.splitLeft})){G.wave++;G.t=0;if(G.wave<waves.length){G.phase='intro';dirty=true}else{G.phase='win';feed('<b style="color:var(--good)">Pergalė! Kaimas apgintas.</b>')}}
-  else if((G.phase==='win'||G.phase==='lose')&&G.t>5)reset();
-  if(G.hp<=0&&G.phase!=='lose'){G.phase='lose';G.t=0;feed('<b style="color:var(--bad)">Kaimas krito…</b>');if(HOST)finishHost('lose')}
+  var playing=G.phase==='timed'||G.phase==='intro'||G.phase==='spawn'||G.phase==='wave';
+  if(playing&&!HOST)students.forEach(function(s){if((s.next-=dt)<=0)answer(s)});
+  if(!hostUpdate(dt)&&G.phase==='spawn'){
+    while(G.spawnI<G.sched.length&&G.sched[G.spawnI].t<=G.t){var q=G.sched[G.spawnI++];spawn(q.type,q.sp,G.hpMul)}if(G.spawnI>=G.sched.length)G.phase='wave'}
+  if(G.hp<=0&&G.phase!=='lose'&&G.phase!=='win'){G.phase='lose';G.t=0;feed('<b style="color:var(--bad)">Tvirtovė krito…</b>');if(HOST)finishHost('lose');else logResult('lose')}
   towers.forEach(function(t){updTower(t,dt)});
   enemies.forEach(function(e){if(!e.dead)updEnemy(e,dt)});
   shots=shots.filter(function(p){return updShot(p,dt)});
@@ -698,47 +858,64 @@ function update(dt){
   rings=rings.filter(function(r){r.life+=dt;return r.life<r.max});
 }
 
-// host mode phases: build -> timed (continuous enemies until the time is up) or intro/spawn/wave forever (endless)
+// game phases (class game and demo alike): build -> timed (continuous enemies until the time is up) or
+// intro/spawn/wave forever (until defeat)
 function hostUpdate(dt){
   if(G.phase==='build'){if(towers.every(function(t){return t.state!=='upg'})){G.t=0;
-    G.playing=true;G.played=0;
-    if(HS.mode==='timed')G.phase='timed';else{G.phase='intro';waves[0]=endlessWave(0);G.hpMul=diff().hp}
-    clockNow()}return true}
-  if(G.playing&&G.phase!=='win'&&G.phase!=='lose')G.played+=dt;
+    G.playing=true;G.played=0;dirInit();G.bossT=Math.max(60,.3*HS.minutes*60);
+    if(HS.mode==='timed')G.phase='timed';else{G.phase='intro';waves[0]=endlessWave(0)}
+    feed('Žaidimas prasidėjo. Sėkmės, klase!');if(HOST)clockNow()}return true}
+  if(G.playing&&G.phase!=='win'&&G.phase!=='lose'){G.played+=dt;dirUpdate(dt)}
   if(G.phase==='timed'){
-    G.left-=dt;G.spawnT+=dt;director(dt);var prog=Math.min(1,1-G.left/(HS.minutes*60)),k=boost(),gap=hostGap()*(1-.2*prog)/k;
-    if(G.spawnT>=gap){G.spawnT=(Math.random()-.5)*gap*.3;spawn(pickType(Math.min(1,prog+(k-1))),(G.rr++)%M.spawns.length,diff().hp*(1+.4*prog)*(1+(k-1)/2))}
-    if(G.left<=0){G.left=0;G.phase='win';G.t=0;finishHost('win')}
+    G.left-=dt;var P=G.dir.P,fire=classDps(),hm=hpMul();
+    // ordinary enemies: a budget fills with pressure × firepower (in swells, never more than 3 s ahead);
+    // the next enemy comes as soon as its health fits in the budget
+    if(!G.nextT)G.nextT=pickType(strength());
+    var c=cost(G.nextT)*hm;G.budget=Math.min(G.budget+P*swell()*fire*dt,Math.max(3*P*fire,c));
+    if(G.budget>=c){G.budget-=c;spawn(G.nextT,(G.rr++)%M.spawns.length,hm);G.nextT=null}
+    // bosses from 60 s (or 30% of the game) on, at the difficulty's interval, never in the last 30 s;
+    // a boss takes its cost out of the budget, so fewer ordinary enemies come with it
+    if(G.played>=G.bossT&&G.left>30){var b=nextBoss();G.budget-=bossCost(b);spawn(b,farSpawn());G.bossT+=diff().boss}
+    if(G.left<=0){G.left=0;G.phase='win';G.t=0;clearField();feed('<b style="color:var(--good)">Pergalė! Tvirtovė apginta.</b>');if(HOST)finishHost('win');else logResult('win')}
     return true}
-  if(G.phase==='intro'&&G.t>2.2){M.spawnInt=hostGap();G.phase='spawn';G.t=0;G.spawnI=0;G.sched=schedule(waves[G.wave]);return true}
+  if(G.phase==='intro'&&G.t>2.2){G.phase='spawn';G.t=0;G.spawnI=0;G.sched=schedule(waves[G.wave]);
+    G.sched.forEach(function(q){if(ETYPE[q.type].boss)q.sp=farSpawn()});return true}
   if(G.phase==='wave'&&!enemies.length&&!corpses.some(function(c){return c.e.splitLeft})){
-    G.wave++;G.t=0;waves[G.wave]=endlessWave(G.wave);G.hpMul=diff().hp*(1+.18*G.wave);G.phase='intro';return true}
-  if(G.phase==='win'||G.phase==='lose')return true;     // stay on the result; the end screen takes over
+    G.wave++;G.t=0;waves[G.wave]=endlessWave(G.wave);G.phase='intro';return true}
+  // stay on the result: in a class game the end screen takes over, the demo starts again
+  if(G.phase==='win'||G.phase==='lose'){if(!HOST&&G.t>8)reset();return true}
   return false}
+// a short record of how the game went (browser console; for tuning the difficulty levels)
+function logResult(result){var D=G.dir||{};
+  console.info('[gynyba]',{result:result,difficulty:HS.difficulty,mode:HS.mode,players:students.length,minutes:+(G.played/60).toFixed(1),
+    wave:G.wave+1,hp:Math.ceil(G.hp),killed:G.killed,leaked:D.leaked,pressure:+(D.P||0).toFixed(2),firepower:+(D.dps||0).toFixed(2)})}
 // the students' timers follow this game's clock (time left in a timed game, time played until defeat)
 function sendClock(sk){if(!G.playing||G.sent)return;sk.emit('game:clock',HS.mode==='timed'?{leftMs:Math.round(G.left*1000)}:{elapsedMs:Math.round(G.played*1000)})}
 function clockNow(){SudGame.connect().then(sendClock).catch(function(){})}
-// a correct answer from a student: their unit in the tower gets one more shot to fire
-function hostShot(s){var tw=towers[s.team],un=tw.units.filter(function(u){return u.si===s.i})[0];
-  s.correct++;tw.correct++;if(un.queue.length<6)un.queue.push({si:s.i,eq:'',at:G.anim+SHOT_DELAY});
+// a correct answer from a student: their unit in the tower gets one more shot to fire (and the class's measured
+// firepower grows by that tower's damage × reach: a tower that reaches further gets more of the road to shoot at)
+function hostShot(s,eq){var tw=towers[s.team],un=tw.units.filter(function(u){return u.si===s.i})[0];
+  s.correct++;tw.correct++;dirty=true;if(un.queue.length<6)un.queue.push({si:s.i,eq:eq||'',at:G.anim+SHOT_DELAY});
+  if(G.dir){G.dir.acc+=lv(tw).dmg*(lv(tw).reach||1);G.dir.nacc++}
   floater(tw.x+un.off*2,feetY(tw)-36,fitText(s.name,90,FLOAT_FONT(11))+' ✓',tw.col,11)}
 // ten correct in a row: the student's tower goes up a level (up to 4)
 function hostUpgrade(s){var tw=towers[s.team];if(tw.want<4){tw.want++;floater(tw.x,feetY(tw)-84,fitText(s.name,90,FLOAT_FONT(13))+': 10 iš eilės!','#ffd34d',13)}}
 function finishHost(result){
-  if(G.sent)return;G.sent=true;
+  if(G.sent)return;G.sent=true;logResult(result);
   SudGame.request('game:end',{result:result,wave:G.wave+1}).catch(function(){});
   if(result==='stopped'){location.href='klase.html?tab=zaidimai';return}
   setTimeout(function(){
-    $('host-end-title').textContent=result==='win'?'Pergalė!':'Kaimas krito…';
-    $('host-end-text').textContent=result==='win'?'Klasė atlaikė '+HS.minutes+' min. ir apgynė kaimą!':(HS.mode==='endless'?'Klasė atlaikė '+(G.wave+1)+' bangas.':'Šį kartą priešai buvo stipresni.');
+    $('host-end-title').textContent=result==='win'?'Pergalė!':'Tvirtovė krito…';
+    $('host-end-text').textContent=result==='win'?'Klasė atlaikė '+HS.minutes+' min. ir apgynė tvirtovę!':(HS.mode==='endless'?'Klasė atlaikė '+(G.wave+1)+' bangas.':'Šį kartą priešai buvo stipresni.');
     $('host-end').hidden=false},2500)}
+function clock(s){return Math.floor(s/60)+':'+('0'+Math.floor(s%60)).slice(-2)}
 // small overlay in the corner of the field: castle health and time left / wave
 function drawHud(){
   var x=14,y=14,w=330,h=46;ctx.fillStyle='rgba(31,22,51,.72)';ctx.fillRect(x,y,w,h);
   ctx.fillStyle='#1f1633';ctx.fillRect(x+10,y+28,w-20,10);ctx.fillStyle=G.hp>50?'#5ee36a':G.hp>25?'#ffd34d':'#ff5a4a';ctx.fillRect(x+11,y+29,Math.round((w-22)*G.hp/100),8);
   ctx.font='900 14px Nunito,system-ui,sans-serif';ctx.textAlign='left';ctx.fillStyle='#fff';
-  var t=HS.mode==='timed'?'Liko '+Math.floor(G.left/60)+':'+('0'+Math.floor(G.left%60)).slice(-2):(G.wave+1)+' banga';
-  ctx.fillText('Kaimo vartų tvirtumas '+G.hp+'%',x+10,y+20);ctx.textAlign='right';ctx.fillText(t,x+w-10,y+20)}
+  var t=HS.mode==='timed'?'Liko '+clock(G.left):(G.wave+1)+' banga';
+  ctx.fillText('Tvirtovės vartų tvirtumas '+Math.ceil(G.hp)+'%',x+10,y+20);ctx.textAlign='right';ctx.fillText(t,x+w-10,y+20)}
 
 /* ---------- drawing ---------- */
 function label(txt,x,y,size,fill,stroke){ctx.font='900 '+size+'px Nunito,system-ui,sans-serif';ctx.textAlign='center';ctx.lineJoin='round';
@@ -779,17 +956,19 @@ function drawTower(tw){
   ctx.font=NAME_FONT;ctx.fillStyle='#fff';ctx.textAlign='center';
   P.lines.forEach(function(l,k){ctx.fillText(l,tw.x,py+10+k*11)});
 }
-// anim: walk / attack / death; frame clamps on the last frame for one-shot animations
+// anim: walk / charge (loop) or attack / death / rise (one-shot: the frame stays on the last one)
 function drawEnemy(e,anim,t){
-  var T=ETYPE[e.type],sheet=T.sheet[anim][e.dir],f=Math.floor(t*EN_FPS),fly=T.fly?T.fly+Math.round(Math.sin(t*6)*2):0;
-  f=anim==='walk'?f%6:Math.min(5,f);
-  var x=Math.round(e.x),y=Math.round(e.y+6-38-fly);
-  if(anim!=='death'||f<3){ctx.fillStyle='rgba(50,30,20,.22)';ctx.beginPath();ctx.ellipse(x,Math.round(e.y+6),fly?6:8,fly?2:3,0,0,Math.PI*2);ctx.fill()}
+  var T=ETYPE[e.type],fs=T.fs,sheet=T.sheet[anim][e.dir],n=Math.max(1,Math.round(sheet.width/fs)),f=Math.floor(t*EN_FPS),fly=T.fly?T.fly+Math.round(Math.sin(t*6)*2):0;
+  f=anim==='walk'||anim==='charge'?f%n:Math.min(n-1,f);
+  var x=Math.round(e.x),y=Math.round(e.y+6-T.feet-fly),big=T.boss||T.hive;
+  if(anim!=='death'||f<3){ctx.fillStyle='rgba(50,30,20,.22)';ctx.beginPath();ctx.ellipse(x,Math.round(e.y+6),(fly?6:8)*(big?2:1),(fly?2:3)*(big?1.6:1),0,0,Math.PI*2);ctx.fill()}
   ctx.save();ctx.translate(x,y);if(e.flip)ctx.scale(-1,1);
-  ctx.drawImage(sheet,f*48,0,48,48,-24,0,48,48);
-  if(e.hitT>0){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.7;ctx.drawImage(sheet,f*48,0,48,48,-24,0,48,48)}
+  ctx.drawImage(sheet,f*fs,0,fs,fs,-fs/2,0,fs,fs);
+  if(e.hitT>0){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.7;ctx.drawImage(sheet,f*fs,0,fs,fs,-fs/2,0,fs,fs)}
   ctx.restore();
-  if(anim!=='death'&&e.hp<e.max){var bw=16,by=Math.round(e.y+6-fly-T.top-7);ctx.fillStyle='#1f1633';ctx.fillRect(x-bw/2-1,by,bw+2,5);
+  // health bar: always shown for bosses (wider, with a gold frame), for the others once they are hit
+  if(anim!=='death'&&anim!=='rise'&&(e.hp<e.max||T.boss)){var bw=T.boss?36:T.hive?22:16,by=Math.round(e.y+6-fly-T.top-7);
+    ctx.fillStyle=T.boss?'#ffd34d':'#1f1633';ctx.fillRect(x-bw/2-1,by,bw+2,5);ctx.fillStyle='#1f1633';ctx.fillRect(x-bw/2,by+1,bw,3);
     ctx.fillStyle=e.hp/e.max>.5?'#5ee36a':'#ff5a4a';ctx.fillRect(x-bw/2,by+1,Math.round(bw*e.hp/e.max),3)}
 }
 function drawArrow(p){
@@ -813,7 +992,9 @@ function draw(){
   FIRES.forEach(function(f){if(f.smoke)strip(ANIM.smoke,32,7,f.x,f.y-32,f.off);strip(ANIM.fire,32,9,f.x,f.y,f.off)});
   var list=[{y:M.cy+VTOP,f:drawVillage}];
   towers.forEach(function(t){list.push({y:t.base-6,f:function(){drawTower(t)}})});
-  enemies.forEach(function(e){list.push({y:e.y+6,f:function(){drawEnemy(e,e.state==='attack'?'attack':'walk',e.t)}})});
+  enemies.forEach(function(e){var T=ETYPE[e.type],a=e.state;
+    if(a==='siege')a=!e.mv&&T.sheet.attack&&e.t*EN_FPS<frames(T,'attack')?'attack':'walk';
+    list.push({y:e.y+6,f:function(){drawEnemy(e,a,e.t)}})});
   corpses.forEach(function(c){list.push({y:c.e.y+5,f:function(){drawEnemy(c.e,'death',c.t)}})});
   list.sort(function(a,b){return a.y-b.y}).forEach(function(d){d.f()});
   shots.forEach(function(p){p.kind==='archer'?drawArrow(p):drawOrb(p)});
@@ -822,19 +1003,31 @@ function draw(){
   ctx.globalAlpha=1;
   floats.forEach(function(f){ctx.globalAlpha=Math.min(1,(f.max-f.life)*3);label(f.txt,f.x,f.y,f.size,f.col==='#ffd34d'?f.col:'#fff',f.col==='#ffd34d'?null:f.col)});
   ctx.globalAlpha=1;
-  if(HOST&&ROSTER)drawHud();
-  var msg=G.phase==='timed'&&G.t<2.2?'Ginkite kaimą!':G.phase==='intro'?(G.wave+1)+' banga':G.phase==='win'?'Pergalė!':G.phase==='lose'?'Kaimas krito…':G.paused?'Pauzė':null;
+  drawHud();
+  var msg=G.phase==='timed'&&G.t<2.2?'Ginkite tvirtovę!':G.phase==='intro'?(G.wave+1)+' banga':G.phase==='win'?'Pergalė!':G.phase==='lose'?'Tvirtovė krito…':G.paused?'Pauzė':null;
   if(msg){var bs=Math.max(36,Math.round(W/26));ctx.fillStyle='rgba(31,22,51,.55)';ctx.fillRect(0,H/2-bs,W,bs*1.9);label(msg,W/2,H/2+bs*.3,bs,G.phase==='lose'?'#ff8a80':'#fff')}
 }
 
 /* ---------- side panel ---------- */
 function buildTeamList(){$('tw').innerHTML=towers.map(function(t){return'<li><div class="h"><i class="dot" style="background:'+t.col+'"></i>Bokštas '+(t.i+1)+' <span class="k">· '+t.K.name+'</span><span class="lv" id="lv'+t.i+'"></span></div><small>'+esc(teamNames(t).join(', '))+'</small><div class="pb"><i id="pb'+t.i+'"></i></div></li>'}).join('')}
 function updDom(){
-  $('hpv').textContent=G.hp;var h=$('hp');h.style.width=G.hp+'%';h.style.background=G.hp>50?'var(--good)':G.hp>25?'var(--gold)':'var(--bad)';
-  $('killv').textContent=G.killed+' / '+TOTAL;$('kill').style.width=(TOTAL?G.killed/TOTAL*100:0)+'%';
-  $('wave').textContent='Banga '+Math.min(waves.length,G.wave+1)+' / '+waves.length;
+  $('hpv').textContent=Math.ceil(G.hp);var h=$('hp');h.style.width=G.hp+'%';h.style.background=G.hp>50?'var(--good)':G.hp>25?'var(--gold)':'var(--bad)';
+  var D=G.dir,leaked=D?D.leaked:0;
+  $('killv').textContent=G.killed+(leaked?' · praleista '+leaked:'');$('kill').style.width=(G.killed+leaked?G.killed/(G.killed+leaked)*100:0)+'%';
+  $('wave').textContent=HS.mode==='timed'?'Liko '+clock(G.left):'Banga '+(G.wave+1);
+  // tower level; the bar shows the best streak in the tower towards the next upgrade (10 in a row)
   towers.forEach(function(t){$('lv'+t.i).textContent=t.want+' lygis';
-    var cur=lvNeed(t,t.want),nx=t.want<4?lvNeed(t,t.want+1):0;$('pb'+t.i).style.width=(nx?Math.min(100,(t.correct-cur)/(nx-cur)*100):100)+'%'});
+    var st=Math.max.apply(null,t.team.map(function(si){return students[si].streak||0}));$('pb'+t.i).style.width=(t.want<4?st*10:100)+'%'});
+  var d=diff(),row=function(a,b){return'<div class="r"><span>'+a+'</span><span>'+b+'</span></div>'};
+  $('dir').innerHTML=!D?row(d.name,'spaudimas '+d.lo.toFixed(2)+'–'+d.hi.toFixed(2))+'<small>Laukiama, kol bus pastatyti bokštai…</small>':
+    row(d.name,'spaudimas '+d.lo.toFixed(2)+'–'+d.hi.toFixed(2))+'<div class="rng"><i style="left:'+Math.round(D.x*100)+'%"></i></div>'+
+    row('Dabartinis spaudimas',D.P.toFixed(2)+(HS.mode==='timed'?' × '+swell().toFixed(2):''))+
+    row('Klasės ugnis',classDps().toFixed(1)+' gyv./s'+(D.dps<students.length/d.pace?' (min.)':''))+
+    row('Tvirtovė / planas',Math.ceil(G.hp)+' % / '+Math.round(targetHp())+' %')+
+    row('Priešų lauke',enemies.length)+
+    row('Numatoma žala',Math.round(D.pend||0)+' %')+
+    row('Kitas bosas',HS.mode==='timed'?(G.bossT-G.played<G.left-30?'po '+Math.max(0,Math.ceil(G.bossT-G.played))+' s':'—'):'kas 3 banga')+
+    '<small>Spaudimas = priešų gyvybės per sekundę ÷ kiek klasė jų nukerta per sekundę.</small>';
   $('lb').innerHTML=students.slice().sort(function(a,b){return b.correct-a.correct}).slice(0,6).map(function(s){
     return'<li><i class="dot" style="background:'+towers[s.team].col+'"></i><span class="n">'+esc(s.name)+'</span><span class="s">'+s.correct+' ✓</span></li>'}).join('');
 }
@@ -848,6 +1041,14 @@ $('pn').oninput=function(){$('pv').textContent=this.value;clearTimeout(rbT);rbT=
 $('pair').onchange=rebuild;
 $('m1').onclick=function(){target=1;$('m1').className='on';$('m2').className='';rebuild()};
 $('m2').onclick=function(){target=16/9;$('m2').className='on';$('m1').className='';rebuild()};
+// a segmented control: marks the pressed button and passes its value on
+function seg(id,fn){var bs=$(id).querySelectorAll('button');bs.forEach(function(b){b.onclick=function(){bs.forEach(function(x){x.className=x===b?'on':''});fn(b.getAttribute('data-v'))}})}
+seg('dseg',function(v){HS.difficulty=v;reset()});
+seg('mseg',function(v){HS.mode=v;reset()});
+$('mins').onchange=function(){HS.minutes=+this.value;reset()};
+seg('sseg',function(v){DEMO.speed=+v});
+$('pace').oninput=function(){DEMO.pace=+this.value;$('pacev').textContent=this.value+' s'};
+$('acc').oninput=function(){DEMO.acc=this.value/100;$('accv').textContent=this.value+' %'};
 // fit the whole field on screen: as wide as the card allows, but no taller than ~75% of the window
 function resize(){
   var avail=$('stage').parentNode.clientWidth-34,dw=Math.max(200,Math.min(avail,window.innerHeight*.75*W/H));
@@ -857,7 +1058,9 @@ function resize(){
   if(k!==SC||cv.width!==W*k||cv.height!==H*k){SC=k;cv.width=W*k;cv.height=H*k}}
 var last=0;
 function loop(t){var dt=Math.min(.05,(t-last)/1000||0);last=t;
-  if(!G.paused)update(dt);
+  if(!G.paused)for(var i=0;i<DEMO.speed;i++)update(dt);
+  // the side panel follows the clock twice a second (demo only; in a class game it is hidden)
+  if(!HOST&&Math.floor(G.anim*2)!==loop.tick){loop.tick=Math.floor(G.anim*2);dirty=true}
   draw();if(dirty){dirty=false;updDom()}
   requestAnimationFrame(loop)}
 $('pause').onclick=function(){G.paused=!G.paused;this.textContent=G.paused?'Tęsti':'Pauzė'};
