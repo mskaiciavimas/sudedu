@@ -759,7 +759,7 @@ function hit(e,p){
     var s=students[p.shot.si];feed('<b style="color:'+p.tw.col+'">'+esc(s.name)+'</b>'+(p.shot.eq?' ('+p.shot.eq+')':'')+' nugalėjo: '+T.name);dirty=true}
 }
 // a dead enemy leaves the fight at once and plays its death animation as a corpse; a slime splits into little ones
-function kill(e){e.dead=true;G.killed++;corpses.push({e:e,t:0});
+function kill(e){e.dead=true;G.killed++;corpses.push({e:e,t:0});if(G.met)G.met.k++;
   if(G.dir)G.dir.depth.push(Math.min(1,e.d/e.rt.len));
   if(G.dir&&e.state==='siege')G.dir.strikes+=((e.strikes||0)-G.dir.strikes)*.15;   // how long enemies last at the gates
   var T=ETYPE[e.type];if(T.split)e.splitLeft=T.splitN||2;
@@ -808,6 +808,7 @@ function atGate(e){var T=ETYPE[e.type],side=e.x<M.cx?-1:1;
   e.state='siege';e.d=e.rt.len;e.side=side;e.arr=G.arrN=(G.arrN||0)+1;e.wait=14+Math.random()*22;
   e.sy=M.cy+(Math.random()*2-1)*22;e.atkT=.3+Math.random()*.5;
   if(G.dir){G.dir.leaked++;G.dir.nGate++;G.dir.calm=0}
+  if(G.met)G.met.g++;
   feed('<b style="color:var(--bad)">'+T.name.charAt(0).toUpperCase()+T.name.slice(1)+' puola tvirtovės vartus!</b>');dirty=true}
 // Only the first GATE_FRONT enemies to reach each gate strike it; the rest crowd behind and wait, and step up to the
 // gate when one in front falls (so the damage a crowd does has a ceiling and the class can win it back)
@@ -839,7 +840,8 @@ function schedule(list){
   var rot=rnd(S);   // which entrances get the odd extra enemy changes from wave to wave
   for(var i=0;i<list.length;i++){var s=(i+rot)%S,k=Math.floor(i/S);out.push({type:list[i],sp:s,t:start[s]+k*gap+(Math.random()-.5)*gap*.3})}
   return out.sort(function(a,b){return a.t-b.t})}
-function spawn(type,si,hpMul){var T=ETYPE[type];return addEnemy(type,makeRoute(M.spawns[si]),0,hpMul||1,T.boss?bossHp(type):0)}
+function spawn(type,si,hpMul){var T=ETYPE[type];if(T.boss)metricEvent(type);
+  return addEnemy(type,makeRoute(M.spawns[si]),0,hpMul||1,T.boss?bossHp(type):0)}
 
 function update(dt){
   G.t+=dt;G.anim+=dt;if(G.hitL>0)G.hitL-=dt;if(G.hitR>0)G.hitR-=dt;
@@ -862,10 +864,10 @@ function update(dt){
 // intro/spawn/wave forever (until defeat)
 function hostUpdate(dt){
   if(G.phase==='build'){if(towers.every(function(t){return t.state!=='upg'})){G.t=0;
-    G.playing=true;G.played=0;dirInit();G.bossT=Math.max(60,.3*HS.minutes*60);
+    G.playing=true;G.played=0;dirInit();metricsInit();G.bossT=Math.max(60,.3*HS.minutes*60);
     if(HS.mode==='timed')G.phase='timed';else{G.phase='intro';waves[0]=endlessWave(0)}
     feed('Žaidimas prasidėjo. Sėkmės, klase!');if(HOST)clockNow()}return true}
-  if(G.playing&&G.phase!=='win'&&G.phase!=='lose'){G.played+=dt;dirUpdate(dt)}
+  if(G.playing&&G.phase!=='win'&&G.phase!=='lose'){G.played+=dt;dirUpdate(dt);metricsTick(dt)}
   if(G.phase==='timed'){
     G.left-=dt;var P=G.dir.P,fire=classDps(),hm=hpMul();
     // ordinary enemies: a budget fills with pressure × firepower (in swells, never more than 3 s ahead);
@@ -881,10 +883,28 @@ function hostUpdate(dt){
   if(G.phase==='intro'&&G.t>2.2){G.phase='spawn';G.t=0;G.spawnI=0;G.sched=schedule(waves[G.wave]);
     G.sched.forEach(function(q){if(ETYPE[q.type].boss)q.sp=farSpawn()});return true}
   if(G.phase==='wave'&&!enemies.length&&!corpses.some(function(c){return c.e.splitLeft})){
-    G.wave++;G.t=0;waves[G.wave]=endlessWave(G.wave);G.phase='intro';return true}
+    G.wave++;G.t=0;waves[G.wave]=endlessWave(G.wave);G.phase='intro';metricEvent('W');return true}
   // stay on the result: in a class game the end screen takes over, the demo starts again
   if(G.phase==='win'||G.phase==='lose'){if(!HOST&&G.t>8)reset();return true}
   return false}
+/* ---------- game metrics ---------- */
+// For tuning the difficulty with real classes: every METRIC_STEP seconds of play the game notes one row of small whole
+// numbers (columns in METRIC_COLS, the same order as METRIC_COLS.td in the game server):
+//   c correct answers, k enemies killed, g enemies that reached a gate, u tower upgrades (in the row),
+//   hp fortress health, p pressure ×100, f class firepower ×10 (what the director assumes), e enemies on the field,
+//   s enemies at the gates (at the row's end).
+// Plus rare events (second, code): K/Q/G a boss came, W a wave started (until defeat). A class game sends it all once,
+// with game:end: about 1 KB for a 5-minute game; the server stores it as one GameMetric row.
+var METRIC_STEP=10,METRIC_COLS=['c','k','g','u','hp','p','f','e','s'];
+function metricsInit(){G.met={t:0,c:0,k:0,g:0,u:0,rows:[],ev:[]}}
+function metricRow(){var m=G.met;if(m.rows.length>=360*METRIC_COLS.length)return;
+  m.rows.push(m.c,m.k,m.g,m.u,Math.ceil(G.hp),Math.round(G.dir.P*100),Math.round(classDps()*10),enemies.length,
+    enemies.filter(function(x){return x.state==='siege'}).length);m.c=m.k=m.g=m.u=0}
+function metricsTick(dt){var m=G.met;if(!m)return;m.t+=dt;if(m.t>=METRIC_STEP){m.t-=METRIC_STEP;metricRow()}}
+function metricEvent(code){if(G.met&&G.met.ev.length<400)G.met.ev.push(Math.round(G.played),code)}
+// the summary sent with game:end (the last, shorter row is kept if it is at least 3 s long)
+function metricsPayload(){var m=G.met;if(!m)return null;var last=METRIC_STEP;if(m.t>=3){last=Math.round(m.t);metricRow();m.t=0}
+  return{v:1,step:METRIC_STEP,cols:METRIC_COLS,rows:m.rows,last:last,ev:m.ev,seconds:Math.round(G.played),endHp:Math.ceil(G.hp)}}
 // a short record of how the game went (browser console; for tuning the difficulty levels)
 function logResult(result){var D=G.dir||{};
   console.info('[gynyba]',{result:result,difficulty:HS.difficulty,mode:HS.mode,players:students.length,minutes:+(G.played/60).toFixed(1),
@@ -897,12 +917,13 @@ function clockNow(){SudGame.connect().then(sendClock).catch(function(){})}
 function hostShot(s,eq){var tw=towers[s.team],un=tw.units.filter(function(u){return u.si===s.i})[0];
   s.correct++;tw.correct++;dirty=true;if(un.queue.length<6)un.queue.push({si:s.i,eq:eq||'',at:G.anim+SHOT_DELAY});
   if(G.dir){G.dir.acc+=lv(tw).dmg*(lv(tw).reach||1);G.dir.nacc++}
+  if(G.met)G.met.c++;
   floater(tw.x+un.off*2,feetY(tw)-36,fitText(s.name,90,FLOAT_FONT(11))+' ✓',tw.col,11)}
 // ten correct in a row: the student's tower goes up a level (up to 4)
-function hostUpgrade(s){var tw=towers[s.team];if(tw.want<4){tw.want++;floater(tw.x,feetY(tw)-84,fitText(s.name,90,FLOAT_FONT(13))+': 10 iš eilės!','#ffd34d',13)}}
+function hostUpgrade(s){var tw=towers[s.team];if(tw.want<4){tw.want++;if(G.met)G.met.u++;floater(tw.x,feetY(tw)-84,fitText(s.name,90,FLOAT_FONT(13))+': 10 iš eilės!','#ffd34d',13)}}
 function finishHost(result){
   if(G.sent)return;G.sent=true;logResult(result);
-  SudGame.request('game:end',{result:result,wave:G.wave+1}).catch(function(){});
+  SudGame.request('game:end',{result:result,wave:G.wave+1,metrics:metricsPayload()}).catch(function(){});
   if(result==='stopped'){location.href='klase.html?tab=zaidimai';return}
   setTimeout(function(){
     $('host-end-title').textContent=result==='win'?'Pergalė!':'Tvirtovė krito…';
