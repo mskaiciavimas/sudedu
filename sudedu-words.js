@@ -3,7 +3,7 @@
  *   SudWords.verify('Namas')            → Promise<{ word: 'namas', verdict: 'ok' }>   (the games' word rules, below)
  *   SudWords.verifySync('namas')        → 'ok' (just the verdict) without waiting, or null while the lists are still loading
  *   SudWords.preload('legit', 'names')  → start loading lists early (e.g. when a game opens)
- *   SudWords.load('freq12_5000')        → Promise<Dawg> for walking a list (prefixes, next letters, words)
+ *   SudWords.load('freq12_2000')        → Promise<Dawg> for walking a list (prefixes, next letters, words)
  *   SudWords.normalize(' Nãmas ')       → 'namas' (lower case, stress marks removed)
  *
  * verify() verdicts:
@@ -36,11 +36,11 @@
 		truncated:    LEGIT + 'SUDEDU_legit_words_with_truncated_endings.dawg',
 		names:        LEGIT + 'SUDEDU_legit_names.dawg',
 		// most frequent words in grades 1-2 / 3-4 texts (with their other forms), and all common words (every grade)
-		freq12_5000:  FREQ + 'grades_1_2/SUDEDU_word_usage_frequency_top_5000_words.dawg',
-		freq12_10000: FREQ + 'grades_1_2/SUDEDU_word_usage_frequency_top_10000_words.dawg',
+		freq12_2000:  FREQ + 'grades_1_2/SUDEDU_word_usage_frequency_top_2000_words.dawg',
+		freq12_8000:  FREQ + 'grades_1_2/SUDEDU_word_usage_frequency_top_8000_words.dawg',
 		freq12_20000: FREQ + 'grades_1_2/SUDEDU_word_usage_frequency_top_20000_words.dawg',
-		freq34_5000:  FREQ + 'grades_3_4/SUDEDU_word_usage_frequency_top_5000_words.dawg',
-		freq34_10000: FREQ + 'grades_3_4/SUDEDU_word_usage_frequency_top_10000_words.dawg',
+		freq34_2000:  FREQ + 'grades_3_4/SUDEDU_word_usage_frequency_top_2000_words.dawg',
+		freq34_8000:  FREQ + 'grades_3_4/SUDEDU_word_usage_frequency_top_8000_words.dawg',
 		freq34_20000: FREQ + 'grades_3_4/SUDEDU_word_usage_frequency_top_20000_words.dawg',
 		freqCommon:   FREQ + 'SUDEDU_word_usage_frequency_all_common_words.dawg'
 	};
