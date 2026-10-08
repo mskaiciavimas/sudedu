@@ -31,8 +31,10 @@
 	.gg-group.join:hover { border-color: #286D8A; background: rgba(255,255,255,.8); }
 	.gg-group.drop-ok { border-color: rgba(40,109,138,.45); border-style: dashed; }
 	.gg-group.drop-over { border-color: #286D8A; border-style: solid; background: #e7f4fa; }
-	.gg-head { display: flex; align-items: center; gap: 6px; font-weight: 800; color: #1d566e; }
-	.gg-head small { font-weight: 700; color: #3c4f59; margin-left: auto; white-space: nowrap; }
+	/* the title, "Pereiti" and the count: on a narrow card the count moves to its own line (right-aligned) instead of
+	   spilling out of the card */
+	.gg-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-weight: 800; color: #1d566e; min-width: 0; }
+	.gg-head small { font-weight: 700; color: #3c4f59; margin-left: auto; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 	.gg-head small.bad { color: #b3261e; }
 	.gg-join { margin-left: 6px; border: 0; border-radius: 9px; padding: 4px 10px; font: inherit; font-size: 12.5px; font-weight: 800; color: #fff; background: linear-gradient(#3288AC, #286D8A); cursor: pointer; }
 	.gg-list { display: flex; flex-wrap: wrap; gap: 6px; min-height: 40px; align-content: flex-start; }

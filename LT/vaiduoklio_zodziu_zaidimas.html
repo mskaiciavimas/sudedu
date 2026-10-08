@@ -673,6 +673,8 @@
 		font-size: 16px;
 	}
 
+	.vg-done-list { list-style: none; margin: 10px 0 4px; padding: 0; display: grid; gap: 6px; text-align: left; max-height: 45svh; overflow: auto; }
+	.vg-done-list li { padding: 7px 12px; border-radius: 10px; background: rgba(29, 86, 110, .08); }
 	.vg-rules { text-align: left; }
 	.vg-rules ol { margin: 8px 0 0; padding-left: 20px; color: var(--mute); }
 	.vg-rules li { margin: 6px 0; }
@@ -1882,6 +1884,8 @@
 			if (!board) updateReady();
 		}
 		else if (act === 'watch') { ui.keepResult = false; $('resultModal').hidden = true; }
+		else if (act === 'watchStay') $('resultModal').hidden = true;
+		else if (act === 'watchEnd') { $('resultModal').hidden = true; if (watch) watch.end(); }
 		else if (act === 'again') { if (board) startBoard(); else if (settings.mode === 'solo') startGame(); else startDemo(); }
 		else if (act === 'setup' || act === 'leave') leaveGame();
 	});
@@ -2215,6 +2219,18 @@
 		const done = watch.groups.filter(g => g.S && g.S.over).length;
 		$('watchInfo').textContent = plural(watch.groups.length, 'grupė', 'grupės', 'grupių') + (done ? ` · baigė ${done}` : '');
 		document.querySelector('#watchView .vg-pager').hidden = pages < 2;
+		if (done && done === watch.groups.length && !watch.doneShown) { watch.doneShown = true; watchDone(); }
+	}
+	// every group has finished: a pop-up with each group's result; "Baigti žaidimą" ends it (the teacher may first look at
+	// the tiles, the top bar's "Baigti" still ends it)
+	function watchDone() {
+		const rows = watch.groups.map(g => {
+			const T = g.S, w = T && T.winner && T.players.find(p => p.id === T.winner);
+			return `<li><b>${esc(g.label)}:</b> ${T && T.emptied ? 'grupėje neliko mokinių' : w ? `🏆 laimėjo ${esc(w.name)}` : 'žaidimas baigtas'}</li>`;
+		}).join('');
+		$('resultPanel').innerHTML = `<div class="ico">🏁</div><h2>Visos grupės baigė žaidimą</h2><ul class="vg-done-list">${rows}</ul>`
+			+ '<div class="vg-btns"><button class="vg-btn" data-act="watchEnd">Baigti žaidimą</button><button class="vg-btn light" data-act="watchStay">Peržiūrėti grupes</button></div>';
+		$('resultModal').hidden = false;
 	}
 	$('watchPrev').addEventListener('click', () => watch && goPage(watch.page - 1));
 	$('watchNext').addEventListener('click', () => watch && goPage(watch.page + 1));
