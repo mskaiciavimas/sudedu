@@ -1,0 +1,2483 @@
+<!DOCTYPE html>
+<html lang="lt">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>SUDEDU - Vaiduoklis</title>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+	<link rel="stylesheet" href="../main-nav-bar.css">
+
+	<style>
+	@font-face { font-family: "SFpro"; src: url("../fonts/SF-Pro-Text-Regular.otf") format("opentype"); font-weight: 400; }
+	@font-face { font-family: "SFpro"; src: url("../fonts/SF-Pro-Text-Semibold.otf") format("opentype"); font-weight: 600; }
+	@font-face { font-family: "SFpro"; src: url("../fonts/SF-Pro-Text-Bold.otf") format("opentype"); font-weight: 700; }
+	@font-face { font-family: "SFpro"; src: url("../fonts/SF-Pro-Text-Heavy.otf") format("opentype"); font-weight: 800; }
+
+	:root {
+		--ink: #1f2a30;
+		--mute: #3c4f59;
+		--teal: #1d566e;
+		--btn: linear-gradient(#3288AC, #286D8A);
+		--warnBtn: linear-gradient(#f0954a, #d9702a);
+		--glass: rgba(255, 255, 255, .42);
+		--glassB: rgba(255, 255, 255, .65);
+		--tile: rgba(255, 255, 255, .62);
+		--heart: #d64545;
+		--warn: #e07b2e;
+		--cw: 170px;   /* player card width in the carousel */
+	}
+
+	* {
+		box-sizing: border-box;
+		-webkit-tap-highlight-color: transparent;
+		-webkit-user-select: none;
+		user-select: none;
+	}
+
+	[hidden] { display: none !important; }
+
+	html {
+		min-height: 100%;
+		background-image: linear-gradient(to top, #ffbf9c, #ffbf92, #ffbf89, #ffbf7e, #ffc074);
+	}
+
+	body {
+		margin: 0;
+		min-height: 100svh;
+		display: flex;
+		flex-direction: column;
+		color: var(--ink);
+		font: 400 15px/1.4 'SFpro', system-ui, sans-serif;
+		background: transparent;
+	}
+
+	/* while playing, the game fills exactly one screen so the word area knows how much room it has */
+	/* (the wrap may not shrink below its content: on very short screens the page scrolls instead of cutting anything off) */
+	body.vg-playing { height: 100svh; min-height: 0; overflow-x: hidden; overflow-y: auto; }
+	body.vg-playing .vg-wrap { flex: 1 0 auto; }
+
+	.main-nav-mobile-btn { width: auto; height: auto; }
+
+	button { font: inherit; color: inherit; }
+
+	/* ---------- layout ---------- */
+	.vg-wrap {
+		flex: 1;
+		width: 100%;
+		max-width: 940px;
+		margin: 0 auto;
+		padding: 16px;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.vg-card {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		background: var(--glass);
+		border: 1px solid var(--glassB);
+		border-radius: 16px;
+		padding: 18px;
+		box-shadow: 0 8px 40px rgba(0, 0, 0, .08);
+	}
+
+	.vg-top {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		flex-wrap: wrap;
+	}
+
+	.vg-top h1 {
+		margin: 0 auto 0 0;
+		font-size: 21px;
+		font-weight: 800;
+		color: var(--teal);
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.vg-chip {
+		background: var(--tile);
+		border-radius: 999px;
+		padding: 4px 12px;
+		font-size: 13.5px;
+		font-weight: 600;
+		color: var(--mute);
+		white-space: nowrap;
+	}
+
+	.vg-btn {
+		border: 0;
+		border-radius: 12px;
+		padding: 10px 18px;
+		font-size: 14.5px;
+		font-weight: 600;
+		cursor: pointer;
+		background: var(--btn);
+		color: #fff;
+		box-shadow: 0 2px 0 rgba(29, 86, 110, .35);
+		transition: transform .12s, filter .12s, opacity .12s;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		white-space: nowrap;
+	}
+	.vg-btn:hover { filter: brightness(1.06); }
+	.vg-btn:active { transform: translateY(1px); }
+	.vg-btn:disabled { opacity: .45; cursor: default; filter: none; transform: none; }
+	.vg-btn.light { background: var(--tile); color: var(--ink); box-shadow: 0 2px 0 rgba(31, 42, 48, .12); }
+	.vg-btn.warn { background: var(--warnBtn); box-shadow: 0 2px 0 rgba(150, 70, 20, .35); }
+	.vg-btn.big { font-size: 17px; padding: 13px 30px; border-radius: 14px; }
+	.vg-btn .material-symbols-rounded { font-size: 20px; }
+
+	.vg-quit { height: 38px; padding: 0 14px 0 11px; border-radius: 999px; }
+	.vg-quit .material-symbols-rounded { font-size: 19px; }
+
+	.vg-icon-btn {
+		width: 38px;
+		height: 38px;
+		padding: 0;
+		border-radius: 50%;
+	}
+
+	.vg-label {
+		font-size: 13.5px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .05em;
+		color: var(--teal);
+		margin: 0 0 8px;
+	}
+
+	/* ---------- setup ---------- */
+	#setupView { flex: none; }
+
+	.vg-hero {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.vg-ghost {
+		font-size: 56px;
+		line-height: 1;
+		animation: vg-float 3.2s ease-in-out infinite;
+		filter: drop-shadow(0 6px 8px rgba(29, 86, 110, .18));
+	}
+
+	@keyframes vg-float {
+		0%, 100% { transform: translateY(0) rotate(-3deg); }
+		50% { transform: translateY(-6px) rotate(3deg); }
+	}
+
+	.vg-hero h1 { margin: 0; font-size: 26px; font-weight: 800; color: var(--teal); }
+	.vg-hero p { margin: 2px 0 0; color: var(--mute); font-size: 15px; }
+
+	.vg-steps {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 10px;
+	}
+
+	.vg-step {
+		background: var(--tile);
+		border-radius: 14px;
+		padding: 12px;
+	}
+
+	.vg-step b {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-weight: 700;
+		font-size: 15px;
+		margin-bottom: 4px;
+	}
+
+	.vg-step b i {
+		font-style: normal;
+		flex: none;
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		background: var(--btn);
+		color: #fff;
+		font-size: 13px;
+		display: grid;
+		place-items: center;
+	}
+
+	.vg-step span { color: var(--mute); font-size: 14px; }
+
+	.vg-settings {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 12px 20px;
+		background: var(--tile);
+		border-radius: 14px;
+		padding: 14px;
+	}
+
+	.vg-seg {
+		display: flex;
+		border-radius: 12px;
+		overflow: hidden;
+		border: 1px solid rgba(40, 109, 138, .35);
+		background: rgba(255, 255, 255, .45);
+	}
+
+	.vg-seg button {
+		flex: 1;
+		border: 0;
+		background: transparent;
+		padding: 8px 6px;
+		font-size: 14px;
+		font-weight: 600;
+		cursor: pointer;
+		white-space: nowrap;
+	}
+
+	.vg-seg button + button { border-left: 1px solid rgba(40, 109, 138, .2); }
+	.vg-seg button.on { background: var(--btn); color: #fff; }
+
+	.vg-start-row {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 8px;
+		padding-top: 4px;
+	}
+
+	.vg-note { font-size: 14px; color: var(--mute); text-align: center; }
+	.vg-note.err { color: #b3261e; font-weight: 600; }
+
+	/* ---------- players carousel ---------- */
+	.vg-carousel {
+		position: relative;   /* offsetParent of the cards, used to centre them */
+		flex: none;
+		overflow-x: auto;
+		overflow-y: hidden;
+		scrollbar-width: none;
+		cursor: grab;
+		-webkit-mask-image: linear-gradient(90deg, transparent 0, #000 56px, #000 calc(100% - 56px), transparent 100%);
+		mask-image: linear-gradient(90deg, transparent 0, #000 56px, #000 calc(100% - 56px), transparent 100%);
+	}
+	.vg-carousel::-webkit-scrollbar { display: none; }
+	.vg-carousel.dragging { cursor: grabbing; }
+
+	/* side padding lets the first and the last card reach the middle */
+	.vg-track {
+		display: flex;
+		gap: 10px;
+		width: max-content;
+		padding: 8px calc(50% - var(--cw) / 2);
+	}
+
+	.vg-p {
+		position: relative;
+		flex: none;
+		width: var(--cw);
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 8px 12px 8px 10px;
+		border-radius: 14px;
+		background: var(--tile);
+		border: 2px solid transparent;
+		transition: transform .25s, background .25s, border-color .25s, box-shadow .25s, opacity .25s;
+	}
+
+	.vg-p .av {
+		flex: none;
+		font-size: 26px;
+		line-height: 1;
+		width: 40px;
+		height: 40px;
+		display: grid;
+		place-items: center;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, .7);
+	}
+
+	.vg-p .txt { min-width: 0; flex: 1; }
+	.vg-p .nm { font-weight: 700; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.vg-p .hearts { color: var(--heart); font-size: 14px; letter-spacing: 1px; line-height: 1.15; white-space: nowrap; }
+	.vg-p .hearts .lost { color: rgba(31, 42, 48, .18); }
+	.vg-p .tag { font-size: 12.5px; font-weight: 600; color: var(--teal); min-height: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+	.vg-p.next .tag { color: var(--mute); }
+
+	.vg-p.turn {
+		background: rgba(255, 255, 255, .92);
+		border-color: #286D8A;
+		box-shadow: 0 6px 18px rgba(29, 86, 110, .22);
+		transform: translateY(-2px);
+	}
+
+	.vg-p.hot {
+		background: rgba(255, 244, 232, .96);
+		border-color: var(--warn);
+		box-shadow: 0 6px 18px rgba(224, 123, 46, .3);
+		transform: translateY(-2px);
+	}
+	.vg-p.hot .tag { color: #a24c12; }
+	.vg-p.flash { animation: vg-card-flash .45s ease-in-out 3; }
+	@keyframes vg-card-flash { 50% { box-shadow: 0 0 0 6px rgba(224, 123, 46, .45); } }
+
+	.vg-p.out { opacity: .5; }
+	.vg-p.out .av { background: rgba(255, 255, 255, .35); }
+
+	.vg-dots i {
+		display: inline-block;
+		width: 4px;
+		height: 4px;
+		margin-left: 2px;
+		border-radius: 50%;
+		background: currentColor;
+		animation: vg-dot 1s infinite ease-in-out;
+	}
+	.vg-dots i:nth-child(2) { animation-delay: .15s; }
+	.vg-dots i:nth-child(3) { animation-delay: .3s; }
+	@keyframes vg-dot { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+
+	/* ---------- word ---------- */
+	.vg-stage {
+		position: relative;
+		flex: 1 1 0;
+		min-height: 140px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 6px;
+		background: rgba(255, 255, 255, .28);
+		border-radius: 16px;
+		padding: 12px 10px 10px;
+		transition: box-shadow .3s, background .3s;
+	}
+
+	.vg-stage.challenged {
+		background: rgba(255, 244, 232, .5);
+		box-shadow: inset 0 0 0 2px rgba(224, 123, 46, .55);
+	}
+
+	/* scroll box: when even the smallest wrapped letters do not fit, the word scrolls (kept at its end) */
+	.vg-word-box {
+		flex: 1 1 auto;
+		min-height: 0;
+		width: 100%;
+		overflow-y: auto;
+		overflow-x: hidden;
+		display: flex;
+		scrollbar-width: thin;
+		scrollbar-color: rgba(29, 86, 110, .35) transparent;
+	}
+
+	.vg-word {
+		--t: 64px;
+		--g: 8px;
+		margin: auto;   /* centred while it fits, top-aligned (scrollable) once it overflows */
+		width: 100%;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: var(--g);
+		padding: 4px 2px 6px;
+	}
+
+	.vg-tile {
+		flex: none;
+		width: var(--t);
+		height: calc(var(--t) * 1.15);
+		border-radius: calc(var(--t) * .22);
+		display: grid;
+		place-items: center;
+		font-weight: 800;
+		font-size: calc(var(--t) * .56);
+		line-height: 1;
+		background: rgba(255, 255, 255, .88);
+		color: var(--ink);
+		box-shadow: 0 3px 0 rgba(29, 86, 110, .18);
+	}
+
+	.vg-tile.new { background: var(--btn); color: #fff; animation: vg-pop .3s ease-out; }
+	.vg-tile.pending { background: rgba(255, 255, 255, .35); border: 2px dashed #286D8A; color: var(--teal); box-shadow: none; animation: vg-pop .2s ease-out; }
+	.vg-tile.answer { background: rgba(255, 244, 232, .95); border: 2px dashed var(--warn); color: #a24c12; box-shadow: none; }
+	.vg-tile.cursor { background: transparent; border: 2px dashed rgba(29, 86, 110, .35); color: rgba(29, 86, 110, .45); box-shadow: none; }
+	.vg-tile.cursor.answer { border-color: rgba(224, 123, 46, .55); color: rgba(224, 123, 46, .7); animation: vg-blink 1.2s ease-in-out infinite; }
+	.vg-tile.good { background: linear-gradient(#45b27a, #2f9e5b); color: #fff; }
+	.vg-tile.bad { background: linear-gradient(#e46a6a, #c94444); color: #fff; }
+
+	@keyframes vg-pop { 0% { transform: scale(.6); opacity: 0; } 70% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+	@keyframes vg-blink { 50% { opacity: .35; } }
+
+	.vg-word.shake { animation: vg-shake .5s ease-in-out; }
+	@keyframes vg-shake {
+		0%, 100% { transform: translateX(0); }
+		20% { transform: translateX(-8px) rotate(-1deg); }
+		40% { transform: translateX(7px) rotate(1deg); }
+		60% { transform: translateX(-5px); }
+		80% { transform: translateX(3px); }
+	}
+
+	.vg-hint { flex: none; font-size: 14px; color: var(--mute); text-align: center; min-height: 20px; }
+
+	/* challenge announcement over the word */
+	.vg-banner {
+		position: absolute;
+		inset: 0;
+		z-index: 5;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		pointer-events: none;
+		border-radius: 16px;
+		background: rgba(255, 236, 214, .55);
+		backdrop-filter: blur(2px);
+		-webkit-backdrop-filter: blur(2px);
+		animation: vg-banner-bg 1.7s ease-in-out forwards;
+	}
+
+	.vg-banner-box {
+		text-align: center;
+		background: var(--warnBtn);
+		color: #fff;
+		border-radius: 18px;
+		padding: 14px 28px;
+		box-shadow: 0 12px 32px rgba(150, 70, 20, .35);
+		animation: vg-banner-pop 1.7s ease-in-out forwards;
+	}
+	.vg-banner-box b { display: block; font-size: 30px; font-weight: 800; letter-spacing: .06em; }
+	.vg-banner-box span { display: block; font-size: 15px; font-weight: 600; opacity: .95; margin-top: 2px; }
+
+	@keyframes vg-banner-bg { 0% { opacity: 0; } 12%, 82% { opacity: 1; } 100% { opacity: 0; } }
+	@keyframes vg-banner-pop {
+		0% { transform: scale(.4) rotate(-6deg); opacity: 0; }
+		14% { transform: scale(1.12) rotate(2deg); opacity: 1; }
+		24% { transform: scale(1) rotate(0); }
+		82% { transform: scale(1); opacity: 1; }
+		100% { transform: scale(.94); opacity: 0; }
+	}
+
+	.vg-status {
+		flex: none;
+		text-align: center;
+		font-size: 16px;
+		font-weight: 600;
+		min-height: 22px;
+	}
+	.vg-status.alert { color: #a24c12; }
+	/* time left for the player's move, at the end of the status line */
+	.vg-timer { display: inline-block; margin-left: 6px; padding: 0 7px; border-radius: 999px; background: rgba(255, 255, 255, .7); color: var(--teal); font-variant-numeric: tabular-nums; white-space: nowrap; }
+	.vg-timer.low { color: #fff; background: #d64545; animation: vg-tick 1s ease-in-out infinite; }
+	@keyframes vg-tick { 50% { transform: scale(1.08); } }
+
+	.vg-actions {
+		flex: none;
+		display: flex;
+		justify-content: center;
+		gap: 10px;
+		flex-wrap: wrap;
+		min-height: 42px;
+	}
+
+	/* ---------- keyboard (Lithuanian letters, alphabet order) ---------- */
+	.vg-kb {
+		flex: none;
+		width: 100%;
+		max-width: 700px;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	/* every letter key is as wide as one in the longest row (13 keys), so shorter rows sit centred like on a keyboard */
+	.vg-row { --kgap: 5px; display: flex; justify-content: center; gap: var(--kgap); }
+	.vg-row > * { min-width: 0; }
+
+	.vg-key {
+		flex: 0 1 calc((100% - 12 * var(--kgap)) / 13);
+		min-width: 0;
+		max-width: 54px;
+		height: 50px;
+		padding: 0;
+		border: 0;
+		border-radius: 10px;
+		background: rgba(255, 255, 255, .8);
+		color: var(--ink);
+		font-size: 19px;
+		font-weight: 700;
+		cursor: pointer;
+		box-shadow: 0 2px 0 rgba(31, 42, 48, .16);
+		display: grid;
+		place-items: center;
+		transition: transform .08s, background .12s, opacity .12s;
+	}
+	.vg-key:active { transform: translateY(1px); }
+	.vg-key.sel { background: var(--btn); color: #fff; }
+	.vg-key.wide { flex-basis: calc(1.35 * (100% - 12 * var(--kgap)) / 13); max-width: 74px; }
+	.vg-key.ok { background: var(--btn); color: #fff; }
+	.vg-key .material-symbols-rounded { font-size: 22px; }
+	.vg-key:disabled { opacity: .35; cursor: default; transform: none; }
+	.vg-kb.locked .vg-key { opacity: .5; cursor: default; }
+
+	/* ---------- modals ---------- */
+	.vg-modal {
+		position: fixed;
+		inset: 0;
+		z-index: 2000;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 16px;
+		background: rgba(31, 42, 48, .32);
+		backdrop-filter: blur(4px);
+		-webkit-backdrop-filter: blur(4px);
+		animation: vg-fade .2s ease-out;
+	}
+
+	@keyframes vg-fade { from { opacity: 0; } }
+
+	.vg-panel {
+		width: 100%;
+		max-width: 440px;
+		max-height: calc(100svh - 32px);
+		overflow: auto;
+		background: rgba(255, 255, 255, .94);
+		border-radius: 18px;
+		padding: 22px 20px 18px;
+		box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
+		text-align: center;
+		animation: vg-pop .25s ease-out;
+	}
+
+	.vg-panel .ico { font-size: 44px; line-height: 1; }
+	.vg-panel h2 { margin: 8px 0 6px; font-size: 20px; font-weight: 800; color: var(--teal); overflow-wrap: anywhere; }
+	.vg-panel p { margin: 6px 0; color: var(--mute); font-size: 15px; overflow-wrap: anywhere; }
+	.vg-panel p b { color: var(--ink); }
+	.vg-panel .vg-btns { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+	/* setup: how to play + the demo's groups */
+	.vg-settings > .vg-wide { grid-column: 1 / -1; }
+	.vg-seg.vg-seg-wrap { flex-wrap: wrap; }
+	.vg-demo { display: grid; gap: 8px; }
+	.vg-demo-note { margin: 0; font-size: 13.5px; color: var(--mute); }
+	.vg-demo-tools { display: flex; gap: 8px; flex-wrap: wrap; }
+	.vg-ready { font-size: 14px; }
+	.vg-count { display: inline-block; margin-left: 2px; padding: 1px 8px; border-radius: 999px; background: rgba(255, 255, 255, .25); font-size: .9em; font-variant-numeric: tabular-nums; }
+
+	/* teacher's overview: one tile per group, as many per page as fit; pages slide sideways */
+	body.vg-watching { height: 100svh; min-height: 0; overflow: hidden; }
+	body.vg-watching .vg-wrap { flex: 1 0 auto; max-width: none; min-height: 0; }
+	.vg-watch { min-height: 0; }
+	.vg-pager { display: flex; align-items: center; gap: 6px; }
+	.vg-watch-stage { flex: 1; min-height: 0; overflow: hidden; position: relative; touch-action: pan-y; }
+	.vg-watch-strip { display: flex; height: 100%; transition: transform .35s ease; }
+	.vg-watch-page { flex: 0 0 100%; height: 100%; display: grid; gap: 10px; padding: 2px;
+		grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); grid-template-rows: repeat(var(--rows), minmax(0, 1fr)); }
+	/* a tile's text and letters grow with the tile (one group on the whole screen: big; many small tiles: small) */
+	.vg-wt { container-type: size; background: var(--tile); border-radius: 14px; padding: clamp(8px, 2cqmin, 18px) clamp(10px, 2.4cqmin, 22px); display: flex; flex-direction: column;
+		gap: clamp(5px, 1.4cqmin, 12px); min-height: 0; min-width: 0; overflow: hidden; border: 2px solid transparent; }
+	.vg-wt.hot { border-color: var(--warn); background: rgba(255, 244, 232, .96); }
+	.vg-wt.done { opacity: .82; }
+	.vg-wt-head { display: flex; gap: 0.6em; align-items: baseline; font-weight: 800; color: var(--teal); font-size: clamp(14px, 3.8cqmin, 28px); }
+	.vg-wt-head span { margin-left: auto; font-size: 0.75em; color: var(--mute); font-weight: 700; white-space: nowrap; }
+	.vg-wt-timer { font-size: 0.75em; font-weight: 800; color: var(--teal); background: rgba(255, 255, 255, .8); border-radius: 999px; padding: 0.1em 0.6em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+	.vg-wt-timer.low { color: #fff; background: var(--heart); }
+	.vg-wt-players { display: flex; flex-wrap: wrap; gap: 0.25em 0.45em; font-size: clamp(12px, 3.2cqmin, 22px); font-weight: 700; }
+	.vg-wt-p { display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px; border-radius: 999px; background: rgba(255, 255, 255, .7); max-width: 100%; }
+	.vg-wt-p b { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 9em; }
+	.vg-wt-p .h { color: var(--heart); letter-spacing: -1px; }
+	.vg-wt-p.turn { background: #286D8A; color: #fff; }
+	.vg-wt-p.turn .h, .vg-wt-p.hot .h { color: #fff; }
+	.vg-wt-p.hot { background: var(--warn); color: #fff; }
+	.vg-wt-p.out { opacity: .45; }
+	.vg-wt-p.off { outline: 2px dashed rgba(214, 69, 69, .6); }
+	/* the word: each letter's size (--lw) is fitted to the space left and the word's length (fitWord) */
+	.vg-wt-word { flex: 1 1 0; min-height: 0; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 4px; }
+	.vg-wt-word i { font-style: normal; width: var(--lw, 30px); height: calc(var(--lw, 30px) * 1.15); display: grid; place-items: center; background: #fff; border-radius: calc(var(--lw, 30px) * .22);
+		font-weight: 800; font-size: calc(var(--lw, 30px) * .62); box-shadow: 0 2px 0 rgba(31, 42, 48, .12); }
+	.vg-wt-word i.add { background: #ffe9d6; }
+	.vg-wt-word i.q { color: var(--mute); background: rgba(255, 255, 255, .5); box-shadow: none; }
+	.vg-wt-status { font-size: clamp(13px, 3.4cqmin, 24px); font-weight: 700; min-height: 1.3em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.vg-wt-status.alert { color: #a24c12; }
+
+	/* the site's confirmation pop-up (index.css .modal) */
+	.vg-confirm { position: fixed; inset: 0; z-index: 3000; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, .5); font-family: 'SFpro', sans-serif; }
+	.vg-confirm[hidden] { display: none; }
+	.vg-confirm-box { background: #F5F5F7; padding: 20px 30px; border-radius: 10px; text-align: center; max-width: 400px; width: 80%; color: #212529; }
+	.vg-confirm-box p { font-size: 1.1rem; margin: 0; }
+	.vg-confirm-btns { margin-top: 15px; display: flex; justify-content: space-around; gap: 10px; }
+	.vg-confirm-btn { border: none; color: #F5F5F7; padding: 10px 18px; border-radius: 20px; cursor: pointer; font: inherit; font-size: 1rem; min-width: 80px; }
+	.vg-confirm-btn.red { background: linear-gradient(135deg, #ff8073, #e74c3c); }
+	.vg-confirm-btn.grey { background: linear-gradient(135deg, #95a5a6, #aeb4b5); }
+	/* a short notice at the bottom (e.g. moved to another group) */
+	.vg-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 2500; max-width: calc(100% - 32px); padding: 10px 16px; border-radius: 12px; background: rgba(31, 42, 48, .9); color: #fff; font-weight: 700; box-shadow: 0 8px 24px rgba(0, 0, 0, .2); }
+	/* teacher's overview: a student can be tapped (pop-up: move / remove) or dragged to another group's tile */
+	.vg-wt-p.can { cursor: pointer; }
+	.vg-wt-p.can[draggable="true"] { cursor: grab; }
+	.vg-wt-p.can:hover { outline: 2px solid rgba(40, 109, 138, .35); }
+	.vg-wt.drop-ok { border-color: rgba(40, 109, 138, .45); border-style: dashed; }
+	.vg-wt.drop-over { border-color: #286D8A; border-style: solid; background: #e7f4fa; }
+
+	/* players list pop-up: only the list scrolls, the title and the button stay in view */
+	.vg-list-panel { display: flex; flex-direction: column; overflow: hidden; }
+	.vg-list { list-style: none; margin: 10px 0 0; padding: 2px; display: grid; gap: 6px; overflow-y: auto; min-height: 0; text-align: left; }
+	.vg-li { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 12px; background: var(--tile); border: 2px solid transparent; }
+	.vg-li .av { flex: none; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: rgba(255, 255, 255, .7); font-size: 22px; line-height: 1; }
+	.vg-li .nm { flex: 1; min-width: 0; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.vg-li .nm small { display: block; font-size: 12.5px; font-weight: 600; color: var(--teal); }
+	.vg-li .hearts { flex: none; color: var(--heart); font-size: 15px; letter-spacing: 1px; white-space: nowrap; }
+	.vg-li .hearts .lost { color: rgba(31, 42, 48, .18); }
+	.vg-li.turn { background: rgba(255, 255, 255, .92); border-color: #286D8A; }
+	.vg-li.hot { background: rgba(255, 244, 232, .96); border-color: var(--warn); }
+	.vg-li.hot .nm small { color: #a24c12; }
+	.vg-li.out { opacity: .5; }
+
+	/* the round's word, as plain text */
+	.vg-result-word {
+		margin: 10px 0 8px;
+		font-size: 30px;
+		font-weight: 800;
+		letter-spacing: .04em;
+		line-height: 1.15;
+		color: var(--ink);
+		overflow-wrap: anywhere;
+	}
+	.vg-result-word.good { color: #2f9e5b; }
+	.vg-result-word.bad { color: #c94444; }
+
+	.vg-ghost-note {
+		margin-top: 12px;
+		padding: 10px 12px;
+		border-radius: 12px;
+		background: rgba(29, 86, 110, .08);
+		font-weight: 700;
+		color: var(--teal);
+		font-size: 16px;
+	}
+
+	.vg-final {
+		margin-top: 12px;
+		padding: 10px;
+		border-radius: 12px;
+		background: rgba(29, 86, 110, .08);
+		font-weight: 700;
+		color: var(--teal);
+		font-size: 16px;
+	}
+
+	.vg-rules { text-align: left; }
+	.vg-rules ol { margin: 8px 0 0; padding-left: 20px; color: var(--mute); }
+	.vg-rules li { margin: 6px 0; }
+	.vg-rules li b { color: var(--ink); }
+
+	/* ---------- responsive ---------- */
+	@media (max-width: 767px) {
+		.vg-wrap { padding: 10px; }
+		.vg-card { padding: 12px; gap: 9px; }
+		.vg-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+		.vg-settings { grid-template-columns: 1fr; }
+		.vg-stage { padding: 10px 6px 8px; }
+		.vg-row { --kgap: 4px; }
+		.vg-kb { gap: 5px; }
+		.vg-key { height: 46px; font-size: 17px; border-radius: 8px; }
+		.vg-btn { padding: 10px 14px; }
+	}
+
+	@media (max-width: 575px) {
+		:root { --cw: 104px; }
+		.vg-hero .vg-ghost { font-size: 44px; }
+		.vg-hero h1 { font-size: 22px; }
+		.vg-top h1 { font-size: 18px; }
+		.vg-steps { grid-template-columns: 1fr; gap: 6px; }
+		.vg-step { padding: 9px 12px; }
+		.vg-track { gap: 6px; padding-top: 6px; padding-bottom: 6px; }
+		.vg-p { flex-direction: column; gap: 2px; padding: 6px 4px; text-align: center; }
+		.vg-p .txt { width: 100%; }
+		.vg-p .av { width: 34px; height: 34px; font-size: 21px; }
+		.vg-p .nm { font-size: 13.5px; }
+		.vg-p .tag { font-size: 12px; }
+		.vg-wrap { padding: 6px; }
+		.vg-card { padding: 8px; gap: 8px; }
+		.vg-key { height: 44px; font-size: 16px; border-radius: 7px; }
+		.vg-row { --kgap: 3px; }
+		.vg-kb { gap: 4px; }
+		.vg-banner-box { padding: 12px 18px; }
+		.vg-banner-box b { font-size: 24px; }
+		.vg-actions { gap: 8px; }
+		.vg-btn { padding: 10px 12px; font-size: 14px; }
+	}
+
+	/* very narrow phones (320–360 px): 11 keys per row must still fit */
+	@media (max-width: 360px) {
+		.vg-row { --kgap: 2px; }
+		.vg-key { font-size: 14.5px; border-radius: 6px; }
+		.vg-key .material-symbols-rounded { font-size: 19px; }
+		.vg-top { gap: 6px; }
+		.vg-chip { padding: 3px 9px; font-size: 12.5px; }
+	}
+
+	/* shorter screens: compact everything so the game still fits in one screen */
+	@media (max-height: 760px) {
+		.vg-card { gap: 8px; }
+		.vg-key { height: 42px; }
+		.vg-stage { min-height: 110px; }
+		.vg-status { font-size: 15px; }
+	}
+
+	@media (max-height: 660px) {
+		.vg-wrap { padding-top: 6px; padding-bottom: 6px; }
+		.vg-card { padding-top: 8px; padding-bottom: 8px; gap: 6px; }
+		.vg-top h1 { font-size: 17px; }
+		.vg-icon-btn { width: 32px; height: 32px; }
+		.vg-quit { height: 32px; }
+		.vg-p .av { display: none; }
+		.vg-track { padding-top: 4px; padding-bottom: 4px; }
+		.vg-stage { min-height: 96px; padding-top: 8px; padding-bottom: 6px; }
+		.vg-hint { font-size: 13px; min-height: 18px; }
+		.vg-key { height: 38px; }
+		.vg-kb { gap: 4px; }
+		.vg-btn { padding: 8px 12px; }
+		.vg-actions { min-height: 36px; }
+	}
+
+	/* landscape phones: one column cannot fit, so the word and buttons go left, the keyboard right */
+	@media (orientation: landscape) and (max-height: 500px) {
+		:root { --cw: 128px; }
+		body.vg-playing .vg-wrap { max-width: none; }
+		body.vg-playing #gameView {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+			grid-template-rows: auto auto minmax(0, 1fr) auto;
+			grid-template-areas:
+				"players top"
+				"stage   status"
+				"stage   kb"
+				"actions kb";
+			column-gap: 12px;
+			row-gap: 6px;
+		}
+		#gameView > .vg-top { grid-area: top; align-self: start; }
+		#gameView > .vg-carousel { grid-area: players; }
+		#gameView > .vg-stage { grid-area: stage; min-height: 80px; }
+		#gameView > .vg-status { grid-area: status; align-self: end; font-size: 14px; min-height: 0; }
+		#gameView > .vg-actions { grid-area: actions; min-height: 0; }
+		#gameView > .vg-kb { grid-area: kb; align-self: end; max-width: none; }
+		.vg-hint { display: none; }
+		.vg-p { flex-direction: row; text-align: left; padding: 5px 8px; }
+		.vg-p .txt { width: auto; }
+		.vg-p .tag { min-height: 0; }
+	}
+
+	@media (orientation: landscape) and (max-height: 500px) and (max-width: 640px) {
+		.vg-top h1 { display: none; }
+		.vg-top { justify-content: flex-end; }
+		.vg-actions { flex-wrap: nowrap; gap: 6px; }
+		.vg-actions .vg-btn { padding: 7px 9px; font-size: 13px; }
+		.vg-actions .vg-btn .material-symbols-rounded { display: none; }
+	}
+
+	@media (orientation: landscape) and (max-height: 340px) {
+		.vg-wrap { padding-top: 4px; padding-bottom: 4px; }
+		.vg-kb { gap: 3px; }
+		.vg-key { height: 34px; }
+	}
+	</style>
+</head>
+
+<body>
+	<nav class="main-navbar" id="mainNavbar">
+		<div class="main-nav-container">
+			<!-- Logo -->
+			<a href="#" class="main-nav-logo">
+				<div class="main-nav-logo-icon">
+					<img id="sudedu-main-nav-bar-logo" src="../images/sudedu_logo.png" alt="sudEdu">
+				</div>
+			</a>
+
+			<!-- Desktop Navigation -->
+			<div class="main-nav-links invisible">
+				<a class="main-nav-back-btn" id="desktopBackBtn">
+					<span class="main-nav-back-icon">←</span>
+					<div class="main-nav-back-text">
+						<span class="main-nav-back-label">Grįžti</span>
+						<span class="main-nav-back-title">Atgal</span>
+					</div>
+				</a>
+			</div>
+
+			<!-- Mobile Navigation -->
+			<div class="main-nav-mobile-btn simplified">
+				<a class="main-nav-back-btn" id="mobileBackBtn">
+					<span class="main-nav-back-icon">←</span>
+					<div class="main-nav-back-text">
+						<span class="main-nav-back-label">Grįžti</span>
+						<span class="main-nav-back-title">Atgal</span>
+					</div>
+				</a>
+			</div>
+		</div>
+	</nav>
+
+	<main class="vg-wrap">
+		<!-- SETUP -->
+		<section class="vg-card" id="setupView">
+			<div class="vg-hero">
+				<div class="vg-ghost" aria-hidden="true">👻</div>
+				<div>
+					<h1>Vaiduoklis</h1>
+					<p>Žodžių žaidimas: pridėkite raidę ir neįkliūkite į aklavietę!</p>
+				</div>
+			</div>
+
+			<div class="vg-steps">
+				<div class="vg-step"><b><i>1</i>Pridėkite raidę</b><span>Paeiliui pridedate po vieną raidę. Iš jų turi būti galima sudaryti ilgesnį žodį.</span></div>
+				<div class="vg-step"><b><i>2</i>Meskite iššūkį</b><span>Manote, kad taip prasidedančio žodžio nėra arba ilgesnio nebebus? Spauskite „Mesti iššūkį“.</span></div>
+				<div class="vg-step"><b><i>3</i>Įrodykite</b><span>Kam mestas iššūkis, prideda raidžių ir pateikia ilgesnį tikrą žodį. Pavyko – gyvybę <span style="color:var(--heart)">♥</span> praranda iššūkį metęs, ne – jis pats.</span></div>
+				<div class="vg-step"><b><i>4</i>Netapkite vaiduokliu</b><span>Netekęs visų gyvybių tampa vaiduokliu 👻. Laimi paskutinis likęs.</span></div>
+			</div>
+
+			<div class="vg-settings">
+				<div class="vg-wide">
+					<div class="vg-label">Žaidimo būdas</div>
+					<div class="vg-seg vg-seg-wrap" data-setting="mode">
+						<button data-v="solo">Vienas su botais</button>
+						<button data-v="demoStudent">Demonstracija: vedėjas mokinys</button>
+						<button data-v="demoTeacher">Demonstracija: vedėjas mokytojas</button>
+					</div>
+				</div>
+				<div class="vg-wide" id="maxSetting">
+					<div class="vg-label" id="maxLabel">Žaidėjų skaičius</div>
+					<div class="vg-seg" data-setting="max">
+						<button data-v="2">2</button>
+						<button data-v="3">3</button>
+						<button data-v="4">4</button>
+						<button data-v="5">5</button>
+						<button data-v="6">6</button>
+					</div>
+				</div>
+				<div>
+					<div class="vg-label">Botų žodynas</div>
+					<div class="vg-seg" data-setting="dict">
+						<button data-v="easy">Lengvas</button>
+						<button data-v="medium">Vidutinis</button>
+						<button data-v="hard">Sunkus</button>
+						<button data-v="expert">Ekspertas</button>
+					</div>
+				</div>
+				<div>
+					<div class="vg-label">Botų lygis</div>
+					<div class="vg-seg" data-setting="bot">
+						<button data-v="easy">Lengvas</button>
+						<button data-v="normal">Normalus</button>
+						<button data-v="hard">Sunkus</button>
+					</div>
+				</div>
+				<div>
+					<div class="vg-label">Gyvybės</div>
+					<div class="vg-seg" data-setting="lives">
+						<button data-v="2">2</button>
+						<button data-v="3">3</button>
+						<button data-v="5">5</button>
+					</div>
+				</div>
+				<div id="botsSetting">
+					<div class="vg-label">Botų skaičius</div>
+					<div class="vg-seg" data-setting="bots">
+						<button data-v="1">1</button>
+						<button data-v="2">2</button>
+						<button data-v="3">3</button>
+						<button data-v="4">4</button>
+					</div>
+				</div>
+				<div>
+					<div class="vg-label">Laikas ėjimui</div>
+					<div class="vg-seg" data-setting="time">
+						<button data-v="0">Neribota</button>
+						<button data-v="15">15 s</button>
+						<button data-v="30">30 s</button>
+						<button data-v="45">45 s</button>
+						<button data-v="60">1 min</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="vg-demo" id="demoBox" hidden>
+				<div class="vg-label">Demonstracijos grupės</div>
+				<p class="vg-demo-note">Mokiniai čia simuliuoti – už juos žaidžia botų logika. Kaip pamoka su klase: grupės žaidžia atskirai.</p>
+				<div id="demoGroups"></div>
+				<div class="vg-demo-tools">
+					<button class="vg-btn light" type="button" id="demoMany">+ 20 mokinių</button>
+					<button class="vg-btn light" type="button" id="demoReset">Iš naujo</button>
+				</div>
+			</div>
+
+			<div class="vg-start-row">
+				<button class="vg-btn big" id="startBtn"><span class="material-symbols-rounded">play_arrow</span>Pradėti žaidimą</button>
+				<div class="vg-note" id="setupNote">Žodžiai tikrinami SUDEDU žodyne.</div>
+			</div>
+		</section>
+
+		<!-- GAME -->
+		<section class="vg-card" id="gameView" hidden>
+			<div class="vg-top">
+				<h1><span aria-hidden="true">👻</span>Vaiduoklis</h1>
+				<span class="vg-chip" id="roundChip">Raundas 1</span>
+				<button class="vg-btn light vg-icon-btn" id="listBtn" title="Žaidėjai ir gyvybės"><span class="material-symbols-rounded">group</span></button>
+				<button class="vg-btn light vg-icon-btn" id="rulesBtn" title="Taisyklės"><span class="material-symbols-rounded">help</span></button>
+				<button class="vg-btn light vg-quit" id="quitBtn" type="button" title="Išeiti iš žaidimo"><span class="material-symbols-rounded">logout</span><span id="quitTxt">Išeiti</span></button>
+			</div>
+
+			<div class="vg-carousel" id="players" aria-label="Žaidėjai eilės tvarka">
+				<div class="vg-track" id="track"></div>
+			</div>
+
+			<div class="vg-stage" id="stage">
+				<div class="vg-word-box" id="wordBox">
+					<div class="vg-word" id="word"></div>
+				</div>
+				<div class="vg-hint" id="hint"></div>
+				<div class="vg-banner" id="banner" hidden>
+					<div class="vg-banner-box"><b>⚡ IŠŠŪKIS!</b><span id="bannerText"></span></div>
+				</div>
+			</div>
+
+			<div class="vg-status" id="status" aria-live="polite"></div>
+
+			<div class="vg-actions">
+				<button class="vg-btn" id="addBtn"><span class="material-symbols-rounded">check</span>Pridėti raidę</button>
+				<button class="vg-btn warn" id="challengeBtn"><span class="material-symbols-rounded">bolt</span>Mesti iššūkį</button>
+				<button class="vg-btn" id="submitBtn"><span class="material-symbols-rounded">check</span>Pateikti žodį</button>
+				<button class="vg-btn light" id="concedeBtn"><span class="material-symbols-rounded">flag</span>Pasiduoti</button>
+			</div>
+
+			<div class="vg-kb" id="kb"></div>
+		</section>
+
+		<!-- TEACHER'S OVERVIEW: every group's game; pages when they don't all fit -->
+		<section class="vg-card vg-watch" id="watchView" hidden>
+			<div class="vg-top">
+				<h1><span aria-hidden="true">👻</span>Vaiduoklis</h1>
+				<span class="vg-chip" id="watchInfo"></span>
+				<div class="vg-pager">
+					<button class="vg-btn light vg-icon-btn" id="watchPrev" type="button" title="Ankstesnis puslapis"><span class="material-symbols-rounded">chevron_left</span></button>
+					<span class="vg-chip" id="watchPage">1 / 1</span>
+					<button class="vg-btn light vg-icon-btn" id="watchNext" type="button" title="Kitas puslapis"><span class="material-symbols-rounded">chevron_right</span></button>
+				</div>
+				<button class="vg-btn warn" id="watchEnd" type="button"><span class="material-symbols-rounded">stop_circle</span>Baigti</button>
+			</div>
+			<div class="vg-watch-stage" id="watchStage"><div class="vg-watch-strip" id="watchStrip"></div></div>
+		</section>
+	</main>
+
+	<!-- ROUND RESULT -->
+	<div class="vg-modal" id="resultModal" hidden>
+		<div class="vg-panel" id="resultPanel"></div>
+	</div>
+
+	<!-- RULES -->
+	<div class="vg-modal" id="rulesModal" hidden>
+		<div class="vg-panel vg-rules">
+			<div class="ico" style="text-align:center">👻</div>
+			<h2 style="text-align:center">Kaip žaisti?</h2>
+			<ol>
+				<li>Žaidėjai paeiliui prideda po <b>vieną raidę</b>. Pasirinkite raidę ir spauskite <b>„Pridėti raidę“</b> (arba Enter).</li>
+				<li>Iš raidžių visada turi būti galima sudaryti <b>ilgesnį tikrą žodį</b>.</li>
+				<li>Jei manote, kad taip prasidedančio žodžio nėra arba kad ilgesnio žodžio nebebus, spauskite <b>„Mesti iššūkį“</b>.</li>
+				<li>Žaidėjas, kuriam mestas iššūkis, prideda raidžių ir <b>pateikia ilgesnį žodį</b>, prasidedantį tomis raidėmis, arba pasiduoda.</li>
+				<li>Pateiktas žodis patikrinamas žodyne. Jei žodis tikras – gyvybę praranda iššūkį metęs žaidėjas, jei netikras arba iššūkio sulaukęs žaidėjas pasiduoda, gyvybę praranda jis.</li>
+				<li><b>Vardai, pavadinimai</b> ir <b>sutrumpintos žodžių formos</b> neleidžiami – už juos prarandama gyvybė.</li>
+				<li>Jei nustatytas <b>laikas ėjimui</b>, per jį reikia pridėti raidę (arba pateikti žodį). Nespėjus – prarandama gyvybė.</li>
+				<li>Netekęs visų gyvybių žaidėjas tampa <b>vaiduokliu</b> 👻. Laimi paskutinis likęs žaidėjas.</li>
+			</ol>
+			<div class="vg-btns" style="justify-content:center"><button class="vg-btn" id="rulesClose">Supratau</button></div>
+		</div>
+	</div>
+
+	<!-- the site's confirmation pop-up (index.css .modal look, as on the tower defence page) -->
+	<div class="vg-confirm" id="confirmModal" hidden>
+		<div class="vg-confirm-box">
+			<p id="confirmText"></p>
+			<div class="vg-confirm-btns">
+				<button class="vg-confirm-btn red" id="confirmYes" type="button">Taip</button>
+				<button class="vg-confirm-btn grey" id="confirmNo" type="button">Ne</button>
+			</div>
+		</div>
+	</div>
+	<div class="vg-toast" id="toast" hidden></div>
+
+	<div class="vg-modal" id="listModal" hidden>
+		<div class="vg-panel vg-list-panel">
+			<h2>Žaidėjai</h2>
+			<ul class="vg-list" id="playerList"></ul>
+			<div class="vg-btns"><button class="vg-btn" id="listClose">Uždaryti</button></div>
+		</div>
+	</div>
+
+	<script>
+	// main-nav-bar.js shows a server wake-up message through this helper, which only exists on pages that load mental-arithmetic.js.
+	if (typeof window.messageToTheUser !== 'function') window.messageToTheUser = () => () => {};
+	</script>
+	<script src="../refresh-token.js"></script>
+	<script src="../main-nav-bar.js"></script>
+	<script src="../sudedu-words.js"></script>
+	<script src="../ghost-engine.js"></script>
+	<script src="../ghost-groups.js"></script>
+	<script src="../game-client.js"></script>
+
+	<script>
+	(() => {
+	'use strict';
+
+	// ---------- config ----------
+	// Bot knowledge per "Botų žodynas" level (SudWords list names, see sudedu-words.js). Lengvas / Vidutinis / Sunkus:
+	// the 5000 / 10000 / 20000 most frequent words (with their other forms) in grades 1-2 or grades 3-4 texts, chosen by
+	// the median knowledge level of the player's class (classGrade). Ekspertas: all common words (the same for every grade).
+	// Bots only use words that also pass the word check (so never names or shortened forms).
+	const BOT_LISTS = {
+		g12: { easy: 'freq12_5000', medium: 'freq12_10000', hard: 'freq12_20000' },
+		g34: { easy: 'freq34_5000', medium: 'freq34_10000', hard: 'freq34_20000' },
+		expert: 'freqCommon'
+	};
+	const botList = (level, grade) => level === 'expert' ? BOT_LISTS.expert : BOT_LISTS[grade >= 3 ? 'g34' : 'g12'][level];
+	// Submitted words are checked with SudWords.verify(): only 'ok' counts; names/titles and shortened forms are real
+	// words but against the rules.
+	const CHECK_LISTS = ['legit', 'legitExtra', 'names', 'truncated'];
+
+	// The game's alphabet (Lithuanian, the same as the word lists').
+	const ALPHABET = new Set([...SudWords.ALPHABET]);
+	// All 32 letters in keyboard (QWERTY) order without Q, W, X; each Lithuanian letter sits right after its base letter
+	// (E Ę Ė, U Ų Ū, I Į, A Ą, S Š, Z Ž, C Č), as on a phone keyboard's long press.
+	const KB_ROWS = [
+		['e', 'ę', 'ė', 'r', 't', 'y', 'u', 'ų', 'ū', 'i', 'į', 'o', 'p'],
+		['a', 'ą', 's', 'š', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+		['back', 'z', 'ž', 'c', 'č', 'v', 'b', 'n', 'm', 'ok']
+	];
+
+	// Same values as the prototype server (ghost_game/back-end/src/server.js).
+	// move:   botMove "botSmartness" – a mistake happens when Math.random() > move
+	//         (challenging a start that is a word but can still get longer, or playing a random letter).
+	// answer: challengeWord "botSmartness" – when challenged on a start that is already a word,
+	//         the bot gives up although a longer word exists when Math.random() > answer.
+	const BOT_LEVELS = {
+		easy:   { move: .5,  answer: .65 },
+		normal: { move: .75, answer: .8 },
+		hard:   { move: 1,   answer: 1 }
+	};
+	const BOT_DELAY = 1000;
+	const CHALLENGE_PAUSE = 1700;   // the "IŠŠŪKIS!" announcement, before the challenged player can answer
+	const RECENTER_DELAY = 1500;    // carousel glides back to the current player this long after the user stops scrolling
+
+	// Letter tile size limits (px) per screen size: shrink from max to min, then wrap onto more rows, then scroll.
+	const TILE_SIZES = {
+		phone:   { max: 56, min: 30 },   // < 576 px wide
+		tablet:  { max: 68, min: 36 },   // < 1024 px wide
+		desktop: { max: 76, min: 40 }
+	};
+
+	const BOTS = [   // one per bot slot (at most 4 bots in a game); names differ within a group, may repeat between groups
+		{ name: 'Kasparas', av: '👻' },
+		{ name: 'Deduokliukas', av: '🧝' },
+		{ name: 'Baubas', av: '👹' },
+		{ name: 'Slogutis', av: '🦇' }
+	];
+
+	const DEFAULTS = { mode: 'solo', dict: 'medium', bot: 'normal', lives: '3', bots: '2', time: '0', max: '4' };
+	const SETTINGS_KEY = 'vaiduoklisSettings';
+
+	// ---------- helpers ----------
+	const $ = id => document.getElementById(id);
+	const up = s => s.toLocaleUpperCase('lt');
+	const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+	const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+	// Lithuanian number agreement: 1 grupė, 2 grupės, 10 grupių, 21 grupė, 22 grupės, 111 grupių
+	function plural(n, one, few, many) {
+		const t = n % 10, h = n % 100;
+		return n + ' ' + (t === 1 && h !== 11 ? one : t >= 2 && t <= 9 && (h < 12 || h > 19) ? few : many);
+	}
+
+	// the site's confirmation pop-up -> Promise<boolean>
+	function askConfirm(text) {
+		return new Promise(res => {
+			$('confirmText').textContent = text;
+			$('confirmModal').hidden = false;
+			const done = v => { $('confirmModal').hidden = true; $('confirmYes').onclick = $('confirmNo').onclick = null; res(v); };
+			$('confirmYes').onclick = () => done(true);
+			$('confirmNo').onclick = () => done(false);
+			$('confirmNo').focus();
+		});
+	}
+
+	let toastTimer = 0;
+	function toast(text) {
+		$('toast').textContent = text;
+		$('toast').hidden = false;
+		clearTimeout(toastTimer);
+		toastTimer = setTimeout(() => { $('toast').hidden = true; }, 3500);
+	}
+
+	function shuffle(arr) {
+		for (let i = arr.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[arr[i], arr[j]] = [arr[j], arr[i]];
+		}
+		return arr;
+	}
+
+	function loadSettings() {
+		try {
+			const s = { ...DEFAULTS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') };
+			if (!document.querySelector(`[data-setting="bots"] [data-v="${s.bots}"]`)) s.bots = DEFAULTS.bots;
+			if (!document.querySelector(`[data-setting="time"] [data-v="${s.time}"]`)) s.time = DEFAULTS.time;
+			if (!document.querySelector(`[data-setting="mode"] [data-v="${s.mode}"]`)) s.mode = DEFAULTS.mode;
+			if (!document.querySelector(`[data-setting="max"] [data-v="${s.max}"]`)) s.max = DEFAULTS.max;
+			return s;
+		} catch { return { ...DEFAULTS }; }
+	}
+
+	function saveSettings() {
+		try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { }
+	}
+
+	// ---------- dictionaries ----------
+	// Median knowledge level (school grade) of the player's class, from the server (GET class/knowledgeLevel); else the
+	// player's own level; -1 if unknown (then grades 1-2 lists). Asked once per page, given at most 3 s (the server may
+	// be waking up).
+	let gradePromise = null;
+	function classGrade() {
+		if (!gradePromise) gradePromise = (async () => {
+			const me = typeof userData !== 'undefined' && userData ? userData : {};   // set by main-nav-bar.js
+			const own = Number.isInteger(me.knowledgeLvl) ? me.knowledgeLvl : -1;
+			if (!me.token || typeof apiBase === 'undefined') return own;
+			try {
+				const ctl = new AbortController();
+				const t = setTimeout(() => ctl.abort(), 3000);
+				const r = await fetch(apiBase + 'class/knowledgeLevel', { headers: { Authorization: 'Bearer ' + me.token }, signal: ctl.signal });
+				clearTimeout(t);
+				const j = r.ok ? await r.json() : null;
+				return j && j.knowledgeLvl >= 0 ? Math.floor(j.knowledgeLvl) : own;   // a level is whole: a partial median rounds down
+			} catch { return own; }
+		})();
+		return gradePromise;
+	}
+	// the setup screen says which grade's words the bots play with (Ekspertas: all words)
+	classGrade().then(g => {
+		const note = $('setupNote');
+		note.textContent = note.dataset.text = `Žodžiai tikrinami SUDEDU žodyne. Botai žaidžia ${g >= 3 ? '3–4' : '1–2'} klasių žodžiais (Ekspertas – visais dažnais žodžiais).`;
+	});
+
+	// ---------- state ----------
+	// The game itself runs in a GhostGame (ghost-engine.js): on this screen (one player with bots, the board, the demo,
+	// a class game group's runner) or on another player's screen (then its snapshots arrive here). This page only draws
+	// the latest snapshot S and sends this screen's moves.
+	let settings = loadSettings();
+	let S = null;          // the game shown on this screen (a GhostGame snapshot)
+	let shownAt = 0;       // when S arrived (performance.now()); its timers (tLeft, waitLeft, confLeft) count from here
+	let clockFrozen = false;
+	let me = 'me';         // this screen's player
+	let board = false;     // "žaisti lentoje": every person in the game plays on this one screen
+	let game = null;       // the engine running on this screen, if any
+	let sendAct = null;    // (playerId, action): a move leaves this screen – to the engine here or to the group's runner
+	let leaveTo = null;    // where "back" goes after a class game (null: the setup screen)
+	let fromClass = false; // a single-player game started from the class page (?solo=1): "back" returns there
+	const ui = { pending: '', answer: '' };   // the letter being picked / the word being typed (this screen only)
+	let gen = 0;           // bumps on new game / leaving
+	let lastResultSeq = 0;
+
+	const player = id => S.players.find(p => p.id === id);
+	const current = () => S.order[S.turn];
+	const isMe = id => !board && id === me;
+	// a player whose moves are made on this screen
+	const controllable = id => { const p = S && player(id); return !!p && !p.bot && !p.gone && (board || id === me); };
+	const nameOf = id => player(id).name;
+	const myTurn = () => S.phase === 'turn' && !S.waitFor && controllable(current());
+	const answering = () => S.phase === 'answer' && !S.waitFor && controllable(S.challengee);
+	const inChallenge = () => ['intro', 'answer', 'checking', 'botAnswer'].includes(S.phase);
+	const send = (id, action) => { if (sendAct) sendAct(String(id), action); };
+
+	// ---------- setup view ----------
+	function renderSetup() {
+		document.querySelectorAll('.vg-seg').forEach(seg => {
+			const key = seg.dataset.setting;
+			seg.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === String(settings[key])));
+		});
+		renderDemo();
+	}
+
+	document.querySelectorAll('.vg-seg').forEach(seg => {
+		seg.addEventListener('click', e => {
+			const b = e.target.closest('button');
+			if (!b) return;
+			settings[seg.dataset.setting] = b.dataset.v;
+			saveSettings();
+			renderSetup();
+		});
+	});
+
+	$('startBtn').addEventListener('click', () => { if (settings.mode === 'solo') startGame(); else startDemo(); });
+
+	// the bots' word list (and, in the background, the word check lists)
+	// grade: the class level a class game was set up with (else this player's class, see classGrade)
+	async function loadDict(level, note, grade) {
+		const noteText = note && (note.dataset.text || (note.dataset.text = note.textContent));
+		if (note) { note.classList.remove('err'); note.textContent = 'Kraunamas žodynas…'; }
+		try {
+			const g = Number.isInteger(grade) && grade >= 0 ? grade : await classGrade();
+			const dict = await SudWords.load(botList(level, g));
+			if (note) note.textContent = noteText;
+			SudWords.preload(...CHECK_LISTS);
+			return dict;
+		} catch (e) {
+			console.error(e);
+			if (note) { note.classList.add('err'); note.textContent = 'Nepavyko įkelti žodyno. Patikrinkite ryšį ir bandykite dar kartą.'; }
+			return null;
+		}
+	}
+
+	// one player with bots
+	async function startGame() {
+		const btn = $('startBtn');
+		btn.disabled = true;
+		const dict = await loadDict(settings.dict, $('setupNote'));
+		btn.disabled = false;
+		if (!dict) return;
+		const players = [{ id: 'me', name: 'Tu', av: '🙂' }];
+		BOTS.slice(0, Number(settings.bots)).forEach((b, i) => players.push({ id: 'b' + i, name: b.name, av: b.av, bot: true }));
+		runLocal({ players: GhostGame.shuffle(players), lives: Number(settings.lives), timeLimit: Number(settings.time) || 0, botLevel: settings.bot, dict, endWhenOut: 'me' }, 'me', false);
+	}
+
+	// a game whose engine runs on this screen
+	function runLocal(opts, myId, isBoard) {
+		stopGame();
+		me = myId;
+		board = isBoard;
+		game = new GhostGame(Object.assign({}, opts, { onChange: g => { if (g === game) show(g.snapshot()); } }));
+		sendAct = (id, a) => game && game.act(id, a);
+		openGameView();
+		game.start();
+	}
+
+	function openGameView() {
+		gen++;
+		S = null;
+		lastResultSeq = 0;
+		ui.keepResult = false;
+		ui.pending = ui.answer = '';
+		$('resultModal').hidden = true;
+		$('banner').hidden = true;
+		$('setupView').hidden = true;
+		$('gameView').hidden = false;
+		document.body.classList.add('vg-playing');
+		buildKeyboard();
+	}
+
+	function stopGame() {
+		if (game) game.stop();
+		game = null;
+		sendAct = null;
+	}
+
+	async function leaveGame() {
+		if (net && !watch) {
+			stopGame();
+			try { await Promise.race([SudGame.request('ghost:leave'), new Promise(r => setTimeout(r, 1500))]); } catch { }
+		}
+		if (leaveTo) { location.href = leaveTo; return; }
+		gen++;
+		stopGame();
+		S = null;
+		$('resultModal').hidden = true;
+		$('banner').hidden = true;
+		$('gameView').hidden = true;
+		$('setupView').hidden = false;
+		document.body.classList.remove('vg-playing');
+		renderSetup();
+	}
+
+	// "Išeiti" (the board: "Baigti"): asks first while the game is still on
+	async function quit() {
+		const going = S && !S.over && !$('gameView').hidden && !(net && !S.order.includes(me));
+		const q = board ? 'Ar tikrai norite baigti žaidimą?' : net ? 'Ar tikrai nori išeiti? Į šį žaidimą grįžti nebegalėsi.' : 'Ar tikrai nori išeiti? Šis žaidimas bus baigtas.';
+		if (!going || await askConfirm(q)) leaveGame();
+	}
+	$('quitBtn').addEventListener('click', quit);
+
+	// The page's "Grįžti" (top bar): a game started from the class page goes back the same way as "Išeiti" (to Klasė →
+	// Žaidimai, not Klasė's first section); the teacher's overview asks like "Baigti"; this page opened from Klasė goes back
+	// to its games too. Otherwise the site's usual back.
+	window.addEventListener('click', e => {
+		if (!e.target.closest || !e.target.closest('#desktopBackBtn, #mobileBackBtn')) return;
+		const fromKlase = /\/klase\.html(\?|#|$)/.test(document.referrer);
+		if (!leaveTo && !fromKlase) return;
+		e.preventDefault();
+		e.stopImmediatePropagation();
+		if (watch) $('watchEnd').click();
+		else if (leaveTo) quit();
+		else location.href = 'klase.html?tab=zaidimai';
+	}, true);
+
+	// ---------- showing a snapshot ----------
+	function show(snap) {
+		const prev = S;
+		const rebuild = !S || S.seats.join() !== snap.seats.join();
+		S = snap;
+		shownAt = performance.now();
+		clockFrozen = false;
+		if (rebuild) buildCarousel();
+		// this screen's typing belongs to one move
+		if (!myTurn() || (prev && (prev.word !== S.word || prev.turn !== S.turn || prev.round !== S.round))) ui.pending = '';
+		if (!answering() || (prev && prev.round !== S.round)) ui.answer = '';
+		render();
+		if (S.phase === 'intro' && (!prev || prev.phase !== 'intro')) playChallengeIntro();
+		if (S.phase !== 'intro') $('banner').hidden = true;
+		// out of the game on this screen (a ghost, watching): only their own fall and the game's end pop up, and that
+		// pop-up stays until "Stebėti" (the next round may start meanwhile)
+		const watching = !board && !S.over && !S.order.includes(me);
+		if (S.result && S.result.seq !== lastResultSeq) {
+			lastResultSeq = S.result.seq;
+			if (!watching || S.result.loser === me) { showResult(); ui.keepResult = watching; }
+		}
+		// the game ended on the round already shown (the last other player left): the pop-up becomes the final one
+		else if (S.result && S.over && prev && !prev.over) { ui.keepResult = false; showResult(); }
+		else if (S.result && !$('resultModal').hidden && !ui.keepResult) updateReady();
+		if (!S.result && !ui.keepResult) $('resultModal').hidden = true;
+	}
+
+	// ---------- clocks (the move time limit, waiting for a dropped player, the next-round confirmation) ----------
+	const leftOf = ms => Math.max(0, ms - (clockFrozen ? 0 : performance.now() - shownAt));
+	const secs = ms => Math.ceil(ms / 1000);
+	const mmss = ms => { const s = secs(ms); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+	function showClock() {
+		if (!S) return;
+		const el = $('timerTxt');
+		if (el) {
+			const left = S.waitFor ? leftOf(S.waitLeft) : leftOf(S.tLeft);
+			el.textContent = '⏱ ' + secs(left);
+			el.classList.toggle('low', !S.waitFor && secs(left) <= 5);
+		}
+		const conf = $('confLeft');
+		if (conf && S.confLeft) conf.textContent = mmss(leftOf(S.confLeft));
+	}
+	setInterval(showClock, 250);
+
+	// a pop-up on a screen where the game runs for everyone playing here (single player, board) stops the move clock
+	function holdClock(on) {
+		if (!game || net) return;
+		game.holdClock(on);
+		if (on) { if (S) { S.tLeft = leftOf(S.tLeft); shownAt = performance.now(); clockFrozen = true; } }
+		else show(game.snapshot());
+	}
+
+	function playChallengeIntro() {
+		const toMe = isMe(S.challengee);
+		$('bannerText').textContent = isMe(S.challenger)
+			? `Tu → ${nameOf(S.challengee)}`
+			: toMe ? `${nameOf(S.challenger)} → tau` : `${nameOf(S.challenger)} → ${nameOf(S.challengee)}`;
+		const banner = $('banner');
+		banner.hidden = true;
+		void banner.offsetWidth;   // restart the CSS animation
+		banner.hidden = false;
+		const word = $('word');
+		word.classList.remove('shake');
+		void word.offsetWidth;
+		word.classList.add('shake');
+		const card = carouselCard(S.challengee);
+		if (card) {
+			card.classList.remove('flash');
+			void card.offsetWidth;
+			card.classList.add('flash');
+		}
+		if (toMe && navigator.vibrate) { try { navigator.vibrate([80, 60, 80]); } catch { } }
+	}
+
+	// ---------- players carousel ----------
+	// An endless ring: the strip holds several identical copies of the seats (every copy is updated together) and
+	// always turns forward to the next player; only a challenge turns it back (to the challenged player, and after the
+	// challenge the short way to whoever starts the next round). When it has
+	// drifted towards either end, it jumps by whole copies to an identical card, which can't be seen.
+	const carousel = $('players');
+	const cardEls = new Map();   // player id → that player's cards (one per copy)
+	let cards = [];              // all cards in strip order; card i shows seat i % seats
+	let copies = 0;
+	let pos = 0;                 // index in `cards` of the card the carousel is turned to
+	let normTimer = 0;
+	let placed = false;          // turned to a card at least once since the strip was built (then it may glide)
+	let userScrolling = false;   // the user is looking around; don't move the carousel under them
+	let pointerHeld = false;
+	let recenterTimer = 0;
+	let drag = null;             // mouse drag-to-scroll
+
+	const dots = '<span class="vg-dots"><i></i><i></i><i></i></span>';
+
+	function buildCarousel() {
+		const n = S.seats.length;
+		copies = 2 * Math.ceil(8 / n) + 1;   // enough cards on both sides of the middle copy, even for 2 players
+		cardEls.clear();
+		cards = [];
+		$('track').innerHTML = '';
+		for (let c = 0; c < copies; c++) {
+			for (const id of S.seats) {
+				const el = document.createElement('div');
+				el.className = 'vg-p';
+				el.dataset.id = id;
+				el.innerHTML = '<div class="av"></div><div class="txt"><div class="nm"></div><div class="hearts"></div><div class="tag"></div></div>';
+				el.querySelector('.nm').textContent = player(id).name;
+				$('track').appendChild(el);
+				if (!cardEls.has(id)) cardEls.set(id, []);
+				cardEls.get(id).push(el);
+				cards.push(el);
+			}
+		}
+		pos = Math.floor(copies / 2) * n + S.seats.indexOf(focusId());
+		userScrolling = false;
+		placed = false;
+		centerCarousel(false);
+	}
+
+	// the card of player `id` on screen: the marked card for the focused player, otherwise the nearest copy
+	const carouselCard = id => {
+		const n = S.seats.length, k = S.seats.indexOf(id);
+		if (k < 0) return null;
+		if (id === focusId()) return cards[pos] || null;
+		const ahead = pos + ((k - pos % n) + n) % n, behind = ahead - n;
+		return cards[behind >= 0 && pos - behind < ahead - pos ? behind : ahead] || cards[behind] || null;
+	};
+
+	function hearts(p) {
+		let h = '';
+		for (let i = 0; i < S.lives; i++) h += i < p.lives ? '♥' : '<span class="lost">♥</span>';
+		return h;
+	}
+
+	// The player the carousel keeps in the middle.
+	function focusId() {
+		if (inChallenge()) return S.challengee;
+		return current();
+	}
+
+	function nextActive() {
+		if (S.order.length < 2) return null;
+		return S.order[(S.turn + 1) % S.order.length];
+	}
+
+	// Move the marked card: forward to the focused player's next card, back in a challenge (and after one, the short
+	// way to whoever starts the next round). Runs on every render, also while the user scrolls around, so the marked
+	// card always follows the game.
+	function turnPos() {
+		const n = S.seats.length, k = S.seats.indexOf(focusId());
+		if (!cards.length || k < 0) return;
+		let d = ((k - pos % n) + n) % n;
+		if (d && inChallenge()) d -= n;                                          // the challenged player is behind
+		else if (d > n / 2 && (S.phase === 'roundEnd' || !S.word)) d -= n;       // after a challenge: the short way back
+		pos += d;
+		// ran off the strip (only possible while the user keeps scrolling around for long): continue in the middle copy
+		if (pos < 0 || pos >= cards.length) pos = Math.floor(copies / 2) * n + ((pos % n) + n) % n;
+	}
+
+	// the first card after the marked one that shows player `id` (-1 if none)
+	function cardAfter(id) {
+		for (let i = pos + 1; i < cards.length && i <= pos + S.seats.length; i++) if (cards[i].dataset.id === id) return i;
+		return -1;
+	}
+
+	// Only one card is marked for each role (the turn / the challenged player at the marked position, the next
+	// player or the challenger right after it); the other copies look like any other card.
+	function renderPlayers() {
+		turnPos();
+		const cur = current();
+		const next = S.phase === 'turn' ? nextActive() : null;
+		const nextAt = next ? cardAfter(next) : -1;
+		const challengerAt = inChallenge() ? cardAfter(S.challenger) : -1;
+		cards.forEach((el, i) => {
+			const id = el.dataset.id;
+			const p = player(id);
+			const out = !S.order.includes(id);
+			let cls = 'vg-p';
+			let tag = '';
+			if (out) {
+				cls += ' out';
+				tag = p.gone ? 'Išėjo' : 'Vaiduoklis';
+			} else if (S.waitFor === id && i === pos) {
+				cls += ' hot';
+				tag = 'Atsijungė' + dots;
+			} else if (inChallenge()) {
+				if (i === pos && id === S.challengee) {
+					cls += ' hot';
+					tag = S.phase === 'intro' ? 'Gavo iššūkį!' : p.bot ? 'Ieško žodžio' + dots : isMe(id) ? 'Rašai žodį' : 'Rašo žodį';
+				} else if (i === challengerAt) {
+					tag = 'Meta iššūkį';
+				}
+			} else if (S.phase === 'turn' && i === pos && id === cur) {
+				cls += ' turn';
+				tag = controllable(id) ? (board ? 'Eilė' : 'Tavo eilė') : 'Galvoja' + dots;
+			} else if (i === nextAt) {
+				cls += ' next';
+				tag = 'Kitas';
+			}
+			if (el.classList.contains('flash') && i === pos && S.phase === 'intro') cls += ' flash';
+			el.className = cls;
+			el.querySelector('.av').textContent = out ? (p.gone ? '🚪' : '👻') : p.av;
+			el.querySelector('.hearts').innerHTML = hearts(p);
+			el.querySelector('.tag').innerHTML = tag;
+		});
+		if (!userScrolling) centerCarousel(true);
+		if (!$('listModal').hidden) renderList();
+	}
+
+	// Scroll so the marked card is in the middle (also after the user scrolled around: back to that same card).
+	function centerCarousel(smooth) {
+		if (!cards[pos]) return;
+		if (!carousel.clientWidth) return;   // not on screen yet
+		if (!placed) { smooth = false; placed = true; }
+		const el = cards[pos];
+		const left = el.offsetLeft + el.offsetWidth / 2 - carousel.clientWidth / 2;
+		carousel.scrollTo({ left, behavior: smooth ? 'smooth' : 'auto' });
+		clearTimeout(normTimer);
+		normTimer = setTimeout(normalizeCarousel, smooth ? 900 : 0);
+	}
+
+	// Near either end of the strip: jump by whole copies to the identical card in the middle (invisible).
+	// Not while the user scrolls or a card is flashing.
+	function normalizeCarousel() {
+		const n = S && S.seats.length;
+		if (!n || !cards.length) return;
+		const c = Math.floor(pos / n), mid = Math.floor(copies / 2);
+		if (c >= 1 && c <= copies - 2) return;
+		if (userScrolling || pointerHeld || S.phase === 'intro') { normTimer = setTimeout(normalizeCarousel, 500); return; }
+		const shift = (c - mid) * n;
+		const dx = cards[pos - shift].offsetLeft - cards[pos].offsetLeft;
+		pos -= shift;
+		carousel.scrollTo({ left: carousel.scrollLeft + dx, behavior: 'auto' });
+		renderPlayers();   // the marks move to the identical card now in the middle
+	}
+
+	function userTouched() {
+		userScrolling = true;
+		scheduleRecenter();
+	}
+
+	function scheduleRecenter() {
+		clearTimeout(recenterTimer);
+		recenterTimer = setTimeout(() => {
+			if (pointerHeld) { scheduleRecenter(); return; }
+			userScrolling = false;
+			if (S) centerCarousel(true);
+		}, RECENTER_DELAY);
+	}
+
+	carousel.addEventListener('touchstart', () => { pointerHeld = true; userTouched(); }, { passive: true });
+	carousel.addEventListener('touchend', () => { pointerHeld = false; scheduleRecenter(); }, { passive: true });
+	carousel.addEventListener('touchcancel', () => { pointerHeld = false; scheduleRecenter(); }, { passive: true });
+	carousel.addEventListener('scroll', () => { if (userScrolling) scheduleRecenter(); }, { passive: true });
+
+	// mouse wheel scrolls the strip sideways
+	carousel.addEventListener('wheel', e => {
+		const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+		if (!d) return;
+		e.preventDefault();
+		userTouched();
+		carousel.scrollLeft += d;
+	}, { passive: false });
+
+	// mouse drag scrolls it too
+	carousel.addEventListener('pointerdown', e => {
+		if (e.pointerType !== 'mouse' || e.button !== 0) return;
+		drag = { x: e.clientX, left: carousel.scrollLeft };
+		pointerHeld = true;
+		carousel.classList.add('dragging');
+		carousel.setPointerCapture(e.pointerId);
+		userTouched();
+	});
+	carousel.addEventListener('pointermove', e => {
+		if (!drag) return;
+		carousel.scrollLeft = drag.left - (e.clientX - drag.x);
+	});
+	const endDrag = () => {
+		if (!drag) return;
+		drag = null;
+		pointerHeld = false;
+		carousel.classList.remove('dragging');
+		scheduleRecenter();
+	};
+	carousel.addEventListener('pointerup', endDrag);
+	carousel.addEventListener('pointercancel', endDrag);
+
+	// ---------- word ----------
+	function tilesHtml(letters, cls = '') {
+		return letters.map(l => `<div class="vg-tile ${cls}">${esc(up(l))}</div>`).join('');
+	}
+
+	function tileLimits() {
+		const w = window.innerWidth;
+		return w < 576 ? TILE_SIZES.phone : w < 1024 ? TILE_SIZES.tablet : TILE_SIZES.desktop;
+	}
+
+	const gapFor = t => Math.round(Math.max(4, Math.min(10, t * .14)));
+
+	// Largest tile size (max..min) that keeps all tiles on one row; at the minimum the tiles wrap,
+	// and if the rows do not fit either, the box scrolls and stays at the end of the word.
+	function fitTiles(box, el, count, { max, min }) {
+		const W = el.clientWidth - 4;
+		const H = box.clientHeight;
+		let t = max;
+		while (t > min && (count * t + (count - 1) * gapFor(t) > W || (H && t * 1.15 + 10 > H))) t--;
+		el.style.setProperty('--t', t + 'px');
+		el.style.setProperty('--g', gapFor(t) + 'px');
+		box.scrollTop = box.scrollHeight;
+	}
+
+	// the last thing that happened, as this screen's player reads it
+	function hintText(h) {
+		if (!h || !player(h.id)) return '';
+		const me_ = isMe(h.id), n = nameOf(h.id);
+		if (h.k === 'start') return me_ ? 'Tu pradedi raundą.' : `${n} pradeda raundą.`;
+		if (h.k === 'add') return me_ ? `Tu pridėjai „${up(h.l)}“.` : `${n} pridėjo „${up(h.l)}“.`;
+		if (h.k === 'challenge') return (me_ ? 'Tu meti' : `${n} meta`) + ` iššūkį: ar yra ilgesnis žodis, prasidedantis „${up(S.word)}“?`;
+		return '';
+	}
+
+	function renderWord() {
+		const letters = [...S.word];
+		const mine = myTurn();
+		let html = '';
+		letters.forEach((l, i) => {
+			// the newest letter is highlighted until the current player picks their own letter
+			const isNew = i === letters.length - 1 && S.phase === 'turn' && !(mine && ui.pending);
+			html += `<div class="vg-tile${isNew ? ' new' : ''}">${esc(up(l))}</div>`;
+		});
+		let extra = 0;
+		if (S.phase === 'answer' || S.phase === 'checking') {
+			// the challenged player's word: typed here, or (being checked) as submitted; others just see a placeholder
+			const typed = controllable(S.challengee) && S.phase === 'answer' ? ui.answer
+				: S.checking && S.checking.startsWith(S.word) ? S.checking.slice(S.word.length) : '';
+			const a = [...typed];
+			html += tilesHtml(a, 'answer');
+			extra = a.length;
+			if (S.phase === 'answer') { html += `<div class="vg-tile cursor answer">${controllable(S.challengee) ? '+' : '…'}</div>`; extra++; }
+		} else if (mine) {
+			html += ui.pending
+				? `<div class="vg-tile pending">${esc(up(ui.pending))}</div>`
+				: '<div class="vg-tile cursor">?</div>';
+			extra = 1;
+		} else if (!letters.length) {
+			html += '<div class="vg-tile cursor">?</div>';
+			extra = 1;
+		}
+		const el = $('word');
+		el.innerHTML = html;
+		fitTiles($('wordBox'), el, letters.length + extra, tileLimits());
+		$('hint').textContent = hintText(S.hint);
+		$('stage').classList.toggle('challenged', inChallenge());
+	}
+
+	// ---------- status, buttons, keyboard ----------
+	function renderStatus() {
+		const W = up(S.word);
+		let s = '';
+		let alert = false;
+		const who = id => board ? `${nameOf(id)}: tavo` : 'Tavo';
+		if (S.waitFor && player(S.waitFor)) {
+			alert = true;
+			s = `${nameOf(S.waitFor)} atsijungė – laukiama, kol vėl prisijungs…`;
+		} else switch (S.phase) {
+			case 'turn':
+				if (controllable(current())) s = `${who(current())} eilė! ` + (S.word ? 'Pridėkite raidę arba meskite iššūkį.' : 'Pasirinkite pirmą raidę.');
+				else s = `${nameOf(current())} galvoja…`;
+				break;
+			case 'intro':
+				alert = true;
+				s = isMe(S.challenger) ? `Tu meti iššūkį: ${nameOf(S.challengee)}!` : isMe(S.challengee) ? `${nameOf(S.challenger)} meta tau iššūkį!` : `${nameOf(S.challenger)} meta iššūkį: ${nameOf(S.challengee)}!`;
+				break;
+			case 'answer':
+				alert = true;
+				s = controllable(S.challengee)
+					? (board ? `${nameOf(S.challengee)}: p` : 'P') + `ridėkite raidžių ir pateikite ilgesnį žodį, prasidedantį „${W}“, arba pasiduokite.`
+					: `${nameOf(S.challengee)} rašo ilgesnį žodį, prasidedantį „${W}“…`;
+				break;
+			case 'checking':
+				s = 'Tikrinama žodyne…';
+				break;
+			case 'botAnswer':
+				s = `${nameOf(S.challengee)} ieško ilgesnio žodžio, prasidedančio „${W}“…`;
+				break;
+		}
+		const clock = S.waitFor ? S.waitLeft : (S.phase === 'turn' || S.phase === 'answer') ? S.tLeft : 0;
+		$('status').innerHTML = esc(s) + (clock ? '<span class="vg-timer" id="timerTxt"></span>' : '');
+		$('status').classList.toggle('alert', alert);
+		showClock();
+	}
+
+	function renderActions() {
+		const mine = myTurn(), ans = answering();
+		const challengeeHere = controllable(S.challengee) && (S.phase === 'answer' || S.phase === 'checking');
+		$('addBtn').hidden = !mine;
+		$('addBtn').disabled = !ui.pending;
+		$('challengeBtn').hidden = !(mine && S.word && S.last && S.last !== current());
+		$('submitBtn').hidden = !challengeeHere;
+		$('submitBtn').disabled = !ans || !ui.answer;
+		$('concedeBtn').hidden = !challengeeHere;
+		$('concedeBtn').disabled = !ans;
+	}
+
+	function buildKeyboard() {
+		$('kb').innerHTML = KB_ROWS.map(row => '<div class="vg-row">' + row.map(k => {
+			if (k === 'back') return '<button class="vg-key wide" data-k="back" title="Trinti"><span class="material-symbols-rounded">backspace</span></button>';
+			if (k === 'ok') return '<button class="vg-key wide ok" data-k="ok" title="Patvirtinti"><span class="material-symbols-rounded">check</span></button>';
+			return `<button class="vg-key" data-k="${k}">${up(k)}</button>`;
+		}).join('') + '</div>').join('');
+	}
+
+	function renderKeyboard() {
+		const mine = myTurn();
+		const ans = answering();
+		const typing = mine || ans;
+		$('kb').classList.toggle('locked', !typing);
+		$('kb').querySelectorAll('.vg-key').forEach(b => {
+			const k = b.dataset.k;
+			if (k === 'ok' || k === 'back') b.disabled = !(mine ? ui.pending : ans && ui.answer);
+			else b.disabled = !typing;
+			b.classList.toggle('sel', mine && k === ui.pending);
+		});
+	}
+
+	function render() {
+		if (!S) return;
+		$('roundChip').textContent = `Raundas ${S.round}`;
+		renderPlayers();
+		renderWord();
+		renderStatus();
+		renderActions();
+		renderKeyboard();
+	}
+
+	// ---------- round result ----------
+	// What happened in the round (S.result), as this screen's player reads it, and the next-round confirmation.
+	function showResult() {
+		const R = S.result, info = R.info;
+		const loserId = R.loser, me_ = isMe(loserId), L = nameOf(loserId);
+		const W = up(info.word || R.word);
+		const prefix = up(R.word);   // the letters at the moment of the challenge
+		const you = id => isMe(id) ? '<b>Tu</b>' : `<b>${esc(nameOf(id))}</b>`;
+		let ico = '💔', title = '', lines = [], word = '', wordCls = '';
+
+		if (info.type === 'valid') {
+			ico = '✅';
+			const who = S.challengee;
+			title = 'Tikras žodis!';
+			lines.push(`${isMe(who) ? 'Tu pateikei' : esc(nameOf(who)) + ' pateikė'} žodį, ilgesnį už raides „${esc(prefix)}“, kurioms buvo mestas iššūkis.`);
+			lines.push(me_ ? '<b>Tu</b> metei iššūkį be reikalo ir prarandi gyvybę.' : `<b>${esc(L)}</b> metė iššūkį be reikalo ir praranda gyvybę.`);
+			word = W;
+			wordCls = 'good';
+		} else if (info.type === 'invalid') {
+			ico = '❌';
+			const loses = me_ ? 'prarandi' : 'praranda';
+			if (info.verdict === 'name') {
+				title = 'Vardas ar pavadinimas';
+				lines.push(`„${esc(W)}“ – tikras žodis, bet tai vardas ar pavadinimas, o jų žaidime naudoti negalima. ${you(loserId)} ${loses} gyvybę.`);
+			} else if (info.verdict === 'truncated') {
+				title = 'Sutrumpinta forma';
+				lines.push(`„${esc(W)}“ – tikras žodis, bet sutrumpinta forma, o jų žaidime naudoti negalima. ${you(loserId)} ${loses} gyvybę.`);
+			} else {
+				title = 'Tokio žodžio nėra';
+				lines.push(`Žodyne nėra žodžio „${esc(W)}“. ${you(loserId)} ${loses} gyvybę.`);
+			}
+			word = W;
+			wordCls = 'bad';
+		} else if (info.type === 'timeout') {
+			ico = '⏰';
+			title = 'Laikas baigėsi';
+			lines.push(`${you(loserId)} ${me_ ? 'nespėjai' : 'nespėjo'} per ${S.timeLimit} s ir ${me_ ? 'prarandi' : 'praranda'} gyvybę.`);
+			word = prefix;
+			wordCls = 'bad';
+		} else if (info.type === 'concede') {
+			ico = me_ ? '🏳️' : '🎯';
+			title = me_ ? 'Tu pasidavei' : `${L} pasidavė!`;
+			lines.push(me_
+				? `Tu nepateikei ilgesnio žodžio, prasidedančio „${prefix}“, ir prarandi gyvybę.`
+				: `${esc(L)} nerado ilgesnio žodžio, prasidedančio „${prefix}“, ir praranda gyvybę.`);
+			if (info.example) lines.push(`Pavyzdžiui, buvo galima: <b>„${esc(up(info.example))}“</b>.`);
+			else lines.push(info.noWordIsWord
+				? `„${prefix}“ – žodis, bet ilgesnio žodžio nėra.`
+				: `Žodžio, prasidedančio „${prefix}“, nėra${me_ ? '' : ' – tai buvo blefas'}.`);
+			word = prefix;
+			wordCls = me_ ? 'bad' : '';
+		} else if (info.type === 'left') {
+			ico = '🚪';
+			title = me_ ? 'Tu palikai žaidimą' : `${L} paliko žaidimą`;
+			const left = player(loserId).left;
+			const why = left === 'noconfirm' ? 'laiku nepatvirtino kito raundo' : left === 'moved' ? 'perkeltas į kitą grupę' : left === 'quit' ? 'išėjo iš žaidimo' : left === 'kicked' ? 'pašalintas iš žaidimo' : 'atsijungė ir laiku negrįžo';
+			lines.push(me_ ? 'Tu buvai pašalintas iš žaidimo.' : `${esc(L)} ${why}. Raundas baigiamas, gyvybių niekas nepraranda.`);
+		}
+
+		const ghost = R.out ? `<div class="vg-ghost-note">👻 ${me_ ? 'Tu tampi vaiduokliu!' : `${esc(L)} tampa vaiduokliu!`}</div>` : '';
+
+		let final = '';
+		let buttons = '';
+		const meIn = !board && S.order.includes(me), mePlayer = !board && player(me);
+		if (S.over) {
+			if (board) final = S.winner ? `<div class="vg-final">🏆 Laimėjo ${esc(nameOf(S.winner))}!</div>` : '';
+			else if (S.winner === me) final = '<div class="vg-final">🏆 Laimėjai! Visi kiti tapo vaiduokliais.</div>';
+			else if (mePlayer && !mePlayer.gone) {
+				const place = S.players.filter(p => !p.gone && p.lives > 0).length + 1;
+				final = `<div class="vg-final">Žaidimas baigtas${S.winner ? ` – laimėjo ${esc(nameOf(S.winner))}` : ''}. Užėmei ${place} vietą.</div>`;
+			} else if (S.winner) final = `<div class="vg-final">Žaidimas baigtas – laimėjo ${esc(nameOf(S.winner))}.</div>`;
+			buttons = leaveTo && !fromClass
+				? '<button class="vg-btn" data-act="leave">Grįžti</button>'
+				: '<button class="vg-btn" data-act="again"><span class="material-symbols-rounded">replay</span>Žaisti dar kartą</button>'
+					+ (fromClass ? '<button class="vg-btn light" data-act="leave">Grįžti</button>' : '<button class="vg-btn light" data-act="setup">Nustatymai</button>');
+		} else if (!board && !meIn) {
+			// out of the game on this screen: just watch
+			final = mePlayer && mePlayer.gone ? '<div class="vg-final">Tu nebedalyvauji šiame žaidime.</div>' : '<div class="vg-final">Tu – vaiduoklis 👻, bet gali stebėti žaidimą.</div>';
+			buttons = '<button class="vg-btn" data-act="watch">Stebėti</button>';
+		} else {
+			buttons = '<button class="vg-btn" data-act="next" id="nextBtn">Kitas raundas<span class="material-symbols-rounded">arrow_forward</span></button>';
+		}
+
+		$('resultPanel').innerHTML = `
+			<div class="ico">${ico}</div>
+			<h2>${esc(title)}</h2>
+			${word ? `<div class="vg-result-word ${wordCls}">${esc(word)}</div>` : ''}
+			${lines.map(l => `<p>${l}</p>`).join('')}
+			${ghost}
+			${final}
+			<p class="vg-ready" id="readyLine" hidden></p>
+			<div class="vg-btns">${buttons}</div>`;
+		$('resultModal').hidden = false;
+		updateReady();
+		$('resultPanel').querySelector('.vg-btns .vg-btn')?.focus();
+	}
+
+	// how many of the players still in the game have confirmed the next round (class games: with the time left)
+	function updateReady() {
+		const line = $('readyLine');
+		if (!line || !S.result || S.over) return;
+		const people = S.order.filter(id => !player(id).bot || player(id).sim);
+		const ready = S.order.filter(id => S.ready.includes(id));
+		const many = people.length > 1 && !board;
+		line.hidden = !many;
+		line.hidden = !many || !S.confLeft;
+		if (many && S.confLeft) line.innerHTML = 'Patvirtinti kitą raundą liko <span id="confLeft"></span>';
+		// "Kitas raundas" says how many have pressed it
+		const btn = $('nextBtn'), count = many ? ` <span class="vg-count">${ready.length}/${S.order.length}</span>` : '';
+		if (btn && !board && S.ready.includes(me)) { btn.disabled = true; btn.innerHTML = 'Laukiama kitų…' + count; }
+		else if (btn) btn.innerHTML = 'Kitas raundas' + count + '<span class="material-symbols-rounded">arrow_forward</span>';
+		showClock();
+	}
+
+	$('resultPanel').addEventListener('click', e => {
+		const b = e.target.closest('[data-act]');
+		if (!b || b.disabled) return;
+		const act = b.dataset.act;
+		if (act === 'next') {
+			if (board) S.order.forEach(id => { if (controllable(id)) send(id, { a: 'next' }); });
+			else send(me, { a: 'next' });
+			if (!board) updateReady();
+		}
+		else if (act === 'watch') { ui.keepResult = false; $('resultModal').hidden = true; }
+		else if (act === 'again') { if (board) startBoard(); else if (settings.mode === 'solo') startGame(); else startDemo(); }
+		else if (act === 'setup' || act === 'leave') leaveGame();
+	});
+
+	// ---------- input ----------
+	function press(k) {
+		if (!S || !$('resultModal').hidden || !$('rulesModal').hidden || !$('listModal').hidden) return;
+		if (myTurn()) {
+			if (k === 'ok') {
+				if (ui.pending) { const l = ui.pending; ui.pending = ''; send(current(), { a: 'letter', v: l }); }
+				return;
+			}
+			if (k === 'back') ui.pending = '';
+			else if (ALPHABET.has(k)) ui.pending = k;
+			render();
+		} else if (answering()) {
+			if (k === 'ok') { if (ui.answer) send(S.challengee, { a: 'submit', v: S.word + ui.answer }); return; }
+			if (k === 'back') ui.answer = [...ui.answer].slice(0, -1).join('');
+			else if (ALPHABET.has(k) && [...ui.answer].length < 30) ui.answer += k;
+			render();
+		}
+	}
+
+	$('kb').addEventListener('click', e => {
+		const b = e.target.closest('.vg-key');
+		if (b && !b.disabled) press(b.dataset.k);
+	});
+
+	$('addBtn').addEventListener('click', () => press('ok'));
+	$('submitBtn').addEventListener('click', () => press('ok'));
+	$('challengeBtn').addEventListener('click', () => {
+		if (S && myTurn() && S.word) send(current(), { a: 'challenge' });
+	});
+	$('concedeBtn').addEventListener('click', () => { if (S && answering()) send(S.challengee, { a: 'concede' }); });
+
+	document.addEventListener('keydown', e => {
+		if (e.ctrlKey || e.metaKey || e.altKey) return;
+		if (!$('confirmModal').hidden) {
+			if (e.key === 'Escape') { e.preventDefault(); $('confirmNo').click(); }
+			else if (e.key === 'Enter') { e.preventDefault(); document.activeElement && document.activeElement.click && document.activeElement.closest('.vg-confirm') ? document.activeElement.click() : $('confirmNo').click(); }
+			e.stopImmediatePropagation();
+			return;
+		}
+		if (!$('rulesModal').hidden) {
+			if (e.key === 'Escape' || e.key === 'Enter') { e.preventDefault(); closeRules(); }
+			return;
+		}
+		if (!$('listModal').hidden) {
+			if (e.key === 'Escape' || e.key === 'Enter') { e.preventDefault(); closeList(); }
+			return;
+		}
+		if (!$('resultModal').hidden) {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				$('resultPanel').querySelector('.vg-btns .vg-btn:not(:disabled)')?.click();
+			}
+			return;
+		}
+		if (!S || $('gameView').hidden) return;
+		if (e.key === 'Enter') { e.preventDefault(); press('ok'); return; }
+		if (e.key === 'Backspace') { e.preventDefault(); press('back'); return; }
+		const k = e.key.toLocaleLowerCase('lt');
+		if (ALPHABET.has(k)) press(k);
+	});
+
+	// ---------- rules ----------
+	const openRules = () => { $('rulesModal').hidden = false; $('rulesClose').focus(); holdClock(true); };
+	const closeRules = () => { $('rulesModal').hidden = true; holdClock(false); };
+	$('rulesBtn').addEventListener('click', openRules);
+	$('rulesClose').addEventListener('click', closeRules);
+	$('rulesModal').addEventListener('click', e => { if (e.target.id === 'rulesModal') closeRules(); });
+
+	// ---------- players list ----------
+	// Everyone in turn order with their lives; the one whose turn it is (or who was challenged) is highlighted.
+	function renderList() {
+		$('playerList').innerHTML = S.seats.map(id => {
+			const p = player(id), out = !S.order.includes(id);
+			let cls = 'vg-li', tag = '';
+			if (out) { cls += ' out'; tag = p.gone ? 'Išėjo' : 'Vaiduoklis'; }
+			else if (S.waitFor === id) { cls += ' hot'; tag = 'Atsijungė – laukiama'; }
+			else if (inChallenge() && id === S.challengee) { cls += ' hot'; tag = 'Gavo iššūkį'; }
+			else if (inChallenge() && id === S.challenger) tag = 'Metė iššūkį';
+			else if (S.phase === 'turn' && id === current()) { cls += ' turn'; tag = isMe(id) ? 'Tavo eilė' : 'Eina dabar'; }
+			else if (p.conn === false) tag = 'Atsijungė';
+			return `<li class="${cls}"><span class="av">${out ? (p.gone ? '🚪' : '👻') : p.av}</span>`
+				+ `<span class="nm">${esc(p.name)}${tag ? `<small>${tag}</small>` : ''}</span>`
+				+ `<span class="hearts" title="Gyvybės: ${p.lives}">${hearts(p)}</span></li>`;
+		}).join('');
+	}
+	const openList = () => {
+		if (!S) return;
+		renderList();
+		$('listModal').hidden = false;
+		const on = $('playerList').querySelector('.turn, .hot');
+		if (on) on.scrollIntoView({ block: 'nearest' });
+		$('listClose').focus();
+		holdClock(true);
+	};
+	const closeList = () => { $('listModal').hidden = true; holdClock(false); };
+	$('listBtn').addEventListener('click', openList);
+	$('listClose').addEventListener('click', closeList);
+	$('listModal').addEventListener('click', e => { if (e.target.id === 'listModal') closeList(); });
+
+	// ---------- the demo: groups of simulated students (played by the bot logic), hosted as a student or a teacher ----------
+	const SIM_NAMES = ['Jonas', 'Ona', 'Matas', 'Ugnė', 'Lukas', 'Emilija', 'Nojus', 'Gabija', 'Dominykas', 'Austėja', 'Kajus', 'Kamilė',
+		'Benas', 'Liepa', 'Herkus', 'Rugilė', 'Titas', 'Saulė', 'Pijus', 'Smiltė', 'Rokas', 'Miglė', 'Joris', 'Urtė'];
+	const PEOPLE_AV = ['🦁', '🐯', '🐼', '🐨', '🐵', '🐰', '🦄', '🐧', '🐢', '🐙', '🦋', '🐞', '🐬', '🐹', '🦒', '🐮'];
+	const MAX_BOTS = 4;
+	let demo = null;   // { groups: [{ id, members: [{ id, name, av, bot, sim, me }] }], gid, sim, bot }
+
+	// Like the real lobbies: a student host's game is one group of at most `max` players, a teacher's has groups of at
+	// most `max` players each (bots included in both).
+	const demoMax = () => Number(settings.max) || 4;
+	const demoFull = g => g.members.length >= demoMax();
+	function demoReset() {
+		demo = { groups: [], gid: 1, sim: 0, bot: 0, mode: settings.mode, max: demoMax() };
+		const g1 = demoGroup();
+		if (settings.mode === 'demoStudent') {
+			g1.members.push({ id: 'me', name: 'Tu', av: '🙂', me: true });
+			demoSim(g1);
+			if (!demoFull(g1)) demoBot(g1);
+			return;
+		}
+		const g2 = demoGroup();
+		for (let i = 0; i < Math.min(2, demoMax()); i++) demoSim(g1);
+		demoBot(g1);
+		for (let i = 0; i < Math.min(3, demoMax()); i++) demoSim(g2);
+	}
+	function demoGroup() { const g = { id: String(demo.gid++), members: [] }; demo.groups.push(g); return g; }
+	function demoSim(g) {
+		const k = demo.sim++, name = SIM_NAMES[k % SIM_NAMES.length] + (k >= SIM_NAMES.length ? ' ' + (Math.floor(k / SIM_NAMES.length) + 1) : '');
+		g.members.push({ id: 's' + k, name, av: PEOPLE_AV[k % PEOPLE_AV.length], bot: true, sim: true });
+	}
+	function demoBot(g) {
+		if (g.members.filter(m => m.bot && !m.sim).length >= MAX_BOTS || demoFull(g)) return;
+		const k = demo.bot++, b = demoFreeBot(g);
+		g.members.push({ id: 'b' + k, name: b.name, av: b.av, bot: true });
+	}
+	// a bot name not yet used in the group
+	function demoFreeBot(g, except) {
+		const used = new Set(g.members.filter(m => m.bot && !m.sim && m !== except).map(m => m.name));
+		return BOTS.find(b => !used.has(b.name)) || BOTS[0];
+	}
+	const demoFind = id => { for (const g of demo.groups) { const m = g.members.find(x => String(x.id) === String(id)); if (m) return [g, m]; } return [null, null]; };
+
+	function renderDemo() {
+		const on = settings.mode !== 'solo', single = settings.mode === 'demoStudent';
+		$('demoBox').hidden = !on;
+		$('botsSetting').hidden = on;
+		$('maxSetting').hidden = !on;
+		$('maxLabel').textContent = single ? 'Žaidėjų žaidime (su botais)' : 'Žaidėjų grupėje (su botais)';
+		if (!on) return;
+		if (!demo || demo.mode !== settings.mode || demo.max !== demoMax()) demoReset();
+		GhostGroups.render($('demoGroups'), {
+			groups: demo.groups, maxBots: MAX_BOTS,
+			single, max: single ? demoMax() : 0, maxPeople: single ? 0 : demoMax(), host: true,
+			canMove: () => !single, canAddGroup: !single, canAddBot: true, canAddSim: true,
+			onMove: (id, to) => {
+				const [from, m] = demoFind(id), g = demo.groups.find(x => x.id === to);
+				if (!from || !g || (m.bot && !m.sim && g.members.filter(x => x.bot && !x.sim).length >= MAX_BOTS)) return;
+				if (demoFull(g)) return;
+				from.members = from.members.filter(x => x !== m);
+				if (m.bot && !m.sim && g.members.some(x => x.bot && !x.sim && x.name === m.name)) { const b = demoFreeBot(g); m.name = b.name; m.av = b.av; }
+				g.members.push(m);
+				renderDemo();
+			},
+			onAddGroup: () => { if (demo.groups.length < 16) demoGroup(); renderDemo(); },
+			onAddBot: id => { const g = demo.groups.find(x => x.id === id); demoBot(g); renderDemo(); },
+			onAddSim: id => { const g = demo.groups.find(x => x.id === id); if (!demoFull(g)) demoSim(g); renderDemo(); },
+			onRemove: id => { const [g, m] = demoFind(id); if (g && !m.me) g.members = g.members.filter(x => x !== m); renderDemo(); }
+		});
+	}
+	// a big class at once: 20 more simulated students (a teacher's game: groups of the chosen size; a student's game:
+	// until it is full)
+	$('demoMany').addEventListener('click', () => {
+		for (let i = 0; i < 20; i++) {
+			let g = demo.groups.find(x => !demoFull(x));
+			if (!g) { if (settings.mode === 'demoStudent' || demo.groups.length >= 16) break; g = demoGroup(); }
+			demoSim(g);
+		}
+		// nobody is left alone in a group: a lone student gets a bot to play with
+		demo.groups.forEach(g => { if (g.members.length === 1) demoBot(g); });
+		renderDemo();
+	});
+	$('demoReset').addEventListener('click', () => { demoReset(); renderDemo(); });
+
+	const asPlayer = m => ({ id: String(m.id), name: m.name, av: m.av, bot: !!m.bot, sim: !!m.sim });
+
+	async function startDemo() {
+		const note = $('setupNote');
+		const check = GhostGroups.forStart(demo.groups);
+		const err = check.error || (settings.mode === 'demoStudent' && !check.groups.some(g => g.members.some(m => m.me)) ? 'Tu turi būti vienoje iš grupių.' : null);
+		if (err) { note.classList.add('err'); note.textContent = err; return; }
+		const btn = $('startBtn');
+		btn.disabled = true;
+		const dict = await loadDict(settings.dict, note);
+		btn.disabled = false;
+		if (!dict) return;
+		const common = { lives: Number(settings.lives), timeLimit: Number(settings.time) || 0, botLevel: settings.bot, dict };
+		if (settings.mode === 'demoTeacher') {
+			// every group plays on this screen; the teacher watches them all
+			const engines = {};
+			openWatch(check.groups.map((g, i) => ({ id: g.id, label: 'Grupė ' + (i + 1), S: null })), {
+				end: () => { Object.values(engines).forEach(e => e.stop()); closeWatch(); },
+				max: demoMax(),
+				// the teacher moves a (simulated) student to another group's game
+				move: (id, from, to) => {
+					const a = engines[from], b = engines[to], p = a && a.player(id);
+					if (!p || !b || b.S.over) return 'Šios grupės žaidimas jau baigėsi.';
+					if (playersIn(b.S) >= demoMax()) return 'Ši grupė jau pilna.';
+					a.removePlayer(id, 'moved');
+					b.addPlayer(p);
+					return null;
+				},
+				kick: (id, from) => { const e = engines[from]; if (e) e.removePlayer(id, 'kicked'); return null; }
+			});
+			check.groups.forEach(g => {
+				const e = new GhostGame(Object.assign({}, common, { players: GhostGame.shuffle(g.members.map(asPlayer)), onChange: x => updateTile(g.id, x.snapshot()) }));
+				engines[g.id] = e;
+				e.start();
+			});
+		} else {
+			// a student host plays in their group (the other groups play on their own devices in a real game)
+			const mine = check.groups.find(g => g.members.some(m => m.me));
+			runLocal(Object.assign({}, common, { players: GhostGame.shuffle(mine.members.map(asPlayer)) }), 'me', false);
+		}
+	}
+
+	// ---------- the teacher's overview: a tile per group, pages of as many tiles as fit ----------
+	let watch = null;   // { groups: [{ id, label, S, players }], page, perPage, end() }
+	function openWatch(groups, o) {
+		watch = { groups, page: 0, perPage: 1, end: o.end, move: o.move, kick: o.kick, max: o.max || 0, drag: null };
+		$('setupView').hidden = true;
+		$('gameView').hidden = true;
+		$('watchView').hidden = false;
+		document.body.classList.add('vg-watching');
+		layoutWatch();
+	}
+	function closeWatch() {
+		watch = null;
+		$('watchView').hidden = true;
+		document.body.classList.remove('vg-watching');
+		$('setupView').hidden = false;
+		renderSetup();
+	}
+	// Moving / removing a student: drag their name to another group's tile (mouse), or tap it – a pop-up with the group
+	// to move them to (any group, also on other pages) and "Pašalinti iš žaidimo".
+	const canTake = g => !!g && !!g.S && !g.S.over && (!watch.max || playersIn(g.S) < watch.max);
+	const finePointer = () => window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches;
+	function tileMenu(gid, id) {
+		const g = watch.groups.find(x => String(x.id) === String(gid)), p = g && g.S && g.S.players.find(x => x.id === id);
+		if (!p) return;
+		GhostGroups.menu({
+			title: p.name, avatar: GhostGroups.avatar({ name: p.name, av: p.av }), note: g.label,
+			groups: watch.groups.map(x => ({ id: x.id, label: x.label + (x === g ? '' : x.S && x.S.over ? ' (baigė)' : !canTake(x) ? ' (pilna)' : ''), disabled: x !== g && !canTake(x) })),
+			current: g.id,
+			onMove: to => moveTo(id, g.id, to),
+			removeLabel: watch.kick ? 'Pašalinti iš žaidimo' : '',
+			onRemove: watch.kick ? () => kickFrom(id, g.id, p.name) : null
+		});
+	}
+	async function moveTo(id, from, to) {
+		const err = await watch.move(id, String(from), String(to));
+		if (err) toast(err);
+		watch.groups.forEach(g => updateTile(g.id));
+	}
+	async function kickFrom(id, from, name) {
+		if (!watch || !await askConfirm(`Pašalinti ${name} iš žaidimo? Grįžti nebegalės.`)) return;
+		const err = await watch.kick(id, String(from));
+		if (err) toast(err);
+	}
+	$('watchStrip').addEventListener('click', e => {
+		const t = e.target.closest('[data-pick]');
+		if (t && watch) tileMenu(t.dataset.g, t.dataset.pick);
+	});
+	// drag and drop (mouse); a tile that takes the student is marked while dragging (kept when a tile is redrawn)
+	const dropTiles = () => document.querySelectorAll('#watchStrip .vg-wt');
+	function endTileDrag() { if (watch) watch.drag = null; dropTiles().forEach(el => el.classList.remove('drop-ok', 'drop-over')); }
+	$('watchStrip').addEventListener('dragstart', e => {
+		const t = e.target.closest && e.target.closest('[data-pick]');
+		if (!t || !watch) return;
+		watch.drag = { id: t.dataset.pick, from: t.dataset.g };
+		e.dataTransfer.effectAllowed = 'move';
+		e.dataTransfer.setData('text/plain', t.dataset.pick);
+		watch.groups.forEach(g => { const el = document.getElementById('wt-' + g.id); if (el && String(g.id) !== watch.drag.from && canTake(g)) el.classList.add('drop-ok'); });
+	});
+	$('watchStrip').addEventListener('dragover', e => {
+		const el = e.target.closest && e.target.closest('.vg-wt.drop-ok');
+		if (!watch || !watch.drag || !el) return;
+		e.preventDefault();
+		e.dataTransfer.dropEffect = 'move';
+		dropTiles().forEach(x => x.classList.toggle('drop-over', x === el));
+	});
+	$('watchStrip').addEventListener('drop', e => {
+		const el = e.target.closest && e.target.closest('.vg-wt.drop-ok'), d = watch && watch.drag;
+		endTileDrag();
+		if (!d || !el) return;
+		e.preventDefault();
+		moveTo(d.id, d.from, el.id.slice(3));
+	});
+	window.addEventListener('dragend', endTileDrag);
+	// players in a group's game (students, the demo's simulated ones and bots; not those who left)
+	const playersIn = T => T ? T.players.filter(p => !p.gone).length : 0;
+
+	function layoutWatch() {
+		if (!watch) return;
+		const stage = $('watchStage'), W = stage.clientWidth, H = stage.clientHeight, gap = 10;
+		const minW = W < 600 ? 250 : 320, minH = 190;
+		const cols = Math.max(1, Math.floor((W + gap) / (minW + gap))), rows = Math.max(1, Math.floor((H + gap) / (minH + gap)));
+		watch.cols = Math.min(cols, watch.groups.length);
+		watch.rows = Math.max(1, Math.min(rows, Math.ceil(watch.groups.length / watch.cols)));
+		watch.perPage = watch.cols * watch.rows;
+		const pages = Math.ceil(watch.groups.length / watch.perPage);
+		watch.page = Math.min(watch.page, pages - 1);
+		let html = '';
+		for (let pg = 0; pg < pages; pg++) {
+			html += `<div class="vg-watch-page" style="--cols:${watch.cols};--rows:${watch.rows}">`
+				+ watch.groups.slice(pg * watch.perPage, (pg + 1) * watch.perPage).map(g => `<div class="vg-wt" id="wt-${esc(g.id)}"></div>`).join('') + '</div>';
+		}
+		$('watchStrip').innerHTML = html;
+		watch.groups.forEach(g => updateTile(g.id, g.S));
+		goPage(watch.page);
+	}
+	function goPage(n) {
+		const pages = Math.ceil(watch.groups.length / watch.perPage);
+		watch.page = Math.max(0, Math.min(pages - 1, n));
+		$('watchStrip').style.transform = `translateX(${-100 * watch.page}%)`;
+		$('watchPage').textContent = `${watch.page + 1} / ${pages}`;
+		$('watchPrev').disabled = watch.page === 0;
+		$('watchNext').disabled = watch.page >= pages - 1;
+		const done = watch.groups.filter(g => g.S && g.S.over).length;
+		$('watchInfo').textContent = plural(watch.groups.length, 'grupė', 'grupės', 'grupių') + (done ? ` · baigė ${done}` : '');
+		document.querySelector('#watchView .vg-pager').hidden = pages < 2;
+	}
+	$('watchPrev').addEventListener('click', () => watch && goPage(watch.page - 1));
+	$('watchNext').addEventListener('click', () => watch && goPage(watch.page + 1));
+	$('watchEnd').addEventListener('click', async () => { if (watch && await askConfirm('Ar tikrai norite baigti žaidimą visoms grupėms?')) watch.end(); });
+	// swipe between pages (touch and mouse)
+	let swipe = null;
+	$('watchStage').addEventListener('pointerdown', e => { swipe = { x: e.clientX, y: e.clientY }; });
+	$('watchStage').addEventListener('pointerup', e => {
+		if (!swipe || !watch) return;
+		const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y;
+		swipe = null;
+		if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) goPage(watch.page + (dx < 0 ? 1 : -1));
+	});
+	document.addEventListener('keydown', e => {
+		if (!watch || $('watchView').hidden) return;
+		if (e.key === 'ArrowRight' || e.key === 'PageDown') goPage(watch.page + 1);
+		if (e.key === 'ArrowLeft' || e.key === 'PageUp') goPage(watch.page - 1);
+	});
+	window.addEventListener('resize', () => { if (watch) layoutWatch(); });
+
+	// one group's tile: players (turn, lives), the move timer, the word, what is going on
+	function updateTile(gid, snap) {
+		if (!watch) return;
+		const g = watch.groups.find(x => String(x.id) === String(gid));
+		if (!g) return;
+		if (snap) { g.S = snap; g.at = performance.now(); }
+		const el = document.getElementById('wt-' + gid);
+		if (!el) return;
+		const T = g.S;
+		if (!T) { el.innerHTML = `<div class="vg-wt-head">${esc(g.label)}<span>Laukiama…</span></div><div class="vg-wt-status">Žaidimas dar neprasidėjo.</div>`; return; }
+		const P = id => T.players.find(p => p.id === id), N = id => (P(id) || {}).name || '?';
+		const cur = T.order[T.turn];
+		const hot = ['intro', 'answer', 'checking', 'botAnswer'].includes(T.phase);
+		const d = watch.drag, dropOk = d && d.from !== String(g.id) && canTake(g);
+		el.className = 'vg-wt' + (hot ? ' hot' : '') + (T.over ? ' done' : '') + (dropOk ? ' drop-ok' : '');
+		const canMove = !!watch.move && !T.over, drag = finePointer();
+		const players = T.seats.map(id => {
+			const p = P(id), out = !T.order.includes(id);
+			const cls = out ? 'out' : hot && id === T.challengee ? 'hot' : T.phase === 'turn' && id === cur ? 'turn' : '';
+			let hearts = '';
+			for (let i = 0; i < T.lives; i++) hearts += i < p.lives ? '♥' : '';
+			const pickable = canMove && (!p.bot || p.sim) && !p.gone;
+			return `<span class="vg-wt-p ${cls}${p.conn === false && !out ? ' off' : ''}${pickable ? ' can' : ''}"`
+				+ (pickable ? ` data-pick="${esc(id)}" data-g="${esc(g.id)}" role="button" tabindex="0" title="Perkelti ar pašalinti"${drag ? ' draggable="true"' : ''}` : '')
+				+ `>${out ? (p.gone ? '🚪' : '👻') : esc(p.av)}<b>${esc(p.name)}</b>${out ? '' : `<span class="h">${hearts}</span>`}</span>`;
+		}).join('');
+		let word = [...T.word].map((l, i, a) => `<i${i === a.length - 1 && T.phase === 'turn' ? ' class="add"' : ''}>${esc(up(l))}</i>`).join('');
+		if (!T.word && !T.over) word = '<i class="q">?</i>';
+		if ((T.phase === 'checking') && T.checking) word += [...T.checking.slice(T.word.length)].map(l => `<i class="add">${esc(up(l))}</i>`).join('');
+		let st = '', alert = false;
+		if (T.emptied) st = 'Grupėje neliko mokinių';
+		else if (T.over) st = T.winner ? `🏆 Laimėjo ${N(T.winner)}` : 'Žaidimas baigtas';
+		else if (T.waitFor) { st = `${N(T.waitFor)} atsijungė – laukiama…`; alert = true; }
+		else if (T.phase === 'turn') st = `${N(cur)} galvoja…`;
+		else if (T.phase === 'intro') { st = `⚡ Iššūkis: ${N(T.challenger)} → ${N(T.challengee)}`; alert = true; }
+		else if (T.phase === 'answer' || T.phase === 'botAnswer') { st = `⚡ ${N(T.challengee)} ieško ilgesnio žodžio…`; alert = true; }
+		else if (T.phase === 'checking') { st = 'Tikrinama žodyne…'; alert = true; }
+		else if (T.phase === 'roundEnd' && T.result) {
+			const R = T.result, L = N(R.loser), how = (P(R.loser) || {}).left;
+			st = R.info.type === 'left' ? `${L} ${how === 'kicked' ? 'pašalintas iš žaidimo' : how === 'moved' ? 'perkeltas į kitą grupę' : 'paliko žaidimą'}`
+				: R.info.type === 'valid' ? `✅ Tikras žodis – ${L} praranda gyvybę` : `${L} praranda gyvybę` + (R.out ? ' ir tampa vaiduokliu 👻' : '');
+			st += ` · pasiruošę ${T.ready.length}/${T.order.length}`;
+		}
+		// the move time limit: the same countdown the players see
+		const timed = !T.over && !T.waitFor && T.tLeft > 0;
+		el.innerHTML = `<div class="vg-wt-head">${esc(g.label)}<span>Raundas ${T.round}</span>${timed ? `<b class="vg-wt-timer" data-timer="${esc(g.id)}"></b>` : ''}</div>`
+			+ `<div class="vg-wt-players">${players}</div><div class="vg-wt-word">${word}</div>`
+			+ `<div class="vg-wt-status${alert ? ' alert' : ''}">${esc(st)}</div>`;
+		fitWord(el);
+		tileClocks();
+		if (T.over) goPage(watch.page);
+	}
+	// the word's letters as big as the tile allows (up to 120 px): in one row while they fit, else smaller and wrapped;
+	// a short word's letters are sized as if it had 3 (so a single letter isn't huge)
+	function fitWord(el) {
+		const box = el.querySelector('.vg-wt-word');
+		if (!box) return;
+		const n = Math.max(3, box.children.length), W = box.clientWidth, H = box.clientHeight, gap = 4;
+		const lw = Math.max(18, Math.min((W - gap * (n - 1)) / n, (H - 4) / 1.15, 120));
+		box.style.setProperty('--lw', Math.floor(lw) + 'px');
+	}
+	function tileClocks() {
+		if (!watch) return;
+		document.querySelectorAll('#watchStrip [data-timer]').forEach(t => {
+			const g = watch.groups.find(x => String(x.id) === t.dataset.timer);
+			if (!g || !g.S) return;
+			const left = Math.max(0, g.S.tLeft - (performance.now() - g.at)), sec = Math.ceil(left / 1000);
+			t.textContent = '⏱ ' + sec;
+			t.classList.toggle('low', sec <= 5);
+		});
+	}
+	setInterval(tileClocks, 250);
+
+	// ---------- the board ("žaisti lentoje"): the teacher's chosen students take turns on this screen ----------
+	let boardSetup = null;
+	async function startBoard() {
+		try { boardSetup = boardSetup || JSON.parse(sessionStorage.getItem('ghostBoard')); } catch { boardSetup = null; }
+		leaveTo = 'klase.html?tab=zaidimai';
+		$('quitTxt').textContent = 'Baigti';
+		if (!boardSetup || !boardSetup.students || !boardSetup.students.length) { notice('Žaidimas nerastas', 'Pasirinkite mokinius Klasės puslapyje (Žaidimai → Vaiduoklis → Žaisti lentoje).'); return; }
+		const set = boardSetup.settings || {};
+		openGameView();
+		$('status').textContent = 'Kraunamas žodynas…';
+		const dict = await loadDict(set.dict || 'medium', null, set.grade);
+		if (!dict) { notice('Nepavyko įkelti žodyno', 'Patikrinkite ryšį ir bandykite dar kartą.'); return; }
+		const players = boardSetup.students.map((p, i) => ({ id: 'p' + p.id, name: p.name, av: PEOPLE_AV[i % PEOPLE_AV.length] }));
+		BOTS.slice(0, Math.min(4, Number(set.bots) || 0)).forEach((b, i) => players.push({ id: 'b' + i, name: b.name, av: b.av, bot: true }));
+		runLocal({ players: GhostGame.shuffle(players), lives: Number(set.lives) || 3, timeLimit: Number(set.time) || 0, botLevel: set.bot || 'normal', dict }, null, true);
+	}
+
+	// a message instead of a game (with the way back)
+	function notice(title, text) {
+		$('setupView').hidden = true;
+		$('gameView').hidden = false;
+		$('resultPanel').innerHTML = `<div class="ico">👻</div><h2>${esc(title)}</h2><p>${esc(text)}</p><div class="vg-btns"><button class="vg-btn" data-act="leave">Grįžti</button></div>`;
+		$('resultModal').hidden = false;
+	}
+
+	// ---------- a class game (?code=): a player of a group (maybe its runner) or the teacher's overview ----------
+	const CODE = new URLSearchParams(location.search).get('code');
+	let net = null;   // { code, group, settings, players }
+	const NET_ERR = {
+		REMOVED: ['Tu nebedalyvauji', 'Buvai pašalintas iš šio žaidimo (laiku negrįžai arba nepatvirtinai kito raundo).'],
+		NOT_FOUND: ['Žaidimas nerastas', 'Šis žaidimas jau baigėsi arba buvo uždarytas.'],
+		NOT_IN_GAME: ['Tu nežaidi šiame žaidime', 'Šis žaidimas vyksta be tavęs.'],
+		LEFT: ['Tu išėjai iš žaidimo', 'Į šį žaidimą grįžti nebegalima.'],
+		KICKED: ['Tu nebedalyvauji', 'Mokytojas pašalino tave iš žaidimo.']
+	};
+
+	async function startNet() {
+		leaveTo = 'klase.html?tab=zaidimai';
+		$('setupView').hidden = true;
+		$('gameView').hidden = false;
+		$('status').textContent = 'Jungiamasi prie žaidimo…';
+		let r;
+		try { r = await SudGame.request('ghost:attach', { code: CODE }); } catch { r = null; }
+		if (!r || !r.ok) { const e = NET_ERR[r && r.error] || NET_ERR.NOT_FOUND; notice(e[0], e[1]); return; }
+		net = { code: CODE, settings: r.settings };
+		listenNet();
+		if (r.role === 'watch') { startNetWatch(r); return; }
+		attached(r);
+	}
+
+	// (re)attached as a player: run the group here, or show what its runner sends
+	function attached(r) {
+		me = r.me;
+		board = false;
+		net.group = r.group;
+		net.players = r.players;
+		if (r.runner) { becomeRunner(r.state, r.players, r.connected); return; }
+		if (game) stopGame();
+		sendAct = (id, a) => SudGame.connect().then(s => s.emit('g:act', a)).catch(() => {});
+		if ($('gameView').hidden || !S) openGameView();
+		if (r.state) show(r.state);
+		else $('status').textContent = 'Laukiama, kol žaidimas prasidės…';
+	}
+
+	async function becomeRunner(state, players, connected) {
+		if (game) return;   // runs here already
+		const set = net.settings;
+		if (!S) { openGameView(); $('status').textContent = 'Kraunamas žodynas…'; }
+		const dict = await loadDict(set.dict, null, set.grade);
+		if (!dict) { notice('Nepavyko įkelti žodyno', 'Patikrinkite ryšį ir perkraukite puslapį.'); return; }
+		if (game) return;
+		const emit = (ev, data) => SudGame.connect().then(s => s.emit(ev, data)).catch(() => {});
+		const list = players.map((p, i) => ({ id: p.id, name: p.name, av: p.av || PEOPLE_AV[i % PEOPLE_AV.length], bot: !!p.bot }));
+		game = new GhostGame({
+			players: state ? list : GhostGame.shuffle(list), lives: set.lives, timeLimit: set.time, botLevel: set.bot, dict, remote: true,
+			onChange: g => { if (g !== game) return; const snap = g.snapshot(); show(snap); emit('g:state', { s: snap }); },
+			onPing: id => emit('g:ping', { id }),
+			onRemoved: (g, id) => { if (id !== me) emit('g:removed', { id }); }
+		});
+		sendAct = (id, a) => game && game.act(id, a);
+		if (state) { game.restore(state); game.syncPlayers(list.filter(p => !p.bot), net.why); } else game.start();
+		list.filter(p => !p.bot && p.id !== me && !(connected || []).includes(p.id)).forEach(p => game.presence(p.id, false));
+	}
+
+	let netListening = false;
+	function listenNet() {
+		if (netListening) return;
+		netListening = true;
+		SudGame.on('g:state', d => {
+			if (watch && d.g != null) { updateTile(d.g, d.s); return; }
+			if (!game && d.s) show(d.s);
+		});
+		// who left the group themselves / was removed by the teacher (the game says so instead of "moved")
+		const whyOf = d => { const w = {}; (d.quit || []).forEach(id => { w[id] = 'quit'; }); (d.kicked || []).forEach(id => { w[id] = 'kicked'; }); return w; };
+		SudGame.on('g:runner', d => { if (!watch) { net.why = whyOf(d); becomeRunner(d.state, d.players, d.connected); } });
+		SudGame.on('g:act', d => { if (game) game.act(d.from, { a: d.a, v: d.v }); });
+		SudGame.on('g:presence', d => { if (game) game.presence(d.id, d.on); });
+		SudGame.on('g:ping', () => SudGame.connect().then(s => s.emit('g:act', { a: 'pong' })).catch(() => {}));
+		SudGame.on('g:removed', d => { stopGame(); notice(...(d && d.by === 'host' ? NET_ERR.KICKED : NET_ERR.REMOVED)); });
+		// a group's member list changed (the teacher moved someone): the runner adds / removes them
+		SudGame.on('g:members', d => { if (game) game.syncPlayers(d.players.filter(p => !p.bot), whyOf(d)); });
+		// this player was moved to another group: attach again (to the new group's game)
+		SudGame.on('g:moved', () => {
+			stopGame();
+			S = null;
+			SudGame.request('ghost:attach', { code: net.code }).then(r => {
+				if (!r || !r.ok) { const e = NET_ERR[r && r.error] || NET_ERR.NOT_FOUND; notice(e[0], e[1]); return; }
+				openGameView();
+				attached(r);
+				toast('Mokytojas perkėlė tave į kitą grupę.');
+			});
+		});
+		SudGame.on('g:empty', d => { if (!watch) return; const g = watch.groups.find(x => String(x.id) === String(d.g)); if (g && g.S) { g.S = Object.assign({}, g.S, { over: true, emptied: true }); updateTile(g.id); } });
+		SudGame.on('game:end', () => { if (watch) return; stopGame(); notice('Žaidimas baigtas', 'Vedėjas baigė žaidimą.'); });
+		SudGame.on('lobby:closed', d => { if (d.reason !== 'ended' && !watch) { stopGame(); notice(...NET_ERR.NOT_FOUND); } });
+		// back after a dropped connection: attach again (a runner keeps its game; the server gets its snapshot again)
+		SudGame.onReconnect(() => {
+			SudGame.request('ghost:attach', { code: net.code }).then(r => {
+				if (!r || !r.ok) { stopGame(); const e = NET_ERR[r && r.error] || NET_ERR.NOT_FOUND; notice(e[0], e[1]); return; }
+				if (r.role === 'watch') { r.groups.forEach(g => updateTile(g.id, g.state)); return; }
+				if (game && r.runner) { SudGame.connect().then(s => s.emit('g:state', { s: game.snapshot() })); return; }
+				if (game && !r.runner) stopGame();
+				attached(r);
+			});
+		});
+	}
+
+	const MOVE_ERR = { GROUP_FULL: 'Ši grupė jau pilna.', GROUP_OVER: 'Šios grupės žaidimas jau baigėsi.', NOT_FOUND: 'Šio mokinio nebėra žaidime.' };
+	function startNetWatch(r) {
+		openWatch(r.groups.map((g, i) => ({ id: g.id, label: 'Grupė ' + (i + 1), S: g.state })), {
+			end: () => {
+				SudGame.request('game:end', { result: 'stopped' }).finally(() => { location.href = 'klase.html?tab=zaidimai'; });
+			},
+			max: r.settings && r.settings.max,
+			move: (id, from, to) => SudGame.request('ghost:move', { who: Number(id), to: Number(to) })
+				.then(x => (x && x.ok ? null : MOVE_ERR[x && x.error] || 'Nepavyko perkelti.')),
+			kick: id => SudGame.request('ghost:kick', { who: Number(id) }).then(x => (x && x.ok ? null : 'Nepavyko pašalinti.'))
+		});
+		// the host's page shows it's still there
+		setInterval(() => SudGame.connect().then(s => s.emit('host:alive')).catch(() => {}), 5000);
+	}
+
+	window.addEventListener('resize', () => {
+		if (!S || $('gameView').hidden) return;
+		renderWord();
+		if (!userScrolling) centerCarousel(false);
+	});
+
+	// ---------- one player with bots, set up on the class page (?solo=1; Žaidimai → Vaiduoklis → Vienas su botais) ----------
+	function startFromClass() {
+		let set = null;
+		try { set = JSON.parse(sessionStorage.getItem('ghostSolo')); } catch { }
+		renderSetup();
+		if (!set) return;   // nothing chosen there: the usual setup screen
+		fromClass = true;
+		leaveTo = 'klase.html?tab=zaidimai';
+		// this game's settings (not saved over this page's own choices)
+		settings = Object.assign({}, settings, set, { mode: 'solo' });
+		startGame();
+	}
+
+	// which game this page opens: a class game (?code=), the board (?board=1), a single-player game from the class
+	// page (?solo=1), or the setup screen
+	const PARAMS = new URLSearchParams(location.search);
+	if (CODE) startNet();
+	else if (PARAMS.get('board') === '1') startBoard();
+	else if (PARAMS.get('solo') === '1') startFromClass();
+	else renderSetup();
+	})();
+	</script>
+</body>
+
+</html>

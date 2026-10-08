@@ -1758,9 +1758,75 @@
         .zg-host { font-weight: 700; font-size: 0.9rem; color: #718096; }
         .zg-box { background: rgba(255, 255, 255, 0.22); border: 1px solid rgba(255, 255, 255, 0.55); border-radius: 16px; padding: 18px; }
         .zg-box + .zg-box, .zg-lobby-grid + .zg-box { margin-top: 10px; }
+        /* boxes side by side in a grid: the grid's gap spaces them (no top margin, so a row lines up), and the game
+           cards of one row are equally tall */
+        .zg-games > .zg-box, .zg-settings-grid > .zg-box, .zg-lobby-grid > .zg-box, .zg-g-ways > .zg-box { margin-top: 0; }
+        /* Vaiduoklis: how to play (big choice buttons), the expanding bot settings, the lobby's settings form */
+        .zg-g-ways { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 10px; }
+        .zg-g-way { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: start; cursor: pointer; font: inherit; color: #212529; transition: transform 0.15s, background 0.15s; }
+        .zg-g-way:hover { background: rgba(255, 255, 255, 0.42); transform: translateY(-1px); }
+        .zg-g-way-ico { font-size: 2.2rem; line-height: 1; margin-bottom: 6px; }
+        .zg-board-ico { display: block; width: 1.2em; height: 1em; }   /* "Lentoje": a classroom chalkboard (no emoji shows one) */
+        .zg-g-way b { font-size: 1.15rem; font-weight: 800; }
+        .zg-g-way span:last-child { font-size: 0.9rem; font-weight: 500; color: #4a5568; }
+        .zg-settings-grid.zg-one { grid-template-columns: minmax(0, 560px); }
+        .zg-g-toggle { display: flex; width: 100%; align-items: center; gap: 10px; min-height: 44px; padding: 6px 14px; margin: 2px 0 10px; border: 1px solid rgba(255, 255, 255, 0.95);
+            border-radius: 12px; background: rgba(255, 255, 255, 0.75); color: #1f2a30; font: inherit; font-size: 0.95rem; font-weight: 700; text-align: start; cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, border-radius 0.15s; }
+        .zg-g-toggle:hover { background: #ffffff; }
+        .zg-g-toggle-txt { flex: none; }
+        .zg-g-sum { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #718096; font-size: 0.85rem; font-weight: 600; text-align: end; }
+        .zg-g-chev { flex: none; color: #286D8A; transition: transform 0.15s; }
+        .zg-g-chev { margin-left: auto; }
+        @media (max-width: 480px) { .zg-g-sum { display: none; } }
+        .zg-g-toggle[aria-expanded="true"] { border-color: #286D8A; background: #ffffff; color: #1d566e; border-radius: 12px 12px 0 0; margin-bottom: 0; }
+        .zg-g-toggle[aria-expanded="true"] .zg-g-chev { transform: rotate(180deg); }
+        .zg-g-botset { margin: 0 0 10px; padding: 12px 14px 2px; border: 1px solid #286D8A; border-top: 0; border-radius: 0 0 12px 12px; background: rgba(255, 255, 255, 0.62);
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr)); column-gap: 12px; }
+        .zg-l-form { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); column-gap: 12px; }
+        .zg-l-wide { grid-column: 1 / -1; }
+        /* fields in these grids may shrink below their dropdown's natural width (else they overflow narrow screens) */
+        .zg-g-botset > *, .zg-l-form > *, .zg-settings-grid > * { min-width: 0; }
+        .zg-g-botset select, .zg-l-form select { max-width: 100%; }
+        /* fields side by side: a row is as tall as its tallest label, and every dropdown sits at the bottom (they line up
+           when one label wraps onto two lines) */
+        .zg-g-botset > .zg-field > select, .zg-l-form > .zg-field > select { margin-top: auto; }
+        .zg-l-form select:disabled { opacity: 0.7; cursor: not-allowed; }
+        .zg-players .zg-player { position: relative; }
+        /* "?" – Kaip žaisti? (on the game card and next to "Atgal") and its pop-up */
+        .zg-head-btns { display: flex; align-items: center; gap: 8px; }
+        .zg-help { flex: none; width: 40px; height: 40px; padding: 0; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.65); background: rgba(255, 255, 255, 0.55);
+            color: #286D8A; font: inherit; font-size: 1.2rem; font-weight: 800; line-height: 1; cursor: pointer; display: grid; place-items: center; transition: background 0.15s; }
+        .zg-help:hover { background: rgba(255, 255, 255, 0.85); }
+        .zg-game-card { position: relative; }
+        .zg-card-help { position: absolute; top: 10px; right: 10px; width: 34px; height: 34px; font-size: 1.05rem; }
+        .zg-card-help ~ .zg-game-body { padding-right: 30px; }
+        @media (max-width: 767px) { .zg-card-help ~ .zg-game-body { padding: 0 30px; } }
+        .zg-rules-modal { position: fixed; inset: 0; z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(31, 42, 48, 0.32);
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); font-family: inherit; }
+        .zg-rules-modal[hidden], .zg-rules-modal [hidden] { display: none !important; }
+        .zg-rules-panel { width: 100%; max-width: 460px; max-height: calc(100svh - 32px); overflow: auto; background: rgba(255, 255, 255, 0.95); border-radius: 18px; padding: 22px 20px 18px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2); color: #1f2a30; text-align: left; display: flex; flex-direction: column; }
+        .zg-rules-ico { font-size: 44px; line-height: 1; text-align: center; }
+        .zg-rules-title { font-size: 1.35rem; font-weight: 800; text-align: center; margin: 8px 0 4px; }
+        .zg-rules-panel ol { margin: 8px 0 14px; padding-left: 22px; color: #4a5568; font-size: 0.95rem; }
+        .zg-rules-panel li { margin: 6px 0; }
+        .zg-rules-panel li b { color: #1f2a30; }
+        .zg-rules-panel > .zg-btn { align-self: center; min-width: 140px; }
+
+        .zg-games { align-items: stretch; }
         .zg-label { font-size: 0.85rem; font-weight: 800; letter-spacing: 1.2px; margin-bottom: 10px; text-align: start; }
         .zg-text { font-size: 0.9rem; font-weight: 500; margin: 0 0 12px; }
         .zg-note { color: #718096; margin: 10px 0 0; }
+        .zg-g-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .zg-g-tools { justify-content: space-between; padding: 0 10px 2px 14px; }
+        .zg-g-all { display: flex; align-items: center; gap: 10px; margin: 0; color: #3c4f59; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; }
+        .zg-g-all input { width: 20px; height: 20px; margin: 0; accent-color: #286D8A; cursor: pointer; }
+        .zg-g-count { font-weight: 700; color: #4a5568; }
+        .zg-g-students { list-style: none; margin: 6px 0 0; padding: 4px; max-height: 300px; overflow-y: auto; display: grid; gap: 4px;
+            background: rgba(255, 255, 255, 0.45); border-radius: 12px; }
+        .zg-g-students label { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: rgba(255, 255, 255, 0.7); cursor: pointer; font-weight: 700; }
+        .zg-g-students input { width: 20px; height: 20px; flex: none; accent-color: #286D8A; }
         .zg-btn { position: relative; background: linear-gradient(135deg, #3288AC, #286D8A); border: none; color: #F5F5F7; display: inline-flex; align-items: center; justify-content: center; padding: 12px 18px; border-radius: 20px; cursor: pointer; font: inherit; font-size: 1rem; letter-spacing: 0.01em; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); margin: 0; white-space: nowrap; }
         .zg-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%); border-radius: 20px; pointer-events: none; transition: background 0.3s ease; }
         .zg-btn:hover::before { background: rgba(255, 255, 255, 0.15); }
@@ -1786,11 +1852,27 @@
         .zg-join .zg-input { flex: 1; }
         .zg-games { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 10px; }
         .zg-game-card { display: flex; gap: 16px; align-items: center; }
-        .zg-game-art { display: flex; align-items: flex-end; flex: none; background: linear-gradient(#cfe9b8, #93c66f); border-radius: 12px; padding: 6px 8px 0; }
-        .zg-game-art i { display: block; width: 70px; height: 130px; background-size: 400% 100%; background-position: 0 0; image-rendering: pixelated; }
-        .zg-game-art i.zg-six { background-size: 600% 100%; margin-left: -6px; }
+        /* game pictures: one size for every card, the picture centred in it */
+        .zg-game-art { flex: none; width: 150px; height: 150px; display: grid; place-items: center; overflow: hidden; background: linear-gradient(#cfe9b8, #93c66f); border-radius: 12px; }
+        .zg-game-art i { display: block; background-repeat: no-repeat; image-rendering: pixelated; }
+        /* tower defence: tower 70x130 (4 frames), mage 48x48 (4 frames), both at the game's 6 frames per second */
+        .zg-td-scene { position: relative; width: 70px; height: 130px; transform: scale(1.1); transform-origin: 50% 55%; }
+        .zg-td-tower { position: absolute; left: 0; top: 0; width: 70px; height: 130px;
+            background-image: url('../images/tower-defence-game/playerUnits/mages/2 Idle/6.png'); animation: zg-tower 0.667s steps(4) infinite; }
+        .zg-td-rim { top: 71px; height: 59px; background-position-y: -71px; }
+        .zg-td-mage { position: absolute; left: 12px; top: 40px; width: 48px; height: 48px;
+            background-image: url('../images/tower-defence-game/playerUnits/mages/3 Units/3/D_Idle.png'); animation: zg-mage 0.667s steps(4) infinite; }
+        @keyframes zg-tower { from { background-position-x: 0; } to { background-position-x: -280px; } }
+        @keyframes zg-mage { from { background-position-x: 0; } to { background-position-x: -192px; } }
+        /* the ghost: the pet game's sprite sheet (24 x 10 frames of 74 px), its idle row, at 1.5x */
+        .zg-ghost-art { background: linear-gradient(#e4ddf7, #b6a6e3); }
+        .zg-ghost-sprite { width: 111px; height: 111px; background-image: url('../images/pet-game/ghost-1-1.png'); background-size: 2664px 1110px;
+            background-position: 0 -555px; animation: zg-ghost 1.5s steps(12) infinite; scale: 80%}
+        @keyframes zg-ghost { from { background-position: 0 -555px; } to { background-position: -1332px -555px; } }
+        @media (prefers-reduced-motion: reduce) { .zg-td-tower, .zg-td-mage, .zg-ghost-sprite { animation: none; } }
         .zg-game-name { font-size: 1.2rem; font-weight: 800; margin-bottom: 6px; }
         .zg-settings-grid, .zg-lobby-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 10px; align-items: start; }
+        .zg-settings-grid { align-items: stretch; }
         .zg-field { display: flex; flex-direction: column; gap: 5px; font-weight: 700; font-size: 0.9rem; margin-bottom: 10px; }
         #zg-math select { display: block; width: 100%; max-width: 100%; box-sizing: border-box; margin: 0 0 8px; border: 1px solid rgba(255, 255, 255, 0.65); background: rgba(255, 255, 255, 0.6); border-radius: 14px; padding: 10px 14px; font-size: 0.95rem; color: #212529; white-space: normal; }
         #zg-math .selected_numbers_inner_div { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
@@ -1811,6 +1893,14 @@
         .zg-ready-mark { position: absolute; top: -2px; right: -6px; width: 26px; height: 26px; border-radius: 50%; background: #32ac93; color: #F5F5F7; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: bold; border: 2px solid #F5F5F7; }
         .zg-player.ready .zg-state { color: #32ac93; font-weight: 600; }
         .zg-players .zg-empty { grid-column: 1 / -1; }
+        .zg-bot-av { width: 100%; height: 100%; display: grid; place-items: center; font-size: 2.1rem; line-height: 1; background: rgba(255, 255, 255, 0.7); border-radius: 50%; }
+        .zg-player.zg-bot { position: relative; }
+        .zg-bot-x { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border: 0; border-radius: 50%; background: rgba(231, 76, 60, 0.12); color: #c0392b; font-weight: 800; cursor: pointer; }
+        .zg-bot-x:hover { background: rgba(231, 76, 60, 0.25); }
+        .zg-add-bot { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 80px; border: 2px dashed rgba(40, 109, 138, 0.35); border-radius: 16px;
+            background: rgba(255, 255, 255, 0.25); color: #1d566e; font: inherit; font-weight: 700; cursor: pointer; width: 100%; height: 100%; }
+        .zg-add-bot:hover:not(:disabled) { background: rgba(255, 255, 255, 0.55); }
+        .zg-add-bot:disabled { opacity: 0.5; cursor: not-allowed; }
 
         @media (min-width: 768px) and (orientation: landscape) {
             .zg-title { font-size: 1.4rem; }
@@ -2070,7 +2160,7 @@
                                 <button class="zg-btn zg-btn-light" id="zg-refresh" type="button" autocomplete="off">Atnaujinti</button>
                             </div>
                             <ul class="zg-lobby-list" id="zg-lobby-list">
-                                <li class="zg-empty">Paspausk „Atnaujinti“, kad pamatytum klasės žaidimus.</li>
+                                <li class="zg-empty">Paspauskite „Atnaujinti“, kad pamatytumėte klasės žaidimus.</li>
                             </ul>
                             <div class="zg-box zg-join-box">
                                 <div class="zg-label">PRISIJUNGTI SU NUMERIU</div>
@@ -2084,15 +2174,25 @@
                             <div class="zg-panel-head"><div class="zg-title">Žaidimai</div></div>
                             <div class="zg-games">
                                 <div class="zg-box zg-game-card">
-                                    <div class="zg-game-art" aria-hidden="true">
-                                        <i style="background-image:url('../images/tower-defence-game/playerUnits/mages/2 Idle/6.png')"></i>
-                                        <i class="zg-six" style="background-image:url('../images/tower-defence-game/playerUnits/archers/2 Idle/7.png')"></i>
+                                    <div class="zg-game-art zg-td-art" aria-hidden="true">
+                                        <!-- the game's top mage tower, its mage standing inside (the front wall drawn again over the mage's feet) -->
+                                        <div class="zg-td-scene"><i class="zg-td-tower"></i><i class="zg-td-mage"></i><i class="zg-td-tower zg-td-rim"></i></div>
                                     </div>
                                     <div class="zg-game-body">
                                         <div class="zg-game-name">Tvirtovės gynyba</div>
                                         <p class="zg-text">Kartu apginkite tvirtovę spręsdami matematikos užduotis!</p>
                                         <button class="zg-btn" id="zg-play-td" type="button" autocomplete="off">Kurti</button>
                                         <p class="zg-text zg-note" id="zg-play-note" hidden>Žaidimą mokytojas gali vesti tik didesnio ekrano įrenginuose.</p>
+                                        <p class="zg-text zg-note" id="zg-td-host-note" hidden>Šį žaidimą gali kurti tik mokytojas.</p>
+                                    </div>
+                                </div>
+                                <div class="zg-box zg-game-card">
+                                    <button class="zg-help zg-card-help" type="button" data-rules="ghost" title="Kaip žaisti?" aria-label="Kaip žaisti?">?</button>
+                                    <div class="zg-game-art zg-ghost-art" aria-hidden="true"><i class="zg-ghost-sprite"></i></div>
+                                    <div class="zg-game-body">
+                                        <div class="zg-game-name">Vaiduoklis</div>
+                                        <p class="zg-text">Žodžių žaidimas: pridėkite po raidę ir neužbaikite žodžio pirmi!</p>
+                                        <button class="zg-btn" id="zg-play-ghost" type="button" autocomplete="off">Kurti</button>
                                     </div>
                                 </div>
                             </div>
@@ -2450,9 +2550,118 @@
                                     <label class="zg-field" id="zg-minutes-field"><span>Trukmė (minutės)</span>
                                         <input type="number" id="zg-minutes" class="zg-input" min="1" max="60" value="5">
                                     </label>
+                                    <label class="zg-field"><span>Laukiamojo matomumas</span>
+                                        <select id="zg-visibility" class="zg-input">
+                                            <option value="public">Viešas – matomas klasės žaidimų sąraše</option>
+                                            <option value="private">Privatus – prisijungiama tik su numeriu</option>
+                                        </select>
+                                    </label>
                                     <button class="zg-btn zg-btn-wide" id="zg-create" type="button" autocomplete="off">Sukurti žaidimą</button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Vaiduoklis: first how to play (a student: alone with bots or with classmates; a teacher: on the students'
+                         devices or on the board), then that way's settings. A game with others gets a lobby, where the host
+                         sets the rest. -->
+                    <div id="zg-ghost-settings" hidden>
+                        <div class="zg-panel">
+                            <div class="zg-panel-head">
+                                <div class="zg-title" id="zg-g-title">Vaiduoklis</div>
+                                <div class="zg-head-btns">
+                                    <button class="zg-help" type="button" data-rules="ghost" title="Kaip žaisti?" aria-label="Kaip žaisti?">?</button>
+                                    <button class="zg-btn zg-btn-light" id="zg-ghost-back" type="button" autocomplete="off">Atgal</button>
+                                </div>
+                            </div>
+                            <div class="zg-g-ways" id="zg-g-ways">
+                                <button class="zg-box zg-g-way" type="button" data-way="solo" data-who="student"><span class="zg-g-way-ico" aria-hidden="true">🤖</span><b>Žaisti prieš kompiuterį</b><span>Sukurti laukiamąjį, kuriame gali pasirinkti varžovų pajėgumus.</span></button>
+                                <button class="zg-box zg-g-way" type="button" data-way="multi" data-who="student"><span class="zg-g-way-ico" aria-hidden="true">👥</span><b>Žaisti su klasės draugais</b><span>Sukurti laukiamąjį, į kurį gali prisijungti klasės draugai.</span></button>
+                                <button class="zg-box zg-g-way" type="button" data-way="multi" data-who="teacher"><span class="zg-g-way-ico" aria-hidden="true">📱</span><b>Individualiuose prietaisuose</b><span>Mokiniai žaidžia grupėmis savo įrenginiuose, o jūs stebite visas grupes.</span></button>
+                                <button class="zg-box zg-g-way" type="button" data-way="board" data-who="teacher"><span class="zg-g-way-ico" aria-hidden="true"><svg class="zg-board-ico" viewBox="0 0 48 40"><rect x="2" y="3" width="44" height="29" rx="2.5" fill="#8a5a2b"/><rect x="5" y="6" width="38" height="23" rx="1" fill="#2f6b4f"/><path d="M10 22l3.5-10 3.5 10M11.3 18.5h4.4M21 12v10h3.2a2.6 2.6 0 0 0 0-5.2H21m0 0h2.6a2.4 2.4 0 0 0 0-4.8H21M36 13.5a4.5 5 0 1 0 0 7" fill="none" stroke="#f1f5ee" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="8" y="32" width="32" height="2.5" rx="1" fill="#6b4421"/><rect x="31" y="30.2" width="6" height="1.8" rx=".9" fill="#f1f5ee"/><path d="M14 34.5L10 39M34 34.5L38 39" stroke="#6b4421" stroke-width="2" stroke-linecap="round"/></svg></span><b>Išmaniojoje lentoje</b><span>Pasirinkti mokiniai žaidžia paeiliui viename ekrane.</span></button>
+                            </div>
+                            <div class="zg-settings-grid" id="zg-g-form" hidden>
+                                <!-- one player with bots, the board: the game's settings -->
+                                <div class="zg-box" id="zg-g-game-box">
+                                    <div class="zg-label">NUSTATYMAI</div>
+                                    <label class="zg-field"><span>Žaidėjo gyvybės</span>
+                                        <select id="zg-g-lives" class="zg-input">
+                                            <option value="2">2</option>
+                                            <option value="3" selected>3</option>
+                                            <option value="5">5</option>
+                                        </select>
+                                    </label>
+                                    <label class="zg-field"><span>Maksimalus ėjimo laikas</span>
+                                        <select id="zg-g-time" class="zg-input">
+                                            <option value="0" selected>Neribota</option>
+                                            <option value="15">15 s</option>
+                                            <option value="30">30 s</option>
+                                            <option value="45">45 s</option>
+                                            <option value="60">1 min</option>
+                                        </select>
+                                    </label>
+                                    <label class="zg-field"><span>Kompiuterio valdomi varžovai (botai)</span>
+                                        <select id="zg-g-bots" class="zg-input">
+                                            <option value="0">Be botų</option>
+                                            <option value="1">1</option>
+                                            <option value="2" selected>2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                        </select>
+                                    </label>
+                                    <button class="zg-g-toggle" type="button" aria-expanded="false"><span class="zg-g-toggle-txt">Botų nustatymai</span><span class="zg-g-sum"></span><svg class="zg-g-chev" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                    <div class="zg-g-botset" hidden>
+                                        <label class="zg-field"><span>Botų žodynas</span>
+                                            <select id="zg-g-dict" class="zg-input">
+                                            <option value="easy">Ribotas</option>
+                                            <option value="medium" selected>Vidutinis</option>
+                                            <option value="hard">Platus</option>
+                                            <option value="expert">Turtingas</option>
+                                        </select>
+                                        </label>
+                                        <label class="zg-field"><span>Botų lygis</span>
+                                            <select id="zg-g-bot" class="zg-input">
+                                            <option value="easy">Lengvas</option>
+                                            <option value="normal" selected>Vidutinis</option>
+                                            <option value="hard">Sunkus</option>
+                                        </select>
+                                        </label>
+                                    </div>
+                                    <button class="zg-btn zg-btn-wide" id="zg-g-solo-start" type="button" autocomplete="off">Pradėti</button>
+                                </div>
+                                <!-- the board: who plays -->
+                                <div class="zg-box" id="zg-g-board-box">
+                                    <div class="zg-label">ŽAIDŽIANTYS MOKINIAI</div>
+                                    <div class="zg-g-tools">
+                                        <label class="zg-g-all"><input type="checkbox" id="zg-g-all" checked><span>Visi</span></label>
+                                        <span class="zg-g-count" id="zg-g-count"></span>
+                                    </div>
+                                    <ul class="zg-g-students" id="zg-g-students"></ul>
+                                    <button class="zg-btn zg-btn-wide" id="zg-g-board-start" type="button" autocomplete="off">Pradėti</button>
+                                </div>
+                                <!-- a game with others: its size (and who sees it); everything else is set in the lobby -->
+                                <div class="zg-box" id="zg-g-multi-box">
+                                    <div class="zg-label">ŽAIDIMAS</div>
+                                    <label class="zg-field"><span id="zg-g-max-label">Žaidėjų skaičius</span>
+                                        <select id="zg-g-max" class="zg-input">
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4" selected>4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                        </select>
+                                    </label>
+                                    <label class="zg-field"><span>Matomumas</span>
+                                        <select id="zg-g-visibility" class="zg-input">
+                                            <option value="public" selected>Viešas – matomas klasės žaidimų sąraše</option>
+                                            <option value="private">Privatus – prisijungiama tik su numeriu</option>
+                                        </select>
+                                    </label>
+                                    <p class="zg-text zg-note" id="zg-g-multi-note"></p>
+                                    <button class="zg-btn zg-btn-wide" id="zg-g-create" type="button" autocomplete="off">Toliau</button>
+                                </div>
+                            </div>
+                            <p class="zg-text zg-note" id="zg-g-note"></p>
                         </div>
                     </div>
 
@@ -2465,8 +2674,63 @@
                             </div>
                             <div class="zg-lobby-grid">
                                 <div class="zg-box">
-                                    <div class="zg-label">UŽDUOTIS</div>
+                                    <div class="zg-label" id="zg-task-label">UŽDUOTIS</div>
                                     <ul class="zg-task-list" id="zg-task-list"></ul>
+                                    <!-- the host of a Vaiduoklis game: its settings (changed at once for everyone) -->
+                                    <div class="zg-l-form" id="zg-l-form" hidden>
+                                        <label class="zg-field"><span id="zg-l-max-label">Žaidėjų skaičius</span>
+                                        <select id="zg-l-max" class="zg-input" data-key="max">
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                        </select>
+                                        </label>
+                                        <label class="zg-field"><span>Žaidėjo gyvybės</span>
+                                        <select id="zg-l-lives" class="zg-input" data-key="lives">
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="5">5</option>
+                                        </select>
+                                        </label>
+                                        <label class="zg-field"><span>Maksimalus ėjimo laikas</span>
+                                        <select id="zg-l-time" class="zg-input" data-key="time">
+                                            <option value="0">Neribota</option>
+                                            <option value="15">15 s</option>
+                                            <option value="30">30 s</option>
+                                            <option value="45">45 s</option>
+                                            <option value="60">1 min</option>
+                                        </select>
+                                        </label>
+                                        <!-- chosen when the lobby is created; only shown here -->
+                                        <label class="zg-field"><span>Laukiamojo matomumas</span>
+                                        <select id="zg-l-visibility" class="zg-input" disabled>
+                                            <option value="public">Viešas – matomas klasės žaidimų sąraše</option>
+                                            <option value="private">Privatus – prisijungiama tik su numeriu</option>
+                                        </select>
+                                        </label>
+                                        <div class="zg-l-wide">
+                                            <button class="zg-g-toggle" type="button" aria-expanded="false"><span class="zg-g-toggle-txt">Botų nustatymai</span><span class="zg-g-sum"></span><svg class="zg-g-chev" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                            <div class="zg-g-botset zg-l-botset" hidden>
+                                                <label class="zg-field"><span>Botų žodynas</span>
+                                                <select id="zg-l-dict" class="zg-input" data-key="dict">
+                                            <option value="easy">Ribotas</option>
+                                            <option value="medium">Vidutinis</option>
+                                            <option value="hard">Platus</option>
+                                            <option value="expert">Turtingas</option>
+                                        </select>
+                                                </label>
+                                                <label class="zg-field"><span>Botų lygis</span>
+                                                <select id="zg-l-bot" class="zg-input" data-key="bot">
+                                            <option value="easy">Lengvas</option>
+                                            <option value="normal">Normalus</option>
+                                            <option value="hard">Sunkus</option>
+                                        </select>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="zg-box zg-code-box">
                                     <div class="zg-label">ŽAIDIMO NUMERIS</div>
@@ -2478,7 +2742,29 @@
                             <div class="zg-box">
                                 <div class="zg-label" id="zg-players-label">PRISIJUNGĘ MOKINIAI</div>
                                 <ul class="zg-players" id="zg-players"></ul>
+                                <div id="zg-groups" hidden></div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- "Kaip žaisti?": a game's rules (the "?" buttons; moved to <body> when opened) -->
+                    <div class="zg-rules-modal" id="zg-rules" hidden>
+                        <div class="zg-rules-panel" role="dialog" aria-modal="true" aria-labelledby="zg-rules-title">
+                            <div data-game="ghost">
+                                <div class="zg-rules-ico" aria-hidden="true">👻</div>
+                                <h2 class="zg-rules-title" id="zg-rules-title">Kaip žaisti Vaiduoklį?</h2>
+                                <ol>
+                                    <li>Žaidėjai paeiliui prideda po <b>vieną raidę</b>. Pasirinkite raidę ir spauskite <b>„Pridėti raidę“</b> (arba Enter).</li>
+                                    <li>Iš raidžių visada turi būti galima sudaryti <b>ilgesnį tikrą žodį</b>.</li>
+                                    <li>Jei manote, kad taip prasidedančio žodžio nėra arba kad ilgesnio žodžio nebebus, spauskite <b>„Mesti iššūkį“</b>.</li>
+                                    <li>Žaidėjas, kuriam mestas iššūkis, prideda raidžių ir <b>pateikia ilgesnį žodį</b>, prasidedantį tomis raidėmis, arba pasiduoda.</li>
+                                    <li>Pateiktas žodis patikrinamas žodyne. Jei žodis tikras – gyvybę praranda iššūkį metęs žaidėjas, jei netikras arba iššūkio sulaukęs žaidėjas pasiduoda, gyvybę praranda jis.</li>
+                                    <li><b>Vardai, pavadinimai</b> ir <b>sutrumpintos žodžių formos</b> neleidžiami – už juos prarandama gyvybė.</li>
+                                    <li>Jei nustatytas <b>laikas ėjimui</b>, per jį reikia pridėti raidę (arba pateikti žodį). Nespėjus – prarandama gyvybė.</li>
+                                    <li>Netekęs visų gyvybių žaidėjas tampa <b>vaiduokliu</b> 👻. Laimi paskutinis likęs žaidėjas.</li>
+                                </ol>
+                            </div>
+                            <button class="zg-btn" type="button" data-rules-close>Supratau</button>
                         </div>
                     </div>
                 </div>
@@ -2550,6 +2836,7 @@
         var questionNumberInputElement = document.querySelector('#question-number-input');
     </script>
     <script src="matematika_options.js"></script>
+    <script src="../ghost-groups.js"></script>
     <script src="../klase-games.js"></script>
     <script type="module">
         const weekChallengeWinningsTotalPrizeCoins = 90;
