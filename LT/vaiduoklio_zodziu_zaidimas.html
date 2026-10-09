@@ -486,7 +486,7 @@
 		min-height: 42px;
 	}
 
-	/* ---------- keyboard (Lithuanian letters, alphabet order) ---------- */
+	/* ---------- keyboard (Lithuanian letters in Lithuanian keyboard order, 4 rows) ---------- */
 	.vg-kb {
 		flex: none;
 		width: 100%;
@@ -497,14 +497,14 @@
 		gap: 6px;
 	}
 
-	/* every letter key is as wide as one in the longest row (13 keys), so shorter rows sit centred like on a keyboard */
+	/* every letter key is as wide as one in the longest row (9 keys), so shorter rows sit centred like on a keyboard */
 	.vg-row { --kgap: 5px; display: flex; justify-content: center; gap: var(--kgap); }
 	.vg-row > * { min-width: 0; }
 
 	.vg-key {
-		flex: 0 1 calc((100% - 12 * var(--kgap)) / 13);
+		flex: 0 1 calc((100% - 8 * var(--kgap)) / 9);
 		min-width: 0;
-		max-width: 54px;
+		max-width: 60px;
 		height: 50px;
 		padding: 0;
 		border: 0;
@@ -521,7 +521,7 @@
 	}
 	.vg-key:active { transform: translateY(1px); }
 	.vg-key.sel { background: var(--btn); color: #fff; }
-	.vg-key.wide { flex-basis: calc(1.35 * (100% - 12 * var(--kgap)) / 13); max-width: 74px; }
+	.vg-key.wide { flex-basis: calc(1.35 * (100% - 8 * var(--kgap)) / 9); max-width: 81px; }
 	.vg-key.ok { background: var(--btn); color: #fff; }
 	.vg-key .material-symbols-rounded { font-size: 22px; }
 	.vg-key:disabled { opacity: .35; cursor: default; transform: none; }
@@ -717,7 +717,7 @@
 		.vg-btn { padding: 10px 12px; font-size: 14px; }
 	}
 
-	/* very narrow phones (320–360 px): 11 keys per row must still fit */
+	/* very narrow phones (320–360 px) */
 	@media (max-width: 360px) {
 		.vg-row { --kgap: 2px; }
 		.vg-key { font-size: 14.5px; border-radius: 6px; }
@@ -791,6 +791,28 @@
 		.vg-kb { gap: 3px; }
 		.vg-key { height: 34px; }
 	}
+
+	/* the keyboard has 4 rows: on short screens its keys get lower so the game still fits without scrolling */
+	@media (max-height: 700px) and (orientation: portrait) { .vg-key { height: 38px; } }
+	@media (max-height: 600px) and (orientation: portrait) { .vg-key { height: 30px; font-size: 15px; } .vg-kb { gap: 3px; } }
+	@media (orientation: landscape) and (max-height: 400px) { .vg-key { height: 32px; } .vg-kb { gap: 3px; } }
+	@media (orientation: landscape) and (max-height: 340px) { .vg-key { height: 27px; font-size: 15px; } }
+	/* narrow phones: "Išeiti" as an icon only, so the top bar stays one line; shorter phones: no player avatars */
+	@media (max-width: 420px) {
+		.vg-top { gap: 6px; }
+		.vg-top h1 > span[aria-hidden] { display: none; }
+		.vg-top .vg-icon-btn, .vg-quit { width: 34px; height: 34px; padding: 0; }
+		.vg-quit #quitTxt { display: none; }
+	}
+	@media (max-width: 360px) { .vg-top { gap: 4px; } .vg-top h1 { font-size: 16px; } }
+	@media (max-width: 340px) { #gameView .vg-top h1 { display: none; } #gameView .vg-top { justify-content: flex-end; } }
+	/* very low landscape screens: a smaller players strip and keys */
+	@media (orientation: landscape) and (max-height: 340px) {
+		.vg-key { height: 25px; }
+		.vg-p .tag { display: none; }
+		#gameView > .vg-status { font-size: 13px; }
+	}
+	@media (max-height: 720px) and (orientation: portrait) { .vg-p .av { display: none; } }
 	</style>
 </head>
 
@@ -1055,12 +1077,13 @@
 
 	// The game's alphabet (Lithuanian, the same as the word lists').
 	const ALPHABET = new Set([...SudWords.ALPHABET]);
-	// All 32 letters in keyboard (QWERTY) order without Q, W, X; each Lithuanian letter sits right after its base letter
-	// (E Ę Ė, U Ų Ū, I Į, A Ą, S Š, Z Ž, C Č), as on a phone keyboard's long press.
+	// All 32 letters as on a Lithuanian computer keyboard, without Q, W, X: the number row's Ą Č Ę Ė Į Š Ų Ū Ž (Ž on
+	// the "=" key), then the QWERTY rows. 4 rows of at most 9 keys, so the keys are big enough on phones.
 	const KB_ROWS = [
-		['e', 'ę', 'ė', 'r', 't', 'y', 'u', 'ų', 'ū', 'i', 'į', 'o', 'p'],
-		['a', 'ą', 's', 'š', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-		['back', 'z', 'ž', 'c', 'č', 'v', 'b', 'n', 'm', 'ok']
+		['ą', 'č', 'ę', 'ė', 'į', 'š', 'ų', 'ū', 'ž'],
+		['e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+		['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+		['back', 'z', 'c', 'v', 'b', 'n', 'm', 'ok']
 	];
 
 	// Same values as the prototype server (ghost_game/back-end/src/server.js).
@@ -1200,6 +1223,8 @@
 	// a player whose moves are made on this screen
 	const controllable = id => { const p = S && player(id); return !!p && !p.bot && !p.gone && (board || id === me); };
 	const nameOf = id => player(id).name;
+	// how a player is labelled on their card and in the players list: this screen's own player is "Aš"
+	const cardName = id => isMe(id) ? 'Aš' : nameOf(id);
 	const myTurn = () => S.phase === 'turn' && !S.waitFor && controllable(current());
 	const answering = () => S.phase === 'answer' && !S.waitFor && controllable(S.challengee);
 	const inChallenge = () => ['intro', 'answer', 'checking', 'botAnswer'].includes(S.phase);
@@ -1431,7 +1456,7 @@
 				el.className = 'vg-p';
 				el.dataset.id = id;
 				el.innerHTML = '<div class="av"></div><div class="txt"><div class="nm"></div><div class="hearts"></div><div class="tag"></div></div>';
-				el.querySelector('.nm').textContent = player(id).name;
+				el.querySelector('.nm').textContent = cardName(id);
 				$('track').appendChild(el);
 				if (!cardEls.has(id)) cardEls.set(id, []);
 				cardEls.get(id).push(el);
@@ -1971,7 +1996,7 @@
 			else if (S.phase === 'turn' && id === current()) { cls += ' turn'; tag = isMe(id) ? 'Tavo eilė' : 'Eina dabar'; }
 			else if (p.conn === false) tag = 'Atsijungė';
 			return `<li class="${cls}"><span class="av">${out ? (p.gone ? '🚪' : '👻') : p.av}</span>`
-				+ `<span class="nm">${esc(p.name)}${tag ? `<small>${tag}</small>` : ''}</span>`
+				+ `<span class="nm">${esc(cardName(id))}${tag ? `<small>${tag}</small>` : ''}</span>`
 				+ `<span class="hearts" title="Gyvybės: ${p.lives}">${hearts(p)}</span></li>`;
 		}).join('');
 	}
