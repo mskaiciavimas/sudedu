@@ -375,8 +375,13 @@
         flex-wrap: wrap;
     }
 
+    .user-pick-list { display: flex; flex-direction: column; gap: 6px; }
+    .user-pick { width: 100%; font: inherit; color: inherit; text-align: left; cursor: pointer; gap: 12px; flex-wrap: wrap; }
+    .user-pick:hover, .user-pick:focus-visible { background: rgba(255, 255, 255, 0.45); outline: none; }
+    .user-pick-login { font-size: 13px; color: rgba(0, 0, 0, 0.6); }
+
     .asset-list {
-        max-height: 300px;
+        max-height: 480px;
         overflow-y: auto;
         border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 10px;
@@ -890,6 +895,8 @@
             <button class="tab-btn" onclick="showTab('itemlookup', event)">🔍 Item Lookup</button>
             <button class="tab-btn" onclick="showTab('statistics', event)">📊 Statistics</button>
             <button class="tab-btn" onclick="showTab('taskstorage', event)">💾 Task Storage</button>
+            <button class="tab-btn" onclick="showTab('points', event)">⚖️ Coins</button>
+            <button class="tab-btn" onclick="showTab('gamestats', event)">🎮 Game stats</button>
         </div>
 
         <!-- User Lookup Tab -->
@@ -973,29 +980,21 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="bulk-pet-id">Pet ID (NOT GAME INDEX ID)</label>
+                        <label for="bulk-pet-id">Pet ID</label>
                         <input type="text" id="bulk-pet-id" placeholder="e.g., cat-1">
-                        <small style="color: #666; display: block; margin-top: 5px;">
-                            First class in the "css-class" list in the Game Index for the pet item.
-                        </small>
+                        <small style="color: #666; display: block; margin-top: 5px;">Use 🔍 Choose - it fills these fields.</small>
                     </div>
                     <div class="form-group" id="pet-name-group">
                         <label for="bulk-pet-name">Pet Name</label>
                            <input type="text" id="bulk-pet-name" placeholder="e.g., Fluffy">
                     </div>
                     <div class="form-group" id="pet-skin-id-group">
-                        <label for="bulk-pet-skin-id">Default Skin ID (NOT GAME INDEX ID)</label>
+                        <label for="bulk-pet-skin-id">Default skin ID</label>
                         <input type="text" id="bulk-pet-skin-id" placeholder="e.g., default-cat">
-                        <small style="color: #666; display: block; margin-top: 5px;">
-                            Second class in the "css-class" list in the Game Index for the pet or skin item. Default is ${pet ID}-1, i.e. cat-1-1.
-                        </small>
                     </div>
                     <div class="form-group" id="pet-skin-index-group">
                         <label for="bulk-pet-skin-index">Default Skin Index</label>
                         <input type="number" id="bulk-pet-skin-index" placeholder="e.g., 100">
-                        <small style="color: #666; display: block; margin-top: 5px;">
-                            Game Index ID for pet or skin item.
-                        </small>
                     </div>
                     <div class="form-group" id="pet-compensation-group" style="display: none;">
                         <label for="bulk-pet-compensation">Compensation (per pet)</label>
@@ -1019,25 +1018,17 @@
                         </select>
                     </div>
                     <div class="form-group" id="target-pet-group">
-                        <label for="bulk-target-pet-id">Target Pet ID (NOT GAME INDEX ID)</label>
+                        <label for="bulk-target-pet-id">Target Pet ID</label>
                         <input type="text" id="bulk-target-pet-id" placeholder="e.g., cat-1">
-                        <small style="color: #666; display: block; margin-top: 5px;">
-                            First class in pet's "css-class" list in the Game Index.
-                        </small>
                     </div>
                     <div class="form-group">
-                        <label for="bulk-skin-id">Skin ID (NOT GAME INDEX ID)</label>
+                        <label for="bulk-skin-id">Skin ID</label>
                         <input type="text" id="bulk-skin-id" placeholder="e.g., cat-skin-1">
-                        <small style="color: #666; display: block; margin-top: 5px;">
-                            Second class in "css-class" list in the Game Index for pet or skin items. Default is ${pet's first class}-1.
-                        </small>
+                        <small style="color: #666; display: block; margin-top: 5px;">Use 🔍 Choose - it fills these fields.</small>
                     </div>
                     <div class="form-group">
                         <label for="bulk-skin-index">Skin Game Index ID</label>
                         <input type="number" id="bulk-skin-index" placeholder="e.g., 100">
-                        <small style="color: #666; display: block; margin-top: 5px;">
-                            Skin's ID in Game Index. Default is pet's ID in Game Index.
-                        </small>
                     </div>
                     <div class="form-group" id="skin-equipped-group">
                         <label class="checkbox-label">
@@ -1218,6 +1209,15 @@
                 <div class="loading">Loading storage information...</div>
             </div>
         </div>
+
+        <!-- Coins for tasks: weights, per-task adjustments, the analysis (admin-points.js) -->
+        <div id="points-tab" class="tab-content"></div>
+
+        <!-- Recorded class games (Klasė → Žaidimai) - admin-tools.js -->
+        <div id="gamestats-tab" class="tab-content">
+            <h2>Class game statistics</h2>
+            <div id="gamestats-content"></div>
+        </div>
     </div>
 
     <script src="../mental-arithmetic.js"></script>
@@ -1315,92 +1315,6 @@
             return item ? item.title : `Item ${itemId}`;
         }
 
-        async function findMatchinItems(query) {
-            // Admin check is removed or replaced — frontend cannot check server-side admin
-            // But we keep the exact variable name and return format
-            if (!query) {
-                return { status: 400, json: { message: 'Search query required' } };
-            }
-
-            try {
-                // Load game asset index (replace with actual fetch)
-                const response = await fetch('/gameAssetIndex.json');
-                if (!response.ok) {
-                    return { status: 500, json: { message: 'Game asset index not found' } };
-                }
-
-                const gameAssetIndex = await response.json();
-
-                // If query is only numbers, return specific item by ID
-                if (/^\d+$/.test(query)) {
-                    const itemId = query;
-                    const item = gameAssetIndex[itemId];
-
-                    if (!item) {
-                        return { status: 404, json: { message: 'Item not found' } };
-                    }
-
-                    return {
-                        status: 200,
-                        json: {
-                            results: [{ id: itemId, ...item }],
-                            searchType: 'exact'
-                        }
-                    };
-                }
-
-                // Search by category, title, css-class, or description
-                const queryLower = query.toLowerCase();
-                const results = [];
-
-                for (const [itemId, item] of Object.entries(gameAssetIndex)) {
-                    let matches = false;
-
-                    // Check title
-                    if (item.title && item.title.toLowerCase().includes(queryLower)) {
-                        matches = true;
-                    }
-
-                    // Check css-class
-                    if (item['css-class'] && item['css-class'].toLowerCase().includes(queryLower)) {
-                        matches = true;
-                    }
-
-                    // Check description
-                    if (item.description && item.description.toLowerCase().includes(queryLower)) {
-                        matches = true;
-                    }
-
-                    // Check categories
-                    if (item.category && Array.isArray(item.category)) {
-                        if (item.category.some(cat => cat.toLowerCase().includes(queryLower))) {
-                            matches = true;
-                        }
-                    }
-
-                    if (matches) {
-                        results.push({ id: itemId, ...item });
-                    }
-                }
-
-                if (results.length === 0) {
-                    return { status: 404, json: { message: 'No items found' } };
-                }
-
-                return {
-                    status: 200,
-                    json: {
-                        results,
-                        searchType: 'multiple',
-                        count: results.length
-                    }
-                };
-
-            } catch (err) {
-                console.error('Error searching items:', err);
-                return { status: 500, json: { message: 'Internal server error' } };
-            }
-        }
 
 
 
@@ -1772,6 +1686,10 @@
                 loadStatistics();
             } else if (tabName === 'taskstorage') {
                 loadTaskStorage();
+            } else if (tabName === 'points') {
+                AdminPoints.mount();
+            } else if (tabName === 'gamestats') {
+                AdminTools.loadGameStats();
             }
         }
 
@@ -1836,7 +1754,7 @@
                 }
 
                 if (data.users) {
-                    displayUserSelectionList(data.users);
+                    displayUserSelectionList(data.users, data.total);
                 } else if (data.user) {
                     displayUserDetails(data.user);
                 } else {
@@ -1847,30 +1765,31 @@
             }
         }
 
-        function displayUserSelectionList(users) {
+        // several matches (any part of an e-mail or nickname): a scrollable list; a click opens that user's card
+        function displayUserSelectionList(users, total) {
             const resultsDiv = document.getElementById('lookup-results');
-            let html = `
+            const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+            resultsDiv.innerHTML = `
                 <div class="user-card">
-                    <h3>Multiple users found (${users.length}) — select one to view:</h3>
-                    <div class="asset-list">
-            `;
-            users.forEach(user => {
-                // Safely serialize user to pass into onclick
-                const userJson = JSON.stringify(user).replace(/'/g, "\\'");
-                html += `
-                    <div class="asset-item" style="cursor: pointer;" onclick='displayUserDetails(${JSON.stringify(user)})'>
-                        <div>
-                            <strong>${user.username}</strong>
-                            &nbsp;|&nbsp; Nickname: ${user.nickname}
-                            &nbsp;|&nbsp; ID: ${user.id}
-                            &nbsp;|&nbsp; Type: ${user.accType}
-                            &nbsp;|&nbsp; Last login: ${user.lastLogIn ? new Date(user.lastLogIn).toLocaleString() : 'Never'}
-                        </div>
+                    <h3>${total > users.length ? `${total} users found - the ${users.length} most recently active shown, narrow the search to see others` : `${users.length} users found`} - select one:</h3>
+                    <div class="asset-list user-pick-list">
+                        ${users.map(user => `
+                            <button type="button" class="asset-item user-pick" data-id="${user.id}">
+                                <span><strong>${esc(user.username)}</strong> &nbsp;|&nbsp; ${esc(user.nickname)} &nbsp;|&nbsp; ID ${user.id} &nbsp;|&nbsp; ${esc(user.accType)}</span>
+                                <span class="user-pick-login">Last login: ${user.lastLogIn ? new Date(user.lastLogIn).toLocaleString('lt-LT') : 'never'}</span>
+                            </button>`).join('')}
                     </div>
-                `;
-            });
-            html += `</div></div>`;
-            resultsDiv.innerHTML = html;
+                </div>`;
+            resultsDiv.querySelectorAll('.user-pick').forEach(b => b.addEventListener('click', () => openUserById(b.dataset.id)));
+        }
+        async function openUserById(id) {
+            const resultsDiv = document.getElementById('lookup-results');
+            resultsDiv.innerHTML = '<div class="loading">Loading...</div>';
+            const response = await apiFetch(`${apiBase}admin/user?search=${encodeURIComponent(id)}`);
+            const data = response ? await response.json().catch(() => ({})) : {};
+            if (!response || !response.ok || !data.user) { resultsDiv.innerHTML = `<div class="message error">${data.message || 'Could not load the user'}</div>`; return; }
+            document.getElementById('search-input').value = String(id);   // (saving and refreshing reload this user)
+            displayUserDetails(data.user);
         }
 
         // Display user details with edit form
@@ -2218,12 +2137,6 @@
                                 `;
                             }).join('')}
                         </div>
-
-                        <small style="color: #666; display: block; margin-top: 5px;">
-                            Pet ID is the first class in the "css-class" list in the Game Index for the pet item.
-                            Skin ID is the second class in the "css-class" list in the Game Index for the pet or skin items. 
-                            Game Index ID is the ID of the pet/skin item in the GameAssetIndex.json
-                        </small>
 
                         <h4 style="margin-top: 20px; margin-bottom: 10px; color: #667eea;">Consumables</h4>
                         
@@ -2733,46 +2646,6 @@
             }
         }
 
-        // Remove item from all users
-        async function removeItemFromAll() {
-            const itemId = parseInt(document.getElementById('remove-itemid').value);
-            const compensation = parseInt(document.getElementById('remove-compensation').value) || 0;
-            
-            if (isNaN(itemId)) {
-                showMessage('remove-message', 'Please enter a valid item ID', 'error');
-                return;
-            }
-
-            let confirmMsg = `Remove all instances of item ${itemId} from all users?`;
-            if (compensation > 0) {
-                confirmMsg += `\n\nCompensation: ${compensation} money per item removed`;
-            }
-            
-            if (!confirm(confirmMsg)) return;
-
-            try {
-                const response = await apiFetch(`${apiBase}admin/remove-item/${itemId}`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ compensation })
-                });
-
-                if (!response || !response.ok) {
-                    const data = await response.json();
-                    throw new Error(data.message || 'Failed to remove item');
-                }
-
-                const data = await response.json();
-                showMessage('remove-message', 
-                    `${data.message}<br>Users affected: ${data.usersAffected}<br>Items removed: ${data.itemsRemoved}${data.totalCompensation > 0 ? `<br>Total compensation: ${data.totalCompensation}` : ''}`, 
-                    'success'
-                );
-                document.getElementById('remove-itemid').value = '';
-                document.getElementById('remove-compensation').value = '';
-            } catch (error) {
-                showMessage('remove-message', error.message, 'error');
-            }
-        }
 
         // Logout user
         async function logoutUser(userId, username) {
@@ -2983,81 +2856,7 @@
             }
         }
 
-        // Bulk consumable operations
-        async function addConsumableToAll() {
-            const itemId = parseInt(document.getElementById('bulk-consumable-id').value);
-            const quantity = parseInt(document.getElementById('bulk-consumable-qty').value);
 
-            if (isNaN(itemId) || isNaN(quantity) || quantity < 1) {
-                showMessage('bulk-consumable-message', 'Please enter valid item ID and quantity', 'error');
-                return;
-            }
-
-            if (!confirm(`Add consumable ${itemId} (qty: ${quantity}) to all users?`)) return;
-
-            try {
-                const response = await apiFetch(`${apiBase}admin/bulk/consumable`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ itemId, quantity })
-                });
-
-                if (!response || !response.ok) {
-                    const data = await response.json();
-                    throw new Error(data.message || 'Failed to add consumable');
-                }
-
-                const data = await response.json();
-                showMessage('bulk-consumable-message', 
-                    `${data.message}<br>Updated ${data.updatedCount} users`, 
-                    'success'
-                );
-                document.getElementById('bulk-consumable-id').value = '';
-                document.getElementById('bulk-consumable-qty').value = '1';
-            } catch (error) {
-                showMessage('bulk-consumable-message', error.message, 'error');
-            }
-        }
-
-        async function removeConsumableFromAll() {
-            const itemId = parseInt(document.getElementById('bulk-remove-consumable-id').value);
-            const compensation = parseInt(document.getElementById('bulk-remove-compensation').value) || 0;
-
-            if (isNaN(itemId)) {
-                showMessage('bulk-remove-consumable-message', 'Please enter a valid item ID', 'error');
-                return;
-            }
-
-            let confirmMsg = `Remove consumable ${itemId} from all users?`;
-            if (compensation > 0) {
-                confirmMsg += `\n\nCompensation: ${compensation} money per item removed`;
-            }
-
-            if (!confirm(confirmMsg)) return;
-
-            try {
-                const response = await apiFetch(`${apiBase}admin/bulk/consumable/${itemId}`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ compensation })
-                });
-
-                if (!response || !response.ok) {
-                    const data = await response.json();
-                    throw new Error(data.message || 'Failed to remove consumable');
-                }
-
-                const data = await response.json();
-                showMessage('bulk-remove-consumable-message', 
-                    `${data.message}<br>Users affected: ${data.usersAffected}${data.totalCompensation > 0 ? `<br>Total items removed: ${data.totalItemsRemoved}<br>Total compensation: ${data.totalCompensation}` : ''}`, 
-                    'success'
-                );
-                document.getElementById('bulk-remove-consumable-id').value = '';
-                document.getElementById('bulk-remove-compensation').value = '';
-            } catch (error) {
-                showMessage('bulk-remove-consumable-message', error.message, 'error');
-            }
-        }
 
         // MESSAGE GIFT FUNCTIONS
 
@@ -4267,109 +4066,7 @@ async function cleanupTaskArchives() {
     }
 }
 
-// Remove pet from all users
-async function removePetFromAll() {
-    const petId = document.getElementById('bulk-remove-pet-id').value.trim();
-    const compensation = parseInt(document.getElementById('bulk-remove-pet-compensation').value) || 0;
 
-    if (!petId) {
-        showMessage('bulk-remove-pet-message', 'Please enter a pet ID', 'error');
-        return;
-    }
-
-    let confirmMsg = `Remove pet "${petId}" from all users?\n\nThis will remove the pet even if it's the only pet a user has.`;
-    if (compensation > 0) {
-        confirmMsg += `\n\nCompensation: ${compensation} money per pet removed`;
-    }
-
-    if (!confirm(confirmMsg)) return;
-
-    try {
-        const response = await apiFetch(`${apiBase}admin/bulk/pet/${encodeURIComponent(petId)}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ compensation })
-        });
-
-        if (!response || !response.ok) {
-            const data = await response.json();
-            throw new Error(data.message || 'Failed to remove pet');
-        }
-
-        const data = await response.json();
-        showMessage('bulk-remove-pet-message', 
-            `${data.message}<br>Users affected: ${data.usersAffected}<br>Pets removed: ${data.petsRemoved}${data.totalCompensation > 0 ? `<br>Total compensation: ${data.totalCompensation}` : ''}`, 
-            'success'
-        );
-        document.getElementById('bulk-remove-pet-id').value = '';
-        document.getElementById('bulk-remove-pet-compensation').value = '';
-    } catch (error) {
-        showMessage('bulk-remove-pet-message', error.message, 'error');
-    }
-}
-
-// Remove skin from all users
-async function removeSkinFromAll() {
-    const skinId = document.getElementById('bulk-remove-skin-id').value.trim();
-    const compensation = parseInt(document.getElementById('bulk-remove-skin-compensation').value) || 0;
-    const backupSkinId = document.getElementById('backup-skin-id').value.trim();
-    const backupSkinIndex = document.getElementById('backup-skin-index').value.trim();
-
-    if (!skinId) {
-        showMessage('bulk-remove-skin-message', 'Please enter a skin ID', 'error');
-        return;
-    }
-
-    const hasBackup = backupSkinId && backupSkinIndex;
-
-    let confirmMsg = `Remove skin "${skinId}" from all pets across all users?`;
-    if (hasBackup) {
-        confirmMsg += `\n\nIf a pet is left with no skins, backup skin "${backupSkinId}" (index ${backupSkinIndex}) will be added.`;
-    } else {
-        confirmMsg += `\n\nWARNING: No backup skin provided. Pets may be left with no skins!`;
-    }
-    if (compensation > 0) {
-        confirmMsg += `\n\nCompensation: ${compensation} money per skin removed`;
-    }
-
-    if (!confirm(confirmMsg)) return;
-
-    try {
-        const body = { compensation };
-        if (hasBackup) {
-            body.backupSkinId = backupSkinId;
-            body.backupSkinIndex = parseInt(backupSkinIndex);
-        }
-
-        const response = await apiFetch(`${apiBase}admin/bulk/skin/${encodeURIComponent(skinId)}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-        });
-
-        if (!response || !response.ok) {
-            const data = await response.json();
-            throw new Error(data.message || 'Failed to remove skin');
-        }
-
-        const data = await response.json();
-        let message = `${data.message}<br>Users affected: ${data.usersAffected}<br>Skins removed: ${data.skinsRemoved}`;
-        if (data.backupsAdded > 0) {
-            message += `<br>Backup skins added: ${data.backupsAdded}`;
-        }
-        if (data.totalCompensation > 0) {
-            message += `<br>Total compensation: ${data.totalCompensation}`;
-        }
-        
-        showMessage('bulk-remove-skin-message', message, 'success');
-        document.getElementById('bulk-remove-skin-id').value = '';
-        document.getElementById('bulk-remove-skin-compensation').value = '';
-        document.getElementById('backup-skin-id').value = '';
-        document.getElementById('backup-skin-index').value = '';
-    } catch (error) {
-        showMessage('bulk-remove-skin-message', error.message, 'error');
-    }
-}
 
 // Toggle pet action UI
 document.addEventListener('DOMContentLoaded', function() {
@@ -4938,5 +4635,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
     </script>
+    <script src="admin-points.js"></script>
+    <script src="admin-tools.js"></script>
 </body>
 </html>
