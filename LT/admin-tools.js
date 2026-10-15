@@ -188,24 +188,48 @@
         });
     }
 
+    // ------------------------------------------------------------ deleting needs the admin's password
+    // Every DELETE of the admin API (and deleting game statistics) carries the admin's password (X-Admin-Password);
+    // it is asked in the dialog when needed and kept in this tab's memory for 2 minutes (one action deleting several
+    // things asks once). A wrong one: a message, nothing deleted, asked again next time.
+    let deletePassword = null, deletePasswordUntil = 0;
+    function needsPassword(url, opts) {
+        const method = String((opts && opts.method) || 'GET').toUpperCase();
+        return /\/admin\//.test(url) && (method === 'DELETE' || /\/admin\/game-metrics\/delete/.test(url));
+    }
+    function hookDeletes() {
+        if (typeof window.apiFetch !== 'function' || window.apiFetch.__deletes) return;
+        const base = window.apiFetch;
+        window.apiFetch = async function (url, opts = {}) {
+            if (!needsPassword(String(url), opts)) return base(url, opts);
+            let pw = Date.now() < deletePasswordUntil ? deletePassword : null;
+            if (!pw) pw = await askAdminPassword('Confirm deleting', 'Deleting needs your admin password.');
+            if (!pw) return { ok: false, status: 0, json: async () => ({ message: 'Cancelled - nothing was deleted' }), clone() { return this; } };
+            const res = await base(url, { ...opts, headers: { ...(opts.headers || {}), 'X-Admin-Password': encodeURIComponent(pw) } });
+            if (res && res.ok) { deletePassword = pw; deletePasswordUntil = Date.now() + 2 * 60000; }
+            else if (res && (res.status === 403 || res.status === 429)) {
+                const body = await res.clone().json().catch(() => ({}));
+                if (body.code === 'ADMIN_PASSWORD_WRONG' || res.status === 429) { deletePassword = null; deletePasswordUntil = 0; }
+            }
+            return res;
+        };
+        window.apiFetch.__deletes = true;
+    }
+
     // ------------------------------------------------------------ simulation: the site as the user sees it
     // (refresh-token.js startSimulation / exitSimulation and its floating "Grįžti" button)
     async function simulate(userId, mode, page) {
-        const text = mode === 'full'
-            ? 'You will act as this user: everything you do is saved to their account (and logged). A button at the bottom left brings you back.'
-            : 'You will see the site as this user does. Nothing can be changed. A button at the bottom left brings you back.';
-        const adminPassword = await askAdminPassword(mode === 'full' ? 'Log in as this user' : 'View as this user', text);
-        if (!adminPassword) return;
-        const res = await apiFetch(`${apiBase}admin/impersonate/${userId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adminPassword, mode }) });
+        if (mode === 'full' && !confirm('Log in as this user? Everything you do is saved to their account (and logged). A button at the bottom left brings you back.')) return;
+        const res = await apiFetch(`${apiBase}admin/impersonate/${userId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode }) });
         const body = res ? await res.json().catch(() => ({})) : {};
-        if (!res || !res.ok) { alert(body.message || 'Could not start'); return; }   // (a wrong password: a message, the page stays)
+        if (!res || !res.ok) { alert(body.message || 'Could not start'); return; }
         startSimulation(body, page);
     }
     function accessPanel(user) {
         if (!user || user.accType === 'admin') return '';
         return `<div class="at-access">
             <h3>🧭 Account access</h3>
-            <p class="at-pw-note">See the site exactly as this user does (2 hours at most). "View" is read-only; "Log in" acts as the user - for fixing things.</p>
+            <p class="at-pw-note">See the site exactly as this user does (2 hours at most). "View" is read-only; "Log in" acts as the user - for fixing things. No password needed.</p>
             <div class="at-pw-row">
                 <button type="button" class="btn small-btn" data-sim="view">👁 View as user</button>
                 ${user.accType === 'student' ? '<button type="button" class="btn small-btn" data-sim="room">🏠 View pet room</button>' : ''}
@@ -242,14 +266,15 @@
         const type = document.getElementById('browse-type').value;
         const [sort, dir] = document.getElementById('browse-sort').value.split(':');
         out.innerHTML = '<div class="loading">Loading…</div>';
-        const res = await apiFetch(`${apiBase}admin/users?type=${encodeURIComponent(type)}&sort=${sort}&dir=${dir}`, { headers: { 'Content-Type': 'application/json' } });
+        const min = document.getElementById('browse-min').value, max = document.getElementById('browse-max').value;
+        const res = await apiFetch(`${apiBase}admin/users?type=${encodeURIComponent(type)}&sort=${sort}&dir=${dir}&minStudents=${encodeURIComponent(min)}&maxStudents=${encodeURIComponent(max)}`, { headers: { 'Content-Type': 'application/json' } });
         const body = res ? await res.json().catch(() => ({})) : {};
         if (!res || !res.ok) { out.innerHTML = `<div class="message error">${esc(body.message || 'Could not load')}</div>`; return; }
         const pct = v => (v == null ? '–' : `${String(Math.round(v * 10) / 10).replace('.', ',')}%`);
         out.innerHTML = `
             <div class="user-card">
                 <h3>${body.total > body.users.length ? `${body.users.length} of ${body.total}` : body.users.length} ${type === 'student' ? 'students' : type === 'teacher' ? 'teachers' : 'users'} - select one:</h3>
-                ${sort === 'consistency' ? '<p class="at-pw-note">Only students with at least 3 weeks of data (as the progress graphs); a teacher by the median of such students.</p>' : ''}
+                ${sort === 'consistency' ? '<p class="at-pw-note">Students with at least 3 full weeks of data (as the progress graphs); a teacher by the class median as Užduotys shows it.</p>' : ''}
                 <div class="asset-list user-pick-list">
                     ${body.users.map(u => `
                         <button type="button" class="asset-item user-pick" data-id="${u.id}">
@@ -347,6 +372,7 @@
         .at-ask-row{display:flex;gap:8px}
         .user-browse{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:4px 0 14px}
         .user-browse label{display:flex;gap:6px;align-items:center;font-size:14px}
+        .user-browse input[type=number]{width:70px;padding:7px 8px;border-radius:10px;border:1px solid rgba(0,0,0,.15);font:inherit;background:rgba(255,255,255,.8)}
         .user-browse select{padding:7px 10px;border-radius:10px;border:1px solid rgba(0,0,0,.15);font:inherit;background:rgba(255,255,255,.8)}
         .user-pick-mail{font-size:13px;color:rgba(0,0,0,.6)}
         .user-pick-stats{font-size:13px;color:rgba(0,0,0,.65)}
@@ -359,9 +385,15 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         hookUserCard();
+        hookDeletes();
         attachPickers();
         const browse = document.getElementById('browse-users');
         if (browse) browse.addEventListener('click', browseUsers);
+        // (the class size filter: with teachers only)
+        const typeSel = document.getElementById('browse-type'), classBox = document.querySelector('.browse-class');
+        const showClass = () => { if (classBox) classBox.hidden = typeSel.value !== 'teacher'; };
+        if (typeSel) { typeSel.addEventListener('change', showClass); showClass(); }
+        document.getElementById('browse-sort')?.addEventListener('change', e => { if (e.target.value.startsWith('students') && typeSel) { typeSel.value = 'teacher'; showClass(); } });
         // (forms drawn later - a user's card, a pet's skin rows)
         new MutationObserver(() => attachPickers()).observe(document.body, { childList: true, subtree: true });
     });
