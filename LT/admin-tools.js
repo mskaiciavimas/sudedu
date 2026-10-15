@@ -340,6 +340,32 @@
         });
     }
 
+    // ------------------------------------------------------------ everyone's weekly statistics brought up to date
+    // "Check" previews (nothing saved), "Update" saves - the server works it out again then, so practice meanwhile counts.
+    async function refreshStats(apply) {
+        const box = document.getElementById('stats-refresh-result');
+        const check = document.getElementById('stats-refresh-check'), save = document.getElementById('stats-refresh-apply');
+        if (apply && !confirm('Update every student\'s weekly stats now?')) return;
+        check.disabled = save.disabled = true;
+        box.innerHTML = '<div class="loading">Working…</div>';
+        try {
+            const res = await apiFetch(`${apiBase}admin/stats/refresh`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ apply }) });
+            const j = res ? await res.json().catch(() => ({})) : {};
+            if (!res || !res.ok) { box.innerHTML = `<div class="message error">${esc(j.message || 'Could not do it')}</div>`; return; }
+            const weeks = c => (c || []).map(v => Math.round(Number(v) * 100)).join(' · ');
+            const list = j.examples.length ? `<div class="gs-scroll" style="max-height:260px"><table class="gs-table">
+                <thead><tr><th>Student</th><th>Last practice</th><th>Consistency % by week (oldest → this week): before</th><th>after</th></tr></thead>
+                <tbody>${j.examples.map(e => `<tr><td>${esc(e.name)} (${e.id})</td><td>${esc(e.lastPractice || '–')}</td><td>${weeks(e.before)}</td><td>${weeks(e.after)}</td></tr>`).join('')}</tbody>
+            </table></div>${j.repaired > j.examples.length ? `<p class="at-pw-note">The first ${j.examples.length} of ${j.repaired}.</p>` : ''}` : '';
+            box.innerHTML = apply
+                ? `<div class="message success">Saved for ${j.saved} of ${j.students} students (${j.rolled} brought up to today, ${j.repaired} with shifted weeks put back).</div>${list}`
+                : `<p class="at-pw-note"><b>${j.students}</b> students: <b>${j.rolled}</b> would be brought up to today, <b>${j.repaired}</b> have shifted weeks to put back${j.rolled || j.repaired ? '' : ' - everything is up to date'}.</p>${list}`;
+            save.disabled = apply || !(j.rolled || j.repaired);
+        } finally {
+            check.disabled = false;
+        }
+    }
+
     const style = document.createElement('style');
     style.textContent = `
         .at-field{display:flex;align-items:center;gap:6px;width:100%;min-width:0}
@@ -389,6 +415,8 @@
         attachPickers();
         const browse = document.getElementById('browse-users');
         if (browse) browse.addEventListener('click', browseUsers);
+        document.getElementById('stats-refresh-check')?.addEventListener('click', () => refreshStats(false));
+        document.getElementById('stats-refresh-apply')?.addEventListener('click', () => refreshStats(true));
         // (the class size filter: with teachers only)
         const typeSel = document.getElementById('browse-type'), classBox = document.querySelector('.browse-class');
         const showClass = () => { if (classBox) classBox.hidden = typeSel.value !== 'teacher'; };
