@@ -198,7 +198,7 @@
         if (!adminPassword) return;
         const res = await apiFetch(`${apiBase}admin/impersonate/${userId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adminPassword, mode }) });
         const body = res ? await res.json().catch(() => ({})) : {};
-        if (!res || !res.ok) { alert(body.message || 'Could not start'); return; }
+        if (!res || !res.ok) { alert(body.message || 'Could not start'); return; }   // (a wrong password: a message, the page stays)
         startSimulation(body, page);
     }
     function accessPanel(user) {
@@ -234,6 +234,30 @@
             return result;
         };
         window.displayUserDetails.__hooked = true;
+    }
+
+    // ------------------------------------------------------------ a list of users (students / teachers by consistency)
+    async function browseUsers() {
+        const out = document.getElementById('lookup-results');
+        const type = document.getElementById('browse-type').value;
+        const [sort, dir] = document.getElementById('browse-sort').value.split(':');
+        out.innerHTML = '<div class="loading">Loading…</div>';
+        const res = await apiFetch(`${apiBase}admin/users?type=${encodeURIComponent(type)}&sort=${sort}&dir=${dir}`, { headers: { 'Content-Type': 'application/json' } });
+        const body = res ? await res.json().catch(() => ({})) : {};
+        if (!res || !res.ok) { out.innerHTML = `<div class="message error">${esc(body.message || 'Could not load')}</div>`; return; }
+        const pct = v => (v == null ? '–' : `${String(Math.round(v * 10) / 10).replace('.', ',')}%`);
+        out.innerHTML = `
+            <div class="user-card">
+                <h3>${body.total > body.users.length ? `${body.users.length} of ${body.total}` : body.users.length} ${type === 'student' ? 'students' : type === 'teacher' ? 'teachers' : 'users'} - select one:</h3>
+                <div class="asset-list user-pick-list">
+                    ${body.users.map(u => `
+                        <button type="button" class="asset-item user-pick" data-id="${u.id}">
+                            <span><strong>${esc(u.nickname || u.username)}</strong> <span class="user-pick-mail">${esc(u.username)}</span> &nbsp;|&nbsp; ID ${u.id} &nbsp;|&nbsp; ${esc(u.accType)}${u.accType === 'teacher' ? ` &nbsp;|&nbsp; ${u.students} students` : ''}</span>
+                            <span class="user-pick-stats"><b title="${u.accType === 'teacher' ? 'Median of the class' : 'Average weekly consistency'}">Nuoseklumas ${pct(u.consistency)}</b> · last login ${u.lastLogIn ? new Date(u.lastLogIn).toLocaleDateString('lt-LT') : 'never'}</span>
+                        </button>`).join('') || '<p class="at-pw-note">Nobody.</p>'}
+                </div>
+            </div>`;
+        out.querySelectorAll('.user-pick').forEach(b => b.addEventListener('click', () => openUserById(b.dataset.id)));
     }
 
     // ------------------------------------------------------------ class game statistics (GameMetric)
@@ -320,6 +344,11 @@
         .at-ask-label{display:flex;flex-direction:column;gap:4px;font-size:13px}
         .at-ask-label input{padding:8px 10px;border-radius:8px;border:1px solid rgba(0,0,0,.15);font:inherit}
         .at-ask-row{display:flex;gap:8px}
+        .user-browse{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:4px 0 14px}
+        .user-browse label{display:flex;gap:6px;align-items:center;font-size:14px}
+        .user-browse select{padding:7px 10px;border-radius:10px;border:1px solid rgba(0,0,0,.15);font:inherit;background:rgba(255,255,255,.8)}
+        .user-pick-mail{font-size:13px;color:rgba(0,0,0,.6)}
+        .user-pick-stats{font-size:13px;color:rgba(0,0,0,.65)}
         .gs-scroll{overflow:auto;max-height:70vh;margin-top:10px}
         .gs-table{width:100%;border-collapse:collapse;font-size:13px;background:rgba(255,255,255,.7)}
         .gs-table th,.gs-table td{padding:6px 8px;border-bottom:1px solid rgba(0,0,0,.06);text-align:left;white-space:nowrap}
@@ -330,6 +359,8 @@
     document.addEventListener('DOMContentLoaded', () => {
         hookUserCard();
         attachPickers();
+        const browse = document.getElementById('browse-users');
+        if (browse) browse.addEventListener('click', browseUsers);
         // (forms drawn later - a user's card, a pet's skin rows)
         new MutationObserver(() => attachPickers()).observe(document.body, { childList: true, subtree: true });
     });

@@ -902,6 +902,18 @@
         <!-- User Lookup Tab -->
         <div id="lookup-tab" class="tab-content active">
             <h2>Search Users</h2>
+            <!-- a list of users: students / teachers by consistency (admin-tools.js) -->
+            <div class="user-browse" id="user-browse">
+                <label>Show <select id="browse-type"><option value="">All users</option><option value="student">Students</option><option value="teacher">Teachers</option></select></label>
+                <label>Order by <select id="browse-sort">
+                    <option value="consistency:desc">Nuoseklumas (highest first)</option>
+                    <option value="consistency:asc">Nuoseklumas (lowest first)</option>
+                    <option value="lastLogIn:desc">Last login</option>
+                    <option value="name:asc">Name</option>
+                    <option value="createdAt:desc">Newest accounts</option>
+                </select></label>
+                <button type="button" class="btn btn-secondary" id="browse-users">Show list</button>
+            </div>
             <div class="search-bar">
                 <input type="text" id="search-input" placeholder="Search by ID or email adress" autocomplete="off">
                 <button class="btn" onclick="searchUsers()">Search</button>
