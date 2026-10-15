@@ -249,6 +249,7 @@
         out.innerHTML = `
             <div class="user-card">
                 <h3>${body.total > body.users.length ? `${body.users.length} of ${body.total}` : body.users.length} ${type === 'student' ? 'students' : type === 'teacher' ? 'teachers' : 'users'} - select one:</h3>
+                ${sort === 'consistency' ? '<p class="at-pw-note">Only students with at least 3 weeks of data (as the progress graphs); a teacher by the median of such students.</p>' : ''}
                 <div class="asset-list user-pick-list">
                     ${body.users.map(u => `
                         <button type="button" class="asset-item user-pick" data-id="${u.id}">
