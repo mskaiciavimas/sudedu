@@ -211,6 +211,12 @@
 	}
 	// accepts an assigned task ({taskDescription, completionDate, result}) or an archive row ({taskInfo, date, totalAnswers…})
 	function normalizeTask(t, kindOf) {
+		const item = normalizeTaskFields(t, kindOf);
+		// (the task as the page gave it - e.g. to open an excluded task's results; not enumerable, so not copied around)
+		if (item) Object.defineProperty(item, 'source', { value: t, enumerable: false });
+		return item;
+	}
+	function normalizeTaskFields(t, kindOf) {
 		const info = parseJson(t.taskDescription ?? t.taskInfo ?? t.taskInstructions);
 		const subject = subjectOf(info);
 		const r = t.result ? parseJson(t.result) : t;
@@ -2947,6 +2953,21 @@
 				if (!part) { part = { after: i.opParts.after, ops: [], first: i }; parts.push(part); }
 				part.ops.push(SET_OP_GEN[i.opParts.op]);
 			});
+			// the same operations with and without regrouping: said together - "dviženklių skaičių iki 100 atimties užduotyse
+			// – tiek pergrupuojant, tiek nepergrupuojant skaičių skyrius" (not "… pergrupuojant skaičių skyrius ir atimties
+			// užduotyse nepergrupuojant skaičių skyrių", which reads as another, wider kind of task)
+			const CROSS_WITH = ' pergrupuojant skaičių skyrius', CROSS_WITHOUT = ' nepergrupuojant skaičių skyrių';
+			for (let a = 0; a < parts.length; a++) {
+				for (let b = parts.length - 1; b > a; b--) {
+					const pa = parts[a], pb = parts[b];
+					if (pa.ops.join() !== pb.ops.join()) continue;
+					const pair = (x, y) => x.after.includes(CROSS_WITH) && x.after.replace(CROSS_WITH, CROSS_WITHOUT) === y.after;
+					const withOne = pair(pa, pb) ? pa : pair(pb, pa) ? pb : null;
+					if (!withOne) continue;
+					pa.after = withOne.after.replace(CROSS_WITH, ' – tiek pergrupuojant, tiek nepergrupuojant skaičių skyrius');
+					parts.splice(b, 1);
+				}
+			}
 			const join = (list, word) => (list.length < 2 ? list.join('') : `${list.slice(0, -1).join(', ')} ${word} ${list[list.length - 1]}`);
 			const text = join(parts.map(x => join(x.ops, 'ir') + x.after + example(x.first)), 'ir');   // ("ir" inside: the list joins its last item with "bei")
 			// (the examples are in the text already)
@@ -2968,7 +2989,7 @@
 		});
 		return [...groups.values()].map(({ n, ops }) => ops.length
 			? `${cap(joinList(ops))} skaičiuojant ${n.worse} klystama dažniau nei ${n.better}.`
-			: `${cap(n.area)} skaičiuojant ${n.worse} klystama dažniau nei ${n.better}.`);
+			: `${cap(n.area)} dažniau klystama skaičiuojant ${n.worse} nei ${n.better}.`);
 	}
 	function mistakeSentences(f, details) {
 		const out = [];
@@ -3316,11 +3337,14 @@
 			const o = f.outliers;
 			const one = o.length === 1 && !f.isClass
 				? ` (${periodText(o[0].date, o[0].date).replace(/^\d{4} m\. /, '')}: ${count(o[0].mistakes, W.mistake)} per ${count(o[0].answers, SUBJECTS[f.subject].unitAcc)})` : '';
-			mistakes.push(`Į klaidų ir greičio analizę neįtraukta ${count(o.length, W.task)} su neįprastai daug klaidų${one} – tikėtina, atsakinėta atsitiktinai.`);
+			mistakes.push(`Į klaidų ir greičio analizę ${form(o.length, ['neįtraukta', 'neįtrauktos', 'neįtraukta'])} ${count(o.length, W.task)} su neįprastai daug klaidų${one} – tikėtina, atsakinėta atsitiktinai.`);
 		}
 		const said = mistakes.filter(Boolean);
 		const mistakeLinks = (cmp ? cmp.links.filter(l => l.key === 'peer:mistakes') : [])
-			.concat((f.patternPeers || []).filter(x => x.dist).map(x => ({ text: x.area, key: 'peerpat:' + x.key, after: 'Palyginti su klasės vidurkiu' })));
+			.concat((f.patternPeers || []).filter(x => x.dist).map(x => ({ text: x.area, key: 'peerpat:' + x.key, after: 'Palyginti su klasės vidurkiu' })))
+			// (the excluded tasks: the words open their list, when the page can show it)
+			.concat(details && f.outliers && f.outliers.length && typeof f.openTasks === 'function'
+				? [{ text: count(f.outliers.length, W.task), key: 'outliers', after: 'Į klaidų ir greičio analizę', list: true }] : []);
 		if (said.length) blocks.push({ h: 'Klaidos' }, { p: said.join(' '), links: mistakeLinks });
 		// Tendencijos: the changes from the start to the end of the period that passed the test (the words open the graph), then
 		// what the rest showed - "not detected", not "no change" - or that there was too little data to look at all
@@ -3538,6 +3562,7 @@
 .ins-chart-btn{cursor:pointer;border-bottom:1px dashed rgba(29,86,110,.45)}
 .ins-chart-btn::after{content:'';display:inline-block;width:11px;height:9px;margin-left:5px;vertical-align:1px;background:linear-gradient(#5f7f8c,#5f7f8c) 0 100%/3px 45% no-repeat,linear-gradient(#5f7f8c,#5f7f8c) 4px 100%/3px 100% no-repeat,linear-gradient(#5f7f8c,#5f7f8c) 8px 100%/3px 70% no-repeat}
 .ins-chart-btn:hover{color:#1d566e;border-bottom-color:#1d566e}
+.ins-chart-btn.ins-list-btn::after{display:none}
 .ins-chart-btn:focus-visible{outline:2px solid #1d566e;outline-offset:2px;border-radius:3px}
 .ins-chart-back{position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(20,32,38,.45)}
 .ins-chart-box{position:relative;width:min(760px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:16px 18px 14px;border-radius:14px;background:#fff;color:#1f2a30;box-shadow:0 12px 40px rgba(0,0,0,.25);text-align:left}
@@ -3675,7 +3700,7 @@
 			const from = l.after ? Math.max(0, html.indexOf(esc(l.after))) : 0;
 			const at = html.indexOf(words, from);
 			if (at < 0) return;
-			html = html.slice(0, at) + `<span class="ins-chart-btn" role="button" tabindex="0" data-key="${esc(l.key)}" title="Rodyti grafiką">${words}</span>` + html.slice(at + words.length);
+			html = html.slice(0, at) + `<span class="ins-chart-btn${l.list ? ' ins-list-btn' : ''}" role="button" tabindex="0" data-key="${esc(l.key)}" title="${l.list ? 'Rodyti užduotis' : 'Rodyti grafiką'}">${words}</span>` + html.slice(at + words.length);
 		});
 		return html;
 	}
@@ -3768,6 +3793,7 @@
 		});
 	}
 	function openChart(f, key, opener) {
+		if (key === 'outliers') { if (typeof f.openTasks === 'function') f.openTasks(f.outliers.map(o => o.source).filter(Boolean), { subject: f.subject }); return; }
 		if (/^peer(pat)?:/.test(key)) { openPeerChart(f, key, opener); return; }
 		const c = (f.changes || []).find(x => x.key === key);
 		if (!c) return;
@@ -4179,6 +4205,7 @@
 			return;
 		}
 		if (el.dataset.insToken !== token) return;   // a newer render has started
+		f.openTasks = opts.openTasks;   // (the page's list of tasks - the excluded ones' link)
 		el._insFacts = f;   // (also for checking in the console)
 		if (views) renderMistakeViews(f, views);
 		if (!summary) return;

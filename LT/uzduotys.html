@@ -3913,11 +3913,11 @@
             align-items: center;
             gap: 8px 12px;
         }
-        #teacher-gui #embedded-archive-table-container,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table),
         #teacher-gui #statisticsAnalysisTaskList table {
             width: 100%;
         }
-        #teacher-gui #embedded-archive-table-container {
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) {
             max-height: none;
             padding: 0;
             overflow: visible;
@@ -3925,7 +3925,7 @@
             border-radius: 0;
             background: transparent;
         }
-        #teacher-gui #embedded-archive-table-container table,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) table,
         #teacher-gui #statisticsAnalysisTaskList table {
             display: block;
             height: auto;
@@ -3936,8 +3936,8 @@
             background: transparent;
             overflow: visible;
         }
-        #teacher-gui #embedded-archive-table-container thead,
-        #teacher-gui #embedded-archive-table-container tbody,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) thead,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) tbody,
         #teacher-gui #statisticsAnalysisTaskList thead,
         #teacher-gui #statisticsAnalysisTaskList tbody {
             display: block;
@@ -3949,19 +3949,19 @@
         }
 
         /* The header row stays where it is; only the rows below it scroll (both reserve the same scrollbar gutter, so columns line up). */
-        #teacher-gui #embedded-archive-table-container thead,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) thead,
         #teacher-gui #statisticsAnalysisTaskList thead {
             overflow-y: hidden;
             scrollbar-gutter: stable;
         }
-        #teacher-gui #embedded-archive-table-container tbody,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) tbody,
         #teacher-gui #statisticsAnalysisTaskList tbody {
             overflow-x: hidden;
             overflow-y: auto;
             overscroll-behavior: contain;
             scrollbar-gutter: stable;
         }
-        #teacher-gui #embedded-archive-table-container tbody {
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) tbody {
             max-height: clamp(260px, 30vh, 520px);
         }
         /* a wide screen: "Atliktos" fills the column like the tasks' list - only its rows scroll, the column itself never does */
@@ -3971,35 +3971,35 @@
             #teacher-gui #embedded-archived-tasks-section:not([style*="none"]) { display: flex !important; flex: 1 1 0px; flex-direction: column; min-height: 0; }
             #teacher-gui #embedded-archived-tasks-section > #embeddedArchiveCollapseBody:not(.collapsed) { display: flex; flex: 1 1 0px; flex-direction: column; min-height: 0; }
             #teacher-gui #embedded-archive-view { flex: 1 1 0px; flex-direction: column; min-height: 0; }
-            #teacher-gui #embedded-archive-table-container { display: flex; flex: 1 1 0px; flex-direction: column; min-height: 0; }
-            #teacher-gui #embedded-archive-table-container table { display: flex; flex: 1 1 0px; flex-direction: column; min-height: 0; }
-            #teacher-gui #embedded-archive-table-container tbody { flex: 1 1 0px; min-height: 120px; max-height: none; }
+            :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) { display: flex; flex: 1 1 0px; flex-direction: column; min-height: 0; }
+            :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) table { display: flex; flex: 1 1 0px; flex-direction: column; min-height: 0; }
+            :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) tbody { flex: 1 1 0px; min-height: 120px; max-height: none; }
         }
         #teacher-gui #statisticsAnalysisTaskList tbody {
             max-height: 240px;
         }
         /* Column layouts: 3 / 4 columns, plus a leading checkbox column */
-        #teacher-gui #embedded-archive-table-container tr,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) tr,
         #teacher-gui #statisticsAnalysisTaskList tr {
             display: grid;
             grid-template-columns: minmax(78px, 0.8fr) minmax(90px, 1fr) minmax(140px, 2.2fr);
             align-items: center;
             gap: 6px;
         }
-        #teacher-gui #embedded-archive-table-container table:has(th:nth-child(4)) tr,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) table:has(th:nth-child(4)) tr,
         #teacher-gui #statisticsAnalysisTaskList table:has(th:nth-child(4)) tr {
             grid-template-columns: minmax(78px, 0.8fr) minmax(90px, 1fr) minmax(56px, 0.5fr) minmax(140px, 2.2fr);
         }
-        #teacher-gui #embedded-archive-table-container table:has(.analysis-task-checkbox-cell):has(th:nth-child(4)) tr,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) table:has(.analysis-task-checkbox-cell):has(th:nth-child(4)) tr,
         #teacher-gui #statisticsAnalysisTaskList table:has(.analysis-task-checkbox-cell):has(th:nth-child(4)) tr {
             grid-template-columns: 30px minmax(78px, 0.8fr) minmax(90px, 1fr) minmax(140px, 2.2fr);
         }
-        #teacher-gui #embedded-archive-table-container table:has(.analysis-task-checkbox-cell):has(th:nth-child(5)) tr,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) table:has(.analysis-task-checkbox-cell):has(th:nth-child(5)) tr,
         #teacher-gui #statisticsAnalysisTaskList table:has(.analysis-task-checkbox-cell):has(th:nth-child(5)) tr {
             grid-template-columns: 30px minmax(78px, 0.8fr) minmax(90px, 1fr) minmax(56px, 0.5fr) minmax(140px, 2.2fr);
         }
         /* Header row */
-        #teacher-gui #embedded-archive-table-container thead tr,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) thead tr,
         #teacher-gui #statisticsAnalysisTaskList thead tr {
             padding: 0 10px 6px;
             color: #3c4f59;
@@ -4008,7 +4008,7 @@
             text-transform: uppercase;
         }
         /* Task rows */
-        #teacher-gui #embedded-archive-table-container tbody tr,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) tbody tr,
         #teacher-gui #statisticsAnalysisTaskList tbody tr {
             margin-bottom: 6px;
             padding: 0 10px;
@@ -4016,15 +4016,15 @@
             background: rgba(255, 255, 255, 0.62);
             contain: layout paint;
         }
-        #teacher-gui #embedded-archive-table-container tbody tr.archive-row-clickable {
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) tbody tr.archive-row-clickable {
             cursor: pointer;
         }
-        #teacher-gui #embedded-archive-table-container tbody tr:hover,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) tbody tr:hover,
         #teacher-gui #statisticsAnalysisTaskList tbody tr:hover {
             background: rgba(255, 255, 255, 0.92);
         }
-        #teacher-gui #embedded-archive-table-container th,
-        #teacher-gui #embedded-archive-table-container td,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) th,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) td,
         #teacher-gui #statisticsAnalysisTaskList th,
         #teacher-gui #statisticsAnalysisTaskList td {
             position: static;
@@ -4042,17 +4042,17 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        #teacher-gui #embedded-archive-table-container thead th,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) thead th,
         #teacher-gui #statisticsAnalysisTaskList thead th {
             padding: 0;
             font-weight: 400;
         }
-        #teacher-gui #embedded-archive-table-container td:last-child,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) td:last-child,
         #teacher-gui #statisticsAnalysisTaskList td:last-child {
             position: relative;
             padding-right: 22px;
         }
-        #teacher-gui #embedded-archive-table-container td:last-child::after,
+        :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) td:last-child::after,
         #teacher-gui #statisticsAnalysisTaskList td:last-child::after {
             content: "\203A";
             position: absolute;
@@ -5831,24 +5831,24 @@
 
             /* Tables of tasks (completed tasks, task picker of the analysis): the columns share the width,
                long text wraps instead of being cut, and whatever still does not fit scrolls sideways */
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) table {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) table {
                 overflow-x: auto;
                 overflow-y: hidden;
             }
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) thead,
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) tbody {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) thead,
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) tbody {
                 min-width: 300px;
             }
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) table:has(.analysis-task-checkbox-cell) :is(thead, tbody) {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) table:has(.analysis-task-checkbox-cell) :is(thead, tbody) {
                 min-width: 330px;
             }
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) thead tr {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) thead tr {
                 padding-bottom: 8px;
                 font-size: 12.5px;
                 letter-spacing: 0.03em;
             }
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) th,
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) td {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) th,
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) td {
                 width: auto;                /* (the old phone rule "th:first-child { width: 37% }" squeezed the headers to a few pixels) */
                 overflow: visible;
                 text-overflow: clip;
@@ -5856,10 +5856,10 @@
                 overflow-wrap: anywhere;
                 line-height: 1.25;
             }
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) .archive-col-date {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) .archive-col-date {
                 white-space: nowrap;
             }
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) td:last-child {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) td:last-child {
                 padding-right: 18px;
             }
             /* (on upright tablets "table * { font-size: 1.5rem }" made the task names inside the cells huge) */
@@ -5879,38 +5879,38 @@
         /* ---------- 17b. Phones ------------------------------------------------ */
         @media (max-width: 520px) {
             /* Task tables: date | group | task. "Atliko" is dropped, the task shows only its first item */
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) tr {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) tr {
                 grid-template-columns: 72px minmax(0, 0.9fr) minmax(0, 1.25fr) !important;
                 gap: 8px;
                 padding-right: 8px;
                 padding-left: 8px;
             }
             /* the task picker of the analysis has a checkbox column too: it gives up the year of the date */
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) table:has(.analysis-task-checkbox-cell) tr {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) table:has(.analysis-task-checkbox-cell) tr {
                 grid-template-columns: 22px 40px minmax(0, 0.9fr) minmax(0, 1.25fr) !important;
             }
             #teacher-gui table:has(.analysis-task-checkbox-cell) .archive-date-year {
                 display: none;
             }
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) table:has(.analysis-task-checkbox-cell) :is(thead, tbody) {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) table:has(.analysis-task-checkbox-cell) :is(thead, tbody) {
                 min-width: 260px;
             }
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) td:last-child {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) td:last-child {
                 padding-right: 14px;
             }
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) td:last-child::after {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) td:last-child::after {
                 right: 1px;
                 font-size: 18px;
             }
             #teacher-gui .archive-col-completion {
                 display: none;
             }
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) .task-label-rest {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) .task-label-rest {
                 display: none;
             }
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) th,
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) td,
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) .task-label-wrapper {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) th,
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) td,
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) .task-label-wrapper {
                 font-size: 13px;
             }
 
@@ -5942,23 +5942,23 @@
             #teacher-gui .tc .unfinished-task-actions {
                 width: 92px;
             }
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) th,
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) td,
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) .task-label-wrapper {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) th,
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) td,
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) .task-label-wrapper {
                 font-size: 12.5px;
             }
             /* the year of the date goes, so the table fits (2026-09-12 shows as 09-12) */
             #teacher-gui .archive-date-year {
                 display: none;
             }
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) tr {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) tr {
                 grid-template-columns: 40px minmax(0, 0.9fr) minmax(0, 1.25fr) !important;
             }
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) table:has(.analysis-task-checkbox-cell) tr {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) table:has(.analysis-task-checkbox-cell) tr {
                 grid-template-columns: 22px 40px minmax(0, 0.9fr) minmax(0, 1.25fr) !important;
             }
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) :is(thead, tbody),
-            #teacher-gui :is(#embedded-archive-table-container, #statisticsAnalysisTaskList) table:has(.analysis-task-checkbox-cell) :is(thead, tbody) {
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) :is(thead, tbody),
+            :is(#teacher-gui #embedded-archive-table-container, #teacher-gui #statisticsAnalysisTaskList, #excluded-tasks-table) table:has(.analysis-task-checkbox-cell) :is(thead, tbody) {
                 min-width: 250px;
             }
             #teacher-gui .nb {
@@ -6900,6 +6900,20 @@
         .aa-mode-row { flex-direction: column; align-items: stretch; gap: 4px; }
         #new-task-options-container .tms-btn { font-size: 13.5px; white-space: normal; }
     }
+    /* the analysis's excluded tasks: a list like Atliktos, one layer under the site's pop-up (a task's results open on top) */
+    #excluded-tasks-overlay { position: fixed; inset: 0; z-index: 9998; display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; background: rgba(0, 0, 0, 0.5); }
+    .excluded-tasks-panel { position: relative; display: flex; flex-direction: column; gap: 6px; box-sizing: border-box; width: 760px; max-width: 100%; max-height: 85svh; padding: 22px 20px 18px; border-radius: 20px; background: #F5F5F7; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); color: #1f2a30; font-family: 'SFpro', sans-serif; }
+    .excluded-tasks-title { padding-right: 40px; font-size: 19px; font-weight: 600; }
+    .excluded-tasks-sub { margin-bottom: 8px; color: #3c4f59; font-size: 14.5px; line-height: 1.4; }
+    .excluded-tasks-close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: rgba(31, 42, 48, 0.08); color: #1f2a30; font-size: 22px; line-height: 1; cursor: pointer; }
+    .excluded-tasks-close:hover { background: rgba(31, 42, 48, 0.15); }
+    #excluded-tasks-overlay #excluded-tasks-table { display: block; flex: 1 1 auto; height: auto; min-height: 0; max-height: none; overflow-y: auto; overscroll-behavior: contain; }
+    /* (a task's results open on top: their glass panel would show the list through it) */
+    #excluded-tasks-overlay.under .excluded-tasks-panel { visibility: hidden; }
+    /* (the Atliktos table's flexible body has no height of its own here: the list is as tall as its rows, the panel scrolls) */
+    #excluded-tasks-overlay #excluded-tasks-table table, #excluded-tasks-overlay #excluded-tasks-table tbody { display: block; flex: none; min-height: 0; max-height: none; overflow: visible; }
+    /* (the class: date | student | group | task) */
+    #excluded-tasks-overlay #excluded-tasks-table table:has(th:nth-child(4)) tr { grid-template-columns: minmax(78px, 0.8fr) minmax(80px, 0.8fr) minmax(90px, 1fr) minmax(140px, 2.2fr); }
 </style>
 </head>
 
@@ -8017,7 +8031,7 @@
 	<script src="../mental-arithmetic-combinations.js?v=20261017"></script>
     <script src="../parameter_dictionary.js?v=20261018r"></script>
     <script src="../rasyba-generator.js?v=20261018r"></script>
-    <script src="../sudedu-insights.js?v=20261018r"></script>
+    <script src="../sudedu-insights.js?v=20261018t"></script>
     <script src="../sudedu-auto-tasks.js?v=20261018r"></script>
     <script src="../klase-invites.js?v=20261018r"></script>
     <script src="../main-nav-bar.js"></script>
@@ -13101,7 +13115,10 @@ async function displayTeacherHome(selectedGroupNames=null) {
 
     const taskStatusSummary = countTaskStatuses(studentTasks)
 
-    renderPendingTasksAccordion(studentTasks, studentStatisticsCompletedTasks, true);
+    // the week board and the list at once - from the class's tasks known so far (or, before they ever came, the same
+    // layout saying "Kraunama…") - then the same layout again with the fresh ones: the fields fill in, nothing jumps
+    if (classTeacherTasksLoaded) renderClassTeacherTasks();
+    else renderPendingTasksAccordion(studentTasks, studentStatisticsCompletedTasks, true);
     await fetchClassTeacherTasks();
     renderClassTeacherTasks();
     placePendingTasksBeforeArchive();
@@ -15849,6 +15866,66 @@ function studentGradeNow(studentId) {
     return student && Number.isInteger(Number(student.knowledgeLvl)) ? Number(student.knowledgeLvl) : null;
 }
 
+// The tasks the analysis left out (Analizė → Didelis: "… neįtrauktos N užduotys su neįprastai daug klaidų"): a list that
+// looks like Atliktos. A task opens its results pop-up on top of it; closing that comes back to the list.
+function archiveRowFromTask(t) {
+    if (!t) return null;
+    const nameOf = id => ((studentList || []).find(s => Number(s.id) === Number(id)) || {}).nickname || '';
+    if (t.taskInfo != null && t.totalAnswers != null) return { ...t, studentName: nameOf(t.studentId) };   // (an archive row)
+    let r = t.result;
+    if (typeof r === 'string') { try { r = JSON.parse(r); } catch (e) { r = null; } }
+    r = r || {};
+    const teacherTask = /^teacher:(\d+)$/.exec(t.taskKey || '');
+    return {
+        id: t.assignmentId ?? t.id,
+        date: String(t.completionDate || t.date || '').slice(0, 10),
+        taskInfo: t.taskDescription ?? t.taskInstructions,
+        totalAnswers: r.totalAnswers, correct: r.correct, mistakes: r.mistakes, answerRate: r.answerRate, mistakesDetail: r.mistakesDetail,
+        duration: t.duration, group: t.group,
+        teacherTaskId: teacherTask ? Number(teacherTask[1]) : (t.teacherTaskId ?? null),
+        studentId: t.studentId ?? null, studentName: nameOf(t.studentId),
+        dueDate: t.dueDate ?? null, onTime: t.onTime ?? null
+    };
+}
+let excludedTasksWatch = null;
+function closeExcludedTasksPopup() {
+    if (excludedTasksWatch) { excludedTasksWatch.disconnect(); excludedTasksWatch = null; }
+    document.getElementById('excluded-tasks-overlay')?.remove();
+    document.removeEventListener('keydown', excludedTasksKey);
+}
+function excludedTasksKey(event) {
+    // (Escape closes the top pop-up only: an open task's results first)
+    if (event.key === 'Escape' && document.getElementById('object-popup')?.style.display !== 'flex') closeExcludedTasksPopup();
+}
+function openExcludedTasksPopup(tasks) {
+    const rows = (tasks || []).map(archiveRowFromTask).filter(row => row && row.id != null)
+        .sort((a, b) => String(b.date).localeCompare(String(a.date)));
+    if (!rows.length) return;
+    closeExcludedTasksPopup();
+    const withStudent = Boolean(currentStatisticsIsClass) && rows.some(row => row.studentName);
+    const overlay = document.createElement('div');
+    overlay.id = 'excluded-tasks-overlay';
+    overlay.innerHTML = `<div class="excluded-tasks-panel" role="dialog" aria-modal="true" aria-labelledby="excluded-tasks-title">
+        <button type="button" class="excluded-tasks-close" aria-label="Uždaryti">&times;</button>
+        <div class="excluded-tasks-title" id="excluded-tasks-title">Į analizę neįtrauktos užduotys</div>
+        <div class="excluded-tasks-sub">Neįprastai daug klaidų – tikėtina, atsakinėta atsitiktinai. Paspauskite užduotį – atsivers jos rezultatai.</div>
+        <div id="excluded-tasks-table"></div>
+    </div>`;
+    // (next to the site's pop-up, in the same layering: a task's results, opened from the list, come on top of it)
+    const sitePopup = document.getElementById('object-popup');
+    if (sitePopup && sitePopup.parentNode) sitePopup.parentNode.insertBefore(overlay, sitePopup); else document.body.appendChild(overlay);
+    renderEmbeddedArchiveTable(rows, overlay.querySelector('#excluded-tasks-table'), withStudent);
+    // (while a task's results are open on top, the list's panel is hidden; it comes back when they close)
+    if (sitePopup) {
+        const sync = () => overlay.classList.toggle('under', sitePopup.style.display === 'flex');
+        excludedTasksWatch = new MutationObserver(sync);
+        excludedTasksWatch.observe(sitePopup, { attributes: true, attributeFilter: ['style'] });
+    }
+    overlay.querySelector('.excluded-tasks-close').addEventListener('click', closeExcludedTasksPopup);
+    overlay.addEventListener('click', event => { if (event.target === overlay) closeExcludedTasksPopup(); });
+    document.addEventListener('keydown', excludedTasksKey);
+}
+
 function renderAnalysisInsights(tasks) {
     if (!window.SudInsights || !SudInsights.enabled('period')) return;
     const isClass = Boolean(currentStatisticsIsClass);
@@ -15861,7 +15938,9 @@ function renderAnalysisInsights(tasks) {
         period: analysisDateRange(),
         // the class overview: the typical student, out of the students in the overview
         classSize: isClass ? ((typeof studentListFiltered !== 'undefined' && studentListFiltered) || studentList || []).length : null,
-        gradeOf: studentGradeNow
+        gradeOf: studentGradeNow,
+        // (Didelis: "… neįtrauktos N užduotys su neįprastai daug klaidų" - the words open those tasks)
+        openTasks: openExcludedTasksPopup
     };
     // the class overview's mistakes tables without the bar column (CSS)
     document.getElementById('teacher-analysis-content')?.classList.toggle('ins-class', isClass);
@@ -16653,7 +16732,9 @@ function toggleAnalysisTask(checkbox) {
     updateAnalysisTaskCount();
 }
 
+// (includeCompletion - the old "Atliko" column - is no longer shown anywhere: Atliktos, Analizė, the excluded tasks)
 function renderEmbeddedArchiveTable(rows, container, includeStudent = false, includeCompletion = false, analysisTable = false) {
+    includeCompletion = false;
     if (!rows.length) {
         container.innerHTML = '<div class="task-archive-empty">Nėra duomenų šiam laikotarpiui.</div>';
         return;
