@@ -6915,6 +6915,34 @@
     #excluded-tasks-overlay #excluded-tasks-table table, #excluded-tasks-overlay #excluded-tasks-table tbody { display: block; flex: none; min-height: 0; max-height: none; overflow: visible; }
     /* (the class: date | student | group | task) */
     #excluded-tasks-overlay #excluded-tasks-table table:has(th:nth-child(4)) tr { grid-template-columns: minmax(78px, 0.8fr) minmax(80px, 0.8fr) minmax(90px, 1fr) minmax(140px, 2.2fr); }
+    /* "Sudėlioti tekstai" (displayComletedTextIdsForTextComp): one row per text, in a scrolling box */
+    .tx-box { display: flex; flex-direction: column; gap: 4px; margin: 6px 0 4px; }
+    .tx-summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; color: #3c4f59; font-size: 13.5px; }
+    .tx-hint { color: #5f7480; font-size: 12.5px; }
+    .tx-scroll { max-height: 260px; overflow-y: auto; overscroll-behavior: contain; padding: 2px 4px 2px 0; }
+    .tx-list { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 0; list-style: none; }
+    .tx-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; padding: 5px 8px; border-radius: 10px; background: rgba(255, 255, 255, 0.55); }
+    .tx-row > .text-id-chip { flex: none; min-width: 58px; }
+    .tx-seq { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 2px; }
+    .tx-sep { color: #8a9aa3; font-size: 12px; }
+    .tx-n, .tx-avg { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 22px; padding: 0 6px; border-radius: 7px; font-size: 13px; font-weight: 700; }
+    .tx-n.ok, .tx-avg.ok { background: rgba(64, 201, 169, 0.2); color: #17705d; }
+    .tx-n.mid, .tx-avg.mid { background: #fbefb0; color: #6b5700; }
+    .tx-n.bad, .tx-avg.bad { background: #f8dada; color: #983a3a; }
+    .tx-trend { display: inline-flex; align-items: center; gap: 3px; margin-left: auto; font-size: 12.5px; font-weight: 600; }
+    .tx-trend .ti { font-size: 15px; }
+    .tx-trend.down { color: #17705d; }
+    .tx-trend.up { color: #983a3a; }
+    .tx-trend.same { color: #5f7480; font-weight: 500; }
+    .tx-bar { flex: 1 1 80px; max-width: 220px; height: 6px; border-radius: 3px; background: rgba(31, 42, 48, 0.1); overflow: hidden; }
+    .tx-bar i { display: block; height: 100%; border-radius: 3px; }
+    .tx-bar i.ok { background: #40c9a9; } .tx-bar i.mid { background: #e8c547; } .tx-bar i.bad { background: #d57e7e; }
+    .tx-note { margin-left: auto; color: #5f7480; font-size: 12.5px; }
+    .tx-empty { padding: 6px 2px; color: #3c4f59; font-size: 13.5px; }
+    .tx-more { margin: 6px 0 2px; padding: 4px 8px; border: 0; border-radius: 8px; background: none; color: #1d566e; font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+    .tx-more:hover { background: rgba(50, 136, 172, 0.12); }
+    .tx-others { margin-top: 2px; }
+    .tx-list[hidden] { display: none; }
 </style>
 </head>
 
@@ -10074,117 +10102,96 @@ function textIdButton(textId) {
     button.dataset.textId = textId;
     return button;
 }
+/* "Sudėlioti tekstai": one row per text - its ID (opens the text), the mistakes of every time it was assembled in order
+ * (oldest → newest, coloured: 0 green, 1–2 yellow, 3+ red) and how they changed. The texts with mistakes first, the ones
+ * always assembled without mistakes behind a button. The class overview (showAverages): per text the average mistakes and
+ * how many times it was assembled - the harder texts first, the rest behind the button. In a scrolling box. */
+function textMistakeLabel(n) {
+    const v = Math.abs(Math.round(Number(n)));
+    if (v % 10 === 1 && v % 100 !== 11) return 'klaida';
+    if (v % 10 >= 2 && (v % 100 < 10 || v % 100 > 20)) return 'klaidos';
+    return 'klaidų';
+}
+function textTimesLabel(n) {
+    const v = Math.abs(Math.round(Number(n)));
+    return `${n} ${v % 10 >= 2 && (v % 100 < 10 || v % 100 > 20) ? 'kartus' : v % 10 === 1 && v % 100 !== 11 ? 'kartą' : 'kartų'}`;   // ("sudėliota 3 kartus")
+}
+function textCountLabel(n) {
+    const v = Math.abs(Math.round(Number(n)));
+    return `${n} ${v % 10 >= 2 && (v % 100 < 10 || v % 100 > 20) ? 'tekstai' : v % 10 === 1 && v % 100 !== 11 ? 'tekstas' : 'tekstų'}`;
+}
+const TEXT_CLASS_HARD = 1;   // (the class overview: a text with at least this many mistakes on average is shown first)
 function displayComletedTextIdsForTextComp(textInfo, htmlContainer, showAverages = false, openTextHandler = openTextBrowser) {
-    const ul = document.createElement("ol");
-    const textComprehensionTextsTitle = document.createElement("div");
-    
-    if (showAverages) {
-        textComprehensionTextsTitle.innerHTML = "Sudėlioti tekstai (vidutinis klaidų skaičius):";
-    } else {
-        textComprehensionTextsTitle.innerHTML = "Sudėlioti tekstai:";
-    }
-    textComprehensionTextsTitle.classList.add("task-info-subtitle");
-
-    // 1. Extract all [textId, mistakes, date] triples
+    // [textId, mistakes, date] of every text assembled, in the order they were done
     const allEntries = [];
-    const entries = textInfo.slice(1)[0]; // Skip metadata (e.g., [2, 1])
-
-    for (const entry of entries) {
-        const [texts, date] = entry; // each entry is [texts, taskDate]
-
-        for (const text of texts) { // texts is an array of [textId, textMistakes]
-            const [textId, textMistakes] = text;
-            allEntries.push({ textId, textMistakes, date });
-        }
-    }
-
+    (textInfo.slice(1)[0] || []).forEach(([texts, date], order) => (texts || []).forEach(([textId, textMistakes], i) =>
+        allEntries.push({ textId: String(textId), mistakes: Number(textMistakes) || 0, date: String(date || ''), order: order * 1000 + i })));
+    if (!allEntries.length) return;
+    allEntries.sort((a, b) => a.date.localeCompare(b.date) || a.order - b.order);
+    const byText = new Map();
+    allEntries.forEach(e => { if (!byText.has(e.textId)) byText.set(e.textId, []); byText.get(e.textId).push(e); });
+    let texts = [...byText.entries()].map(([textId, list]) => {
+        const values = list.map(e => e.mistakes);
+        const total = values.reduce((a, b) => a + b, 0);
+        return { textId, values, dates: list.map(e => e.date), total, average: total / values.length, last: values[values.length - 1], max: Math.max(...values) };
+    });
+    const sev = n => (n <= 0 ? 'ok' : n <= 2 ? 'mid' : 'bad');
+    let problem, others, summary, emptyNote, othersLabel;
     if (showAverages) {
-        // Group by textId and calculate averages
-        const grouped = {};
-        
-        for (const { textId, textMistakes } of allEntries) {
-            if (!grouped[textId]) {
-                grouped[textId] = {
-                    textId,
-                    totalMistakes: 0,
-                    count: 0
-                };
-            }
-            grouped[textId].totalMistakes += Number(textMistakes);
-            grouped[textId].count += 1;
-        }
-
-        // Calculate averages and sort by highest average (descending)
-        const averages = Object.values(grouped).map(item => ({
-            textId: item.textId,
-            average: (item.totalMistakes / item.count).toFixed(1)
-        }));
-        
-        averages.sort((a, b) => Number(b.average) - Number(a.average));
-
-        // Display sorted averages
-        for (const { textId, average } of averages) {
-            const li = document.createElement("li");
-            const textIdSpan = textIdButton(textId);
-            const averageSpan = document.createElement("span");
-            textIdSpan.dataset.textId = textId;
-
-            averageSpan.innerHTML = `: ${average}`;
-
-            textIdSpan.addEventListener("click", (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                const id = e.currentTarget.dataset.textId;
-                openTextHandler(Number(id));
-            });
-
-            li.appendChild(textIdSpan);
-            li.appendChild(averageSpan);
-            ul.appendChild(li);
-        }
-
+        texts.sort((a, b) => b.average - a.average || b.values.length - a.values.length || Number(a.textId) - Number(b.textId));
+        problem = texts.filter(t => t.average >= TEXT_CLASS_HARD);
+        others = texts.filter(t => t.average < TEXT_CLASS_HARD);
+        summary = `${textCountLabel(texts.length)} · sudėliota ${textTimesLabel(allEntries.length)} · ${problem.length ? `vidutiniškai ${TEXT_CLASS_HARD} ar daugiau klaidų – ${problem.length}` : 'sunkių tekstų nėra'}`;
+        emptyNote = `Nė viename tekste vidutiniškai nepadaroma ${TEXT_CLASS_HARD} ar daugiau klaidų.`;
+        othersLabel = n => `Rodyti kitus tekstus (${n})`;
     } else {
-        // 2. Sort by textId (ascending, converted to number)
-        allEntries.sort((a, b) => Number(a.textId) - Number(b.textId));
-
-        // 3. Display sorted entries
-        for (const { textId, textMistakes, date } of allEntries) {
-            const li = document.createElement("li");
-            const textIdSpan = textIdButton(textId);
-            const mistakesNumberSpan = document.createElement("span");
-            const completionDataSpan = document.createElement("span");
-
-            // Lithuanian pluralization
-            let numberLabel;
-            const mistakesNum = Number(textMistakes);
-            if (mistakesNum === 0 || (mistakesNum > 9 && mistakesNum < 21)) {
-                numberLabel = "klaidų";
-            } else if (mistakesNum === 1 || String(mistakesNum).endsWith("1")) {
-                numberLabel = "klaida";
-            } else {
-                numberLabel = "klaidos";
-            }
-
-            mistakesNumberSpan.innerHTML = `: ${textMistakes} ${numberLabel}`;
-            completionDataSpan.innerHTML = ` (${date})`;
-            textIdSpan.dataset.textId = textId;
-
-            textIdSpan.addEventListener("click", (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                const id = e.currentTarget.dataset.textId;
-                openTextHandler(Number(id));
-            });
-
-            li.appendChild(textIdSpan);
-            li.appendChild(mistakesNumberSpan);
-            li.appendChild(completionDataSpan);
-            ul.appendChild(li);
-        }
+        // (the texts still causing mistakes first: the last time's mistakes, then the most at any time, then the most attempts)
+        texts.sort((a, b) => b.last - a.last || b.max - a.max || b.values.length - a.values.length || Number(a.textId) - Number(b.textId));
+        problem = texts.filter(t => t.max > 0);
+        others = texts.filter(t => t.max === 0);
+        summary = `${textCountLabel(texts.length)} · sudėliota ${textTimesLabel(allEntries.length)} · su klaidomis – ${problem.length}`;
+        emptyNote = 'Visi tekstai sudėlioti be klaidų.';
+        othersLabel = n => `Rodyti tekstus be klaidų (${n})`;
     }
-
-    htmlContainer.appendChild(textComprehensionTextsTitle);
-    htmlContainer.appendChild(ul);
+    const trendHtml = t => {
+        if (t.values.length < 2) return '';
+        const first = t.values[0];
+        if (t.last < first) return '<span class="tx-trend down" title="Paskutinį kartą klaidų mažiau nei pirmą"><i class="ti ti-trending-down" aria-hidden="true"></i>mažiau</span>';
+        if (t.last > first) return '<span class="tx-trend up" title="Paskutinį kartą klaidų daugiau nei pirmą"><i class="ti ti-trending-up" aria-hidden="true"></i>daugiau</span>';
+        return '<span class="tx-trend same" title="Paskutinį kartą klaidų tiek pat, kiek pirmą">be pokyčio</span>';
+    };
+    const rowHtml = t => showAverages
+        ? `<li class="tx-row"><span class="tx-id" data-text-id="${escapeTeacherHtml(t.textId)}"></span>
+            <span class="tx-avg ${sev(t.average)}" title="Vidutinis klaidų skaičius">${String(Math.round(t.average * 10) / 10).replace('.', ',')}</span>
+            <span class="tx-bar"><i class="${sev(t.average)}" style="width:${Math.min(100, t.average / Math.max(3, texts[0].average) * 100)}%"></i></span>
+            <span class="tx-note">sudėliotas ${textTimesLabel(t.values.length)}</span></li>`
+        : `<li class="tx-row"><span class="tx-id" data-text-id="${escapeTeacherHtml(t.textId)}"></span>
+            <span class="tx-seq" aria-label="Klaidos kiekvieną kartą: ${t.values.join(', ')}">${t.values.map((v, i) =>
+                `${i ? '<i class="ti ti-chevron-right tx-sep" aria-hidden="true"></i>' : ''}<span class="tx-n ${sev(v)}" title="${escapeTeacherHtml(t.dates[i])}: ${v} ${textMistakeLabel(v)}">${v}</span>`).join('')}</span>
+            ${trendHtml(t)}</li>`;
+    const box = document.createElement('div');
+    box.className = 'tx-box';
+    box.innerHTML = `<div class="task-info-subtitle tx-title">Sudėlioti tekstai</div>
+        <div class="tx-summary">${summary}${showAverages ? '' : '<span class="tx-hint">Skaičiai – klaidos kiekvieną kartą (nuo seniausio iki naujausio)</span>'}</div>
+        <div class="tx-scroll">
+            ${problem.length ? `<ol class="tx-list">${problem.map(rowHtml).join('')}</ol>` : `<div class="tx-empty">${emptyNote}</div>`}
+            ${others.length ? `<button type="button" class="tx-more" aria-expanded="false">${othersLabel(others.length)}</button>
+                <ol class="tx-list tx-others" hidden>${others.map(rowHtml).join('')}</ol>` : ''}
+        </div>`;
+    box.querySelectorAll('.tx-id').forEach(slot => {
+        const button = textIdButton(slot.dataset.textId);
+        button.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); openTextHandler(Number(e.currentTarget.dataset.textId)); });
+        slot.replaceWith(button);
+    });
+    const more = box.querySelector('.tx-more');
+    if (more) more.addEventListener('click', e => {
+        e.stopPropagation();
+        const list = box.querySelector('.tx-others');
+        list.hidden = !list.hidden;
+        more.setAttribute('aria-expanded', String(!list.hidden));
+        more.textContent = list.hidden ? othersLabel(others.length) : 'Slėpti';
+    });
+    htmlContainer.appendChild(box);
 }
 
 let globalClassStatsCache = null;
