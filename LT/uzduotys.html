@@ -12002,6 +12002,22 @@ function teacherTaskShortLabel(task) {
 }
 // (the class overview's task list says "Kraunama…" until the class's tasks have come once)
 let classTeacherTasksLoaded = false;
+// The class's task panel while its data is still coming: the same heading (title, week number, arrows) and week board as
+// when it is loaded - only the tasks are missing - so nothing jumps when they arrive.
+function classTasksLoadingHtml() {
+    return `
+        <div class="pt week-pt" id="teacher-week-head">${teacherWeekHeadHtml()}</div>
+        <div class="teacher-week" id="teacher-week">${teacherWeekHtml()}</div>
+        <div class="pb"><div class="statistics-empty-message">Kraunama…</div></div>`;
+}
+function showClassTasksLoading() {
+    const container = document.getElementById('student-statistics-completed-tasks');
+    if (!container || classTeacherTasksLoaded || container.querySelector('#teacher-week') || container.querySelector('.unfinished-task-list')) return;
+    try {
+        container.innerHTML = classTasksLoadingHtml();
+        container.style.display = 'flex';
+    } catch (error) { console.error('Could not show the week board while loading', error); }
+}
 async function fetchClassTeacherTasks() {
     try {
         const response = await apiFetch(apiBase + 'tasks/class', { method: 'GET' });
@@ -13842,6 +13858,9 @@ function restoreTaskInfoScroll(scrollPosition) {
             if (newTaskButton) newTaskButton.disabled = true;
             if (deleteTaskButton) deleteTaskButton.disabled = true;
             if (deleteStudentButton) deleteStudentButton.disabled = true;
+            // (the first load: the week board and its navigation at once, the tasks fill in; a moment later - this first call
+            // comes while the page's script is still being read, before the board's helpers exist)
+            setTimeout(showClassTasksLoading, 0);
 
             try {
                 const response = await apiFetch(apiBase + 'students', {
@@ -15619,6 +15638,7 @@ function renderPendingTasksAccordion(tasks, container, classOverview = false) {
         ? ` (${classOverview ? pendingGroups.length : pendingGroups.reduce((sum, item) => sum + item.pending, 0)})`
         : ''}`;
     pupilWeekTitle = title;
+    if (classLoading) { container.innerHTML = classTasksLoadingHtml(); return; }
     container.innerHTML = `
         ${classOverview
             ? `<div class="pt"><div class="pn">${title}</div></div>`
