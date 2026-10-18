@@ -15368,6 +15368,7 @@ function getCurrentStatisticsTasksForAnalysis() {
     const archiveRows = !currentStatisticsIsClass && Array.isArray(analysisArchiveRows) ? analysisArchiveRows : [];
     const asTask = (row, taskKey) => ({
             taskKey,
+            archiveRow: row,     // (the row itself - e.g. to open its results from the analysis)
             resultKind: resultKindOf(row),
             studentId: row.studentId,
             completed: true,
@@ -15871,13 +15872,15 @@ function studentGradeNow(studentId) {
 function archiveRowFromTask(t) {
     if (!t) return null;
     const nameOf = id => ((studentList || []).find(s => Number(s.id) === Number(id)) || {}).nickname || '';
+    if (t.archiveRow) return { ...t.archiveRow, studentName: nameOf(t.archiveRow.studentId) };   // (an archive row made into a task for the analysis)
     if (t.taskInfo != null && t.totalAnswers != null) return { ...t, studentName: nameOf(t.studentId) };   // (an archive row)
+    const archiveKey = /^archive:(\d+)$/.exec(t.taskKey || '');
     let r = t.result;
     if (typeof r === 'string') { try { r = JSON.parse(r); } catch (e) { r = null; } }
     r = r || {};
     const teacherTask = /^teacher:(\d+)$/.exec(t.taskKey || '');
     return {
-        id: t.assignmentId ?? t.id,
+        id: t.assignmentId ?? t.id ?? (archiveKey ? Number(archiveKey[1]) : null),
         date: String(t.completionDate || t.date || '').slice(0, 10),
         taskInfo: t.taskDescription ?? t.taskInstructions,
         totalAnswers: r.totalAnswers, correct: r.correct, mistakes: r.mistakes, answerRate: r.answerRate, mistakesDetail: r.mistakesDetail,
@@ -15900,7 +15903,7 @@ function excludedTasksKey(event) {
 function openExcludedTasksPopup(tasks) {
     const rows = (tasks || []).map(archiveRowFromTask).filter(row => row && row.id != null)
         .sort((a, b) => String(b.date).localeCompare(String(a.date)));
-    if (!rows.length) return;
+    if (!rows.length) { console.warn('Excluded tasks: none of them can be opened', tasks); return; }
     closeExcludedTasksPopup();
     const withStudent = Boolean(currentStatisticsIsClass) && rows.some(row => row.studentName);
     const overlay = document.createElement('div');
