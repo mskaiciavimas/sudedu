@@ -12000,12 +12000,15 @@ function teacherTaskShortLabel(task) {
     const raw = task.taskInstructions || task.task || task.taskDescription || '';
     try { return formatTaskLabel(typeof raw === 'string' ? raw : JSON.stringify(raw)); } catch (_) { return ''; }
 }
+// (the class overview's task list says "Kraunama…" until the class's tasks have come once)
+let classTeacherTasksLoaded = false;
 async function fetchClassTeacherTasks() {
     try {
         const response = await apiFetch(apiBase + 'tasks/class', { method: 'GET' });
         if (!response) return [];
         if (!response.ok) throw new Error((await response.json().catch(() => ({}))).error || 'Nepavyko gauti klasės užduočių');
         classTeacherTasks = await response.json();
+        classTeacherTasksLoaded = true;
         return classTeacherTasks;
     } catch (error) {
         console.error('Error fetching class tasks:', error);
@@ -12688,7 +12691,7 @@ function displayStudentStatistics(student, studentTasks) {
     renderPendingTasksAccordion(studentTasks, studentStatisticsCompletedTasks);
     placePendingTasksBeforeArchive();
 
-    document.getElementById("embedded-archived-tasks-section").style.display = "block";
+    document.getElementById("embedded-archived-tasks-section").style.display = (typeof teacherSection !== 'undefined' && teacherSection === 'completed') ? "block" : "none";   // (only on its own tab)
     document.getElementById("embeddedArchiveSectionTitle").textContent = "Atliktos užduotys";
     document.getElementById("embedded-archive-teacher-only-toggle-wrapper").style.display = "flex";
     renderResultKinds('archive');
@@ -13073,7 +13076,7 @@ async function displayTeacherHome(selectedGroupNames=null) {
     }
     showProgressSection();
 
-    document.getElementById("embedded-archived-tasks-section").style.display = "block";
+    document.getElementById("embedded-archived-tasks-section").style.display = (typeof teacherSection !== 'undefined' && teacherSection === 'completed') ? "block" : "none";   // (only on its own tab)
     document.getElementById("embeddedArchiveSectionTitle").textContent = "Užduotys";
     document.getElementById("embedded-archive-teacher-only-toggle-wrapper").style.display = "flex";
     loadClassEmbeddedTaskArchive(studentListFiltered);
@@ -15610,7 +15613,9 @@ function renderPendingTasksAccordion(tasks, container, classOverview = false) {
 
     container.style.display = "flex";
     setPendingTasksBadge(classOverview ? pendingGroups.length : pendingGroups.reduce((sum, item) => sum + item.pending, 0));
-    const title = `Neatliktos užduotys${pendingGroups.length
+    // (the class overview before its tasks have come: the list's own title, loading)
+    const classLoading = classOverview && !classTeacherTasksLoaded && !pendingGroups.length;
+    const title = classLoading ? 'Aktyvių užduočių sąrašas' : `Neatliktos užduotys${pendingGroups.length
         ? ` (${classOverview ? pendingGroups.length : pendingGroups.reduce((sum, item) => sum + item.pending, 0)})`
         : ''}`;
     pupilWeekTitle = title;
@@ -15620,7 +15625,7 @@ function renderPendingTasksAccordion(tasks, container, classOverview = false) {
             : `<div class="pt week-pt" id="pupil-week-head">${pupilWeekHeadHtml()}</div>
         <div class="teacher-week" id="pupil-week">${pupilWeekHtml()}</div>`}
         <div class="pb">
-            <div class="unfinished-task-list">${listHtml || `<div class="statistics-empty-message">${statisticsPeriodMessage()}</div>`}</div>
+            <div class="unfinished-task-list">${listHtml || `<div class="statistics-empty-message">${classLoading ? 'Kraunama…' : 'Nebaigtų užduočių nėra.'}</div>`}</div>
         </div>`;
 }
 
