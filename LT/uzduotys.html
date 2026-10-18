@@ -10221,6 +10221,7 @@ function displayComletedTextIdsForTextComp(textInfo, htmlContainer, showAverages
         more.textContent = list.hidden ? restLabel(rest.length) : 'Slėpti';
         if (!list.hidden) more.scrollIntoView({ block: 'nearest' });
     });
+    htmlContainer.querySelectorAll(':scope > .tx-box').forEach(el => el.remove());
     htmlContainer.appendChild(box);
 }
 
