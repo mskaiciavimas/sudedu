@@ -3337,7 +3337,7 @@
 			const o = f.outliers;
 			const one = o.length === 1 && !f.isClass
 				? ` (${periodText(o[0].date, o[0].date).replace(/^\d{4} m\. /, '')}: ${count(o[0].mistakes, W.mistake)} per ${count(o[0].answers, SUBJECTS[f.subject].unitAcc)})` : '';
-			mistakes.push(`Į klaidų ir greičio analizę ${form(o.length, ['neįtraukta', 'neįtrauktos', 'neįtraukta'])} ${count(o.length, W.task)} su neįprastai daug klaidų${one} – tikėtina, atsakinėta atsitiktinai.`);
+			mistakes.push(`Į klaidų ir greičio analizę ${form(o.length, ['neįtraukta', 'neįtrauktos', 'neįtraukta'])} ${count(o.length, W.task)} su neįprastai daug klaidų${one}.`);
 		}
 		const said = mistakes.filter(Boolean);
 		const mistakeLinks = (cmp ? cmp.links.filter(l => l.key === 'peer:mistakes') : [])

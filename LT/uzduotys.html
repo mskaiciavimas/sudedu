@@ -6910,6 +6910,7 @@
     #excluded-tasks-overlay #excluded-tasks-table { display: block; flex: 1 1 auto; height: auto; min-height: 0; max-height: none; overflow-y: auto; overscroll-behavior: contain; }
     /* (a task's results open on top: their glass panel would show the list through it) */
     #excluded-tasks-overlay.under .excluded-tasks-panel { visibility: hidden; }
+    body.excluded-tasks-open #student-list, body.excluded-tasks-open .teacher-home-button { pointer-events: none; }
     /* (the Atliktos table's flexible body has no height of its own here: the list is as tall as its rows, the panel scrolls) */
     #excluded-tasks-overlay #excluded-tasks-table table, #excluded-tasks-overlay #excluded-tasks-table tbody { display: block; flex: none; min-height: 0; max-height: none; overflow: visible; }
     /* (the class: date | student | group | task) */
@@ -8031,7 +8032,7 @@
 	<script src="../mental-arithmetic-combinations.js?v=20261017"></script>
     <script src="../parameter_dictionary.js?v=20261018r"></script>
     <script src="../rasyba-generator.js?v=20261018r"></script>
-    <script src="../sudedu-insights.js?v=20261018t"></script>
+    <script src="../sudedu-insights.js?v=20261018u"></script>
     <script src="../sudedu-auto-tasks.js?v=20261018r"></script>
     <script src="../klase-invites.js?v=20261018r"></script>
     <script src="../main-nav-bar.js"></script>
@@ -15894,6 +15895,7 @@ let excludedTasksWatch = null;
 function closeExcludedTasksPopup() {
     if (excludedTasksWatch) { excludedTasksWatch.disconnect(); excludedTasksWatch = null; }
     document.getElementById('excluded-tasks-overlay')?.remove();
+    document.body.classList.remove('excluded-tasks-open');
     document.removeEventListener('keydown', excludedTasksKey);
 }
 function excludedTasksKey(event) {
@@ -15905,13 +15907,15 @@ function openExcludedTasksPopup(tasks) {
         .sort((a, b) => String(b.date).localeCompare(String(a.date)));
     if (!rows.length) { console.warn('Excluded tasks: none of them can be opened', tasks); return; }
     closeExcludedTasksPopup();
+    // (while the list - or a task opened from it - is open, the student list cannot be used)
+    document.body.classList.add('excluded-tasks-open');
     const withStudent = Boolean(currentStatisticsIsClass) && rows.some(row => row.studentName);
     const overlay = document.createElement('div');
     overlay.id = 'excluded-tasks-overlay';
     overlay.innerHTML = `<div class="excluded-tasks-panel" role="dialog" aria-modal="true" aria-labelledby="excluded-tasks-title">
         <button type="button" class="excluded-tasks-close" aria-label="Uždaryti">&times;</button>
         <div class="excluded-tasks-title" id="excluded-tasks-title">Į analizę neįtrauktos užduotys</div>
-        <div class="excluded-tasks-sub">Neįprastai daug klaidų – tikėtina, atsakinėta atsitiktinai. Paspauskite užduotį – atsivers jos rezultatai.</div>
+        <div class="excluded-tasks-sub">Neįprastai daug klaidų.</div>
         <div id="excluded-tasks-table"></div>
     </div>`;
     // (next to the site's pop-up, in the same layering: a task's results, opened from the list, come on top of it)
@@ -15925,7 +15929,7 @@ function openExcludedTasksPopup(tasks) {
         excludedTasksWatch.observe(sitePopup, { attributes: true, attributeFilter: ['style'] });
     }
     overlay.querySelector('.excluded-tasks-close').addEventListener('click', closeExcludedTasksPopup);
-    overlay.addEventListener('click', event => { if (event.target === overlay) closeExcludedTasksPopup(); });
+    // (closed with × or Escape only: a click beside it - e.g. on the student list - does nothing)
     document.addEventListener('keydown', excludedTasksKey);
 }
 
