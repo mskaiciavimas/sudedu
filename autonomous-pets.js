@@ -17,7 +17,11 @@ function clearAllAutoPetTimeouts() {
 
 function disableAutoPets() {
     clearAllAutoPetTimeouts();
-    const autonomousPets = document.querySelectorAll('.auto-pet');
+    // Scoped to the room (not `document.querySelectorAll`): inventory/shop preview thumbnails for
+    // the ghost item also carry the `auto-pet` class (from its gameAssetIndex css-class string)
+    // but are never given an id, so an unscoped query here picks them up too and corrupts
+    // id-keyed lookups elsewhere with an empty-string key.
+    const autonomousPets = document.querySelectorAll('#roomObjectsContainer .auto-pet');
 
     autonomousPets.forEach((autoPet) => {
         const autoPetId = autoPet.id
@@ -65,7 +69,9 @@ const ghost1ReappearActions = {
 
 async function initiateAutonomousPets () {
   clearAllAutoPetTimeouts()
-  const autonomousPets = document.querySelectorAll('.auto-pet');
+  // Scoped to the room — see the comment in disableAutoPets() above: an unscoped query also
+  // matches id-less inventory preview thumbnails for the ghost item.
+  const autonomousPets = document.querySelectorAll('#roomObjectsContainer .auto-pet');
 
   autonomousPets.forEach((autoPet) => {
     autoPet._petType = autoPet.className.split(' ')[0]
@@ -73,7 +79,7 @@ async function initiateAutonomousPets () {
 }
 
 async function selectAutonomousPetStartingActions () {
-  const autonomousPets = document.querySelectorAll('.auto-pet');
+  const autonomousPets = document.querySelectorAll('#roomObjectsContainer .auto-pet');
 
   autonomousPets.forEach((autoPet) => {
     if (autoPet._busy) return;
@@ -90,7 +96,7 @@ async function selectAutonomousPetStartingActions () {
 }
 
 function initiateAutonomousPetStartingActions () {
-  const autonomousPets = document.querySelectorAll('.auto-pet');
+  const autonomousPets = document.querySelectorAll('#roomObjectsContainer .auto-pet');
 
   autonomousPets.forEach((autoPet) => {
     const handler = autoPetStartingActionSelection[autoPet.id];
@@ -269,6 +275,7 @@ async function ghostTogglesAppliances(autoPet) {
 
   if (!objects.length) {
     maintainAutonomousPet(autoPet);
+    return;
   }
 
   const chosen = objects[Math.floor(Math.random() * objects.length)];
@@ -310,6 +317,7 @@ async function ghostTogglesAppliances(autoPet) {
   if (!endCoordsValidityChecker(petPos[0], petPos[1], closestWalkableCoords[0], closestWalkableCoords[1], autoPet.id, globalWalkabilityMap)) {
       setObjectAnimation(autoPet, `${autoPet._petType}-stands-idle`);
       maintainAutonomousPet(autoPet);
+      return;
   }
 
   if (Math.random() < 0.5) {

@@ -37,6 +37,27 @@ const LONG_TERM_RECORDING_ENABLED = true;
 const PET_STATS_EXPIRATION = 0.0035 // EXPIRE FULLY IN 48 hrs
 const MAX_CURRENT_MISTAKES_STORED = 100;
 
+// Spelling tasks: what the results analysis needs to replay the task's questions - the seed they were generated from
+// (LT/rasyba.html, rasyba-generator.js) and the student's grade (it decides which sentences fit). Saved in the
+// result's duration after the length: ["C40", 20, seed, grade, highest text id, texts fingerprint] (a teacher's task
+// already keeps its seed there); the texts there were, so that texts added later can be left out of a replay.
+function grammarReplayInfo() {
+  if (controller.mode !== "lang" || controller.modeChoice1 !== "C83" || !controller.grammarSeed) return null;
+  const grade = typeof userData !== "undefined" && userData && Number.isInteger(Number(userData.knowledgeLvl)) ? Number(userData.knowledgeLvl) : null;
+  const texts = Array.isArray(controller.grammarTexts) && controller.grammarTexts.length === 2 ? controller.grammarTexts : [null, null];
+  return { seed: String(controller.grammarSeed).slice(0, 40), grade, textsMax: texts[0], textsHash: texts[1] };
+}
+
+// EXPERIMENTAL (pages that mark testers with html.experimental-on, e.g. uzduotys.html): mistake tables show the wrong
+// answers next to each word / example, and a word's sentence only highlights the word
+function mistakeTableShowsAnswers() {
+  return window.SUDEDU_TABLE_ANSWERS === true || document.documentElement.classList.contains('experimental-on');
+}
+function escapeMistakeText(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
+
+
 const animationStepsAndDurationNumberDict = {
     "cat-1-sits-idle": [10, 2],
     "cat-1-sits-idle-blinks": [10, 2],
@@ -145,6 +166,8 @@ function resetControllerTaskSettings () {
   controller.answeredQuestionTracker = 0,
   controller.correctAnswersTracker = 0,
   controller.questionsStopped = false
+  controller.grammarSeed = ''
+  controller.grammarTexts = null
   localStorage.setItem('controller', JSON.stringify(controller))
 }
 
@@ -189,11 +212,7 @@ if (document.querySelector("#stop-button-span")) {
 
       if (controller.task) {
         if (!controller.taskCompleted) {
-          if (controller.language === 'LT') {
-            messageToTheUser('Užduotis nebaigta iki galo. Rezultatai neišsaugoti.');
-          } else if (controller.language === 'EN') {
-            messageToTheUser('Task was not completed. Results were not saved.');
-          }
+          showUnfinishedTaskMessage();
         }
       }
 
@@ -479,11 +498,7 @@ async function formatFinalMessageForGrammar() {
 
   if (controller.task) {
     if (!controller.taskCompleted) {
-      if (controller.language === 'LT') {
-        messageToTheUser('Užduotis nebaigta iki galo. Rezultatai neišsaugoti.')
-      } else if (controller.language === 'EN') {
-        messageToTheUser('Task was not completed. Results were not saved.')
-      }
+      showUnfinishedTaskMessage();
     }
   }
 
@@ -551,11 +566,7 @@ async function formatFinalMessageForTextcomprehension() {
 
     if (controller.task) {
       if (!controller.taskCompleted) {
-        if (controller.language === 'LT') {
-          messageToTheUser('Užduotis nebaigta iki galo. Rezultatai neišsaugoti.')
-        } else if (controller.language === 'EN') {
-          messageToTheUser('Task was not completed. Results were not saved.')
-        }
+        showUnfinishedTaskMessage();
       }
     }
 
@@ -595,10 +606,21 @@ async function sendSetTaskResultsToDatabase() {
     closer = messageToTheUser(closerText, false);
   }, 500);
 
-  let elapsedTime = 0;
-  if (localStorage.getItem("elapsedTime")) {
-    elapsedTime = localStorage.getItem("elapsedTime")
+  let storedElapsedTimeMs = 0;
+  const storedElapsedTime = localStorage.getItem("elapsedTime");
+  if (storedElapsedTime) {
+    const elapsedParts = String(storedElapsedTime).split(':').map(Number);
+    if (elapsedParts.length === 3 && elapsedParts.every(Number.isFinite)) {
+      storedElapsedTimeMs = ((elapsedParts[0] * 60 * 60) + (elapsedParts[1] * 60) + elapsedParts[2]) * 1000;
+    } else if (elapsedParts.length === 2 && elapsedParts.every(Number.isFinite)) {
+      storedElapsedTimeMs = ((elapsedParts[0] * 60) + elapsedParts[1]) * 1000;
+    } else if (Number.isFinite(Number(storedElapsedTime))) {
+      storedElapsedTimeMs = Number(storedElapsedTime);
+    }
   }
+  const taskElapsedTime = Number.isFinite(elapsedTime) && elapsedTime > 0
+    ? elapsedTime
+    : storedElapsedTimeMs;
 
 
   if (document.querySelector("#stopButton")) {
@@ -618,9 +640,26 @@ async function sendSetTaskResultsToDatabase() {
 
   if (controller.task) {
     if (controller.task[0] === "setTask") {
-      resultsData = [ [controller.answeredQuestionTracker, controller.mistakesTracker],
-                      controller.currentMistakes, elapsedTime
-                    ]
+      const totalAnswers = Number(controller.answeredQuestionTracker);
+      const mistakes = Number(controller.mistakesTracker);
+      if (!Number.isFinite(Number(totalAnswers)) || Number(totalAnswers) < 0) {
+        throw new Error('Unable to save task results: total answer count is invalid.');
+      }
+      if (!Number.isFinite(mistakes) || mistakes < 0) {
+        throw new Error('Unable to save task results: mistake count is invalid.');
+      }
+      const answerRate = taskElapsedTime > 0
+        ? Number((totalAnswers / (taskElapsedTime / 1000 / 60)).toFixed(1))
+        : 0;
+      resultsData = {
+        correct: Math.max(0, totalAnswers - mistakes),
+        mistakes,
+        totalAnswers,
+        answerRate,
+        mistakesDetail: controller.currentMistakes || []
+      };
+      const replay = grammarReplayInfo();
+      if (replay) Object.assign(resultsData, replay);
 
       requestSuccess = await sendTaskResults(controller.task[1], resultsData)
       if (requestSuccess) {
@@ -628,7 +667,8 @@ async function sendSetTaskResultsToDatabase() {
       }
 
       if (requestSuccess) {
-        await recordTaskToLongTerm();
+        // No recordTaskToLongTerm() here: the results route already writes this result to the archive (with the
+        // teacher task id, group and duration). Posting it again created a second row that counted as own practice.
         clearTimeout(showMessageTimeout);
         if (closer) {
           setTimeout(() => closer(), 0);
@@ -867,6 +907,7 @@ async function sendSetTaskResultsToDatabase() {
     }
 
     if (controller.task && controller.task[0] !== "weekChl") {
+      stopTaskProgressSync();
       controller.task = null;
     }
     controller.taskRecorded = true;
@@ -889,11 +930,9 @@ async function sendSetTaskResultsToDatabase() {
 }
 
 async function sendTaskResults(taskId, resultsData) {
-  const resultsDataString = JSON.stringify(resultsData);
-
   const taskResults = {
     taskId,
-    results: resultsDataString
+    results: resultsData
   };
   try {
     const response = await apiFetch(apiBase + 'results', {
@@ -916,6 +955,219 @@ async function sendTaskResults(taskId, resultsData) {
     console.log('Error saving task results:', error);
     return false
   }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Mid-task progress sync for teacher-assigned tasks ("setTask"). Shared by veiksmai.html (math),
+// rasyba.html (grammar) and teksto-suvokimas.html (text comprehension) — all three already load
+// this file and share the same `controller` object and tracker fields.
+//
+// Saves every 5s if something changed (answeredQuestionTracker/mistakesTracker moved), falls
+// back to a time-only save every 30s if nothing changed (so elapsed/remaining time doesn't go
+// stale during a long thinking/reading pause), and text-comprehension additionally calls
+// `saveTaskProgressNow()` after every answer submit. On top of that, every time the mistake count
+// goes up (one mistake, or several marked at once, e.g. in grammar) the progress is saved at once,
+// so a teacher watching the task sees mistakes straight away. All of these funnel through the same
+// `scheduleProgressSave` coalescing queue: at most one request in flight at a time, so rapid
+// button-spam or several triggers firing close together never produce more than ~1 extra request
+// beyond whatever is already in flight — important on a free-tier DB with a small connection cap.
+// ---------------------------------------------------------------------------------------------
+let taskProgressTimer = null;
+let taskProgressIdleTicks = 0;
+let taskProgressLastAnswered = 0;
+let taskProgressLastMistakes = 0;
+let taskProgressSaveInFlight = false;
+let taskProgressSavePending = null;
+let taskProgressStartedFlagSent = false;
+let taskMistakeWatch = null;      // checks every 400 ms whether new mistakes were made (then saves at once)
+
+function computeTaskSecondsElapsed() {
+  const startTimeRaw = localStorage.getItem("startTime");
+  if (startTimeRaw) {
+    return Math.max(0, Math.floor((Date.now() - parseInt(startTimeRaw, 10)) / 1000));
+  }
+  const remainingRaw = localStorage.getItem("remainingTime");
+  if (remainingRaw && controller.timerLimit) {
+    const remainingMs = parseInt(remainingRaw, 10);
+    return Math.max(0, controller.timerLimit * 60 - Math.floor(remainingMs / 1000));
+  }
+  return 0;
+}
+
+// Reads whatever the task-type-specific code already tracks on `controller` (and, for text
+// comprehension / grammar, the page-local mistake-detail objects they only ever fold into
+// `controller.currentMistakes` once, at actual task completion) — no new tracking variables needed.
+function buildProgressSnapshot() {
+  const sequencePosition = (controller.randomSelection && typeof controller.randomSelection[2] === "number")
+    ? controller.randomSelection[2]
+    : (controller.answeredQuestionTracker || 0);
+
+  // controller.currentMistakes only ever holds mistakes carried over from a PRIOR interrupted
+  // session (set once, at resume-hydration) — it is never written to again until the task is
+  // actually finished. Math is the exception: recordMistakes() pushes onto it live, so it's
+  // already current there. Grammar instead accumulates live detail in a page-local `mistakeRecords`
+  // object, only converted into controller.currentMistakes once, at completion
+  // (recordGrammarFinalMistakes) — so without this, every mid-session snapshot would report
+  // `currentMistakes: []` no matter how many mistakes were actually made. Converting it here too
+  // (into a throwaway array, without mutating mistakeRecords or controller.currentMistakes) closes
+  // that gap: if the task gets interrupted again, this merged snapshot becomes next time's
+  // resume-hydration baseline, and mistakeRecords starts clean next session — no double-counting.
+  let currentMistakesForSnapshot = controller.currentMistakes || [];
+  if (typeof mistakeRecords !== "undefined" && mistakeRecords) {
+    const liveGrammarMistakes = Object.keys(mistakeRecords).map(key => [
+      mistakeRecords[key]["wordWithAnswer"],
+      mistakeRecords[key]["wordGrammarType"],
+      [mistakeRecords[key]["mistakesCounter"], mistakeRecords[key]["wrongAnswer"]],
+      mistakeRecords[key]["wordId"]
+    ]);
+    if (liveGrammarMistakes.length) {
+      currentMistakesForSnapshot = [...currentMistakesForSnapshot, ...liveGrammarMistakes];
+    }
+  }
+
+  return {
+    answeredCount: controller.answeredQuestionTracker || 0,
+    mistakesSoFar: controller.mistakesTracker || 0,
+    secondsElapsed: computeTaskSecondsElapsed(),
+    progress: {
+      currentMistakes: currentMistakesForSnapshot,
+      sequencePosition,
+      passNumber: controller.passNumber || 0,
+      // Only teksto-suvokimas.html defines this (page-local, not on `controller`); everywhere
+      // else `typeof mistakesSummary` is safely "undefined".
+      mistakesSummary: (typeof mistakesSummary !== "undefined" && Array.isArray(mistakesSummary))
+        ? mistakesSummary
+        : undefined
+    }
+  };
+}
+
+async function dispatchProgressSave(payload) {
+  if (!controller.task || controller.task[0] !== "setTask") return false;
+  const assignmentId = controller.task[1];
+  const finalPayload = taskProgressStartedFlagSent ? payload : { ...payload, started: true };
+  let saved = false;
+  taskProgressSaveInFlight = true;
+  try {
+    const response = await apiFetch(apiBase + `tasks/${assignmentId}/progress`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(finalPayload)
+    });
+    if (response) {
+      if (response.status === 404) {
+        // Assignment already completed (archived) or deleted by the teacher — stop trying.
+        stopTaskProgressSync();
+      } else if (response.ok) {
+        taskProgressStartedFlagSent = true;
+        saved = true;
+      }
+    }
+  } catch (error) {
+    console.log('Error saving task progress:', error);
+  } finally {
+    taskProgressSaveInFlight = false;
+    if (taskProgressSavePending) {
+      const next = taskProgressSavePending;
+      taskProgressSavePending = null;
+      dispatchProgressSave(next);
+    }
+  }
+  return saved;
+}
+
+// A teacher's task stopped with the stop button before its end: the progress so far is saved at once
+// (the same save as above), so the teacher sees it and the student can carry on from there later.
+// Called first thing in the page's stopQuestionsCloseActions: the snapshot is taken before the page
+// folds or clears anything. The syncing pauses until the task is started again.
+let stoppedTaskProgressSave = null;
+function saveStoppedTaskProgress() {
+  stoppedTaskProgressSave = null;
+  if (!controller.task || controller.task[0] !== "setTask" || controller.taskCompleted) return;
+  if (typeof userData !== "undefined" && userData && userData.accType !== "student") return;
+  const snapshot = buildProgressSnapshot();
+  stopTaskProgressSync();
+  stoppedTaskProgressSave = (async () => {
+    // let a save that is already on its way finish first; the newest snapshot then replaces what was queued
+    for (let i = 0; taskProgressSaveInFlight && i < 100; i++) await new Promise(resolve => setTimeout(resolve, 100));
+    taskProgressSavePending = null;
+    return dispatchProgressSave(snapshot);
+  })();
+}
+// the message for a task that was not finished (after a stop: whether its progress was saved)
+async function showUnfinishedTaskMessage() {
+  const save = stoppedTaskProgressSave;
+  stoppedTaskProgressSave = null;
+  const saved = save ? await save : false;
+  if (controller.language === 'EN') {
+    messageToTheUser(save ? (saved ? 'Task was not completed. Progress was saved.' : 'Task was not completed. Progress could not be saved.') : 'Task was not completed. Results were not saved.');
+  } else {
+    messageToTheUser(save ? (saved ? 'Užduotis nebaigta iki galo. Progresas išsaugotas.' : 'Užduotis nebaigta iki galo. Progreso išsaugoti nepavyko.') : 'Užduotis nebaigta iki galo. Rezultatai neišsaugoti.');
+  }
+}
+
+// Coalescing entry point: if a save is already in flight, the newest payload simply replaces
+// whatever was queued to go next (never piles up), and fires the moment the in-flight one
+// resolves.
+function scheduleProgressSave(payload) {
+  if (!controller.task || controller.task[0] !== "setTask") return;
+  if (taskProgressSaveInFlight) {
+    taskProgressSavePending = payload;
+    return;
+  }
+  dispatchProgressSave(payload);
+}
+
+function startTaskProgressSync() {
+  if (taskProgressTimer) return;
+  if (!controller.task || controller.task[0] !== "setTask") return;
+  taskProgressIdleTicks = 0;
+  taskProgressLastAnswered = controller.answeredQuestionTracker;
+  taskProgressLastMistakes = controller.mistakesTracker;
+  // new mistakes (one or several at a time): save right away instead of waiting for the next tick
+  taskMistakeWatch = setInterval(() => {
+    if ((controller.mistakesTracker || 0) > (taskProgressLastMistakes || 0)) saveTaskProgressNow();
+  }, 400);
+  taskProgressTimer = setInterval(() => {
+    const dirty = controller.answeredQuestionTracker !== taskProgressLastAnswered
+      || controller.mistakesTracker !== taskProgressLastMistakes;
+    taskProgressLastAnswered = controller.answeredQuestionTracker;
+    taskProgressLastMistakes = controller.mistakesTracker;
+    if (dirty) {
+      taskProgressIdleTicks = 0;
+      scheduleProgressSave(buildProgressSnapshot());
+    } else {
+      taskProgressIdleTicks += 1;
+      // 6 idle ticks of the 5s base interval below = 30s between time-only saves.
+      if (taskProgressIdleTicks >= 6) {
+        taskProgressIdleTicks = 0;
+        scheduleProgressSave({ secondsElapsed: computeTaskSecondsElapsed() });
+      }
+    }
+  }, 5000);
+}
+
+function stopTaskProgressSync() {
+  if (taskProgressTimer) {
+    clearInterval(taskProgressTimer);
+    taskProgressTimer = null;
+  }
+  if (taskMistakeWatch) {
+    clearInterval(taskMistakeWatch);
+    taskMistakeWatch = null;
+  }
+}
+
+// Called right after an answer is checked (text comprehension only, where answers come slowly
+// enough that this stays cheap) — goes through the same coalescing queue as the tick loop, so
+// clicking rapidly never produces more than ~1 extra request beyond whatever's already in flight.
+function saveTaskProgressNow() {
+  taskProgressIdleTicks = 0;
+  if (controller.task) {
+    taskProgressLastAnswered = controller.answeredQuestionTracker;
+    taskProgressLastMistakes = controller.mistakesTracker;
+  }
+  scheduleProgressSave(buildProgressSnapshot());
 }
 
 async function updateStudentPointsAndStatistics(coinMultiplier=1) {
@@ -2117,18 +2369,24 @@ async function checkAnswer () {
       controller.totalMistakes.splice(0, 1)
     }
 
-    if (controller.randomSelection[3]) {
-      if (controller.randomSelection[3] === "first") {
-        controller.currentMistakes.push([[controller.randomSelection[0], controller.randomSelection[1], "F"], controller.randomSelection[2]])
-        controller.totalMistakes.push([[controller.randomSelection[0], controller.randomSelection[1], "F"], controller.randomSelection[2]])
-      } else if (controller.randomSelection[3] === "second") {
-        controller.currentMistakes.push([[controller.randomSelection[0], controller.randomSelection[1], "S"], controller.randomSelection[2]])
-        controller.totalMistakes.push([[controller.randomSelection[0], controller.randomSelection[1], "S"], controller.randomSelection[2]])
+    // [[a, b, "F"|"S" when a number is unknown], op, [tries, answers given (at most 3)]]: another try on the same example
+    // (the last mistake recorded) adds to it instead of making a new record
+    const flag = controller.randomSelection[3] === "first" ? "F" : controller.randomSelection[3] === "second" ? "S" : null;
+    const numbers = flag ? [controller.randomSelection[0], controller.randomSelection[1], flag] : [controller.randomSelection[0], controller.randomSelection[1]];
+    const op = controller.randomSelection[2];
+    let given = controller.modeChoice7 === "C48" && op !== 'D' && !flag ? flipNumber(userInput) : userAnswer;
+    if (op === 'D' && controller.withRemainder && !flag) given = `${userAnswer} (${userAnswerRemainder})`;
+    [controller.currentMistakes, controller.totalMistakes].forEach(list => {
+      const last = list[list.length - 1];
+      const same = last && Array.isArray(last[0]) && last[1] === op && Array.isArray(last[2]) &&
+        JSON.stringify(last[0]) === JSON.stringify(numbers);
+      if (same) {
+        last[2][0] = (Number(last[2][0]) || 1) + 1;
+        if (last[2][1].length < 3) last[2][1].push(given);
+      } else {
+        list.push([numbers, op, [1, [given]]]);
       }
-    } else {
-      controller.currentMistakes.push([[controller.randomSelection[0], controller.randomSelection[1]], controller.randomSelection[2]])
-      controller.totalMistakes.push([[controller.randomSelection[0], controller.randomSelection[1]], controller.randomSelection[2]])
-    }
+    });
   }
     localStorage.setItem('controller', JSON.stringify(controller));
 
@@ -2308,6 +2566,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
 
   if (mathMistakes.length > 0) {
       // Group the data and calculate the number of mistakes for each action and pair of numbers
+      const mathAnswersByKey = {};   // the answers given (new records keep up to 3 per example)
       const performanceData = mathMistakes.reduce((acc, mistake) => {
         const first_number = mistake[0][0];
         const second_number = mistake[0][1];
@@ -2361,26 +2620,31 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
           swappedOrder = `${second_number} ${action} ${first_number} = &#x25fb`;
         }
 
+        // a mistake counts its tries ([..., op, [tries, answers]]; older records are one try each)
+        const tries = Array.isArray(mistake[2]) ? Math.max(1, Number(mistake[2][0]) || 1) : 1;
+        let usedKey;
         if ((action === "\u00D7" || action === "+")) {
-          if (acc[firstAsIs]) {
-            acc[firstAsIs] += 1;
-          } else if (acc[swappedOrder]) {
-            acc[swappedOrder] += 1;
-          } else {
-            acc[firstAsIs] = 1;
-          }
+          usedKey = acc[firstAsIs] ? firstAsIs : acc[swappedOrder] ? swappedOrder : firstAsIs;
         } else {
           // For other actions, follow the previous behavior
-          const veiksmas = `${firstAsIs}`;
-          acc[veiksmas] = (acc[veiksmas] || 0) + 1;
+          usedKey = `${firstAsIs}`;
+        }
+        acc[usedKey] = (acc[usedKey] || 0) + tries;
+        if (Array.isArray(mistake[2]) && Array.isArray(mistake[2][1])) {
+          if (!mathAnswersByKey[usedKey]) mathAnswersByKey[usedKey] = new Set();
+          mistake[2][1].forEach(answer => mathAnswersByKey[usedKey].add(String(answer)));
         }
       
         return acc;
       }, {});
 
       // Convert the data to an array of objects
+      // (EXPERIMENTAL pages: the answers given, next to the example)
+      const answersHtml = key => mistakeTableShowsAnswers() && mathAnswersByKey[key] && mathAnswersByKey[key].size
+        ? ` <span class="word-wrong-answers">(${[...mathAnswersByKey[key]].map(a => `<span class="wa">${escapeMistakeText(a)}</span>`).join(', ')})</span>`
+        : '';
       const summaryData = Object.entries(performanceData).map(([veiksmas, mistakes]) => ({
-          Veiksmai: veiksmas,
+          Veiksmai: veiksmas + answersHtml(veiksmas),
           "Suklysta (kartai)": mistakes
       }));
 
@@ -2429,8 +2693,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
                                 barColor = getBarColor(row["Suklysta (kartai)"]);
                             }
                             
-                            return `<div class="col-12 table-container">
-                            <tr>
+                            return `<tr>
                                 <td>${row["Veiksmai"]}</td>
                                 <td>${displayValue}</td>
                                 <td>
@@ -2440,7 +2703,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
                         `}
                     )
                   .join("")}
-          </div>`;
+          `;
       } else if (controller.language === 'EN') {
           summaryTable.innerHTML = `
               <tr>
@@ -2471,8 +2734,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
                                   barColor = getBarColor(row["Suklysta (kartai)"]);
                               }
                               
-                              return `<div class="col-12 table-container">
-                              <tr>
+                              return `<tr>
                                   <td>${row["Veiksmai"]}</td>
                                   <td>${displayValue}</td>
                                   <td>
@@ -2482,7 +2744,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
                           `}
                       )
                   .join("")}
-          </div>`;
+          `;
       }
 
       // Display the summary table
@@ -2515,8 +2777,16 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
  if (grammarMistakes.length > 0) {
   // First, group all word occurrences by their base form (prefix+answer+suffix)
 // First, group all word occurrences by their base form (prefix+answer+suffix)
-  const wordOccurrences = grammarMistakes.reduce((acc, [wordParts, wordCategory, usersMistakes, wordId]) => {
+  const wordOccurrences = grammarMistakes.reduce((acc, [rawWordParts, wordCategory, rawUsersMistakes, wordId]) => {
+    const wordParts = Array.isArray(rawWordParts)
+      ? rawWordParts
+      : rawWordParts && typeof rawWordParts === 'object'
+        ? [rawWordParts.prefix || '', rawWordParts.answer || rawWordParts.word || '', rawWordParts.suffix || '']
+        : [String(rawWordParts || ''), '', ''];
     const key = wordParts.join('|');
+    const usersMistakes = Array.isArray(rawUsersMistakes)
+      ? [Number(rawUsersMistakes[0]) || 0, Array.isArray(rawUsersMistakes[1]) ? rawUsersMistakes[1] : []]
+      : [0, []];
     if (!acc[key]) {
       acc[key] = {
         wordParts,
@@ -2551,16 +2821,24 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
 
   // Then process into the final mistake data structure
   const mistakeData = Object.values(wordOccurrences).reduce((result, { wordParts, wordCategory, occurrences, totalMistakes }) => {
-    const decodedWordCategory = parameterDictionary[wordCategory]["decodedParameterText"];
+    const categoryEntry = typeof parameterDictionary !== "undefined"
+      ? parameterDictionary[wordCategory]
+      : null;
+    const decodedWordCategory = categoryEntry?.decodedParameterText || String(wordCategory || "Kita klaida");
     const [prefix, answer, suffix] = wordParts;
+
+    // EXPERIMENTAL (testers' pages only, html.experimental-on): the wrong answers next to the word, e.g. "pažinsi (q, ž)"
+    const wrongAnswers = mistakeTableShowsAnswers()
+      ? [...new Set(occurrences.flatMap(occ => occ.usersMistakes[1] || []))].map(escapeMistakeText)
+      : [];
 
     // Create highlighted word form with all occurrence data
     const highlightedWord = `
-      <span class="clickable-word" 
+      <span class="clickable-word"
             data-word-parts='${JSON.stringify(wordParts)}'
             data-category="${decodedWordCategory}"
             data-occurrences='${encodeURIComponent(JSON.stringify(occurrences))}'>
-        ${prefix}<span class="incorrect-part">${answer}</span>${suffix}
+        ${prefix}<span class="incorrect-part">${answer}</span>${suffix}${wrongAnswers.length ? ` <span class="word-wrong-answers">(${wrongAnswers.map(w => `<span class="wa">${w}</span>`).join(', ')})</span>` : ''}
       </span>
     `;
     
@@ -2667,29 +2945,36 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
   };
 
 // Optimized function to process and display sentences for a word
-async function showAllSentencesForWord(wordParts, occurrences) {
+// targetContainerId: optional id of a specific element to render into (used when the
+// mistakes table lives in its own isolated context, e.g. an embedded archive row's
+// detail cell) — falls back to the shared global fields when not provided.
+async function showAllSentencesForWord(wordParts, occurrences, targetContainerId = null) {
     // 1. Get the results container
-    const resultsContainer = document.getElementById('sentence-with-mistake-field');
-    const resultsContainerForStudents = document.getElementById('sentence-with-mistake-field-for-student');
-    
-    if (!resultsContainer && !resultsContainerForStudents) {
-        console.error("Results container not found");
-        return;
-    }
+    let container = targetContainerId ? document.getElementById(targetContainerId) : null;
 
-    // Parse user data
-    let userData;
-    try {
-        userData = JSON.parse(userDataString);
-    } catch (error) {
-        console.error("Failed to parse user data:", error);
-        return;
-    }
+    if (!container) {
+        const resultsContainer = document.getElementById('sentence-with-mistake-field');
+        const resultsContainerForStudents = document.getElementById('sentence-with-mistake-field-for-student');
 
-    const container = userData.accType === "teacher" ? resultsContainer : resultsContainerForStudents;
+        if (!resultsContainer && !resultsContainerForStudents) {
+            console.error("Results container not found");
+            return;
+        }
+
+        // Parse user data
+        let userData;
+        try {
+            userData = JSON.parse(userDataString);
+        } catch (error) {
+            console.error("Failed to parse user data:", error);
+            return;
+        }
+
+        container = userData.accType === "teacher" ? resultsContainer : resultsContainerForStudents;
+    }
     
     if (!container) {
-        console.error("Container not found for user type:", userData.accType);
+        console.error("Sentence results container not found");
         return;
     }
 
@@ -2961,8 +3246,8 @@ async function processOccurrence({ usersMistakes, wordId }, wordParts, database)
         const instanceIndex = Math.min(wordIndex, matches.length - 1);
         const matchData = matches[instanceIndex];
 
-        // Prepare user mistakes display
-        const wrappedMistakes = Array.isArray(usersMistakes) && Array.isArray(usersMistakes[1])
+        // Prepare user mistakes display (EXPERIMENTAL pages: the answers are in the table, the sentence only highlights the word)
+        const wrappedMistakes = !mistakeTableShowsAnswers() && Array.isArray(usersMistakes) && Array.isArray(usersMistakes[1])
             ? usersMistakes[1].map(m => `<span class="user-incorrect-answer">${m}</span>`).join(", ")
             : '';
 
@@ -2970,8 +3255,12 @@ async function processOccurrence({ usersMistakes, wordId }, wordParts, database)
         const beforeMatch = originalSentence.substring(0, matchData.index).replace(/\uE000/g, "");
         const afterMatch = originalSentence.substring(matchData.index + matchData[0].length).replace(/\uE000/g, "");
 
+        // (EXPERIMENTAL pages: the whole word highlighted, without marking the letters asked)
+        const answeredWord = mistakeTableShowsAnswers()
+            ? `${wordParts[0]}${wordParts[1]}${wordParts[2]}`
+            : `${wordParts[0]}<span class="incorrect-part">${wordParts[1]}</span>${wordParts[2]}`;
         return `
-            <div class="sentence-occurrence">${beforeMatch}<span class="answered-word">${wordParts[0]}<span class="incorrect-part">${wordParts[1]}</span>${wordParts[2]}${wrappedMistakes ? `(${wrappedMistakes})` : ''}</span>${afterMatch}</div>
+            <div class="sentence-occurrence">${beforeMatch}<span class="answered-word">${answeredWord}${wrappedMistakes ? `(${wrappedMistakes})` : ''}</span>${afterMatch}</div>
         `;
 
     } catch (error) {
@@ -2990,6 +3279,18 @@ async function processOccurrence({ usersMistakes, wordId }, wordParts, database)
     const table = createTable(currentView);
     container.appendChild(table);
 
+    // If this table belongs to an embedded archive row's detail cell, target that
+    // row's own sentence container so the result appears right there, not in a
+    // shared field elsewhere on the page.
+    let sentenceTargetId = null;
+    if (customDivForGrammarSummaryTable && customDivForGrammarSummaryTable.startsWith('archive-detail-mistakes-grammar-')) {
+      const rowIdSuffix = customDivForGrammarSummaryTable.slice('archive-detail-mistakes-grammar-'.length);
+      sentenceTargetId = `archive-detail-sentence-${rowIdSuffix}`;
+    } else if (customDivForGrammarSummaryTable && customDivForGrammarSummaryTable.startsWith('archive-popup-grammar-')) {
+      const rowIdSuffix = customDivForGrammarSummaryTable.slice('archive-popup-grammar-'.length);
+      sentenceTargetId = `archive-popup-sentence-${rowIdSuffix}`;
+    }
+
     // Add click handler for word rows
     container.addEventListener('click', (e) => {
       // Only process if we're in words view
@@ -3001,7 +3302,7 @@ async function processOccurrence({ usersMistakes, wordId }, wordParts, database)
           const occurrences = JSON.parse(decodeURIComponent(clickableWord.getAttribute('data-occurrences')));
           
           // Show all sentences for this word
-          showAllSentencesForWord(wordParts, occurrences);
+          showAllSentencesForWord(wordParts, occurrences, sentenceTargetId);
         }
       }
     });
@@ -3035,8 +3336,21 @@ function startTimer() {
   let startTime = localStorage.getItem("startTime");
 
   if (!startTime) {
-    // If start time is not in local storage, get the current time and save it
+    // If start time is not in local storage, get the current time and save it — computed HERE,
+    // the moment the timer actually starts ticking (not earlier, back on uzduotys.html before
+    // navigation), so page-load time is never counted against the student. Resuming a task with
+    // prior elapsed time just backdates this same starting point by that amount.
     startTime = new Date().getTime();
+    // Only a resumed teacher-assigned task gets backdated — resumeData can otherwise still be
+    // sitting in `controller` from an earlier teacher task's resume (completeTask() is the only
+    // thing that sets/clears it, and a practice run never goes through it), which would wrongly
+    // dock time off a fresh practice session. Consumed once, then cleared, so it can't leak again.
+    if (controller.task && controller.task[0] === "setTask" && controller.resumeData
+        && typeof controller.resumeData.secondsElapsed === "number") {
+      startTime -= controller.resumeData.secondsElapsed * 1000;
+      controller.resumeData = null;
+      localStorage.setItem('controller', JSON.stringify(controller));
+    }
     localStorage.setItem("startTime", startTime);
   } else {
     // If start time is in local storage, parse it to a number
@@ -3080,9 +3394,23 @@ function countDown() {
   // Check if there is remaining time stored in the memory
   let remainingTime = parseInt(localStorage.getItem("remainingTime"), 10);
   
-  // If there is no remaining time, set it to the total time
+  // If there is no remaining time, set it to the total time — computed HERE, the moment the
+  // countdown actually starts ticking (not earlier, back on uzduotys.html before navigation), so
+  // page-load time is never counted against the student. Resuming a task with prior elapsed time
+  // just starts this same countdown that much further along.
   if (!remainingTime) {
     remainingTime = timerLimit * 1000;
+    // Only a resumed teacher-assigned task gets this head start docked off — resumeData can
+    // otherwise still be sitting in `controller` from an earlier teacher task's resume
+    // (completeTask() is the only thing that sets/clears it, and a practice run never goes
+    // through it), which would wrongly shorten a fresh practice countdown. Consumed once, then
+    // cleared, so it can't leak again.
+    if (controller.task && controller.task[0] === "setTask" && controller.resumeData
+        && typeof controller.resumeData.secondsElapsed === "number") {
+      remainingTime = Math.max(0, timerLimit - controller.resumeData.secondsElapsed) * 1000;
+      controller.resumeData = null;
+      localStorage.setItem('controller', JSON.stringify(controller));
+    }
     localStorage.setItem("remainingTime", remainingTime);
   }
 
@@ -3177,9 +3505,9 @@ function startQuestionsTimer () {
 	controller.timerLimit = 5;
 	}
 
-	if (localStorage.getItem("remainingTime")) {
-	localStorage.removeItem("remainingTime");
-	}
+	// Resuming a teacher-assigned task that already has saved progress: restore trackers and
+	// pick the countdown back up from where it was, instead of wiping everything to a fresh start.
+	const resuming = !!(controller.task && controller.task[0] === "setTask" && controller.resumeData);
 
 	if (localStorage.getItem("elapsedTime")) {
 	localStorage.removeItem("elapsedTime");
@@ -3189,18 +3517,49 @@ function startQuestionsTimer () {
 	localStorage.removeItem("startTime");
 	}
 	controller.result = ['', '', '', '', '']
-	controller.currentMistakes = [];
-	controller.mistakesTracker = 0;
-	controller.answeredQuestionTracker = 0;
-  controller.correctAnswersTracker = 0;
 	controller.equation = '';
 	controller.equation2 = '';
 	controller.randomSelection = [];
 	controller.questionsStopped = false;
+
+	if (resuming) {
+		const resumeSeconds = Number(controller.resumeData.secondsElapsed) || 0;
+		const resumeProgress = controller.resumeData.progress || {};
+		controller.currentMistakes = resumeProgress.currentMistakes || [];
+		controller.mistakesTracker = Number(controller.resumeData.mistakesSoFar) || 0;
+		controller.answeredQuestionTracker = Number(controller.resumeData.answeredCount) || 0;
+		controller.correctAnswersTracker = 0;
+		// NOTE: deliberately not touching controller.randomSelection here — it means something
+		// different per task type (math: [num1,num2,op]; text comprehension: [currentItem]) and
+		// writing to index 2 generically made its .length non-zero for all of them, which broke
+		// their own "is there already a buffered item" checks. Grammar (rasyba.html) restores its
+		// own sequence position itself, using controller.resumeData directly, not this field.
+		if (typeof resumeProgress.passNumber === "number") {
+			controller.passNumber = resumeProgress.passNumber;
+		}
+		// Deliberately NOT writing "remainingTime" here: this runs on uzduotys.html, before the
+		// navigation + script-load time it takes to actually reach the task page — pre-computing
+		// it against Date.now() here would count that navigation delay against the student (the
+		// countdown would already show a few seconds gone the moment they can see/interact with
+		// it). countDown() on the destination page computes the resume-adjusted value itself, the
+		// moment it actually starts ticking, so only real navigation time is ever "free".
+		if (localStorage.getItem("remainingTime")) {
+		localStorage.removeItem("remainingTime");
+		}
+	} else {
+		if (localStorage.getItem("remainingTime")) {
+		localStorage.removeItem("remainingTime");
+		}
+		controller.currentMistakes = [];
+		controller.mistakesTracker = 0;
+		controller.answeredQuestionTracker = 0;
+		controller.correctAnswersTracker = 0;
+	}
+
 	if (controller.mode === "math") {
 		generateCombinations();
 	}
-	
+
 	localStorage.setItem('controller', JSON.stringify(controller));
 	redirectToQuestions();
 };
@@ -3208,7 +3567,7 @@ function startQuestionsTimer () {
 function startQuestionsNumber () {
 	controller = JSON.parse(localStorage.getItem('controller'));
 
-	if (controller.task) { 
+	if (controller.task) {
 	  controller.questionNumber = parseInt(controller.setTaskDuration);
 	} else {
 			controller.questionNumber = parseInt(questionNumberInputElement.value);
@@ -3216,17 +3575,50 @@ function startQuestionsNumber () {
 	if (!controller.questionNumber) {
 	controller.questionNumber = 20;
 	}
-	if (localStorage.getItem("startTime")) {
-	localStorage.removeItem("startTime");
-	}
+
+	// Resuming a teacher-assigned task that already has saved progress: restore trackers and the
+	// elapsed stopwatch instead of wiping everything to a fresh start.
+	const resuming = !!(controller.task && controller.task[0] === "setTask" && controller.resumeData);
+
 	controller.result = ['', '', '', '', '']
-  controller.currentMistakes = [];
-  controller.mistakesTracker = 0;
-  controller.answeredQuestionTracker = 0;
-  controller.correctAnswersTracker = 0;
-  controller.equation = '';
+	controller.equation = '';
 	controller.randomSelection = [];
 	controller.questionsStopped = false;
+
+	if (resuming) {
+		const resumeSeconds = Number(controller.resumeData.secondsElapsed) || 0;
+		const resumeProgress = controller.resumeData.progress || {};
+		controller.currentMistakes = resumeProgress.currentMistakes || [];
+		controller.mistakesTracker = Number(controller.resumeData.mistakesSoFar) || 0;
+		controller.answeredQuestionTracker = Number(controller.resumeData.answeredCount) || 0;
+		controller.correctAnswersTracker = 0;
+		// NOTE: deliberately not touching controller.randomSelection here — it means something
+		// different per task type (math: [num1,num2,op]; text comprehension: [currentItem]) and
+		// writing to index 2 generically made its .length non-zero for all of them, which broke
+		// their own "is there already a buffered item" checks. Grammar (rasyba.html) restores its
+		// own sequence position itself, using controller.resumeData directly, not this field.
+		if (typeof resumeProgress.passNumber === "number") {
+			controller.passNumber = resumeProgress.passNumber;
+		}
+		// Deliberately NOT writing "startTime" here: this runs on uzduotys.html, before the
+		// navigation + script-load time it takes to actually reach the task page — pre-computing
+		// it against Date.now() here would count that navigation delay against the student (the
+		// stopwatch would already show a few seconds elapsed the moment they can see/interact
+		// with it). startTimer() on the destination page computes the resume-adjusted value
+		// itself, the moment it actually starts ticking, so only real navigation time is free.
+		if (localStorage.getItem("startTime")) {
+		localStorage.removeItem("startTime");
+		}
+	} else {
+		if (localStorage.getItem("startTime")) {
+		localStorage.removeItem("startTime");
+		}
+		controller.currentMistakes = [];
+		controller.mistakesTracker = 0;
+		controller.answeredQuestionTracker = 0;
+		controller.correctAnswersTracker = 0;
+	}
+
 	if (controller.mode === "math") {
 			generateCombinations();
 	}
@@ -3335,7 +3727,6 @@ function getOptionTextFromValues(values, taskDuration, forTeacher = false, compa
             final_results.push(result[3]);
 
             compactDescription.push([result[1], "primary"])
-            compactDescription.push([result[2], "primary"])
 
             if (result[3] === "SKAITINĖ LYGYBĖ SU NEŽINOMUOJU") {
                 final_results.push(result[4]);
@@ -3464,7 +3855,6 @@ function getOptionTextFromValues(values, taskDuration, forTeacher = false, compa
                     final_results.push(parameterDictionary[values[6]]["decodedParameterText"]);
                     final_results.push(parameterDictionary[values[4]]["decodedParameterText"]);
 
-                    compactDescription.push([parameterDictionary[values[5]]["decodedParameterText"], "primary"])
                     compactDescription.push([parameterDictionary[values[6]]["decodedParameterText"], "primary"])
 
                 } else {
@@ -3493,11 +3883,12 @@ function getOptionTextFromValues(values, taskDuration, forTeacher = false, compa
                     outerDiv.classList = "selected-text-task-info-for-teachers-list";
 
                     if (taskDuration) {
+                      // "Tekstų ID:" and each text's number as a small button (in a pop-up it opens the pop-up's own browser)
                       const htmlItems = taskDuration[1]
-                          .map(id => `<span class="selected-text-task-info-for-teachers-item" id="${id}" onclick="openTextBrowser(${id})">ID: ${id}</span>`)
-                          .join(", ");
+                          .map(id => `<button type="button" class="selected-text-task-info-for-teachers-item text-id-chip" data-text-id-chip="${id}" title="Atidaryti tekstą naršyklėje" onclick="event.stopPropagation(); (typeof openTextIdChip === 'function' ? openTextIdChip(${id}, this) : openTextBrowser(${id}))">${id}</button>`)
+                          .join("");
 
-                      outerDiv.innerHTML = htmlItems;
+                      outerDiv.innerHTML = `<span class="selected-text-ids-label">Tekstų ID:</span>${htmlItems}`;
                     }
                     final_results.push(outerDiv.outerHTML);
                     final_results.push(parameterDictionary[values[3]]["decodedParameterText"]);
@@ -3516,7 +3907,6 @@ function getOptionTextFromValues(values, taskDuration, forTeacher = false, compa
 
         } else if (result[0] === "GRAMATIKA") {
           final_results.push(result[2]);
-          compactDescription.push([result[2], "primary"])
 
           if (result[1] === "RAŠYBA") {
             let compactParams = []
@@ -3710,6 +4100,16 @@ async function controllerToTask() {
         }
     }
 
+    // the task's length, in the teacher tasks' format: ["C40", questions] / ["C39", minutes]. Own practice rows are told
+    // apart from the older archive rows by it (those have no teacher task, group or duration).
+    const taskLength = controller.modeChoice4 === "C39" ? controller.timerLimit : controller.questionNumber;
+    const replay = grammarReplayInfo();
+    recordsList.forEach(record => {
+        if (!record.duration) record.duration = JSON.stringify(replay
+            ? [controller.modeChoice4 || "C40", Number(taskLength) || 0, replay.seed, replay.grade, replay.textsMax, replay.textsHash]
+            : [controller.modeChoice4 || "C40", Number(taskLength) || 0]);
+    });
+
     return recordsList;
 }
 
@@ -3840,7 +4240,8 @@ async function processSelectedTexts() {
             mistakes: totalMistakes,
             totalAnswers: totalTexts,
             answerRate: answerRate,
-            mistakesDetail: group.texts.map(t => [t.id, t.mistakes])
+            mistakesDetail: group.texts.map(t => [t.id, t.mistakes]),
+            duration: JSON.stringify(["C40", totalTexts])
         });
     }
 
@@ -4269,7 +4670,7 @@ const infoMessages = {
 
 let popupOpenTime = 0;
 // Open popup with dynamic content
-function openObjectPopup(content, title='', subtitle = '', functionToTrigger=null, saferClosing=false) {
+function openObjectPopup(content, title='', subtitle = '', functionToTrigger=null, saferClosing=false, options={}) {
     popupOpenTime = Date.now();
     // Clear existing content
     objectPopupContent.innerHTML = '';
@@ -4286,6 +4687,17 @@ function openObjectPopup(content, title='', subtitle = '', functionToTrigger=nul
 
     objectPopupTitle.innerHTML = title;
     objectPopupSubtitle.innerHTML = subtitle;
+    const popupPanel = objectPopup.querySelector('.object-popup-panel');
+    if (popupPanel) {
+      popupPanel.classList.remove('archive-task-info-popup');
+      if (options.className) popupPanel.classList.add(options.className);
+      popupPanel.style.width = options.width || '';
+      popupPanel.style.maxWidth = options.maxWidth || '';
+      popupPanel.style.height = options.height || '';
+      popupPanel.style.maxHeight = options.maxHeight || '';
+      popupPanel.style.padding = options.padding || '';
+      popupPanel.style.margin = options.margin || '';
+    }
 
     // Show the popup
     objectPopup.style.display = 'flex';
@@ -5648,6 +6060,11 @@ function redirectToAppropriateLanguage(targetFolder) {
       const timestamp = Date.now() % 1000000;
       const random = Math.floor(Math.random() * 46656);
       return (timestamp * 46656 + random).toString(36).toUpperCase();
+  }
+  // a spelling task's seed: marked with the questions' rules version (rasyba-generator.js seedRules) - the task and the
+  // results analysis's replay of it follow the same rules; older seeds (no mark) keep the first ones
+  function generateGrammarSeed() {
+      return 'R2-' + generateSessionSeed();
   }
 
   /**

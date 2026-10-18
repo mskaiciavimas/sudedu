@@ -93,6 +93,26 @@
     // (it would when its own countdown reaches zero just before the game's end arrives)
     if (typeof recordTaskToLongTerm === 'function') window.recordTaskToLongTerm = function () { return Promise.resolve(); };
 
+    // instead, the answers given in this game go to the archive once, when the game ends: like practice results, but with
+    // the game's permanent key (the server stores the row with the group "#<key>"); the speed counts the time played
+    var recorded = false;
+    function recordGameResults() {
+      if (recorded || typeof controllerToTask !== 'function' || typeof apiFetch !== 'function' || typeof controller === 'undefined') return;
+      if (typeof LONG_TERM_RECORDING_ENABLED !== 'undefined' && !LONG_TERM_RECORDING_ENABLED) return;
+      recorded = true;
+      if (!(Number(controller.answeredQuestionTracker) > 0)) return;
+      var minutes = Math.max(1 / 60, (Date.now() - (session.startedAt || Date.now())) / 60000);
+      Promise.resolve(controllerToTask()).then(function (records) {
+        records = (records || []).filter(function (r) { return r && r.totalAnswers > 0; }).map(function (r) {
+          return Object.assign({}, r, { game: session.game || 'td', answerRate: Number((r.totalAnswers / minutes).toFixed(1)) });
+        });
+        if (!records.length) return;
+        return apiFetch(apiBase + 'students/long-term', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ records: records })
+        });
+      }).catch(function (e) { console.error('Game results were not saved:', e); });
+    }
+
     // "Grįžti" during a game goes back to the games section (the page's own back button would open Klasė's first section)
     window.addEventListener('click', function (e) {
       if (!e.target.closest || !e.target.closest('#desktopBackBtn, #mobileBackBtn')) return;
@@ -104,6 +124,7 @@
     function showEnd(result, reason) {
       if (ended) return;
       ended = true;
+      recordGameResults();
       clearSession();
       clearInterval(watch);
       if (typeof controller !== 'undefined') controller.questionsStopped = true;

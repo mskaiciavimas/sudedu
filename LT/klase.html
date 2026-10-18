@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <script>
-        // EXPERIMENTAL FEATURES (elements with class "experimental-features", e.g. the Žaidimai section) are hidden
-        // from everyone except the approved tester teachers listed here (by user ID) and the students linked to them.
+        // EXPERIMENTAL FEATURES (elements with class "experimental-features"; none on this page at the moment - Žaidimai and
+        // Aukcionas are for everyone) are hidden from everyone except the approved tester teachers listed here (by user ID)
+        // and the students linked to them.
         var EXPERIMENTAL_TESTER_TEACHER_IDS = [22, 3428];
         (function () {
             try {
@@ -19,9 +20,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUDEDU - klasė</title>
-    <link rel="stylesheet" type="text/css" href="../index.css">
+    <link rel="stylesheet" type="text/css" href="../index.css?v=20261018r">
     <link rel="stylesheet" href="../main-nav-bar.css">
     <script src="../refresh-token.js"></script>
+    <script src="../reveal-expanded.js?v=20261018r"></script>
     <!-- Google tag (gtag.js) -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-96Q83PW8XY"></script>
 	<script>
@@ -228,6 +230,13 @@
             justify-content: center;
         }
 
+        /* Aukcionas fills exactly the visible area (no page scrollbar); only the open pane's content scrolls.
+           :where() keeps this at the specificity of the rule above, so the phone / tablet-portrait rules
+           further down (which give this box its own height) still win there. */
+        #content-outer-container:where(:has(> #aukcionas.active)) {
+            height: 100%;
+        }
+
         .content-panel {
             display: none;
             width: 100%;
@@ -268,7 +277,7 @@
             align-items: center;
             padding: 8px;
             flex-direction: row;
-            gap: 0;
+            gap: 5px;
         }
 
         .side-navigation.mobile .nav-item {
@@ -302,12 +311,12 @@
         }
 
         .pupils-list {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.22);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.55);
             border-radius: 20px;
-            padding: 25px;
+            padding: 20px 25px;
 
         }
 
@@ -324,7 +333,7 @@
         .member-card {
             background: rgba(255, 255, 255, 0.4);
             border-radius: 15px;
-            padding: 15px;
+            padding: 10px;
             text-align: center;
             transition: all 0.3s ease;
             border: 2px solid transparent;
@@ -416,10 +425,10 @@
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 20px;
-            padding: 25px;
+            padding: 15px 20px;
             text-align: center;
             flex-wrap: wrap;
-            margin-bottom: 20px; 
+            margin-bottom: 8px; 
             min-height: 65px;
         }
 
@@ -671,6 +680,17 @@
         .arrow:hover {
             background: rgba(255, 255, 255, 0.6);
         }
+
+        .au-item-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .au-item-meta span {
+            display: inline-flex;
+            align-items: center;
+        }
         
         #featureSelect {
             padding: 8px 12px;
@@ -826,7 +846,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 8px;
             gap: 15px;
             flex-wrap: wrap;
             background: rgba(255, 255, 255, 0.15);
@@ -843,8 +863,8 @@
         .class-challenge-content-grid {
             display: grid;
             grid-template-columns: 1fr auto;
-            gap: 20px;
-            margin-bottom: 24px;
+            gap: 10px;
+            margin-bottom: 8px;
             width: 100%;
         }
 
@@ -1099,10 +1119,10 @@
             flex-direction: column;
             gap: 5px;
             align-items: center;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.22);
             padding: 18px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.55);
         }
 
         .my-score-label {
@@ -1202,7 +1222,7 @@
         }
 
         .side-navigation.mobile .nav-item {
-            min-width: 25vw;
+            min-width: 22vw;
         }
 
         .carousel-controls {
@@ -1710,6 +1730,7 @@
 
             .teacher-info-div {
                 margin-bottom: 15px;
+                padding: 4px 16px;
             }
         }
 
@@ -1724,7 +1745,7 @@
             }
 
             .teachers-name {
-                font-size: 1.65rem;
+                font-size: 1.85rem;
             }
 
             .teachers-id {
@@ -1749,6 +1770,78 @@
 
         }
 
+        /* =====================================================================
+           TYPOGRAPHY + GLASS ALIGNMENT WITH THE "UŽDUOTYS" PAGE
+           Only font sizes, colours, borders and corner radii are changed here.
+           Desktop sizes apply to landscape viewports >= 768px; the phone
+           sizes below and the tablet-portrait overrides above are kept.
+           Scale: 17-22px titles | 15-16px body | 13.5-14px small labels
+           ===================================================================== */
+
+        /* Glass sections: same look as the panels on the tasks page */
+        .teacher-info-div,
+        .class-challenge-header {
+            background: rgba(255, 255, 255, 0.42);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            border-radius: 16px;
+        }
+
+        .personal-info-main-holder,
+        .class-challenge-task-box,
+        .previous-challenge-winners-holder {
+            background: rgba(255, 255, 255, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            border-radius: 16px;
+        }
+
+        @media (min-width: 768px) and (orientation: landscape) {
+            .personal-info-header,
+            .class-challenge-title {
+                font-size: 1.4rem;
+            }
+
+            .teachers-id {
+                font-size: 1rem;
+            }
+
+            .pupils-list-title {
+                font-size: 1.15rem;
+            }
+
+            .section-title {
+                font-size: 1.1rem;
+            }
+
+        }
+
+        @media (max-width: 767px) {
+            .teachers-name,
+            .personal-info-header {
+                font-size: 1.4rem;
+            }
+
+            .pupils-list-title {
+                font-size: 1.15rem;
+            }
+
+            .section-title {
+                font-size: 1.1rem;
+            }
+
+            .class-challenge-title {
+                font-size: 1.25rem;
+            }
+        }
+
+        @media (max-width: 578px) {
+            .teachers-name {
+                font-size: 1.3rem;
+            }
+
+            .pupils-list-title {
+                font-size: 1.1rem;
+            }
+        }
 
         /* ---------- Žaidimai: class game lobbies (same glass, type scale and buttons as Iššūkis) ---------- */
         #zaidimai [hidden] { display: none !important; }
@@ -1845,6 +1938,7 @@
         .zg-lobby-info span { font-size: 0.85rem; color: #718096; font-weight: 600; overflow-wrap: anywhere; }
         .zg-lobby-row .zg-btn { font-size: 0.9rem; padding: 8px 14px; border-radius: 16px; }
         .zg-lobby-row .zg-btn::before { border-radius: 16px; }
+        .zg-lobby-state { flex-shrink: 0; font-size: 0.9rem; color: #3c4f59; background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.65); border-radius: 16px; padding: 7px 14px; white-space: nowrap; }
         .zg-badge { font-style: normal; background: #32ac93; color: #F5F5F7; border-radius: 99px; padding: 1px 8px; font-size: 0.75rem; font-weight: 700; }
         .zg-empty { background: rgba(255, 255, 255, 0.22); border: 1px solid rgba(255, 255, 255, 0.55); border-radius: 16px; padding: 14px; color: #718096; font-weight: 600; font-size: 0.9rem; text-align: center; }
         .zg-join-box { margin-top: 10px; }
@@ -1874,7 +1968,9 @@
         .zg-settings-grid, .zg-lobby-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 10px; align-items: start; }
         .zg-settings-grid { align-items: stretch; }
         .zg-field { display: flex; flex-direction: column; gap: 5px; font-weight: 700; font-size: 0.9rem; margin-bottom: 10px; }
-        #zg-math select { display: block; width: 100%; max-width: 100%; box-sizing: border-box; margin: 0 0 8px; border: 1px solid rgba(255, 255, 255, 0.65); background: rgba(255, 255, 255, 0.6); border-radius: 14px; padding: 10px 14px; font-size: 0.95rem; color: #212529; white-space: normal; }
+        #zg-math select { display: block; width: 100%; max-width: 100%; box-sizing: border-box; margin: 0 0 8px; border: 1px solid rgba(255, 255, 255, 0.65); background: rgba(255, 255, 255, 0.6); border-radius: 14px; padding: 10px 14px; font-size: 1.1rem; color: #212529; white-space: normal; }
+        /* (the task choice dropdowns have Praktika's font sizes) */
+        #zg-math #mode_choice_12 { font-size: 1rem; }
         #zg-math .selected_numbers_inner_div { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
         #zg-math #selected_number, #zg-math #selected_number_2 { width: auto; margin: 0; }
         #zg-math label { font-weight: 700; font-size: 0.9rem; }
@@ -1931,13 +2027,266 @@
             .zg-text, .zg-task-list li, .zg-field, #zg-math label, .zg-lobby-info span, .zg-empty { font-size: 1.25rem; }
             .zg-btn { font-size: 1.5rem; }
             .zg-lobby-row .zg-btn { font-size: 1.2rem; }
-            .zg-input, #zg-math select { font-size: 1.35rem; }
+            .zg-input { font-size: 1.35rem; }
+            #zg-math select { font-size: 1.5rem; }
+            #zg-math #selected_number, #zg-math #selected_number_2 { font-size: 1.2rem; }
+            #zg-math #mode_choice_12 { font-size: 1rem; }
             .zg-code { font-size: 2rem; }
             .zg-big-code { font-size: 3.5rem; }
             .zg-game-name { font-size: 1.75rem; }
             .zg-task-list li::before { top: 9px; }
         }
-    </style>
+
+        /* ---------- Aukcionas: rewards bought with SUDEDU coins (reuses the Žaidimai .zg-* panels, boxes and buttons) ---------- */
+        #aukcionas [hidden] { display: none !important; }
+        #aukcionas .zg-box + .zg-box { margin-top: 10px; }
+        .au-head-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .au-coins { display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.62); border: 1px solid rgba(255, 255, 255, 0.65); border-radius: 99px; padding: 6px 14px 6px 12px; }
+        .au-coins-label { font-size: 0.75rem; font-weight: 800; letter-spacing: 1.2px; color: #3c4f59; margin-right: 2px; }
+        .au-coins img { width: 26px; height: 26px; }
+        .au-coins b { font-size: 1.15rem; font-weight: 800; color: #bf9b30; }
+        .au-coin { width: 20px; height: 20px; vertical-align: -5px; margin: 0 3px 0 2px; }
+        .au-small { font-size: 0.9rem; padding: 8px 14px; border-radius: 16px; }
+        .au-small::before { border-radius: 16px; }
+        .au-box-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .au-box-head .zg-label { margin-bottom: 0; }
+        .au-items, .au-list, .au-notice-list, .au-owner ul { list-style: none; margin: 0; padding: 0; }
+        .au-items, .au-list { display: grid; gap: 8px; }
+        .au-item, .au-row, .au-owner { display: flex; align-items: center; gap: 14px; background: rgba(255, 255, 255, 0.42); border: 1px solid rgba(255, 255, 255, 0.65); border-radius: 16px; padding: 12px 14px; }
+        .au-item.au-winning { border-color: #32ac93; box-shadow: inset 0 0 0 1px #32ac93; }
+        .au-item-main, .au-row-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+        .au-item-title { font-weight: 800; font-size: 1.05rem; overflow-wrap: anywhere; }
+        .au-item-desc { font-size: 0.9rem; font-weight: 500; color: #3c4f59; overflow-wrap: anywhere; }
+        .au-item-meta { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.9rem; font-weight: 500; color: #3c4f59; margin-top: 2px; }
+        .au-item-meta b, .au-state b, .au-row-text b, .au-bidder b, .au-hint b { color: #1f2a30; }
+        .au-item-actions { display: flex; gap: 6px; flex: none; align-items: center; }
+        .au-student-actions { flex-direction: column; align-items: stretch; width: 210px; gap: 6px; }
+        .au-student-actions > .zg-btn { width: 100%; }
+        .au-badge-auction { background: #3288AC; vertical-align: 2px; margin-left: 4px; }
+        .au-badge-wait { background: #e6a23c; white-space: nowrap; }
+        .au-bids { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 0.85rem; font-weight: 600; color: #3c4f59; margin-top: 4px; }
+        .au-bidder { background: rgba(255, 255, 255, 0.62); border-radius: 99px; padding: 2px 10px; }
+        .au-bidder.win { box-shadow: inset 0 0 0 1px #32ac93; }
+        .au-state { font-size: 0.9rem; font-weight: 600; color: #3c4f59; }
+        .au-state.win { color: #32ac93; }
+        .au-bid { display: flex; gap: 6px; }
+        .au-bid .zg-input { flex: 1; min-width: 0; padding: 8px 10px; }
+        .au-hint { font-size: 0.8rem; font-weight: 600; color: #718096; }
+        .au-row-text span { font-size: 0.85rem; font-weight: 500; color: #3c4f59; overflow-wrap: anywhere; }
+        .au-redeem-box { border-color: #e6a23c; box-shadow: inset 0 0 0 1px #e6a23c; }
+        .au-owner { flex-direction: column; align-items: stretch; gap: 6px; }
+        .au-owner-name { font-weight: 800; font-size: 0.9rem; }
+        .au-owner li { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 0.9rem; font-weight: 500; padding: 3px 0; border-top: 1px solid rgba(255, 255, 255, 0.65); overflow-wrap: anywhere; }
+        .au-owned-info { display: inline-flex; align-items: center; gap: 6px; flex: none; }
+        .au-notices { border-color: #3288AC; box-shadow: inset 0 0 0 1px #3288AC; }
+        .au-notice-list li { position: relative; padding: 4px 0 4px 18px; font-size: 0.9rem; font-weight: 500; }
+        .au-notice-list li::before { content: ''; position: absolute; left: 4px; top: 11px; width: 7px; height: 7px; border-radius: 50%; background: #3288AC; }
+        .au-settings { max-width: 720px; }
+        .au-period-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(150px, 220px); gap: 0 10px; align-items: end; }
+        .au-period-note { margin: -4px 0 10px; font-size: 0.85rem; }
+        /* student: the class's rules (folded until "Taisyklės"), each limit with how much of it is used */
+        .au-rules-btn { gap: 6px; }
+        .au-rules-btn[aria-expanded="true"] { background: rgba(255, 255, 255, 0.9); }
+        .au-rules-btn.au-warn { box-shadow: inset 0 0 0 1px #e6a23c; }
+        .au-rules-warn { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: #e6a23c; color: #ffffff; font-size: 0.8rem; font-weight: 800; line-height: 1; }
+        .au-limits { flex: none; margin: 0 0 10px; padding: 12px 14px; background: rgba(255, 255, 255, 0.42); border: 1px solid rgba(255, 255, 255, 0.65); border-radius: 16px; font-size: 0.9rem; font-weight: 500; color: #1f2a30; }
+        .au-limits-title { font-size: 0.8rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #3c4f59; margin: 0 0 8px; }
+        .au-limits-title + .au-limits-title, .au-rule-list + .au-limits-title, .au-limits-none + .au-limits-title { margin-top: 12px; }
+        .au-rule-list, .au-how { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+        .au-rule-list li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 12px; padding: 7px 10px; background: rgba(255, 255, 255, 0.55); border-radius: 10px; }
+        .au-rule-list li > span { flex: 1 1 200px; min-width: 0; }
+        .au-rule-list li > b { flex: none; white-space: nowrap; }
+        .au-rule-list li.hit { background: rgba(230, 162, 60, 0.16); box-shadow: inset 0 0 0 1px rgba(230, 162, 60, 0.55); }
+        .au-rule-list li.hit > b { color: #8a4b08; }
+        .au-rule-list li > .au-rule-msg { flex: 1 1 100%; color: #8a4b08; font-weight: 600; }
+        .au-limits-none { margin: 0; color: #3c4f59; }
+        .au-how li { position: relative; padding-left: 16px; color: #3c4f59; }
+        .au-how li::before { content: ''; position: absolute; left: 3px; top: 0.6em; width: 6px; height: 6px; border-radius: 50%; background: #3288AC; }
+        .au-form { flex: none; }
+        /* the section fills the visible area: title + buttons stay, the open pane takes the rest and scrolls inside */
+        #aukcionas.active { height: 100%; overflow: hidden; }
+        #aukcionas > .zg-panel { flex: 0 1 auto; min-height: 0; display: flex; flex-direction: column; margin-bottom: 0; }
+        #aukcionas .zg-panel-head, .au-tabs, #au-message { flex: none; }
+        #au-teacher, #au-student { display: contents; }                     /* their panes become rows of the panel */
+        #aukcionas .zg-box.au-pane, #aukcionas .au-pane { flex: 0 1 auto; min-height: 0; margin-top: 0; display: flex; flex-direction: column; }
+        #aukcionas .au-pane > .zg-label, #aukcionas .au-pane > .au-box-head { flex: none; }
+        .au-scroll, .au-messages { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+        .au-scroll { flex: 1 1 auto; margin-right: -8px; padding-right: 8px; }   /* scrollbar beside the cards, not over them */
+        .au-form { background: rgba(255, 255, 255, 0.42); border: 1px solid rgba(255, 255, 255, 0.65); border-radius: 16px; padding: 14px; margin-bottom: 10px; }
+        .au-form-title { font-weight: 800; font-size: 1.05rem; margin-bottom: 10px; overflow-wrap: anywhere; }
+        .au-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 10px; }
+        .au-span2 { grid-column: 1 / -1; }
+        .au-form textarea { resize: vertical; min-height: 44px; }
+        .au-form .zg-input:disabled { opacity: 0.6; }
+        .au-form .zg-note { margin: 0 0 10px; font-size: 0.85rem; }
+        .au-settings .zg-field span small { font-weight: 500; color: #718096; }
+        .nav-item .nav-icon { position: relative; }
+        /* long lists in Žaidimai scroll inside their box instead of stretching the page */
+        #zg-lobby-list, .zg-games, #zg-players {
+            max-height: min(520px, 60svh);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            padding-right: 4px;
+        }
+        .au-valid { font-size: 0.8rem; font-weight: 600; color: #718096; white-space: nowrap; }
+        .zg-stepper { align-self: flex-start; }
+        .zg-stepper .input-wrapper { background: rgba(255, 255, 255, 0.6); border-color: rgba(255, 255, 255, 0.65); }
+        .zg-stepper .control-btn { width: 42px; height: 42px; font-size: 1.2rem; touch-action: manipulation; }
+        #zg-minutes { width: 54px; padding: 0.5rem; border: 0; margin: 0; outline: none; background: transparent; text-align: center; font: inherit; font-size: 1.1rem; font-weight: 600; color: #212529; pointer-events: none; -moz-appearance: textfield; appearance: textfield; }
+        #zg-minutes::-webkit-inner-spin-button, #zg-minutes::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        /* Aukcionas section buttons: the same look as the section buttons on "Užduotys" (.nav-group / .nb) */
+        .au-tabs { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; margin: 0 0 10px; padding: 8px; border: 1px solid rgba(255, 255, 255, 0.55); border-radius: 14px; background: rgba(255, 255, 255, 0.22); }
+        .au-tab { position: relative; display: flex; align-items: center; gap: 6px; min-width: 0; height: 42px; padding: 0 10px; border: 1px solid rgba(255, 255, 255, 0.85); border-radius: 12px; background: rgba(255, 255, 255, 0.6); color: #1f2a30; font: inherit; font-size: 15px; font-weight: 500; text-align: left; cursor: pointer; transition: background 0.15s, transform 0.1s; -webkit-tap-highlight-color: transparent; }
+        .au-tab:hover:not(:disabled):not(.active) { background: rgba(255, 255, 255, 0.88); }
+        .au-tab:active:not(:disabled) { transform: scale(0.98); }
+        .au-tab:focus-visible { outline: 2px solid #3288AC; outline-offset: 1px; }
+        .au-tab.active { border-color: transparent; background: linear-gradient(135deg, #3288AC, #286D8A); color: #ffffff; cursor: default; }
+        .au-tab:disabled { opacity: 0.5; cursor: default; }
+        .au-tab svg { width: 19px; height: 19px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .au-tab-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .au-tab-count { display: inline-flex; flex: none; align-items: center; justify-content: center; min-width: 22px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 10px; background: rgba(31, 42, 48, 0.12); font-size: 13.5px; font-weight: 500; line-height: 1; }
+        .au-tab.active .au-tab-count { background: rgba(255, 255, 255, 0.28); }
+        .au-tab-badge { display: inline-flex; flex: none; align-items: center; justify-content: center; min-width: 22px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 10px; background: #e74c3c; color: #F5F5F7; font-size: 13px; font-weight: 700; line-height: 1; }
+        .au-tab.active .au-tab-badge { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85); }
+        @media (max-width: 767px) {
+            /* two buttons per row (like "Užduotys"); an odd last one takes the whole row */
+            .au-tabs { grid-auto-flow: row; grid-template-columns: 1fr 1fr; grid-auto-columns: auto; padding: 6px; }
+            .au-tab:last-child:nth-child(odd) { grid-column: 1 / -1; }
+            .au-tab { height: 44px; padding: 0 8px; font-size: 14px; }
+        }
+        @media (max-width: 380px) {
+            .au-tab { gap: 4px; padding: 0 6px; }
+            .au-tab svg { width: 16px; height: 16px; }
+        }
+        @media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait) {
+            .au-tabs { grid-auto-flow: row; grid-template-columns: 1fr 1fr; grid-auto-columns: auto; }
+            .au-tab:last-child:nth-child(odd) { grid-column: 1 / -1; }
+            .au-tab { height: 56px; font-size: 1.15rem; gap: 8px; }
+            .au-tab svg { width: 24px; height: 24px; }
+            .au-tab-count, .au-tab-badge { height: 26px; min-width: 28px; font-size: 1rem; border-radius: 13px; }
+        }
+        /* ---------- Nariai: "add / change teacher" card + class invitations (same glass, inputs and buttons as Žaidimai) ---------- */
+        #members-panel .teacher-info-div { gap: 10px 12px; padding: 14px 18px; }
+        #add-teacher-input, #change-teacher-input {
+            height: 46px; padding: 0 14px; border: 1px solid rgba(255, 255, 255, 0.65); border-radius: 14px;
+            background: rgba(255, 255, 255, 0.6); color: #212529; font: inherit; font-size: 1rem; font-weight: 500;
+        }
+        #add-teacher-input::placeholder, #change-teacher-input::placeholder { color: #718096; font-size: 0.95rem; }
+        #add-teacher-input:focus, #change-teacher-input:focus { border-color: #3288AC; box-shadow: 0 0 0 3px rgba(50, 136, 172, 0.18); }
+        #add-change-teacher-buttons { margin-left: 0; }
+        #add-change-teacher-buttons button { height: 46px; padding: 0 18px; border-radius: 14px; font-size: 1rem; white-space: nowrap; }
+        #add-change-teacher-buttons button::before, #add-change-teacher-buttons button::after { border-radius: 14px; }
+        #members-panel .cl-invites { margin-bottom: 8px; }
+        .cl-list-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding-bottom: 15px; }
+        .cl-list-head .pupils-list-title { padding-bottom: 0; }
+        .cl-invite-toggle[aria-expanded="true"] { background: rgba(255, 255, 255, 0.55); color: #212529; border: 1px solid rgba(255, 255, 255, 0.65); }
+        #members-panel .cl-invite-panel { margin-bottom: 15px; }
+        /* .zg-btn sets display, which would override the hidden attribute (the invite button must stay hidden for students) */
+        #members-panel [hidden] { display: none !important; }
+        .cl-invites { border-color: #32ac93; box-shadow: inset 0 0 0 1px #32ac93; }
+        .cl-invite-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+        .cl-invite-row { display: flex; align-items: center; gap: 12px; background: rgba(255, 255, 255, 0.55); border: 1px solid rgba(255, 255, 255, 0.75); border-radius: 14px; padding: 10px 12px; }
+        .cl-invite-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 0.95rem; overflow-wrap: anywhere; }
+        .cl-invite-text span { font-size: 0.82rem; font-weight: 600; color: #718096; }
+        .cl-invite-actions { display: flex; gap: 6px; flex: none; }
+        .cl-help { margin: 0 0 10px; color: #3c4f59; font-size: 0.9rem; }
+        #cl-invite-input { display: block; resize: vertical; min-height: 72px; max-height: 260px; font-size: 0.95rem; line-height: 1.4; }
+        .cl-invite-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .cl-invite-count { font-size: 0.85rem; font-weight: 600; color: #3c4f59; }
+        .cl-invite-count.cl-warn { color: #b9770e; }
+        /* results popup: one compact row per address */
+        .cl-res { list-style: none; margin: 0; padding: 0 4px 0 0; }
+        .cl-res li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(31, 42, 48, 0.08); line-height: 1.3; }
+        .cl-res li:last-child { border-bottom: 0; }
+        .cl-res-input { min-width: 0; overflow-wrap: anywhere; font-size: 0.92rem; }
+        .cl-chip { flex: none; max-width: 55%; border-radius: 99px; padding: 3px 10px; font-size: 0.78rem; font-weight: 700; text-align: right; overflow-wrap: anywhere; }
+        .cl-chip.cl-ok { background: rgba(50, 172, 147, 0.16); color: #1f7a63; }
+        .cl-chip.cl-info { background: rgba(50, 136, 172, 0.14); color: #1d566e; }
+        .cl-chip.cl-bad { background: rgba(231, 76, 60, 0.13); color: #b03a2e; }
+        .cl-chip.cl-warn { background: rgba(230, 162, 60, 0.18); color: #8a5a0b; }
+        .cl-chip.cl-muted { background: rgba(31, 42, 48, 0.07); color: #3c4f59; }
+        .cl-limit { color: #b9770e; font-weight: 600; font-size: 0.9rem; }
+        @media (max-width: 767px) {
+            #members-panel .teacher-info-div { padding: 12px 14px; }
+            .teacher-name-input-holder { flex: 1 1 100%; }
+            #add-change-teacher-buttons { flex: 1 1 100%; justify-content: stretch; }
+            #add-change-teacher-buttons button { flex: 1; margin-top: 0; }
+            .cl-invite-row { flex-wrap: wrap; }
+            .cl-invite-actions { width: 100%; }
+            .cl-invite-actions .zg-btn { flex: 1; }
+            .cl-invite-foot .zg-btn { width: 100%; }
+            .cl-invite-toggle { font-size: 0.85rem; padding: 7px 12px; }
+        }
+        @media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait) {
+            #add-teacher-input, #change-teacher-input { width: 100%; height: 56px; font-size: 1.35rem; }
+            #add-change-teacher-buttons button { height: 56px; font-size: 1.35rem; }
+            .cl-invite-text, .cl-help, #cl-invite-input { font-size: 1.2rem; }
+            .cl-invite-text span, .cl-invite-count { font-size: 1.05rem; }
+            .cl-invite-toggle { font-size: 1.2rem; }
+        }
+        .member-coins { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding-top: 3px; font-weight: 700; color: #bf9b30; }
+        .member-coins img { width: 20px; height: 20px; }
+        .nav-badge { position: absolute; top: -10px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 99px; background: #e74c3c; color: #F5F5F7; font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; justify-content: center; line-height: 1; }
+        .nav-item.active .nav-badge { box-shadow: 0 0 0 2px #F5F5F7; }
+        .nav-badge[hidden] { display: none; }
+        /* phone / portrait-tablet bottom bar: the open section's label pushes its icon up to the button's top edge, where a
+           badge sticking out above the icon was cut off (the buttons clip their content) – keep it inside the button */
+        @media (max-width: 767px) { .side-navigation .nav-badge { top: -3px; } }
+        @media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait) { .side-navigation .nav-badge { top: -3px; } }
+
+        @media (max-width: 767px) {
+            .au-item { flex-direction: column; align-items: stretch; }
+            .au-student-actions { width: auto; }
+            .au-item-actions:not(.au-student-actions) .zg-btn { flex: 1; }
+            .au-row { flex-wrap: wrap; }
+            .au-row .zg-btn { width: 100%; }
+            .au-form-grid { grid-template-columns: 1fr; }
+            .au-period-row { grid-template-columns: 1fr; }
+            .au-coins-label { display: none; }
+        }
+        /* five section buttons (Nariai, Iššūkis, Žaidimai, Aukcionas, Profilis) must fit the phone / tablet bottom bar */
+        @media (max-width: 767px) {
+            .side-navigation.mobile .nav-item { min-width: 0; width: auto; flex: 1 1 0; }
+            .side-navigation.mobile .nav-item.active { flex: 1.7 1 0; }
+        }
+        @media (min-device-width: 768px) and (max-device-width: 1200px) and (orientation: portrait) {
+            .side-navigation .nav-item { min-width: 0; width: auto; flex: 1 1 0; }
+            .side-navigation .nav-item.active { flex: 1.5 1 0; }
+            .au-item-title, .au-form-title { font-size: 1.5rem; }
+            .au-item-desc, .au-item-meta, .au-state, .au-row-text span, .au-owner li, .au-owner-name, .au-notice-list li, .au-bids, .au-limits { font-size: 1.2rem; }
+            .au-limits-title { font-size: 1.05rem; }
+            .au-small { font-size: 1.2rem; }
+            .au-hint, .au-badge-wait, .au-badge-auction { font-size: 1.05rem; }
+            .au-row-text b { font-size: 1.35rem; }
+            .au-coins b { font-size: 1.5rem; }
+            .au-coins-label { font-size: 1.05rem; }
+            .au-coin { width: 26px; height: 26px; vertical-align: -6px; }
+            .nav-badge { min-width: 24px; height: 24px; font-size: 0.95rem; }
+            .member-coins { font-size: 1.2rem; }
+            .au-valid { font-size: 1.05rem; }
+            .zg-stepper .control-btn { width: 54px; height: 54px; font-size: 1.6rem; }
+            #zg-minutes { width: 70px; font-size: 1.5rem; }
+            .member-coins img { width: 28px; height: 28px; }
+        }
+    
+        /* deleting one's account (Profilis): a quiet link; the pop-up asks for the password */
+        .delete-account-link { align-self: flex-start; margin-top: 18px; padding: 4px 0; border: 0; background: none; color: #b0544a; font-family: inherit; font-size: 0.9rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; opacity: 0.8; }
+        .delete-account-link:hover { opacity: 1; }
+        .delete-account-link.hidden { display: none; }
+        .da-pop { display: flex; flex-direction: column; gap: 12px; max-width: 460px; font-size: 15px; line-height: 1.5; color: #1f2a30; }
+        .da-pop p { margin: 0; }
+        .da-pop ul { margin: 0; padding-left: 20px; }
+        .da-pop .da-warn { padding: 10px 12px; border-radius: 12px; background: rgba(231, 76, 60, 0.1); color: #9c3a2e; font-weight: 600; }
+        .da-pop label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: #3c4f59; }
+        .da-pop input { padding: 10px 12px; border: 1px solid rgba(31, 42, 48, 0.2); border-radius: 12px; background: #fff; font-family: inherit; font-size: 15px; }
+        .da-pop input:focus { outline: none; border-color: #e74c3c; }
+        .da-pop .da-error { min-height: 1.2em; color: #c0392b; font-size: 14px; }
+        .da-pop .da-btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+        .da-pop .da-btns button { padding: 10px 18px; border: 0; border-radius: 20px; font-family: inherit; font-size: 15px; cursor: pointer; }
+        .da-pop .da-cancel { background: rgba(31, 42, 48, 0.08); color: #1f2a30; }
+        .da-pop .da-confirm { background: linear-gradient(135deg, #ff8073, #e74c3c); color: #fff; }
+        .da-pop .da-confirm:disabled { opacity: 0.55; cursor: default; }
+</style>
 </head>
 <body>
     <div id="object-popup" class="object-popup-overlay" style="display:none;">
@@ -2051,11 +2400,19 @@
                     </span>
                     <span class="nav-label">Iššūkis</span>
                 </button>
-                <button class="nav-item experimental-features" data-target="zaidimai">
+                <button class="nav-item" data-target="zaidimai">
                     <span class="nav-icon">
                         <img src="../images/icons/icon-games.svg">
+                        <span class="nav-badge" id="zg-nav-badge" hidden></span>
                     </span>
                     <span class="nav-label">Žaidimai</span>
+                </button>
+                <button class="nav-item" data-target="aukcionas">
+                    <span class="nav-icon">
+                        <img src="../images/icons/icon-auction.svg">
+                        <span class="nav-badge" id="au-nav-badge" hidden></span>
+                    </span>
+                    <span class="nav-label">Aukcionas</span>
                 </button>
                 <button class="nav-item" data-target="profilis">
                     <span class="nav-icon">
@@ -2084,8 +2441,25 @@
                           <button id="change-teacher" class="item-to-be-disabled-while-talking-to-server" style="display: none;">Keisti mokytoją</button>
                         </div>
                     </div>
+                    <!-- student: invitations from teachers (klase-invites.js) -->
+                    <div class="zg-panel cl-invites" id="cl-invites" hidden>
+                        <div class="zg-label">KVIETIMAI Į KLASĘ</div>
+                        <ul class="cl-invite-list" id="cl-invite-list"></ul>
+                    </div>
                     <div class="pupils-list">
-                            <div class="pupils-list-title"></div>
+                            <div class="cl-list-head">
+                                <div class="pupils-list-title"></div>
+                                <button class="zg-btn zg-btn-green au-small cl-invite-toggle" id="cl-invite-toggle" type="button" aria-expanded="false" aria-controls="cl-invite-panel" hidden>Kviesti mokinius</button>
+                            </div>
+                            <!-- teacher: invite students by e-mail or ID, opened by the button above (klase-invites.js) -->
+                            <div class="zg-panel cl-invite-panel" id="cl-invite-panel" hidden>
+                                <p class="zg-text cl-help">Įrašykite arba įklijuokite (pvz., iš Excel) mokinių el. pašto adresus ar ID numerius, atskirtus tarpais, kableliais ar naujomis eilutėmis. Vienu kartu apdorojama iki 30.</p>
+                                <textarea id="cl-invite-input" class="zg-input" rows="3" spellcheck="false" autocomplete="off" placeholder="pvz. jonas@gmail.com, ona@mokykla.lt, 1234"></textarea>
+                                <div class="cl-invite-foot">
+                                    <span class="cl-invite-count" id="cl-invite-count"></span>
+                                    <button class="zg-btn zg-btn-green" id="cl-invite-send" type="button" autocomplete="off" disabled>Kviesti</button>
+                                </div>
+                            </div>
                             <div class="members-grid" id="membersGrid"></div>
                     </div>
                   </div>
@@ -2151,7 +2525,7 @@
                 </div>
 
                 <!-- Content Panel: class games -->
-                <div id="zaidimai" class="content-panel experimental-features">
+                <div id="zaidimai" class="content-panel">
                     <!-- start: open lobbies of the class + the games that can be started -->
                     <div id="zg-home">
                         <div class="zg-panel">
@@ -2174,6 +2548,7 @@
                             <div class="zg-panel-head"><div class="zg-title">Žaidimai</div></div>
                             <div class="zg-games">
                                 <div class="zg-box zg-game-card">
+                                    <button class="zg-help zg-card-help" type="button" data-rules="td" title="Kaip žaisti?" aria-label="Kaip žaisti?">?</button>
                                     <div class="zg-game-art zg-td-art" aria-hidden="true">
                                         <!-- the game's top mage tower, its mage standing inside (the front wall drawn again over the mage's feet) -->
                                         <div class="zg-td-scene"><i class="zg-td-tower"></i><i class="zg-td-mage"></i><i class="zg-td-tower zg-td-rim"></i></div>
@@ -2191,7 +2566,7 @@
                                     <div class="zg-game-art zg-ghost-art" aria-hidden="true"><i class="zg-ghost-sprite"></i></div>
                                     <div class="zg-game-body">
                                         <div class="zg-game-name">Vaiduoklis</div>
-                                        <p class="zg-text">Žodžių žaidimas: pridėkite po raidę ir neužbaikite žodžio pirmi!</p>
+                                        <p class="zg-text">Žodžių žaidimas: pridėkite po raidę ir neužbaikite ilgiausio žodžio pirmi!</p>
                                         <button class="zg-btn" id="zg-play-ghost" type="button" autocomplete="off">Kurti</button>
                                     </div>
                                 </div>
@@ -2204,7 +2579,10 @@
                         <div class="zg-panel">
                             <div class="zg-panel-head">
                                 <div class="zg-title">Tvirtovės gynyba</div>
-                                <button class="zg-btn zg-btn-light" id="zg-settings-back" type="button" autocomplete="off">Atgal</button>
+                                <div class="zg-head-btns">
+                                    <button class="zg-help" type="button" data-rules="td" title="Kaip žaisti?" aria-label="Kaip žaisti?">?</button>
+                                    <button class="zg-btn zg-btn-light" id="zg-settings-back" type="button" autocomplete="off">Atgal</button>
+                                </div>
                             </div>
                             <div class="zg-settings-grid">
                                 <div class="zg-box">
@@ -2284,7 +2662,7 @@
                             <div class="mode_choice_3_div">
                                 <div class="col-12 d-flex justify-content-center align-items-center text-center mode_choice_3_div" id="mode_choice_3_div">
                                     <select class="btn btn-secondary dropdown-toggle dropdown text-center" name="mode_choice_3" id="mode_choice_3">
-                                        <option value="C37">NEPERŽENGIANT DEŠIMTIES</option>
+                                        <option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>
                                     </select>
                                 </div>
                             </div>
@@ -2432,7 +2810,7 @@
                                         <br>
                                     </label>
                                     <label class="rasyba-options-label options-for-first-second-classes" style="display: block;">
-                                        <input type="checkbox" class="r parent-toggle" name="r" value='BALSĖS:' data-controls="balsiu-div" checked>
+                                        <input type="checkbox" class="r parent-toggle" name="r" value='BALSĖS' data-controls="balsiu-div" checked>
                                         <span class="rasyba-options-label-text">BALSĖS</span>
                                         <br>
                                     </label>
@@ -2547,9 +2925,16 @@
                                             <option value="endless">Atlaikyti kuo įmanoma ilgiau</option>
                                         </select>
                                     </label>
-                                    <label class="zg-field" id="zg-minutes-field"><span>Trukmė (minutės)</span>
-                                        <input type="number" id="zg-minutes" class="zg-input" min="1" max="60" value="5">
-                                    </label>
+                                    <div class="zg-field" id="zg-minutes-field"><span>Trukmė (minutės)</span>
+                                        <!-- the same +/- control as Praktika: no typing, so no on-screen keyboard -->
+                                        <div class="input-group zg-stepper">
+                                            <div class="input-wrapper">
+                                                <button class="control-btn zg-minutes-minus" type="button" aria-label="Mažiau minučių">−</button>
+                                                <input type="number" id="zg-minutes" min="1" max="60" step="1" value="5" readonly inputmode="none" tabindex="-1">
+                                                <button class="control-btn zg-minutes-plus" type="button" aria-label="Daugiau minučių">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <label class="zg-field"><span>Laukiamojo matomumas</span>
                                         <select id="zg-visibility" class="zg-input">
                                             <option value="public">Viešas – matomas klasės žaidimų sąraše</option>
@@ -2764,10 +3149,160 @@
                                     <li>Netekęs visų gyvybių žaidėjas tampa <b>vaiduokliu</b> 👻. Laimi paskutinis likęs žaidėjas.</li>
                                 </ol>
                             </div>
+                            <div data-game="td">
+                                <div class="zg-rules-ico" aria-hidden="true">🏰</div>
+                                <h2 class="zg-rules-title" id="zg-rules-title-td">Kaip žaisti Tvirtovės gynybą?</h2>
+                                <ol>
+                                    <li>Žaidimą kuria <b>mokytojas</b> ir rodo jį <b>lentoje</b> arba kitame dideliame ekrane. Mokiniai prisijungia savo įrenginiuose: klasės puslapyje arba įvedę <b>žaidimo numerį</b>.</li>
+                                    <li>Kiekvienas mokinys turi savo <b>bokštą</b> prie tvirtovės – virš jo rodomas mokinio vardas.</li>
+                                    <li>Mokiniai savo įrenginiuose sprendžia mokytojo parinktas <b>matematikos užduotis</b>. Kiekvienas teisingas atsakymas – <b>šūvis</b> iš to mokinio bokšto.</li>
+                                    <li><b>10 teisingų atsakymų iš eilės</b> – bokštas pakyla lygiu ir šaudo stipriau bei toliau. Suklydus atsakymai vėl skaičiuojami nuo pradžių.</li>
+                                    <li>Priešai keliais eina link tvirtovės vartų. Bokštas šauna tik į netoliese esančius priešus, todėl tvirtovę apginti galima tik <b>visiems kartu</b>. Kartais pasirodo <b>bosas</b> – ypač stiprus priešas.</li>
+                                    <li>Vartus pasiekę priešai apgadina tvirtovę. Kai tvirtovės gyvybės baigiasi, ji <b>krenta</b>.</li>
+                                    <li>Režimas <b>„Atlaikyti nustatytą laiką“</b>: klasė laimi, jei tvirtovė atlaiko iki laiko pabaigos. <b>„Atlaikyti kuo įmanoma ilgiau“</b>: žaidžiama, kol tvirtovė krenta – kiek bangų atlaikysite?</li>
+                                    <li>Priešų jėga prisitaiko prie to, kaip greitai ir tiksliai atsako klasė, o <b>sunkumas</b> nustato, kiek jų spaudimas gali augti.</li>
+                                    <li>Žaidimo pabaigoje mokinių atsakymai išsaugomi – juos galima peržiūrėti Užduočių puslapio skiltyje „Rezultatai“.</li>
+                                </ol>
+                            </div>
                             <button class="zg-btn" type="button" data-rules-close>Supratau</button>
                         </div>
                     </div>
                 </div>
+
+                <!-- Content Panel: class auction (the teacher's rewards, bought with SUDEDU coins) -->
+                <div id="aukcionas" class="content-panel">
+                    <div class="zg-panel">
+                        <div class="zg-panel-head">
+                            <div class="zg-title">Aukcionas</div>
+                            <div class="au-head-right">
+                                <div class="au-coins" id="au-coins" hidden>
+                                    <img src="../images/icons/icon-sudedu-coin.png" alt="monetos">
+                                    <b id="au-coins-amount"></b>
+                                </div>
+                                <button class="zg-btn zg-btn-light" id="au-refresh" type="button" autocomplete="off">Atnaujinti</button>
+                            </div>
+                        </div>
+
+                        <!-- section buttons: one pane at a time; only the pane's content scrolls, below them (built by klase-auction.js) -->
+                        <nav class="au-tabs" id="au-tabs" role="tablist" aria-label="Aukciono skiltys" hidden></nav>
+
+                        <div class="zg-empty" id="au-message" hidden></div>
+
+                        <!-- teacher panes: offers, who owns what, class limits -->
+                        <div id="au-teacher" hidden>
+                            <div class="zg-box au-pane" data-pane="offers" hidden>
+                                <div class="au-box-head">
+                                    <div class="zg-label">SIŪLOMI DAIKTAI</div>
+                                    <button class="zg-btn zg-btn-green au-small" id="au-new" type="button" autocomplete="off">+ Naujas daiktas</button>
+                                </div>
+                                <!-- the form opens above the list (not inside it), so it is in view however far the list was scrolled -->
+                                <form class="au-form" id="au-form" hidden autocomplete="off">
+                                    <div class="au-form-title" id="au-form-title">Naujas daiktas</div>
+                                    <div class="au-form-grid">
+                                        <label class="zg-field au-span2"><span>Pavadinimas</span>
+                                            <input id="au-f-title" class="zg-input" maxlength="80" placeholder="pvz. Diena be namų darbų">
+                                        </label>
+                                        <label class="zg-field au-span2"><span>Aprašymas (nebūtina)</span>
+                                            <textarea id="au-f-desc" class="zg-input" maxlength="300" rows="2"></textarea>
+                                        </label>
+                                        <label class="zg-field"><span>Pardavimo būdas</span>
+                                            <select id="au-f-type" class="zg-input">
+                                                <option value="fixed">Nustatyta kaina</option>
+                                                <option value="auction">Aukcionas</option>
+                                            </select>
+                                        </label>
+                                        <label class="zg-field"><span id="au-f-price-label">Kaina (SUDEDU monetos)</span>
+                                            <input id="au-f-price" class="zg-input" type="number" inputmode="numeric" min="0" max="100000" step="1" value="10">
+                                        </label>
+                                        <label class="zg-field"><span id="au-f-qty-label">Kiekis</span>
+                                            <input id="au-f-qty" class="zg-input" type="number" inputmode="numeric" min="1" max="100" step="1" value="1">
+                                        </label>
+                                        <label class="zg-field" id="au-f-closes-field" hidden><span>Aukcionas baigiasi (dienos pabaigoje, ne vėliau kaip po 9 mėn.)</span>
+                                            <input id="au-f-closes" class="zg-input" type="date">
+                                        </label>
+                                    </div>
+                                    <p class="zg-text zg-note" id="au-f-auction-note" hidden>Statymai priimami iki pasirinktos dienos pabaigos. Laimi didžiausi statymai, kiekvienas moka savo statytą sumą. Monetos paimamos statant ir grąžinamos, jei kas nors pastato daugiau.</p>
+                                    <p class="zg-text zg-note" id="au-f-locked" hidden>Šiam aukcionui jau yra statymų, todėl galima keisti tik pavadinimą, aprašymą ir pabaigos datą.</p>
+                                    <div class="zg-actions">
+                                        <button class="zg-btn zg-btn-green" id="au-f-save" type="submit" autocomplete="off">Išsaugoti</button>
+                                        <button class="zg-btn zg-btn-light" id="au-f-cancel" type="button" autocomplete="off">Atšaukti</button>
+                                    </div>
+                                </form>
+                                <div class="au-scroll">
+                                <ul class="au-items" id="au-t-items"></ul>
+                                </div>
+                            </div>
+                            <div class="zg-box au-pane" data-pane="owned" hidden>
+                                <div class="zg-label">MOKINIŲ DAIKTAI</div>
+                                <div class="au-scroll"><ul class="au-list" id="au-t-owned"></ul></div>
+                            </div>
+                            <div class="zg-box au-pane au-settings" data-pane="settings" hidden>
+                                <div class="zg-label">NUSTATYMAI</div>
+                                <div class="au-scroll">
+                                    <!-- limits: "Neribota" (empty) or 1-6 (klase-auction.js adds a larger value saved earlier, so it isn't lost) -->
+                                    <label class="zg-field"><span>Kiek daiktų vienas mokinys gali turėti vienu metu?</span>
+                                        <select id="au-max-owned" class="zg-input au-limit-select"></select>
+                                    </label>
+                                    <label class="zg-field"><span>Keliuose aukcionuose vienas mokinys gali statyti vienu metu?</span>
+                                        <select id="au-max-bids" class="zg-input au-limit-select"></select>
+                                    </label>
+                                    <div class="au-period-row">
+                                        <label class="zg-field"><span>Kiek daiktų vienas mokinys gali įsigyti per laikotarpį?</span>
+                                            <select id="au-max-period" class="zg-input au-limit-select"></select>
+                                        </label>
+                                        <label class="zg-field"><span>Laikotarpis</span>
+                                            <select id="au-period-kind" class="zg-input">
+                                                <option value="1w">Per 1 savaitę</option>
+                                                <option value="2w">Per 2 savaites</option>
+                                                <option value="1m">Per 1 mėnesį</option>
+                                                <option value="2m">Per 2 mėnesius</option>
+                                                <option value="3m">Per 3 mėnesius</option>
+                                                <option value="semester" selected>Per pusmetį</option>
+                                                <option value="year">Per mokslo metus</option>
+                                            </select>
+                                        </label>
+                                    </div>
+                                    <p class="zg-text zg-note au-period-note" id="au-period-note" hidden></p>
+                                    <button class="zg-btn zg-btn-wide" id="au-settings-save" type="button" autocomplete="off">Išsaugoti nustatymus</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- student panes: the offers (buy / bid) and the items they own -->
+                        <div id="au-student" hidden>
+                            <div class="zg-box au-pane" data-pane="offers" hidden>
+                                <div class="au-box-head">
+                                    <div class="zg-label">SIŪLOMI DAIKTAI</div>
+                                    <button class="zg-btn zg-btn-light au-small au-rules-btn" id="au-rules-btn" type="button" aria-expanded="false" aria-controls="au-limits" autocomplete="off">Taisyklės</button>
+                                </div>
+                                <!-- the class's rules and how much of them is used: folded until "Taisyklės" is pressed -->
+                                <div class="au-limits" id="au-limits" hidden></div>
+                                <div class="au-scroll">
+                                    <ul class="au-items" id="au-s-items"></ul>
+                                </div>
+                            </div>
+                            <div class="zg-box au-pane" data-pane="owned" hidden>
+                                <div class="zg-label">MANO DAIKTAI</div>
+                                <div class="au-scroll"><ul class="au-list" id="au-s-owned"></ul></div>
+                            </div>
+                        </div>
+
+                        <!-- Žinutės (both roles): redemption requests (teacher) + one-off messages -->
+                        <div class="au-pane au-messages" data-pane="messages" hidden>
+                            <div class="zg-box au-redeem-box" id="au-redeem-box" hidden>
+                                <div class="zg-label">PANAUDOJIMO PRAŠYMAI</div>
+                                <ul class="au-list" id="au-redeem-list"></ul>
+                            </div>
+                            <div class="zg-box au-notices" id="au-notices" hidden>
+                                <div class="au-box-head">
+                                    <div class="zg-label">PRANEŠIMAI</div>
+                                    <button class="zg-btn zg-btn-light au-small" id="au-notices-ok" type="button" autocomplete="off">Supratau</button>
+                                </div>
+                                <ul class="au-notice-list" id="au-notice-list"></ul>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
 
                 <!-- Content Panel 3 -->
                 <div id="profilis" class="content-panel">
@@ -2817,27 +3352,32 @@
                                 <button class="save-btn hidden" id="saveBtn">Išsaugoti pakeitimus</button>
                                 <button class="cancel-btn hidden" id="cancelBtn">Atšaukti</button>
                             </div>
+                            <button type="button" class="delete-account-link" id="deleteAccountBtn">Ištrinti paskyrą</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    </div>
 
-    <script src="../mental-arithmetic.js"></script>
+    <script src="../mental-arithmetic.js?v=20261018r"></script>
     <script src="../main-nav-bar.js"></script>
-    <script src="../parameter_dictionary.js"></script>
+    <script src="../parameter_dictionary.js?v=20261018r"></script>
     <script src="../mental-arithmetic-combinations.js"></script>
     <!-- class games: lobby client, Praktika's task settings (math only here) and the Žaidimai section -->
-    <script src="../game-client.js"></script>
+    <script src="../game-client.js?v=20261018r"></script>
     <script>
         // Praktika's settings script and the task launcher expect these page globals (Praktika defines them itself)
         var timerInputElement = document.querySelector('#timer-input');
         var questionNumberInputElement = document.querySelector('#question-number-input');
     </script>
-    <script src="matematika_options.js"></script>
+    <script src="matematika_options.js?v=20261018r"></script>
     <script src="../ghost-groups.js"></script>
-    <script src="../klase-games.js"></script>
+    <script src="../game-names.js?v=20261018r"></script>
+    <script src="../klase-games.js?v=20261018r"></script>
+    <script src="../klase-auction.js?v=20261018r"></script>
+    <script src="../klase-invites.js?v=20261018r"></script>
     <script type="module">
         const weekChallengeWinningsTotalPrizeCoins = 90;
         const weekChallengeWinningsWeights = {
@@ -2988,8 +3528,10 @@
 
         changeTeacherButton.addEventListener('click', async () => {
             const teacherId = changeTeacherInput.value;
-            messageToTheUser("Įrašyk mokytojo ID numerį!")
-            if (!teacherId) return;
+            if (!teacherId) {
+                messageToTheUser("Įrašyk mokytojo ID numerį!")
+                return;
+            }
 
             changeTeacherButton.innerHTML = "Keičiama..."
             document.querySelectorAll('.item-to-be-disabled-while-talking-to-server').forEach(el => el.disabled = true);   
@@ -3043,9 +3585,11 @@
                         changeTeacherToggleButton.style.display = "flex"
                         changeTeacherToggle();
                     }
-                    deleteAllTasks();
+                    if (typeof deleteAllTasks === 'function') deleteAllTasks();
+                    localStorage.removeItem('classDataCache');
+                    localStorage.removeItem('classDataCacheExpiry');
                     messageToTheUser("Mokytojas sėkmingai pakeistas.", false)
-                    window.reload()
+                    setTimeout(() => location.reload(), 900)
                 }
             } catch (error) {
                 console.log('Full error:', error);
@@ -3256,6 +3800,7 @@
             document.getElementById('colorPalette').classList.add('hidden');
             
             document.getElementById('editBtn').classList.remove('hidden');
+            document.getElementById('deleteAccountBtn').classList.remove('hidden');
             document.getElementById('saveBtn').classList.add('hidden');
             document.getElementById('cancelBtn').classList.add('hidden');
 
@@ -3288,6 +3833,7 @@
             accountSelect.disabled = true;
 
             document.getElementById('editBtn').classList.add('hidden');
+            document.getElementById('deleteAccountBtn').classList.add('hidden');
             document.getElementById('saveBtn').classList.remove('hidden');
             document.getElementById('cancelBtn').classList.remove('hidden');
         }
@@ -3572,6 +4118,61 @@
         document.getElementById('editBtn').addEventListener('click', setProfileEditMode);
         document.getElementById('saveBtn').addEventListener('click', saveProfileChanges);
         document.getElementById('cancelBtn').addEventListener('click', cancelProfileEdit);
+        document.getElementById('deleteAccountBtn').addEventListener('click', openDeleteAccount);
+
+        // ----- deleting the account: what goes, then the password; the server deletes everything linked to it
+        function openDeleteAccount() {
+            let me = {};
+            try { me = JSON.parse(localStorage.getItem('userData')) || {}; } catch (e) {}
+            const teacher = me.accType === 'teacher';
+            const box = document.createElement('div');
+            box.className = 'da-pop';
+            box.innerHTML = `
+                <p>Paskyra bus ištrinta visam laikui. Kartu bus ištrinta:</p>
+                <ul>${teacher
+                    ? '<li>visos jūsų skirtos užduotys ir automatinio skyrimo nustatymai;</li><li>klasės aukcionas (mokiniams bus grąžintos jame pastatytos monetos);</li><li>ryšys su mokiniais – jų paskyros liks, bet be mokytojo.</li>'
+                    : '<li>visi jūsų užduočių rezultatai ir statistika;</li><li>augintiniai, namai ir SUDEDU monetos;</li><li>ryšys su mokytoju ir aukciono daiktai.</li>'}</ul>
+                <div class="da-warn">Šio veiksmo atšaukti nebus galima.</div>
+                <label>Norėdami patvirtinti, įveskite slaptažodį
+                    <input type="password" id="da-password" autocomplete="current-password"></label>
+                <div class="da-error" id="da-error"></div>
+                <div class="da-btns">
+                    <button type="button" class="da-cancel" id="da-cancel">Atšaukti</button>
+                    <button type="button" class="da-confirm" id="da-confirm" disabled>Ištrinti paskyrą</button>
+                </div>`;
+            openObjectPopup(box, 'Ištrinti paskyrą?');
+            const input = box.querySelector('#da-password');
+            const confirmBtn = box.querySelector('#da-confirm');
+            const error = box.querySelector('#da-error');
+            input.addEventListener('input', () => { confirmBtn.disabled = !input.value; error.textContent = ''; });
+            input.addEventListener('keydown', event => { if (event.key === 'Enter' && input.value) confirmBtn.click(); });
+            box.querySelector('#da-cancel').addEventListener('click', () => closeObjectPopup());
+            confirmBtn.addEventListener('click', async () => {
+                confirmBtn.disabled = true;
+                error.textContent = '';
+                try {
+                    const response = await apiFetch(apiBase + 'account/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: input.value }) });
+                    const data = response ? await response.json().catch(() => ({})) : {};
+                    if (response && response.ok) {
+                        localStorage.removeItem('userData');
+                        localStorage.removeItem('refreshToken');
+                        localStorage.removeItem('classDataCache');
+                        localStorage.removeItem('classDataCacheExpiry');
+                        box.innerHTML = '<p>Paskyra ištrinta. Ačiū, kad naudojotės SUDEDU!</p>';
+                        setTimeout(() => { window.location.href = getIndexPage(); }, 1800);
+                        return;
+                    }
+                    error.textContent = data.code === 'WRONG_PASSWORD' ? 'Neteisingas slaptažodis.'
+                        : data.code === 'TOO_MANY_ATTEMPTS' ? 'Per daug bandymų. Pabandykite po 15 minučių.'
+                        : data.code === 'IMP_NOT_ALLOWED' ? 'Peržiūros režimu paskyros ištrinti negalima.'
+                        : 'Nepavyko ištrinti paskyros. Pabandykite vėliau.';
+                } catch (e) {
+                    error.textContent = 'Nepavyko ištrinti paskyros. Pabandykite vėliau.';
+                }
+                confirmBtn.disabled = !input.value;
+            });
+            setTimeout(() => input.focus(), 50);
+        }
         
         document.getElementById('prev').addEventListener('click', () => cycleFeature('prev'));
         document.getElementById('next').addEventListener('click', () => cycleFeature('next'));
@@ -3622,6 +4223,7 @@ function renderMembers() {
     studentMap[s.id] = s;
   });
   if (requestingStudent) studentMap[requestingStudent.id] = requestingStudent;
+  const coinsById = new Map(classDataCache.studentCoins || []);
 
   // Helper: create a student card
   function createMemberCard(member, extraClass = '', points = null, medalPath = null, isYou = false) {
@@ -3655,6 +4257,11 @@ function renderMembers() {
     if (points !== null) {
         const pointsLabel = pointsLabelDeterminator(points);
         nameHTML += `<span class="top-students-points">${points} ${pointsLabel}</span>`;
+    }
+
+    // teacher only: the student's SUDEDU coins
+    if (isTeacher && coinsById.has(member.id)) {
+        nameHTML += `<span class="member-coins"><img src="../images/icons/icon-sudedu-coin.png" alt="monetos">${coinsById.get(member.id).toLocaleString('lt-LT')}</span>`;
     }
 
     nameDiv.innerHTML = nameHTML;
@@ -3845,7 +4452,8 @@ async function fetchClassData() {
       top3WeekChl,
       requestingStudentWeekChlScore,
       weekChlId,
-      weekChlWinnerStudentId
+      weekChlWinnerStudentId,
+      studentCoins = []   // [[studentId, coins]] - only sent to the teacher
     ] = raw;
 
     const requestingStudentData = allStudents.find(s => s[0] === userData.userId);
@@ -3881,7 +4489,8 @@ async function fetchClassData() {
             top3WeekChl: top3WeekChl.map(s => ({ id: s[0], weekChlScore: s[1] })),
             requestingStudentWeekChlScore,
             weekChlId,
-            weekChlWinnerStudentId
+            weekChlWinnerStudentId,
+            studentCoins
         };
         
     } else {
@@ -3895,7 +4504,8 @@ async function fetchClassData() {
             top3WeekChl: top3WeekChl.map(s => ({ id: s[0], weekChlScore: s[1] })),
             requestingStudentWeekChlScore,
             weekChlId,
-            weekChlWinnerStudentId
+            weekChlWinnerStudentId,
+            studentCoins
         };
     }
 
@@ -4198,7 +4808,7 @@ async function renderClassWeekChallenge () {
 
     } else {
 
-        document.querySelector('.class-challenge-content-grid').style.gap = '20px';
+        document.querySelector('.class-challenge-content-grid').style.gap = '10px';
 
         const today = new Date();
         const day = today.getDay(); // Sunday = 0, Monday = 1, ..., Saturday = 6

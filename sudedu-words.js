@@ -41,7 +41,7 @@
 		freq12_20000: FREQ + 'grades_1_2/SUDEDU_word_usage_frequency_top_20000_words.dawg',
 		freq34_2000:  FREQ + 'grades_3_4/SUDEDU_word_usage_frequency_top_2000_words.dawg',
 		freq34_8000:  FREQ + 'grades_3_4/SUDEDU_word_usage_frequency_top_8000_words.dawg',
-		freq34_20000: FREQ + 'grades_3_4/SUDEDU_word_usage_frequency_top_20000_words.dawg',
+		freq34_20000: FREQ + 'grades_3_4/SUDEDU_word_usage_frequency_top_18785_words.dawg',   // (the 3-4 grade texts have 18 785 words)
 		freqCommon:   FREQ + 'SUDEDU_word_usage_frequency_all_common_words.dawg'
 	};
 	const ALPHABET = 'aąbcčdeęėfghiįyjklmnoprsštuųūvzž';

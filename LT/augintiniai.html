@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUDEDU - augintiniai</title>
-    <link rel="stylesheet" type="text/css" href="../index.css">
+    <link rel="stylesheet" type="text/css" href="../index.css?v=20261018r">
     <link rel="stylesheet" href="../main-nav-bar.css">
     <link rel="stylesheet" href="../pet-game-pets.css">
     <link rel="stylesheet" href="../pet-game-items.css">
@@ -542,7 +542,15 @@
             background: transparent;
             border-radius: 20px;
             cursor: pointer;
-            transition: all 0.2s;
+            /* color 0s overrides "all" for that one property: with the 0.2s transition, clicking
+               a nav button into/out of .active queued a color fade that the browser can only
+               paint a frame at a time — and the room-rebuild work right after the click hogs the
+               main thread for longer than that, so no intermediate frames get painted and the
+               color visibly only "snaps" once that work finishes, making the switch look delayed
+               even though the class change itself is instant. The background swap (an
+               un-interpolable gradient) was already effectively instant, which is why only the
+               text looked delayed and not the green highlight. */
+            transition: all 0.2s, color 0s;
             font-size: 1rem;
             color: #4b5563;
             width: 100%;
@@ -557,6 +565,21 @@
 
         .nav-item:focus {
             outline: none;
+        }
+
+        .nav-item:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* The button just clicked is marked .active immediately (before the room-loading disable
+           even runs), but :disabled's opacity:0.5 above was washing out its highlighted state for
+           as long as loading lasted, making the switch look delayed even though it wasn't. Keep
+           the active button at full brightness regardless of the (still non-interactive) disabled
+           state, so the highlight change is visibly instant. */
+        .nav-item.active:disabled {
+            opacity: 1;
         }
 
         .nav-item.active {
@@ -826,7 +849,7 @@
         .shop-header h2 {
             color: #212529;
             margin: 0;
-            font-size: 2rem;
+            font-size: 1.85rem;
             font-weight: 800;
             margin: 3px 0;
         }
@@ -2316,6 +2339,36 @@
     touch-action: none;
 }
 
+/* Shown while the room is (re)initializing — e.g. switching into/out of "Namai", resizing, or
+   previewing furniture — so the wait is visible instead of stale/half-updated content, and so
+   nothing underneath is clickable while it's up (a direct child of #pet-room-container, covering
+   it completely, rather than trying to individually disable every button inside it). No
+   background fill — #game-panel underneath is already visibility:hidden, so there's nothing to
+   cover; just the spinner on the existing page background. */
+#room-loading-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    z-index: 200;
+}
+#room-loading-overlay.visible {
+    display: flex;
+}
+#room-loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(50, 172, 147, 0.2);
+    border-top-color: #32ac93;
+    border-radius: 50%;
+    animation: room-loading-spin 0.8s linear infinite;
+}
+@keyframes room-loading-spin {
+    to { transform: rotate(360deg); }
+}
+
 #room-transform-wrapper {
     position: absolute;
     transform-origin: 0 0;
@@ -3395,6 +3448,41 @@
     }
 }
 
+/* =====================================================================
+   TYPOGRAPHY + GLASS ALIGNMENT WITH THE "UŽDUOTYS" PAGE
+   Only font sizes, colours, borders and corner radii are changed here.
+   Desktop sizes apply to landscape viewports >= 768px; the phone sizes
+   below and the tablet-portrait overrides above are kept.
+   ===================================================================== */
+
+/* Glass section: same look as the panels on the tasks page */
+.shop-header {
+    background: rgba(255, 255, 255, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    border-radius: 16px;
+}
+
+@media (min-width: 768px) and (orientation: landscape) {
+
+
+    #floor-plan-container-title {
+        font-size: 1.2rem;
+    }
+
+    .type-name {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .shop-header h2 {
+        font-size: 1.65rem;
+    }
+
+    #floor-plan-container-title {
+        font-size: 1.2rem;
+    }
+}
 
     </style>
 </head>
@@ -3597,6 +3685,10 @@
         <div id="content-outer-container" class="hide-scrollbar">
 
             <div id="pet-room-container" class="game-content-panel active">
+
+            <div id="room-loading-overlay" aria-hidden="true">
+                <div id="room-loading-spinner"></div>
+            </div>
 
             <div id="game-panel">
             <div class="pet-buttons-and-stats-holder">
@@ -3984,9 +4076,9 @@
         </div>
     </div>
 
-    <script src="../mental-arithmetic.js"></script>
+    <script src="../mental-arithmetic.js?v=20261018r"></script>
     <script src="../main-nav-bar.js"></script>
-    <script src="../autonomous-pets.js"></script>
+    <script src="../autonomous-pets.js?v=20261018r"></script>
     <script src="../functional-objects.js"></script>
     <script>
         
@@ -4043,6 +4135,11 @@
         let gameAssetIndex = {};
         let roomLayoutNumber;
         let roomLayout;
+        // Row->z-index grid for the current roomLayout, cached since roomLayout is only ever
+        // reassigned in one place (renderRoomGrid()) — recomputing it fresh on every pet movement
+        // step (as setPetZIndex used to) was pure waste the rest of the time.
+        let cachedRowZIndexMap = null;
+
         let userPetAssets = {};
         let userMoney = 0;
         let selectedConsumable = [];
@@ -4077,6 +4174,10 @@
         }
 
         function petStartSleeping (petNumber) {
+            // Declared locally — these were previously bare assignments with no let/const/var,
+            // silently creating implicit globals (non-strict script) that nothing scoped to this
+            // function, a latent collision risk with same-named variables anywhere else in the file.
+            let object, petStartingPosLeft, petStaringPosTop;
             const pet = document.getElementById(petNumber);
             const petSpecies = petNumber.split('-')[0]
             const matchingBeds = Array.from(roomObjectsContainer.querySelectorAll("*")).filter(el => {
@@ -4145,8 +4246,6 @@
                 let validCoords = findValidPlacements(suitableWalkingTiles, pet);
 
                 if (validCoords.length !== 0) {
-                    visibleCoords = getVisibleTiles(validCoords, 20);
-
                     // Get pet and autoPet dimensions in tiles
                     const petWidth = Math.ceil(pet.offsetWidth / unitSize);
                     const autoPetWidth = Math.ceil(autoPet.offsetWidth / unitSize);
@@ -4208,6 +4307,11 @@
                     autoPetStartChattingPreConditioning(autoPet, [x + petWidth, y])
                 } else {
                     actionFailed = true
+                    // autoPetStartChattingPreConditioning() (the only thing that would eventually
+                    // clear _busy, via autoPetStartChatting()) never runs on this path — without
+                    // this, the autoPet would stay _busy forever and never be picked for another
+                    // action again.
+                    autoPet._busy = false;
                 }
 
                 setPetZIndex(pet)
@@ -4643,6 +4747,10 @@
         async function renderRoomGrid(offsetX = 0, offsetY = 0, scale = 1) {
             if (!roomLayoutNumber) return
             roomLayout = roomLayoutLibrary[roomLayoutNumber];
+            // roomLayout only ever changes here, so this is the one place the row->z-index map
+            // needs recomputing — every other consumer just reads the cache (see setPetZIndex,
+            // setRoomObjectZIndexes, updateSingleItemZIndex).
+            cachedRowZIndexMap = generateRowZIndexMap(roomLayout);
 
             resizeCanvas();
 
@@ -4864,39 +4972,51 @@ async function renderRoomObjects() {
         }
     });
 
-    // Helper function to render objects
-    function renderObjects(objectList) {
+    // Create every element up front (pass 1: create, append, class, left — no layout reads yet),
+    // preserving the existing append order (normal objects, then auto-pet objects, then the
+    // furniture preview) so DOM order / stacking stays exactly as before.
+    const createdElements = [];
+    function createObjects(objectList) {
         objectList.forEach(([key, asset]) => {
             const [x, y] = asset.position;
             const div = document.createElement("div");
-            roomObjectsContainer.appendChild(div);
-
             div.className = `${gameAssetIndex[asset.assetIndex]["css-class"]} room-object`;
             div.id = key;
             div.style.left = `calc(${x} * var(--unit-size))`;
-            div.style.top = `calc((${y + 1} * var(--unit-size)) - ${div.offsetHeight}px)`;
+            roomObjectsContainer.appendChild(div);
+            createdElements.push({ div, y });
         });
     }
 
     // Render normal objects FIRST
-    renderObjects(normalObjects);
+    createObjects(normalObjects);
 
     // Then render auto-pet objects LAST
-    renderObjects(autoPetObjects);
+    createObjects(autoPetObjects);
 
     // Render furniture preview (always last)
     if (furniturePreviewDict["furniture-preview"].assetIndex) {
         if (furniturePreviewDict["furniture-preview"].position.length !== 0) {
             const [x, y] = furniturePreviewDict["furniture-preview"].position;
             const div = document.createElement("div");
-            roomObjectsContainer.appendChild(div);
-
             div.className = `${gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex]["css-class"]} room-object furniture-preview`;
             div.id = 'furniture-preview';
             div.style.left = `calc(${x} * var(--unit-size))`;
-            div.style.top = `calc((${y + 1} * var(--unit-size)) - ${div.offsetHeight}px)`;
+            roomObjectsContainer.appendChild(div);
+            createdElements.push({ div, y });
         }
     }
+
+    // Pass 2: read every element's height in one batch — the first read here forces exactly one
+    // reflow, and since nothing writes to the DOM in between, every subsequent read in this same
+    // pass reuses that same cached layout (no further reflows), instead of one reflow per object
+    // like the old interleaved create-then-immediately-read-offsetHeight loop did.
+    const heights = createdElements.map(({ div }) => div.offsetHeight);
+
+    // Pass 3: write every `top` using the heights just read — a pure write pass, no further reads.
+    createdElements.forEach(({ div, y }, i) => {
+        div.style.top = `calc((${y + 1} * var(--unit-size)) - ${heights[i]}px)`;
+    });
 
     disableObjectDragging();
 }
@@ -4918,10 +5038,9 @@ async function initGame() {
     adjustUnitSizeForSmallScreens();
     await new Promise(resolve => requestAnimationFrame(resolve));
     await renderRoomGrid();
-    
-    // ADD: Extra safety delay for canvas rendering
-    await new Promise(resolve => setTimeout(resolve, 50));
-    
+    // (No extra wait needed here: renderRoomGrid() only does synchronous Canvas 2D drawing —
+    // there's nothing left pending by the time it returns.)
+
     await setPetAndObjectContainersToGridDimentions();
     
     // ADD: Validate room loaded before proceeding
@@ -4956,6 +5075,13 @@ async function initGame() {
     const objEl = document.querySelector(".switch-text-object");
     if (objEl) objEl.textContent = "NENAUD.";
 
+    // Abort every controller still held from before this (re)init, not just drop the dict — a
+    // dropped-but-unaborted controller leaves its action chain's signal.aborted permanently false,
+    // so a stale chain (e.g. one resumed from an await right after this point) would never notice
+    // it's supposed to stop and can keep animating/repositioning a pet concurrently with whatever
+    // the fresh init starts for it afterward (managePetActions() is called again on every pet at
+    // the end of attemptGameInitInternal()).
+    Object.values(petControllers).forEach(controller => controller.abort());
     petControllers = {};
     pendingPetActions = {};
 
@@ -5017,27 +5143,83 @@ async function validateAndFixObjectPositions() {
 let initAttempts = 0;
 const maxAttempts = 3;
 
+// A real "the browser has actually finished a layout+paint pass" signal, used in place of a
+// guessed setTimeout wait: the first rAF fires right before the next paint, the second fires
+// right after it — so by the time this resolves, whatever was written to the DOM just before
+// calling this is guaranteed to have gone through one full layout/paint cycle. Reliably faster
+// than a fixed delay (one display refresh, ~16ms, not however long someone guessed) and, unlike
+// a fixed delay, it's not a guess — it's tied to the browser's own rendering pipeline.
+function waitForNextPaint() {
+    return new Promise(resolve => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve));
+    });
+}
+
+// Re-entrancy guard: several places can end up calling attemptGameInit() while one is already
+// running (e.g. usePetSupply()'s food branch synthetically clicks the pet-room nav button, whose
+// own click handler already calls attemptGameInit() — then calls it again itself; or a window
+// resize firing several 'resize' events in quick succession while one render is still in flight).
+// Without this, two concurrent runs would both clear/rebuild #roomObjectsContainer/#petContainer
+// at once. A call that arrives while one is already in flight does NOT start a conflicting second
+// run, but it also must not be silently dropped: resizeCanvas() (a separate, unconditional resize
+// listener) clears the canvas on every single resize event regardless of this guard, so if a
+// piggybacked call were simply discarded, the canvas could end up cleared by the last resize event
+// of a drag with nothing left to redraw it — the grid tiles/borders/stairs would vanish while the
+// DOM-positioned objects (unaffected by canvas clearing) stayed visible. So instead, a call that
+// arrives mid-flight marks "one more full run is needed" and awaits the *same* promise everyone
+// else is awaiting; that promise only resolves once a run has completed with no further calls
+// having arrived during it, guaranteeing the final state always reflects the latest request.
+let gameInitPromise = null;
+let gameInitRerunNeeded = false;
+
 async function attemptGameInit() {
+    if (gameInitPromise) {
+        gameInitRerunNeeded = true;
+        return gameInitPromise;
+    }
+    gameInitPromise = runAttemptGameInitUntilSettled();
+    try {
+        return await gameInitPromise;
+    } finally {
+        gameInitPromise = null;
+    }
+}
+
+async function runAttemptGameInitUntilSettled() {
+    let result;
+    do {
+        gameInitRerunNeeded = false;
+        result = await attemptGameInitInternal();
+    } while (gameInitRerunNeeded);
+    return result;
+}
+
+async function attemptGameInitInternal() {
     showRoomLoading();
-    
+
+    // hideRoomLoading() now lives in `finally` (not inline in each branch) so every invocation —
+    // success, a retry that recurses, or the max-attempts path — calls it exactly once, no matter
+    // how many retries happen. This matters now that showRoomLoading/hideRoomLoading count nested
+    // calls: the retry branch below calls this function again (its own show/hide pair nested
+    // inside this one's), so this level's own show needs its own matching hide, not zero.
     try {
         initAttempts++;
         console.log(`Init attempt ${initAttempts}/${maxAttempts}`);
-        
+
         await initGame();
-        
-        // Give placement logic time to position new objects
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
+
+        // Let a real paint pass complete before reading positions back (was a blind 100ms wait).
+        await waitForNextPaint();
+
         // Validate object positions are on valid tiles
         const objectsValid = await validateAndFixObjectPositions();
         if (!objectsValid) {
             throw new Error("Object positions invalid after placement");
         }
-        
-        // NEW: Wait for any final rendering/layout to complete
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
+
+        // Same here — ensure the corrections above have actually painted (was a blind 100ms wait).
+        await waitForNextPaint();
+
         // NEW: Verify rendered positions match saved data
         const positionsMatch = await verifyObjectPositionsMatchData();
         if (!positionsMatch) {
@@ -5056,22 +5238,21 @@ async function attemptGameInit() {
         });
 
         initiateAutonomousPetStartingActions();
-        
-        hideRoomLoading();
-        
+
     } catch (error) {
         console.log(`Init attempt ${initAttempts} failed:`, error);
-        
+
         if (initAttempts < maxAttempts) {
             await new Promise(resolve => setTimeout(resolve, 500));
             console.log("Retrying initialization...");
-            await attemptGameInit();
+            await attemptGameInitInternal(); // bypass the guard — this retry IS the in-flight run
         } else {
             console.error("Max attempts reached, removing invalid objects");
             await removeInvalidObjectsAndSave();
             await initGame();
-            hideRoomLoading();
         }
+    } finally {
+        hideRoomLoading();
     }
 }
 
@@ -5128,30 +5309,51 @@ async function verifyObjectPositionsMatchData() {
     return !discrepanciesFound;
 }
 
+// Tracks nested show/hide calls (e.g. the nav handler calls this around work that itself calls
+// attemptGameInit(), which also calls this) so an inner hide doesn't prematurely re-enable
+// everything while an outer caller is still mid-flight.
+let roomLoadingDepth = 0;
+
+// #pet-room-container has exactly two direct children: #room-loading-overlay (always left alone
+// here) and #game-panel, which holds literally everything else. visibility:hidden on #game-panel
+// as a whole kept letting specific buttons (the pet name buttons, "Perstatyti") stay visible
+// through it for reasons that didn't trace back to any findable CSS/JS conflict — so rather than
+// keep hunting for it, the two sections that hold buttons (not room content) now use display:none
+// instead, which has no equivalent failure mode: a display:none ancestor makes every descendant
+// completely unrenderable, full stop, with no inheritance/override edge case that could let
+// something slip through. #viewport-container (the room itself) stays on visibility:hidden
+// specifically because the positioning math that runs while loading reads offsetWidth/offsetHeight
+// on pets/objects inside it — display:none would zero those out and break placement.
 function showRoomLoading() {
-    const roomContainer = document.getElementById('room-container');
-    const viewport = document.getElementById('viewport-container');
-    
-    if (roomContainer) {
-        roomContainer.style.opacity = '0';
-        roomContainer.style.pointerEvents = 'none';
-    }
-    if (viewport) {
-        viewport.style.pointerEvents = 'none';
-    }
+    roomLoadingDepth++;
+    const overlay = document.getElementById('room-loading-overlay');
+    if (overlay) overlay.classList.add('visible');
+
+    const petButtonsHolder = document.querySelector('.pet-buttons-and-stats-holder');
+    if (petButtonsHolder) petButtonsHolder.style.display = 'none';
+    const buttonContainer = document.getElementById('button-container');
+    if (buttonContainer) buttonContainer.style.display = 'none';
+    const viewportContainer = document.getElementById('viewport-container');
+    if (viewportContainer) viewportContainer.style.visibility = 'hidden';
+
+    document.querySelectorAll('.nav-item').forEach(btn => btn.disabled = true);
 }
 
 function hideRoomLoading() {
-    const roomContainer = document.getElementById('room-container');
-    const viewport = document.getElementById('viewport-container');
-    
-    if (roomContainer) {
-        roomContainer.style.opacity = '1';
-        roomContainer.style.pointerEvents = 'auto';
-    }
-    if (viewport) {
-        viewport.style.pointerEvents = 'auto';
-    }
+    roomLoadingDepth = Math.max(0, roomLoadingDepth - 1);
+    if (roomLoadingDepth > 0) return; // an outer caller is still loading — stay hidden
+
+    const overlay = document.getElementById('room-loading-overlay');
+    if (overlay) overlay.classList.remove('visible');
+
+    const petButtonsHolder = document.querySelector('.pet-buttons-and-stats-holder');
+    if (petButtonsHolder) petButtonsHolder.style.display = '';
+    const buttonContainer = document.getElementById('button-container');
+    if (buttonContainer) buttonContainer.style.display = '';
+    const viewportContainer = document.getElementById('viewport-container');
+    if (viewportContainer) viewportContainer.style.visibility = '';
+
+    document.querySelectorAll('.nav-item').forEach(btn => btn.disabled = false);
 }
 
 async function validatePetPositions() {
@@ -5257,18 +5459,35 @@ async function removeInvalidObjectsAndSave() {
 }
 
 
-fetch("gameAssetIndex.json")
-    .then(response => response.json())
-    .then(data => {
-        gameAssetIndex = data;      // assign JSON result
-        return fetchGameData();     // call your function next
-    })
+// gameAssetIndex.json (a static catalog) and fetchGameData() (the student's own save data from
+// the backend) don't depend on each other at all — parseGameData()/formatObjectAssets()/
+// parseUserPetAssets() (called from inside fetchGameData()) never read gameAssetIndex, they just
+// reshape the server's arrays into dicts keyed by plain numbers. The only thing that actually
+// needs gameAssetIndex loaded is attemptGameInit() (room/pet rendering), which already only runs
+// after this whole chain resolves. So there's no reason to wait for the static file before even
+// starting the network request for the student's data — fetch both at once and only pay for
+// whichever one is slower, instead of the sum of both.
+// Show the same loading state (spinner + disabled buttons) used for nav switches for this entire
+// bootstrap sequence, not just the local-render portion attemptGameInit() itself covers — the
+// network fetches below are usually the bulk of "page is loading" time, and previously had no
+// indicator at all, making the very first load look like it has no loading animation while every
+// later tab switch (which skips the fetch, since data's already in memory) clearly shows one.
+showRoomLoading();
+Promise.all([
+    fetch("gameAssetIndex.json").then(response => response.json()).then(data => { gameAssetIndex = data; }),
+    fetchGameData()
+])
     .then(async () => {
-        await attemptGameInit();
+        try {
+            await attemptGameInit();
+        } finally {
+            hideRoomLoading();
+        }
         fetchMessageGiftsFromServer();
     })
     .catch(error => {
         console.error("Error loading gameAssetIndex.json or fetching game data:", error);
+        hideRoomLoading();
     });
 
 function parseGameData(dataFromServer) {
@@ -5716,29 +5935,13 @@ function startDragging(e) {
     offsetY = e.clientY - objRect.top;
 }
 
-// Global pointer move handler
-document.addEventListener('pointermove', function(e) {
-    if (viewportState.isDragging) {
-        handleViewportPanMove(e);
-        return;
-    }
-    
-    if (isDragging && currentObject) {
-        e.preventDefault();
-        
-        // Get the translate wrapper (not scale wrapper!)
-        const translateWrapper = document.getElementById('room-transform-wrapper');
-        const translateRect = translateWrapper.getBoundingClientRect();
-        
-        // Calculate new position in the translated coordinate system
-        // The key: translateRect already accounts for scale
-        const newLeft = (e.clientX - translateRect.left - offsetX);
-        const newTop = (e.clientY - translateRect.top - offsetY);
-        
-        currentObject.style.left = newLeft + 'px';
-        currentObject.style.top = newTop + 'px';
-    }
-});
+// NOTE: a second, duplicate global 'pointermove' handler used to live here (identical
+// isDragging/currentObject guard, also writing style.left/top). It was dead code — both
+// handlers ran synchronously on every pointermove during a drag, and the OTHER handler below
+// ("REVERTED TO DIRECT CALCULATION") is registered after this one, so its write always
+// overwrote this one's before the browser ever painted. Removed: halves the per-pointermove-
+// event work during any drag (furniture or pet), with zero change to the visible drag behavior,
+// which the other handler already fully determined on its own.
 
 function enablePetDragging() {
     const pets = document.querySelectorAll('.pet');
@@ -6863,11 +7066,11 @@ const activeMovements = new Map();
 function moveObjectAlongPath(objectId, path, onComplete) {
     const speed = 150
     const object = document.getElementById(objectId);
-    const mainPetClass = object.className.split(' ')[0];
     if (!object || !path?.length) {
         onComplete?.();
         return;
     }
+    const mainPetClass = object.className.split(' ')[0];
 
     cancelMovement(objectId); // Cancel any existing movement
 
@@ -6966,43 +7169,49 @@ function generateRowZIndexMap(roomLayout) {
 function setRoomObjectZIndexes() {
     const itemsInFrontOfPetClasses = ['food-bowl', 'water-bowl'];
 
-    const rowZIndexMap = generateRowZIndexMap(roomLayout);
+    const rowZIndexMap = cachedRowZIndexMap;
     
     // Get all room objects
     const allObjects = document.querySelectorAll('.room-object:not(.auto-pet)');
     
-    // First pass: categorize and set basic z-indexes
+    // First pass: categorize and decide what to write, but don't write yet — every z-index write
+    // is deferred into `pendingZIndexWrites` and applied together afterward, so this loop only
+    // ever reads layout (coordinates/dimensions), never interleaving a write with the next
+    // object's read. That forces exactly one reflow total for the whole room instead of one per
+    // object (the previous version wrote obj.style.zIndex immediately inside the loop, which
+    // invalidated the layout cache for every subsequent object's coordinate/dimension read).
     const wallOnlyItems = [];
     const floorItems = [];
     const walkOnItems = [];
-    
+    const pendingZIndexWrites = [];
+
     allObjects.forEach(obj => {
         const assetSource = userObjectAssets[obj.id] || furniturePreviewDict[obj.id];
         if (!assetSource || assetSource.assetIndex == null) return;
-        
+
         const asset = gameAssetIndex[assetSource.assetIndex];
         if (!asset) return;
-        
+
         const coords = getObjectCoordinates(obj.id);
         if (!coords) return;
-        
+
         const [x, y] = coords;
         const width = Math.ceil(obj.offsetWidth / unitSize);
         const height = Math.ceil(obj.offsetHeight / unitSize);
         const bottomRow = y;
-        
+
 
         //SETTING Z-INDEX OF FLOOR-PLACED ITEMS ALWAYS AT THE BOTTOM
 
         // FLOORING
         if (asset.placingIndex === 5) {
-            obj.style.zIndex = 1;
+            pendingZIndexWrites.push(() => { obj.style.zIndex = 1; });
             return;
         }
 
         // CARPETS
         if (asset.placingIndex === 6) {
-            obj.style.zIndex = 2;
+            pendingZIndexWrites.push(() => { obj.style.zIndex = 2; });
             return;
         }
 
@@ -7010,46 +7219,51 @@ function setRoomObjectZIndexes() {
         if (asset.walkOn) {
             const firstFloorRow = rowZIndexMap.findIndex(row => row.some(z => z != null));
             const walkOnZ = firstFloorRow !== -1 ? firstFloorRow + 1 : 3;
-            obj.style.zIndex = walkOnZ;
+            pendingZIndexWrites.push(() => { obj.style.zIndex = walkOnZ; });
             walkOnItems.push(obj.id);
             return;
         }
-        
+
         // Get all tiles occupied by this object
         const occupiedTiles = getTilesOccupiedByObject(coords, width, height);
-        
+
         // Check if entirely on wall tiles
         let isWallOnly = true;
-        
+
         occupiedTiles.forEach(([tileX, tileY]) => {
-            if (tileY >= 0 && tileY < roomLayout.length && 
+            if (tileY >= 0 && tileY < roomLayout.length &&
                 tileX >= 0 && tileX < roomLayout[0].length) {
                 const tileType = roomLayout[tileY][tileX];
                 const type = tileType?.type ?? tileType;
-                
+
                 if (type === 1.0) {
                     isWallOnly = false;
                     return
                 }
             }
         });
-        
+
         if (isWallOnly) {
             // Keep original z-index for wall-only items
             wallOnlyItems.push(obj.id);
-            obj.style.zIndex = '';
+            pendingZIndexWrites.push(() => { obj.style.zIndex = ''; });
         } else {
             // Floor/boundary items: use bottom row z-index
             floorItems.push(obj.id);
             const zIndex = rowZIndexMap[bottomRow]?.[x];
             if (zIndex) {
-                obj.style.zIndex = zIndex;
-                if (itemsInFrontOfPetClasses.some(cls => obj.classList.contains(cls))) {
-                    obj.style.zIndex = Number(obj.style.zIndex) + 1;
-                }
+                pendingZIndexWrites.push(() => {
+                    obj.style.zIndex = zIndex;
+                    if (itemsInFrontOfPetClasses.some(cls => obj.classList.contains(cls))) {
+                        obj.style.zIndex = Number(obj.style.zIndex) + 1;
+                    }
+                });
             }
         }
     });
+
+    // Second pass: apply every decided z-index now, all at once (pure writes, no further reads).
+    pendingZIndexWrites.forEach(write => write());
 
     const overlappingItemPairs = findClusters();
     
@@ -7269,7 +7483,7 @@ function updateSingleItemZIndex(itemId) {
     const item = document.getElementById(itemId);
     if (!item) return;
     
-    const rowZIndexMap = generateRowZIndexMap(roomLayout);
+    const rowZIndexMap = cachedRowZIndexMap;
     
     // Get previous overlaps from cache
     const previousOverlaps = itemOverlapCache.get(itemId) || new Set();
@@ -7548,7 +7762,7 @@ function updateSingleItemZIndex(itemId) {
 function setPetZIndex(pet) {
     if (!pet) return;
     
-    const rowZIndexMap = generateRowZIndexMap(roomLayout);
+    const rowZIndexMap = cachedRowZIndexMap;
     const coords = getObjectCoordinates(pet.id);
     
     if (!coords) return;
@@ -7923,6 +8137,15 @@ function findPetOverlapClusters(data) {
 
 function cancelMovement(objectId) {
     const object = document.getElementById(objectId);
+    if (!object) {
+        // Element already gone (e.g. deleted while its action loop was mid-wait) — nothing to
+        // animate, but still clear any tracked movement so activeMovements doesn't leak it.
+        if (activeMovements.has(objectId)) {
+            clearTimeout(activeMovements.get(objectId).interval);
+            activeMovements.delete(objectId);
+        }
+        return;
+    }
     const mainPetClass = object.className.split(' ')[0];
     if (activeMovements.has(objectId)) {
         const movement = activeMovements.get(objectId);
@@ -8275,47 +8498,84 @@ let editing = false;
 
 let preEditUserObjectAssets;
 
+// Pulled out of the click listener so previewFurniture() can call this directly (and properly
+// await it) instead of a synthetic toggleEditSaveBtn.click() — a synthetic click can't be
+// awaited, and once this started doing a real `await waitForNextPaint()` internally (see below),
+// the synthetic click's resumption started landing AFTER previewFurniture() had already hidden
+// Atšaukti/Trinti and closed the sidebar, re-showing/re-opening both. `showEditingControls=false`
+// (what previewFurniture() passes) skips exactly those two UI reveals — preview wants the other
+// "enter edit mode" side effects (pets hidden, dragging enabled, z-indexes set, editing=true) but
+// never wants the full editor chrome, only "Baigti peržiūrą".
+async function enterEditMode(showEditingControls = true) {
+    preEditUserObjectAssets = JSON.parse(JSON.stringify(userObjectAssets)); //deep copy
+    toggleEditSaveBtn.textContent = "Išsaugoti";
+    toggleEditSaveBtn.classList.remove("edit");
+    toggleEditSaveBtn.classList.add("save");
+
+    if (showEditingControls) {
+        cancelEditBtn.classList.remove("hidden");
+        deleteSelectedItemBtn.classList.remove("hidden");
+    }
+
+    const petElements = document.querySelectorAll('.pet');
+    petElements.forEach(pet => {
+        pet.style.display = 'none';
+    });
+
+    disableAutoPets();
+
+    // REMOVE FILLED FROM ALL BATHS TO RESET ACTION
+    document.querySelectorAll('.room-object.bath').forEach(obj => {
+        obj.classList.remove('filled'); // remove if present
+        obj._full = false;
+    });
+
+    updateStatsBeforeRerunningInitGameAndRenderPets();
+    enableObjectDragging();
+    initializeRoomZIndexes();
+    makeSelectedClickable();
+
+    if (showEditingControls) {
+        displaySidebar();
+        renderObjectAssetsDropdown(sidebar=true);
+    }
+
+    editing = true;
+
+    document.querySelector("#floor-plan-btn").style.opacity = "0";
+    document.querySelector("#floor-plan-btn").disabled = true;
+}
+
 toggleEditSaveBtn.addEventListener("click", async () => {
     if (toggleEditSaveBtn.disabled) return;
-    
+
+    // Same loading state as every other room-layout-affecting action (nav switches, preview,
+    // resize): buttons hidden, nav disabled, spinner up, until this is fully done.
+    showRoomLoading();
+
     // Disable all action buttons
     toggleEditSaveBtn.disabled = true;
     cancelEditBtn.disabled = true;
     deleteSelectedItemBtn.disabled = true;
     document.querySelectorAll('.sidebar button').forEach(btn => btn.disabled = true);
-    
+
+    // Saving (exiting edit mode) should close the inventory sidebar immediately, in the same
+    // painted frame as the loading state — not after the room finishes reloading, which is what
+    // calling hideSidebar() later (at the end of the "else" branch below) produced.
+    if (editing) {
+        hideSidebar();
+    }
+
+    // The "entering edit mode" branch below has no await in it at all — without yielding here
+    // first, the whole handler (show loading, do the work, hide loading) runs in one synchronous
+    // block and the browser never gets a chance to actually paint the loading state in between,
+    // so it looked like nothing happened until the result just appeared. This guarantees a real
+    // rendered frame of the loading state before any work (sync or async) begins.
+    await waitForNextPaint();
+
     try {
         if (!editing) {
-        // switch to Save mode
-            preEditUserObjectAssets = JSON.parse(JSON.stringify(userObjectAssets)); //deep copy
-            toggleEditSaveBtn.textContent = "Išsaugoti";
-            toggleEditSaveBtn.classList.remove("edit");
-            toggleEditSaveBtn.classList.add("save");
-            cancelEditBtn.classList.remove("hidden");
-            deleteSelectedItemBtn.classList.remove("hidden");
-            const petElements = document.querySelectorAll('.pet');
-            petElements.forEach(pet => {
-                pet.style.display = 'none';
-            });
-
-            disableAutoPets();
-
-            // REMOVE FILLED FROM ALL BATHS TO RESET ACTION
-            document.querySelectorAll('.room-object.bath').forEach(obj => {
-                obj.classList.remove('filled'); // remove if present
-                obj._full = false;
-            });
-            
-            updateStatsBeforeRerunningInitGameAndRenderPets();
-            enableObjectDragging();
-            initializeRoomZIndexes();
-            makeSelectedClickable();
-            displaySidebar();
-            renderObjectAssetsDropdown(sidebar=true);
-            editing = true;
-
-            document.querySelector("#floor-plan-btn").style.opacity = "0";
-            document.querySelector("#floor-plan-btn").disabled = true;
+            await enterEditMode(true);
         } else {
             await updateObjectPositionChanges();
             const petElements = document.querySelectorAll('.pet');
@@ -8339,7 +8599,6 @@ toggleEditSaveBtn.addEventListener("click", async () => {
             initiateAutonomousPetStartingActions();
             clearPlacementHighlights()
             removeAllDeleteItemHighlights();
-            hideSidebar();
 
             document.querySelector("#floor-plan-btn").style.opacity = "1";
             document.querySelector("#floor-plan-btn").disabled = false;
@@ -8350,18 +8609,35 @@ toggleEditSaveBtn.addEventListener("click", async () => {
         cancelEditBtn.disabled = false;
         deleteSelectedItemBtn.disabled = false;
         document.querySelectorAll('.sidebar button').forEach(btn => btn.disabled = false);
+        hideRoomLoading();
     }
 });
 
-cancelEditBtn.addEventListener("click", async () => {
+// Pulled out of the click listener (kept functionally identical) so other code — specifically the
+// nav bar handler, when leaving the pet-room tab while mid-edit — can call this directly and
+// properly `await` its real completion, instead of firing a synthetic `.click()` it can't await.
+async function cancelEditAction() {
     if (cancelEditBtn.disabled) return;
-    
+
+    // Same loading state as toggleEditSaveBtn's handler above — see its comment.
+    showRoomLoading();
+
     // Disable all action buttons
     toggleEditSaveBtn.disabled = true;
     cancelEditBtn.disabled = true;
     deleteSelectedItemBtn.disabled = true;
     document.querySelectorAll('.sidebar button').forEach(btn => btn.disabled = true);
-    
+
+    // Close the inventory sidebar immediately, in the same painted frame as the loading state —
+    // not after the room finishes reloading, which is what calling hideSidebar() later (at its
+    // old spot further down) produced.
+    hideSidebar();
+
+    // Guarantee a real painted frame of the loading state before the work below runs — the first
+    // real async wait inside renderRoomObjects() isn't necessarily early/slow enough on its own
+    // to let the browser paint in between (same reasoning as toggleEditSaveBtn's handler).
+    await waitForNextPaint();
+
     try {
         if (editing && preEditUserObjectAssets) {
             userObjectAssets = JSON.parse(JSON.stringify(preEditUserObjectAssets));
@@ -8378,9 +8654,8 @@ cancelEditBtn.addEventListener("click", async () => {
         makeSelectedClickThrough();
         clearPlacementHighlights()
         removeAllDeleteItemHighlights();
-        hideSidebar();
         initializeRoomZIndexes();
-        
+
         const allPets = document.querySelectorAll("#petContainer .pet");
         if (allPets[0]) {
             displayPetStats(allPets[0].id);
@@ -8393,11 +8668,13 @@ cancelEditBtn.addEventListener("click", async () => {
         cancelEditBtn.disabled = false;
         deleteSelectedItemBtn.disabled = false;
         document.querySelectorAll('.sidebar button').forEach(btn => btn.disabled = false);
+        hideRoomLoading();
     }
 
     document.querySelector("#floor-plan-btn").style.opacity = "1";
     document.querySelector("#floor-plan-btn").disabled = false;
-});
+}
+cancelEditBtn.addEventListener("click", cancelEditAction);
 
 function updateStatsBeforeRerunningInitGameAndRenderPets() {
     const allPets = document.querySelectorAll("#petContainer .pet");
@@ -9781,27 +10058,60 @@ function clearPlacementHighlights() {
 const navButtons = document.querySelectorAll('.nav-item');
 const contentPanels = document.querySelectorAll('.game-content-panel');
 
-navButtons.forEach((button) => {
-    button.addEventListener('click', async () => {
-        const targetId = button.dataset.target;
+// Extracted from the click listener so OTHER code that needs to switch to a panel (e.g.
+// usePetSupply()'s food branch, below) can call this directly and actually await it. A synthetic
+// `.click()` can't be awaited — the async listener only runs synchronously up to its first
+// `await`, then control returns to whoever called `.click()` immediately — so a caller doing
+// `button.click(); await attemptGameInit();` was racing a SECOND, independent attemptGameInit()
+// call against the one this function triggers internally, overlapping two room-rebuild passes.
+// Anything created by the second pass (e.g. the pet-name buttons, rebuilt fresh on every
+// initGame()) was created after showRoomLoading()'s hide pass already ran, so it never got
+// hidden — which is what made specific buttons stay visible during loading, but only on this
+// particular path, not on a plain single nav click or the initial page load.
+async function activateNavPanel(targetId) {
+    const button = Array.from(navButtons).find(btn => btn.dataset.target === targetId);
+    if (!button || button.disabled) return;
 
-        const previouslyActivePanel = document.querySelector(".game-content-panel.active");
-        const previousId = previouslyActivePanel ? previouslyActivePanel.id : null;
+    // Disable the clicked button immediately, synchronously — before the paint-wait below. There's
+    // a real ~33ms gap between this click starting and showRoomLoading() (further down) actually
+    // disabling it, since showRoomLoading() only runs after awaiting waitForNextPaint(); a fast
+    // repeat click could land inside that gap and queue up a second overlapping call. Re-enabled
+    // in the outer finally below — needed because not every target needs showRoomLoading()/
+    // hideRoomLoading() at all (e.g. Baldai, Parduotuvė), so nothing else would re-enable it.
+    button.disabled = true;
+    try {
 
-        if (previousId === "pet-room-container" && targetId !== "pet-room-container") {
-            document.getElementById('cancel-edit-btn').click();
+    const previouslyActivePanel = document.querySelector(".game-content-panel.active");
+    const previousId = previouslyActivePanel ? previouslyActivePanel.id : null;
+
+    // Mark the clicked button/panel active FIRST, and let the browser actually paint that,
+    // before any of the potentially-slow work below runs. Without the paint-yield, the class
+    // change lands on the element instantly but stays invisible until the (possibly long)
+    // synchronous room-init work below finishes, making the click feel unresponsive even
+    // though the state change itself was never the slow part.
+    navButtons.forEach(btn => btn.classList.remove('active'));
+    contentPanels.forEach(panel => panel.classList.remove('active'));
+    button.classList.add('active');
+    const targetPanel = document.getElementById(targetId);
+    targetPanel.classList.add('active');
+    await waitForNextPaint();
+
+    // Leaving/entering the pet room are the only transitions slow enough to need the loading
+    // state — the other panels just render a dropdown list. Disables the nav buttons and
+    // shows the spinner for the duration, so a second click can't land mid-transition.
+    const leavingPetRoom = previousId === "pet-room-container" && targetId !== "pet-room-container";
+    const needsRoomLoading = leavingPetRoom || targetId === 'pet-room-container';
+    if (needsRoomLoading) showRoomLoading();
+
+    try {
+        if (leavingPetRoom) {
+            // Call directly (not a synthetic .click()) so this is actually awaited — a
+            // synthetic click can't be awaited, which previously let this run concurrently
+            // with whatever came next.
+            await cancelEditAction();
         }
-        
-        // Remove active class from all buttons and panels
-        navButtons.forEach(btn => btn.classList.remove('active'));
-        contentPanels.forEach(panel => panel.classList.remove('active'));
-        
-        // Add active class to clicked button and target panel
-        button.classList.add('active');
-        const targetPanel = document.getElementById(targetId);
-        targetPanel.classList.add('active');
 
-        endPreview()
+        await endPreview()
 
         if (button.id !== "pet-room-button") {
             selectedConsumable = [];
@@ -9827,7 +10137,7 @@ navButtons.forEach((button) => {
             }
             document.getElementById('shopHeader').classList.remove('compact');
         } else if (targetId === 'pet-room-container') {
-            await clickPetRoomSection(targetId)
+            await attemptGameInit();
         } else if (targetId === 'pet-asset-container') {
             const departmentBtns = document.querySelectorAll('#pet-asset-container .department-btn');
             const foodBtn = Array.from(departmentBtns).find(btn => {
@@ -9847,15 +10157,18 @@ navButtons.forEach((button) => {
             renderTaxesSection();
             document.getElementById('taxesHeader').classList.remove('compact');
         }
-    });
-});
-
-async function clickPetRoomSection (button=null) {
-    if (button !== 'pet-room-container') {
-        document.getElementById("pet-room-button").click();
+    } finally {
+        if (needsRoomLoading) hideRoomLoading();
     }
-    await attemptGameInit();
+
+    } finally {
+        button.disabled = false;
+    }
 }
+
+navButtons.forEach((button) => {
+    button.addEventListener('click', () => activateNavPanel(button.dataset.target));
+});
 
 function navigationResponsiveLayout() {
     const gameContainer = document.getElementById("gameContainer");
@@ -9881,17 +10194,37 @@ function navigationResponsiveLayout() {
     }
 }
 
-// Recalculate on resize
+// Recalculate on resize. A resize drag fires many native 'resize' events in quick succession —
+// re-running the full attemptGameInit() pipeline (room teardown/rebuild, pet re-render, position
+// validation...) on every single one of them is what made the whole browser visibly lag while
+// resizing. So that part is debounced: the loading overlay goes up on the first event of a burst
+// (covering the stale room immediately) but the actual rebuild only runs once events stop
+// arriving for a bit, and the overlay only comes back down once that rebuild finishes.
+let resizeRebuildTimer = null;
+let resizeLoadingActive = false;
+
 window.addEventListener("resize", async () => {
     updateStatsBeforeRerunningInitGameAndRenderPets();
     navigationResponsiveLayout();
-    endPreview()
+    await endPreview()
     hideSidebar()
 
     if (document.getElementById("pet-room-container").classList.contains("active")) {
-        await attemptGameInit();
-        document.querySelector("#end-preview-button").classList.add("hidden")
-        resetEditButtonToggle();
+        if (!resizeLoadingActive) {
+            resizeLoadingActive = true;
+            showRoomLoading();
+        }
+        clearTimeout(resizeRebuildTimer);
+        resizeRebuildTimer = setTimeout(async () => {
+            try {
+                await attemptGameInit();
+                document.querySelector("#end-preview-button").classList.add("hidden")
+                resetEditButtonToggle();
+            } finally {
+                resizeLoadingActive = false;
+                hideRoomLoading();
+            }
+        }, 200);
     }
 
     const checkbox = document.getElementById("shop-not-owned-toggle");
@@ -10524,19 +10857,36 @@ let furniturePreviewDict = {
 }
 
 document.querySelector("#end-preview-button").addEventListener("click", async () => {
-    endPreview();
-    updateStatsBeforeRerunningInitGameAndRenderPets();
-    await attemptGameInit()
-    initiateAutonomousPetStartingActions();
+    // Explicit, immediate showRoomLoading() rather than relying on attemptGameInit()'s own
+    // internal call — guarantees the loading state (buttons hidden, nav disabled, spinner up)
+    // is active from the very first moment of the click, with no gap at all.
+    showRoomLoading();
+    // Guarantee a real painted frame of the loading state before endPreview()'s cleanup and
+    // attemptGameInit()'s work run, same reasoning as toggleEditSaveBtn's handler.
+    await waitForNextPaint();
+    try {
+        await endPreview();
+        updateStatsBeforeRerunningInitGameAndRenderPets();
+        // attemptGameInit() already calls initiateAutonomousPetStartingActions() itself on success —
+        // calling it again here doubled up every auto-pet's starting action (colliding timers/
+        // position writes from two overlapping movement sequences for the same pet).
+        await attemptGameInit()
+    } finally {
+        hideRoomLoading();
+    }
 });;
 
-function endPreview() {
+async function endPreview() {
     if (!furniturePreviewDict["furniture-preview"].assetIndex) {
         return
     }
     
     document.querySelector("#end-preview-button").classList.add("hidden");
     document.querySelector("#toggle-edit-save-btn").classList.remove("hidden");
+
+    // In case the preview's few-seconds "here it is" highlight (see previewFurniture()) hasn't
+    // cleared itself yet when the preview ends early.
+    clearSpecificPlacementHighlights();
 
     // Clean up the preview object
     furniturePreviewDict["furniture-preview"].assetIndex = null;
@@ -10549,9 +10899,12 @@ function endPreview() {
         previewDiv.remove();
     }
 
-    // If in edit mode, exit it first
+    // If in edit mode, exit it first. Call directly (not a synthetic .click()) so this is
+    // actually awaited — a synthetic click can't be awaited, which let this run concurrently
+    // with whatever the caller did right after endPreview() (e.g. its own attemptGameInit()
+    // call), racing two overlapping room rebuilds against each other.
     if (editing) {
-        cancelEditBtn.click();
+        await cancelEditAction();
     }
 }
 
@@ -10575,46 +10928,82 @@ async function previewFurniture (key) {
     furniturePreviewDict["furniture-preview"].position = getObjectCoordinates(tempDivId);
 
     updateStatsBeforeRerunningInitGameAndRenderPets();
-    
-    await attemptGameInit();
 
-    const placementMap = generatePlacementMap(tempDivId);
+    // Let the panel switch (and the dimming above) actually paint before the heavy, mostly-
+    // synchronous attemptGameInit() work runs — otherwise the browser can go straight from "still
+    // showing the old panel" to "room fully rendered with the preview item" in one jump, with the
+    // switch-to-Namai feedback never getting its own rendered frame (same fix as the nav handler).
+    await waitForNextPaint();
 
-    const validPosition = findValidPosition(placementMap, tempDivId);
+    // Keep the loading state up for this WHOLE flow, not just attemptGameInit()'s own internal
+    // portion — this function does a SECOND render pass below (computing the item's actual valid
+    // position and re-rendering the room/objects for it) after attemptGameInit() already
+    // finished. attemptGameInit() reveals the room as soon as IT's done, which previously exposed
+    // that pre-placement state for a moment before the second pass visibly snapped everything to
+    // its final position — explicit showRoomLoading()/hideRoomLoading() around the whole thing
+    // means the room only ever becomes visible once, already in its finished state.
+    showRoomLoading();
+    try {
+        await attemptGameInit();
 
-    if (validPosition) {
-        furniturePreviewDict["furniture-preview"].position = validPosition;
-        updateStatsBeforeRerunningInitGameAndRenderPets();
-        adjustUnitSizeForSmallScreens();
-        await new Promise(resolve => requestAnimationFrame(resolve));
-        renderRoomGrid();
-        await setPetAndObjectContainersToGridDimentions();
-        await renderRoomObjects();
-        await initFunctionalObjects();
-        toggleRoomDarknessBasedOnElectricityTax();
-        updateSingleItemZIndex(tempDivId);
+        const placementMap = generatePlacementMap(tempDivId);
 
-        toggleEditSaveBtn.click();
+        const validPosition = findValidPosition(placementMap, tempDivId);
 
-        document.querySelector("#end-preview-button").classList.remove("hidden")
-        document.querySelector("#toggle-edit-save-btn").classList.add("hidden")
-        document.querySelector("#cancel-edit-btn").classList.add("hidden")
-        document.querySelector("#delete-selected-item-button").classList.add("hidden")
-        hideSidebar();
+        if (validPosition) {
+            furniturePreviewDict["furniture-preview"].position = validPosition;
+            updateStatsBeforeRerunningInitGameAndRenderPets();
+            adjustUnitSizeForSmallScreens();
+            await new Promise(resolve => requestAnimationFrame(resolve));
+            renderRoomGrid();
+            await setPetAndObjectContainersToGridDimentions();
+            await renderRoomObjects();
+            await initFunctionalObjects();
+            toggleRoomDarknessBasedOnElectricityTax();
+            updateSingleItemZIndex(tempDivId);
 
-        centerViewportOnObject("furniture-preview")
+            // Direct call (not a synthetic .click()) with showEditingControls=false — preview
+            // wants editing's other side effects (pets hidden, dragging enabled, editing=true)
+            // but never the full editor chrome (sidebar, Atšaukti/Trinti), only "Baigti peržiūrą".
+            // A synthetic click couldn't be awaited, which raced this against the lines below.
+            await enterEditMode(false);
 
-    } else {
-        furniturePreviewDict["furniture-preview"].position = [];
-        document.getElementById(tempDivId).remove();
-        if (gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex].placingIndex === 13 || gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex]["css-class"].includes("window-sill")) {
-            messageToTheUser("Nėra tinkamo dydžio lango arba jį užstoja kiti daiktai!")
-        } else if (gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex].placingIndex === 17 || gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex]["css-class"].includes("fireplace")) {
-            messageToTheUser("Nepakanka vietos! Židiniai gali būti pastatyti tik prie laisvos sienos!")
+            document.querySelector("#end-preview-button").classList.remove("hidden")
+            document.querySelector("#toggle-edit-save-btn").classList.add("hidden")
+            document.querySelector("#cancel-edit-btn").classList.add("hidden")
+            document.querySelector("#delete-selected-item-button").classList.add("hidden")
+            hideSidebar();
+
+            centerViewportOnObject("furniture-preview")
+
+            // Briefly highlight the newly previewed item using the same green tile overlay already
+            // used elsewhere (e.g. highlighting an empty food bowl) — reused here as a plain "here it
+            // is" indicator rather than a valid-placement check.
+            const previewObj = document.getElementById(tempDivId);
+            if (previewObj) {
+                const previewTiles = getTilesOccupiedByObject(
+                    validPosition,
+                    Math.ceil(previewObj.offsetWidth / unitSize),
+                    Math.ceil(previewObj.offsetHeight / unitSize)
+                );
+                previewTiles.forEach(([col, row]) => createSpecificPlacementHighlight(col, row, true));
+                setTimeout(clearSpecificPlacementHighlights, 2500);
+            }
+
         } else {
-            messageToTheUser("Nepakanka vietos!")
+            furniturePreviewDict["furniture-preview"].position = [];
+            document.getElementById(tempDivId).remove();
+            if (gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex].placingIndex === 13 || gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex]["css-class"].includes("window-sill")) {
+                messageToTheUser("Nėra tinkamo dydžio lango arba jį užstoja kiti daiktai!")
+            } else if (gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex].placingIndex === 17 || gameAssetIndex[furniturePreviewDict["furniture-preview"].assetIndex]["css-class"].includes("fireplace")) {
+                messageToTheUser("Nepakanka vietos! Židiniai gali būti pastatyti tik prie laisvos sienos!")
+            } else {
+                messageToTheUser("Nepakanka vietos!")
+            }
+            furniturePreviewDict["furniture-preview"].assetIndex = null;
         }
-        furniturePreviewDict["furniture-preview"].assetIndex = null;
+    } finally {
+        hideRoomLoading();
     }
 
     if (document.querySelector(`#${tempDivId}`)) {
@@ -12827,13 +13216,16 @@ async function usePetSupply (itemIndex, useQuantity=1) {
     const provides = providesData[0]
     const providesFor = providesData[1]
     if (provides === "food") {
-        await clickPetRoomSection()
+        // Call directly (not a synthetic .click() on the nav button) so this is actually awaited
+        // instead of racing a second, independent attemptGameInit() against the one this
+        // triggers internally — see the comment on activateNavPanel() for what that race broke.
+        await activateNavPanel('pet-room-container')
         selectFullSpeciesBowls (providesFor)
 
     } else if (provides === "love") {
         selectedConsumable = [itemIndex, useQuantity];
-        
-        document.getElementById("pet-room-button").click();
+
+        activateNavPanel('pet-room-container');
 
         messageToTheUser(`Pasirink augintinį.`, false)
     }
@@ -14144,7 +14536,11 @@ function managePetActions(pet) {
         // Abort any ongoing action for this pet
         if (petControllers[pet.id]) {
             petControllers[pet.id].abort();
-            setObjectAnimation(pet, `${pet.id}-stands-idle`);
+            // The abort signal only reaches code that actually checks it between awaits — it does
+            // NOT stop an in-flight moveObjectAlongPath() timer loop (movePetToTile() never wires
+            // the signal through to it). Explicitly cancel any such loop too, or it keeps stepping
+            // the pet toward its old destination after we've already moved on.
+            cancelMovement(pet.id);
             delete petControllers[pet.id]; // Clean up the controller
         }
         return; // Exit the function without starting new actions
@@ -14153,7 +14549,8 @@ function managePetActions(pet) {
     // cancel any ongoing action for this pet
     if (petControllers[pet.id]) {
         petControllers[pet.id].abort();
-        setObjectAnimation(pet, `${pet.id}-stands-idle`);
+        // See the comment above: abort() alone doesn't stop an in-flight movement timer loop.
+        cancelMovement(pet.id);
     }
 
     // create a new controller for this action chain
@@ -17365,7 +17762,10 @@ async function purchaseRoom(upgradeNum) {
             return;
         } else {
             roomLayoutNumber = upgradeNum;
-            attemptGameInit();
+            // Await + catch: fire-and-forget here left a rejection (e.g. attemptGameInitInternal
+            // exhausting its retries) as an unhandled promise rejection with no visible feedback,
+            // right after the purchase had already gone through on the server.
+            await attemptGameInit().catch(err => console.error("Room re-init after purchase failed:", err));
         }
 
         // Success!

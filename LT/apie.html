@@ -20,7 +20,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- External CSS Files -->
-    <link rel="stylesheet" type="text/css" href="../index.css">
+    <link rel="stylesheet" type="text/css" href="../index.css?v=20261018r">
     <link rel="stylesheet" href="../main-nav-bar.css">
 	<script src="../refresh-token.js"></script>
 
@@ -574,10 +574,10 @@
         }
 
         .info-card {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.22);
 			backdrop-filter: blur(10px);
 			-webkit-backdrop-filter: blur(10px);
-			border: 1px solid rgba(255, 255, 255, 0.2);
+			border: 1px solid rgba(255, 255, 255, 0.55);
             border-radius: 12px;
             padding: 15px 25px;
             margin-bottom: 25px;
@@ -1130,6 +1130,61 @@
         .text-unit, .info-card, .grade-card {
             animation: fadeIn 0.5s ease-out;
         }
+
+        /* =====================================================================
+           TYPOGRAPHY + GLASS ALIGNMENT WITH THE "UŽDUOTYS" PAGE
+           Only heading sizes, colours, borders and corner radii are changed;
+           body text (16px) and the table of contents are left as they were.
+           Desktop sizes apply to landscape viewports >= 768px; the
+           tablet-portrait overrides above keep their own values.
+           ===================================================================== */
+
+        /* Glass content cards: same look as the panels on the tasks page */
+        .text-unit {
+            background: rgba(255, 255, 255, 0.62);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            border-radius: 16px;
+        }
+
+        @media (min-width: 768px) and (orientation: landscape) {
+            .text-title {
+                font-size: 1.75rem;
+            }
+
+            .text-subtitle {
+                font-size: 1.3rem;
+            }
+
+            .section-upper-header {
+                font-size: 1.25rem;
+            }
+
+            .section-header {
+                font-size: 1.15rem;
+            }
+
+            .grade-title {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .text-title {
+                font-size: 1.5rem;
+            }
+
+            .text-subtitle {
+                font-size: 1.25rem;
+            }
+
+            .section-upper-header {
+                font-size: 1.2rem;
+            }
+
+            .section-header {
+                font-size: 1.1rem;
+            }
+        }
     </style>
 </head>
 
@@ -1255,28 +1310,30 @@
                                         <li><a class="content-list-link" href="#mokinio-paskyra">Mokinio paskyra</a></li>
                                         <ul style="padding-left: 10px;">
                                             <li><a class="content-list-link" href="#uzduociu-atlikimas">Kaip atlikti užduotį?</a></li>
-                                            <li><a class="content-list-link" href="#rezultatu-analize-mokiniams">Asmeninių rezultatų analizė</a></li>
+                                            <li><a class="content-list-link" href="#rezultatu-analize-mokiniams">Rezultatų peržiūra</a></li>
                                         </ul>
-
 
                                         <li><a class="content-list-link" href="#mokytojo-paskyra">Mokytojo paskyra</a></li>
                                         <ul style="padding-left: 10px;">
-                                            <li><a class="content-list-link" href="#ziniu-lygis">Mokinio žinių lygis</a></li>
-                                            <li><a class="content-list-link" href="#mokinio-vardo-keitimas">Mokinio vardo keitimas</a></li>
-                                            <li><a class="content-list-link" href="#uzduociu-skyrimas">Užduočių skyrimas <svg class="in-text-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 -900 960 960" fill="currentColor"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q65 0 123 19t107 53l-58 59q-38-24-81-37.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160q32 0 62-6t58-17l60 61q-41 20-86 31t-94 11Zm280-80v-120H640v-80h120v-120h80v120h120v80H840v120h-80ZM424-296 254-466l56-56 114 114 400-401 56 56-456 457Z"></path></svg></a></li>
-                                            <li><a class="content-list-link" href="#rezultatu-analize">Užduočių rezultatų analizė</a></li>
+                                            <li><a class="content-list-link" href="#mokytojo-suvestine">Suvestinė</a></li>
+                                            <li><a class="content-list-link" href="#mokiniu-zymes">Spalviniai indikatoriai</a></li>
+                                            <li><a class="content-list-link" href="#uzduociu-skyrimas">Užduočių skyrimas</a></li>
+                                            <ul>
+                                                <li><a class="content-list-link" href="#kelios-uzduotys">Kelios užduotys vienu metu</a></li>
+                                            </ul>
+                                            <li><a class="content-list-link" href="#rezultatu-analize">Pažanga</a></li>
                                             <ul style="padding-left: 10px;">
                                                 <li><a class="content-list-link" href="#mokytojo-statistika-rodikliai">Rodiklių apibrėžimai</a></li>
                                                 <li><a class="content-list-link" href="#rezultatyvumas">Rezultatyvumas</a></li>
                                             </ul>
-                                            <li><a class="content-list-link" href="#rezultatu-archyvas">Rezultatų archyvas <svg class="in-text-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="m105-399-65-47 200-320 120 140 160-260 120 180 135-214 65 47-198 314-119-179-152 247-121-141-145 233Zm475 159q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29ZM784-80 676-188q-21 14-45.5 21t-50.5 7q-75 0-127.5-52.5T400-340q0-75 52.5-127.5T580-520q75 0 127.5 52.5T760-340q0 26-7 50.5T732-244l108 108-56 56Z"></path></svg></a></li>
+                                            <li><a class="content-list-link" href="#rezultatu-analize-mokytojams">Analizė</a></li>
                                             <ul style="padding-left: 10px;">
-                                                <li><a class="content-list-link" href="#uzduociu-istorija">Užduočių istorija</a></li>
-                                                <li><a class="content-list-link" href="#mokiniu-progresas">Mokinių progresas</a></li>
+                                                <li><a class="content-list-link" href="#klaidu-kategorijos">Klaidų kategorijos</a></li>
                                             </ul>
                                             <li><a class="content-list-link" href="#tekstu-narsykle">Tekstų naršyklė</a></li>
-                                            <li><a class="content-list-link" href="#uzduociu-trynimas">Užduočių trynimas <svg class="in-text-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 -900 960 960" fill="currentColor"><path d="m376-300 104-104 104 104 56-56-104-104 104-104-56-56-104 104-104-104-56 56 104 104-104 104 56 56Zm-96 180q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520Zm-400 0v520-520Z"></path></svg></a></li>
-                                            <li><a class="content-list-link" href="#mokiniu-salinimas">Mokinių šalinimas <svg class="in-text-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 -860 960 960" fill="currentColor"><path d="M819-28 680-167v7H40v-112q0-34 17.5-62.5T104-378q62-31 126-46.5T360-440q12 0 24.5.5T409-438l-42-42h-7q-66 0-113-47t-47-113v-7L27-820l57-57L876-85l-57 57ZM666-434q51 6 96 20.5t84 35.5q36 20 55 44.5t19 53.5v120h-5L755-320q-9-33-31.5-62.5T666-434Zm-306 74q-56 0-111 13.5T140-306q-9 5-14.5 14t-5.5 20v32h480v-7l-87-87q-38-13-76.5-19.5T360-360Zm202-153q19-28 28.5-60t9.5-67q0-42-14.5-81T544-792q14-5 28-6.5t28-1.5q66 0 113 47t47 113q0 66-49.5 113T595-480l-33-33Zm-58-58-64-64v-5q0-33-23.5-56.5T360-720h-5l-64-64q16-8 33-12t36-4q66 0 113 47t47 113q0 19-4 36t-12 33ZM365-240Zm33-438Z"></path></svg></a></li>
+                                            <li><a class="content-list-link" href="#ziniu-lygis">Mokinio žinių lygis</a></li>
+                                            <li><a class="content-list-link" href="#mokinio-vardo-keitimas">Mokinio vardo keitimas</a></li>
+                                            <li><a class="content-list-link" href="#mokiniu-salinimas">Mokinių šalinimas</a></li>
                                         </ul>
                                     </ul>
                                 <li><a class="content-list-link" href="#klase">Klasė</a></li>
@@ -1284,8 +1341,15 @@
                                     <li><a class="content-list-link" href="#nariai">Nariai</a></li>
                                     <ul>
                                         <li><a class="content-list-link" href="#mokytojo-mokinio-susiejimas">Kaip pridėti mokytoją?</a></li>
+                                        <li><a class="content-list-link" href="#mokiniu-kvietimas">Kaip pakviesti mokinius?</a></li>
                                     </ul>
                                     <li><a class="content-list-link" href="#klasės-issūkis">Klasės iššūkis</a></li>
+                                    <li><a class="content-list-link" href="#zaidimai">Žaidimai</a></li>
+                                    <ul>
+                                        <li><a class="content-list-link" href="#tvirtoves-gynyba">Tvirtovės gynyba</a></li>
+                                        <li><a class="content-list-link" href="#vaiduoklis">Vaiduoklis</a></li>
+                                    </ul>
+                                    <li><a class="content-list-link" href="#aukcionas">Aukcionas</a></li>
                                     <li><a class="content-list-link" href="#profilis">Profilis</a></li>
                                 </ul>
 
@@ -1439,155 +1503,217 @@
                     </p>
                     
                     <div class="image-div">
-                        <img src="../images/about-images/LT/user-instructions-1.png" class="user-instruction-image" alt="Praktikos skiltis">
+                        <img src="../images/about-images/LT/user-instructions-59.png" class="user-instruction-image" alt="Praktikos puslapis">
                     </div>
                 </div>
 
                 <div class="info-card">
                     <div class="text-subtitle" id="uzduotys">Užduotys</div>
                     <p>Puslapis „<span class="stressed-text">Užduotys</span>“ skirtas užduočių skyrimui, atlikimui bei rezultatų analizei.</p>
-                    
 
 				<div class="info-card">
                     <div class="section-upper-header" id="mokinio-paskyra">Mokinio paskyra</div>
                     <p>
-						Mokiniai šiame puslapyje mato jiems mokytojo priskirtų užduočių sąrašą. 
-						Baigtos užduotys žymimos žaliu skrituliu (<span class="student-list-task-indicatior" style="background-color: rgb(64, 201, 169);"></span>),
-                    	o dar neatliktos – rožiniu (<span class="student-list-task-indicatior" style="background-color: rgb(213, 126, 126);"></span>).
-					</p>
+                        Savo paskyroje kiekvienas mokinys mato mokytojo skirtų užduočių sąrašą, kuris gali būti suskirstytas į keturias grupes: 
+                        <ul>
+                            <li><strong>Vėluojama</strong> – užduotys, kurių atlikimo terminas jau praėjo;</li>
+                            <li><strong>Šiandienos užduotys</strong> – užduotys, kurių terminas pasibaigia šiandien;</li>
+                            <li><strong>Neatliktos užduotys</strong> – užduotys, kurios nebuvo pradėtos, bet jų atlikimo terminas dar neatėjo;</li>
+                            <li><strong>Atliktos užduotys</strong> – naujausiai atliktų užduočių sąrašas su rezultatais.</li>
+                        </ul>
+                        Užduotys taip pat gali būti matomos savaitės kalendoriuje.
+                        Spalvotas skritulys šalia užduoties rodo, kokia jos būsena:
+                    </p>
+                    <ul>
+                        <li><span class="student-list-task-indicatior" style="background-color: rgba(31, 42, 48, 0.18);"></span> – užduotis dar neatlikta, jos terminas dar neatėjo;</li>
+                        <li><span class="student-list-task-indicatior" style="background: conic-gradient(#eed202 0 50%, rgba(31, 42, 48, 0.18) 50% 100%);"></span> – užduotis pradėta, bet nebaigta (jei ji vėluoja, pusė skritulio būna geltonas arba rožinis);</li>
+                        <li><span class="student-list-task-indicatior" style="background-color: #eed202;"></span> – užduotis vėluoja (terminas baigėsi šią savaitę);</li>
+                        <li><span class="student-list-task-indicatior" style="background-color: #d57e7e;"></span> – užduotis vėluoja ilgiau (terminas baigėsi praėjusią savaitę arba dar anksčiau);</li>
+                        <li><span class="student-list-task-indicatior" style="background-color: #40c9a9;"></span> – užduotis atlikta.</li>
+                    </ul>
 
-					<div class="info-box">
-                        <p id="uzduociu-atlikimas"><strong>Kaip atlikti užduotį?</strong> Pasirinkę dar neatliktą užduotį, mokiniai gali matyti jos nustatymus ir mygtuką „Atlikti užduotį“. Paspaudus šį mygtuką, užduotis bus pradėta automatiškai. Pabaigus užduotį, mokiniai gaus žinutę, patvirtinančią, kad užduoties rezultatai buvo sėkmingai išsaugoti*.</p>
-						<div class="ps-text">*Techninių problemų atveju, mokiniai bus informuoti, kad rezultatai nebuvo išsaugoti ir užduotį teks atlikti iš naujo.</div>
-					</div>
-                    
-                    <div class="section-header" id="rezultatu-analize-mokiniams">Rezultatų analizė</div>
-                    <p>
-						Paspaudus ant atliktų užduočių, mokiniai gali matyti savo rezultatus ir žemiau aprašytus rodiklius.
-					</p>
-
-					<dl class="definition-group">
-                        <dt>Atlikimo data ir trukmė</dt>
-                        <dd>
-							
-						</dd>
-
-                        <dt>Atliktų veiksmų / sudėliotų tekstų / įrašytų raidžių skaičius</dt>
-                        <dd>
-
-						</dd>
-
-                        <dt>Klaidų skaičius</dt>
-                        <dd>
-
-						</dd>
-
-                        <dt>Dažniausios klaidos</dt>
-                        <dd>
-							Iki 30 paskutiniųjų klaidų, padarytų priskirtoje užduotyje.
-							Rašybos klaidos gali būti grupuojamos pagal žodį arba žodžių kategoriją. Paspaudus ant žodžio, galima 
-							pamatyti iki 3 padarytų klaidų įrašant nežinomą raidę ir pažiūrėti, kokiama sakinyje žodis buvo. 
-						</dd>
-                    </dl>
-
-                    <p>Paspaudę „<strong>Paskutinės klaidos</strong>“ mygtuką (<svg class="in-text-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 -900 960 960" fill="currentColor"><path d="M280-320q17 0 28.5-11.5T320-360q0-17-11.5-28.5T280-400q-17 0-28.5 11.5T240-360q0 17 11.5 28.5T280-320Zm-40-120h80v-200h-80v200Zm160 80h320v-80H400v80Zm0-160h320v-80H400v80ZM160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm0 0v-480 480Z"></path></svg>) mokiniai gali matyti paskutiniųjų 30 klaidų suvestinę (iš matematikos ir lietuvių kalbos užduočių) nepriklausomai ar jos buvo padarytos atliekant priskirtas užduotis, ar praktikuojantis savarankiškai.</p>
-
-					<div class="image-div">
-                        <img src="../images/about-images/LT/user-instructions-2.png" class="user-instruction-image" alt="Mokinio užduočių sąrašas">
-                        <img src="../images/about-images/LT/user-instructions-3.png" class="user-instruction-image" alt="Užduoties peržiūra">
+                    <div class="info-box">
+                        <p id="uzduociu-atlikimas"><strong>Kaip atlikti užduotį?</strong> Paspaudę užduotį sąraše arba savaitės kalendoriuje, mokiniai gali matyti jos aprašymą,
+                        datą, kada ji buvo užduota, ir dieną, iki kurios ją reikia atlikti. Užduotis pradedama paspaudus mygtuką „<strong>Atlikti užduotį</strong>“.
+                        Mokytojo užduotų užduočių progresas išsaugomas kas kelias sekundes. Jei užduotis nutrūksta
+                        (pavyzdžiui, mokinys uždaro puslapį ar praranda prieigą prie interneto), kitą kartą ją galima tęsti nuo apytiksliai tos vietos, kurioje sustota:
+                        atsakymai, klaidos ir sugaištas laikas niekur nedingsta. Pradėtos užduoties aprašyme nurodyta, kada ji pradėta
+                        ir kiek klausimų jau atsakyta arba kiek liko laiko.</p>
                     </div>
-					
+
+                    <div class="section-header" id="rezultatu-analize-mokiniams">Rezultatų peržiūra</div>
+                    <p>
+                        Paspaudę ant atliktos užduoties užduočių sąraše, mokiniai gali matyti savo rezultatus: kada ir kiek laiko užduotis buvo atliekama, kiek atsakyta, kiek ir kokių klaidų padaryta.
+                        Mygtukas „<strong>Dažniausios klaidos</strong>“ parodo dažniausiai pasikartojančias matematikos ir rašybos klaidas iš visų per paskutines 4 savaites mokytojo skirtų ir savarankiškai atliktų užduočių.
+                    </p>
+
+                    <div class="image-div">
+                        <img src="../images/about-images/LT/user-instructions-60.png" class="user-instruction-image" alt="Mokinio užduočių sąrašas ir savaitės užduotys">
+                        <img src="../images/about-images/LT/user-instructions-61.png" class="user-instruction-image" alt="Pradėta mokinio užduotis">
+                    </div>
                 </div>
 
 				<div class="info-card">
                     <div class="section-upper-header" id="mokytojo-paskyra">Mokytojo paskyra</div>
-                    <p>Puslapyje „<strong>Užduotys</strong>“ mokytojas mato mokinių, susiejusių savo paskyras su mokytoju, sąrašą.</p>
-                    
-                    <div class="section-header" id="ziniu-lygis">Mokinio žinių lygis</div>
-                    <p class="knowledge-level">Paspaudęs ant mokinio vardo mokytojas suvestinės viršuje gali matyti nustatytą mokinio žinių lygį.
-                       Mokiniai registruodamiesi pasirenka savo klasę. Visgi, labai svarbu, kad mokytojas patikrintų, ar mokinys 
-                       pasirinko teisingai. Taip pat, mokytojai turėtų pakoreguoti žinių lygį mokiniams, besimokantiems pagal pritaikytą dalyko programą.
-                       <div class="warning-box knowledge-level">
-                            <strong>DĖMESIO!</strong> Nuo nustatyto žinių lygio priklauso mokinio taškų bei atlygio (SUDEDU monetų) skaičiavimas.
-                        </div>
-                    </p>
-
-                    <div class="section-header" id="mokinio-vardo-keitimas">Mokinio vardo keitimas</div>
-
                     <p>
-                        Mokytojas, paspaudęs mygtuką „<strong>Keisti vardą</strong>“ (<span class="edit-icon"><img src="../images/icons/icon-edit.svg"></span>) šalia mokinio vardo, 
-                        gali jį pakeisti. Vardo keitimas leidžia ištaisyti neteisingai įvestą vardą arba skirti unikalų vardą mokiniui, jei mokytojo sąraše 
-                        yra keli mokiniai tuo pačiu vardu, siekiant juos lengviau atskirti. Mokiniai, nepriklausomai nuo mokytojo, gali keisti savo vardą savarankiškai.
-                    </p>
-                    
-
-                    <div class="section-header" id="uzduociu-skyrimas">Užduočių skyrimas</div>
-                    <p>Paspaudęs mygtuką „<strong>Nauja užduotis</strong>“ (<svg class="in-text-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 -900 960 960" fill="currentColor"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q65 0 123 19t107 53l-58 59q-38-24-81-37.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160q32 0 62-6t58-17l60 61q-41 20-86 31t-94 11Zm280-80v-120H640v-80h120v-120h80v120h120v80H840v120h-80ZM424-296 254-466l56-56 114 114 400-401 56 56-456 457Z"></path></svg>), mokytojas, naudodamasis visais galimais SUDEDU užduočių nustatymais, gali priskirti naujas užduotis.</p>
+                        Puslapis „<span class="stressed-text">Užduotys</span>“ yra mokytojo pagrindinis valdymo skydas, skirtas redaguoti ir stebėti užduotis bei analizuoti mokinių
+                        pastangas ir pažangą. Puslapyje mokytojas gali matyti klasės mokinių sąrašą – kiekvieno mokinio suvestinę galima peržiūrėti paspaudus ant mokinio vardo. 
+                        Paspaudus <strong>„Klasės apžvalga“</strong> mygtuką (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" style="width: 1.1em; height: 1.1em; vertical-align: -0.2em; fill: #212529;" aria-hidden="true"><path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"/></svg>) šalia užrašo „Mokinių sąrašas“, rodoma bendra klasės suvestinė.
+                    </p>   
+                    <div class="section-header" id="mokytojo-suvestine">Suvestinė</div> 
+                        Mokytojo suvestinė turi kelias dalis:
                     
                     <ul>
-                        <li>
-							<strong>Grupės pavadinimas:</strong> kiekvienai užduočiai nurodykite grupės pavadinimą (pvz., dalyko pavadinimą, datą ir pan.). 
-							Atskirai skirtingiems mokiniams priskirtos užduotys (pvz., diferencijuotos užduotys pagal sudėtingumą, atlikimo būdą, laiką ir pan.), 
-							gali būti pavadintos identiškai. Užduočių grupės pavadinimas yra naudingas tuomet, kai norima peržiūrėti ar ištrinti tam tikras 
-							užduotis, nes pagal pavadinimą užduotys gali būti filtruojamos.
-						</li>
-                        <li><strong>Tekstų pastovumas:</strong> teksto suvokimo bei gramatikos užduotims, priskirtoms mokiniams tuo pačiu metu, bus naudojami tokie pat tekstai ir išimamos tos pačios raidės.</li>
-                        <li><strong>Pasirinktų tekstų skyrimas:</strong> norint pasirinkti specifinius tekstus teksto suvokimo užduotims, pasirinkę „LIETUVIŲ KALBĄ“ ir „TEKSTO SUVOKIMĄ“ pakeiskite „ATSITIKTINIAI TEKSTAI“ nustatymą į „PASIRINKTI TEKSTUS“ ir išsirinkite norimus tekstus tekstų naršyklėje.</li>
-                        <li><strong>Limitai:</strong> maksimalus užduočių skyrimo kiekis – 6 užduotys vienam mokiniui. Todėl, jei mokiniui jau priskirtos 6 užduotys, naują galėsite užduoti tik ištrynę vieną ar daugiau senųjų.</li>
-                        <li>
-                            <strong>Patogus naudojimas:</strong> užduočių skyrimas SUDEDU platformoje patogus visuose prietaisuose. Mažesniuose ekranuose 
-                            užduoties nustatymai gali būti rasti šoniniame meniu, kuris automatiškai atsidaro paspausus „<strong>Nauja užduotis</strong>“ 
-                            (<svg class="in-text-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 -900 960 960" fill="currentColor"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q65 0 123 19t107 53l-58 59q-38-24-81-37.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160q32 0 62-6t58-17l60 61q-41 20-86 31t-94 11Zm280-80v-120H640v-80h120v-120h80v120h120v80H840v120h-80ZM424-296 254-466l56-56 114 114 400-401 56 56-456 457Z"></path></svg>) mygtuką.
-                            Pasirinkus norimus nustatymus ir uždarius šoninį meniu, telieka pasirinkti mokinius iš mokinių sąrašo ir paspausti „Sukurti užduotį“ mygtuką.
-                        </li>
+                        <li><strong>Pačiame viršuje</strong> galima rasti bei koreguoti mokinio žinių lygį (plačiau <a href="#ziniu-lygis">čia</a>), taip pat peržiūrėti mokinio asmeninius arba klasės vidutinius taškus ir nuoseklumą (plačiau <a href="#mokytojo-statistika-rodikliai">čia</a>);</li>
+                        <li><strong>Sekcijoje „Užduotys“</strong> galima rasti du pasirinkimus:
+                            <ul>
+                                <li><strong>Užduotos:</strong> užduotų, bet dar bent vieno mokinio neatliktų užduočių sąrašas;</li>
+                                <li><strong>Atliktos:</strong> jau atliktų užduočių istorija. Šioje skiltyje galima rasti visų mokinių atliktų užduočių sąrašą. Užduotys gali būti filtruojamos pagal norimą laikotarpį, tipą (mokytojo užduotos arba savarankiškai atliktos užduotys, žaidimų rezultatai), arba užduotį (pavyzdžiui, tik matematikos užduotys, tik panašiai skambančių priebalsių rašyba).
+                                Paspaudus ant užduoties pavadinimo, galima peržiūrėti susijusią informaciją apie užduotį ir jos atlikimą. Jei ta pati užduotis (ar užduotis iš tos pačios grupės, plačiau <a href="#uzduociu-skyrimas">čia</a>) buvo atlikta kelių mokinių,
+                                atsidarius užduoties peržiūros langui, mokiniai, kurie atliko tą pačią užduotį, bus pažymėti (žymėjimas priklauso nuo to, ar užduotis jau atlikta, vėluojama ir panašiai – plačiau <a href="#mokiniu-zymes">čia</a>). Paspaudus ant tų mokinių vardų, galima greitai peržiūrėti jų rezultatus pasirinktoje užduotyje.
+
+                                </li>
+                            </ul>
+                        <li><strong>Sekcijoje „Rezultatai“</strong> galima rasti du pasirinkimus:
+                            <ul>
+                                <li><strong>Pažanga:</strong> mokinio arba klasės ilgalaikė statistika (plačiau <a href="#rezultatu-analize">čia</a>);</li>
+                                <li><strong>Analizė:</strong> automatizuotas rezultatų apibendrinimas ir klaidų analizė (plačiau <a href="#rezultatu-analize-mokytojams">čia</a>).</li>
+                            </ul>
+                    </ul>
+                    <p>Visai klasei ir kiekvienam mokiniui rodomos tos pačios skiltys, todėl mokinio rezultatus lengva palyginti su klasės.</p>
+
+                    <div class="image-div">
+                        <img src="../images/about-images/LT/user-instructions-62.png" class="user-instruction-image" alt="Klasės apžvalga: aktyvių užduočių sąrašas">
+                        <img src="../images/about-images/LT/user-instructions-63.png" class="user-instruction-image" alt="Mokinio suvestinė">
+                    </div>
+
+                    <div class="section-header" id="mokiniu-zymes">Spalviniai indikatoriai</div>
+                    <p>Spalvoti skrituliai yra naudojami nurodyti užduočių atlikimo būseną. Jei mokinys neatlieka užduočių laiku, indikatorius šalia jo vardo mokinių sąraše taip pat pakeičia spalvą.</p>
+                    <ul>
+                        <li><span class="student-list-task-indicatior" style="background-color: rgba(31, 42, 48, 0.18);"></span> <strong>pilkas</strong> – užduotis neatlikta, bet terminas dar nesibaigė;</li>
+                        <li><span class="student-list-task-indicatior" style="background-color: #40c9a9;"></span> <strong>žalias</strong> – užduotis atlikta;</li>
+                        <li><span class="student-list-task-indicatior" style="background-color: #eed202;"></span> <strong>geltonas</strong> – užduoties atlikimas vėluoja, jos terminas baigėsi šią savaitę;</li>
+                        <li><span class="student-list-task-indicatior" style="background-color: #d57e7e;"></span> <strong>rožinis</strong> – užduoties atlikimas vėluoja, jos terminas baigėsi praėjusią savaitę ar dar anksčiau.</li>
                     </ul>
 
-                    <div class="image-div">
-                        <img src="../images/about-images/LT/user-instructions-4.png" class="user-instruction-image shared-with-gif" alt="Mokinio užduočių sąrašas">
-                        <img src="../images/about-images/LT/user-instructions-5.gif" class="user-instruction-image gif" alt="Užduoties peržiūra">
+                    <div class="section-header" id="uzduociu-skyrimas">Užduočių skyrimas</div>
+                    <p>
+                        Užduotys skiriamos sekcijoje, kuri atsidaro paspaudus mygtuką „Nauja užduotis“ (<strong>+</strong>).
+                        Užduotis galima skirti dviem būdais:
+                       <ul>
+                        <li>„<strong>Specifinė užduotis</strong>“ – priskirama viena užduotis su jūsų pasirinktais nustatymais;</li>
+                        <li>„<strong>Kelios užduotys vienu metu</strong>“ – visos savaitės užduotys, kurias SUDEDU parenka pagal jūsų pasirinktus nustatymus, klasės išeitas temas ir mokinių rezultatus (plačiau <a href="#kelios-uzduotys">čia</a>).</li>
+                       </ul>
+                    </p>
+                    Kuriant užduotis, privaloma nurodyti atlikimo terminą (dieną, iki kurios užduotis turi būti atlikta).
+                    Taip pat galima nurodyti „<strong>užduočių grupės pavadinimą</strong>“, pavyzdžiui, „Daugybos lentelė 6–9“. Jei jo neįrašysite, užduotis bus pavadinta automatiškai, naudojant šį formatą:
+                            metų savaitė, savaitės diena, iki kurios reikia užduotį atlikti, ir užduoties tema („Sav. 43 – treč. – matematika“). Skirtingas užduotis (pavyzdžiui diferencijuojant pagal mokinių gebėjimus) galima pavadinti vienodai.
+                            Užduotys su vienodu pavadinimu ir atlikimo terminu yra grupuojamos ir jas galima lengvai ištrinti arba peržiūrėti vienu metu. 
+
+                    <p>
+                    Teksto suvokimo ir rašybos užduotims skirtoms vienu metu, visiems mokiniams parenkami tie patys tekstai ir sakiniai.
+                    </p>
+
+                    <div class="section-header" id="kelios-uzduotys">Kelios užduotys vienu metu</div>
+                    <p>
+                        Ši funkcija leidžia užduoti visos savaitės užduotis per kelias minutes. Galimi du būdai:
+                        <ul>
+                            <li><strong>SUDEDU algoritmas</strong>: užduotys parenkamos automatiškai remiantis pradinio ugdymo programa ir atsižvelgiant į mokinių žinių lygį, mokslo metų laikotarpį bei pastarųjų savaičių rezultatus.
+                            <div class="warning-box">
+                                Labai svarbu sekcijoje „Išeitos temos“ reguliariai atnaujinti jau išmoktų arba dabar mokomų temų sąrašą, nes jis naudojamas užduočių parinkimui.
+                            </div>
+                            </li>
+                            <li><strong>Mokytojo šablonas</strong>: užduotys parenkamos iš specifinio užduočių sąrašo, kurį sudaro pats mokytojas. Galima nustatyti, kurios užduotys turėtų pasitaikyti dažniau,
+                            ir ar užduočių dažnumas gali būti automatiškai koreguojamas pagal daromų klaidų skaičių.
+                            </li>
+                        </ul>
+                        SUDEDU jas parenka pagal mokinių žinių lygį, mokslo metų laikotarpį
+                        ir pastarųjų savaičių rezultatus, o jūs viską peržiūrite ir prireikus pakoreguojate.
+                    </p>
+                    Be užduočių skyrimo būdo, reikia nustatyti šiuos parametrus:
+                    <ul>
+                        <li>
+                            <strong>Savaitė</strong>: užduotys gali būti skirtos dabartinei arba sekančiai savaitei;
+                        </li>
+                        <li>
+                            <strong>Dalykai</strong>: galima skirti matematikos, rašybos ir teksto suvokimo užduotis bet kokia kombinacija;
+                        </li>
+                        <li>
+                            Reikia nustatyti <strong>užduočių per savaitę kiekį</strong>. Taip pat galima koreguoti, kiek visų užduočių skirti kiekvienam dalykui.
+                        </li>
+                        <li>
+                            <strong>Savaitės dienos</strong>: dienos, kuriomis galima paskirstyti užduotis;
+                        </li>
+                        <li>
+                            <strong>Užduočių individualizavimas</strong>: ar užduotys turėtų būti visiems vienodos, ar individualizuotos pagal daromas klaidas (net pasirinkus vienodų užduočių skyrimą, užduotys skiriamos skirtingai mokiniams su skirtingu žinių lygiu. Plačiau apie žinių lygį skaitykite <a href="#ziniu-lygis">čia</a>).
+                            Individualizuotos užduotys, skiriamos tai pačiai dienai, yra grupuojamos ir pavadinamos vienodai.
+                        </li>
+                        
+                    </ul>
+                    <p>
+                        <strong>„Savaitės užduotys“</strong> skiltyje matoma savaitės apžvalga su paskirstytomis užduotimis. Užduotis galima perkelti iš vienos dienos į kitą. Ant jų paspaudus, užduotis galima pakeisti alternatyviomis (jei jų yra), jas koreguoti arba ištrinti. 
+                        Kai savaitės planas sudarytas, telieka jį patvirtinti paspaudus mygtuką „<strong>Užduoti</strong>“.
+                    </p>
+
+                    <p>
+                        „<strong>Kelios užduotys vienu metu</strong>“ nustatymai yra išsaugomi, todėl kitą kartą nereikia jų vėl nustatinėti, jei pakeitimai nereikalingi.
+                    </p>
+
+                    <div class="info-box">
+                        <p><strong>Kaip SUDEDU algoritmas parenka užduotis?</strong> Algoritmas atsižvelgia į pastarųjų 8 savaičių rezultatus, bet didesnį dėmesį skiria paskutinėms 4 savaitėms.
+                        Tema laikoma sunkia, jei joje mokinys klysta dažniau nei spręsdamas kitas to paties dalyko užduotis – taip kiekvieno mokinio pažanga lyginama tik su jo paties rezultatais.</p>
+                        <ul>
+                            <li>Apie <strong>ketvirtadalis</strong> užduočių skiriama ankstesnėms temoms, kuriose mokinys klysta dažniausiai. Jei aptinkama, kad klaidų dažnis kartojamose užduotyse sumažėjo, laikoma, kad tema jau įsisavinta ir daugiau nebėra kartojama.</li>
+                            <li>Likusios užduotys skiriamos <strong>atitinkamo mokslo metų laikotarpio aktualiausioms temoms</strong>: pirmiausia užduodamos dar nespręstos užduotys (pradedant nuo lengviausių), o vėliau pakaitomis parenkamos tos, kuriose klystama dažniausiai, arba tos, kurios spręstos seniausiai.</li>
+                            <li>Jei tema buvo spręsta per pastarąsias 7 dienas arba vis dar neatlikta, kitą savaitę ji nebesikartoja (jei yra kitų tinkamų temų).</li>
+                            <li>Rašybos užduotyse apie trečdalis dėmesio skiriama taisyklėms, kuriose daroma daugiausia klaidų, o daugybos lentelėje – skaičiams, kurie kelia daugiausia sunkumų.</li>
+                        </ul>
                     </div>
 
-                    <div class="section-header" id="rezultatu-analize">Rezultatų analizė</div>
-                    <p>Mokinių rezultatai gali būti analizuojami trimis skirtingais lygiais (statistinių metrikų bei rodiklių aprašymus galite rasti  <a href="#mokytojo-statistika-rodikliai">čia</a>):</p>
-                    
-                    <ol>
-                        <li><strong>Individuali užduotis:</strong> paspaudus and specifinės mokinio užduoties galima matyti jos nustatymus, atlikimo datą, trukmę, atliktų veiksmų / sudėliotų tekstų / įrašytų raidžių bei klaidų skaičius, dažniausių klaidų suvestinę arba sudėliotų tekstų ID numerius, priklausomai nuo užduoties tipo.</li>
-                        <li><strong>Individualus mokinys:</strong> paspaudus ant mokinio, galima matyti mokinio ilgalaikės statistikos metrikas bei grafikus, taip pat atliktų užduočių vidurkius, įskaitant klaidų dažnį, paskutiniųjų klaidų suvestines ir sudėliotų tekstų sąrašus su klaidų skačiumi ir atlikimo data.</li>
-						<li>
-							<strong>Klasės apžvalga:</strong> paspaudus „<strong>Klasės apžvalga</strong>“ mygtuką (<svg class="in-text-svg" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -900 960 960" width="24px" fill="#1f1f1f"><path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"></path></svg>), galima matyti tokias pat įžvalgas, kaip rodomas indvidualiam mokiniui, bet apskaičiuotas bendrai iš visų klasės mokinių užduočių rezultatų. Klasės apžvalga gali būti apskaičiuota ir tik tam tikroms užduočių grupėms, tereikia „<strong>Užduočių grupės</strong>“ meniu pasirinkti norimas užduotis.
-						
-						</li>
-                    </ol>
-
                     <div class="image-div">
-                        <img src="../images/about-images/LT/user-instructions-6.png" class="user-instruction-image" alt="Mokinio užduočių sąrašas">
-                        <img src="../images/about-images/LT/user-instructions-7.png" class="user-instruction-image" alt="Užduoties peržiūra">
+                        <img src="../images/about-images/LT/user-instructions-69.png" class="user-instruction-image" alt="Savaitės planas">
+                        <img src="../images/about-images/LT/user-instructions-70.png" class="user-instruction-image" alt="Savaitės užduočių kalendorius">
                     </div>
-                    
+                    <div class="image-div">
+                        <img src="../images/about-images/LT/user-instructions-71.png" class="user-instruction-image" alt="Parinktos užduoties langas">
+                        <img src="../images/about-images/LT/user-instructions-72.png" class="user-instruction-image" alt="Išeitos temos">
+                    </div>
+
+                    <div class="warning-box knowledge-level">
+                        Šiuo metu saugomi visi atliktų užduočių įrašai nuo 2026 m. sausio 1 d. <strong>Ateityje įrašų saugojimo laikotarpis gali keistis</strong>.
+                    </div>
+
+                    <div class="section-header" id="rezultatu-analize">Pažanga</div>
+                    <p>
+                        Skiltyje „<strong>Pažanga</strong>“ rodomas mokinio (arba visos klasės) ilgalaikės statistikos grafikas – kiekvienos savaitės rodiklių vidurkių
+                        pokyčiai per pastarąsias 7 savaites. Norimą rodiklį galima pasirinkti virš grafiko. Grafikas atsiranda, kai surenkami bent 3 savaičių duomenys.
+                        Į jį įskaičiuojamos visos užduotys – ir mokytojo skirtos, ir atliktos savarankiškai.
+                    </p>
+
                     <dl id="mokytojo-statistika-rodikliai" class="definition-group">
                         <dt class="metric-local-heading" id="mokytojo-statistika-rodikliai">Rodiklių apibrėžimai</dt>
                         <dt id="taškai">Taškai</dt>
 						<dd>
 							Mokinių taškai apskaičiuojami pagal SUDEDU formulę, paremtą pradinio ugdymo programa. Mokiniai taškus gauna tik atlikdami
-							užduotis, atitinkančias arba viršijančias jų žinių lygį. Matematikos ir gramtikos užduotyse, taškai skiriami tik už iš pirmo karto
-							teisingai atsakytus klausimus. Teksto suvokimo užduotyse, galima gauti taškų ir padarius klaidų: 
+							užduotis, atitinkančias arba viršijančias jų žinių lygį. Matematikos ir gramatikos užduotyse taškai skiriami tik už iš pirmo karto
+							teisingai atsakytus klausimus. Teksto suvokimo užduotyse galima gauti taškų ir padarius klaidų: 
                             <ul>
                                 <li>Lengvas lygis:
                                     <ul>
-                                        <li>1 klaida - 50% taškų</li>
+                                        <li>1 klaida – 50% taškų</li>
                                     </ul>
                                 </li>
                                 <li>Vidutinis lygis:
                                     <ul>
-                                        <li>1 klaida - 50% taškų</li>
-                                        <li>2 klaidos - 25% taškų</li>
+                                        <li>1 klaida – 50% taškų</li>
+                                        <li>2 klaidos – 25% taškų</li>
                                     </ul>
                                 </li>
                                 <li>Sunkus lygis:
                                     <ul>
-                                        <li>1 klaida - 50% taškų</li>
-                                        <li>2 klaidos - 25% taškų</li>
-                                        <li>3 klaidos - 10% taškų</li>
+                                        <li>1 klaida – 50% taškų</li>
+                                        <li>2 klaidos – 25% taškų</li>
+                                        <li>3 klaidos – 10% taškų</li>
                                     </ul>
                                 </li>
                             </ul>
@@ -1628,17 +1754,17 @@
                         <dt>Dažniausios klaidos</dt>
                         <dd>
 							Matematikos ir rašybos klaidų suvestinės. Rašybos klaidos gali būti grupuojamos pagal žodį arba žodžių kategoriją. Paspaudus ant žodžio, galima 
-							pamatyti iki 3 padarytų klaidų įrašant nežinomą raidę ir pažiūrėti, kokiama sakinyje žodis buvo.
+							pamatyti iki 3 padarytų klaidų įrašant nežinomą raidę ir pažiūrėti, kokiame sakinyje žodis buvo.
 							<ul>
 								<li>
-									Pasirinkus <strong>specifinę užduotį</strong> - rodomos iki 30 paskutiniųjų per šią užduotį padarytų klaidų. Klaidų kiekis nurodomas kartais.
+									Pasirinkus <strong>specifinę užduotį</strong> – rodomos iki 30 paskutiniųjų per šią užduotį padarytų klaidų. Klaidų kiekis nurodomas kartais.
 								</li>
 								<li>
-									Pasirinkus <strong>individualų mokinį</strong> - rodomos klaidos iš visų mokinio atliktų užduočių. Klaidų kiekis nurodomas kartais.
+									Pasirinkus <strong>individualų mokinį</strong> – rodomos klaidos iš visų mokinio atliktų užduočių. Klaidų kiekis nurodomas kartais.
 								</li>
 								<li>
-									Pasirinkus <strong>klasės apžvalgą</strong> - rodomos klaidos iš visų klasės mokinių atliktų užduočių. Klaidų kiekis 
-									nurodomos procentais - kiek procentų visų padarytų klaidų buvo būtent ši klaida.
+									Pasirinkus <strong>klasės apžvalgą</strong> – rodomos klaidos iš visų klasės mokinių atliktų užduočių. Klaidų kiekis 
+									nurodomas procentais – kiek procentų visų padarytų klaidų buvo būtent ši klaida.
 								</li>
 							</ul>
 						</dd>
@@ -1649,14 +1775,14 @@
                             surandamas tekstų naršyklėje.
                             <ul>
 								<li>
-									Pasirinkus <strong>specifinę užduotį</strong> - rodomi visų per užduotį sudėliotų tekstų ID numeriai ir klaidų, padarytų dėliojant kiekvieną tekstą, skaičius.
+									Pasirinkus <strong>specifinę užduotį</strong> – rodomi visų per užduotį sudėliotų tekstų ID numeriai ir klaidų, padarytų dėliojant kiekvieną tekstą, skaičius.
 								</li>
 								<li>
-									Pasirinkus <strong>individualų mokinį</strong> - rodomi sudėliotų tekstų ID numeriai, padarytos klaidos ir atlikimo data iš visų atliktų mokinio užduočių. Atlikimo
-                                    data leidžia greitai pamatyti ar pakartotinai dėliodamas tą patį tekstą mokinys daro mažiau klaidų.
+									Pasirinkus <strong>individualų mokinį</strong> – rodomi sudėliotų tekstų ID numeriai, padarytos klaidos ir atlikimo data iš visų atliktų mokinio užduočių. Atlikimo
+                                    data leidžia greitai pamatyti, ar pakartotinai dėliodamas tą patį tekstą mokinys daro mažiau klaidų.
 								</li>
 								<li>
-									Pasirinkus <strong>klasės apžvalgą</strong> - rodomi sudėliotų tekstų ID numeriai iš visų mokinių atliktų užduočių ir vidutinis klaidų skaičius dėliojant kiekvieną tekstą.
+									Pasirinkus <strong>klasės apžvalgą</strong> – rodomi sudėliotų tekstų ID numeriai iš visų mokinių atliktų užduočių ir vidutinis klaidų skaičius dėliojant kiekvieną tekstą.
                                     Naudojantis šia informacija, galima rasti tekstus, kurie galbūt yra sudėtingesni didžiajai daliai mokinių ir kuriuos gali būti verta užduoti
                                     pakartotinai.
 								</li>
@@ -1668,7 +1794,7 @@
                     <dt class="metric-local-heading" id="rezultatyvumas">Rezultatyvumas</dt>
                     <p>
                         Ilgalaikės statistikos grafike pasirinkus mokymo temą (matematiką, teksto suvokimą ar gramatiką), galima pamatyti mokinio rezultatyvumo indeksą per paskutines 7 savaites. 
-                        Ilgalaikės statistikos grafikas atsiranda tik surinkus bent 3 savaičių duomenis. Visos užduotys - skirtos mokytojo ir atliktos savarankišai - prisideda
+                        Ilgalaikės statistikos grafikas atsiranda tik surinkus bent 3 savaičių duomenis. Visos užduotys – skirtos mokytojo ir atliktos savarankiškai – prisideda
                         prie ilgalaikės statistikos skaičiavimo.
                     </p>
                     <ul>
@@ -1699,7 +1825,7 @@
                         <br>
                         <br>
                         Rezultatyvumas gali kristi dėl kelių skirtingų priežasčių. Norint tiksliau identifikuoti priežastį, ilgalaikės 
-                        statistikos grafike taip pat galima peržiūrėti pokyčius metrikose, kurios naudojamos rezultayvumo indeksui apskaičiuoti.
+                        statistikos grafike taip pat galima peržiūrėti pokyčius metrikose, kurios naudojamos rezultatyvumo indeksui apskaičiuoti.
                         <ul>
                             <li>
                                 Pasirinkus „atsakyti klausimai“, galima matyti bendrą savaitinį atsakytų klausimų kiekį bei
@@ -1712,9 +1838,9 @@
                             <li>
                                 Pasirinkus „santykinis sudėtingumas“, galima matyti mokinio atliktų užduočių sudėtingumą, palyginus
                                 su visų mokinių atliktų užduočių vidutiniu sudėtingumu tą savaitę. Jei mokinys atlieka tokio pat sudėtingumo
-                                užduotis kaip dauguma klasės mokinių, šis rodiklis yra 1. Jei rodiklis yra virš 1 - mokinys vidutiniškai
-                                atlieka sudėtingesnes užduotis, jei žemiau - lengvesnes. Jei mokinys atlieka užduotis per lengvas jo
-                                klasei - santykinis sudėtingumas yra 0.
+                                užduotis kaip dauguma klasės mokinių, šis rodiklis yra 1. Jei rodiklis yra virš 1 – mokinys vidutiniškai
+                                atlieka sudėtingesnes užduotis, jei žemiau – lengvesnes. Jei mokinys atlieka užduotis per lengvas jo
+                                klasei – santykinis sudėtingumas yra 0.
                             </li>
                         </ul>
 
@@ -1727,85 +1853,79 @@
                     </div>
 
                     <div class="image-div">
-                        <img src="../images/about-images/LT/user-instructions-8.png" class="user-instruction-image" alt="Užduoties peržiūra">
+                        <img src="../images/about-images/LT/user-instructions-75.png" class="user-instruction-image" alt="Mokinio ilgalaikė statistika (Pažanga)">
                     </div>
 
-                    <div class="section-header" id="rezultatu-archyvas">Rezultatų archyvas</div>
+                    <div class="section-header" id="rezultatu-analize-mokytojams">Analizė</div>
                     <p>
-                        Paspaudę mygtuką „<strong>Rezultatų archyvas</strong>“ (<svg class="in-text-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="m105-399-65-47 200-320 120 140 160-260 120 180 135-214 65 47-198 314-119-179-152 247-121-141-145 233Zm475 159q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29ZM784-80 676-188q-21 14-45.5 21t-50.5 7q-75 0-127.5-52.5T400-340q0-75 52.5-127.5T580-520q75 0 127.5 52.5T760-340q0 26-7 50.5T732-244l108 108-56 56Z"></path></svg>)
-                        mokytojai gali labiau įsigilinti į mokinio atliktų užduočių rezultatus. Archyve yra išsaugomi ir mokytojo skirtų, ir mokinio savarankiškai
-                        pasirinktų užduočių rezultatai. Juos galima analizuoti dvejais būdais:
-                        <ul>
-                            <li id="uzduociu-istorija">
-                                Skiltyje „<strong>Užduočių istorija</strong>“ galima peržiūrėti mokinio atliktų užduočių įrašus. 
-                                Vienodų užduočių, atliktų tą pačią dieną, rezultatai yra sujungiami į vieną įrašą. Kiekvienas įrašas turi šią informaciją:
-                                <ol>
-                                    <li>užduoties data</li>
-                                    <li>užduoties aprašymas</li>
-                                    <li>teisingai iš pirmo karto atsakytų 
-                                        klausimų skaičius (teksto supratimo užduotyse šis skaičius gali būti trupmeninis, plačiau <a href="#taškai">čia</a>)
-                                    </li>
-                                    <li>klaidų kiekis</li>
-                                    <li>sprendimo greitis (atsakytų klausimų kiekis per minutę)</li>
-                                </ol>
-
-                                <div class="image-div">
-                                    <img src="../images/about-images/LT/user-instructions-25.png" class="user-instruction-image" alt="Užduoties peržiūra">
-                                </div>
-                            </li>
-                            
-                            <li id="mokiniu-progresas">
-                                Skiltyje „<strong>Mokinių progresas</strong>“ pateikiami grafikai, rodantys, kaip reguliariai 
-                                atliekant specifines užduotis keitėsi mokinių sprendimo greitis ir klaidų dažnis. Ši informacija 
-                                padeda stebėti mokymosi efektyvumą: dažniausiai, tobulėjant mokiniai užduotis atlieka vis greičiau
-                                ir darydami mažiau klaidų nei mokymosi pradžioje.
-                                <br><br>
-                                Grafikai yra sugeneruojami specifinėms užduotims – mokytojams
-                                tereikia pasirinkti užduoties nustatymus ir paspausti „Ieškoti“. Grafiko generavimui reikalingas minimalus įrašų skaičius – mokinys 
-                                pasirinktą užduotį turi būti atlikęs bent po kartą penkias skirtingas dienas. Grafike abiems rodikliams 
-                                (atsakymo greičiui ir klaidų dažniui) yra rodoma mokinio tendencija (ryški ištisinė linija) pritaikyta prie mokinio rezultatų 
-                                (blankesnė tokios pat spalvos kreivė) bei klasės tendencija (tokios pat spalvos punktyrinė kreivė).
-                                Paspaudus „<strong>Klasės apžvalga</strong>“ (<svg class="in-text-svg" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -900 960 960" width="24px" fill="#1f1f1f"><path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"></path></svg>)
-                                mygtuką galima atskirai peržiūrėti tik klasės tendenciją.
-                                <br><br>
-                                Ieškant įrašų, pasirinktų užduočių nustatymai yra išplečiami. Pavyzdžiui, pasirinkus „SUDĖTĮ IR ATIMTĮ“, 
-                                bus naudojami ne tik įrašai su šiuo nustatymu, bet ir tik sudėties ar tik atimties užduočių įrašai, atitinkantys 
-                                kitus nustatymus. Kitas pavyzdys: pasirinkus „DAUGYBOS LENTELĖ“ nuo 2 iki 4, grafiko generavimui bus naudojami 
-                                įrašai su visomis galimomis „nuo–iki“ kombinacijomis (nuo 2 iki 2, nuo 2 iki 3 ir t. t.). Todėl dažniausiai geriausia 
-                                pasirinkti kuo „platesnius“ nustatymus, nes tuomet grafiko generavimui naudojamas didesnis skaičius užduočių, o kuo 
-                                daugiau įrašų – tuo tikslesni rezultatai.
-
-
-                            <div class="image-div">
-                                <img src="../images/about-images/LT/user-instructions-26.png" class="user-instruction-image" alt="Užduoties peržiūra">
-                            </div>
-                            </li>
-                        </ul>
-
-                        <div class="warning-box knowledge-level">
-                            Šiu metu, rezultatų archyve saugomi visi įrašai nuo 2026 m. sausio 1 d. <strong>Ateityje įrašų saugojimo archyve laikotarpis gali keistis</strong>.
-                        </div>
-
+                        Skiltyje „<strong>Analizė</strong>“ apžvelgiami mokinio arba visos klasės pasirinkto laikotarpio rezultatai – atskirai matematikai, rašybai ir teksto supratimui.
                     </p>
+                    <ul>
+                        <li>
+                            <strong>Apibendrinimas</strong> (bandomoji versija) – trumpas aprašymas, kiek laiko ir kaip reguliariai mokinys mokėsi, kokias užduotis sprendė, kur klydo dažniausiai ir kokie pokyčiai buvo aptikti per šį laikotarpį. Galima pasirinkti detalumo lygį:
+                            <strong>mažas</strong> – viena trumpa pastraipa, tinkanti įrašui į TAMO dienyną arba žinutei tėvams;
+                            <strong>vidutinis</strong> – išsamesnis tekstas, su papildoma informacija mokytojams; 
+                            <strong>didelis</strong> – išsami apžvalga su skaičiais ir konkrečiais pavyzdžiais.
+                        </li>
+                        <li><strong>Klaidų kategorijos</strong> – pagal rūšį sugrupuotos klaidos (plačiau apie tai <a href="#klaidu-kategorijos">čia</a>).</li>
+                        <li><strong>Klaidų sąrašas</strong> – visos padarytos klaidos vienoje lentelėje. Rašybos klaidas galima grupuoti pagal žodį arba žodžių kategoriją.</li>
+                        <li><strong>Teksto supratimas</strong> – atliktų tekstų ID numeriai ir kiekviename iš jų padarytos klaidos. Spustelėjus numerį, tekstas atidaromas tekstų naršyklėje.</li>
+                    </ul>
+
+                    <div class="info-box" id="klaidu-kategorijos">
+                        <p><strong>Kaip rikiuojamos klaidų kategorijos?</strong> 
+                            Panašios klaidos sugrupuojamos į atitinkamas kategorijas, pavyzdžiui, „Trumpųjų ir ilgųjų balsių rašyba“. Klaidų kategorijos tuomet surikiuojamos atsižvelgiant ne tik į klaidų skaičių, bet ir kaip dažnai klaidos šioje kategorijoje <i>galėjo</i> būti padarytos ir kiek duomenų buvo tinkami analizei.
+                        </p>
+                    </div>
+
+                    <div class="image-div">
+                        <img src="../images/about-images/LT/user-instructions-76.png" class="user-instruction-image" alt="Analizė: apibendrinimas">
+                        <img src="../images/about-images/LT/user-instructions-77.png" class="user-instruction-image" alt="Rašybos klaidų kategorijos">
+                    </div>
+
+                    <p>Paspaudus „<strong>Nustatymai</strong>“, galima pasirinkti, kurias užduotis analizuoti:</p>
+                    <ul>
+                        <li><strong>Laikotarpis</strong> („Nuo“ – „Iki“);</li>
+                        <li><strong>Įrašų tipai</strong> – mokytojo skirtos užduotys, savarankiškas mokymasis (tik pasirinkus mokinį), žaidimų rezultatai;</li>
+                        <li><strong>Filtrai</strong> – galima pasirinkti tik užduotis su dominančiais nustatymais;</li>
+                        <li><strong>Pasirinkti specifines užduotis</strong> – tik tam tikros užduotys iš sąrašo pasirenkamos rankiniu būdu.</li>
+                    </ul>
+                    <p>Pasirinkus nustatymus, reikia paspausti „<strong>Atnaujinti analizę</strong>“.</p>
+
+                    <div class="image-div">
+                        <img src="../images/about-images/LT/user-instructions-79.png" class="user-instruction-image" alt="Analizės nustatymai">
+                    </div>
 
                     <div class="section-header" id="tekstu-narsykle">Tekstų naršyklė</div>
                     <p>
-                        Mokytojai tekstų naršyklę gali rasti „<strong>Užduotys</strong>“ puslapyje, pačioje dešinės sekcijos apačioje (arba šoniniame meniu prietaisuose su mažesniais ekranais).
-                        Tekstų naršyklė leidžia peržiūrėti visą tekstų, naudojamų teksto suvokimo užduotims, informaciją. Tekstus galima filtruoti pagal klasę, užduoties tipą (struktūros išdėstymas arba
-                        turinio komponavimas) ir sudėtingumą. Taip pat galima rasti tekstą pagal jo ID numerį arba ištrauką. Mokytojo suvestinėse paspaudus and teksto ID numerio, šis
-                        bus automatiškai rastas ir atidarytas tekstų naršyklėje.
+                        Tekstų naršyklėje galima peržiūrėti visus tekstus, naudojamus teksto suvokimo užduotyse. Tekstus galima atsirinkti pagal klasę, užduoties tipą
+                        (struktūros išdėstymas ar turinio komponavimas) ir sudėtingumą arba surasti pagal ID numerį ar ištrauką.
+                        Naršyklė atsidaro paspaudus teksto ID numerį (pavyzdžiui, užduoties rezultatuose) arba kuriant užduotį su pasirinktais tekstais.
+                        Užduoties rezultatų lange yra ir atskira naršyklė, kurioje rodomi tik tos užduoties tekstai.
                     </p>
 
                     <div class="image-div">
-                        <img src="../images/about-images/LT/user-instructions-9.png" class="user-instruction-image" alt="Užduoties peržiūra">
-                        <img src="../images/about-images/LT/user-instructions-10.png" class="user-instruction-image" alt="Užduoties peržiūra">
+                        <img src="../images/about-images/LT/user-instructions-80.png" class="user-instruction-image" alt="Tekstų naršyklė">
                     </div>
 
-                    <div class="section-header" id="uzduociu-trynimas">Užduočių trynimas</div>
-                    <p>Užduotis gali ištrinti tik mokytojas, paspaudęs mygtuką „<strong>Ištrinti užduotis</strong>“ (<svg class="in-text-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 -900 960 960" fill="currentColor"><path d="m376-300 104-104 104 104 56-56-104-104 104-104-56-56-104 104-104-104-56 56 104 104-104 104 56 56Zm-96 180q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520Zm-400 0v520-520Z"></path></svg>). Trinant galima pasirinkti individualias užduotis arba trinti visas iš karto. Taip pat galima išfiltruoti užduotis pagal grupės pavadinimą ir ištrinti visą grupę vienu metu.</p>
+                    <div class="section-header" id="ziniu-lygis">Mokinio žinių lygis</div>
+                    <p class="knowledge-level">Mokinio suvestinės viršuje, laukelyje „<strong>Žinių lygis</strong>“, nurodyta mokinio klasė – ją galima pakeisti.
+                       Registruodamiesi mokiniai klasę pasirenka patys, todėl verta patikrinti, ar jie nesuklydo. Mokiniams, kurie mokosi pagal pritaikytą programą,
+                       žinių lygį rekomenduojame pakoreguoti.
+                       <div class="warning-box knowledge-level">
+                            <strong>DĖMESIO!</strong> Nuo žinių lygio priklauso mokinio taškai, atlygis (SUDEDU monetos) ir automatiškai parenkamos užduotys.
+                        </div>
+                    </p>
+
+                    <div class="section-header" id="mokinio-vardo-keitimas">Mokinio vardo keitimas</div>
+                    <p>
+                        Paspaudę pieštuką (<span class="edit-icon"><img src="../images/icons/icon-edit.svg"></span>) šalia mokinio vardo, galite vardą pakeisti –
+                        pavyzdžiui, ištaisyti klaidą arba atskirti kelis to paties vardo mokinius. Šalia vardo nurodytas ir mokinio ID numeris bei el. pašto adresas.
+                        Mokiniai savo vardą gali pasikeisti ir patys.
+                    </p>
 
                     <div class="section-header" id="mokiniu-salinimas">Mokinių šalinimas</div>
-                    <p>Iš mokytojo sąrašo mokiniai gali būti pašalinti paspaudus „<strong>Šalinti mokinius</strong>“ (<svg class="in-text-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 -860 960 960" fill="currentColor"><path d="M819-28 680-167v7H40v-112q0-34 17.5-62.5T104-378q62-31 126-46.5T360-440q12 0 24.5.5T409-438l-42-42h-7q-66 0-113-47t-47-113v-7L27-820l57-57L876-85l-57 57ZM666-434q51 6 96 20.5t84 35.5q36 20 55 44.5t19 53.5v120h-5L755-320q-9-33-31.5-62.5T666-434Zm-306 74q-56 0-111 13.5T140-306q-9 5-14.5 14t-5.5 20v32h480v-7l-87-87q-38-13-76.5-19.5T360-360Zm202-153q19-28 28.5-60t9.5-67q0-42-14.5-81T544-792q14-5 28-6.5t28-1.5q66 0 113 47t47 113q0 66-49.5 113T595-480l-33-33Zm-58-58-64-64v-5q0-33-23.5-56.5T360-720h-5l-64-64q16-8 33-12t36-4q66 0 113 47t47 113q0 19-4 36t-12 33ZM365-240Zm33-438Z"></path></svg>).</p>
+                    <p>Norėdami pašalinti mokinį iš klasės, jo suvestinėje paspauskite „<strong>Šalinti mokinį</strong>“ (viršutiniame dešiniajame kampe).</p>
                 </div>
 				</div>
 
@@ -1813,25 +1933,39 @@
                     <div class="text-subtitle" id="klase">Klasė</div>
                     <p>
                         Puslapis „<span class="stressed-text">Klasė</span>“ yra virtuali erdvė visiems klasės nariams ir bendriems 
-                        užsiėmimams. Puslapyje rasite 3 skiltis:
+                        užsiėmimams. Puslapyje rasite 5 skiltis:
                     </p>
                     
                     <div id="nariai" class="section-header">Nariai</div>
                     <p>
-                        Šioje skiltyje galima matyti visus klasės narius įskaitant mokytoją ir mokinius. Tris aukščiausias vietas pagal 8 paskutinių savaičių surinktų
-                        taškų vidurkį užimantys mokiniai rodomomi sąrašo pradžioje. Kiekvienas mokinys taip pat mato savo taškų vidurkį
-                        nepriklausomai, kurią vietą ji(s) užima. Visų likusių mokinių taškai yra nematomi, ir mokiniai sąraše rodomi atsitiktine tvarka.
+                        Šioje skiltyje galima matyti visus klasės narius, įskaitant mokytoją ir mokinius. Tris aukščiausias vietas pagal 8 paskutinių savaičių surinktų
+                        taškų vidurkį užimantys mokiniai rodomi sąrašo pradžioje. Kiekvienas mokinys taip pat mato savo taškų vidurkį,
+                        nesvarbu, kurią vietą užima. Visų likusių mokinių taškai yra nematomi, ir mokiniai sąraše rodomi atsitiktine tvarka.
+                        Mokytojas prie kiekvieno mokinio mato ir jo taškus, ir turimų SUDEDU monetų skaičių.
                     </p>
 
                     <div id="mokytojo-mokinio-susiejimas" class="info-box">
-                        <p ><strong>Kaip pridėti mokytoją?</strong> Pačiame puslapio „<span class="stressed-text">Klasė</span>“ višuje yra laukelis, į kurį reikia įrašyti mokytojo ID numerį arba elektroninį paštą, kurį mokytojas naudojo 
+                        <p ><strong>Kaip pridėti mokytoją?</strong> Pačiame puslapio „<span class="stressed-text">Klasė</span>“ viršuje yra laukelis, į kurį reikia įrašyti mokytojo ID numerį arba elektroninį paštą, kurį mokytojas naudojo 
                         sukurdamas savo SUDEDU paskyrą. Tuomet telieka paspausti „Pridėti mokytoją“ mygtuką. Toje pačioje vietoje galite rasti „Keisti mokytoją“ mygtuką,
                         jei per klaidą susiejote savo paskyrą su ne tuo mokytoju.
                     </div>
 
                     <div class="image-div">
-                        <img src="../images/about-images/LT/user-instructions-11.png" class="user-instruction-image" alt="Praktikos skiltis">
-                        <img src="../images/about-images/LT/user-instructions-12.png" class="user-instruction-image" alt="Praktikos skiltis">
+                        <img src="../images/about-images/LT/user-instructions-81.png" class="user-instruction-image" alt="Mokytojo pridėjimas">
+                        <img src="../images/about-images/LT/user-instructions-82.png" class="user-instruction-image" alt="Klasės nariai">
+                    </div>
+
+                    <div id="mokiniu-kvietimas" class="info-box">
+                        <p><strong>Kaip pakviesti mokinius?</strong> Mokytojai skiltyje „Nariai“ gali pakviesti mokinius į savo klasę paspaudę „<strong>Kviesti mokinius</strong>“ mygtuką.
+                        Atsiradusiame lauke reikia įrašyti arba įklijuoti (pvz., iš „Excel“ lentelės) mokinių el. pašto adresus arba ID numerius, atskirtus tarpais, kableliais ar naujomis eilutėmis.
+                        Vienu kartu galima pakviesti iki 30 mokinių. Paspaudus „<strong>Kviesti</strong>“, rodoma, kurie mokiniai pakviesti,
+                        kurie jau yra klasėje ar buvo pakviesti anksčiau ir kurių el. pašto adresai neatpažinti.</p>
+                        <p>Pakviestas mokinys savo skiltyje „Nariai“ mato kvietimą (pvz., „Mok. Mokytojas A kviečia tave prisijungti prie savo klasės“)
+                        ir gali jį <strong>priimti</strong> arba <strong>atmesti</strong>.</p>
+                    </div>
+
+                    <div class="image-div">
+                        <img src="../images/about-images/LT/user-instructions-83.png" class="user-instruction-image" alt="Mokinių kvietimas į klasę">
                     </div>
 					
                     
@@ -1847,20 +1981,20 @@
                                 <ul>
                                     <li>Lengvas lygis:
                                         <ul>
-                                            <li>1 klaida - 50% taškų</li>
+                                            <li>1 klaida – 50% taškų</li>
                                         </ul>
                                     </li>
                                     <li>Vidutinis lygis:
                                         <ul>
-                                            <li>1 klaida - 50% taškų</li>
-                                            <li>2 klaidos - 25% taškų</li>
+                                            <li>1 klaida – 50% taškų</li>
+                                            <li>2 klaidos – 25% taškų</li>
                                         </ul>
                                     </li>
                                     <li>Sunkus lygis:
                                         <ul>
-                                            <li>1 klaida - 50% taškų</li>
-                                            <li>2 klaidos - 25% taškų</li>
-                                            <li>3 klaidos - 10% taškų</li>
+                                            <li>1 klaida – 50% taškų</li>
+                                            <li>2 klaidos – 25% taškų</li>
+                                            <li>3 klaidos – 10% taškų</li>
                                         </ul>
                                     </li>
                                 </ul>
@@ -1872,21 +2006,194 @@
                     </p>
 
                     <div class="image-div">
-                        <img src="../images/about-images/LT/user-instructions-13.png" class="user-instruction-image" alt="Praktikos skiltis">
+                        <img src="../images/about-images/LT/user-instructions-84.png" class="user-instruction-image" alt="Klasės savaitės iššūkis">
                     </div>
                     
+                    <div id="zaidimai" class="section-header">Žaidimai</div>
+                    <p>
+                        Šioje skiltyje galima rasti SUDEDU edukacinių žaidimų sąrašą. Kai kuriuos žaidimus galima žaisti individualiai, o kitus – su visa klase. 
+                        Tam tikrus žaidimus gali vesti tik mokytojas ir tik didesnio ekrano įrenginiuose (pavyzdžiui, išmaniojoje lentoje).
+                        
+                        
+                        „<strong>Aktyvūs žaidimai</strong>“ skiltyje rodomi šiuo metu klasėje sukurti žaidimai. Prie žaidimo galima
+                        prisijungti spustelėjus „<strong>Prisijungti</strong>“ arba įvedus 4 skaitmenų žaidimo kodą laukelyje „Prisijungti su numeriu“.
+                        Žemiau pateikiami visi žaidimai, kuriuos galima sukurti paspaudus mygtuką „<strong>Kurti</strong>“.
+                    </p>
+                    <ul>
+                        <li>
+                            <strong>Laukiamasis:</strong> sukūrus žaidimą, atidaromas laukiamasis su priskirtu prisijungimo kodu. Prisijungę mokiniai turi paspausti
+                            „<strong>Pasiruošęs!</strong>“, o žaidimo vedėjas, kai visi pasirengę, turi pradėti žaidimą paspaudęs „<strong>Pradėti žaidimą</strong>“.
+                            Vedėjas gali pašalinti mokinį iš laukiamojo; pašalintas mokinys prie šio žaidimo vėl prisijungti nebegalės.
+                        </li>
+                        <li>
+                            <strong>Matomumas:</strong> kuriant žaidimą galima pasirinkti, ar laukiamasis bus <strong>viešas</strong> (matomas klasės
+                            žaidimų sąraše), ar <strong>privatus</strong> (prisijungiama tik įvedus žaidimo kodą). Sukūrus laukiamąjį, jo matomumo pakeisti nebegalima.
+                        </li>
+                        <li>
+                            <strong>Grįžimas į žaidimą:</strong> nutrūkus ryšiui ar netyčia uždarius puslapį, žaidėjas gali grįžti į vykstantį
+                            žaidimą per „Aktyvių žaidimų“ sąrašą paspaudęs „Grįžti į žaidimą“.
+                        </li>
+                    </ul>
+
+                    <div class="image-div">
+                        <img src="../images/about-images/LT/user-instructions-40.png" class="user-instruction-image" alt="Žaidimų skiltis">
+                    </div>
+
+                    <p id="tvirtoves-gynyba"><strong>TVIRTOVĖS GYNYBA</strong></p>
+                    <p>
+                        Visa klasė kartu gina tvirtovę spręsdama matematikos užduotis. Žaidimą kuria ir veda mokytojas: žaidimo laukas rodomas
+                        mokytojo ekrane (patogu jį rodyti projektoriumi ar išmaniojoje lentoje), todėl žaidimą vesti galima tik kompiuteryje ar kitame
+                        didesnio ekrano įrenginyje. Mokiniai prisijungia savo įrenginiuose ir sprendžia įprastas SUDEDU užduotis.
+                    </p>
+                    <ul>
+                        <li><strong>Nustatymai:</strong> užduotys (tokie pat matematikos nustatymai, kaip „Praktikos“ puslapyje), sunkumas
+                            (lengvas, vidutinis, sunkus, labai sunkus), režimas („Atlaikyti nustatytą laiką“ – nuo 1 iki 60 min., arba
+                            „Atsilaikyti kuo ilgiau“ – vis stipresnės priešų bangos) ir laukiamojo matomumas.</li>
+                        <li><strong>Žaidimo eiga:</strong> kiekvienas mokinys turi savo bokštą (pažymėtą mokinio vardu). Kiekvienas teisingas atsakymas –
+                            bokšto šūvis į priešus, keliaujančius link tvirtovės. Už 10 teisingų atsakymų iš eilės mokinio bokštas patobulinamas
+                            (šaudo toliau, stipriau), o padarius klaidą šis skaičiavimas pradedamas iš naujo.</li>
+                        <li><strong>Sunkumas prisitaiko prie klasės:</strong> priešų stiprumas automatiškai derinamas prie to, kaip greitai ir tiksliai
+                            atsako klasė, todėl žaidimas įdomus ir mažesnei, ir didesnei klasei. Pasirinktas sunkumas nurodo, kiek sunku bus atsilaikyti.</li>
+                        <li><strong>Pabaiga:</strong> žaidimas laimimas, jei tvirtovė atlaiko nustatytą laiką, ir pralaimimas, jei priešai sugriauna
+                            tvirtovės vartus. Mokinių įrenginiuose rodomas tas pats likęs (arba jau sužaistas) laikas.</li>
+                        <li><strong>Rezultatai:</strong> žaidimui pasibaigus, kiekvieno mokinio atsakymai išsaugomi jo atliktų užduočių istorijoje
+                            (puslapyje „Užduotys“ – kategorija „Žaidimų rezultatai“), todėl juos galima peržiūrėti ir analizuoti kaip kitas užduotis.</li>
+                    </ul>
+
+                    <div class="image-div">
+                        <img src="../images/about-images/LT/user-instructions-43.png" class="user-instruction-image" alt="Tvirtovės gynybos laukiamasis">
+                        <img src="../images/about-images/LT/user-instructions-45.png" class="user-instruction-image" alt="Tvirtovės gynybos žaidimo laukas">
+                    </div>
+
+
+                    <p id="vaiduoklis"><strong>VAIDUOKLIS</strong></p>
+                    <p>
+                        Lietuvių kalbos žodžių žaidimas, lavinantis žodyną ir rašybą. Žaidėjai paeiliui prideda po vieną raidę: iš raidžių visada turi būti
+                        galima sudaryti ilgesnį tikrą žodį. Manantis, kad taip prasidedančio žodžio nėra ar ilgesnio nebebus, žaidėjas gali
+                        „<strong>Mesti iššūkį</strong>“ – tuomet žaidėjas, kuriam mestas iššūkis, turi pateikti ilgesnį žodį, prasidedantį tomis raidėmis.
+                        Kas suklysta, praranda gyvybę, o netekęs visų gyvybių žaidėjas tampa vaiduokliu 👻. Laimi paskutinis likęs žaidėjas.
+                        Visas taisykles galima rasti paspaudus klaustuko mygtuką (<strong>?</strong>) prie žaidimo.
+                    </p>
+                    <ul>
+                        <li><strong>Žodžių tikrinimas:</strong> pateikti žodžiai tikrinami SUDEDU žodyne. Vardai, pavadinimai ir sutrumpintos žodžių
+                            formos neleidžiami – už juos prarandama gyvybė.</li>
+                        <li><strong>Botai:</strong> žaidime gali dalyvauti kompiuterio valdomi varžovai (botai Kasparas, Deduokliukas, Baubas ir Slogutis;
+                            iki 4 vienoje grupėje). Botų žodynas (ribotas, vidutinis, platus arba turtingas) ir lygis (lengvas, vidutinis, sunkus) nustatomi
+                            „Botų nustatymuose“. Botų žodžiai parenkami pagal klasės žinių lygį (1–2 arba 3–4 klasių dažniausius žodžius).</li>
+                        <li><strong>Kiti nustatymai:</strong> žaidėjo gyvybės (2, 3 arba 5) ir maksimalus ėjimo laikas (neribotas, 15 s, 30 s, 45 s arba 1 min.).
+                            Nespėjus per nustatytą laiką, prarandama gyvybė.</li>
+                    </ul>
+
+                    <p><strong>Mokiniai</strong> „Vaiduoklį“ gali žaisti dviem būdais:</p>
+                    <ul>
+                        <li><strong>Žaisti prieš kompiuterį:</strong> mokinys žaidžia vienas su 1–4 botais.</li>
+                        <li><strong>Žaisti su klasės draugais:</strong> mokinys sukuria laukiamąjį ir pasirenka didžiausią žaidėjų skaičių (2–6, įskaitant botus).
+                            Laukiamajame vedėjas gali keisti nustatymus, pridėti botų (mygtukas „+ Botas“) ir pašalinti žaidėjus. Kai visi pasiruošę – pradedama.
+                            Jei žaidimą sukūręs mokinys žaidimo metu išeina, žaidimas nesibaigia – jį toliau žaidžia kiti žaidėjai.</li>
+                    </ul>
+
+                    <div class="image-div">
+                        <img src="../images/about-images/LT/user-instructions-47.png" class="user-instruction-image" alt="Vaiduoklio žaidimo būdai mokiniui">
+                        <img src="../images/about-images/LT/user-instructions-50.png" class="user-instruction-image" alt="Vaiduoklio žaidimas">
+                    </div>
+
+                    <p><strong>Mokytojai</strong> „Vaiduoklį“ gali vesti dviem būdais:</p>
+                    <ul>
+                        <li>
+                            <strong>Individualiuose prietaisuose:</strong> mokiniai žaidžia grupėmis savo įrenginiuose. Kuriant žaidimą pasirenkamas didžiausias
+                            žaidėjų skaičius grupėje (2–6, įskaitant botus) – kai grupės užsipildo, prisijungiantiems mokiniams automatiškai sukuriama nauja grupė.
+                            Laukiamajame mokytojas gali tempti mokinius ar botus iš vienos grupės į kitą (arba paspaudęs vardą pasirinkti grupę ar pašalinti žaidėją),
+                            pridėti grupių ir botų; mokiniai patys gali pereiti į kitą grupę, kurioje yra vietos. Grupė, kurioje yra tik vienas žaidėjas, pradėti negali.
+                        </li>
+                        <li>
+                            Žaidimo metu mokytojas stebi visas grupes viename ekrane: matomas kiekvienos grupės žodis, žaidėjai, jų gyvybės, ėjimo laikas ir
+                            kas vyksta (pvz., mestas iššūkis). Jei grupių daug, jos išdėstomos keliuose puslapiuose. Mokinius galima perkelti į kitą grupę arba
+                            pašalinti iš žaidimo ir žaidimo metu. Kai visos grupės baigia žaisti, parodomi kiekvienos grupės rezultatai
+                            ir žaidimą galima baigti.
+                        </li>
+                        <li>
+                            <strong>Išmaniojoje lentoje:</strong> visas žaidimas vyksta viename ekrane (pvz., išmaniojoje lentoje). Mokytojas pasirenka žaidžiančius
+                            mokinius (ir, jei nori, iki 4 botų), o mokiniai paeiliui prieina prie lentos ir prideda raides. Ekrane visada parodoma, kieno eilė.
+                        </li>
+                    </ul>
+
+                    <div class="image-div">
+                        <img src="../images/about-images/LT/user-instructions-48.png" class="user-instruction-image" alt="Vaiduoklio laukiamasis su grupėmis">
+                        <img src="../images/about-images/LT/user-instructions-51.png" class="user-instruction-image" alt="Mokytojo grupių apžvalga">
+                    </div>
+                    <div class="image-div">
+                        <img src="../images/about-images/LT/user-instructions-46.png" class="user-instruction-image" alt="Vaiduoklio žaidimo būdai mokytojui">
+                        <img src="../images/about-images/LT/user-instructions-52.png" class="user-instruction-image" alt="Vaiduoklis išmaniojoje lentoje">
+                    </div>
+
+                    <div id="aukcionas" class="section-header">Aukcionas</div>
+                    <p>
+                        Aukcionas – tai puikus būdas perkelti virtualų SUDEDU pasaulį į realybę. Aukcione mokytojas gali siūlyti klasei įvairių prizų ar privilegijų, kurias mokiniai gali įsigyti už uždirbtas SUDEDU monetas (tas pačias, kurias naudoja „<span class="stressed-text">Augintiniai</span>“ puslapyje,
+                        plačiau <a href="#sudedu-monetos">čia</a>).
+                        
+                        Keli aukciono pavyzdžiai:</p>
+                    <ul>
+                        <li><strong>Sėdėjimas su draugu</strong> – vieną pamoką, dieną ar net visą savaitę sėdėti šalia pasirinkto draugo;</li>
+                        <li><strong>Dienos DJ</strong> – per pertraukas arba dailės ir technologijų pamokas parinkti foninę muziką (dainas patvirtina mokytojas);</li>
+                        <li><strong>Diena be namų darbų</strong> – vieną pasirinktą dieną nedaryti namų darbų.</li>
+                    </ul>
+                    <p> Pardavimai gali būti vykdomi dviem būdais:
+                    </p>
+                    <ul>
+                        <li><strong>Nustatyta kaina:</strong> prizą/privilegiją gali nusipirkti kiekvienas mokinys, turintis pakankamai monetų, kol daiktų nepritrūksta (kiekis nuo 1 iki 100).</li>
+                        <li>
+                            <strong>Aukcionas:</strong> mokiniai stato monetas iki pasirinktos dienos pabaigos (ne vėliau kaip po 9 mėnesių). Nurodoma pradinė kaina ir
+                            kiek bus laimėtojų – laimi didžiausi statymai, o kiekvienas laimėtojas moka savo pastatytą sumą. Statant, monetos iškart paimamos
+                            ir automatiškai grąžinamos, jei kitas mokinys pastato daugiau. Laimėtojai paaiškėja kitą dieną po aukciono pabaigos.
+                        </li>
+                    </ul>
+
+                    <p><strong>Mokytojas</strong> aukciono skiltyje mato keturias dalis:</p>
+                    <ul>
+                        <li><strong>Pasiūlymai:</strong> daiktų kūrimas („+ Naujas daiktas“: pavadinimas, aprašymas, pardavimo būdas, kaina ir kiekis),
+                            redagavimas ir trynimas. Aukcionuose matomi visi statymai. Kai aukcione jau yra statymų, galima keisti tik pavadinimą,
+                            aprašymą ir pabaigos datą. Ištrynus aukcioną, statę mokiniai atgauna savo monetas.</li>
+                        <li><strong>Mokinių daiktai:</strong> kuris mokinys kokius daiktus turi ir iki kada jie galioja.</li>
+                        <li><strong>Nustatymai:</strong> klasės taisyklės – kiek daiktų vienas mokinys gali turėti vienu metu (įskaitant laimimus aukcionus),
+                            keliuose aukcionuose vienu metu gali statyti ir kiek daiktų gali įsigyti per pasirinktą laikotarpį (savaitę, 2 savaites, 1–3 mėnesius, pusmetį ar mokslo metus).</li>
+                        <li><strong>Žinutės:</strong> mokinių prašymai panaudoti įsigytus daiktus (mokytojas patvirtina, kad daiktas panaudotas, ir įrašas ištrinamas) bei pranešimai apie pasibaigusius aukcionus.</li>
+                    </ul>
+
+                    <div class="image-div">
+                        <img src="../images/about-images/LT/user-instructions-85.png" class="user-instruction-image" alt="Aukciono pasiūlymai (mokytojas)">
+                        <img src="../images/about-images/LT/user-instructions-86.png" class="user-instruction-image" alt="Naujas aukciono daiktas">
+                    </div>
+                    <div class="image-div">
+                        <img src="../images/about-images/LT/user-instructions-87.png" class="user-instruction-image" alt="Aukciono nustatymai">
+                        <img src="../images/about-images/LT/user-instructions-88.png" class="user-instruction-image" alt="Aukciono žinutės (mokytojas)">
+                    </div>
+
+                    <p><strong>Mokiniai</strong> skilties viršuje mato, kiek turi SUDEDU monetų, ir gali:</p>
+                    <ul>
+                        <li><strong>Pasiūlymai:</strong> pirkti daiktus („Pirkti“) arba statyti aukcionuose („Statyti“; nurodomas mažiausias galimas statymas).
+                            Jei pasiektas klasės apribojimas, tai nurodoma prie daiktų.</li>
+                        <li><strong>Mano daiktai:</strong> peržiūrėti įsigytus daiktus ir juos panaudoti („Panaudoti“) – tuomet mokytojas gauna prašymą patvirtinti.
+                            Įsigyti daiktai galioja 12 mėnesių.</li>
+                        <li><strong>Žinutės:</strong> pranešimai, pvz., kai kitas mokinys pastato daugiau (monetos grąžinamos), laimimas aukcionas ar mokytojas patvirtina, kad daiktas panaudotas.</li>
+                    </ul>
+
+                    <div class="image-div">
+                        <img src="../images/about-images/LT/user-instructions-89.png" class="user-instruction-image" alt="Aukciono pasiūlymai (mokinys)">
+                        <img src="../images/about-images/LT/user-instructions-90.png" class="user-instruction-image" alt="Mokinio daiktai">
+                    </div>
+
                     <div id="profilis" class="section-header">Profilis</div>
                     <p>
                         Šioje skiltyje mokiniai ir mokytojai gali rasti savo paskyros ID numerį bei pakeisti vartotojo vardą. 
                         Mokiniai gali pakeisti savo avataro – matomo mokytojui ir klasės draugams – išvaizdą, taip pat peržiūrėti 
-                        savo klasę. Jei klasė nurodyta neteisingai, ją gali pakeisti mokytojas (mokiniams besimokantiems pagal pritaikytą 
+                        savo klasę. Jei klasė nurodyta neteisingai, ją gali pakeisti mokytojas (mokiniams, besimokantiems pagal pritaikytą 
                         programą, nustatyta klasė gali neatitikti jų dabartinės klasės). Mokiniai, kurių paskyros nėra susietos 
                         su mokytoju, gali pakeisti savo klasę atsiuntę mums prašymą 
                         el. paštu <a href="mailto:sudedult@gmail.com">sudedult@gmail.com</a>.
                     </p>
                     
                     <div class="image-div">
-                        <img src="../images/about-images/LT/user-instructions-14.png" class="user-instruction-image" alt="Praktikos skiltis">
+                        <img src="../images/about-images/LT/user-instructions-91.png" class="user-instruction-image" alt="Profilis">
                     </div>
                 </div>
 
@@ -1916,7 +2223,7 @@
                             <ul>
                                 <li>Monetos uždirbamos atliekant matematikos arba lietuvių kalbos užduotis (nesvarbu, ar jos buvo užduotos
                                     mokytojo, ar pasirinktos savarankiškai).</li>
-                                <li>Prie užduoties atlikimo mygtuko yra nuorodomas galimas uždarbis. Kai nustatomas klausimų kiekis,
+                                <li>Prie užduoties atlikimo mygtuko yra nurodomas galimas uždarbis. Kai nustatomas klausimų kiekis,
                                     uždarbis rodomas kaip maksimali potencialaus uždarbio suma (pvz., 
                                     <span class="potetnital-earnings-coin-icon-and-amount-holder">
                                     <span class="earnings-iki-holder custom-earnings-iki-holder">IKI</span>
@@ -1925,7 +2232,7 @@
                                     </span>
                                     <span class="coin-amount">6</span>
                                     </span>
-                                    - atsakius visus klausimus teisingai iš pirmo karto galima uždirbti 6 SUDEDU monetas). Užduotims, kurios atliekamos nustačius laiką
+                                    – atsakius visus klausimus teisingai iš pirmo karto galima uždirbti 6 SUDEDU monetas). Užduotims, kurios atliekamos nustačius laiką
                                     arba visoms gramatikos užduotims, šalia atlikimo mygtuko yra nurodomas uždarbis per kiekvieną teisingą atsakymą (pvz.,
                                     <span class="potetnital-earnings-coin-icon-and-amount-holder">
                                     <span class="earnings-iki-holder custom-earnings-iki-holder">x</span>
@@ -1934,31 +2241,31 @@
                                     </span>
                                     <span class="coin-amount">0.71</span>
                                     </span>
-                                    - už kiekvieną iš pirmo karto teisingai atsakytą klausimą bus uždirbtos 0.71 SUDEDU monetos). 
-                                    Matematikos ir gramatikos užduotys, monetos uždirbamos tik už iš pirmo karto teisingai atsakytus klausimus. 
+                                    – už kiekvieną iš pirmo karto teisingai atsakytą klausimą bus uždirbtos 0.71 SUDEDU monetos). 
+                                    Matematikos ir gramatikos užduotyse monetos uždirbamos tik už iš pirmo karto teisingai atsakytus klausimus. 
                                     Teksto suvokimo užduotyse SUDEDU monetos gali būti uždirbamos ir padarius klaidų:
                                     <ul>
                                         <li>Lengvas lygis:
                                             <ul>
-                                                <li>1 klaida - 50% monetų</li>
+                                                <li>1 klaida – 50% monetų</li>
                                             </ul>
                                         </li>
                                         <li>Vidutinis lygis:
                                             <ul>
-                                                <li>1 klaida - 50% monetų</li>
-                                                <li>2 klaidos - 25% monetų</li>
+                                                <li>1 klaida – 50% monetų</li>
+                                                <li>2 klaidos – 25% monetų</li>
                                             </ul>
                                         </li>
                                         <li>Sunkus lygis:
                                             <ul>
-                                                <li>1 klaida - 50% monetų</li>
-                                                <li>2 klaidos - 25% monetų</li>
-                                                <li>3 klaidos - 10% monetų</li>
+                                                <li>1 klaida – 50% monetų</li>
+                                                <li>2 klaidos – 25% monetų</li>
+                                                <li>3 klaidos – 10% monetų</li>
                                             </ul>
                                         </li>
                                     </ul>
                                 </li>
-                                <li>Uždarbis priklauso nuo užduoties ir mokinio klasės - atliekant užduotis, kurios pagal priešmokyklinio 
+                                <li>Uždarbis priklauso nuo užduoties ir mokinio klasės – atliekant užduotis, kurios pagal priešmokyklinio 
                                     ugdymo programą yra per lengvos tos klasės mokiniams, uždirbama mažiau monetų arba jos neuždirbamos iš viso. 
                                     Apibendrintas priešmokyklinio ugdymo gaires matematikos mokymui galite rasti <a href="#matematika">čia</a>, 
                                     o lietuvių kalbos mokymui <a href="#lietuviu-kalba">čia</a>.
@@ -1997,7 +2304,7 @@
                                 („spacebar“).
                             </li>
                             <li>
-                                <strong>Padidinti ar sumažinti kambario vaizdą</strong> galima naudojantis viduriniu pelytės mygtuku arba judintant du pirštus
+                                <strong>Padidinti ar sumažinti kambario vaizdą</strong> galima naudojantis viduriniu pelytės mygtuku arba judinant du pirštus
                                 artyn ar tolyn vienas nuo kito ant nešiojamojo kompiuterio jutiklinio kilimėlio.
                             </li>
                         </ul>
@@ -2007,7 +2314,7 @@
                             <strong>Sąveikauti su daiktais ir augintiniais</strong> galima palietus juos vienu pirštu.
                         </li>
                         <li>
-                            <strong>Judinti daiktus</strong> galima ant juos palietus vienu pirštu ir palaikius, kol atsiranda žalios, geltonos 
+                            <strong>Judinti daiktus</strong> galima juos palietus vienu pirštu ir palaikius, kol atsiranda žalios, geltonos 
                             ar raudonos spalvos žymės, nurodančios, kur daiktas gali būti padėtas. Augintinį galima judinti iš karto.
                         </li>
                         <li>
@@ -2025,15 +2332,15 @@
                             <svg id="toggle-zoom-lock-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 -1040 960 960">
                                 <path d="M240-160h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM240-160v-400 400Zm0 80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h280v-80q0-83 58.5-141.5T720-920q83 0 141.5 58.5T920-720h-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80h120q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Z"></path>
                             </svg>
-                            paspaudus šį mygtuką, kambario priartinimo lygis yra užfiksuojamas ir nebereguoja į artinimo/tolinimo 
+                            paspaudus šį mygtuką, kambario priartinimo lygis yra užfiksuojamas ir nebereaguoja į artinimo/tolinimo 
                             gestus (patogu judinant kambario vaizdą prietaisuose su liečiamuoju ekranu).
                         </li>
                         <li>
                             <svg id="toggle-zoom-lock-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 -1040 960 960">
                                 <path d="M120-120v-320h80v184l504-504H520v-80h320v320h-80v-184L256-200h184v80H120Z"></path>
                             </svg>
-                            paspaudus šį mygtuką, kamabrio vaizdas išsiplečia per didžiąją dalį prietaiso ekrano (patogu,
-                            kai mokinys keičia kamabrio dizainą ar žaidžia su augintinias).
+                            paspaudus šį mygtuką, kambario vaizdas išsiplečia per didžiąją dalį prietaiso ekrano (patogu,
+                            kai mokinys keičia kambario dizainą ar žaidžia su augintiniais).
                         </li>
                         </ul>
 
@@ -2126,7 +2433,7 @@
                                 Pagirdžius augintinį, jo atsigėrimo lygis bus pilnai atstatytas iki 10 vienetų. Bet koks perviršis yra nurašomas.
                             </li>
                             <li>
-                               <strong>Girdymas:</strong> augintinį galima pagirdyti paspaudus and tinkamo vandens dubenėlio ir paspaudus mygtuką „Pripildyti“
+                               <strong>Girdymas:</strong> augintinį galima pagirdyti paspaudus ant tinkamo vandens dubenėlio ir paspaudus mygtuką „Pripildyti“
                                atsiradusiame vandens dubenėlio valdymo langelyje. Norint pripildyti vandens dubenėlį, reikia būti susimokėjus vandens mokestį
                                „Mokesčiai“ skiltyje.
                             </li>
@@ -2143,10 +2450,10 @@
                                 Kad augintiniai jaustųsi mylimi, jiems reikia rodyti dėmesį.
                             </li>
                             <li>
-                                Augintinaimas parodytas dėmesys <strong>visiškai išblėsta per 48 valandas</strong>.
+                                Augintiniams parodytas dėmesys <strong>visiškai išblėsta per 48 valandas</strong>.
                             </li>
                             <li>
-                                Augintinams rodoma meilė matuojama <svg class="stats-icon"><use href="#icon-love"></use></svg> vienetais, kurie gali pakilti <strong>iki 10</strong>. 
+                                Augintiniams rodoma meilė matuojama <svg class="stats-icon"><use href="#icon-love"></use></svg> vienetais, kurie gali pakilti <strong>iki 10</strong>. 
                                 Bet koks perviršis yra nurašomas.
                             </li>
                             <li>
@@ -2162,9 +2469,9 @@
                                         </ol>
                                     </li>
                                     <li>
-                                        <strong>Pramogos:</strong> augintiniams galima nupirkti įvairių daiktų, skirtų pramogomos, pavyzdžiui,
+                                        <strong>Pramogos:</strong> augintiniams galima nupirkti įvairių daiktų, skirtų pramogoms, pavyzdžiui,
                                         muzikos grotuvą ar vonią maudynėms. Šie daiktai reguliariai didina augintiniui rodomos meilės lygį.
-                                        Susijusi informacija nurodoma daikto, skirto pramogoms, aprašyme (pvz., <strong><svg class="stats-icon"><use href="#icon-love"></use></svg>x2 per dieną</strong> -
+                                        Susijusi informacija nurodoma daikto, skirto pramogoms, aprašyme (pvz., <strong><svg class="stats-icon"><use href="#icon-love"></use></svg>x2 per dieną</strong> –
                                         daiktas per dieną augintiniams suteikia 2 rodomos meilės vienetus. Tai reiškia, kad augintiniui 
                                         rodomos meilės lygis negali nukristi žemiau 2 vienetų).
                                     </li>
@@ -2229,10 +2536,10 @@
                                     <li>
                                     Daiktai į namus gali būti pridėti dviem būdais:
                                     <ol>
-                                        <li>„Baldai“ skiltyje paspaudus daikto, kurį norima pridėti į namus „Naudoti“ mygtuką.</li>
+                                        <li>„Baldai“ skiltyje paspaudus daikto, kurį norima pridėti į namus, „Naudoti“ mygtuką.</li>
                                         <li>„Namai“ skiltyje įjungus redagavimo režimą paspaudžiant „Perstatyti“ mygtuką ir daiktų sąraše atsirandančiame
                                             kairėje ekrano pusėje (arba šoniniame meniu prietaisuose su mažesniais ekranais) paspaudus daikto, kurį
-                                            norima pridėti į namus „Naudoti“ mygtuką.</li>
+                                            norima pridėti į namus, „Naudoti“ mygtuką.</li>
                                     </ol>
                                     </li>
                                     <li>
@@ -2248,7 +2555,7 @@
                                 <ul>
                                 <li>
                                     Norint perstatyti daiktus, reikia įjungti redagavimo režimą paspaudžiant „Perstatyti“ mygtuką. Tuomet daiktai gali būti judinami ant jų paspaudus
-                                    (palietus) ir palaikius, kol atsiranda žalios, geltonos ar raudonos spalvos žymės nurodančios, kur daiktas gali būti padėtas. Raudona spalva reiškia, 
+                                    (palietus) ir palaikius, kol atsiranda žalios, geltonos ar raudonos spalvos žymės, nurodančios, kur daiktas gali būti padėtas. Raudona spalva reiškia, 
                                     kad jokia daikto dalis negali užimti tos erdvės. Žalia nurodo, kur gali būti padėta daikto apačia. Geltona žymi erdvę, kurią 
                                     daiktas gali užimti, bet tik tada, kai jo apačia yra žaliai pažymėtoje zonoje.
 
@@ -2267,15 +2574,15 @@
                                 <ul>
                                 <li>
                                     Norint pašalinti daiktus iš namų, reikia įjungti redagavimo režimą paspaudžiant „Perstatyti“ mygtuką. 
-                                    Daiktai gali būti pažymėti ištrynimui ant jų paspaudžiant - aplink daiktą atsiras
+                                    Daiktai gali būti pažymėti ištrynimui ant jų paspaudžiant – aplink daiktą atsiras
                                     raudonas rėmas. Paspaudus ant pažymėto daikto vėl, trynimo žymė bus nuimta. Kai visi daiktai, kuriuos
-                                    norima ištrinti, yra pažymėti, tereikia paspausti „Trinti“ mygtuką
+                                    norima ištrinti, yra pažymėti, tereikia paspausti „Trinti“ mygtuką.
                                 </li>
                                 <li>
                                     Norint, kad namų pakeitimai būtų išsaugoti, būtina paspausti „Išsaugoti“ mygtuką.
                                 </li>
                                 <li>
-                                    Daiktai pašalinti iš namų vis tiek priklauso mokiniui ir gali būti vėl naudojami vėliau.
+                                    Daiktai, pašalinti iš namų, vis tiek priklauso mokiniui ir gali būti vėl naudojami vėliau.
                                 </li>
                                 </ul>
                             </dd>
@@ -2296,7 +2603,7 @@
                                 pažymėtas mėlynos spalvos fonu).
                             </li>
                             <li>
-                                Augintinį galima atiduoti į gyvūnėlių namus paspaudus „Atiduoti“ mygtuką virš augintinio nuotraukos - susigrąžinti atiduoto
+                                Augintinį galima atiduoti į gyvūnėlių namus paspaudus „Atiduoti“ mygtuką virš augintinio nuotraukos – susigrąžinti atiduoto
                                 augintinio neįmanoma!
                             </li>
                         </ul>
@@ -2318,7 +2625,7 @@
                                 Paspaudus mygtuką „Naudoti“, daiktas bus pridėtas į mokinio namus, jei juose yra pakankamai vietos (plačiau <a href="#daiktu-pridejimas">čia</a>).
                             </li>
                             <li>
-                                Viršutiniame dešinajame nenaudojamo daikto nuotraukos kampe galima rasti 
+                                Viršutiniame dešiniajame nenaudojamo daikto nuotraukos kampe galima rasti 
                                 <div class="item-delete-btn-holder">
                                     <button class="item-delete-btn" disabled>
                                         <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -2342,7 +2649,7 @@
                                     Parduotuvė suskirstyta į tris skyrius:
                                     <ol>
                                         <li>
-                                            <strong>Reikmenys</strong>: čia galima įsigyti maisto bei skaniukių augintiniams ir 
+                                            <strong>Reikmenys</strong>: čia galima įsigyti maisto bei skaniukų augintiniams ir 
                                             augintinių išvaizdos paketų. Paspaudus ant mygtuko su augintinio nuotrauka, rodomi visi
                                             produktai, tinkami tam augintiniui (aktyvus mygtukas pažymėtas mėlynos spalvos fonu).
                                         </li>
@@ -2357,7 +2664,7 @@
                                                 <path fill="currentColor" opacity="1.00" d=" M 43.34 36.28 C 47.08 35.56 51.53 37.40 52.99 41.08 C 54.64 44.43 53.88 48.67 51.37 51.37 C 48.85 53.67 45.00 54.58 41.80 53.27 C 36.93 51.78 34.78 45.49 37.00 41.08 C 38.00 38.42 40.65 36.81 43.34 36.28 Z"></path>
                                             </g>
                                             </svg>
-                                            </button> mygtuką viršutiniame dešinajame daikto nuotraukos kampe.
+                                            </button> mygtuką viršutiniame dešiniajame daikto nuotraukos kampe.
                                         </li>
                                         <li>
                                             <strong>Gyvūnėliai</strong>: čia galima įsigyti skirtingų augintinių. Kol kas prekyboje yra tik vienas 
@@ -2392,7 +2699,7 @@
                                     </span>).
                             </li>
                             <li>
-                                Norint sumokėti už patranavimus, tereikia paspausti „Mokėti“ mygtuką šalia atitinkamos sąskaitos.
+                                Norint sumokėti už patarnavimus, tereikia paspausti „Mokėti“ mygtuką šalia atitinkamos sąskaitos.
                             </li>
                             <li>
                                 Nesumokėjus sąskaitų už elektrą ar vandenį, šios paslaugos bus išjungtos. Jei yra neapmokėtų sąskaitų, 
@@ -2402,7 +2709,7 @@
                                     </span>).
                             </li>
                             <li>
-                                Vanduo reikalingas augintinams girdyti bei prausti. Elektra reikalinga šviesai namuose ir elektros
+                                Vanduo reikalingas augintiniams girdyti bei prausti. Elektra reikalinga šviesai namuose ir elektros
                                 prietaisams, tokiems kaip šaldytuvas.
                             </li>
                         </ul>
@@ -2427,9 +2734,9 @@
                             <div class="grade-title">1 KLASĖ (skaičiai nuo 0 iki 100)</div>
                             <ul>
                                 <li>Sudėtis, atimtis, sudėtis ir atimtis iki 10*</li>
-                                <li>Sudėtis, atimtis, sudėtis ir atimtis iki 20 (vienaženklių skaičių peržengiant dešimtį)</li>
-                                <li>Sudėtis, atimtis, sudėtis ir atimtis iki 100 (dviženklio ir vienaženklio skaičių peržengiant dešimtį)</li>
-                                <li>Sudėtis, atimtis, sudėtis ir atimtis iki 100 (dviženklių skaičių neperžengiant dešimties)</li>
+                                <li>Sudėtis, atimtis, sudėtis ir atimtis iki 20 (vienaženklių skaičių pergrupuojant skaičių skyrius)</li>
+                                <li>Sudėtis, atimtis, sudėtis ir atimtis iki 100 (dviženklio ir vienaženklio skaičių pergrupuojant skaičių skyrius)</li>
+                                <li>Sudėtis, atimtis, sudėtis ir atimtis iki 100 (dviženklių skaičių nepergrupuojant skaičių skyrių)</li>
                                 <li>Skaitinė lygybė su nežinomuoju (dėmeniu, turiniu, atėminiu)</li>
                             </ul>
                             <div class="ps-text">*Tinka įgyvendinant priešmokyklinio ugdymo programą.</div>
@@ -2438,8 +2745,8 @@
                         <div class="grade-card" id="antra">
                             <div class="grade-title">2 KLASĖ (skaičiai nuo 0 iki 1 000)</div>
                             <ul>
-                                <li>Sudėtis, atimtis, sudėtis ir atimtis iki 100 (peržengiant dešimtį)</li>
-                                <li>Sudėtis, atimtis, sudėtis ir atimtis iki 1 000 (ne/peržengiant skaičių skyrių)</li>
+                                <li>Sudėtis, atimtis, sudėtis ir atimtis iki 100 (pergrupuojant skaičių skyrius)</li>
+                                <li>Sudėtis, atimtis, sudėtis ir atimtis iki 1 000 (pergrupuojant ir nepergrupuojant skaičių skyrius)</li>
                                 <li>1–9 daugybos lentelė (galimybė pasirinkti aktualų turinį)</li>
                                 <li>Dalyba (iš 1–9 daugybos lentelės)</li>
                                 <li>Skaitinė lygybė su nežinomuoju (dėmeniu, turiniu, atėminiu, dauginamuoju, daliniu, dalikliu)</li>
@@ -2449,7 +2756,7 @@
                         <div class="grade-card" id="trecia">
                             <div class="grade-title">3 KLASĖ (skaičiai nuo 0 iki 10 000)</div>
                             <ul>
-                                <li>Sudėtis, atimtis, sudėtis ir atimtis iki 10 000 (ne/peržengiant skaičių skyrių)</li>
+                                <li>Sudėtis, atimtis, sudėtis ir atimtis iki 10 000 (pergrupuojant ir nepergrupuojant skaičių skyrius)</li>
                                 <li>Daugyba (dviženklio, triženklio ir keturženklio skaičiaus iš vienaženklio)</li>
                                 <li>Dalyba (iš daugybos lentelės, dviženklio, triženklio ir keturženklio skaičiaus iš vienaženklio, įskaitant dalybą su liekana)</li>
                                 <li>Daugyba ir dalyba su pilnas dešimtis, šimtus turinčiais skaičiais</li>
@@ -2460,7 +2767,7 @@
                         <div class="grade-card" id="ketvirta">
                             <div class="grade-title">4 KLASĖ (skaičiai nuo 0 iki 1 000 000)</div>
                             <ul>
-                                <li>Sudėtis, atimtis, sudėtis ir atimtis iki 1 000 000 (ne/peržengiant skaičių skyrių)</li>
+                                <li>Sudėtis, atimtis, sudėtis ir atimtis iki 1 000 000 (pergrupuojant ir nepergrupuojant skaičių skyrius)</li>
                                 <li>Daugyba (daugiaženklių skaičių iš dviženklio, *daugiaženklių skaičių iš triženklio)</li>
                                 <li>Dalyba (daugiaženklių skaičių iš vienaženklio, *daugiaženklių skaičių iš dviženklio)</li>
                                 <li>Skaitinė lygybė su nežinomuoju (dėmeniu, turiniu, atėminiu, dauginamuoju, daliniu, dalikliu)</li>
@@ -2472,7 +2779,7 @@
                     <div class="section-header" id="matematika-patogus-naudojimas">Patogus naudojimas</div>
                     <p>
                         SUDEDU platforma pritaikyta patogiam naudojimuisi prietaisuose su mažesniais ekranais. Matematikos užduotyse, skaičiuojant stulpeliu
-                        ar kampu, atlikimo mechanika leidžia visuomet matyti svarbiausią informaciją be reikiamybės nuolat judinti ekrantą aukštyn ir žemyn.
+                        ar kampu, atlikimo mechanika leidžia visuomet matyti svarbiausią informaciją be reikiamybės nuolat judinti ekraną aukštyn ir žemyn.
                         <ul>
                             <li>Pasirinkti laukeliai yra sucentruojami kuo arčiau ekrano vidurio.</li>
                             <li>Paspaudus mygtuką „Tikrinti“, laukeliai su klaidomis yra automatiškai pasirinkti ir sucentruojami.</li>
@@ -2512,18 +2819,18 @@
                     
                     <div id="sudetingumo-lygiai" class="section-header compact-items">Sudėtingumo lygiai:</div>
                     <p class="compact-items">
-                        Teksto supratimo užduotys skirstomos pagal klasę (1-2 klasės arba 3-4 klasės) ir 3 sudėtingumo lygius (lengvas,
+                        Teksto supratimo užduotys skirstomos pagal klasę (1–2 klasės arba 3–4 klasės) ir 3 sudėtingumo lygius (lengvas,
                         vidutinis, sunkus). Kiekvienas lygis taip pat gali būti pasunkintas pridedant distraktorių*.</p>
                     <p class="ps-text">* Distraktorius – tai sakinys arba pastraipa dėliojamame tekste, kurie atitinka teksto temą, bet netinka pagal kontekstą, prasmę.</p>
                     
                     <div id="pagalba" class="section-header">Pagalba:</div>
                     <p class="compact-items">Po trijų nesėkmingų bandymų siūloma pirmoji pagalba – pateikiamas trečdalis tinkama tvarka sudėlioto teksto. Mokinys gali pasirinkti, ar nori naudotis pagalba – ji neprivaloma.</p>
                     <p class="compact-items">Norint pasinaudoti antrąja pagalba reikia būti išnaudojus pirmąją pagalbą ir dar tris kartus pabandyti atlikti užduotį. Tuomet bus pateikti jau du trečdaliai tinkama tvarka sudėlioto teksto.</p>
-                    <p class="compact-items">Trečiąja pagalba galima naudotis tik tuomet, kai išnaudotos primoji ir antroji pagalbos bei atlikti dar trys nesėkmingi bandymai. Tuomet mokiniui pateikiamas jau visas teisingai sudėliotas tekstas.</p>
+                    <p class="compact-items">Trečiąja pagalba galima naudotis tik tuomet, kai išnaudotos pirmoji ir antroji pagalbos bei atlikti dar trys nesėkmingi bandymai. Tuomet mokiniui pateikiamas jau visas teisingai sudėliotas tekstas.</p>
 
                     <div id="teksto-suvokimas-patogus-naudojimas" class="section-header">Patogus naudojimas:</div>
                     <p class="compact-items">
-                        SUDEDU platforma pritaikyta patogiam naudojimuisi prietaisuose su mažesniais ekranais. Teksto suvokimo užduotyse,
+                        SUDEDU platforma pritaikyta patogiam naudojimuisi prietaisuose su mažesniais ekranais. Teksto suvokimo užduotyse
                         pabirę sakiniai/pastraipos yra šoniniame meniu, kuris gali būti atidarytas ir uždarytas paspaudus mygtuką su rodykle (<svg width="18px" height="18px" viewBox="0 0 22 20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"></path></svg>).
                         Paspaudus (palietus) ir palaikius norimą sakinį, šoninis meniu automatiškai užsidaro ir mokiniai gali nukelti pasirinktą
                         sakinį, kur nori. Paleidus sakinį bet kur kitur nei laukeliuose teksto dėliojimui, sakinys grįš į sąrašą šoniniame meniu.
@@ -2547,8 +2854,8 @@
                                    Daiktavardžių vienaskaitos galininkas (ką vieną?). 
                                 </li>
                                 <li>
-                                   Daiktavardžių vienaskaitos vietininkas (kur?) - antros klasės mokinių prašoma įrašyti pilną galūnę,
-                                   pirmos - paskutinę „e“ raidę.
+                                   Daiktavardžių vienaskaitos vietininkas (kur?) – antros klasės mokinių prašoma įrašyti pilną galūnę,
+                                   pirmos – paskutinę „e“ raidę.
                                 </li>
                                 <li>
                                    Daiktavardžių daugiskaitos kilmininkas (ko daug?).
@@ -2557,16 +2864,16 @@
                         </li>
                         <li><strong>Įsidėmėtinos rašybos žodžiai</strong></li>
                         <li><strong>Panašiai skambančios priebalsės</strong> (k–g, p–b, t–d, ž–š, z–s) be priebalsių supanašėjimo</li>
-                        <li><strong>H - CH - F</strong> (žodžiai su šiomis priebalsėmis)</li>
+                        <li><strong>H–CH–F</strong> (žodžiai su šiomis priebalsėmis)</li>
                         <li><strong>Minkštumo ženklas</strong> (ne prieš dvibalsius)</li>
-                        <li><strong>Balsių poros</strong> (e - ė, i - y, u - ū)</li>
+                        <li><strong>Balsių poros</strong> (e–ė, i–y, u–ū)</li>
                         <li><strong>Dvibalsiai</strong> (be minkštumo ženklo)</li>
                     </ul>
                     
                     <div id="rasyba-1-2-sudetingumas" class="stressed-text-black">Sudėtingumas:</div>
                     <p class="compact-items">Galima pasirinkti retesnius arba dažnesnius atvejus:</p>
                     <ul class="compact-items">
-                        <li><strong>Retesni atvejai:</strong> maksimalus žodžių, su nežinomomis raidėmis, skaičius yra tris kartus mažesnis nei žodžių skaičius sakinyje (pvz., šešių žodžių sakinyje gali būti du žodžiai su nežinomomis raidėmis).</li>
+                        <li><strong>Retesni atvejai:</strong> maksimalus žodžių su nežinomomis raidėmis skaičius yra tris kartus mažesnis nei žodžių skaičius sakinyje (pvz., šešių žodžių sakinyje gali būti du žodžiai su nežinomomis raidėmis).</li>
                         <li><strong>Dažnesni atvejai:</strong> kiekvienas žodis sakinyje gali turėti nežinomą raidę.</li>
                     </ul>
                     
@@ -2575,8 +2882,8 @@
                     <ul class="compact-items">
                         <li><strong>Žodžio pabaiga:</strong> klausimai, padedantys nustatyti žodžio galūnę (pvz., „ką vieną?“)</li>
                         <li><strong>Įsidėmėtina rašyba:</strong> keli galimi atsakymo variantai (pvz., „e|ę|ė|ia“)</li>
-                        <li><strong>Panašiai skambančios priebalsės:</strong> panašiai skambančių priebalsių pora (pvz., „t|d“) - rodoma visą laiką</li>
-                        <li><strong>H - CH - F:</strong> galimi atsakymų variantai („h|ch|f“)</li>
+                        <li><strong>Panašiai skambančios priebalsės:</strong> panašiai skambančių priebalsių pora (pvz., „t|d“) – rodoma visą laiką</li>
+                        <li><strong>H–CH–F:</strong> galimi atsakymų variantai („h|ch|f“)</li>
                         <li><strong>Minkštumo ženklas:</strong> keli galimi atsakymo variantai (pvz., „u|iu|ū|iū“)</li>
                         <li><strong>Balsių poros:</strong> balsių pora (pvz., „i|y“)</li>
                         <li><strong>Dvibalsiai:</strong> visi dvibalsiai („ai|au|ei|ie|ui|uo“)</li>
@@ -2609,13 +2916,13 @@
                     <div class="example-sentence">
                         <strong>Pavyzdys:</strong><br>
                         ORIGINALUS SAKINYS: „Gilioje baloje gyveno vėžliukas.“<br>
-                        LENGVESNĖS KOMBINACIJOS: „Gil__ baloje gyven__ vėžliukas." ARBA „Gilioje bal__ gyven__ vėžliukas.“<br>
+                        LENGVESNĖS KOMBINACIJOS: „Gil__ baloje gyven__ vėžliukas.“ ARBA „Gilioje bal__ gyven__ vėžliukas.“<br>
                         SUNKESNĖS KOMBINACIJOS: „Gil__ bal__ gyven__ vėžliukas.“
                     </div>
 
                     <p class="compact-items">Galima pasirinkti retesnius arba dažnesnius atvejus:</p>
                     <ul class="compact-items">
-                        <li><strong>Retesni atvejai:</strong> maksimalus žodžių, su nežinomomis raidėmis, skaičius yra tris kartus mažesnis nei žodžių skaičius sakinyje (pvz., šešių žodžių sakinyje gali būti du žodžiai su nežinomomis raidėmis).</li>
+                        <li><strong>Retesni atvejai:</strong> maksimalus žodžių su nežinomomis raidėmis skaičius yra tris kartus mažesnis nei žodžių skaičius sakinyje (pvz., šešių žodžių sakinyje gali būti du žodžiai su nežinomomis raidėmis).</li>
                         <li><strong>Dažnesni atvejai:</strong> kiekvienas žodis sakinyje gali turėti nežinomą raidę.</li>
                     </ul>
                     
@@ -2679,33 +2986,33 @@
                                 <div class="example-sentence">
                                     <strong>Pavyzdys:</strong> „Tebenešioj__ (vksm.,es.l.,vns.,Ia.) tavo dovanotas apyrankes su savimi.“<br>
                                 </div>
-                                    Šiuo atveju pagalba nurodo, kad teisingas atsakymas, kuris bus užskaitytas, yra esamojo laiko („es.l“) vienaskaitos („vns.“) 
+                                    Šiuo atveju pagalba nurodo, kad teisingas atsakymas, kuris bus užskaitytas, yra esamojo laiko („es.l.“) vienaskaitos („vns.“) 
                                     pirmo asmens („Ia.“) forma „Tebenešioju“, o ne kiti gramatiškai teisingi variantai, kaip „Tebenešiojau“, „Tebenešiojame“, 
                                     „Tebenešiojo“.
                             </ol>
                         </li>
 
                         <li><strong>Įsidėmėtinos rašybos žodžiai:</strong> keli galimi atsakymo variantai (pvz., „e|ę|ė|ia“)</li>
-                        <li><strong>Sudurtiniai žodžiai</strong> keli galimi atsakymo variantai (pvz., „a|ą|ia|e|ė“)</li>
+                        <li><strong>Sudurtiniai žodžiai:</strong> keli galimi atsakymo variantai (pvz., „a|ą|ia|e|ė“)</li>
                         <li><strong>Priebalsių supanašėjimas:</strong> priebalsių pora (pvz., „ž|š“)</li>
-                        <li><strong>Dvibalsiai:</strong> nurodoma, kad atsakymas yra dvibalsis, galimai su minkštumo ženklu - „i?dvib.“</li>
-                        <li><strong>Mišrieji dvigarsiai:</strong> nurodoma, kad atsakymas yra mišrusis dvigarsis, galimai su minkštumo ženklu - „i?m.dvig.“</li>
+                        <li><strong>Dvibalsiai:</strong> nurodoma, kad atsakymas yra dvibalsis, galimai su minkštumo ženklu – „i?dvib.“</li>
+                        <li><strong>Mišrieji dvigarsiai:</strong> nurodoma, kad atsakymas yra mišrusis dvigarsis, galimai su minkštumo ženklu – „i?m.dvig.“</li>
                         <li><strong>Priešdėliai:</strong> keli galimi atsakymo variantai (pvz., „i|į|y“)</li>
                          
                     </ul>
                     
                     <div class="section-header" id="teisingi-atsakymai">Teisingi atsakymai</div>
-                    <p class="compact-items">Po kiekvieno bandymo būtina ištaisyti visus neteisingus atsakymus. Po trijų nesėkmingų bandymų atsiranda naujas mygtukas („Atsakymai"), kurį paspaudus pateikiami visi teisingi atsakymai.</p>
+                    <p class="compact-items">Po kiekvieno bandymo būtina ištaisyti visus neteisingus atsakymus. Po trijų nesėkmingų bandymų atsiranda naujas mygtukas („Atsakymai“), kurį paspaudus pateikiami visi teisingi atsakymai.</p>
                 
                     <div id="rasyba-patogus-naudojimas" class="section-header">Patogus naudojimas:</div>
                     <p class="compact-items">
                         Rašybos užduotyse įrašius raidę, galima 
-                        spausti įvedimo mygtuką („enter“; ↵) - teksto žymeklis automatiškai peršoks į kitą neužpildytą nežinomos raidės laukelį arba
-                        nepataisytą klaidą. Peršokus į laukelį su klaida, neteisingos raidės spalva (įprastai rožinė) pradės mirksėti geltonai - tai
+                        spausti įvedimo mygtuką („enter“; ↵) – teksto žymeklis automatiškai peršoks į kitą neužpildytą nežinomos raidės laukelį arba
+                        nepataisytą klaidą. Peršokus į laukelį su klaida, neteisingos raidės spalva (įprastai rožinė) pradės mirksėti geltonai – tai
                         reiškia, kad pradėjus rašyti, ši raidė bus pakeista nauja. Paspaudus įvedimo mygtuką vėl, žymeklis peršoks toliau.
-                        Jei visi laukeliai įrašyti ir klaidos pataisytos, įvedimo mygtukas automatiškai paspaus „Tikrinti“ mygtuką. Patrikrinus, kad 
+                        Jei visi laukeliai įrašyti ir klaidos pataisytos, įvedimo mygtukas automatiškai paspaus „Tikrinti“ mygtuką. Patikrinus, kad 
                         visos įrašytos raidės teisingos, įvedimo mygtukas automatiškai paspaus „Toliau“ mygtuką. Ši mechanika leidžia įrašyti nežinomas
-                        raides ar pataisyti klaidas greičiau nei individualiai spaudžiant ant kiekvieno laukelio ir veikia komputeriuose bei 
+                        raides ar pataisyti klaidas greičiau nei individualiai spaudžiant ant kiekvieno laukelio ir veikia kompiuteriuose bei 
                         prietaisuose su liečiamuoju ekranu.
                     </p>
 
@@ -2741,10 +3048,10 @@
     <!-- External JavaScript Files -->
     <!-- REMOVED problematic external scripts for this page -->
     <!-- <script src="../refresh-token.js"></script> -->
-    <!-- <script src="../mental-arithmetic.js"></script> -->
+    <!-- <script src="../mental-arithmetic.js?v=20261018r"></script> -->
     <!-- <script src="../mental-arithmetic-combinations.js"></script> -->
     <script src="../main-nav-bar.js"></script>
-    <script src="../mental-arithmetic.js"></script>
+    <script src="../mental-arithmetic.js?v=20261018r"></script>
 
     <script>
         // ===== SIDEBAR FUNCTIONALITY =====

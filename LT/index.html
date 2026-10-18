@@ -14,7 +14,7 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link rel="stylesheet" type="text/css" href="../index.css">
+    <link rel="stylesheet" type="text/css" href="../index.css?v=20261018r">
     <link rel="stylesheet" href="../main-nav-bar.css">
 
 <!-- Google tag (gtag.js) -->
@@ -319,7 +319,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-gutter: stable;
-    padding: 15px 3px 15px 15px;
+    padding: 10px;
     position: relative;
     height: 100%;
     -webkit-overflow-scrolling: touch;
@@ -616,7 +616,7 @@ body.popup-active {
         }
 
         .board-message:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 1);
             color: rgba(0, 0, 0, 0.85);
         }
 
@@ -1179,6 +1179,155 @@ body.popup-active {
 }
 
 /* POPUP STYLES END */
+
+/* =====================================================================
+   TYPOGRAPHY + GLASS ALIGNMENT WITH THE "UŽDUOTYS" PAGE
+   Only font sizes, colours, borders and corner radii are changed here.
+   Widths, paddings and positions are untouched. The desktop sizes apply
+   to landscape viewports >= 768px; phones and the tablet-portrait
+   overrides above keep their own values.
+   Scale: 17px titles | 15-16px body | 13.5-14px small labels
+   ===================================================================== */
+
+/* Glass sections: same look as the panels on the tasks page */
+.practice-outer-div,
+.message-board-container,
+.personal-chl-container {
+    background: rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 16px;
+}
+
+.message-board,
+.chl-category-content {
+    background: rgba(255, 255, 255, 0.62);
+    border-color: rgba(255, 255, 255, 0.65);
+}
+
+@media (min-width: 768px) and (orientation: landscape), (max-width: 767px) {
+    .class-popup-title {
+        font-size: 20px;
+    }
+
+    .class-options {
+        font-size: 1.1rem;
+    }
+}
+
+@media (min-width: 768px) and (orientation: landscape) {
+
+    .dropdown,
+    #group_name, #mode_choice, #mode_choice_1, #mode_choice_2, #mode_choice_3,
+    #mode_choice_4, #mode_choice_5, #mode_choice_6, #mode_choice_7, #mode_choice_8,
+    #mode_choice_9, #mode_choice_10, #mode_choice_13, #mode_choice_14, #mode_choice_15,
+    #class_choice,
+    #selected_number, #selected_number_2,
+    #timer-input, #question-number-input,
+    .control-btn {
+        font-size: 1.1rem;
+    }
+
+    #remainder-option,
+    .timer-choice-label, .answer-number-label,
+    .number-choice-label-nuo, .number-choice-label-iki {
+        font-size: 1.1rem;
+    }
+
+    .submit-button {
+        font-size: 1.05rem;
+    }
+
+    .board-title, .personal-chl-label, .chl-title {
+        font-size: 1.05rem;
+    }
+
+    .chl-header {
+        font-size: 1.1rem;
+    }
+
+    .message-meta {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .practice-label {
+        font-size: 1.4rem;
+    }
+
+    #remainder-option,
+    .timer-choice-label, .answer-number-label,
+    .number-choice-label-nuo, .number-choice-label-iki {
+        font-size: 1.1rem;
+    }
+
+    .board-title {
+        font-size: 1.05rem;
+    }
+}
+
+@media (max-width: 575px) {
+    .practice-label {
+        font-size: 1.4rem;
+    }
+
+    #remainder-option {
+        font-size: 1.1rem;
+    }
+}
+
+/* =====================================================================
+   Praktika in the look of the Užduotys page (2026-10-17): glass panels with a heading line, the form's fields as white
+   rounded rows (text on the left, one chevron), the counter and the buttons like there. Layout and widths unchanged.
+   ===================================================================== */
+.practice-outer-div,
+.message-board-container,
+.personal-chl-container {
+    background: rgba(255, 255, 255, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    border-radius: 16px;
+    color: #1f2a30;
+}
+/* the headings: "Praktikuotis", "Naujienos", "Iššūkiai" - 17px, on the left, a line under the practice one */
+.practice-label-div.free-practice-div { justify-content: center; border-bottom: 0; }
+@media (max-width: 767px) { .practice-label { font-size: 1.9rem !important; } }
+.board-title, .personal-chl-label {
+    color: #1f2a30; font-family: 'SFpro', sans-serif; font-size: 17px !important; font-weight: 500; letter-spacing: 0; text-transform: none;
+}
+.board-date { color: #3c4f59; font-size: 13.5px; font-weight: 500; }
+.message-board, .chl-category-content { background: rgba(255, 255, 255, 0.55); border: 1px solid rgba(255, 255, 255, 0.75); border-radius: 12px; }
+/* the form's dropdowns */
+#new-task-options-container select.dropdown {
+    box-sizing: border-box; width: 100%; height: 42px; margin: 4px 0; padding: 0 38px 0 14px;
+    border: 1px solid rgba(255, 255, 255, 0.75); border-radius: 12px; background-color: rgba(255, 255, 255, 0.6); backdrop-filter: none; box-shadow: none;
+    color: #1f2a30; font-family: 'SFpro', sans-serif; font-size: 15px !important; font-weight: 500; letter-spacing: 0.02em;
+    text-align: left; text-align-last: left; appearance: none; -webkit-appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231d566e' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center; background-size: 16px;
+}
+#new-task-options-container select.dropdown:hover { background-color: rgba(255, 255, 255, 0.82); }
+#new-task-options-container select.dropdown:focus { outline: none; box-shadow: 0 0 0 2px rgba(40, 109, 138, 0.35); }
+#new-task-options-container .d-flex.justify-content-center { justify-content: flex-start !important; }
+/* "nuo … iki …" and "dalyba su liekana" */
+#new-task-options-container .selected_numbers_inner_div { justify-content: flex-start; gap: 8px; }
+#new-task-options-container .selected_numbers_inner_div select.dropdown { width: 84px; }
+#new-task-options-container :is(.number-choice-label-nuo, .number-choice-label-iki, #remainder-option) { color: #3c4f59; font-size: 14px !important; font-weight: 600; letter-spacing: 0.04em; }
+#new-task-options-container .remainder-div { justify-content: flex-start; }
+/* the spelling rules */
+#new-task-options-container #mode_choice_11_div { margin: 6px 0; padding: 10px 14px; border: 1px solid rgba(255, 255, 255, 0.75); border-radius: 12px; background: rgba(255, 255, 255, 0.4); }
+#new-task-options-container .rasyba-options-label:not([style*="none"]) { display: flex !important; }
+#new-task-options-container .rasyba-options-label { align-items: center; gap: 10px; margin: 0; padding: 3px 0; color: #1f2a30; font-size: 15px; font-weight: 500; letter-spacing: 0.02em; line-height: 1.3; cursor: pointer; }
+#new-task-options-container .rasyba-options-label br, #new-task-options-container #mode_choice_11_div > br { display: none; }
+#new-task-options-container .rasyba-options-label input { flex: none; width: 16px; height: 16px; margin: 0; accent-color: #286d8a; }
+#new-task-options-container .rasyba-options-label-text { font-size: 15px; font-weight: 500; letter-spacing: 0.02em; }
+#new-task-options-container #mode_choice_11_div [data-parent] { padding-left: 26px; background: none; }
+/* how many / how long */
+#new-task-options-container .timer-question-number-div { justify-content: center; gap: 16px; margin-top: 6px; }
+#new-task-options-container :is(.timer-input-div, .question-number-input-div, .input-group) { justify-content: center; }
+#new-task-options-container .input-group { gap: 10px; margin-bottom: 0; }
+#new-task-options-container .input-wrapper { border: 1px solid rgba(255, 255, 255, 0.75); border-radius: 12px; background: rgba(255, 255, 255, 0.6); backdrop-filter: none; }
+#new-task-options-container :is(#timer-input, #question-number-input) { width: 48px; padding: 0; color: #1f2a30; font-size: 17px !important; font-weight: 600; }
+#new-task-options-container :is(.timer-choice-label, .answer-number-label) { width: auto; color: #3c4f59; font-size: 15px !important; font-weight: 500; text-transform: none; letter-spacing: 0; }
 </style>
 </head>
 
@@ -1381,7 +1530,7 @@ body.popup-active {
                             <div class="mode_choice_3_div">
                                 <div class="col-12 d-flex justify-content-center align-items-center text-center mode_choice_3_div" id="mode_choice_3_div">
                                     <select class="btn btn-secondary dropdown-toggle dropdown text-center" name="mode_choice_3" id="mode_choice_3">
-                                        <option value="C37">NEPERŽENGIANT DEŠIMTIES</option>
+                                        <option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>
                                     </select>
                                 </div>
                             </div>
@@ -1529,7 +1678,7 @@ body.popup-active {
                                         <br>
                                     </label>
                                     <label class="rasyba-options-label options-for-first-second-classes" style="display: block;">
-                                        <input type="checkbox" class="r parent-toggle" name="r" value='BALSĖS:' data-controls="balsiu-div" checked>
+                                        <input type="checkbox" class="r parent-toggle" name="r" value='BALSĖS' data-controls="balsiu-div" checked>
                                         <span class="rasyba-options-label-text">BALSĖS</span>
                                         <br>
                                     </label>
@@ -1677,7 +1826,7 @@ body.popup-active {
             
             <div class="personal-chl-container">
                 <div class="chl-header">
-                    <div class="personal-chl-label">IŠŠŪKIAI</div>
+                    <div class="personal-chl-label">Iššūkiai</div>
                     <div class="chl-nav-arrows">
                         <button class="chl-nav-btn chl-nav-prev" id="chlNavPrev">
                             <svg fill="currentColor" viewBox="0 0 24 24" width="16" height="16">
@@ -1708,11 +1857,12 @@ body.popup-active {
 
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="../parameter_dictionary.js"></script>
-	<script src="../mental-arithmetic.js"></script>
-	<script src="../mental-arithmetic-combinations.js"></script>
+    <script src="../parameter_dictionary.js?v=20261018r"></script>
+	<script src="../mental-arithmetic.js?v=20261018r"></script>
+	<script src="../mental-arithmetic-combinations.js?v=20261017"></script>
     <script src="../main-nav-bar.js"></script>
-	<script src="matematika_options.js"></script>
+	<script src="matematika_options.js?v=20261018r"></script>
+	<script src="../sudedu-auto-tasks.js?v=20261018r"></script>
 
 	<script>
         let userClass;
@@ -1792,7 +1942,7 @@ body.popup-active {
                     controller.modeChoice2 = modeChoice9Selection;
                     controller.modeChoice6 = modeChoice14Selection;
                     controller.modeChoice7 = "C82";
-                    controller.modeChoice8 = generateSessionSeed();
+                    controller.modeChoice8 = modeChoice8Selection === "C83" ? generateGrammarSeed() : generateSessionSeed();
 
                     controller.modeChoice3 = getSelectedRasybaConditions();
                     controller.modeChoice5 = modeChoice12Selection;
@@ -1930,6 +2080,23 @@ async function updateUserClass (userClassSelection) {
 //POPUP SCRIPT END
       
 const messagesToUsers = [
+        {
+            title: "SUDEDU atsinaujina 🥳",
+            text: `SUDEDU atsinaujina – daug naujų funkcijų, palengvinančių mokytojų darbą ir praturtinančių mokinių kasdienę veiklą!`,
+            fullText: `
+            Džiaugiamės galėdami pristatyti didelį SUDEDU atnaujinimą! Pagrindinės naujovės:
+            <ul>
+            <li><b>Žaidimai visai klasei.</b> Skiltyje „Klasė“ atsirado žaidimai, kuriuos mokiniai gali žaisti visi kartu (plačiau <a href="apie.html#zaidimai">čia</a>).</li>
+            <li><b>Aukcionas.</b> Uždirbtas SUDEDU monetas mokiniai gali išleisti realiems prizams ir privilegijoms, kuriuos pasiūlo mokytojas (plačiau <a href="apie.html#aukcionas">čia</a>).</li>
+            <li><b>Automatinis užduočių skyrimas.</b> Su funkcija „Kelios užduotys vienu metu“ visos savaitės užduotis galima užduoti per kelias minutes: SUDEDU jas parenka pagal mokinių žinių lygį, išeitas temas ir pastarųjų savaičių rezultatus (plačiau <a href="apie.html#kelios-uzduotys">čia</a>).</li>
+            <li><b>Rezultatų analizės apibendrinimas</b> (bandomoji versija). Puslapyje „Užduotys“ skiltyje „Analizė“ mokytojai gali rasti trumpus mokinio ar visos klasės rezultatų aprašymus. Juos patogu panaudoti, pavyzdžiui, rašant įrašą į el. dienyną ar žinutę tėvams (plačiau <a href="apie.html#rezultatu-analize-mokytojams">čia</a>).</li>
+            <li><b>Klaidų kategorijos.</b> Panašios klaidos sugrupuojamos pagal rūšį, todėl iš karto matyti, kurios temos ar rašybos taisyklės mokiniams kelia daugiausia sunkumų (plačiau <a href="apie.html#klaidu-kategorijos">čia</a>).</li>
+            </ul>
+            Visų naujovių aprašymus rasite <a href="apie.html">Instrukcijų</a> puslapyje. Dėl didelio kiekio naujovių gali pasitaikyti klaidų ar neaiškumų. Kaip visada, laukiame jūsų pastabų ir pasiūlymų el. paštu <a href="mailto:sudedult@gmail.com">sudedult@gmail.com</a>!
+            `,
+            date: "2026-10-18",
+            target: ["all"]
+        },
         {   
             title: "Žinių lygio patikslinimas",
             text: `❗❗❗ SVARBI INFORMACIJA MOKYTOJAMS! Primename, kad prasidėjus naujiems mokslo metams reikia pakoreguoti mokinių žinių lygį: perkelti mokinius į aukštesnę klasę (plačiau <a href="apie.html#ziniu-lygis">čia</a>)!`,
@@ -1954,7 +2121,7 @@ const messagesToUsers = [
         },
         {
             title: `NUOTOLINIS SUSITIKIMAS MOKYTOJAMS`,
-            text: `Kviečiame visus mokytojus į individualios pažangos dienoraščio pristatymą (registracija <span class="fake-link">čia</span>)`,
+            text: `Kviečiame visus mokytojus į individualios pažangos dienoraščio pristymą (registracija <span class="fake-link">čia</span>)`,
             fullText: `
             Gegužės 20 d. 18.00 val. kviečiame į nuotolinį susitikimą, kuriame:
             <br>
@@ -2174,644 +2341,7 @@ displayMessages();
 const timerInputElement = document.querySelector('#timer-input');
 const questionNumberInputElement = document.querySelector('#question-number-input');
 
-const personalChlDict = {
-    0: {
-        "9-10": {
-            "math": [
-                `[["math","C1","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","5"]]`,
-                `[["math","C2","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","5"]]`,
-                `[["math","C3","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","5"]]`
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C80", "C82", "C75","C58"], ["C40","1"]]`
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C75",{"C67":[]},"C73",3], ["C40","1"]]`
-            ]
-        },
-        "11-12": {
-            "math": [
-                `[["math","C1","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C80", "C82", "C75","C58"], ["C40","1"]]`
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C75",{"C67":[]},"C73",3], ["C40","1"]]`
-            ]
-        },
-        "1-2": {
-            "math": [
-                `[["math","C1","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C1","C8","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C8","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C8","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C80", "C82", "C75","C58"], ["C40","1"]]`
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C75",{"C67":[]},"C73",3], ["C40","1"]]`
-            ]
-        },
-        "3-8": {
-            "math": [
-                `[["math","C1","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C1","C8","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C8","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C8","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C1","C10","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C10","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C10","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C80", "C82", "C75","C58"], ["C40","1"]]`
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C75",{"C67":[]},"C73",3], ["C40","1"]]`
-            ]
-        }
-    },
-    1: {
-        "9-10": {
-            "math": [
-                `[["math","C1","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C2","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C8","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C1","C8","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C2","C8","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C8","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-
-                `[["math","C1","C8","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C8","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C8","C37","C42","C44","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C8","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-
-                `[["math","C3","C10","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C10","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-
-                `[["math","C3","C10","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C80", "C82", "C75","C58"], ["C40","1"]]`
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C75",{"C67":[],"C88":[],"C90":[]},"C73",3], ["C40","1"]]`
-            ]
-        },
-        "11-12": {
-            "math": [
-                `[["math","C3","C8","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","30"]]`,
-
-                `[["math","C1","C9","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C2","C10","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C17","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C80", "C82", "C75","C58"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C80", "C82", "C75","C58"], ["C40","1"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C75","C58"], ["C40","1"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C75","C58"], ["C40","1"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C75",{"C67":[],"C85":[],"C88":[],"C89":[],"C90":[]},"C73",3], ["C40","3"]]`
-            ]
-        },
-        "1-2": {
-            "math": [
-                `[["math","C1","C9","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","30"]]`,
-                `[["math","C2","C10","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","30"]]`,
-                `[["math","C3","C17","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","30"]]`,
-
-                `[["math","C1","C9","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C2","C10","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C2","C10","C38","C42","C44","C47",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C3","C17","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","15"]]`,            
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C80", "C82", "C75","C58"], ["C40","3"]]`,
-                `[["lang","C49","C52", "C80", "C82", "C75","C58"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C75","C58"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C75","C58"], ["C40","1"]]`,
-                `[["lang","C49","C51", "C80", "C82", "C75","C59"], ["C40","1"]]`,
-                `[["lang","C49","C52", "C80", "C82", "C75","C59"], ["C40","1"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C75",{"C61":[],"C67":[],"C68":[],"C85":[],"C88":[],"C89":[],"C90":[],"C91":[]},"C73",3], ["C40","5"]]`
-            ]
-        },
-        "3-8": {
-            "math": [
-                `[["math","C3","C17","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","30"]]`,
-
-                `[["math","C1","C11","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C2","C11","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C11","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-
-                `[["math","C1","C11","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C2","C11","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C11","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-
-                `[["math","C1","C11","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C11","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C11","C38","C42","C44","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C11","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-
-                `[["math","C1","C12","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C2","C12","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C12","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-
-                `[["math","C1","C12","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C2","C12","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C12","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-
-                `[["math","C1","C12","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C12","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C12","C37","C42","C44","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C12","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C80", "C82", "C75","C58"], ["C40","4"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C75","C58"], ["C40","3"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C75","C58"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C80", "C82", "C75","C59"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C80", "C82", "C75","C59"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C75","C59"], ["C40","1"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C75","C59"], ["C40","1"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C75",{"C61":[],"C66":[],"C67":[],"C68":[],"C85":[],"C86":[],"C87":[],"C88":[],"C89":[],"C90":[],"C91":[]},"C73",3], ["C40","10"]]`
-            ]
-        }
-    },
-    2: {
-        "9-10": {
-            "math": [
-                `[["math","C3","C17","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","30"]]`,
-
-                `[["math","C1","C11","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C2","C11","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C11","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-
-                `[["math","C1","C11","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C2","C11","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C11","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-
-                `[["math","C1","C11","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C11","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C11","C38","C42","C44","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C11","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-
-                `[["math","C1","C12","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C2","C12","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C12","C37","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-
-                `[["math","C1","C12","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C2","C12","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C12","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-
-                `[["math","C1","C12","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C12","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C12","C37","C42","C44","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C12","C37","C42","C43","C47",["1","1"],false,"C79"], ["C40","10"]]`,
-
-                `[["math","C1","C12","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C2","C12","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C12","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-
-                `[["math","C1","C12","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C2","C12","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C12","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-
-                `[["math","C4","C18","","C41","C45","C47",["2","5"],false,"C79"], ["C40","30"]]`,
-                `[["math","C4","C18","","C42","C45","C47",["2","5"],false,"C79"], ["C40","20"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C80", "C82", "C75","C59"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C80", "C82", "C75","C59"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C75","C59"], ["C40","1"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C75","C59"], ["C40","1"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C75",{"C61":[],"C66":[],"C67":[],"C68":[],"C85":[],"C86":[],"C87":[],"C88":[],"C89":[],"C90":[],"C91":[]},"C73",3], ["C40","10"]]`
-            ]
-        },
-        "11-12": {
-            "math": [
-                `[["math","C4","C18","","C41","C45","C47",["2","9"],false,"C79"], ["C40","30"]]`,
-                `[["math","C4","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","20"]]`,
-                `[["math","C5","C18","","C41","C45","C47",["2","5"],false,"C79"], ["C40","20"]]`,
-                `[["math","C5","C18","","C42","C45","C47",["2","5"],false,"C79"], ["C40","10"]]`,
-                `[["math","C5","C18","","C42","C46","C47",["2","5"],false,"C79"], ["C40","10"]]`,
-                `[["math","C7","C33","","C41","C45","C47",["1","1"],false,"C79"], ["C40","30"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C80", "C82", "C75","C59"], ["C40","3"]]`,
-                `[["lang","C49","C52", "C80", "C82", "C75","C59"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C75","C59"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C75","C59"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C80", "C82", "C75","C60"], ["C40","1"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C75","C60"], ["C40","1"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C75",{"C61":[],"C66":[],"C67":[],"C68":[],"C85":[],"C86":[],"C87":[],"C88":[],"C89":[],"C90":[],"C91":[]},"C73",1], ["C40","10"]]`
-            ]
-        },
-        "1-2": {
-            "math": [
-                `[["math","C4","C18","","C41","C45","C47",["2","9"],false,"C79"], ["C40","30"]]`,
-                `[["math","C4","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","20"]]`,
-                `[["math","C5","C18","","C41","C45","C47",["2","9"],false,"C79"], ["C40","30"]]`,
-                `[["math","C5","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","20"]]`,
-                `[["math","C5","C18","","C42","C46","C47",["2","9"],false,"C79"], ["C40","20"]]`,
-                `[["math","C7","C33","","C41","C45","C47",["1","1"],false,"C79"], ["C40","30"]]`,
-                `[["math","C3","C11","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","30"]]`,
-                `[["math","C3","C11","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","30"]]`,
-                `[["math","C3","C11","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C12","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","30"]]`,
-                `[["math","C3","C12","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C7","C33","","C41","C45","C47",["1","1"],false,"C79"], ["C40","30"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C80", "C82", "C75","C59"], ["C40","3"]]`,
-                `[["lang","C49","C52", "C80", "C82", "C75","C59"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C75","C59"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C75","C59"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C80", "C82", "C75","C60"], ["C40","1"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C75","C60"], ["C40","1"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C75",{"C61":[],"C66":[],"C67":[],"C68":[],"C85":[],"C86":[],"C87":[],"C88":[],"C89":[],"C90":[],"C91":[]},"C73",1], ["C40","15"]]`
-            ]
-        },
-        "3-8": {
-            "math": [
-                `[["math","C3","C12","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C11","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C7","C33","","C41","C45","C47",["1","1"],false,"C79"], ["C40","30"]]`,
-                `[["math","C6","C18","","C41","C45","C47",["2","9"],false,"C79"], ["C40","40"]]`,
-                `[["math","C6","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","40"]]`,
-                `[["math","C1","C13","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C13","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C13","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C13","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","5"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C81", "C82", "C75","C59"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C75","C59"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C80", "C82", "C75","C60"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C80", "C82", "C75","C60"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C75","C60"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C75","C60"], ["C40","2"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C75",{"C61":[],"C66":[],"C67":[],"C68":[],"C85":[],"C86":[],"C87":[],"C88":[],"C89":[],"C90":[],"C91":[]},"C73",1], ["C40","20"]]`
-            ]
-        }
-    },
-    3: {
-        "9-10": {
-            "math": [
-                `[["math","C3","C12","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C11","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C7","C33","","C41","C45","C47",["1","1"],false,"C79"], ["C40","30"]]`,
-                `[["math","C6","C18","","C41","C45","C47",["2","9"],false,"C79"], ["C40","40"]]`,
-                `[["math","C6","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","40"]]`,
-                `[["math","C1","C13","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C13","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C13","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C13","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","5"]]`,
-                `[["math","C1","C14","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C14","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C14","C37","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C1","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","5"]]`,
-                `[["math","C2","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","5"]]`,
-                `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","5"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C80", "C82", "C76","C58"], ["C40","3"]]`,
-                `[["lang","C49","C52", "C80", "C82", "C76","C58"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C76","C58"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C58"], ["C40","1"]]`,
-                `[["lang","C49","C51", "C80", "C82", "C76","C59"], ["C40","1"]]`,
-                `[["lang","C49","C52", "C80", "C82", "C76","C59"], ["C40","1"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C76",{"C66":[],"C68":[],"C72":[]},"C73",3], ["C40","20"]]`,
-            ]
-        },
-        "11-12": {
-            "math": [
-                `[["math","C3","C12","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C11","C38","C42","C43","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C7","C33","","C41","C45","C47",["1","1"],false,"C79"], ["C40","30"]]`,
-                `[["math","C6","C18","","C41","C45","C47",["2","9"],false,"C79"], ["C40","40"]]`,
-                `[["math","C6","C18","","C42","C45","C47",["2","9"],false,"C79"], ["C40","40"]]`,
-                `[["math","C1","C13","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C13","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C13","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C13","C38","C41","C43","C47",["1","1"],false,"C79"], ["C40","5"]]`,
-                `[["math","C1","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C81", "C82", "C76","C58"], ["C40","3"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C58"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C80", "C82", "C76","C59"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C80", "C82", "C76","C59"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","1"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","1"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C76",{"C66":[],"C68":[],"C69":[],"C72":[]},"C73",3], ["C40","20"]]`,
-            ]
-        },
-        "1-2": {
-            "math": [
-                `[["math","C1","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C4","C28","","C41","C45","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C5","C28","","C41","C45","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C6","C28","","C41","C45","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C4","C19","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C4","C19","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C4","C20","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C4","C21","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C5","C20","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C5","C21","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C5","C18","","C41","C45","C47",["2","9"],true,"C79"], ["C40","20"]]`,
-                `[["math","C5","C22","","C41","C45","C48",["1","1"],true,"C79"], ["C40","10"]]`,
-                `[["math","C5","C30","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C7","C34","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C1","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C81", "C82", "C76","C58"], ["C40","3"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C58"], ["C40","3"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C60"], ["C40","1"]]`
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C76",{"C65":[],"C66":[],"C68":[],"C69":[],"C71":[],"C72":[],"C92":[]},"C73",3], ["C40","20"]]`
-            ]
-        },
-        "3-8": {
-            "math": [
-                `[["math","C2","C16","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C1","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C4","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C5","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C5","C22","","C41","C45","C47",["1","1"],true,"C79"], ["C40","10"]]`,
-                `[["math","C5","C30","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C7","C34","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C7","C35","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","3"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","1"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C60"], ["C40","2"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":[],"C68":[],"C69":[],"C71":[],"C72":[],"C92":[]},"C73",3], ["C40","20"]]`]
-        }
-    },
-    4: {
-        "9-10": {
-            "math": [
-                `[["math","C2","C16","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C1","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C4","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C5","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C5","C22","","C41","C45","C47",["1","1"],true,"C79"], ["C40","10"]]`,
-                `[["math","C5","C30","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C7","C34","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C7","C35","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C4","C23","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C4","C24","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C6","C29","","C41","C45","C47",["1","1"],false,"C79"], ["C40","20"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C80", "C82", "C76","C59"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C80", "C82", "C76","C59"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","1"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","1"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":[],"C68":[],"C69":[],"C71":[],"C72":[],"C92":[]},"C73",3], ["C40","20"]]`,
-            ]
-        },
-        "11-12": {
-            "math": [
-                `[["math","C2","C16","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C1","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C2","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C4","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C5","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C5","C22","","C41","C45","C47",["1","1"],true,"C79"], ["C40","15"]]`,
-                `[["math","C5","C30","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C7","C35","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C4","C26","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C80", "C82", "C76","C59"], ["C40","3"]]`,
-                `[["lang","C49","C52", "C80", "C82", "C76","C59"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C80", "C82", "C76","C60"], ["C40","1"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C60"], ["C40","1"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":[],"C68":[],"C69":[],"C71":[],"C72":[],"C92":[]},"C74",1], ["C40","20"]]`,
-            ]
-        },
-        "1-2": {
-            "math": [
-                `[["math","C2","C16","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C1","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C2","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C4","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C5","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C5","C22","","C41","C45","C47",["1","1"],true,"C79"], ["C40","15"]]`,
-                `[["math","C5","C30","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C7","C35","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C4","C26","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C1","C15","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","5"]]`,
-                `[["math","C2","C15","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","5"]]`,
-                `[["math","C3","C15","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","5"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C80", "C82", "C76","C59"], ["C40","3"]]`,
-                `[["lang","C49","C52", "C80", "C82", "C76","C59"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C80", "C82", "C76","C60"], ["C40","1"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","1"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":[],"C68":[],"C69":[],"C71":[],"C72":[],"C92":[]},"C74",1], ["C40","20"]]`,
-            ]
-        },
-        "3-8": {
-            "math": [
-                `[["math","C2","C16","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C1","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C2","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C4","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C5","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C5","C22","","C41","C45","C47",["1","1"],true,"C79"], ["C40","15"]]`,
-                `[["math","C5","C30","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C7","C35","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C4","C26","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C1","C15","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","5"]]`,
-                `[["math","C2","C15","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","5"]]`,
-                `[["math","C3","C15","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","5"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C80", "C82", "C76","C60"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C80", "C82", "C76","C60"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C60"], ["C40","2"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":[],"C68":[],"C69":[],"C71":[],"C72":[],"C92":[]},"C74",1], ["C40","20"]]`
-            ]
-        }
-    },
-    5: {
-        "9-10": {
-            "math": [
-                `[["math","C2","C16","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C1","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C2","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C4","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C5","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C5","C22","","C41","C45","C47",["1","1"],true,"C79"], ["C40","15"]]`,
-                `[["math","C5","C30","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C7","C34","","C41","C45","C48",["1","1"],false,"C79"], ["C40","25"]]`,
-                `[["math","C7","C35","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C4","C23","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C4","C24","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C6","C29","","C41","C45","C47",["1","1"],false,"C79"], ["C40","25"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C80", "C82", "C76","C59"], ["C40","3"]]`,
-                `[["lang","C49","C52", "C80", "C82", "C76","C59"], ["C40","3"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","2"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","2"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":[],"C68":[],"C69":[],"C71":[],"C72":[],"C92":[]},"C74",1], ["C40","30"]]`
-            ]
-        },
-        "11-12": {
-            "math": [
-                `[["math","C2","C16","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C1","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C2","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C4","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C5","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C5","C22","","C41","C45","C47",["1","1"],true,"C79"], ["C40","20"]]`,
-                `[["math","C5","C30","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C7","C35","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C4","C26","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C5","C24","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C5","C25","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C5","C26","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","3"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","3"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","2"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":[],"C68":[],"C69":[],"C71":[],"C72":[],"C92":[]},"C74",1], ["C40","30"]]`
-            ]
-        },
-        "1-2": {
-            "math": [
-                `[["math","C2","C16","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C1","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C2","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C4","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C5","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C5","C22","","C41","C45","C47",["1","1"],true,"C79"], ["C40","20"]]`,
-                `[["math","C5","C30","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C7","C35","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C4","C26","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C1","C15","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C15","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C15","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C5","C24","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C5","C25","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C5","C26","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","3"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","3"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","2"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","2"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":[],"C68":[],"C69":[],"C71":[],"C72":[],"C92":[]},"C74",1], ["C40","30"]]`
-            ]
-        },
-        "3-8": {
-            "math": [
-                `[["math","C2","C16","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C1","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C2","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C3","C14","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C4","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C5","C22","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C5","C22","","C41","C45","C47",["1","1"],true,"C79"], ["C40","20"]]`,
-                `[["math","C5","C30","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C7","C35","","C41","C45","C48",["1","1"],false,"C79"], ["C40","20"]]`,
-                `[["math","C4","C26","","C41","C45","C48",["1","1"],false,"C79"], ["C40","15"]]`,
-                `[["math","C1","C15","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C2","C15","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C3","C15","C38","C41","C43","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                 `[["math","C5","C24","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C5","C25","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-                `[["math","C5","C26","","C41","C45","C48",["1","1"],false,"C79"], ["C40","10"]]`,
-            ],
-            "text-comp": [
-                `[["lang","C49","C51", "C81", "C82", "C76","C59"], ["C40","4"]]`,
-                `[["lang","C49","C52", "C81", "C82", "C76","C59"], ["C40","4"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","3"]]`,
-                `[["lang","C49","C51", "C81", "C82", "C76","C60"], ["C40","3"]]`,
-            ],
-            "grammar": [
-                `[["lang","C83","C50","C76",{"C62":[],"C63":[],"C64":[],"C65":[],"C66":[],"C68":[],"C69":[],"C71":[],"C72":[],"C92":[]},"C74",1], ["C40","30"]]`
-            ]
-        }
-    }
-}
-
+// (personalChlDict - the challenge lists - is in ../sudedu-auto-tasks.js)
 const typeLabels = {
     "math": "Matematika",
     "text-comp": "Teksto supratimas",

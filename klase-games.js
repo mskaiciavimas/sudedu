@@ -14,7 +14,7 @@
   var current = null;                 // the lobby this page is in (as last sent by the server)
   var heartbeat = 0;                  // host only: interval that keeps the lobby open
   var leavingForGame = false;         // the game started: navigating away must not close the lobby
-  var GAME_NAMES = { td: 'Tvirtovės gynyba', ghost: 'Vaiduoklis' };
+  var GAME_NAMES = window.SUDEDU_GAME_NAMES || { td: 'Tvirtovės gynyba', ghost: 'Vaiduoklis' };   // game-names.js
   // who may host each game (the same rule as the game server): 'teacher', 'student' or 'both'
   var GAME_HOSTS = { td: 'teacher', ghost: 'both' };
   var GHOST_DICT = { easy: 'lengvas', medium: 'vidutinis', hard: 'sunkus', expert: 'ekspertas' };
@@ -71,6 +71,7 @@
     SudGame.request('lobby:list').then(function (r) {
       btn.disabled = false;
       if (!r || !r.ok) { list.innerHTML = '<li class="zg-empty">Nepavyko gauti žaidimų sąrašo.</li>'; return; }
+      setLobbyBadge(r.lobbies.length);
       if (!r.lobbies.length) { list.innerHTML = '<li class="zg-empty">Šiuo metu klasėje žaidimų nėra.</li>'; return; }
       list.innerHTML = r.lobbies.map(function (l) {
         var mine = isMine(l), back = l.status !== 'lobby' && l.inGame;
@@ -80,13 +81,32 @@
         return '<li class="zg-lobby-row"><div class="zg-code">' + esc(l.code) + '</div>' +
           '<div class="zg-lobby-info"><b>' + esc(GAME_NAMES[l.game] || l.game) + '</b><span>' + esc(l.hostName) +
           (l.hostIsTeacher ? ' <i class="zg-badge">Mokytojo</i>' : '') + (l.visibility === 'private' ? ' <i class="zg-badge">Privatus</i>' : '') + ' · ' + count + '</span></div>' +
+          // a teacher can only open their own games; the students' games just show their state
+          (isTeacher && !mine ? '<span class="zg-lobby-state">' + (l.status === 'lobby' ? 'Laukiamasis' : 'Vyksta') + '</span></li>' :
           '<button class="zg-btn" type="button" data-code="' + esc(l.code) + '"' + (mine ? ' data-mine="1"' : '') +
-          (open || mine || back ? '' : ' disabled') + '>' + (mine ? 'Atidaryti' : open ? 'Prisijungti' : back ? 'Grįžti į žaidimą' : full && l.status === 'lobby' ? 'Pilnas' : 'Vyksta') + '</button></li>';
+          (open || mine || back ? '' : ' disabled') + '>' + (mine ? 'Atidaryti' : open ? 'Prisijungti' : back ? 'Grįžti į žaidimą' : full && l.status === 'lobby' ? 'Pilnas' : 'Vyksta') + '</button></li>');
       }).join('');
     }).catch(function () { btn.disabled = false; list.innerHTML = '<li class="zg-empty">Nepavyko prisijungti prie žaidimų serverio.</li>'; });
   }
 
+  // ---------- the badge on the Žaidimai button: how many lobbies / games the class has open ----------
+  // (a plain HTTP request, so visiting the page doesn't open a game connection; refreshed every minute)
+  function setLobbyBadge(n) {
+    var b = $('zg-nav-badge');
+    if (!b) return;
+    b.textContent = n > 9 ? '9+' : String(n);
+    b.hidden = !n;
+  }
+  function fetchLobbyCount() {
+    if (typeof apiFetch !== 'function') return;
+    apiFetch(apiBase + 'class/activeLobbies')
+      .then(function (r) { return r && r.ok ? r.json() : null; })
+      .then(function (d) { if (d) setLobbyBadge(d.count || 0); })
+      .catch(function () {});
+  }
+
   function joinLobby(code) {
+    if (isTeacher) return;                                     // teachers host games, they don't join them
     listen();
     code = String(code || '').trim();
     if (!/^\d{4}$/.test(code)) { say('Įrašykite 4 skaitmenų žaidimo numerį.'); return; }
@@ -319,6 +339,8 @@
   function openRules(game) {
     if ($('zg-rules').parentNode !== document.body) document.body.appendChild($('zg-rules'));   // above everything on the page
     [].forEach.call($('zg-rules').querySelectorAll('[data-game]'), function (el) { el.hidden = el.dataset.game !== game; });
+    var title = $('zg-rules').querySelector('[data-game="' + game + '"] .zg-rules-title');
+    if (title) $('zg-rules').querySelector('[role="dialog"]').setAttribute('aria-labelledby', title.id);
     $('zg-rules').hidden = false;
     $('zg-rules').querySelector('[data-rules-close]').focus();
   }
@@ -414,7 +436,8 @@
   function startStudentGame(lobby) {
     leavingForGame = true;
     var s = lobby.settings, m = s.math;
-    SudGame.setSession({ code: lobby.code, role: 'player', mode: s.mode, minutes: s.minutes, startedAt: Date.now() });
+    // game: the game's permanent key – its results go to the student's archive under it (game-client.js)
+    SudGame.setSession({ code: lobby.code, game: lobby.game, role: 'player', mode: s.mode, minutes: s.minutes, startedAt: Date.now() });
     try { var saved = JSON.parse(localStorage.getItem('controller')); if (saved) controller = saved; } catch (e) {}
     controller.language = 'LT';
     controller.mode = 'math';
@@ -451,13 +474,13 @@
   // ---------- wiring ----------
   var listen = function () {};
   function init() {
-    // experimental section: only for approved tester teachers and their students (see the top of klase.html)
-    if (!$('zaidimai') || !document.documentElement.classList.contains('experimental-on')) return;
+    if (!$('zaidimai')) return;
     var s = SudGame.getSession();
     if (s && s.role === 'player') SudGame.clearSession();      // back on the class page: any earlier game is over
 
     // every game is shown; its create button only works for those who may host it (with the reason underneath)
     $('zg-games-panel').hidden = false;
+    $('zg-join-code').closest('.zg-join-box').hidden = isTeacher;
     $('zg-refresh').onclick = refreshLobbies;
     $('zg-join-btn').onclick = function () { joinLobby($('zg-join-code').value); };
     $('zg-join-code').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 4); });
@@ -477,6 +500,12 @@
     updatePlayButton();
     window.addEventListener('resize', updatePlayButton);
     $('zg-play-ghost').onclick = function () { if (canHost('ghost')) openGhostSettings(); };
+    // going to another section closes a game's settings (not a lobby: that stays open while the user looks around)
+    document.querySelectorAll('.nav-item').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (btn.dataset.target !== 'zaidimai' && (!$('zg-settings').hidden || !$('zg-ghost-settings').hidden)) show('zg-home');
+      });
+    });
     // "?" (Kaip žaisti?): the game's rules, before starting it
     document.querySelectorAll('#zaidimai [data-rules]').forEach(function (b) { b.addEventListener('click', function () { openRules(b.dataset.rules); }); });
     $('zg-rules').addEventListener('click', function (e) { if (e.target.id === 'zg-rules' || e.target.closest('[data-rules-close]')) closeRules(); });
@@ -489,6 +518,8 @@
         var open = t.getAttribute('aria-expanded') !== 'true';
         t.setAttribute('aria-expanded', String(open));
         t.nextElementSibling.hidden = !open;
+        // the toggle and the settings it opened
+        if (open && window.revealExpanded) revealExpanded(t.parentElement.classList.contains('zg-l-wide') ? t.parentElement : t.nextElementSibling);
       });
     });
     $('zg-l-form').addEventListener('change', changeLobbySetting);
@@ -512,6 +543,11 @@
     };
     $('zg-settings-back').onclick = function () { show('zg-home'); };
     $('zg-mode').onchange = function () { $('zg-minutes-field').hidden = this.value !== 'timed'; };
+    // minutes: Praktika's +/- buttons (tap, or hold to speed up); the field itself can't be typed in
+    if (typeof setupHoldButton === 'function') {
+      setupHoldButton('.zg-minutes-minus', 'zg-minutes', 1, 60, false);
+      setupHoldButton('.zg-minutes-plus', 'zg-minutes', 1, 60, true);
+    }
     $('zg-create').onclick = createLobby;
     $('zg-actions').addEventListener('click', function (e) {
       var b = e.target.closest('button'), id = b && b.id;
@@ -555,6 +591,11 @@
       });
     });
     };
+
+    // the lobby-count badge (inside the section the list itself shows the lobbies)
+    fetchLobbyCount();
+    setInterval(function () { if (!document.hidden && !sectionOpen()) fetchLobbyCount(); }, 60000);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden && !sectionOpen()) fetchLobbyCount(); });
 
     // leaving the Žaidimai section (another tab of this page) leaves / closes the lobby
     document.querySelectorAll('.nav-item').forEach(function (btn) {

@@ -8,7 +8,7 @@
     <link rel="stylesheet"
 		href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="../main-nav-bar.css">
-    <link rel="stylesheet" type="text/css" href="../index.css">
+    <link rel="stylesheet" type="text/css" href="../index.css?v=20261018r">
     <link id="questionsStyleSheet" rel="stylesheet" type="text/css" href="">
     <link rel="stylesheet" href="../pet-game-pets.css">
     <!-- Google tag (gtag.js) -->
@@ -831,6 +831,48 @@
   z-index: 10000;
 }
 
+/* =====================================================================
+   TYPOGRAPHY + GLASS ALIGNMENT WITH THE "UŽDUOTYS" PAGE
+   Only the counters/timer/hint font sizes and the two panel colours are
+   changed. Draggable items (.item) are deliberately left alone so the drag
+   highlight states keep working. The panel ring is an inset shadow, so no
+   layout box changes. The tablet-portrait overrides above keep their sizes.
+   ===================================================================== */
+
+.right-side-panel {
+    background: rgba(255, 255, 255, 0.42);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
+    border-radius: 16px;
+}
+
+/* The sidebar is a slide-in drawer on phones and tablets in portrait, with
+   its own background and corners, so the glass look is desktop-only here. */
+@media (min-width: 768px) and (orientation: landscape) {
+    .sidebar {
+        background: rgba(255, 255, 255, 0.42);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
+        border-radius: 16px;
+    }
+}
+
+/* line-height is pinned to the old line box (1.25rem x 1.2 = 1.5rem), so the
+   header keeps exactly its previous height and nothing below it moves. */
+@media (min-width: 768px) and (orientation: landscape), (max-width: 767px) {
+    #mistakes-tracker,
+    #question-number-tracker,
+    #timer {
+        font-size: 1.1rem;
+        line-height: 1.5rem;
+    }
+}
+
+@media (min-width: 768px) and (orientation: landscape) {
+    #tries,
+    #help {
+        font-size: 1.1rem;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -1020,8 +1062,8 @@
   
   <script src="../main-nav-bar.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-  <script src="../parameter_dictionary.js"></script>
-  <script src="../mental-arithmetic.js"></script>
+  <script src="../parameter_dictionary.js?v=20261018r"></script>
+  <script src="../mental-arithmetic.js?v=20261018r"></script>
   <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.12/lib/draggable.bundle.js"></script>
 
   <script>
@@ -1048,6 +1090,7 @@
 
   controller = JSON.parse(localStorage.getItem('controller')) 
     window.stopQuestionsCloseActions = function () {
+    saveStoppedTaskProgress();      // a teacher's task: save the progress so far (before anything is cleared)
     controller.questionsStopped = true;
     clearInterval(timerInterval);
     stopButtonSpanElement.innerHTML = "refresh";
@@ -1110,6 +1153,37 @@
 
     let currentSeed = controller.modeChoice8;
     let currentPassNumber = 0;
+    let resumeSkipApplied = false;
+
+    // Resuming an in-progress teacher-assigned task: restore per-text attempt history so repeat
+    // attempts keep scoring correctly, and rebuild answeredTexts so textIncidenceCount comes out
+    // right. A mistakesSummary entry is created the moment a text is first drawn (displayQuestion),
+    // before it's completed — so if the task was closed mid-text, the LAST saved entry is that same
+    // still-unfinished text, and it's about to be redrawn (nothing gets skipped for it) rather than
+    // freshly drawn. displayQuestion() always does answeredTexts.push(currentTextId) on every draw,
+    // including that redraw, so counting that entry's full attempt history here too would double
+    // count it: textIncidenceCount would come out one too high, padding a brand new zero-mistake
+    // slot onto attempts[] and sending every further mistake there instead of the existing slot —
+    // leaving the mistake(s) already made on it stranded and uncounted. Reserving one fewer
+    // occurrence for that specific entry lets the redraw's own push land back on the existing slot.
+    if (controller.task && controller.task[0] === "setTask" && controller.resumeData
+        && controller.resumeData.progress && Array.isArray(controller.resumeData.progress.mistakesSummary)) {
+        const restoredSummary = controller.resumeData.progress.mistakesSummary.map(entry => ({
+            textId: entry.textId,
+            attempts: Array.isArray(entry.attempts) ? [...entry.attempts] : []
+        }));
+        window.mistakesSummary = restoredSummary;
+        const completedCount = Number(controller.resumeData.answeredCount) || 0;
+        answeredTexts = [];
+        restoredSummary.forEach((entry, index) => {
+            const isStillInProgress = index >= completedCount;
+            const occurrences = isStillInProgress ? Math.max(0, entry.attempts.length - 1) : entry.attempts.length;
+            for (let i = 0; i < occurrences; i++) answeredTexts.push(entry.textId);
+        });
+        if (typeof controller.resumeData.progress.passNumber === "number") {
+            currentPassNumber = controller.resumeData.progress.passNumber;
+        }
+    }
 
     let allTextIds = [];
     let currentTextBatchIndex = 0;
@@ -1319,6 +1393,19 @@ function loadNextTextBatch() {
       } else if (filteredTextLibrary.length === 0) {
           // Texts exist but batch is empty - load next batch
           loadNextTextBatch();
+      }
+
+      // Resuming an in-progress teacher-assigned task: discard however many texts were already
+      // completed last time from the deterministic queue (reusing selectRandomItem()'s own batch
+      // loading/pass-rollover), so the next one served is the first unfinished one, not a replay.
+      if (!resumeSkipApplied) {
+          resumeSkipApplied = true;
+          const resuming = controller.task && controller.task[0] === "setTask" && controller.resumeData;
+          if (resuming && controller.randomSelection.length === 0 && controller.answeredQuestionTracker > 0) {
+              for (let i = 0; i < controller.answeredQuestionTracker; i++) {
+                  selectRandomItem();
+              }
+          }
       }
 
       if (controller.randomSelection.length === 0) {
@@ -1600,6 +1687,13 @@ function loadNextTextBatch() {
         localStorage.setItem('controller', JSON.stringify(controller));
         mistakesTracker.innerHTML = `Klaidos: ${controller.mistakesTracker}`;
     }
+
+      // Text comprehension answers come in slowly enough that saving on every submit (correct or
+      // wrong) stays cheap — and it's coalesced, so clicking rapidly in succession never produces
+      // more than ~1 extra request beyond whatever save is already in flight.
+      if (controller.task && controller.task[0] === "setTask") {
+        saveTaskProgressNow();
+      }
     });
 
     function recordTextComprehensionMistake() {
@@ -1887,6 +1981,10 @@ function loadNextTextBatch() {
             questionNumberTracker.innerHTML = `Atlikta: ${controller.answeredQuestionTracker}`;
         }
         mistakesTracker.innerHTML = `Klaidos: ${controller.mistakesTracker}`;
+
+        if (controller.task && controller.task[0] === "setTask") {
+            startTaskProgressSync();
+        }
     }
 
     function clearInputFields() {
@@ -2017,6 +2115,7 @@ function loadNextTextBatch() {
 
           localStorage.setItem('controller', JSON.stringify(controller));
           initiateTheProgram();
+          startTaskProgressSync();      // (paused by the stop; does nothing for other tasks or when already running)
       }
   }
 

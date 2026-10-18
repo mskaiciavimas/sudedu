@@ -155,7 +155,7 @@ body.host .host-close{display:flex;align-items:center;justify-content:center}
 
 <!-- class games: login token + real-time connection (only used when opened from a lobby) -->
 <script src="../refresh-token.js"></script>
-<script src="../game-client.js"></script>
+<script src="../game-client.js?v=20261018r"></script>
 <script>
 (function(){
 'use strict';
@@ -225,11 +225,11 @@ var ETYPE={
   // bosses (health set when they appear, from the class's firepower): the slime king bursts into four spiky slimelings;
   // the queen bee flies and leaves hives on the road that hatch two bees each and crumble; the goblin warlord now and then
   // charges on his wolf
-  K:enemyKind(BOSSES+1,{walk:'Walk',death:'!Death2',attack:'!Attack1'},{name:'gleivių karalius',reach:16,boss:1,bossS:4,minHp:12,spd:30,castle:40,aim:10,top:28,fs:96,feet:58,split:'k',splitN:4,cols:['#c9d84e','#6f9a32','#fff']}),
+  K:enemyKind(BOSSES+1,{walk:'Walk',death:'!Death2',attack:'!Attack1'},{name:'gleivių karalius',reach:16,boss:1,bossS:4,minHp:12,spd:30,castle:20,aim:10,top:28,fs:96,feet:58,split:'k',splitN:4,cols:['#c9d84e','#6f9a32','#fff']}),
   k:enemyKind(BOSSES+1,{walk:'Special_{d}_Walk',death:'!Special_Death'},{name:'dygliukas',reach:8,hp:2,spd:62,castle:5,aim:7,top:20,cols:['#c9d84e','#fff']}),
-  Q:enemyKind(BOSSES+2,{walk:'Fly',death:'Death',attack:'Attack'},{name:'bičių motinėlė',reach:18,boss:1,bossS:3,minHp:10,spd:40,castle:30,aim:22,top:44,fly:10,fs:96,feet:65,hives:1,cols:['#f0a23a','#fff','#7a4a2a']}),
+  Q:enemyKind(BOSSES+2,{walk:'Fly',death:'Death',attack:'Attack'},{name:'bičių motinėlė',reach:18,boss:1,bossS:3,minHp:10,spd:40,castle:15,aim:22,top:44,fly:10,fs:96,feet:65,hives:1,cols:['#f0a23a','#fff','#7a4a2a']}),
   h:enemyKind(BOSSES+2,{walk:'!Special_Idle',death:'!Special_Death',rise:'!Special_Rise'},{name:'avilys',hp:5,spd:0,castle:0,aim:18,top:42,fs:96,feet:68,hive:1,cols:['#a89a8a','#7a6a5a']}),
-  G:enemyKind(BOSSES+3,{walk:'Walk',death:'Death',attack:'Attack',charge:'Special'},{name:'goblinų vadas',reach:22,boss:1,bossS:5,minHp:16,spd:36,castle:50,aim:22,top:50,fs:96,feet:67,charge:1,cols:['#5b6f9e','#9db84a','#b4553a']})};
+  G:enemyKind(BOSSES+3,{walk:'Walk',death:'Death',attack:'Attack',charge:'Special'},{name:'goblinų vadas',reach:22,boss:1,bossS:5,minHp:16,spd:36,castle:25,aim:22,top:50,fs:96,feet:67,charge:1,cols:['#5b6f9e','#9db84a','#b4553a']})};
 var BOSS_ORDER=['K','Q','G'],EN_FPS=10;
 
 var NAMES=["Rokas","Emilija","Jonas","Gabija","Lukas","Ugnė","Matas","Austėja","Dovydas","Kamilė","Nojus","Liepa","Ąžuolas","Rugilė","Titas","Benas",
@@ -597,7 +597,8 @@ function dirUpdate(dt){var D=G.dir,d=diff();
   //  - Heading below the planned end (at the loss rate of the last 30 s), below the planned curve, about to lose
   //    clearly more in the next 30 s than planned, or a pile-up building near the gates -> back off (harder the worse).
   //  - Ahead of plan, nothing got through for 15 s and enemies die well before the gates -> a little more pressure.
-  //  - Quiet for a while (no losses for 30 s, nothing at or near the gates) -> a little more pressure even when behind
+  //  - Quiet for a while (no losses for 30 s, no damage expected, no pile-up building; enemies may still reach a gate
+  //    as long as they are shot down before they hurt it) -> a little more pressure even when behind
   //    plan, so after a rough patch the pressure comes back up instead of staying at the bottom.
   D.calm+=dt;D.t5+=dt;if(D.t5>=2.5){D.t5=0;D.n70*=.95;D.nGate*=.95;
     D.hist.push(G.hp);if(D.hist.length>13)D.hist.shift();
@@ -608,9 +609,9 @@ function dirUpdate(dt){var D=G.dir,d=diff();
         crowd=0,near=0;D.depth=[];
     enemies.forEach(function(x){if(x.dead||ETYPE[x.type].hive)return;if(x.state==='siege')crowd++;
       if(x.state==='siege'||x.d>x.rt.len*.7)near+=x.hp});
-    var load=near/(classDps()*5),quiet=D.hist.length>=13&&rate<=0&&pend<1&&!crowd&&load<.4;
+    var load=near/(classDps()*5),quiet=D.hist.length>=13&&rate<=0&&pend<1&&load<.4;
     D.pend=pend;D.load=load;
-    if(quiet&&D.calm>15)D.adj+=e>5&&deep<.7?Math.min(.05,.015*e/10):.012;
+    if(quiet)D.adj+=e>5&&deep<.7&&D.calm>15?Math.min(.05,.015*e/10):.012;
     else{var bad=Math.max(d.end-3-proj,-5-e,risk-3);
       if(bad>0)D.adj-=Math.min(.25,.04+.03*bad/10);
       if(crowd>=2||load>1.3)D.adj-=Math.min(.25,Math.max(.03*crowd,.05*load))}
@@ -632,7 +633,8 @@ function strength(){return Math.min(1.4,(HS.mode==='timed'?gameProg():G.wave/7)+
 // health an enemy brings in total (a slime's little ones included)
 function cost(type){var T=ETYPE[type];return T.hp+(T.split?ETYPE[T.split].hp*(T.splitN||2):0)}
 // ordinary enemies get tougher over the game; with a very strong class they also get tougher instead of ever more of them
-function hpMul(){var rate=G.dir.P*classDps()/4.5;return Math.max(1+.4*gameProg(),rate/2.2)}
+// (at most about 1.2 a second: only the few towers by the gates can stop the ones that get through, whatever the class size)
+function hpMul(){var rate=G.dir.P*classDps()/4.5;return Math.max(1+.4*gameProg(),rate/1.2)}
 function bossHp(type){var T=ETYPE[type];return Math.max(T.minHp,Math.round(classDps()*T.bossS*diff().bossHp))}
 // a boss "costs" its health plus what it brings along; ordinary enemies pause until most of that is paid back
 function bossCost(type){var T=ETYPE[type];return .7*bossHp(type)*(T.split?1.3:T.hives?1.5:1)}
@@ -912,11 +914,12 @@ function logResult(result){var D=G.dir||{};
 // the students' timers follow this game's clock (time left in a timed game, time played until defeat)
 function sendClock(sk){if(!G.playing||G.sent)return;sk.emit('game:clock',HS.mode==='timed'?{leftMs:Math.round(G.left*1000)}:{elapsedMs:Math.round(G.played*1000)})}
 function clockNow(){SudGame.connect().then(sendClock).catch(function(){})}
-// a correct answer from a student: their unit in the tower gets one more shot to fire (and the class's measured
-// firepower grows by that tower's damage × reach: a tower that reaches further gets more of the road to shoot at)
+// a correct answer from a student: their unit in the tower gets one more shot to fire (at most 6 waiting). The class's
+// measured firepower grows by that tower's damage × reach (a tower that reaches further gets more of the road to shoot
+// at), but only for a shot that could be queued: answers piling up in a tower with nothing to shoot at don't count.
 function hostShot(s,eq){var tw=towers[s.team],un=tw.units.filter(function(u){return u.si===s.i})[0];
-  s.correct++;tw.correct++;dirty=true;if(un.queue.length<6)un.queue.push({si:s.i,eq:eq||'',at:G.anim+SHOT_DELAY});
-  if(G.dir){G.dir.acc+=lv(tw).dmg*(lv(tw).reach||1);G.dir.nacc++}
+  s.correct++;tw.correct++;dirty=true;var room=un.queue.length<6;if(room)un.queue.push({si:s.i,eq:eq||'',at:G.anim+SHOT_DELAY});
+  if(G.dir){if(room)G.dir.acc+=lv(tw).dmg*(lv(tw).reach||1);G.dir.nacc++}
   if(G.met)G.met.c++;
   floater(tw.x+un.off*2,feetY(tw)-36,fitText(s.name,90,FLOAT_FONT(11))+' ✓',tw.col,11)}
 // ten correct in a row: the student's tower goes up a level (up to 4)

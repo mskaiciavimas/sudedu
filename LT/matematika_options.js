@@ -289,81 +289,81 @@ function updateModeChoice3() {
     modeChoice5Element.innerHTML += '<option value="C42">SKAITINĖ LYGYBĖ SU NEŽINOMUOJU</option>';
 
     if (modeChoice2Selection === "C9" && modeChoice1Selection === "C1") {
-        modeChoice3Element.innerHTML += '<option value="C38">PERŽENGIANT DEŠIMTĮ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
     } else if (modeChoice2Selection === "C9" && modeChoice1Selection === "C2") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEIŠARDANT DEŠIMTIES</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
     } else if (modeChoice2Selection === "C9" && modeChoice1Selection === "C3") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEPERŽENGIANT/NEIŠARDANT DEŠIMTIES</option>';
-        modeChoice3Element.innerHTML += '<option value="C38">PERŽENGIANT/IŠARDANT DEŠIMTĮ</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
 
     } else if (modeChoice2Selection === "C17" && modeChoice1Selection === "C3") {
-        modeChoice3Element.innerHTML += '<option value="C38">PERŽENGIANT/IŠARDANT DEŠIMTĮ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
     } else if (modeChoice2Selection === "C8" && modeChoice1Selection === "C1") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEPERŽENGIANT DEŠIMTIES</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
     } else if (modeChoice2Selection === "C8" && modeChoice1Selection === "C2") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEIŠARDANT DEŠIMTIES</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
     } else if (modeChoice2Selection === "C8" && modeChoice1Selection === "C3") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEPERŽENGIANT/NEIŠARDANT DEŠIMTIES</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
 
     } else if (modeChoice2Selection === "C10" && modeChoice1Selection === "C1") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEPERŽENGIANT DEŠIMTIES</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
     } else if (modeChoice2Selection === "C10" && modeChoice1Selection === "C2") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEIŠARDANT DEŠIMTIES</option>';
-        modeChoice3Element.innerHTML += '<option value="C38">IŠARDANT DEŠIMTĮ (LENTELINĖ ATIMTIS)</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS (LENTELINĖ ATIMTIS)</option>';
     } else if (modeChoice2Selection === "C10" && modeChoice1Selection === "C3") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEPERŽENGIANT/NEIŠARDANT DEŠIMTIES</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
 
     } else if (modeChoice2Selection === "C11" && modeChoice1Selection === "C1") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEPERŽENGIANT DEŠIMTIES</option>';
-        modeChoice3Element.innerHTML += '<option value="C38">PERŽENGIANT DEŠIMTĮ</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
     } else if (modeChoice2Selection === "C11" && modeChoice1Selection === "C2") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEIŠARDANT DEŠIMTIES</option>';
-        modeChoice3Element.innerHTML += '<option value="C38">IŠARDANT DEŠIMTĮ</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
     } else if (modeChoice2Selection === "C11" && modeChoice1Selection === "C3") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEPERŽENGIANT/NEIŠARDANT DEŠIMTIES</option>';
-        modeChoice3Element.innerHTML += '<option value="C38">PERŽENGIANT/IŠARDANT DEŠIMTĮ</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
 
     } else if (modeChoice2Selection === "C12" && modeChoice1Selection === "C1") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEPERŽENGIANT DEŠIMTIES</option>';
-        modeChoice3Element.innerHTML += '<option value="C38">PERŽENGIANT DEŠIMTĮ</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
     } else if (modeChoice2Selection === "C12" && modeChoice1Selection === "C2") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEIŠARDANT DEŠIMTIES</option>';
-        modeChoice3Element.innerHTML += '<option value="C38">IŠARDANT DEŠIMTĮ</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
     } else if (modeChoice2Selection === "C12" && modeChoice1Selection === "C3") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEPERŽENGIANT/NEIŠARDANT DEŠIMTIES</option>';
-        modeChoice3Element.innerHTML += '<option value="C38">PERŽENGIANT/IŠARDANT DEŠIMTĮ</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
 
     } else if (modeChoice2Selection === "C13" && modeChoice1Selection === "C1") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEPERŽENGIANT SKAIČIŲ SKYRIŲ</option>';
-        modeChoice3Element.innerHTML += '<option value="C38">PERŽENGIANT SKAIČIŲ SKYRIUS</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
     } else if (modeChoice2Selection === "C13" && modeChoice1Selection === "C2") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEIŠARDANT SKAIČIŲ SKYRIŲ</option>';
-        modeChoice3Element.innerHTML += '<option value="C38">IŠARDANT SKAIČIŲ SKYRIUS</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
     } else if (modeChoice2Selection === "C13" && modeChoice1Selection === "C3") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEPERŽENGIANT/NEIŠARDANT SKAIČIŲ SKYRIŲ</option>';
-        modeChoice3Element.innerHTML += '<option value="C38">PERŽENGIANT/IŠARDANT SKAIČIŲ SKYRIUS</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
 
     } else if (modeChoice2Selection === "C14" && modeChoice1Selection === "C1") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEPERŽENGIANT SKAIČIŲ SKYRIŲ</option>';
-        modeChoice3Element.innerHTML += '<option value="C38">PERŽENGIANT SKAIČIŲ SKYRIUS</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
     } else if (modeChoice2Selection === "C14" && modeChoice1Selection === "C2") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEIŠARDANT SKAIČIŲ SKYRIŲ</option>';
-        modeChoice3Element.innerHTML += '<option value="C38">IŠARDANT SKAIČIŲ SKYRIUS</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
     } else if (modeChoice2Selection === "C14" && modeChoice1Selection === "C3") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEPERŽENGIANT/NEIŠARDANT SKAIČIŲ SKYRIŲ</option>';
-        modeChoice3Element.innerHTML += '<option value="C38">PERŽENGIANT/IŠARDANT SKAIČIŲ SKYRIUS</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
     
     } else if (modeChoice2Selection === "C15" && modeChoice1Selection === "C1") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEPERŽENGIANT SKAIČIŲ SKYRIŲ</option>';
-        modeChoice3Element.innerHTML += '<option value="C38">PERŽENGIANT SKAIČIŲ SKYRIUS</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
     } else if (modeChoice2Selection === "C15" && modeChoice1Selection === "C2") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEIŠARDANT SKAIČIŲ SKYRIŲ</option>';
-        modeChoice3Element.innerHTML += '<option value="C38">IŠARDANT SKAIČIŲ SKYRIUS</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
     } else if (modeChoice2Selection === "C15" && modeChoice1Selection === "C3") {
-        modeChoice3Element.innerHTML += '<option value="C37">NEPERŽENGIANT/NEIŠARDANT SKAIČIŲ SKYRIŲ</option>';
-        modeChoice3Element.innerHTML += '<option value="C38">PERŽENGIANT/IŠARDANT SKAIČIŲ SKYRIUS</option>';
+        modeChoice3Element.innerHTML += '<option value="C37">NEPERGRUPUOJANT SKAIČIŲ SKYRIŲ</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
     } else if (modeChoice2Selection === "C16") {
-        modeChoice3Element.innerHTML += '<option value="C38">IŠARDANT SKAIČIŲ SKYRIUS</option>';
+        modeChoice3Element.innerHTML += '<option value="C38">PERGRUPUOJANT SKAIČIŲ SKYRIUS</option>';
     }
     
     else {
@@ -481,7 +481,12 @@ function handleModeChoice8Change() {
         toggleVisibility(modeChoice13Element, false);
         modeChoice9Element.innerHTML += '<option value="C51">TURINIO KOMPONAVIMĄ</option>';
         modeChoice9Element.innerHTML += '<option value="C52">STRUKTŪROS IŠDĖSTYMĄ</option>';
-        modeChoice9Element.value = modeChoice9Selection
+        // Only restore the previous selection if it's actually one of THESE options — otherwise
+        // (e.g. it was "C50" from grammar mode a moment ago) `.value =` silently matches nothing
+        // and leaves the dropdown visibly blank with selectedIndex -1, even though it has options.
+        if ([...modeChoice9Element.options].some(option => option.value === modeChoice9Selection)) {
+            modeChoice9Element.value = modeChoice9Selection;
+        }
 
         if (modeChoice15Selection === "C82") {
             toggleVisibility(timerQuestionNumberDiv, true);
@@ -612,8 +617,10 @@ function handleClassChoiceChange() {
             // In a controlled div, only check if:
             // 1. The controlled div is visible AND
             // 2. The parent checkbox is checked
+            // (the group's own tick box: the one that controls this div - its value text differs between the pages)
             const parentValue = controlledDiv.getAttribute('data-parent');
-            const parentCheckbox = document.querySelector(`.parent-toggle[value="${parentValue}"]`);
+            const parentCheckbox = document.querySelector(`.parent-toggle[data-controls="${controlledDiv.id}"]`)
+                || document.querySelector(`.parent-toggle[value="${parentValue}"]`);
             
             // Only check if parent checkbox exists, is checked, AND the div should be visible for this class
             if (parentCheckbox && parentCheckbox.checked && controlledDiv.style.display !== 'none') {
@@ -703,6 +710,12 @@ function updateModeChoice4Options () {
 
 		} else if (document.getElementById('mode_choice_8').value === "C83") {
 			document.getElementById('mode_choice_4').innerHTML += '<option value="C40">NUSTATYTI SAKINIŲ KIEKĮ</option>';
+            document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
+		} else {
+			// Defensive fallback — mode_choice_8 should only ever be C49/C83 here, but if it's
+			// ever caught mid-transition, fall back to the text-comprehension set rather than
+			// leaving this dropdown with no options at all.
+			document.getElementById('mode_choice_4').innerHTML += '<option value="C40">NUSTATYTI TEKSTŲ KIEKĮ</option>';
             document.getElementById('mode_choice_4').innerHTML += '<option value="C39">NUSTATYTI LAIKO TRUKMĘ</option>';
 		}
 	} else {
@@ -877,7 +890,10 @@ document.querySelectorAll('input[type="number"]').forEach(input => {
         const min = parseInt(this.min);
         const max = parseInt(this.max);
         let value = parseInt(this.value);
-        
+
+        // fields where empty means "no limit" (e.g. the Aukcionas settings in klase.html) may stay empty
+        if (this.value.trim() === '' && this.hasAttribute('data-allow-empty')) return;
+
         if (isNaN(value) || value < min) {
             this.value = min;
         } else if (value > max) {
