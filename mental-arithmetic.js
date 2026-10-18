@@ -36,6 +36,7 @@ let controller = {
 const LONG_TERM_RECORDING_ENABLED = true;
 const PET_STATS_EXPIRATION = 0.0035 // EXPIRE FULLY IN 48 hrs
 const MAX_CURRENT_MISTAKES_STORED = 100;
+let columnFields = [];   // (checkAnswer: the column fields of the current check)
 
 // Spelling tasks: what the results analysis needs to replay the task's questions - the seed they were generated from
 // (LT/rasyba.html, rasyba-generator.js) and the student's grade (it decides which sentences fit). Saved in the
@@ -1813,6 +1814,8 @@ async function updateStudentPointsAndStatistics(coinMultiplier=1) {
 async function checkAnswer () {
     document.getElementById('hidden-input').focus();
     var isCorrect = true;
+    // (column notation: [expected, typed] of every intermediate field, in their order - kept with a mistake, recordMistakes)
+    columnFields = [];
     userInput = answerInputElement.value.trim();
     userAnswer = Number(userInput);
     userAnswerRemainder = Number(answerRemainderInputElement.value);
@@ -1885,6 +1888,7 @@ async function checkAnswer () {
             isCorrect = false;
             localIsCorrect = false;
           }
+          columnFields.push([digit * controller.randomSelection[0], document.querySelector('#stulpeliu-' + i).value === '' ? '' : flipNumber(document.querySelector('#stulpeliu-' + i).value)]);
           
           if (document.querySelector('#stulpeliu-' + i).value === '') {
             localIsCorrect = false;
@@ -1947,7 +1951,9 @@ async function checkAnswer () {
             localIsCorrect = false;
             isCorrect = false;
           }
+          const typedField = document.getElementById(`stulpeliu-${i}`).value === '' ? '' : divUserSubAnswer;
           if (i+1 === subAnswerNumber*2) {
+            columnFields.push([controller.randomSelection[0] % controller.randomSelection[1], typedField]);
             if (divUserSubAnswer !== controller.randomSelection[0] % controller.randomSelection[1]) {
               isCorrect = false;
               localIsCorrect = false;
@@ -1985,6 +1991,7 @@ async function checkAnswer () {
               subtractedValue = Number(subtractedValueStr)
             }
 
+            columnFields.push([Number(partialSub) >= number2 ? Number(partialSub) : Number(partialSub + splitNumber2Str[0]), typedField]);
             if (Number(partialSub) >= number2) {
               if (divUserSubAnswer !== Number(partialSub)) {
                 isCorrect = false;
@@ -2049,6 +2056,7 @@ async function checkAnswer () {
               } else if (Number(number1) < number2) {
                 subtract = [0, false];
               }
+              columnFields.push([subtract[0], typedField]);
               if (divUserSubAnswer !== subtract[0]) {
                 isCorrect = false;
                 localIsCorrect = false;
@@ -2375,16 +2383,24 @@ async function checkAnswer () {
     const numbers = flag ? [controller.randomSelection[0], controller.randomSelection[1], flag] : [controller.randomSelection[0], controller.randomSelection[1]];
     const op = controller.randomSelection[2];
     let given = controller.modeChoice7 === "C48" && op !== 'D' && !flag ? flipNumber(userInput) : userAnswer;
-    if (op === 'D' && controller.withRemainder && !flag) given = `${userAnswer} (${userAnswerRemainder})`;
+    if (op === 'D' && controller.withRemainder && !flag && controller.modeChoice7 !== "C48") given = `${userAnswer} (${userAnswerRemainder})`;
     [controller.currentMistakes, controller.totalMistakes].forEach(list => {
       const last = list[list.length - 1];
       const same = last && Array.isArray(last[0]) && last[1] === op && Array.isArray(last[2]) &&
         JSON.stringify(last[0]) === JSON.stringify(numbers);
+      // (column notation: every field's expected value and the wrong values typed in it, at most 3 a field)
+      const fields = controller.modeChoice7 === "C48" && !flag
+        ? columnFields.map(([expected, typed]) => [expected, typed !== '' && typed !== expected ? [typed] : []]) : null;
       if (same) {
         last[2][0] = (Number(last[2][0]) || 1) + 1;
         if (last[2][1].length < 3) last[2][1].push(given);
+        if (fields) {
+          const kept = last[3] && Array.isArray(last[3].f) && last[3].f.length === fields.length ? last[3].f : null;
+          if (!kept) last[3] = { f: fields };
+          else fields.forEach(([, wrong], k) => wrong.forEach(w => { if (!kept[k][1].includes(w) && kept[k][1].length < 3) kept[k][1].push(w); }));
+        }
       } else {
-        list.push([numbers, op, [1, [given]]]);
+        list.push(fields ? [numbers, op, [1, [given]], { f: fields }] : [numbers, op, [1, [given]]]);
       }
     });
   }
@@ -2537,6 +2553,150 @@ function getBarColor(value) {
 }
 
 // Function to generate the summary table
+// ---------- a math mistake, as it was done (the mistakes tables: a click on the example) ----------
+// records: [[a, b, "F"|"S"?], op, [tries, answers], { f: [[expected, [wrong typed]], ...] }?]. Eilute: the example and the
+// wrong answers after it; an unknown number: the wrong answers where it goes; column notation (records with f): the
+// solved example laid out in columns, the wrong values next to the field they were typed in. Older records (no answers)
+// have nothing to show.
+// the right answers of a record (a division also as "q (r)"): not listed among its wrong ones
+function mathMistakeRightAnswers(record) {
+  const a = Number(record[0][0]), b = Number(record[0][1]), flag = record[0][2], op = record[1];
+  if (flag === 'F') return [String(a)];
+  if (flag === 'S') return [String(b)];
+  if (op === 'D') return [String(Math.floor(a / b)), `${Math.floor(a / b)} (${a % b})`];
+  return [String(op === 'A' ? a + b : op === 'S' ? a - b : a * b)];
+}
+function mathMistakeHasDetail(record) {
+  return Array.isArray(record[2]) && Array.isArray(record[2][1]) && record[2][1].length > 0;
+}
+const MM_OP = { A: '+', S: '\u2212', M: '\u00D7', D: ':' };
+function mmEsc(v) { return escapeMistakeText(String(v)); }
+function mmWrongList(values) {
+  return values.map(v => `<span class="mm-w">${mmEsc(v)}</span>`).join('');
+}
+// a grid of character columns (monospace): lines of segments { col, text, cls }, a line's underline range, its note
+function mmGrid(lines) {
+  const width = Math.max(...lines.map(l => Math.max(0, ...l.segs.map(g => g.col + String(g.text).length), l.ul ? l.ul[1] + 1 : 0)));
+  const rows = lines.map(l => {
+    const cells = Array.from({ length: width }, () => ({ ch: ' ', cls: '' }));
+    l.segs.forEach(g => String(g.text).split('').forEach((ch, i) => { if (g.col + i >= 0 && g.col + i < width) cells[g.col + i] = { ch, cls: g.cls || '' }; }));
+    if (l.ul) for (let c = l.ul[0]; c <= l.ul[1]; c++) cells[c].cls += ' mm-ul';
+    let html = '', run = null;
+    cells.forEach(c => {
+      if (run && run.cls === c.cls) { run.text += c.ch; return; }
+      if (run) html += run.cls.trim() ? `<span class="${run.cls.trim()}">${mmEsc(run.text)}</span>` : mmEsc(run.text);
+      run = { cls: c.cls, text: c.ch };
+    });
+    if (run) html += run.cls.trim() ? `<span class="${run.cls.trim()}">${mmEsc(run.text)}</span>` : mmEsc(run.text);
+    return `<div class="mm-line">${html}${l.note ? `<span class="mm-note">${l.note}</span>` : ''}</div>`;
+  });
+  return `<div class="mm-grid">${rows.join('')}</div>`;
+}
+const mmAt = (end, value, cls) => ({ col: end - String(value).length + 1, text: String(value), cls });   // (right-aligned at a column)
+const mmField = f => (f && f[1] && f[1].length ? { cls: 'mm-bad', note: mmWrongList(f[1]) } : { cls: '', note: '' });
+function mmColumnHtml(a, b, op, fields, answers) {
+  const correct = op === 'A' ? a + b : op === 'S' ? a - b : op === 'M' ? a * b : Math.floor(a / b);
+  const wrongAnswers = answers.filter(x => (op === 'D' ? String(parseInt(x, 10)) : String(x)) !== String(correct))
+    .map(x => (op === 'D' ? parseInt(x, 10) : x)).filter((x, i, all) => all.indexOf(x) === i);
+  const answerCls = wrongAnswers.length ? 'mm-bad' : 'mm-ok';
+  if (op === 'D') {
+    const A = String(a), n = A.length, L = String(correct).length;
+    if (fields.length !== 2 * L) return null;
+    const p = k => 1 + (n - L + k);      // (column 0: the minus signs)
+    const lines = [{ segs: [{ col: 1, text: A }, { col: n + 2, text: '\u2502' }, { col: n + 3, text: String(b) }], ul: [n + 3, n + 2 + Math.max(String(b).length, String(correct).length)] }];
+    for (let k = 0; k < L; k++) {
+      const prod = fields[2 * k], m = mmField(prod), v = String(prod[0]);
+      const start = p(k) - v.length + 1;
+      const line = { segs: [{ col: start - 1, text: '\u2212' }, mmAt(p(k), v, m.cls)], ul: [start - 1, p(k)], note: m.note };
+      if (k === 0) {
+        line.segs.push({ col: n + 2, text: '\u2502' }, { col: n + 3, text: String(correct), cls: answerCls });
+        if (wrongAnswers.length) line.note = `${mmWrongList(wrongAnswers)}<span class="mm-lbl">dalmuo</span>${m.note ? ' · ' + m.note : ''}`;
+      }
+      lines.push(line);
+      const next = fields[2 * k + 1], mn = mmField(next);
+      lines.push({ segs: [mmAt(k < L - 1 ? p(k) + 1 : n, next[0], mn.cls)], note: mn.note });
+    }
+    return mmGrid(lines);
+  }
+  const partials = op === 'M' ? fields : [];
+  const R = Math.max(String(a).length, String(b).length + 1, String(correct).length, ...partials.map((f, i) => String(f[0]).length + i)) ;
+  const lines = [
+    { segs: [mmAt(R, a)] },
+    { segs: [{ col: 0, text: MM_OP[op] }, mmAt(R, b)], ul: [0, R] }
+  ];
+  partials.forEach((f, i) => {
+    const m = mmField(f);
+    const line = { segs: [mmAt(R - i, f[0], m.cls)], note: m.note };
+    if (i === partials.length - 1) { line.segs.unshift({ col: 0, text: '+' }); line.ul = [0, R]; }
+    lines.push(line);
+  });
+  lines.push({ segs: [mmAt(R, correct, answerCls)], note: wrongAnswers.length ? mmWrongList(wrongAnswers) : '' });
+  return mmGrid(lines);
+}
+function mathMistakeVisual(record) {
+  const [nums, op] = record;
+  const a = Number(nums[0]), b = Number(nums[1]), flag = nums[2];
+  const answers = mathMistakeHasDetail(record) ? record[2][1] : [];
+  const sign = MM_OP[op] || op;
+  const fields = record[3] && Array.isArray(record[3].f) ? record[3].f : null;
+  if (fields && !flag) {
+    const html = mmColumnHtml(a, b, op, fields, answers);
+    if (html) return html;
+  }
+  const result = op === 'A' ? a + b : op === 'S' ? a - b : op === 'M' ? a * b : a / b;
+  if (flag === 'F' || flag === 'S') {
+    // the unknown number: the wrong answers in its place, the right one after
+    const slot = `<span class="mm-slot">${mmWrongList(answers.filter(x => !mathMistakeRightAnswers(record).includes(String(x))))}</span>`;
+    const eq = flag === 'F' ? `${slot} ${sign} ${b} = ${mmEsc(result)}` : `${a} ${sign} ${slot} = ${mmEsc(result)}`;
+    return `<div class="mm-eq">${eq}<span class="mm-lbl">teisingai: ${flag === 'F' ? a : b}</span></div>`;
+  }
+  const correct = op === 'D' ? Math.floor(a / b) + (a % b ? ` (${a % b})` : '') : result;
+  return `<div class="mm-eq">${a} ${sign} ${b} = <span class="mm-ok">${mmEsc(correct)}</span>${answers.length ? ` <span class="mm-lbl">atsakyta:</span>${mmWrongList(answers.filter(x => String(x) !== String(correct) && !mathMistakeRightAnswers(record).includes(String(x))))}` : ''}</div>`;
+}
+const MM_SHOWN = 4;
+function mathMistakeDetailHtml(records) {
+  // (the same example from several tasks / students: once, the wrong answers together)
+  const merged = new Map();
+  records.filter(mathMistakeHasDetail).forEach(r => {
+    const key = JSON.stringify([r[0], r[1], r[3] && Array.isArray(r[3].f) ? r[3].f.map(f => f[0]) : null]);
+    const m = merged.get(key);
+    if (!m) { merged.set(key, [r[0], r[1], [r[2][0], [...r[2][1]]], r[3] ? { f: r[3].f.map(f => [f[0], [...f[1]]]) } : undefined]); return; }
+    r[2][1].forEach(x => { if (!m[2][1].map(String).includes(String(x))) m[2][1].push(x); });
+    if (m[3] && r[3]) r[3].f.forEach((f, i) => f[1].forEach(w => { if (!m[3].f[i][1].includes(w)) m[3].f[i][1].push(w); }));
+  });
+  const list = [...merged.values()];
+  const shown = list.slice(0, MM_SHOWN).map(r => `<div class="mm-item">${mathMistakeVisual(r)}</div>`).join('');
+  const more = list.length > MM_SHOWN ? `<div class="mm-more">dar ${list.length - MM_SHOWN}</div>` : '';
+  return `<div class="mm-detail">${shown}${more}</div>`;
+}
+function injectMathMistakeStyle() {
+  if (document.getElementById('mm-style')) return;
+  const st = document.createElement('style');
+  st.id = 'mm-style';
+  st.textContent = `
+.mm-toggle{cursor:pointer}
+.mm-toggle .mm-chev{display:inline-block;margin-left:6px;color:#5f7f8c;font-size:11px;transition:transform .15s}
+.mm-toggle.open .mm-chev{transform:rotate(90deg)}
+.mm-detail{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px 22px;margin:6px 0 2px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.6);text-align:left;overflow-x:auto;cursor:default}
+.mm-detail,.mm-detail *{font-size:13px !important;line-height:1.3 !important;letter-spacing:0 !important;text-transform:none !important}
+.mm-detail .mm-lbl,.mm-detail .mm-more{font-size:12px !important}
+.mm-detail .mm-w{font-size:12.5px !important}
+.mm-item{min-width:0}
+.mm-grid{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;line-height:1.3;font-variant-numeric:tabular-nums;color:#1f2a30}
+.mm-line{white-space:pre}
+.mm-ul{border-bottom:1px solid #1f2a30}
+.mm-bad{background:rgba(213,126,126,.28);border-radius:2px}
+.mm-ok{color:#17705d;font-weight:700}
+.mm-note{margin-left:8px;white-space:nowrap}
+.mm-w{display:inline-block;margin:0 3px 0 0;padding:0 5px;border-radius:5px;background:#f8dada;color:#983a3a;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.35}
+.mm-eq{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:nowrap}
+.mm-detail .mm-eq{line-height:1.6 !important}
+.mm-slot{display:inline-block;padding:0 2px;border:1px dashed #b05f5f;border-radius:5px}
+.mm-slot .mm-w{margin:0 1px}
+.mm-lbl{margin-left:8px;color:#5f7480;font-family:inherit;font-size:12px}
+.mm-more{align-self:center;color:#5f7480;font-size:12px}`;
+  document.head.appendChild(st);
+}
 function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=null, customDivForGrammarSummaryTable=null, usePercentage=false) {  controller = JSON.parse(localStorage.getItem('controller'));
 
   mistakes = [];
@@ -2567,6 +2727,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
   if (mathMistakes.length > 0) {
       // Group the data and calculate the number of mistakes for each action and pair of numbers
       const mathAnswersByKey = {};   // the answers given (new records keep up to 3 per example)
+      const mathRecordsByKey = {};   // (the records of each row: a click shows how they were done)
       const performanceData = mathMistakes.reduce((acc, mistake) => {
         const first_number = mistake[0][0];
         const second_number = mistake[0][1];
@@ -2630,9 +2791,11 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
           usedKey = `${firstAsIs}`;
         }
         acc[usedKey] = (acc[usedKey] || 0) + tries;
+        (mathRecordsByKey[usedKey] = mathRecordsByKey[usedKey] || []).push(mistake);
         if (Array.isArray(mistake[2]) && Array.isArray(mistake[2][1])) {
           if (!mathAnswersByKey[usedKey]) mathAnswersByKey[usedKey] = new Set();
-          mistake[2][1].forEach(answer => mathAnswersByKey[usedKey].add(String(answer)));
+          const right = mathMistakeRightAnswers(mistake);
+          mistake[2][1].forEach(answer => { if (!right.includes(String(answer))) mathAnswersByKey[usedKey].add(String(answer)); });
         }
       
         return acc;
@@ -2645,6 +2808,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
         : '';
       const summaryData = Object.entries(performanceData).map(([veiksmas, mistakes]) => ({
           Veiksmai: veiksmas + answersHtml(veiksmas),
+          key: veiksmas,
           "Suklysta (kartai)": mistakes
       }));
 
@@ -2694,7 +2858,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
                             }
                             
                             return `<tr>
-                                <td>${row["Veiksmai"]}</td>
+                                <td${(mathRecordsByKey[row.key] || []).some(mathMistakeHasDetail) ? ` class="mm-toggle" data-mm="${encodeURIComponent(row.key)}" title="Rodyti, kaip spręsta"` : ''}>${row["Veiksmai"]}${(mathRecordsByKey[row.key] || []).some(mathMistakeHasDetail) ? '<span class="mm-chev" aria-hidden="true">\u25B8</span>' : ''}</td>
                                 <td>${displayValue}</td>
                                 <td>
                                     <div class="bar" style="width: ${barWidth}; background-color: ${barColor};"></div>
@@ -2735,7 +2899,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
                               }
                               
                               return `<tr>
-                                  <td>${row["Veiksmai"]}</td>
+                                  <td${(mathRecordsByKey[row.key] || []).some(mathMistakeHasDetail) ? ` class="mm-toggle" data-mm="${encodeURIComponent(row.key)}" title="Rodyti, kaip spręsta"` : ''}>${row["Veiksmai"]}${(mathRecordsByKey[row.key] || []).some(mathMistakeHasDetail) ? '<span class="mm-chev" aria-hidden="true">\u25B8</span>' : ''}</td>
                                   <td>${displayValue}</td>
                                   <td>
                                       <div class="bar" style="width: ${barWidth}; background-color: ${barColor};"></div>
@@ -2756,6 +2920,14 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
       }
       summaryTableElement.innerHTML = "";
       summaryTableElement.appendChild(summaryTable);
+      injectMathMistakeStyle();
+      summaryTable.querySelectorAll('.mm-toggle').forEach(cell => cell.addEventListener('click', event => {
+        if (event.target.closest('.mm-detail')) return;
+        const open = cell.querySelector('.mm-detail');
+        if (open) { open.remove(); cell.classList.remove('open'); return; }
+        cell.insertAdjacentHTML('beforeend', mathMistakeDetailHtml(mathRecordsByKey[decodeURIComponent(cell.dataset.mm)] || []));
+        cell.classList.add('open');
+      }));
   } else {
     // Display the summary table
     let summaryTableElement;
