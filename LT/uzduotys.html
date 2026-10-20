@@ -2085,6 +2085,10 @@
         .archive-detail-desc {
             cursor: pointer;
         }
+        .archive-popup-content .archive-desc-mixed {
+            margin: 0;
+            color: #1f2a30;
+        }
 
         .archive-popup-content .archive-detail-desc strong {
             display: block;
@@ -2763,6 +2767,13 @@
         }
         #teacher-gui #add-students-button:active {
             transform: scale(0.97);
+        }
+        /* (smaller screens: inactive while the task drawer is open over the list) */
+        #teacher-gui #add-students-button:disabled {
+            opacity: 0.4;
+            filter: grayscale(1);
+            cursor: default;
+            pointer-events: none;
         }
 
 
@@ -6397,10 +6408,11 @@
         .sw-task { grid-template-columns: auto minmax(0, 1fr); }
         .sw-frac { grid-column: 2; }
     }
-    .sw-late { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 12px; background: rgba(255, 255, 255, 0.45); box-shadow: inset 3px 0 0 #d57e7e; }
-    .sw-late-label { display: inline-flex; align-items: center; gap: 4px; margin-right: 2px; color: #c27474; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+    /* (one line: cards that do not fit scroll sideways - room above / below for the cards' status dots) */
+    .sw-late { display: flex; flex-wrap: nowrap; align-items: center; gap: 6px; padding: 8px 8px 8px 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.45); box-shadow: inset 3px 0 0 #d57e7e; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: thin; }
+    .sw-late-label { flex: none; display: inline-flex; align-items: center; gap: 4px; margin-right: 2px; color: #c27474; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
     .sw-late-label .ti { color: #d57e7e; }
-    .sw-late .sw-task { flex: 0 1 auto; max-width: 260px; }
+    .sw-late .sw-task { flex: none; max-width: 260px; }
     /* the class board: small blocks (the circle + how many did it), side by side while they fit */
     .sw-days.compact .sw-col-items { flex-direction: row; flex-wrap: wrap; align-content: flex-start; gap: 4px; }
     /* (the teacher's boards: a ring around the subject's icon fills as students do the task) */
@@ -6946,6 +6958,11 @@
     .tx-more:hover { background: rgba(50, 136, 172, 0.12); }
     .tx-others { margin-top: 2px; }
     .tx-list[hidden] { display: none; }
+    /* loading: the pet room's spinner (the teacher's task list and results while their data comes) */
+    .tq-loading { display: flex; align-items: center; justify-content: center; min-height: 120px; padding: 20px 0; }
+    .tq-spinner { width: 40px; height: 40px; border: 4px solid rgba(50, 172, 147, 0.2); border-top-color: #32ac93; border-radius: 50%; animation: tq-spin 0.8s linear infinite; }
+    @keyframes tq-spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .tq-spinner { animation-duration: 2.4s; } }
 </style>
 </head>
 
@@ -8059,11 +8076,12 @@
 </div>
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="../mental-arithmetic.js?v=20261018m"></script>
+	<script src="../mental-arithmetic.js?v=20261020c"></script>
+	<script src="../sudedu-notices.js?v=20261020c"></script>
 	<script src="../mental-arithmetic-combinations.js?v=20261017"></script>
-    <script src="../parameter_dictionary.js?v=20261018r"></script>
+    <script src="../parameter_dictionary.js?v=20261020b"></script>
     <script src="../rasyba-generator.js?v=20261018r"></script>
-    <script src="../sudedu-insights.js?v=20261018u"></script>
+    <script src="../sudedu-insights.js?v=20261020c"></script>
     <script src="../sudedu-auto-tasks.js?v=20261018r"></script>
     <script src="../klase-invites.js?v=20261018r"></script>
     <script src="../main-nav-bar.js"></script>
@@ -10296,6 +10314,13 @@ let teacherHeaderMaxHeight = 0;
 function lockTeacherHeaderHeight() {
     const head = document.querySelector('.task-info-header');
     if (!head || head.offsetParent === null) return;
+    // (smaller screens - the drawer with its tab: the header follows its content)
+    const drawerTab = document.getElementById('toggleTab');
+    if (drawerTab && drawerTab.offsetParent !== null && getComputedStyle(drawerTab).display !== 'none') {
+        head.style.height = '';
+        teacherHeaderMaxHeight = 0;
+        return;
+    }
     const deleteButton = document.getElementById('header-delete-student-button');
     const savedDeleteDisplay = deleteButton ? deleteButton.style.display : '';
     const isClassView = head.classList.contains('class-overview');
@@ -12055,17 +12080,19 @@ function teacherTaskShortLabel(task) {
 }
 // (the class overview's task list says "Kraunama…" until the class's tasks have come once)
 let classTeacherTasksLoaded = false;
+let classTeacherTasksStale = false;
 // The class's task panel while its data is still coming: the same heading (title, week number, arrows) and week board as
 // when it is loaded - only the tasks are missing - so nothing jumps when they arrive.
 function classTasksLoadingHtml() {
     return `
         <div class="pt week-pt" id="teacher-week-head">${teacherWeekHeadHtml()}</div>
         <div class="teacher-week" id="teacher-week">${teacherWeekHtml()}</div>
-        <div class="pb"><div class="statistics-empty-message">Kraunama…</div></div>`;
+        <div class="pb"><div class="tq-loading" role="status" aria-label="Kraunama"><span class="tq-spinner"></span></div></div>`;
 }
-function showClassTasksLoading() {
+// force: also over the class's list drawn from the students' data (before the class's own tasks came)
+function showClassTasksLoading(force = false) {
     const container = document.getElementById('student-statistics-completed-tasks');
-    if (!container || classTeacherTasksLoaded || container.querySelector('#teacher-week') || container.querySelector('.unfinished-task-list')) return;
+    if (!container || classTeacherTasksLoaded || (!force && (container.querySelector('#teacher-week') || container.querySelector('.unfinished-task-list')))) return;
     try {
         container.innerHTML = classTasksLoadingHtml();
         container.style.display = 'flex';
@@ -12078,6 +12105,7 @@ async function fetchClassTeacherTasks() {
         if (!response.ok) throw new Error((await response.json().catch(() => ({}))).error || 'Nepavyko gauti klasės užduočių');
         classTeacherTasks = await response.json();
         classTeacherTasksLoaded = true;
+        classTeacherTasksStale = false;
         return classTeacherTasks;
     } catch (error) {
         console.error('Error fetching class tasks:', error);
@@ -13089,6 +13117,8 @@ function applyTeacherStudentIndicators(students) {
 }
 
 async function displayTeacherHome(selectedGroupNames=null) {
+    const focusList = focusTaskListAfterHomeRender;
+    focusTaskListAfterHomeRender = false;
     currentStatisticsIsClass = true;
     currentStatisticsClassGroups = selectedGroupNames;
     const preservedScrollTop = captureTaskInfoScroll();
@@ -13146,7 +13176,7 @@ async function displayTeacherHome(selectedGroupNames=null) {
     showProgressSection();
 
     document.getElementById("embedded-archived-tasks-section").style.display = (typeof teacherSection !== 'undefined' && teacherSection === 'completed') ? "block" : "none";   // (only on its own tab)
-    document.getElementById("embeddedArchiveSectionTitle").textContent = "Užduotys";
+    document.getElementById("embeddedArchiveSectionTitle").textContent = "Atliktos užduotys";
     document.getElementById("embedded-archive-teacher-only-toggle-wrapper").style.display = "flex";
     loadClassEmbeddedTaskArchive(studentListFiltered);
 
@@ -13157,10 +13187,15 @@ async function displayTeacherHome(selectedGroupNames=null) {
     // the week board and the list at once - from the class's tasks known so far (or, before they ever came, the same
     // layout saying "Kraunama…") - then the same layout again with the fresh ones: the fields fill in, nothing jumps
     if (classTeacherTasksLoaded) renderClassTeacherTasks();
-    else renderPendingTasksAccordion(studentTasks, studentStatisticsCompletedTasks, true);
-    await fetchClassTeacherTasks();
-    renderClassTeacherTasks();
+    else showClassTasksLoading(true);
     placePendingTasksBeforeArchive();
+    // ("Užduočių sąrašas": the list is shown at once - filled in when its tasks come)
+    if (focusList) focusTaskListSection();
+    if (!classTeacherTasksLoaded || classTeacherTasksStale) {
+        await fetchClassTeacherTasks();
+        // (still the class overview - a student may have been picked meanwhile)
+        if (currentStatisticsIsClass) { renderClassTeacherTasks(); placePendingTasksBeforeArchive(); }
+    }
 
     currentStatisticsTasks = studentTasks;
     updateStatisticsAnalysisScope();
@@ -13204,19 +13239,16 @@ async function displayTeacherHome(selectedGroupNames=null) {
     setTeacherSection(teacherSection);
     applyTeacherAnalysisSubject();
     lockTeacherHeaderHeight();
-    restoreTaskInfoScroll(preservedScrollTop);
-    if (focusTaskListAfterHomeRender) {
-        focusTaskListAfterHomeRender = false;
-        // restoreTaskInfoScroll re-applies the old position once more after 320 ms
-        setTimeout(focusTaskListSection, 350);
-    }
+    if (!focusList) restoreTaskInfoScroll(preservedScrollTop);
 }
 
 let focusTaskListAfterHomeRender = false;
 function focusTaskListSection() {
     const section = document.getElementById('student-statistics-completed-tasks');
     if (!section || section.style.display === 'none') return;
-    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    revealAtTop(section);
+    // (a phone's side panel slides in: once more when it is in place)
+    setTimeout(() => revealAtTop(section), 340);
     section.classList.add('task-list-section-highlighted');
     clearTimeout(section._taskListHighlightTimeout);
     section._taskListHighlightTimeout = setTimeout(() => {
@@ -13912,7 +13944,8 @@ function restoreTaskInfoScroll(scrollPosition) {
             }, 500);
 
             if (newTaskButton) newTaskButton.disabled = true;
-            if (deleteTaskButton) deleteTaskButton.disabled = true;
+            classTeacherTasksStale = true;      // (the class's tasks and results: fetched again with the fresh data)
+            classArchiveStale = true;
             if (deleteStudentButton) deleteStudentButton.disabled = true;
             // (the first load: the week board and its navigation at once, the tasks fill in; a moment later - this first call
             // comes while the page's script is still being read, before the board's helpers exist)
@@ -15142,10 +15175,11 @@ let taskHistoryCurrentTask = null;
 
         document.querySelectorAll('.selection-option').forEach(task => task.classList.remove('selected-option'));
         document.querySelector(".teacher-home-button").classList.add('selected-option');
+        const toTaskList = focusTaskListAfterHomeRender;
         displayTeacherHome();
         if (currentAction !== "new-task") openSidebar();
         toggleMainBrowser(true);
-        document.querySelector('.sidebar').scrollTo({ top: 0, behavior: 'smooth' });
+        if (!toTaskList) document.querySelector('.sidebar').scrollTo({ top: 0, behavior: 'smooth' });
     });
     
     // HISTORY VIEW TABS
@@ -16531,6 +16565,8 @@ async function loadClassEmbeddedTaskArchive(students) {
     await fetchAndRenderClassEmbeddedArchive();
 }
 
+// (the class's results, per student: loaded once for the students, kinds and period shown - see fetchDataForTeachers)
+let classArchiveCache = null, classArchiveStale = false;
 async function fetchAndRenderClassEmbeddedArchive() {
     const container = document.getElementById("embedded-archive-table-container");
     if (!container || !classEmbeddedArchiveStudents) return;
@@ -16540,9 +16576,11 @@ async function fetchAndRenderClassEmbeddedArchive() {
     const startDate = document.getElementById("embeddedArchiveStartDate").value;
     const endDate = document.getElementById("embeddedArchiveEndDate").value;
 
+    const cacheKey = JSON.stringify([classEmbeddedArchiveStudents.map(student => student.id), withSelf, embeddedArchiveShowingOlder, statisticsStartDateISO()]);
     try {
-        container.innerHTML = '<div class="task-archive-empty">Kraunama...</div>';
-        const rowsByStudent = await Promise.all(classEmbeddedArchiveStudents.map(async student => {
+        const cached = !classArchiveStale && classArchiveCache && classArchiveCache.key === cacheKey ? classArchiveCache.rowsByStudent : null;
+        if (!cached) container.innerHTML = '<div class="tq-loading" role="status" aria-label="Kraunama"><span class="tq-spinner"></span></div>';
+        const rowsByStudent = cached || await Promise.all(classEmbeddedArchiveStudents.map(async student => {
             const params = new URLSearchParams({ kinds: withSelf ? 'game,legacy,self,teacher' : 'game,legacy,teacher' });
             if (!embeddedArchiveShowingOlder) params.set('from', statisticsStartDateISO());
             const response = await apiFetch(`${apiBase}students/task-history/${student.id}?${params.toString()}`, {
@@ -16558,6 +16596,8 @@ async function fetchAndRenderClassEmbeddedArchive() {
                 studentName: student.nickname || student.username
             }));
         }));
+        classArchiveCache = { key: cacheKey, rowsByStudent };
+        classArchiveStale = false;
 
         // (own practice: for the analysis only - not rows of the results table)
         const classSelfRows = rowsByStudent.flat().filter(row => resultKindOf(row) === 'self');
@@ -17251,10 +17291,81 @@ function withMistakeDetailFromTasks(row) {
         : row;
 }
 
+// ----- the class's results of the task open in the pop-up (the house button while it is open): every student who
+// completed it - a teacher task (or its group's variants) from the students' own results, any other task from the
+// same-task rows the pop-up already found. The totals, the mistakes of all of them together and the texts' averages.
+let archivePopupAnchorRow = null;      // (a student's result the pop-up was opened with)
+let archivePopupOpenedOver = null, archivePopupShowing = null;   // 'class' or a student's id
+function archivePopupNavigateBack() {
+    const target = archivePopupShowing, over = archivePopupOpenedOver;
+    archivePopupShowing = archivePopupOpenedOver = null;
+    if (!target || target === over) return;
+    setTimeout(() => {
+        if (target === 'class') document.querySelector('.teacher-home-button')?.click();
+        else document.querySelector(`#student-list .student-name[data-student-id="${CSS.escape(target)}"]`)?.click();
+    }, 0);
+}
+function archivePopupClassRows() {
+    if (activeArchivePopupTeacherTaskId) {
+        return (studentList || []).map(student => {
+            const { state, task } = teacherTaskStateOf(student, activeArchivePopupTeacherTaskId);
+            if (state !== 'completed' || !task) return null;
+            const row = archiveRowFromTask({ ...task, studentId: student.id });
+            return row && row.taskInfo ? { ...row, studentId: student.id } : null;
+        }).filter(Boolean);
+    }
+    if (archivePopupSameTask && !archivePopupSameTask.loading) return [...archivePopupSameTask.rows.values()].filter(row => row && row.taskInfo);
+    return [];
+}
+function archivePopupIsOpen() {
+    const popup = document.getElementById('object-popup');
+    return Boolean(popup && popup.style.display === 'flex' && popup.classList.contains('archive-task-info-overlay'));
+}
+function openArchivePopupClassSummary() {
+    const rows = archivePopupClassRows();
+    if (!rows.length) { messageToTheUser('Šios užduoties dar neatliko nė vienas mokinys.'); return; }
+    const anchor = archivePopupAnchorRow || rows[0];
+    const sum = key => rows.reduce((total, row) => total + (Number(row[key]) || 0), 0);
+    const timed = rows.map(row => (Number(row.answerRate) > 0 ? (Number(row.totalAnswers) || 0) / Number(row.answerRate) * 60 : null)).filter(v => v != null);
+    archivePopupRowOverride = {
+        ...anchor,
+        id: 'class',
+        totalAnswers: sum('totalAnswers'), correct: sum('correct'), mistakes: sum('mistakes'),
+        mistakesDetail: rows.flatMap(row => normalizeArchiveMistakesDetail(row.mistakesDetail) || []),
+        classRows: rows,
+        averageSeconds: timed.length ? timed.reduce((a, b) => a + b, 0) / timed.length : null
+    };
+    document.querySelectorAll('#student-list .student-name').forEach(name => name.classList.remove('selected-option'));
+    document.querySelector('.teacher-home-button')?.classList.add('selected-option');
+    openEmbeddedArchiveTaskPopup('class');
+}
+// (the house button while a task's results are open: the class's results of that task - not the class overview)
+document.addEventListener('click', event => {
+    const home = event.target.closest && event.target.closest('.teacher-home-button');
+    if (!home || !archivePopupIsOpen()) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    openArchivePopupClassSummary();
+}, true);
+function secondsText(totalSeconds) {
+    const t = Math.round(totalSeconds), minutes = Math.floor(t / 60), seconds = t % 60;
+    return minutes ? `${minutes} min ${seconds} s` : `${seconds} s`;
+}
+
 function openEmbeddedArchiveTaskPopup(rowId) {
             const row = withMistakeDetailFromTasks(archivePopupRowOverride || findEmbeddedArchiveRowById(rowId));
             archivePopupRowOverride = null;
             if (!row || typeof openObjectPopup !== 'function') return;
+            const classRows = Array.isArray(row.classRows) ? row.classRows : null;   // (the class's results of the task)
+            // (opened anew - not a switch inside the pop-up: from the class overview it starts with the whole class)
+            const freshOpen = !archivePopupIsOpen();
+            const startWithClass = freshOpen && !classRows && Boolean(currentStatisticsIsClass) && !document.getElementById('excluded-tasks-overlay');
+            if (freshOpen) archivePopupOpenedOver = currentStatisticsIsClass ? 'class' : String(currentEmbeddedArchiveStudentId ?? '');
+            archivePopupShowing = classRows ? 'class' : String(row.studentId ?? currentEmbeddedArchiveStudentId ?? '');
+            if (!classRows) {
+                archivePopupAnchorRow = row;
+                document.querySelector('.teacher-home-button')?.classList.remove('selected-option');
+            }
             hideStudentTaskInfoForArchivePopup();
             let parsedTaskInfo = null;
             try {
@@ -17267,16 +17378,26 @@ function openEmbeddedArchiveTaskPopup(rowId) {
                 parsedTaskInfo[1] === 'C83';
             const isTextTask = isTextComprehensionTask(parsedTaskInfo);
 
+            // (the class: the totals of all its results, shown per student - one decimal; the shares of all answers)
+            const perStudent = total => {
+                const v = (Number(total) || 0) / (classRows ? classRows.length || 1 : 1);
+                return String(Math.round(v * 10) / 10).replace('.', ',');
+            };
+            const share = part => row.totalAnswers > 0 ? Math.round(part / row.totalAnswers * 100) : 0;
             const popupContent = document.createElement('div');
             popupContent.className = 'archive-popup-content';
             popupContent.innerHTML = `
                 <div class="experimental-features" id="archive-popup-insights-${row.id}"></div>
                 <div class="archive-detail-desc" id="archive-popup-desc-${row.id}"></div>
-                <div class="archive-detail-stats">
+                <div class="archive-detail-stats">${classRows ? `
+                    <div><span class="task-info-subtitle">Vidutiniškai atsakyta:</span> ${perStudent(row.totalAnswers)}</div>
+                    <div><span class="task-info-subtitle">Vidutiniškai teisingai iš pirmo karto:</span> ${perStudent(row.correct)} (${share(row.correct)}%)</div>
+                    <div><span class="task-info-subtitle">Vidutiniškai klaidų:</span> ${perStudent(row.mistakes)} (${share(row.mistakes)}%)</div>
+                    <div><span class="task-info-subtitle">Vidutinė trukmė:</span> ${row.averageSeconds != null ? secondsText(row.averageSeconds) : '–'}</div>` : `
                     <div><span class="task-info-subtitle">Atsakyta iš viso:</span> ${row.totalAnswers}</div>
-                    <div><span class="task-info-subtitle">Teisingai iš pirmo karto:</span> ${row.correct} (${row.totalAnswers > 0 ? Math.round(row.correct / row.totalAnswers * 100) : 0}%)</div>
-                    <div><span class="task-info-subtitle">Klaidos:</span> ${row.mistakes} (${row.totalAnswers > 0 ? Math.round(row.mistakes / row.totalAnswers * 100) : 0}%)</div>
-                    <div><span class="task-info-subtitle">Trukmė:</span> ${calculateArchiveDuration(row)}</div>
+                    <div><span class="task-info-subtitle">Teisingai iš pirmo karto:</span> ${row.correct} (${share(row.correct)}%)</div>
+                    <div><span class="task-info-subtitle">Klaidos:</span> ${row.mistakes} (${share(row.mistakes)}%)</div>
+                    <div><span class="task-info-subtitle">Trukmė:</span> ${calculateArchiveDuration(row)}</div>`}
                 </div>
                 ${isMathTask ? `<div id="archive-popup-mmistakes-${row.id}"></div><div class="archive-mistake-title" id="archive-popup-math-title-${row.id}" style="display:none;">Klaidų suvestinė:</div><div class="table-container"><div id="archive-popup-math-${row.id}"></div></div>` : ''}
                 ${isGrammarTask ? `<div id="archive-popup-mistakes-${row.id}"></div><div class="archive-mistake-title" id="archive-popup-grammar-title-${row.id}" style="display:none;">Klaidų suvestinė:</div><div class="table-container"><div id="archive-popup-grammar-${row.id}"></div></div><div id="archive-popup-sentence-${row.id}"></div>` : ''}
@@ -17284,7 +17405,8 @@ function openEmbeddedArchiveTaskPopup(rowId) {
             `;
 
             const title = archiveGroupLabel(row) || 'Užduotis';
-            openObjectPopup(popupContent, title, row.date, null, false, {
+            const subtitle = classRows ? `Visa klasė · atliko ${classRows.length} ${ltCountForm(classRows.length, 'mokinys', 'mokiniai', 'mokinių')}` : row.date;
+            openObjectPopup(popupContent, title, subtitle, null, false, {
                 className: 'archive-task-info-popup',
                 width: '90svw',
                 maxWidth: '90svw',
@@ -17295,15 +17417,19 @@ function openEmbeddedArchiveTaskPopup(rowId) {
             popup?.classList.add('archive-task-info-overlay');
             syncArchivePopupWithSidebar();
             const studentListElement = document.getElementById('student-list');
-            activeArchivePopupTeacherTaskId = row.teacherTaskId ? row.teacherTaskId : null;
-            activeArchivePopupGroup = row.teacherTaskId ? archivePopupGroupOf(row) : '';
-            studentListElement?.classList.toggle('archive-popup-teacher-task-mode', Boolean(row.teacherTaskId));
-            studentListElement?.classList.remove('archive-popup-student-list-disabled');
-            if (row.teacherTaskId) {
-                archivePopupSameTask = null;
-                applyArchivePopupStudentStates(row.teacherTaskId);
-            } else {
-                applyArchivePopupSameTask(row);
+            if (!classRows) {
+                activeArchivePopupTeacherTaskId = row.teacherTaskId ? row.teacherTaskId : null;
+                activeArchivePopupGroup = row.teacherTaskId ? archivePopupGroupOf(row) : '';
+                studentListElement?.classList.toggle('archive-popup-teacher-task-mode', Boolean(row.teacherTaskId));
+                studentListElement?.classList.remove('archive-popup-student-list-disabled');
+                if (row.teacherTaskId) {
+                    archivePopupSameTask = null;
+                    applyArchivePopupStudentStates(row.teacherTaskId);
+                    if (startWithClass) setTimeout(openArchivePopupClassSummary, 0);
+                } else {
+                    // (the other students' results of the task come from the server: then the class's results)
+                    applyArchivePopupSameTask(row).then(() => { if (startWithClass && archivePopupIsOpen() && archivePopupAnchorRow === row) openArchivePopupClassSummary(); });
+                }
             }
             attachArchivePopupStudentSelection();
             const cleanupPopup = () => {
@@ -17316,6 +17442,7 @@ function openEmbeddedArchiveTaskPopup(rowId) {
                 }
                 clearArchivePopupStudentMode();
                 restoreStudentTaskInfoAfterArchivePopup();
+                archivePopupNavigateBack();
                 window.removeEventListener('resize', syncArchivePopupWithSidebar);
                 popup?.removeEventListener('click', closeOnOverlayClick);
             };
@@ -17327,13 +17454,16 @@ function openEmbeddedArchiveTaskPopup(rowId) {
             window.addEventListener('resize', syncArchivePopupWithSidebar);
 
             if (window.SudInsights && SudInsights.enabled('task')) {
-                // the student's other results (for "more / fewer mistakes than usual"): only a single student's archive is at hand
-                const history = classEmbeddedArchiveStudents ? null
+                // the student's other results (for "more / fewer mistakes than usual"): only a single student's archive is at
+                // hand. The class: all its results of the task read together (the same summary and mistake categories)
+                const history = classRows || classEmbeddedArchiveStudents ? null
                     : (analysisArchiveRows && analysisArchiveRows.length ? analysisArchiveRows
                         : embeddedArchiveCache[embeddedArchiveCacheKey(currentEmbeddedArchiveStudentId, embeddedArchiveShowingOlder, archiveKindsParam('archive'))]?.rows);
                 const grammarTitle = document.getElementById(`archive-popup-grammar-title-${row.id}`);
                 const mathPopupTitle = document.getElementById(`archive-popup-math-title-${row.id}`);
-                SudInsights.renderTask(document.getElementById(`archive-popup-insights-${row.id}`), row, {
+                SudInsights.renderTask(document.getElementById(`archive-popup-insights-${row.id}`), classRows ? classRows.map(withMistakeDetailFromTasks) : row, {
+                    isClass: Boolean(classRows),
+                    classSize: classRows ? classRows.length : undefined,
                     gradeOf: studentGradeNow,
                     subject: isMathTask ? 'math' : isGrammarTask ? 'grammar' : isTextTask ? 'text' : null,
                     kindOf: resultKindOf,
@@ -17358,19 +17488,25 @@ function openEmbeddedArchiveTaskPopup(rowId) {
                 const parsedDuration = row.duration ? JSON.parse(row.duration) : null;
                 const description = document.getElementById(`archive-popup-desc-${row.id}`);
                 description.insertAdjacentHTML('afterbegin', '<strong>Užduoties aprašymas</strong>');
-                const list = document.createElement('ul');
-                list.className = 'task-description-list';
-                getOptionTextFromValues(parsedTaskInfo, parsedDuration, true).forEach(item => {
-                    if (!item) return;
-                    list.appendChild(renderArchiveDescriptionItem(item, isGrammarTask));
-                });
-                description.appendChild(list);
+                // (the class: when its students' tasks in the group were not set up alike, no one student's settings)
+                const settingsOf = r => `${typeof r.taskInfo === 'string' ? r.taskInfo : JSON.stringify(r.taskInfo)}|${r.duration || ''}`;
+                if (classRows && new Set(classRows.map(settingsOf)).size > 1) {
+                    description.insertAdjacentHTML('beforeend', '<p class="archive-desc-mixed">Šioje užduočių grupėje mokinių užduočių nustatymai skiriasi – kiekvieno mokinio užduoties aprašymą rasite pasirinkę mokinį.</p>');
+                } else {
+                    const list = document.createElement('ul');
+                    list.className = 'task-description-list';
+                    getOptionTextFromValues(parsedTaskInfo, parsedDuration, true).forEach(item => {
+                        if (!item) return;
+                        list.appendChild(renderArchiveDescriptionItem(item, isGrammarTask));
+                    });
+                    description.appendChild(list);
+                }
 
                 const mistakesDetail = normalizeArchiveMistakesDetail(row.mistakesDetail);
                 if (Array.isArray(mistakesDetail) && mistakesDetail.length > 0) {
                     const mathTarget = isMathTask ? `archive-popup-math-${row.id}` : 'none';
                     const grammarTarget = isGrammarTask ? `archive-popup-grammar-${row.id}` : 'none';
-                    generateSummaryTable('custom', mistakesDetail, mathTarget, grammarTarget);
+                    generateSummaryTable('custom', mistakesDetail, mathTarget, grammarTarget, Boolean(classRows));
                     const mathBox = document.getElementById(`archive-popup-math-${row.id}`);
                     const grammarBox = document.getElementById(`archive-popup-grammar-${row.id}`);
                     if (isMathTask && mathBox?.querySelector('table')) {
@@ -17387,16 +17523,17 @@ function openEmbeddedArchiveTaskPopup(rowId) {
                 if (isTextTask) {
                     const summary = document.getElementById(`archive-popup-text-summary-${row.id}`);
                     const browserContainer = document.getElementById(`archive-popup-text-browser-${row.id}`);
-                    const textInfo = processStudentTasks([{
+                    const textInfo = processStudentTasks((classRows || [row]).map(r => ({
                         completed: true,
-                        taskDescription: row.taskInfo,
-                        completionDate: row.date,
-                        result: { mistakes: row.mistakes, totalAnswers: row.totalAnswers, mistakesDetail }
-                    }]);
+                        taskDescription: r.taskInfo,
+                        completionDate: r.date,
+                        studentId: r.studentId,
+                        result: { mistakes: r.mistakes, totalAnswers: r.totalAnswers, mistakesDetail: classRows ? normalizeArchiveMistakesDetail(r.mistakesDetail) : mistakesDetail }
+                    })));
                     displayComletedTextIdsForTextComp(
                         textInfo.isdestymas[1].length ? textInfo.isdestymas : textInfo.komponavimas,
                         summary,
-                        false,
+                        Boolean(classRows),
                         textId => openArchivePopupText(browserContainer, textId)
                     );
                     renderArchiveTextBrowser(row, browserContainer);
@@ -18274,6 +18411,27 @@ window.addEventListener('resize', () => {
 // However the drawer is opened or closed (tab, Escape, or code such as picking a student), the task result popup follows it
 new MutationObserver(syncArchivePopupWithSidebar).observe(sidebarWrapper, { attributes: true, attributeFilter: ['class'] });
 
+// smaller screens (the drawer slides over the student list): "invite students" is inactive while the drawer is open
+function syncInviteButtonWithSidebar() {
+    const button = document.getElementById('add-students-button');
+    if (!button) return;
+    // (the drawer's tab is there only when the drawer slides over the list)
+    const overList = Boolean(toggleTab && toggleTab.offsetParent !== null && getComputedStyle(toggleTab).display !== 'none');
+    button.disabled = overList && sidebarWrapper.classList.contains('open');
+}
+new MutationObserver(syncInviteButtonWithSidebar).observe(sidebarWrapper, { attributes: true, attributeFilter: ['class'] });
+window.addEventListener('resize', syncInviteButtonWithSidebar);
+syncInviteButtonWithSidebar();
+
+// a task's results pop-up closes by itself when the teacher goes on to something else: the task list, a new task or
+// inviting students (closed as with its own close button, without going back to what it was opened over)
+document.addEventListener('click', event => {
+    const button = event.target.closest && event.target.closest('#task-list-button, #new-task-button, #add-students-button');
+    if (!button || button.disabled || !archivePopupIsOpen()) return;
+    archivePopupShowing = archivePopupOpenedOver = null;
+    document.querySelector('#object-popup .object-popup-close')?.click();
+}, true);
+
 
 const sidebarWrapperStudent = document.getElementById('sidebarWrapperStudent');
 const toggleTabStudent = document.getElementById('toggleTabStudent');
@@ -18377,9 +18535,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('task-list-button').addEventListener('click', () => {
         // displayTeacherHome() is async and restores the old scroll position when it finishes,
         // so the scroll has to wait for it (see the end of displayTeacherHome)
+        setTeacherSection('pending');
+        if (!Array.isArray(studentList)) {
+            showClassTasksLoading();
+            if (typeof openSidebar === 'function') openSidebar();
+            focusTaskListSection();
+            return;
+        }
         focusTaskListAfterHomeRender = !browsingHistory;
         document.querySelector('.teacher-home-button')?.click();
-        setTeacherSection('pending');
     });
     
     // Confirmation buttons
@@ -19014,7 +19178,7 @@ function weekShortName(name, day) {
     const i = (dayToLocalDate(day).getDay() + 6) % 7;
     const short = typeof SudAutoTasks !== 'undefined' ? SudAutoTasks.WEEKDAYS_SHORT[i].replace('.', '\\.') : '';
     const rest = String(name || 'Užduotis').replace(new RegExp(`^(Sav\\. \\d+ – )?(${STUDENT_WEEK_NAMES[i]}|${short}) – `), '');
-    return rest.charAt(0).toUpperCase() + rest.slice(1);   // ("matematika" in the name, "Matematika" on the board)
+    return rest;   // (as named: the subject stays in lower case - "matematika")
 }
 function renderStudentWeek() {
     const el = document.getElementById('student-week');

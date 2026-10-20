@@ -2384,23 +2384,30 @@ async function checkAnswer () {
     const op = controller.randomSelection[2];
     let given = controller.modeChoice7 === "C48" && op !== 'D' && !flag ? flipNumber(userInput) : userAnswer;
     if (op === 'D' && controller.withRemainder && !flag && controller.modeChoice7 !== "C48") given = `${userAnswer} (${userAnswerRemainder})`;
+    // (a value with more than 2 digits over the right one is typed at random: the try counts, the value is not kept)
+    const digitsOf = v => String(v).replace(/\D/g, '').length;
+    const tooLong = (value, right) => digitsOf(value) > digitsOf(right) + 2;
+    const rightAnswer = flag === 'F' ? numbers[0] : flag === 'S' ? numbers[1]
+      : op === 'A' ? numbers[0] + numbers[1] : op === 'S' ? numbers[0] - numbers[1] : op === 'M' ? numbers[0] * numbers[1] : Math.floor(numbers[0] / numbers[1]);
+    const keepGiven = !tooLong(given, rightAnswer);
     [controller.currentMistakes, controller.totalMistakes].forEach(list => {
       const last = list[list.length - 1];
       const same = last && Array.isArray(last[0]) && last[1] === op && Array.isArray(last[2]) &&
         JSON.stringify(last[0]) === JSON.stringify(numbers);
       // (column notation: every field's expected value and the wrong values typed in it, at most 3 a field)
       const fields = controller.modeChoice7 === "C48" && !flag
-        ? columnFields.map(([expected, typed]) => [expected, typed !== '' && typed !== expected ? [typed] : []]) : null;
+        ? columnFields.map(([expected, typed]) => [expected, typed !== '' && typed !== expected && !tooLong(typed, expected) ? [typed] : []]) : null;
       if (same) {
         last[2][0] = (Number(last[2][0]) || 1) + 1;
-        if (last[2][1].length < 3) last[2][1].push(given);
+        if (last[2][1].length < 3 && keepGiven) last[2][1].push(given);
         if (fields) {
           const kept = last[3] && Array.isArray(last[3].f) && last[3].f.length === fields.length ? last[3].f : null;
           if (!kept) last[3] = { f: fields };
           else fields.forEach(([, wrong], k) => wrong.forEach(w => { if (!kept[k][1].includes(w) && kept[k][1].length < 3) kept[k][1].push(w); }));
         }
       } else {
-        list.push(fields ? [numbers, op, [1, [given]], { f: fields }] : [numbers, op, [1, [given]]]);
+        const answers = keepGiven ? [given] : [];
+        list.push(fields ? [numbers, op, [1, answers], { f: fields }] : [numbers, op, [1, answers]]);
       }
     });
   }
@@ -2567,7 +2574,8 @@ function mathMistakeRightAnswers(record) {
   return [String(op === 'A' ? a + b : op === 'S' ? a - b : a * b)];
 }
 function mathMistakeHasDetail(record) {
-  return Array.isArray(record[2]) && Array.isArray(record[2][1]) && record[2][1].length > 0;
+  return (Array.isArray(record[2]) && Array.isArray(record[2][1]) && record[2][1].length > 0) ||
+    Boolean(record[3] && Array.isArray(record[3].f));
 }
 const MM_OP = { A: '+', S: '\u2212', M: '\u00D7', D: ':' };
 function mmEsc(v) { return escapeMistakeText(String(v)); }
@@ -2588,7 +2596,7 @@ function mmGrid(lines) {
       run = { cls: c.cls, text: c.ch };
     });
     if (run) html += run.cls.trim() ? `<span class="${run.cls.trim()}">${mmEsc(run.text)}</span>` : mmEsc(run.text);
-    return `<div class="mm-line">${html}${l.note ? `<span class="mm-note">${l.note}</span>` : ''}</div>`;
+    return `<span class="mm-side l">${l.left || ''}</span><span class="mm-line">${html}</span><span class="mm-side r">${l.right || ''}</span>`;
   });
   return `<div class="mm-grid">${rows.join('')}</div>`;
 }
@@ -2607,14 +2615,14 @@ function mmColumnHtml(a, b, op, fields, answers) {
     for (let k = 0; k < L; k++) {
       const prod = fields[2 * k], m = mmField(prod), v = String(prod[0]);
       const start = p(k) - v.length + 1;
-      const line = { segs: [{ col: start - 1, text: '\u2212' }, mmAt(p(k), v, m.cls)], ul: [start - 1, p(k)], note: m.note };
+      const line = { segs: [{ col: start - 1, text: '\u2212', cls: 'mm-minus' }, mmAt(p(k), v, m.cls)], ul: [start, p(k)], left: m.note };
       if (k === 0) {
-        line.segs.push({ col: n + 2, text: '\u2502' }, { col: n + 3, text: String(correct), cls: answerCls });
-        if (wrongAnswers.length) line.note = `${mmWrongList(wrongAnswers)}<span class="mm-lbl">dalmuo</span>${m.note ? ' · ' + m.note : ''}`;
+        line.segs.push({ col: n + 3, text: String(correct), cls: answerCls });
+        if (wrongAnswers.length) line.right = mmWrongList(wrongAnswers);
       }
       lines.push(line);
       const next = fields[2 * k + 1], mn = mmField(next);
-      lines.push({ segs: [mmAt(k < L - 1 ? p(k) + 1 : n, next[0], mn.cls)], note: mn.note });
+      lines.push({ segs: [mmAt(k < L - 1 ? p(k) + 1 : n, next[0], mn.cls)], left: mn.note });
     }
     return mmGrid(lines);
   }
@@ -2626,11 +2634,11 @@ function mmColumnHtml(a, b, op, fields, answers) {
   ];
   partials.forEach((f, i) => {
     const m = mmField(f);
-    const line = { segs: [mmAt(R - i, f[0], m.cls)], note: m.note };
+    const line = { segs: [mmAt(R - i, f[0], m.cls)], left: m.note };
     if (i === partials.length - 1) { line.segs.unshift({ col: 0, text: '+' }); line.ul = [0, R]; }
     lines.push(line);
   });
-  lines.push({ segs: [mmAt(R, correct, answerCls)], note: wrongAnswers.length ? mmWrongList(wrongAnswers) : '' });
+  lines.push({ segs: [mmAt(R, correct, answerCls)], right: wrongAnswers.length ? mmWrongList(wrongAnswers) : '' });
   return mmGrid(lines);
 }
 function mathMistakeVisual(record) {
@@ -2669,32 +2677,66 @@ function mathMistakeDetailHtml(records) {
   const more = list.length > MM_SHOWN ? `<div class="mm-more">dar ${list.length - MM_SHOWN}</div>` : '';
   return `<div class="mm-detail">${shown}${more}</div>`;
 }
+// the records of each row that can open (one registry for the page; a row keeps its id)
+const MM_RECORDS = new Map();
+let mmNextId = 1;
+function mmRegister(records) {
+  const id = String(mmNextId++);
+  MM_RECORDS.set(id, records);
+  return id;
+}
+document.addEventListener('click', event => {
+  const cell = event.target.closest && event.target.closest('.mm-toggle');
+  if (!cell || event.target.closest('.mm-detail')) return;
+  const open = cell.querySelector('.mm-detail');
+  const button = cell.querySelector('.mm-btn');
+  if (open) { open.remove(); cell.classList.remove('open'); if (button) button.setAttribute('aria-expanded', 'false'); return; }
+  injectMathMistakeStyle();
+  cell.insertAdjacentHTML('beforeend', mathMistakeDetailHtml(MM_RECORDS.get(cell.dataset.mmId) || []));
+  cell.classList.add('open');
+  if (button) button.setAttribute('aria-expanded', 'true');
+  // (the opened example in view: every scrolling area it is in)
+  const detail = cell.querySelector('.mm-detail');
+  if (detail) requestAnimationFrame(() => {
+    if (typeof revealExpanded === 'function') revealExpanded(detail);
+    else detail.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  });
+});
 function injectMathMistakeStyle() {
   if (document.getElementById('mm-style')) return;
   const st = document.createElement('style');
   st.id = 'mm-style';
   st.textContent = `
 .mm-toggle{cursor:pointer}
-.mm-toggle .mm-chev{display:inline-block;margin-left:6px;color:#5f7f8c;font-size:11px;transition:transform .15s}
-.mm-toggle.open .mm-chev{transform:rotate(90deg)}
+.mm-btn{display:inline-flex;align-items:center;gap:4px;margin:0 8px 0 8px;padding:2px 9px 2px 7px;border:0;border-radius:999px;background:rgba(40,109,138,.12);color:#1d566e;font-family:inherit;font-size:12px;font-weight:600;line-height:1.5;vertical-align:middle;cursor:pointer;transition:background .15s}
+.mm-btn:hover,.mm-toggle.open .mm-btn{background:rgba(40,109,138,.22)}
+.mm-btn .mm-chev{display:inline-block;font-size:10px;transition:transform .15s}
+.mm-toggle.open .mm-btn .mm-chev{transform:rotate(90deg)}
 .mm-detail{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px 22px;margin:6px 0 2px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.6);text-align:left;overflow-x:auto;cursor:default}
 .mm-detail,.mm-detail *{font-size:13px !important;line-height:1.3 !important;letter-spacing:0 !important;text-transform:none !important}
 .mm-detail .mm-lbl,.mm-detail .mm-more{font-size:12px !important}
 .mm-detail .mm-w{font-size:12.5px !important}
 .mm-item{min-width:0}
-.mm-grid{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;line-height:1.3;font-variant-numeric:tabular-nums;color:#1f2a30}
+.mm-grid{display:grid;grid-template-columns:auto auto auto;align-items:center;column-gap:8px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;color:#1f2a30}
 .mm-line{white-space:pre}
+.mm-side{display:flex;gap:3px;white-space:nowrap}
+.mm-side.l{justify-content:flex-end}
+.mm-side.r{justify-content:flex-start}
+.mm-side .mm-w{margin:0}
 .mm-ul{border-bottom:1px solid #1f2a30}
+.mm-minus{position:relative;top:-.65em}
 .mm-bad{background:rgba(213,126,126,.28);border-radius:2px}
 .mm-ok{color:#17705d;font-weight:700}
-.mm-note{margin-left:8px;white-space:nowrap}
 .mm-w{display:inline-block;margin:0 3px 0 0;padding:0 5px;border-radius:5px;background:#f8dada;color:#983a3a;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.35}
 .mm-eq{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:nowrap}
 .mm-detail .mm-eq{line-height:1.6 !important}
 .mm-slot{display:inline-block;padding:0 2px;border:1px dashed #b05f5f;border-radius:5px}
 .mm-slot .mm-w{margin:0 1px}
 .mm-lbl{margin-left:8px;color:#5f7480;font-family:inherit;font-size:12px}
-.mm-more{align-self:center;color:#5f7480;font-size:12px}`;
+.mm-more{align-self:center;color:#5f7480;font-size:12px}
+.mm-unk .mm-ok{color:#32ac93;font-weight:700}
+.mm-unk .mm-wrongs{color:#1f2a30;font-weight:400}
+.mm-unk .mm-wa{color:#D57E7E;font-weight:700}`;
   document.head.appendChild(st);
 }
 function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=null, customDivForGrammarSummaryTable=null, usePercentage=false) {  controller = JSON.parse(localStorage.getItem('controller'));
@@ -2795,7 +2837,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
         if (Array.isArray(mistake[2]) && Array.isArray(mistake[2][1])) {
           if (!mathAnswersByKey[usedKey]) mathAnswersByKey[usedKey] = new Set();
           const right = mathMistakeRightAnswers(mistake);
-          mistake[2][1].forEach(answer => { if (!right.includes(String(answer))) mathAnswersByKey[usedKey].add(String(answer)); });
+          if (!(mistake[3] && Array.isArray(mistake[3].f))) mistake[2][1].forEach(answer => { if (!right.includes(String(answer))) mathAnswersByKey[usedKey].add(String(answer)); });
         }
       
         return acc;
@@ -2803,11 +2845,35 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
 
       // Convert the data to an array of objects
       // (EXPERIMENTAL pages: the answers given, next to the example)
-      const answersHtml = key => mistakeTableShowsAnswers() && mathAnswersByKey[key] && mathAnswersByKey[key].size
+      const answersHtml = key => mathAnswersByKey[key] && mathAnswersByKey[key].size
         ? ` <span class="word-wrong-answers">(${[...mathAnswersByKey[key]].map(a => `<span class="wa">${escapeMistakeText(a)}</span>`).join(', ')})</span>`
         : '';
+      // every example (in a row, with an unknown number): the right number in green where the box was, the wrong
+      // answers in brackets after it (in the mistakes' pink). Only an example done in columns opens "Sprendimas"
+      // (its layout); its wrong answers are shown there.
+      const filledRowHtml = key => {
+        const unknown = key.match(/^(&#x25fb|-?\d+) (\S+)\s+(&#x25fb|-?\d+) = (-?[\d.]+)$/);
+        const plain = !unknown && key.match(/^(-?\d+) (\S+)\s+(-?\d+) = &#x25fb$/);
+        const m = unknown || plain;
+        if (!m) return null;
+        const op = { '+': 'A', '-': 'S', '\u2212': 'S', '\u00D7': 'M', '\uA789': 'D', '\u00F7': 'D' }[m[2]];
+        let correct = null;
+        if (unknown) {
+          const r = Number(m[4]), known = Number(m[1] === '&#x25fb' ? m[3] : m[1]), first = m[1] === '&#x25fb';
+          correct = op === 'A' ? r - known : op === 'S' ? (first ? r + known : known - r) : op === 'M' ? r / known : op === 'D' ? (first ? r * known : known / r) : null;
+        } else {
+          const a = Number(m[1]), b = Number(m[3]);
+          correct = op === 'A' ? a + b : op === 'S' ? a - b : op === 'M' ? a * b : op === 'D' && b ? (a % b ? `${Math.floor(a / b)} (${a % b})` : Math.floor(a / b)) : null;
+        }
+        if (correct == null || (typeof correct === 'number' && !isFinite(correct))) return null;
+        const right = String(correct), quotient = right.split(' ')[0];
+        const wrong = [...(mathAnswersByKey[key] || [])].filter(a => String(a) !== right && String(a) !== quotient);
+        const slot = `<span class="mm-unk"><span class="mm-ok">${escapeMistakeText(right)}</span>${wrong.length ? ` <span class="mm-wrongs">(${wrong.map(a => `<span class="mm-wa">${escapeMistakeText(a)}</span>`).join(', ')})</span>` : ''}</span>`;
+        return key.replace('&#x25fb', slot);
+      };
+      const mmRowOpens = records => (records || []).some(r => mathMistakeHasDetail(r) && r[3] && Array.isArray(r[3].f));
       const summaryData = Object.entries(performanceData).map(([veiksmas, mistakes]) => ({
-          Veiksmai: veiksmas + answersHtml(veiksmas),
+          Veiksmai: filledRowHtml(veiksmas) || veiksmas + answersHtml(veiksmas),
           key: veiksmas,
           "Suklysta (kartai)": mistakes
       }));
@@ -2858,7 +2924,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
                             }
                             
                             return `<tr>
-                                <td${(mathRecordsByKey[row.key] || []).some(mathMistakeHasDetail) ? ` class="mm-toggle" data-mm="${encodeURIComponent(row.key)}" title="Rodyti, kaip spręsta"` : ''}>${row["Veiksmai"]}${(mathRecordsByKey[row.key] || []).some(mathMistakeHasDetail) ? '<span class="mm-chev" aria-hidden="true">\u25B8</span>' : ''}</td>
+                                <td${mmRowOpens(mathRecordsByKey[row.key]) ? ` class="mm-toggle" data-mm-id="${mmRegister(mathRecordsByKey[row.key])}" title="Rodyti, kaip spręsta"` : ''}>${row["Veiksmai"]}${mmRowOpens(mathRecordsByKey[row.key]) ? '<button type="button" class="mm-btn" aria-expanded="false"><span class="mm-chev" aria-hidden="true">\u25B8</span>Sprendimas</button>' : ''}</td>
                                 <td>${displayValue}</td>
                                 <td>
                                     <div class="bar" style="width: ${barWidth}; background-color: ${barColor};"></div>
@@ -2899,7 +2965,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
                               }
                               
                               return `<tr>
-                                  <td${(mathRecordsByKey[row.key] || []).some(mathMistakeHasDetail) ? ` class="mm-toggle" data-mm="${encodeURIComponent(row.key)}" title="Rodyti, kaip spręsta"` : ''}>${row["Veiksmai"]}${(mathRecordsByKey[row.key] || []).some(mathMistakeHasDetail) ? '<span class="mm-chev" aria-hidden="true">\u25B8</span>' : ''}</td>
+                                  <td${mmRowOpens(mathRecordsByKey[row.key]) ? ` class="mm-toggle" data-mm-id="${mmRegister(mathRecordsByKey[row.key])}" title="Rodyti, kaip spręsta"` : ''}>${row["Veiksmai"]}${mmRowOpens(mathRecordsByKey[row.key]) ? '<button type="button" class="mm-btn" aria-expanded="false"><span class="mm-chev" aria-hidden="true">\u25B8</span>Sprendimas</button>' : ''}</td>
                                   <td>${displayValue}</td>
                                   <td>
                                       <div class="bar" style="width: ${barWidth}; background-color: ${barColor};"></div>
@@ -2921,13 +2987,6 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
       summaryTableElement.innerHTML = "";
       summaryTableElement.appendChild(summaryTable);
       injectMathMistakeStyle();
-      summaryTable.querySelectorAll('.mm-toggle').forEach(cell => cell.addEventListener('click', event => {
-        if (event.target.closest('.mm-detail')) return;
-        const open = cell.querySelector('.mm-detail');
-        if (open) { open.remove(); cell.classList.remove('open'); return; }
-        cell.insertAdjacentHTML('beforeend', mathMistakeDetailHtml(mathRecordsByKey[decodeURIComponent(cell.dataset.mm)] || []));
-        cell.classList.add('open');
-      }));
   } else {
     // Display the summary table
     let summaryTableElement;

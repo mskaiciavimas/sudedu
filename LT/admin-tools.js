@@ -17,7 +17,8 @@
         object: { title: 'Choose a room item', test: item => !isConsumable(item) && !item.petAsset },
         consumable: { title: 'Choose a consumable (food, treats)', test: isConsumable },
         pet: { title: 'Choose a pet', test: isPet },
-        skin: { title: 'Choose a skin', test: isSkin }
+        skin: { title: 'Choose a skin', test: isSkin },
+        gift: { title: 'Choose a gift', test: () => true }
     };
 
     // ------------------------------------------------------------ the picker
@@ -195,7 +196,7 @@
     let deletePassword = null, deletePasswordUntil = 0;
     function needsPassword(url, opts) {
         const method = String((opts && opts.method) || 'GET').toUpperCase();
-        return /\/admin\//.test(url) && (method === 'DELETE' || /\/admin\/game-metrics\/delete/.test(url));
+        return /\/admin\//.test(url) && ((method === 'DELETE' && !/\/admin\/notices\//.test(url)) || /\/admin\/game-metrics\/delete/.test(url));
     }
     function hookDeletes() {
         if (typeof window.apiFetch !== 'function' || window.apiFetch.__deletes) return;
@@ -234,12 +235,14 @@
                 <button type="button" class="btn small-btn" data-sim="view">👁 View as user</button>
                 ${user.accType === 'student' ? '<button type="button" class="btn small-btn" data-sim="room">🏠 View pet room</button>' : ''}
                 <button type="button" class="btn btn-danger small-btn" data-sim="full">🔓 Log in as user</button>
+                ${window.AdminMessages ? '<button type="button" class="btn small-btn" data-sim="msg">💌 Send a message</button>' : ''}
             </div>
         </div>`;
     }
     function bindAccessPanel(user) {
         document.querySelectorAll('#lookup-results .at-access [data-sim]').forEach(b => b.addEventListener('click', () => {
             const kind = b.dataset.sim;
+            if (kind === 'msg') { window.AdminMessages.composeFor(user); return; }
             simulate(user.id, kind === 'full' ? 'full' : 'view', kind === 'room' ? '/LT/augintiniai.html' : null);
         }));
     }
@@ -297,12 +300,40 @@
         Object.assign(gs, await res.json());
         drawGameStats();
     }
+    // Vaiduoklis: how the shown games went, summed up (each row keeps per round [how it ended, word length, a bot lost,
+    // seconds] - no names, no words)
+    const GHOST_ENDS = { v: 'challenge: the word existed', i: 'challenge: no such word', c: 'gave up (no word)', t: 'out of time', l: 'a player left', o: 'other' };
+    function ghostSummary(rows) {
+        const games = rows.filter(r => r.game === 'ghost' && r.data && Array.isArray(r.data.r));
+        if (!games.length) return '';
+        const rounds = games.flatMap(r => r.data.r);
+        const pct = (n, d) => d ? Math.round(n / d * 100) + '%' : '–';
+        const avg = (arr, dec = 1) => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(dec).replace(/\.0$/, '') : '–';
+        const by = key => games.reduce((m, r) => { const k = key(r); m[k] = (m[k] || 0) + 1; return m; }, {});
+        const list = o => Object.entries(o).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${esc(k)} ${n}`).join(' · ');
+        const ends = rounds.reduce((m, r) => { m[r[0]] = (m[r[0]] || 0) + 1; return m; }, {});
+        const solo = games.filter(r => r.mode === 'solo');
+        return `<div class="gs-ghost">
+            <h3>👻 Vaiduoklis – ${games.length} game${games.length === 1 ? '' : 's'} shown</h3>
+            <div class="gs-ghost-grid">
+                <div><b>Ways played</b><span>${list(by(r => r.mode))}</span></div>
+                <div><b>Word lists</b><span>${list(by(r => (r.taskSettings && r.taskSettings.dict) || '?'))}</span></div>
+                <div><b>Bot level</b><span>${list(by(r => r.difficulty || '?'))}</span></div>
+                <div><b>Typical game</b><span>${avg(games.map(r => r.data.r.length))} rounds, ${avg(games.map(r => r.seconds / 60))} min, ${avg(games.map(r => r.players))} people + ${avg(games.map(r => (r.taskSettings && r.taskSettings.bots) || 0))} bots</span></div>
+                <div><b>Rounds</b><span>${rounds.length}, typically ${avg(rounds.map(r => r[3]), 0)} s, the word ${avg(rounds.map(r => r[1]))} letters long</span></div>
+                <div><b>Who lost the rounds</b><span>bots ${pct(rounds.filter(r => r[2]).length, rounds.length)}, people ${pct(rounds.filter(r => !r[2]).length, rounds.length)}</span></div>
+                ${solo.length ? `<div><b>Solo games won</b><span>${pct(solo.filter(r => r.result === 'won').length, solo.length)} of ${solo.length}</span></div>` : ''}
+                <div class="gs-ghost-ends"><b>How rounds ended</b><span>${Object.entries(ends).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${esc(GHOST_ENDS[k] || k)} ${pct(n, rounds.length)}`).join(' · ')}</span></div>
+            </div>
+        </div>`;
+    }
     function drawGameStats() {
         const box = document.getElementById('gamestats-content');
         const hostName = id => (id == null ? '–' : `${gs.hosts[id] || 'ID ' + id} (${id})`);
         const hostIds = [...new Set(gs.rows.map(r => r.hostId).filter(v => v != null))];
         box.innerHTML = `
-            <p class="at-pw-note">Recorded class games (Klasė → Žaidimai), used for tuning game difficulty - the ${gs.rows.length} newest of ${gs.total}. Delete test games so they do not skew it.</p>
+            <p class="at-pw-note">Recorded games (Klasė → Žaidimai; Vaiduoklis also alone and on the board), used for tuning the games - the ${gs.rows.length} newest of ${gs.total}. Delete test games so they do not skew it.</p>
+            ${ghostSummary(gs.rows)}
             <div class="at-pw-row">
                 <label>Host <select class="gs-host"><option value="">All</option>${hostIds.map(id => `<option value="${id}">${esc(hostName(id))}</option>`).join('')}</select></label>
                 <button type="button" class="btn small-btn gs-select-host">Select the shown games</button>
@@ -313,8 +344,8 @@
                 <thead><tr><th><input type="checkbox" class="gs-all" aria-label="Select all shown"></th><th>When</th><th>Game</th><th>Host</th><th>Players</th><th>Difficulty</th><th>Mode</th><th>Set min</th><th>Task</th><th>Result</th><th>Played</th><th>Correct</th></tr></thead>
                 <tbody>${gs.rows.map(r => `<tr data-host="${r.hostId ?? ''}"><td><input type="checkbox" class="gs-row" value="${r.id}"></td>
                     <td>${esc(new Date(r.createdAt).toLocaleString('lt-LT'))}</td><td>${esc(r.game)}</td><td>${esc(hostName(r.hostId))}</td><td>${r.players}</td>
-                    <td>${esc(r.difficulty)}</td><td>${esc(r.mode)}</td><td>${r.minutes}</td><td>${esc(r.task)}</td><td>${esc(r.result)}</td>
-                    <td>${Math.round(r.seconds / 60)} min</td><td>${r.correct}</td></tr>`).join('')}</tbody>
+                    <td>${esc(r.difficulty)}</td><td>${esc(r.mode)}</td><td>${r.game === 'ghost' ? '–' : r.minutes}</td><td>${esc(r.task)}${r.game === 'ghost' && r.taskSettings && r.taskSettings.dict ? ` (${esc(r.taskSettings.dict)})` : ''}</td><td>${esc(r.result)}</td>
+                    <td>${Math.round(r.seconds / 60)} min</td><td>${r.correct}${r.game === 'ghost' ? ' rounds' : ''}</td></tr>`).join('')}</tbody>
             </table></div>` : '<p class="at-pw-note">No recorded games.</p>'}`;
         const host = box.querySelector('.gs-host');
         const visible = () => [...box.querySelectorAll('tbody tr')].filter(tr => tr.style.display !== 'none');
@@ -403,6 +434,12 @@
         .user-pick-mail{font-size:13px;color:rgba(0,0,0,.6)}
         .user-pick-stats{font-size:13px;color:rgba(0,0,0,.65)}
         .gs-scroll{overflow:auto;max-height:70vh;margin-top:10px}
+        .gs-ghost{margin:10px 0 14px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.35)}
+        .gs-ghost h3{margin:0 0 8px;font-size:16px}
+        .gs-ghost-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:6px 18px;font-size:13px}
+        .gs-ghost-grid div{display:flex;flex-direction:column}
+        .gs-ghost-grid b{font-size:12px;color:rgba(0,0,0,.55);font-weight:600}
+        .gs-ghost-ends{grid-column:1/-1}
         .gs-table{width:100%;border-collapse:collapse;font-size:13px;background:rgba(255,255,255,.7)}
         .gs-table th,.gs-table td{padding:6px 8px;border-bottom:1px solid rgba(0,0,0,.06);text-align:left;white-space:nowrap}
         .gs-table th{position:sticky;top:0;background:#fff}

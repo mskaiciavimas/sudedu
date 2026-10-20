@@ -64,7 +64,10 @@
 				turn: 0, round: 0, word: '', last: null, phase: 'turn',
 				challenger: null, challengee: null, hint: null,
 				result: null, ready: [], nextStarter: null, over: false, winner: null,
-				checking: null            // the word being checked (so a runner taking over can check it again)
+				checking: null,           // the word being checked (so a runner taking over can check it again)
+				// a short record of how the game went (sent once when it ends - the admin page's game statistics): when it
+				// started, when the round started, and per round [how it ended, word length, a bot lost (1/0), seconds]
+				t0: Date.now(), rt: 0, log: []
 			};
 			this.deadline = 0;            // move clock (performance.now() based)
 			this.waitUntil = 0;           // waiting for a dropped player to come back
@@ -96,6 +99,7 @@
 			const S = this.S;
 			this.cancelWaits();
 			S.round++;
+			S.rt = Date.now();
 			S.word = '';
 			S.last = null;
 			S.challenger = S.challengee = null;
@@ -306,6 +310,10 @@
 				if (!info.example) info.noWordIsWord = this.fullWord(S.word);
 			}
 			S.nextStarter = starter;
+			if (S.log && S.log.length < 60) {
+				const how = { valid: 'v', invalid: 'i', concede: 'c', timeout: 't', left: 'l' }[info.type] || 'o';
+				S.log.push([how, [...S.word].length, loser && loser.bot ? 1 : 0, S.rt ? Math.min(3600, Math.round((Date.now() - S.rt) / 1000)) : 0]);
+			}
 			S.over = S.order.length <= 1 || (!!this.o.endWhenOut && !S.order.includes(this.o.endWhenOut));
 			S.winner = S.order.length === 1 ? S.order[0] : null;
 			S.resultSeq = (S.resultSeq || 0) + 1;

@@ -4076,7 +4076,8 @@
         </div>
     </div>
 
-    <script src="../mental-arithmetic.js?v=20261018m"></script>
+    <script src="../mental-arithmetic.js?v=20261020c"></script>
+    <script src="../sudedu-notices.js?v=20261020c"></script>
     <script src="../main-nav-bar.js"></script>
     <script src="../autonomous-pets.js?v=20261018r"></script>
     <script src="../functional-objects.js"></script>
@@ -5473,6 +5474,9 @@ async function removeInvalidObjectsAndSave() {
 // indicator at all, making the very first load look like it has no loading animation while every
 // later tab switch (which skips the fetch, since data's already in memory) clearly shows one.
 showRoomLoading();
+// (the admin's messages - sudedu-notices.js - wait for the room: a gift then goes into the loaded room)
+let resolveNoticesReady;
+window.sudeduNoticesReady = new Promise(resolve => { resolveNoticesReady = resolve; });
 Promise.all([
     fetch("gameAssetIndex.json").then(response => response.json()).then(data => { gameAssetIndex = data; }),
     fetchGameData()
@@ -5484,6 +5488,7 @@ Promise.all([
             hideRoomLoading();
         }
         fetchMessageGiftsFromServer();
+        resolveNoticesReady();
     })
     .catch(error => {
         console.error("Error loading gameAssetIndex.json or fetching game data:", error);
@@ -16610,6 +16615,37 @@ async function handleReceivedMessagesAndGifts(gifts) {
 
   displayReceivedMessages();
 }
+
+// A gift from an admin's message (sudedu-notices.js): the server has already added it to the saved room - the same
+// change goes into the open room (room items into the storage, food / skins / a new pet into the pet things).
+// gift = { objects: room items added, petAssets: the saved pets and supplies, newPet: a pet type new to the user }
+window.sudeduGiftReceived = async function (gift, notice) {
+  try {
+    for (let i = 0; i < (gift.objects || 0); i++) {
+      userObjectAssets[getNextObjectKey()] = { assetIndex: notice.giftId, position: [] };
+    }
+    if (gift.petAssets) {
+      const [pets, supplies] = JSON.parse(gift.petAssets);
+      const petObj = {}, supObj = {};
+      for (const [petId, [petName, skins]] of pets) {
+        petObj[petId] = { skins: {}, name: petName };
+        for (const [skinName, assetIndex, equipped] of skins) petObj[petId].skins[skinName] = { assetIndex, equiped: equipped };
+      }
+      supplies.forEach(([assetIndex, quantity], idx) => { supObj[`S${idx + 1}`] = { assetIndex, quantity }; });
+      userPetAssets = { pets: petObj, supplies: supObj };
+    }
+    if (gift.newPet) {
+      updateStatsBeforeRerunningInitGameAndRenderPets();
+      await initiateAutonomousPets();
+      await renderPets();
+      await selectAutonomousPetStartingActions();
+      enablePetDragging();
+      createPetButtons();
+    }
+  } catch (err) {
+    console.error('Error adding a gift to the room:', err);
+  }
+};
 
 // Add this function near the top of your script (after line 100 or so):
 function getNextObjectKey() {

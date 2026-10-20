@@ -653,7 +653,7 @@ const insightsMathPatterns = {
         tip: 'Verta pakartoti, kaip randamas nežinomas skaičius – atvirkštiniu veiksmu (□ + 3 = 8 → 8 − 3).' },
     m_zero: { label: 'Veiksmai su nuliu', area: 'veiksmuose su nuliu', tip: 'Verta pakartoti veiksmų su nuliu taisykles (a + 0 = a, a × 0 = 0).' },
     m_off1: { label: 'Apsirinkama vienetu', area: 'apsirinkant vienetu',
-        tip: 'Atsakymas skiriasi vienetu – gali būti, kad skaičiuojama pirštais ir apsirinkama; verta pakartoti skaičių sudėtį ir kaimynus.' },
+        tip: 'Sudedant ar atimant iki 20 atsakymas skiriasi vienetu. Gali būti, kad skaičiuojama po vieną (pvz., pirštais) ir apsirinkama – tada verta pakartoti skaičių sudėtį ir atimtį iki 20 bei skaičių kaimynus.' },
     m_off10: { label: 'Pamirštama perkelti ar paskolinti dešimtį', area: 'pamirštant perkelti ar paskolinti dešimtį',
         tip: 'Atsakymas skiriasi dešimtimi ar šimtu – greičiausiai pamirštama perkelti ar paskolinti dešimtį (šimtą).' },
     m_wrong_op: { label: 'Supainiojamas veiksmas', area: 'supainiojant veiksmą',

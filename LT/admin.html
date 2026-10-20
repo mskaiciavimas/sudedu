@@ -891,7 +891,7 @@
         <div class="tabs">
             <button class="tab-btn active" onclick="showTab('lookup', event)">👤 User Lookup</button>
             <button class="tab-btn" onclick="showTab('bulk', event)">⚡ Bulk Operations</button>
-            <button class="tab-btn" onclick="showTab('messages', event)">💌 Send Gifts</button>
+            <button class="tab-btn" onclick="showTab('messages', event)">💌 Messages</button>
             <button class="tab-btn" onclick="showTab('itemlookup', event)">🔍 Item Lookup</button>
             <button class="tab-btn" onclick="showTab('statistics', event)">📊 Statistics</button>
             <button class="tab-btn" onclick="showTab('taskstorage', event)">💾 Task Storage</button>
@@ -1150,63 +1150,20 @@
             </div>
         </div>
 
-        <!-- Messages Tab -->
+        <!-- Messages, polls and gifts for the site's users (admin-messages.js; the site shows them with sudedu-notices.js) -->
         <div id="messages-tab" class="tab-content">
-            <h2 class="send-gifts-title">Send Gifts or Messages</h2>
-            
-            <!-- Create Message Section -->
-            <div class="user-card">
-                <h3>Create New Entry</h3>
-                <div class="form-group">
-                    <label for="msg-message">Message Text</label>
-                    <textarea id="msg-message" rows="3" placeholder="Enter message for students..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="msg-expiration">Expiration Date</label>
-                    <input type="date" id="msg-expiration">
-                </div>
-                <div class="form-group">
-                    <label for="msg-giftid">Gift ID (optional)</label>
-                    <input type="number" id="msg-giftid" placeholder="e.g., 42">
-                </div>
-                <div class="form-group">
-                    <label for="msg-quantity">Quantity</label>
-                    <input type="number" id="msg-quantity" placeholder="e.g., 1" value="1" min="1">
-                </div>
-                <div class="form-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="msg-sendtoall" onchange="toggleRecipients()">
-                        Send to all users in Pet Game
-                    </label>
-                </div>
-                <div id="recipient-section" class="form-group">
-                    <label for="msg-recipient-input">Recipients (User ID or Username)</label>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="msg-recipient-input" placeholder="Enter user ID, username, or comma-separated list">
-                        <button class="btn small-btn" onclick="addRecipient()">Add</button>
-                    </div>
-                    <small style="color: #666; display: block; margin-top: 5px;">
-                        You can enter multiple recipients separated by commas (e.g., "123, john, 456, mary")
-                    </small>
-                    <div id="recipient-tags" style="margin-top: 10px;"></div>
-                </div>
-                <div id="msg-create-message"></div>
-                <button class="btn" onclick="createMessageGift()">Create Entry</button>
-            </div>
+            <h2 class="send-gifts-title">Messages, polls and gifts</h2>
+            <div id="notices-app"></div>
 
-            <!-- List Messages Section -->
-            <div class="user-card" style="margin-top: 20px;">
-                <h3>Existing Gifts/Messages</h3>
-                <button class="btn btn-secondary" onclick="loadMessages()">🔄 Refresh List</button>
+            <!-- the previous gift system (pet room only): what is still waiting there -->
+            <details class="user-card old-gifts">
+                <summary>Old gifts / messages (previous system, pet room only)</summary>
+                <div style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-secondary small-btn" onclick="loadMessages()">🔄 Refresh List</button>
+                    <button class="btn btn-danger small-btn" onclick="triggerGlobalMessageCleanup()">Delete expired</button>
+                </div>
                 <div id="messages-list" style="margin-top: 15px;"></div>
-            </div>
-
-
-            <div class="user-card" style="margin-top: 20px;">
-                <h3>Clear Expired Gifts/Messages</h3>
-                <button class="btn btn-danger" onclick="triggerGlobalMessageCleanup()">Delete</button>
-                <div id="messages-list" style="margin-top: 15px;"></div>
-            </div>
+            </details>
         </div>
 
         <!-- Item Lookup Tab -->
@@ -1245,9 +1202,10 @@
         </div>
     </div>
 
-    <script src="../mental-arithmetic.js?v=20261018m"></script>
+    <script src="../mental-arithmetic.js?v=20261020c"></script>
+    <script src="../sudedu-notices.js?v=20261020c"></script>
     <script src="../main-nav-bar.js"></script>
-    <script src="../parameter_dictionary.js?v=20261018r"></script>
+    <script src="../parameter_dictionary.js?v=20261020b"></script>
     <script>
         // Global variables
         let gameAssetIndex = null;
@@ -1632,49 +1590,6 @@
 
 
 
-        // Recipients management for messages
-        let recipients = [];
-
-        function toggleRecipients() {
-            const sendToAll = document.getElementById('msg-sendtoall').checked;
-            document.getElementById('recipient-section').style.display = sendToAll ? 'none' : 'block';
-            if (sendToAll) {
-                recipients = [];
-                document.getElementById('recipient-tags').innerHTML = '';
-            }
-        }
-
-        function addRecipient() {
-            const input = document.getElementById('msg-recipient-input');
-            const recipientInput = input.value.trim();
-            
-            if (!recipientInput) return;
-            
-            // Split by comma and process each recipient
-            const recipientList = recipientInput.split(',').map(r => r.trim()).filter(r => r);
-            
-            recipientList.forEach(recipient => {
-                if (!recipients.includes(recipient)) {
-                    recipients.push(recipient);
-                }
-            });
-            
-            updateRecipientTags();
-            input.value = '';
-        }
-
-        function removeRecipient(recipient) {
-            recipients = recipients.filter(r => r !== recipient);
-            updateRecipientTags();
-        }
-
-        function updateRecipientTags() {
-            const container = document.getElementById('recipient-tags');
-            container.innerHTML = recipients.map(r => 
-                `<span class="recipient-tag">${r}<button onclick="removeRecipient('${r}')">×</button></span>`
-            ).join('');
-        }
-
         // Display message
         function showMessage(elementId, message, type = 'info') {
             const element = document.getElementById(elementId);
@@ -1706,6 +1621,7 @@
             
             // Load messages when switching to messages tab
             if (tabName === 'messages') {
+                AdminMessages.mount();
                 loadMessages();
             } else if (tabName === 'statistics') {
                 loadStatistics();
@@ -2933,79 +2849,6 @@
             }
         }
 
-        async function createMessageGift() {
-            const message = document.getElementById('msg-message').value.trim();
-            const expirationDate = document.getElementById('msg-expiration').value;
-            const giftId = document.getElementById('msg-giftid').value.trim();
-            const quantity = parseInt(document.getElementById('msg-quantity').value);
-            const sendToAll = document.getElementById('msg-sendtoall').checked;
-
-            if (!message) {
-                showMessage('msg-create-message', 'Please enter a message', 'error');
-                return;
-            }
-
-            if (!expirationDate) {
-                showMessage('msg-create-message', 'Please select an expiration date', 'error');
-                return;
-            }
-
-            if (!sendToAll && recipients.length === 0) {
-                showMessage('msg-create-message', 'Please add at least one recipient or select "Send to all"', 'error');
-                return;
-            }
-
-            try {
-                const body = {
-                    message,
-                    expirationDate: new Date(expirationDate).toISOString(),
-                    quantity: quantity || 1,
-                    sendToAll
-                };
-
-                if (giftId) {
-                    body.giftId = parseInt(giftId);
-                }
-
-                if (!sendToAll) {
-                    body.recipients = recipients;
-                }
-
-                const response = await apiFetch(`${apiBase}admin/messages`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
-
-                if (!response || !response.ok) {
-                    const data = await response.json();
-                    throw new Error(data.message || 'Failed to create message gift');
-                }
-
-                const data = await response.json();
-                showMessage('msg-create-message', 
-                    `${data.message}<br>Recipients: ${data.recipientCount} users`, 
-                    'success'
-                );
-
-                // Clear form
-                document.getElementById('msg-message').value = '';
-                document.getElementById('msg-expiration').value = '';
-                document.getElementById('msg-giftid').value = '';
-                document.getElementById('msg-quantity').value = '1';
-                document.getElementById('msg-sendtoall').checked = false;
-                recipients = [];
-                updateRecipientTags();
-                toggleRecipients();
-
-                // Reload messages list
-                loadMessages();
-
-            } catch (error) {
-                showMessage('msg-create-message', error.message, 'error');
-            }
-        }
-
         async function deleteMessage(messageId) {
             if (!confirm('Delete this message gift? This will remove it from all users.')) return;
 
@@ -3026,12 +2869,6 @@
                 alert(error.message);
             }
         }
-
-        // Set minimum date for expiration to today
-        window.addEventListener('DOMContentLoaded', () => {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('msg-expiration').setAttribute('min', today);
-        });
 
         // STATS CHART SYSTEM
         let statsChart = null;
@@ -4662,5 +4499,6 @@ document.addEventListener('DOMContentLoaded', function() {
     </script>
     <script src="admin-points.js"></script>
     <script src="admin-tools.js"></script>
+    <script src="admin-messages.js"></script>
 </body>
 </html>

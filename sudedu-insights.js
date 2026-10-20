@@ -522,7 +522,9 @@
 			if (endSwap('ite', 'itia')) hits.add('v_busl_dgs2');
 		}
 		// įsidėmėtina rašyba
-		if (cat === 'C66' && ((ISI_OPTIONS[a] || []).includes(w) || swapEither(a, w, 'e', 'ia') || swapEither(a, w, 'e', 'ie') || swapEither(a, w, 'oj', 'oi'))) hits.add('isidemetina');
+		// (a gap of a word to memorise - its letters are learnt with the word: any wrong answer there is that kind of mistake,
+		// e.g. šiandien written šiendien; it may be another kind of mistake as well - user, 2026-10-20)
+		if (cat === 'C66' && w && w !== a) hits.add('isidemetina');
 		// panašiai skambančios priebalsės
 		if (cat !== 'C71' && pairSwap(a, w, VOICED)) hits.add('priebalses');
 		return hits;
@@ -1818,7 +1820,8 @@
 			x.answers.forEach(g => {
 				const c = expected(x);
 				if (!isFinite(c) || g === c) return;
-				if (Math.abs(g - c) === 1) add('m_off1', mathText('m_off1'), x, each, [g]);
+				// (off by one: only adding / subtracting within 20 - small enough to be counted one by one, e.g. on the fingers)
+				if (Math.abs(g - c) === 1 && (x.op === 'A' || x.op === 'S') && Math.max(x.a, x.b, x.op === 'A' ? x.a + x.b : 0) <= 20) add('m_off1', mathText('m_off1'), x, each, [g]);
 				if ([10, 100].includes(Math.abs(g - c))) add('m_off10', mathText('m_off10'), x, each, [g]);
 				const others = !x.unknown ? { A: [x.a - x.b, x.b - x.a, x.a * x.b], S: [x.a + x.b], M: [x.a + x.b], D: [x.a * x.b, x.a - x.b] }[x.op] : [];
 				if (others.includes(g)) add('m_op', mathText('m_wrong_op'), x, each, [g]);
@@ -1846,7 +1849,7 @@
 			}
 			return { ...g, raw: g.count, count: Math.max(1, Math.round(g.count)), share: g.count / total * 100, wordCount: g.facts.size,
 				examples: [...g.facts].slice(0, 3).map(text => ({ text })),
-				items: [...g.parts.entries()].map(([d, part]) => [d[0], d[1], [Math.max(1, Math.round(part.weight)), part.answers.length ? part.answers : ((d[2] && d[2][1]) || [])]]) };
+				items: [...g.parts.entries()].map(([d, part]) => [d[0], d[1], [Math.max(1, Math.round(part.weight)), part.answers.length ? part.answers : ((d[2] && d[2][1]) || [])], ...d.slice(3)]) };   // (d[3]: a column example's fields)
 		}).sort((x, y) => y.count - x.count);
 		return { total, insights, splitCrossing };
 	}
@@ -4222,8 +4225,9 @@
 	function renderPeriod(el, tasks, opts = {}) {
 		return render(el, tasks, { ...opts, mode: 'period' });
 	}
+	// one task's result - or (an array) the class's results of one task / task group, read together (isClass)
 	function renderTask(el, row, opts = {}) {
-		return render(el, [row], { ...opts, mode: 'task', scope: 'period' });
+		return render(el, Array.isArray(row) ? row : [row], { ...opts, mode: 'task', scope: 'period' });
 	}
 
 	window.SudInsights = { OUTLIER, showInfo, enabled, analyze, describe, renderPeriod, renderTask, showLoading, classifyAnswer, form, trend, verdict, tPValue, INSIGHTS, mathComposition, windowTest, windowChanges, WIN };

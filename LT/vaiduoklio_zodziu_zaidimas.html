@@ -1052,7 +1052,7 @@
 	<script src="../refresh-token.js"></script>
 	<script src="../main-nav-bar.js"></script>
 	<script src="../sudedu-words.js?v=20261018r"></script>
-	<script src="../ghost-engine.js"></script>
+	<script src="../ghost-engine.js?v=20261020c"></script>
 	<script src="../ghost-groups.js"></script>
 	<script src="../game-client.js?v=20261018r"></script>
 
@@ -1278,15 +1278,38 @@
 		if (!dict) return;
 		const players = [{ id: 'me', name: 'Tu', av: '🙂' }];
 		BOTS.slice(0, Number(settings.bots)).forEach((b, i) => players.push({ id: 'b' + i, name: b.name, av: b.av, bot: true }));
-		runLocal({ players: GhostGame.shuffle(players), lives: Number(settings.lives), timeLimit: Number(settings.time) || 0, botLevel: settings.bot, dict, endWhenOut: 'me' }, 'me', false);
+		runLocal({ players: GhostGame.shuffle(players), lives: Number(settings.lives), timeLimit: Number(settings.time) || 0, botLevel: settings.bot, dict, endWhenOut: 'me' }, 'me', false, settings);
+	}
+
+	// how a finished game went - one small anonymous row for the admin page's game statistics (what happened in the
+	// rounds, not who played or the words): solo, board and class games (by the browser running the group); not demos
+	function recordGame(g, mode, set) {
+		try {
+			if (localStorage.getItem('sudeduAdminSimulation') || typeof apiFetch !== 'function') return;
+			const u = JSON.parse(localStorage.getItem('userData') || 'null');
+			if (!u || !u.token) return;
+			const S = g.S, people = S.players.filter(p => !p.bot);
+			const winner = S.winner && S.players.find(p => p.id === S.winner);
+			const result = mode === 'solo' ? (S.winner === 'me' ? 'won' : 'lost') : !winner ? 'none' : winner.bot ? 'bot' : 'human';
+			apiFetch(apiBase + 'class/ghost-metric', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+				mode, result, people: people.length, bots: S.players.length - people.length,
+				seconds: Math.round((Date.now() - (S.t0 || Date.now())) / 1000),
+				settings: { dict: set.dict, bot: set.bot, lives: Number(set.lives) || 0, time: Number(set.time) || 0 },
+				log: S.log || []
+			}) }).catch(() => {});
+		} catch (e) { /* (statistics never get in the way of the game) */ }
 	}
 
 	// a game whose engine runs on this screen
-	function runLocal(opts, myId, isBoard) {
+	function runLocal(opts, myId, isBoard, set) {
 		stopGame();
 		me = myId;
 		board = isBoard;
-		game = new GhostGame(Object.assign({}, opts, { onChange: g => { if (g === game) show(g.snapshot()); } }));
+		let recorded = false;
+		game = new GhostGame(Object.assign({}, opts, {
+			onChange: g => { if (g === game) show(g.snapshot()); },
+			onOver: g => { if (!recorded && g === game && set) { recorded = true; recordGame(g, isBoard ? 'board' : 'solo', set); } }
+		}));
 		sendAct = (id, a) => game && game.act(id, a);
 		openGameView();
 		game.start();
@@ -2363,7 +2386,7 @@
 		if (!dict) { notice('Nepavyko įkelti žodyno', 'Patikrinkite ryšį ir bandykite dar kartą.'); return; }
 		const players = boardSetup.students.map((p, i) => ({ id: 'p' + p.id, name: p.name, av: PEOPLE_AV[i % PEOPLE_AV.length] }));
 		BOTS.slice(0, Math.min(4, Number(set.bots) || 0)).forEach((b, i) => players.push({ id: 'b' + i, name: b.name, av: b.av, bot: true }));
-		runLocal({ players: GhostGame.shuffle(players), lives: Number(set.lives) || 3, timeLimit: Number(set.time) || 0, botLevel: set.bot || 'normal', dict }, null, true);
+		runLocal({ players: GhostGame.shuffle(players), lives: Number(set.lives) || 3, timeLimit: Number(set.time) || 0, botLevel: set.bot || 'normal', dict }, null, true, { dict: set.dict || 'medium', bot: set.bot || 'normal', lives: Number(set.lives) || 3, time: Number(set.time) || 0 });
 	}
 
 	// a message instead of a game (with the way back)
@@ -2426,6 +2449,7 @@
 			players: state ? list : GhostGame.shuffle(list), lives: set.lives, timeLimit: set.time, botLevel: set.bot, dict, remote: true,
 			onChange: g => { if (g !== game) return; const snap = g.snapshot(); show(snap); emit('g:state', { s: snap }); },
 			onPing: id => emit('g:ping', { id }),
+			onOver: g => { if (g === game && !g.recorded) { g.recorded = true; recordGame(g, 'class', set); } },
 			onRemoved: (g, id) => { if (id !== me) emit('g:removed', { id }); }
 		});
 		sendAct = (id, a) => game && game.act(id, a);
