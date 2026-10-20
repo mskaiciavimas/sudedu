@@ -12564,6 +12564,15 @@ function setTeacherSection(section) {
         analysisArchiveLoadedFor !== currentEmbeddedArchiveStudentId) {
         analysisArchiveLoadedFor = currentEmbeddedArchiveStudentId;
         refreshDisplayedStatistics();
+    } else if (analysisVisible && analysisDrawPending) {
+        drawAnalysis();
+    }
+    // (the results table drawn while its tab was hidden waited for it)
+    const archiveBox = document.getElementById('embedded-archive-table-container');
+    if (section === 'completed' && archiveBox && archiveBox._deferred) {
+        const args = archiveBox._deferred;
+        archiveBox._deferred = null;
+        renderEmbeddedArchiveTable(args[0], archiveBox, ...args.slice(1));
     }
     if (section === 'progress' && statsGraphHasData) {
         document.getElementById('statsGraphCollapseBody')?.classList.remove('collapsed');
@@ -12794,42 +12803,7 @@ function displayStudentStatistics(student, studentTasks) {
     renderResultKinds('archive');
     loadEmbeddedTaskArchive(student[0]);
 
-    const analysedStudentTasks = getTasksForStatistics(studentTasks);
-    const categorizedStudentTasks = processStudentTasks(analysedStudentTasks)
-    renderAnalysisInsights(analysedStudentTasks);
-    studentStatisticsMathDiv.style.display = "block";
-    renderCategoryFrequency(studentStatisticsMathErrorFrequency, categorizedStudentTasks.math);
-
-    studentStatisticsLangDiv.style.display = "block";
-    renderCategoryFrequency(studentStatisticsGrammarErrorFrequency, categorizedStudentTasks.grammar);
-
-    studentStatisticsTextComprahensionDiv.style.display = "block";
-
-    renderCategoryFrequency(studentStatisticsKomponavimasErrorFrequency, categorizedStudentTasks.komponavimas);
-    studentStatisticsTextComprahensionKomponavimasTitle.style.display = "block";
-
-    renderCategoryFrequency(studentStatisticsIsdestymasErrorFrequency, categorizedStudentTasks.isdestymas);
-    studentStatisticsTextComprahensionIsdestymasTitle.style.display = "block";
-
-
-    const combinedMathAndGrammarMistakes = [...categorizedStudentTasks.math[1], ...categorizedStudentTasks.grammar[1]]
-    document.getElementById('mathStatisticsMistakesTitle').style.display =
-        categorizedStudentTasks.math[1].length > 0 ? 'block' : 'none';
-    document.getElementById('grammarStatisticsMistakesTitle').style.display =
-        categorizedStudentTasks.grammar[1].length > 0 ? 'block' : 'none';
-
-    if (combinedMathAndGrammarMistakes.length > 0) {
-        generateSummaryTable("custom", combinedMathAndGrammarMistakes, "summary-table", "summary-table-grammar") 
-    }
-    clearNoMistakesMessages();
-
-
-    if (categorizedStudentTasks.isdestymas[1].length > 0) {
-        displayComletedTextIdsForTextComp(categorizedStudentTasks.isdestymas, studentStatisticsIsdestymasCompletedTexts)
-    }
-    if (categorizedStudentTasks.komponavimas[1].length > 0) {
-        displayComletedTextIdsForTextComp(categorizedStudentTasks.komponavimas, studentStatisticsKomponavimasCompletedTexts)
-    }
+    scheduleAnalysisDraw();
     setTeacherSection(teacherSection);
     applyTeacherAnalysisSubject();
     lockTeacherHeaderHeight();
@@ -13199,43 +13173,7 @@ async function displayTeacherHome(selectedGroupNames=null) {
 
     currentStatisticsTasks = studentTasks;
     updateStatisticsAnalysisScope();
-    const analysedClassTasks = getTasksForStatistics(getCurrentStatisticsTasksForAnalysis());
-    const categorizedStudentTasks = processStudentTasks(analysedClassTasks)
-    renderAnalysisInsights(analysedClassTasks);
-
-    studentStatisticsMathDiv.style.display = "block";
-    renderCategoryFrequency(studentStatisticsMathErrorFrequency, categorizedStudentTasks.math);
-
-    studentStatisticsLangDiv.style.display = "block";
-    renderCategoryFrequency(studentStatisticsGrammarErrorFrequency, categorizedStudentTasks.grammar);
-
-    studentStatisticsTextComprahensionDiv.style.display = "block";
-
-    renderCategoryFrequency(studentStatisticsKomponavimasErrorFrequency, categorizedStudentTasks.komponavimas);
-    studentStatisticsTextComprahensionKomponavimasTitle.style.display = "block";
-
-    renderCategoryFrequency(studentStatisticsIsdestymasErrorFrequency, categorizedStudentTasks.isdestymas);
-    studentStatisticsTextComprahensionIsdestymasTitle.style.display = "block";
-
-
-    const combinedMathAndGrammarMistakes = [...categorizedStudentTasks.math[1], ...categorizedStudentTasks.grammar[1]]
-    document.getElementById('mathStatisticsMistakesTitle').style.display =
-        categorizedStudentTasks.math[1].length > 0 ? 'block' : 'none';
-    document.getElementById('grammarStatisticsMistakesTitle').style.display =
-        categorizedStudentTasks.grammar[1].length > 0 ? 'block' : 'none';
-
-    if (combinedMathAndGrammarMistakes.length > 0) {
-        generateSummaryTable("custom", combinedMathAndGrammarMistakes, "summary-table", "summary-table-grammar", usePercentage=true) 
-    }
-    clearNoMistakesMessages();
-
-
-    if (categorizedStudentTasks.isdestymas[1].length > 0) {
-        displayComletedTextIdsForTextComp(categorizedStudentTasks.isdestymas, studentStatisticsIsdestymasCompletedTexts, showAverages=true)
-    }
-    if (categorizedStudentTasks.komponavimas[1].length > 0) {
-        displayComletedTextIdsForTextComp(categorizedStudentTasks.komponavimas, studentStatisticsKomponavimasCompletedTexts, showAverages=true)
-    }
+    scheduleAnalysisDraw();
     setTeacherSection(teacherSection);
     applyTeacherAnalysisSubject();
     lockTeacherHeaderHeight();
@@ -15864,28 +15802,16 @@ function placePendingTasksBeforeArchive() {
 
 }
 
-async function refreshDisplayedStatistics() {
-    if (!Array.isArray(currentStatisticsTasks)) return;
-    if (!currentStatisticsIsClass && currentEmbeddedArchiveStudentId &&
-        (!Array.isArray(analysisArchiveRows) || analysisArchiveRows.length === 0)) {
-        const studentId = currentEmbeddedArchiveStudentId;
-        analysisArchivePending = true;
-        let response = null;
-        try {
-            response = await apiFetch(`${apiBase}students/task-history/${studentId}?teacherOnly=false`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
-        } finally {
-            analysisArchivePending = false;
-        }
-        // (another student may have been opened meanwhile)
-        if (studentId !== currentEmbeddedArchiveStudentId || currentStatisticsIsClass) return;
-        if (response?.ok) {
-            analysisArchiveRows = normalizeArchiveRows(await response.json(), studentId);
-        }
-    }
-
+// The analysis (Analizė) is drawn only while it is shown: for a whole class it is thousands of table rows, and building
+// it hidden - on every switch to the class overview, and again when the class's results came - made the page lag. A
+// change while it is hidden only marks it; opening it draws it from the data then (setTeacherSection).
+let analysisDrawPending = false;
+function scheduleAnalysisDraw() {
+    if (teacherSection === 'analysis') drawAnalysis();
+    else analysisDrawPending = true;
+}
+function drawAnalysis() {
+    analysisDrawPending = false;
     const analysedTasks = getTasksForStatistics(getCurrentStatisticsTasksForAnalysis());
     const categorizedTasks = processStudentTasks(analysedTasks);
     renderAnalysisInsights(analysedTasks);
@@ -15927,6 +15853,32 @@ async function refreshDisplayedStatistics() {
     if (categorizedTasks.komponavimas[1].length > 0) {
         displayComletedTextIdsForTextComp(categorizedTasks.komponavimas, studentStatisticsKomponavimasCompletedTexts, Boolean(currentStatisticsIsClass));
     }
+    applyTeacherAnalysisSubject();
+}
+
+async function refreshDisplayedStatistics() {
+    if (!Array.isArray(currentStatisticsTasks)) return;
+    if (!currentStatisticsIsClass && currentEmbeddedArchiveStudentId &&
+        (!Array.isArray(analysisArchiveRows) || analysisArchiveRows.length === 0)) {
+        const studentId = currentEmbeddedArchiveStudentId;
+        analysisArchivePending = true;
+        let response = null;
+        try {
+            response = await apiFetch(`${apiBase}students/task-history/${studentId}?teacherOnly=false`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+        } finally {
+            analysisArchivePending = false;
+        }
+        // (another student may have been opened meanwhile)
+        if (studentId !== currentEmbeddedArchiveStudentId || currentStatisticsIsClass) return;
+        if (response?.ok) {
+            analysisArchiveRows = normalizeArchiveRows(await response.json(), studentId);
+        }
+    }
+
+    scheduleAnalysisDraw();
     applyTeacherAnalysisSubject();
 }
 
@@ -16659,6 +16611,20 @@ async function fetchAndRenderClassEmbeddedArchive() {
     }
 }
 
+// a student's results already loaded with the class's (the class overview loads every student's): the same rows, when
+// they were asked for the same period and with every kind wanted here (no second request on a click on the student)
+function classArchiveRowsFor(studentId, kinds) {
+    if (!classArchiveCache || classArchiveStale || embeddedArchiveShowingOlder) return null;
+    let key;
+    try { key = JSON.parse(classArchiveCache.key); } catch (e) { return null; }
+    const [ids, withSelf, older, from] = key;
+    if (older || from !== statisticsStartDateISO()) return null;
+    if (String(kinds).split(',').includes('self') && !withSelf) return null;
+    const i = ids.findIndex(id => String(id) === String(studentId));
+    if (i < 0 || !Array.isArray(classArchiveCache.rowsByStudent[i])) return null;
+    return classArchiveCache.rowsByStudent[i].map(({ studentName, ...row }) => row);
+}
+
 async function fetchAndRenderEmbeddedArchive() {
     const container = document.getElementById("embedded-archive-table-container");
     if (!container || !currentEmbeddedArchiveStudentId) return;
@@ -16674,8 +16640,12 @@ async function fetchAndRenderEmbeddedArchive() {
         const cached = embeddedArchiveCache[cacheKey];
         const now = Date.now();
 
+        const fromClass = classArchiveRowsFor(currentEmbeddedArchiveStudentId, kinds);
         if (cached && (now - cached.cachedAt) < EMBEDDED_ARCHIVE_CACHE_TTL) {
             allRows = cached.rows;
+        } else if (fromClass) {
+            allRows = fromClass;
+            embeddedArchiveCache[cacheKey] = { rows: allRows, cachedAt: now };
         } else {
             container.innerHTML = '<div class="task-archive-empty">Kraunama...</div>';
             const params = new URLSearchParams();
@@ -16820,6 +16790,14 @@ function toggleAnalysisTask(checkbox) {
 // (includeCompletion - the old "Atliko" column - is no longer shown anywhere: Atliktos, Analizė, the excluded tasks)
 function renderEmbeddedArchiveTable(rows, container, includeStudent = false, includeCompletion = false, analysisTable = false) {
     includeCompletion = false;
+    if (container) container._deferred = null;
+    // "Atliktos užduotys" while another tab is shown: drawn when it is opened (a class's table is thousands of elements)
+    if (container && container.id === 'embedded-archive-table-container' && rows.length && typeof teacherSection !== 'undefined' && teacherSection !== 'completed') {
+        rows.forEach(row => latestRenderedArchiveRows.set(row.id, row));
+        container._deferred = [rows, includeStudent, includeCompletion, analysisTable];
+        container.innerHTML = '';
+        return;
+    }
     if (!rows.length) {
         container.innerHTML = '<div class="task-archive-empty">Nėra duomenų šiam laikotarpiui.</div>';
         return;

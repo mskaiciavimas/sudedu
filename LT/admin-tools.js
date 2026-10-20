@@ -217,6 +217,71 @@
         window.apiFetch.__deletes = true;
     }
 
+    // ------------------------------------------------------------ moving between users (User Lookup)
+    // A list (search results or "Show list") is kept as it was when someone is picked from it: the card gets "← Back to
+    // the list" (no new request, no new sorting - only the Search / Show list buttons ask again). Names in a card (a
+    // teacher's students, a student's teacher) open that user's card, with "← back to <name>". Starting a simulation keeps
+    // where we were; the admin page opens that card again on the way back.
+    const RETURN_KEY = 'sudeduAdminReturn';
+    const nav = { list: null, stack: [], current: null };
+    const results = () => document.getElementById('lookup-results');
+    function bindPicks(root) {
+        root.querySelectorAll('.user-pick').forEach(b => b.addEventListener('click', () => openUserById(b.dataset.id)));
+    }
+    function backToList() {
+        const box = results();
+        if (!nav.list || !box) return;
+        box.innerHTML = nav.list.html;
+        bindPicks(box);
+        const picked = box.querySelector(`.user-pick[data-id="${CSS.escape(String(nav.list.id))}"]`);
+        nav.stack = [];
+        nav.current = null;
+        if (picked) {
+            picked.classList.add('user-pick-last');
+            picked.scrollIntoView({ block: 'center' });
+        }
+    }
+    function navBar() {
+        const prev = nav.stack[nav.stack.length - 1];
+        if (!prev && !nav.list) return '';
+        return `<div class="at-nav">
+            ${prev ? `<button type="button" class="btn small-btn btn-secondary" data-nav="prev">← ${esc(prev.name)}</button>` : ''}
+            ${nav.list ? '<button type="button" class="btn small-btn btn-secondary" data-nav="list">← Back to the list</button>' : ''}
+        </div>`;
+    }
+    document.addEventListener('click', e => {
+        const box = results();
+        if (!box || !box.contains(e.target)) return;
+        const pick = e.target.closest('.user-pick');
+        if (pick) { nav.list = { html: box.innerHTML, id: pick.dataset.id }; nav.stack = []; nav.current = null; return; }
+        const link = e.target.closest('.user-link');
+        if (link) {
+            e.preventDefault();
+            if (nav.current && String(nav.current.id) !== String(link.dataset.id)) nav.stack.push(nav.current);
+            openUserById(link.dataset.id);
+            return;
+        }
+        const back = e.target.closest('[data-nav]');
+        if (back) {
+            if (back.dataset.nav === 'list') backToList();
+            else { const prev = nav.stack.pop(); if (prev) openUserById(prev.id); }
+        }
+    }, true);
+    // a new search started by the admin starts over (the page also searches again after a save - that keeps the way back)
+    function hookNewSearch() {
+        const reset = () => { nav.list = null; nav.stack = []; nav.current = null; };
+        document.querySelector('button[onclick="searchUsers()"]')?.addEventListener('click', reset, true);
+        document.getElementById('search-input')?.addEventListener('keypress', e => { if (e.key === 'Enter') reset(); }, true);
+    }
+    function restoreReturn() {
+        let back = null;
+        try { back = JSON.parse(sessionStorage.getItem(RETURN_KEY) || 'null'); sessionStorage.removeItem(RETURN_KEY); } catch (e) { back = null; }
+        if (!back || !back.userId || (typeof simulationInfo === 'function' && simulationInfo())) return;
+        nav.list = back.list || null;
+        nav.stack = Array.isArray(back.stack) ? back.stack : [];
+        openUserById(back.userId);
+    }
+
     // ------------------------------------------------------------ simulation: the site as the user sees it
     // (refresh-token.js startSimulation / exitSimulation and its floating "Grįžti" button)
     async function simulate(userId, mode, page) {
@@ -224,6 +289,8 @@
         const res = await apiFetch(`${apiBase}admin/impersonate/${userId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode }) });
         const body = res ? await res.json().catch(() => ({})) : {};
         if (!res || !res.ok) { alert(body.message || 'Could not start'); return; }
+        // (back from the simulation: this user's card again, with the way back to the list)
+        try { sessionStorage.setItem(RETURN_KEY, JSON.stringify({ userId, list: nav.list, stack: nav.stack })); } catch (e) { /* (private mode) */ }
         startSimulation(body, page);
     }
     function accessPanel(user) {
@@ -255,6 +322,8 @@
             const result = original.call(this, user, ...rest);
             const card = document.querySelector('#lookup-results .user-card');
             if (card && !card.querySelector('.at-pw')) card.insertAdjacentHTML('beforeend', accessPanel(user) + passwordPanel(user));
+            nav.current = { id: user.id, name: user.nickname || user.username };
+            if (card && !card.querySelector('.at-nav')) card.insertAdjacentHTML('afterbegin', navBar());
             bindPasswordPanel();
             bindAccessPanel(user);
             attachPickers();
@@ -265,6 +334,7 @@
 
     // ------------------------------------------------------------ a list of users (students / teachers by consistency)
     async function browseUsers() {
+        nav.list = null; nav.stack = []; nav.current = null;
         const out = document.getElementById('lookup-results');
         const type = document.getElementById('browse-type').value;
         const [sort, dir] = document.getElementById('browse-sort').value.split(':');
@@ -434,6 +504,10 @@
         .user-pick-mail{font-size:13px;color:rgba(0,0,0,.6)}
         .user-pick-stats{font-size:13px;color:rgba(0,0,0,.65)}
         .gs-scroll{overflow:auto;max-height:70vh;margin-top:10px}
+        .at-nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+        .user-link{color:#1d566e;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+        .user-link:hover{color:#0d3a4c}
+        .user-pick-last{outline:2px solid rgba(29,86,110,.55)}
         .gs-ghost{margin:10px 0 14px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.35)}
         .gs-ghost h3{margin:0 0 8px;font-size:16px}
         .gs-ghost-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:6px 18px;font-size:13px}
@@ -449,6 +523,8 @@
     document.addEventListener('DOMContentLoaded', () => {
         hookUserCard();
         hookDeletes();
+        hookNewSearch();
+        restoreReturn();
         attachPickers();
         const browse = document.getElementById('browse-users');
         if (browse) browse.addEventListener('click', browseUsers);
