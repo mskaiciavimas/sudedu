@@ -395,6 +395,55 @@
                 ${solo.length ? `<div><b>Solo games won</b><span>${pct(solo.filter(r => r.result === 'won').length, solo.length)} of ${solo.length}</span></div>` : ''}
                 <div class="gs-ghost-ends"><b>How rounds ended</b><span>${Object.entries(ends).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${esc(GHOST_ENDS[k] || k)} ${pct(n, rounds.length)}`).join(' · ')}</span></div>
             </div>
+            ${soloMatrix(solo)}
+        </div>`;
+    }
+    // Vaiduoklis alone with bots: games won for each word list x bot level (and totals) - is a level too easy / hard?
+    const GHOST_DICTS = [['easy', 'Easy words'], ['medium', 'Medium words'], ['hard', 'Hard words'], ['expert', 'Expert words']];
+    const GHOST_BOTS = [['easy', 'Easy bots'], ['normal', 'Normal bots'], ['hard', 'Hard bots']];
+    function soloMatrix(solo) {
+        if (!solo.length) return '';
+        const cell = list => {
+            if (!list.length) return '<td class="gs-empty">–</td>';
+            const won = list.filter(r => r.result === 'won').length, p = Math.round(won / list.length * 100);
+            return `<td style="background:hsla(${Math.round(p * 1.2)},70%,55%,.28)" title="${won} won of ${list.length}"><b>${p}%</b> <span>${won}/${list.length}</span></td>`;
+        };
+        const dictOf = r => (r.taskSettings && r.taskSettings.dict) || '';
+        return `<div class="gs-matrix-box"><b>Solo games won - word list × bot level</b> <span class="at-pw-note">(cell: won % · won/played; greener = more often won)</span>
+            <div class="gs-scroll"><table class="gs-table gs-matrix">
+                <thead><tr><th></th>${GHOST_BOTS.map(([, n]) => `<th>${n}</th>`).join('')}<th>All bot levels</th></tr></thead>
+                <tbody>${GHOST_DICTS.map(([d, dn]) => `<tr><th>${dn}</th>${GHOST_BOTS.map(([b]) => cell(solo.filter(r => dictOf(r) === d && r.difficulty === b))).join('')}${cell(solo.filter(r => dictOf(r) === d))}</tr>`).join('')}
+                    <tr class="gs-total"><th>All word lists</th>${GHOST_BOTS.map(([b]) => cell(solo.filter(r => r.difficulty === b))).join('')}${cell(solo)}</tr></tbody>
+            </table></div></div>`;
+    }
+    // Tower defence: per difficulty - timed games won and the fortress's health left, "until defeat" games and how long
+    // the class held out, correct answers a minute per player
+    const TD_LEVELS = [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard'], ['extreme', 'Very hard']];
+    function tdSummary(rows) {
+        const games = rows.filter(r => r.game === 'td');
+        if (!games.length) return '';
+        const avg = (arr, dec = 0) => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(dec).replace(/\.0$/, '') : '–';
+        const pct = (n, d) => d ? Math.round(n / d * 100) + '%' : '–';
+        const rate = r => r.correct / Math.max(1, r.seconds / 60) / Math.max(1, r.players);
+        const line = list => {
+            const timed = list.filter(r => r.mode === 'timed'), finished = timed.filter(r => r.result !== 'stopped');
+            const won = finished.filter(r => r.result === 'win').length;
+            const endless = list.filter(r => r.mode === 'endless' && r.result !== 'stopped');
+            const p = finished.length ? won / finished.length * 100 : null;
+            return `<td>${list.length}</td>
+                <td${p == null ? '' : ` style="background:hsla(${Math.round(p * 1.2)},70%,55%,.28)"`}>${finished.length ? `<b>${pct(won, finished.length)}</b> <span>${won}/${finished.length}</span>` : '–'}${timed.length > finished.length ? ` <span class="at-pw-note">(+${timed.length - finished.length} stopped)</span>` : ''}</td>
+                <td>${finished.length ? avg(finished.map(r => r.endHp)) + '%' : '–'}</td>
+                <td>${endless.length ? `${avg(endless.map(r => r.seconds / 60), 1)} min <span>(${endless.length})</span>` : '–'}</td>
+                <td>${avg(list.map(r => r.players), 1)}</td>
+                <td>${avg(list.map(rate), 1)}</td>`;
+        };
+        return `<div class="gs-ghost">
+            <h3>🏰 Tower defence – ${games.length} game${games.length === 1 ? '' : 's'} shown</h3>
+            <div class="gs-scroll"><table class="gs-table gs-matrix">
+                <thead><tr><th>Difficulty</th><th>Games</th><th>Timed: won</th><th>Timed: fortress health left</th><th>Until defeat: held out</th><th>Players</th><th>Correct / min / player</th></tr></thead>
+                <tbody>${TD_LEVELS.map(([k, n]) => { const l = games.filter(r => r.difficulty === k); return l.length ? `<tr><th>${n}</th>${line(l)}</tr>` : ''; }).join('')}
+                    <tr class="gs-total"><th>All</th>${line(games)}</tr></tbody>
+            </table></div>
         </div>`;
     }
     function drawGameStats() {
@@ -403,6 +452,7 @@
         const hostIds = [...new Set(gs.rows.map(r => r.hostId).filter(v => v != null))];
         box.innerHTML = `
             <p class="at-pw-note">Recorded games (Klasė → Žaidimai; Vaiduoklis also alone and on the board), used for tuning the games - the ${gs.rows.length} newest of ${gs.total}. Delete test games so they do not skew it.</p>
+            ${tdSummary(gs.rows)}
             ${ghostSummary(gs.rows)}
             <div class="at-pw-row">
                 <label>Host <select class="gs-host"><option value="">All</option>${hostIds.map(id => `<option value="${id}">${esc(hostName(id))}</option>`).join('')}</select></label>
@@ -514,6 +564,13 @@
         .gs-ghost-grid div{display:flex;flex-direction:column}
         .gs-ghost-grid b{font-size:12px;color:rgba(0,0,0,.55);font-weight:600}
         .gs-ghost-ends{grid-column:1/-1}
+        .gs-matrix-box{margin-top:12px}
+        .gs-matrix{margin-top:6px;font-size:13px}
+        .gs-matrix th{text-align:left;white-space:nowrap}
+        .gs-matrix td{text-align:center;white-space:nowrap}
+        .gs-matrix td span{color:rgba(0,0,0,.55);font-size:12px}
+        .gs-matrix .gs-total th,.gs-matrix .gs-total td{border-top:2px solid rgba(0,0,0,.2)}
+        .gs-matrix .gs-empty{color:rgba(0,0,0,.35)}
         .gs-table{width:100%;border-collapse:collapse;font-size:13px;background:rgba(255,255,255,.7)}
         .gs-table th,.gs-table td{padding:6px 8px;border-bottom:1px solid rgba(0,0,0,.06);text-align:left;white-space:nowrap}
         .gs-table th{position:sticky;top:0;background:#fff}

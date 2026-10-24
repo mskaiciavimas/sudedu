@@ -477,6 +477,14 @@
             overflow-wrap: break-word;
         }
 
+        /* Analizė → Rašyba: "!" next to a student who often types any letters (sudedu-insights.js randomLettersOf) */
+        .rl-flag { display: none; flex: none; align-items: center; justify-content: center; width: 22px; height: 22px; margin-left: 6px; padding: 0;
+            border: none; border-radius: 50%; background: #e8590c; color: #fff; font: inherit; font-size: 14px; font-weight: 800; line-height: 1; cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,.2); vertical-align: middle; }
+        .rl-flag:hover, .rl-flag:focus-visible { background: #c2410c; outline: none; box-shadow: 0 0 0 3px rgba(232,89,12,.3); }
+        body.ins-rl-on .rl-flag { display: inline-flex; }
+        .ins-pat.rl-highlight { box-shadow: 0 0 0 3px rgba(232,89,12,.55); border-radius: 12px; transition: box-shadow .3s; }
+
         .student-list-status-indicator {
             display: inline-block;
             margin-left: 5px;
@@ -8077,11 +8085,11 @@
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="../mental-arithmetic.js?v=20261020c"></script>
-	<script src="../sudedu-notices.js?v=20261020c"></script>
+	<script src="../sudedu-notices.js?v=20261024a"></script>
 	<script src="../mental-arithmetic-combinations.js?v=20261017"></script>
-    <script src="../parameter_dictionary.js?v=20261020b"></script>
+    <script src="../parameter_dictionary.js?v=20261024a"></script>
     <script src="../rasyba-generator.js?v=20261018r"></script>
-    <script src="../sudedu-insights.js?v=20261020c"></script>
+    <script src="../sudedu-insights.js?v=20261024d"></script>
     <script src="../sudedu-auto-tasks.js?v=20261018r"></script>
     <script src="../klase-invites.js?v=20261018r"></script>
     <script src="../main-nav-bar.js"></script>
@@ -12656,6 +12664,8 @@ function applyTeacherAnalysisSubject(activeButton) {
         item.classList.toggle('on', isSelected);
         item.setAttribute('aria-selected', isSelected ? 'true' : 'false');
     });
+    // (the student list's "!" - types any letters - only while Analizė → Rašyba is open)
+    document.body.classList.toggle('ins-rl-on', typeof teacherSection !== 'undefined' && teacherSection === 'analysis' && teacherAnalysisSubject === 'grammar');
 }
 function initializeTeacherSections() {
     initializeTeacherAnalysisPanel();
@@ -13697,6 +13707,7 @@ function focusTaskListSection() {
             listContainer.appendChild(item);
         });
         studentListDiv.appendChild(listContainer);
+        paintRandomLetterFlags();
         displayTeacherHome();
     }
 
@@ -16009,10 +16020,94 @@ function renderAnalysisInsights(tasks) {
         waiting();
         loadPeerTasks(studentId, options.period, options.kinds).then(peers => {
             if (studentId === currentEmbeddedArchiveStudentId && !currentStatisticsIsClass) draw(peers || null);
+            updateRandomLetterFlags([{ studentId, tasks }, ...(peers || [])]);
         });
         return;
     }
     draw(null);
+    // (the class overview: every student's tasks are here; a student alone without classmates: theirs)
+    if (isClass) {
+        const byStudent = new Map();
+        tasks.forEach(t => { if (t.studentId != null) { if (!byStudent.has(t.studentId)) byStudent.set(t.studentId, []); byStudent.get(t.studentId).push(t); } });
+        updateRandomLetterFlags([...byStudent].map(([studentId, list]) => ({ studentId, tasks: list })));
+    } else if (currentEmbeddedArchiveStudentId) updateRandomLetterFlags([{ studentId: currentEmbeddedArchiveStudentId, tasks }]);
+}
+
+/* "Įrašinėja bet kokias raides": a "!" next to the name in the student list (shown in Analizė → Rašyba) when the
+ * student's spelling answers often are any letters at all (sudedu-insights.js randomLettersOf - the same verdict as the
+ * sentence in their summary). Worked out from the tasks the analysis already has: the class overview's (every student)
+ * or a student's with the classmates'. A click opens the student's analysis at Rašyba and that mistake category. */
+const randomLetterFlags = new Map();   // student id → { flagged, words, share, tasks }
+let randomLetterRun = 0;
+async function updateRandomLetterFlags(groups) {
+    if (!window.SudInsights || !SudInsights.randomLettersOf || !groups.length) return;
+    const run = ++randomLetterRun;
+    for (const { studentId, tasks } of groups) {
+        try { randomLetterFlags.set(Number(studentId), await SudInsights.randomLettersOf(tasks, { kindOf: resultKindOf })); } catch (error) { /* (never in the way) */ }
+        if (run !== randomLetterRun) return;          // (newer results are being worked out)
+    }
+    paintRandomLetterFlags();
+}
+function paintRandomLetterFlags() {
+    document.querySelectorAll('#student-list .student-name[data-student-id]').forEach(nameEl => {
+        const flag = randomLetterFlags.get(Number(nameEl.dataset.studentId));
+        let button = nameEl.querySelector('.rl-flag');
+        if (!flag || !flag.flagged) { button?.remove(); return; }
+        if (button) return;
+        button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'rl-flag';
+        button.textContent = '!';
+        button.title = 'Įrašinėja bet kokias raides';
+        button.setAttribute('aria-label', 'Įrašinėja bet kokias raides – parodyti šias klaidas');
+        button.addEventListener('click', event => { event.stopPropagation(); openRandomLetters(Number(nameEl.dataset.studentId)); });
+        button.addEventListener('keydown', event => event.stopPropagation());
+        nameEl.appendChild(button);
+    });
+}
+async function openRandomLetters(studentId) {
+    const student = (studentList || []).find(s => Number(s.id) === studentId);
+    if (!student) return;
+    const host = document.getElementById('insights-grammar-mistakes');
+    const old = host && host.querySelector('.ins-pat[data-key="bet_kokias"]');
+    const switching = currentStatisticsIsClass || Number(currentEmbeddedArchiveStudentId) !== studentId;
+    teacherAnalysisSubject = 'grammar';
+    if (switching) await selectTeacherStudent(student);
+    setTeacherSection('analysis');
+    applyTeacherAnalysisSubject();
+    document.getElementById('langGrammarCollapseBody')?.classList.remove('collapsed');
+    // the student's categories come when their results are in: wait for this category's row (a new one, if switching)
+    const started = Date.now();
+    const row = await new Promise(resolve => {
+        const tick = () => {
+            const el = host && host.querySelector('.ins-pat[data-key="bet_kokias"]');
+            if (el && (!switching || el !== old)) resolve(el);
+            else if (Date.now() - started > 20000) resolve(null);
+            else setTimeout(tick, 200);
+        };
+        tick();
+    });
+    if (!row) return;
+    // open it and bring it to the top; the analysis may still be drawn again (e.g. when the classmates' results come) -
+    // for a few seconds a new row is opened and brought up the same way
+    const show = el => {
+        const tab = host.querySelector('.ins-tab[data-view="patterns"]');
+        if (tab && !tab.classList.contains('on')) tab.click();
+        const head = el.querySelector('.ins-pat-head');
+        if (head && head.getAttribute('aria-expanded') !== 'true') head.click();
+        el.classList.add('rl-highlight');
+        setTimeout(() => el.classList.remove('rl-highlight'), 2400);
+        setTimeout(() => revealAtTop(el), 120);
+    };
+    let shown = row;
+    show(row);
+    const until = Date.now() + 5000;
+    const watch = () => {
+        const now = host.querySelector('.ins-pat[data-key="bet_kokias"]');
+        if (now && now !== shown) { shown = now; show(now); }
+        if (Date.now() < until) setTimeout(watch, 250);
+    };
+    setTimeout(watch, 250);
 }
 
 // A pattern's mistakes table ("Klaidų dėsningumai"): the shares are of that pattern's mistakes

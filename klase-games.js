@@ -555,6 +555,8 @@
       if (id === 'zg-start') {
         b.disabled = true;
         SudGame.request('lobby:start').then(function (r) {
+          // nobody joined: the server hands the game back - played here as a solo game (no server needed)
+          if (r && r.ok && r.local) { current = null; sessionStorage.setItem('ghostSolo', JSON.stringify(r.local)); leavingForGame = true; location.href = 'vaiduoklio_zodziu_zaidimas.html?solo=1'; return; }
           if (r && r.ok) return;
           if (r && (r.error === 'NOT_HOST' || r.error === 'NOT_FOUND')) exitLobby(ERR.NOT_FOUND); else { say(errText(r)); renderLobby(); }
         });

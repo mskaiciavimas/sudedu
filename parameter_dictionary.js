@@ -614,8 +614,10 @@ const insightsMistakePatterns = {
             tip: 'Klaidos, kai painiojamos skardžiosios ir duslios priebalsės („b“–„p“, „d“–„t“, „g“–„k“, „z“–„s“, „ž“–„š“).' },
         atskiri: { area: 'skaitant pavienius žodžius jų nesiejant sakinyje', label: 'Skaito pavienius žodžius, nesieja žodžių sakinyje', topic: 'tikri, bet sakiniui netinkami žodžiai',
             tip: 'Klaidingas atsakymas sudaro tikrą žodį, tik netinkamą sakiniui. Apima ir atvejus, kai tiktų keli atsakymai, bet teisingu laikomas tik tas, kuris yra originaliame tekste.' },
-        nedemesys: { area: 'įrašant netinkamas raides dėl dėmesio stokos', label: 'Nekreipia dėmesio, ką rašo, įrašinėja bet kokias raides, arba netyčia įrašė ne tą raidę', topic: 'atsitiktinės ar netyčia įrašytos raidės',
-            tip: 'Įrašytos raidės nesudaro tikro žodžio ir neatitinka tipinių klaidų.' },
+        nedemesys: { area: 'įrašant netinkamas raides dėl dėmesio stokos', label: 'Nekreipia dėmesio, ką rašo, arba netyčia įrašė ne tą raidę', topic: 'netyčia ar neatidžiai įrašytos raidės',
+            tip: 'Įrašytos raidės nesudaro tikro žodžio ir neatitinka tipinių klaidų (pvz., viena raidė pakeista kita ar įrašyta du kartus).' },
+        bet_kokias: { area: 'įrašinėjant bet kokias raides', label: 'Įrašinėja bet kokias raides', topic: 'bet kokios įrašytos raidės',
+            tip: 'Įrašytos raidės aiškiai nėra bandymas parašyti žodį: neįprasti raidžių junginiai (pvz., „hįh“), lietuvių kalboje nevartojamos raidės, ta pati raidė kelis kartus iš eilės, daug daugiau raidžių nei reikia, didžioji raidė žodžio viduryje arba tas pats atsakymas įrašytas į daug skirtingų žodžių.' },
         kita: { area: 'kitais atvejais', label: 'Kitos klaidos', topic: 'kitos klaidos', tip: '' }
     
 };

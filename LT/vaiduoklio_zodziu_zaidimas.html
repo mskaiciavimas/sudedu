@@ -1051,7 +1051,7 @@
 	</script>
 	<script src="../refresh-token.js"></script>
 	<script src="../main-nav-bar.js"></script>
-	<script src="../sudedu-words.js?v=20261018r"></script>
+	<script src="../sudedu-words.js?v=20261024a"></script>
 	<script src="../ghost-engine.js?v=20261020c"></script>
 	<script src="../ghost-groups.js"></script>
 	<script src="../game-client.js?v=20261018r"></script>
@@ -1062,12 +1062,12 @@
 
 	// ---------- config ----------
 	// Bot knowledge per "Botų žodynas" level (SudWords list names, see sudedu-words.js). Lengvas / Vidutinis / Sunkus:
-	// the 2000 / 8000 / 20000 most frequent words (with their other forms) in grades 1-2 or grades 3-4 texts, chosen by
+	// the easy / medium / hard word lists (with their other forms) from grades 1-2 or grades 3-4 texts, chosen by
 	// the median knowledge level of the player's class (classGrade). Ekspertas: all common words (the same for every grade).
 	// Bots only use words that also pass the word check (so never names or shortened forms).
 	const BOT_LISTS = {
-		g12: { easy: 'freq12_2000', medium: 'freq12_8000', hard: 'freq12_20000' },
-		g34: { easy: 'freq34_2000', medium: 'freq34_8000', hard: 'freq34_20000' },
+		g12: { easy: 'freq12_easy', medium: 'freq12_medium', hard: 'freq12_hard' },
+		g34: { easy: 'freq34_easy', medium: 'freq34_medium', hard: 'freq34_hard' },
 		expert: 'freqCommon'
 	};
 	const botList = (level, grade) => level === 'expert' ? BOT_LISTS.expert : BOT_LISTS[grade >= 3 ? 'g34' : 'g12'][level];

@@ -6,6 +6,8 @@
  * a chosen page (or the first page the user opens), optionally from / until a date, optionally with a pet game gift
  * (picked from the items; a poll gives it after the answer), optionally also for accounts created while it is active.
  * Each user sees it once. Preview shows it exactly as users will.
+ * The look: plain text, or a designed card (admin-message-designer.js: text blocks and pictures - GIFs too - placed,
+ * sized and turned freely; the card scales to every screen).
  * Sent: the numbers (sent / seen / waiting, poll answers), results with bars per answer (all, students, teachers), the
  * written answers, a CSV; pause / resume, edit the text and dates, send to more users, copy into a new one, delete
  * (deleting removes it from everyone who has not seen it yet, with its answers). */
@@ -33,7 +35,7 @@
     };
 
     let root = null, mounted = false, list = [];
-    const state = { kind: 'message', options: ['', ''], gift: null, audience: null };
+    const state = { kind: 'message', options: ['', ''], gift: null, audience: null, look: 'text', designer: null };
 
     // ------------------------------------------------------------ who: everyone / students / teachers / class / users
     // → { el, value() → { type, ids }, set(type, users) }; onChange is called after any change
@@ -203,9 +205,13 @@
                 <div class="am-col">
                     <div class="form-group"><label for="am-title">Title</label><input id="am-title" maxlength="120" value="${DEFAULT_TITLE.message}"></div>
                     <div class="form-group">
-                        <label for="am-body" class="am-body-label">Message</label>
-                        <textarea id="am-body" rows="5" maxlength="5000" placeholder="Sveiki! …"></textarea>
-                        <small class="am-muted">New lines, **bold** and links (https://…) work. Users see it in the site's pop-up.</small>
+                        <div class="am-look-row"><label for="am-body" class="am-body-label">Message</label>
+                            <div class="am-seg am-look"><button type="button" class="am-seg-btn on" data-look="text">✏️ Plain text</button><button type="button" class="am-seg-btn" data-look="design">🎨 Designed card</button></div></div>
+                        <div class="am-text-part">
+                            <textarea id="am-body" rows="5" maxlength="5000" placeholder="Sveiki! …"></textarea>
+                            <small class="am-muted">New lines, **bold** and links (https://…) work. Users see it in the site's pop-up.</small>
+                        </div>
+                        <small class="am-muted am-design-note" hidden>Design the card below - it is what users see (a poll's answers come under it).</small>
                     </div>
                     <div class="form-group am-poll" hidden>
                         <label>Answers</label>
@@ -231,6 +237,7 @@
                     </div>
                 </div>
             </div>
+            <div class="am-designer" hidden></div>
             <div class="am-out"></div>
             <div class="am-actions">
                 <button type="button" class="btn btn-secondary am-preview">👁 Preview</button>
@@ -258,14 +265,28 @@
         drawGift();
     }
 
+    // plain text or a designed card
+    function setLook(look) {
+        state.look = look;
+        root.querySelectorAll('.am-look .am-seg-btn').forEach(b => b.classList.toggle('on', b.dataset.look === look));
+        const design = look === 'design';
+        root.querySelector('.am-text-part').hidden = design;
+        root.querySelector('.am-design-note').hidden = !design;
+        root.querySelector('.am-designer').hidden = !design;
+        if (design && !state.designer) state.designer = MessageDesigner.create(root.querySelector('.am-designer'));
+    }
+
     // the form → the notice as the server (and the preview) wants it, or an error text
     function readForm({ preview = false } = {}) {
         const title = root.querySelector('#am-title').value.trim();
-        const body = root.querySelector('#am-body').value.trim();
+        const design = state.look === 'design';
+        const layout = design && state.designer ? state.designer.get() : null;
+        const body = design ? '' : root.querySelector('#am-body').value.trim();
         if (!title) return { error: 'Add a title.' };
-        if (!body) return { error: state.kind === 'poll' ? 'Write the question.' : 'Write the message.' };
+        if (design && !layout) return { error: 'The card is empty - add a text or a picture.' };
+        if (!design && !body) return { error: state.kind === 'poll' ? 'Write the question.' : 'Write the message.' };
         const n = {
-            kind: state.kind, title, body,
+            kind: state.kind, title, body, layout: layout || undefined,
             page: root.querySelector('#am-page').value,
             audience: state.audience.value(),
             forNewAccounts: state.audience.forNew(),
@@ -314,6 +335,7 @@
     }
     function resetForm() {
         root.querySelector('#am-body').value = '';
+        if (state.designer) state.designer.set(null);
         root.querySelector('#am-title').value = DEFAULT_TITLE[state.kind];
         root.querySelector('#am-starts').value = '';
         root.querySelector('#am-ends').value = '';
@@ -329,7 +351,9 @@
     function copyIntoForm(m) {
         setKind(m.kind);
         root.querySelector('#am-title').value = m.title;
-        root.querySelector('#am-body').value = m.body;
+        root.querySelector('#am-body').value = m.layout ? '' : m.body;
+        setLook(m.layout ? 'design' : 'text');
+        if (m.layout) state.designer.set(m.layout);
         root.querySelector('#am-page').value = m.page;
         root.querySelector('#am-starts').value = '';
         root.querySelector('#am-ends').value = '';
@@ -376,7 +400,7 @@
         return `<div class="am-item" data-id="${m.id}">
             <div class="am-item-main">
                 <div class="am-item-top">
-                    <span class="am-kind-tag">${m.kind === 'poll' ? '📊 Poll' : '✉️ Message'}</span>
+                    <span class="am-kind-tag">${m.kind === 'poll' ? '📊 Poll' : '✉️ Message'}${m.layout ? ' · 🎨 designed' : ''}</span>
                     <span class="am-status ${cls}">${esc(label)}</span>
                     <b class="am-item-title">${esc(m.title)}</b>
                 </div>
@@ -456,8 +480,10 @@
     function editPanel(m, panel) {
         panel.innerHTML = `
             <div class="form-group"><label>Title</label><input class="am-e-title" maxlength="120" value="${esc(m.title)}"></div>
-            <div class="form-group"><label>${m.kind === 'poll' ? 'Question' : 'Message'}</label><textarea class="am-e-body" rows="4" maxlength="5000">${esc(m.body)}</textarea>
-                <small class="am-muted">Users who have not seen it yet get the new text${m.kind === 'poll' ? ' (the answers stay as they are)' : ''}.</small></div>
+            ${m.layout ? `<div class="form-group"><label>The card</label><div class="am-e-designer"></div>
+                <small class="am-muted">Users who have not seen it yet get the new card${m.kind === 'poll' ? ' (the answers stay as they are)' : ''}.</small></div>`
+            : `<div class="form-group"><label>${m.kind === 'poll' ? 'Question' : 'Message'}</label><textarea class="am-e-body" rows="4" maxlength="5000">${esc(m.body)}</textarea>
+                <small class="am-muted">Users who have not seen it yet get the new text${m.kind === 'poll' ? ' (the answers stay as they are)' : ''}.</small></div>`}
             <div class="am-dates">
                 <div class="form-group"><label>Show from</label><input type="datetime-local" class="am-e-starts" value="${localInput(m.startsAt)}"></div>
                 <div class="form-group"><label>Until</label><input type="datetime-local" class="am-e-ends" value="${localInput(m.expiresAt)}"></div>
@@ -465,11 +491,13 @@
             ${NEW_OF[m.audience && m.audience.type] ? `<label class="am-check"><input type="checkbox" class="am-e-new" ${m.forNewAccounts ? 'checked' : ''}> Also ${NEW_OF[m.audience.type]} created while it is active</label>` : ''}
             <div class="am-e-out"></div>
             <div class="am-actions"><button type="button" class="btn small-btn btn-secondary am-e-cancel">Cancel</button><button type="button" class="btn small-btn am-e-save">Save</button></div>`;
+        const designer = m.layout ? MessageDesigner.create(panel.querySelector('.am-e-designer'), m.layout) : null;
         panel.querySelector('.am-e-cancel').addEventListener('click', () => { panel.hidden = true; });
         panel.querySelector('.am-e-save').addEventListener('click', async () => {
             const v = s => panel.querySelector(s).value;
+            if (designer && !designer.get()) { panel.querySelector('.am-e-out').innerHTML = '<div class="message error">The card is empty.</div>'; return; }
             const body = {
-                title: v('.am-e-title').trim(), body: v('.am-e-body').trim(),
+                title: v('.am-e-title').trim(), ...(designer ? { layout: designer.get(), body: '' } : { body: v('.am-e-body').trim() }),
                 startsAt: v('.am-e-starts') ? new Date(v('.am-e-starts')).toISOString() : null,
                 expiresAt: v('.am-e-ends') ? new Date(v('.am-e-ends')).toISOString() : null
             };
@@ -540,6 +568,7 @@
         recount();
         drawOptions();
         root.querySelector('.am-kind').addEventListener('click', e => { const b = e.target.closest('[data-kind]'); if (b) setKind(b.dataset.kind); });
+        root.querySelector('.am-look').addEventListener('click', e => { const b = e.target.closest('[data-look]'); if (b) setLook(b.dataset.look); });
         root.querySelector('.am-options').addEventListener('input', e => { const i = e.target.dataset.i; if (i != null) state.options[i] = e.target.value; });
         root.querySelector('.am-options').addEventListener('click', e => { const b = e.target.closest('.am-opt-del'); if (b) { state.options.splice(Number(b.dataset.i), 1); drawOptions(); } });
         root.querySelector('.am-options').addEventListener('keydown', e => {
@@ -622,6 +651,9 @@
         .am-qty{display:flex!important;align-items:center;gap:6px;margin:0!important}
         .am-qty input{width:76px;padding:8px 10px}
         .am-dates{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .am-look-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+        .am-look-row label{margin:0}
+        .am-designer{margin:6px 0 14px}
         .am-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:8px}
         .am-item{padding:14px;border-radius:14px;background:rgba(255,255,255,.3);margin-bottom:12px}
         .am-item-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}

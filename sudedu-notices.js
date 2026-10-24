@@ -6,7 +6,11 @@
  * may be closed (a poll that must be answered has no close button and comes back until it is answered).
  * The pet room passes window.sudeduNoticesReady (resolves when its room is loaded) and window.sudeduGiftReceived (puts
  * a gift the server just added into the open room). Nothing is shown during an admin's simulation of a user.
- * SudeduNotices.preview(notice) shows a notice as users will see it, without the server (the admin page). */
+ * SudeduNotices.preview(notice) shows a notice as users will see it, without the server (the admin page).
+ * A designed message (notice.layout) is a card with text blocks and pictures placed freely (made on the admin page with
+ * admin-message-designer.js, which draws it with the same layoutHtml / itemHtml): positions and sizes are % of the
+ * card, text sizes px at the card's design width (container query units), so the card scales to any screen as one
+ * picture. Pictures come from <apiBase>notice-images/<id> (cached by the browser for a year). */
 (function () {
     'use strict';
     const PAGES = ['index', 'uzduotys', 'augintiniai', 'klase', 'veiksmai', 'rasyba', 'teksto-suvokimas', 'apie'];
@@ -21,6 +25,38 @@
             .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
             .replace(/(^|[\s(])((?:https?:\/\/|www\.)[^\s<)]+)/g, (m, pre, url) => `${pre}<a href="${url.startsWith('www.') ? 'https://' + url : url}" target="_blank" rel="noopener">${url}</a>`)
             .replace(/\n/g, '<br>');
+    }
+
+    // ------------------------------------------------------------ a designed card
+    const FONTS = {
+        base: 'inherit',
+        round: "'Nunito','Varela Round','Trebuchet MS',system-ui,sans-serif",
+        bold: "'Arial Black','Segoe UI Black','Helvetica Neue',sans-serif",
+        hand: "'Comic Sans MS','Comic Neue','Chalkboard SE',cursive",
+        pixel: "'Pixelify Sans',monospace"
+    };
+    const imageUrl = id => (typeof apiBase !== 'undefined' ? apiBase : '') + 'notice-images/' + Number(id);
+    const hexA = (hex, a) => { const n = parseInt(String(hex).slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
+    // one piece of a card (the editor adds data-i and its own handles around it)
+    function itemHtml(it, L, extra = '') {
+        const pos = `left:${it.x}%;top:${it.y}%;width:${it.w}%;height:${it.h}%;${it.rot ? `transform:rotate(${it.rot}deg);` : ''}`;
+        if (it.t === 'img') {
+            return `<div class="sn-it sn-it-img" style="${pos}" ${extra}><img src="${imageUrl(it.img)}" alt="" draggable="false" style="object-fit:${it.fit === 'cover' || it.fit === 'contain' ? it.fit : 'fill'};border-radius:${Number(it.radius) || 0}%;opacity:${it.opacity ?? 1}"></div>`;
+        }
+        const style = [`font-size:calc(${Number(it.size) || 24} / ${L.w} * 100cqw)`, `color:${it.color || '#1f2a30'}`, `font-family:${FONTS[it.font] || 'inherit'}`,
+            `font-weight:${it.bold || it.font === 'bold' ? 800 : 400}`, `font-style:${it.italic ? 'italic' : 'normal'}`, `text-align:${it.align || 'center'}`,
+            `justify-content:${{ top: 'flex-start', bottom: 'flex-end' }[it.valign] || 'center'}`,
+            it.fill ? `background:${hexA(it.fill, it.fillA ?? 0.8)}` : '', it.shadow ? 'text-shadow:0 .06em .14em rgba(0,0,0,.5)' : ''].filter(Boolean).join(';');
+        return `<div class="sn-it sn-it-text" style="${pos}${style}" ${extra}><div class="sn-it-txt">${formatText(it.text || '')}</div></div>`;
+    }
+    function layoutHtml(L) {
+        if (L.items.some(it => it.font === 'pixel') && !document.querySelector('link[href*="Pixelify"]')) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap';
+            document.head.appendChild(link);
+        }
+        return `<div class="sn-card" style="aspect-ratio:${L.w}/${L.h};background:${L.bg || '#ffffff'}">${L.items.map(it => itemHtml(it, L)).join('')}</div>`;
     }
 
     let style = null;
@@ -58,6 +94,12 @@
 .sn-error{color:#c0392b;font-size:.9rem}
 .sn-thanks{text-align:center;font-size:1.1rem;font-weight:600;margin:10px 0}
 .object-popup-overlay.sn-required .object-popup-close{display:none}
+.sn-card{position:relative;width:100%;container-type:inline-size;overflow:hidden;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.sn-it{position:absolute;box-sizing:border-box}
+.sn-it-img img{display:block;width:100%;height:100%;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.sn-it-text{display:flex;flex-direction:column;padding:.25em .35em;border-radius:.35em;line-height:1.22;overflow-wrap:anywhere;overflow:hidden}
+.sn-it-text a{color:inherit;text-decoration:underline}
+.sn-card + .sn-poll,.sn-card + .sn-gift{margin-top:14px}
 `;
         document.head.appendChild(style);
     }
@@ -116,13 +158,17 @@
             // (the page may put something else into the pop-up: then this notice is over for now)
             const watcher = new MutationObserver(() => { if (!root.isConnected) { watcher.disconnect(); finish(); } });
 
+            // a designed card instead of the text, in a pop-up as wide as the card was designed (or the screen)
+            const L = notice.layout && Array.isArray(notice.layout.items) && notice.layout.items.length ? notice.layout : null;
+            const bodyHtml = L ? layoutHtml(L) : `<div class="sn-body">${formatText(notice.body)}</div>`;
+            const popupOpts = L ? { width: `min(94vw, ${Math.max(320, L.w + 56)}px)`, maxWidth: '94vw' } : {};
             if (!poll) {
-                root.innerHTML = `<div class="sn-body">${formatText(notice.body)}</div>${notice.giftId != null ? giftHtml(notice, false) : ''}`;
-                openObjectPopup(root, esc(notice.title), '', finish, true);
+                root.innerHTML = `${bodyHtml}${notice.giftId != null ? giftHtml(notice, false) : ''}`;
+                openObjectPopup(root, esc(notice.title), '', finish, true, popupOpts);
                 server.seen(notice).then(r => { if (r && r.gift && typeof window.sudeduGiftReceived === 'function') window.sudeduGiftReceived(r.gift, notice); });
             } else {
                 const multi = !!poll.multiple;
-                root.innerHTML = `<div class="sn-body">${formatText(notice.body)}</div>
+                root.innerHTML = `${bodyHtml}
                     <div class="sn-poll${multi ? ' multi' : ''}">
                         ${multi ? '<div class="sn-hint">Galite pasirinkti kelis atsakymus.</div>' : ''}
                         ${(poll.options || []).map((o, i) => `<button type="button" class="sn-opt" data-i="${i}" aria-pressed="false"><span class="sn-mark"></span><span>${esc(o)}</span></button>`).join('')}
@@ -157,7 +203,7 @@
                     if (notice.giftId == null) setTimeout(() => { if (root.isConnected) { closeObjectPopup(); finish(); } }, 1600);
                 });
                 // closing without answering: allowed only when the poll may be closed (then it does not come back)
-                openObjectPopup(root, esc(notice.title), '', () => { if (!done && !root.querySelector('.sn-thanks')) server.seen(notice); finish(); }, true);
+                openObjectPopup(root, esc(notice.title), '', () => { if (!done && !root.querySelector('.sn-thanks')) server.seen(notice); finish(); }, true, popupOpts);
                 // (the admin's preview keeps its close button)
                 if (poll.required && !server.preview) overlay()?.classList.add('sn-required');
             }
@@ -222,7 +268,7 @@
         });
     }
 
-    window.SudeduNotices = { preview, run, formatText };
+    window.SudeduNotices = { preview, run, formatText, layoutHtml, itemHtml, imageUrl, injectStyle };
     const start = () => setTimeout(run, 1200);
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();

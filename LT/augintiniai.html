@@ -4077,7 +4077,7 @@
     </div>
 
     <script src="../mental-arithmetic.js?v=20261020c"></script>
-    <script src="../sudedu-notices.js?v=20261020c"></script>
+    <script src="../sudedu-notices.js?v=20261024a"></script>
     <script src="../main-nav-bar.js"></script>
     <script src="../autonomous-pets.js?v=20261018r"></script>
     <script src="../functional-objects.js"></script>
@@ -5195,8 +5195,28 @@ async function runAttemptGameInitUntilSettled() {
     return result;
 }
 
+// #gameContainer starts out `hidden` (display:none) and is only shown in window.onload, which waits for every
+// image/script on the page. Placement measures each object's height (offsetHeight) to stand it on its tile, and
+// inside a display:none container every height reads 0 - so if the student's data arrived before onload (a fast
+// server), every object was placed exactly its own height too low on the first load (re-entering Namai fixed it,
+// and the checks below didn't notice since they measured the same zero heights). So the room waits until it can
+// actually be laid out.
+function waitUntilGameContainerShown() {
+    const gameContainer = document.getElementById('gameContainer');
+    if (!gameContainer || !gameContainer.hasAttribute('hidden')) return Promise.resolve();
+    return new Promise(resolve => {
+        const observer = new MutationObserver(() => {
+            if (gameContainer.hasAttribute('hidden')) return;
+            observer.disconnect();
+            resolve();
+        });
+        observer.observe(gameContainer, { attributes: true, attributeFilter: ['hidden'] });
+    });
+}
+
 async function attemptGameInitInternal() {
     showRoomLoading();
+    await waitUntilGameContainerShown();
 
     // hideRoomLoading() now lives in `finally` (not inline in each branch) so every invocation —
     // success, a retry that recurses, or the max-attempts path — calls it exactly once, no matter

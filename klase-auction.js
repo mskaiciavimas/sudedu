@@ -51,6 +51,7 @@
     LIMIT_BIDS: 'Vienu metu gali statyti ne daugiau kaip {limit} aukcionuose.',
     AUCTION_ENDED: 'Šis aukcionas jau baigėsi.',
     SOLD_OUT: 'Šis daiktas jau išparduotas.',
+    ALREADY_BOUGHT: 'Šį daiktą jau nusipirkai. Vienas mokinys gali nusipirkti tik vieną.',
     NOT_FOUND: 'Šio daikto nebėra.',
     NO_TEACHER: 'Pirmiausia pridėk mokytoją.',
     NOT_OWNED: 'Šio daikto nebeturi arba jis jau panaudotas.',
@@ -409,6 +410,9 @@
         action = status + '<div class="au-bid"><input class="zg-input" type="number" inputmode="numeric" min="' + min + '" step="1" value="' + esc(value) + '" data-bid-for="' + i.id + '" aria-label="Statymo suma"' + (locked ? ' disabled' : '') + '>' +
           '<button class="zg-btn zg-btn-green au-small" type="button" data-act="bid" data-id="' + i.id + '"' + (locked ? ' disabled' : '') + '>' + (i.myBid != null ? 'Didinti' : 'Statyti') + '</button></div>' +
           '<div class="au-hint">' + (locked ? 'Pasiektas klasės limitas' : i.myBid != null ? 'Mažiausiai ' + min : 'Mažiausias statymas: ' + min) + '</div>';
+      } else if (i.bought) {
+        action = '<div class="au-state win">Jau nusipirkai</div>' +
+          '<div class="au-hint">Vienas mokinys gali nusipirkti tik vieną</div>';
       } else {
         var short = state.coins < i.price;
         action = '<button class="zg-btn zg-btn-green au-small" type="button" data-act="buy" data-id="' + i.id + '"' + (short || buyBlocked ? ' disabled' : '') + '>Pirkti</button>' +
@@ -438,6 +442,7 @@
     if (!b || b.disabled || !state) return;
     var id = b.dataset.id, act_ = b.dataset.act, item = find(state.items, id);
     if (act_ === 'buy' && item) {
+      if (item.bought) { say(ERR.ALREADY_BOUGHT); return; }
       showCustomConfirm('Pirkti „' + esc(item.title) + '“ už ' + coins(item.price) + '?', function () {
         act(b, 'POST', 'items/' + id + '/buy', { seenPrice: item.price }, 'buy').then(function (r) { if (r) say('Nupirkta! Daiktą rasi skiltyje „Mano daiktai“.', false); });
       });

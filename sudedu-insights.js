@@ -23,7 +23,10 @@
  * rasyba.html) and gets every insight whose rule matches (they are not exclusive). Rules that need the word's form
  * (vietininkas, prieveiksmis, dkt. dgs. V.) read databases/rasyba_suitable_words.json; answers no rule explains are
  * checked with SudWords: a word in common use (the all-grades frequency list) and not a name → "skaito pavienius žodžius", otherwise
- * → "nekreipia dėmesio".
+ * → "nekreipia dėmesio" - or, when the letters are clearly not an attempt at the word, → "įrašinėja bet kokias raides"
+ * (randomLetters below: letters Lithuanian doesn't use, a letter 3+ times in a row, a capital inside the word, 2+ letters
+ * too many, a combination of letters no common word has, or the same answer typed into 3+ different words of a task).
+ * SudInsights.randomLettersOf(tasks) gives the same verdict for one student's tasks (the teacher's student list "!").
  */
 (function () {
 	'use strict';
@@ -586,7 +589,7 @@
 		if (!sudWordsPromise) {
 			sudWordsPromise = new Promise(resolve => {
 				const s = document.createElement('script');
-				s.src = ROOT + 'sudedu-words.js';
+				s.src = ROOT + 'sudedu-words.js?v=20261024a';
 				s.onload = () => resolve(window.SudWords || null);
 				s.onerror = () => resolve(null);
 				document.head.appendChild(s);
@@ -596,16 +599,18 @@
 	}
 
 	// mistakesDetail items of grammar tasks: [[before, answer, after], category, [count, wrongAnswers (≤3)], wordId]
-	async function analyzeGrammarMistakes(entries) {
+	// (tasksKnown: how many tasks' mistakes are known - those with details and those without mistakes; for "dažnai")
+	async function analyzeGrammarMistakes(entries, tasksKnown) {
 		const answers = [];
 		entries.forEach(({ item, task }) => {
 			if (!Array.isArray(item) || !Array.isArray(item[0])) return;
 			const [b, a, s] = item[0].map(x => String(x ?? '').toLowerCase());
 			const cat = String(item[1] || '').split('-')[0];
 			const counter = Number(item[2] && item[2][0]) || 1;
-			const wrongs = (item[2] && Array.isArray(item[2][1]) ? item[2][1] : []).map(x => String(x ?? '').toLowerCase().replace(/\s+/g, '')).filter(Boolean);
+			const raws = (item[2] && Array.isArray(item[2][1]) ? item[2][1] : []).map(x => String(x ?? '').replace(/\s+/g, '')).filter(Boolean);
+			const wrongs = raws.map(x => x.toLowerCase());
 			const weight = wrongs.length ? counter / wrongs.length : 0;
-			wrongs.forEach(w => { if (w !== a) answers.push({ cat, b, a, s, w, weight, task, counter, word: b + a + s, item }); });
+			wrongs.forEach((w, k) => { if (w !== a) answers.push({ cat, b, a, s, w, raw: raws[k], weight, task, counter, word: b + a + s, item }); });
 			if (!wrongs.length) answers.push({ cat, b, a, s, w: null, weight: counter, task, counter, word: b + a + s, item });
 		});
 		if (!answers.length) return null;
@@ -639,6 +644,7 @@
 			}
 		}
 
+		await markRandomLetters(answers);
 		answers.forEach(x => { if (!x.keys.size) x.keys.add('kita'); });
 		const total = answers.reduce((sum, x) => sum + x.weight, 0);
 		const byKey = new Map();
@@ -672,7 +678,99 @@
 		const repeatedWords = [...wordTasks.entries()].filter(([, t]) => t.size >= 2)
 			.map(([word, t]) => ({ word, tasks: t.size })).sort((x, y) => y.tasks - x.tasks);
 
-		return { total: Math.round(total), insights, repeatedWords, retried: retried.size };
+		return { total: Math.round(total), insights, repeatedWords, retried: retried.size, randomLetters: randomSummary(insights, total, tasksKnown || new Set(entries.map(e => e.task)).size) };
+	}
+
+	/* "Įrašinėja bet kokias raides": answers that are clearly not an attempt at the word - only among those no spelling rule
+	 * explains and that make no real word (nothing else is ever moved here). Strong signs in one answer: letters Lithuanian
+	 * doesn't use (q, w, x, digits, signs), a letter 3+ times in a row, a capital letter inside the word, 2+ letters more
+	 * than the gap needs, or (2+ letters typed) a combination of three letters no common word has. And across one task: the
+	 * same answer typed into 3+ different words whose right letters differ (the same key pressed to fill every gap). Kept as
+	 * "nekreipia dėmesio" (a slip): one wrong letter, a letter typed twice where the word is otherwise right. */
+	const LT_LETTERS = /^[aąbcčdeęėfghiįyjklmnoprsštuųūvzž]+$/;
+	let trigramsPromise = null;
+	// the three-letter combinations ('^' / '$' = the word's start / end) of the common words - those in 2+ words count
+	function loadTrigrams() {
+		if (!trigramsPromise) {
+			trigramsPromise = loadSudWords().then(async words => {
+				if (!words) return null;
+				const dawg = await words.load('freqCommon');
+				const seen = new Map();
+				for (const w of dawg.words(dawg.node(''), '')) {
+					const p = '^' + w + '$', mine = new Set();
+					for (let i = 0; i + 3 <= p.length; i++) mine.add(p.slice(i, i + 3));
+					mine.forEach(t => seen.set(t, (seen.get(t) || 0) + 1));
+				}
+				const common = new Set();
+				seen.forEach((n, t) => { if (n >= 2) common.add(t); });
+				return common;
+			}).catch(() => null);
+		}
+		return trigramsPromise;
+	}
+	// a letter typed twice where the word would otherwise be right (n-uuo-lat): a slip of the hand
+	function typedTwice(cw, ww) {
+		for (let i = 0; i < ww.length - 1; i++) if (ww[i] === ww[i + 1] && ww.slice(0, i) + ww.slice(i + 1) === cw) return true;
+		return false;
+	}
+	function randomSign(x, trigrams) {
+		const ww = x.b + x.w + x.s, cw = x.b + x.a + x.s;
+		if (typedTwice(cw, ww)) return false;
+		if (!LT_LETTERS.test(x.w)) return true;                                   // q, w, x, digits, signs
+		if (/(.)\1\1/.test(ww)) return true;                                       // a letter 3+ times in a row
+		const raw = String(x.raw || '');
+		if (/[A-ZĄČĘĖĮŠŲŪŽ]/.test(raw) && (x.b || /[A-ZĄČĘĖĮŠŲŪŽ]/.test(raw.slice(1)))) return true;   // a capital inside the word
+		if (x.w.length >= x.a.length + 2) return true;                            // 2+ letters too many
+		// the right letters in another order (ou for uo): a slip, not random
+		if ([...x.w].sort().join('') === [...x.a].sort().join('')) return false;
+		if (trigrams && x.w.length >= 2) {
+			// (the triples touching a typed letter: the typed letters are p[from + 1 … from + length]); one unusual triple is
+			// enough for 3+ typed letters, two letters need two (a rare but real combination alone is not random)
+			const p = '^' + ww + '$', from = x.b.length, last = x.b.length + x.w.length;
+			let odd = 0;
+			for (let i = Math.max(0, from - 1); i + 3 <= p.length && i <= last; i++) if (!trigrams.has(p.slice(i, i + 3))) odd++;
+			if (odd >= (x.w.length >= 3 ? 1 : 2)) return true;
+		}
+		return false;
+	}
+	async function markRandomLetters(answers) {
+		const open = x => x.w !== null && x.keys.size === 1 && x.keys.has('nedemesys');
+		const candidates = answers.filter(open);
+		if (!candidates.length) return;
+		const trigrams = await loadTrigrams();
+		const hits = new Set(candidates.filter(x => randomSign(x, trigrams)));
+		// the same answer in 3+ different words of a task, their right letters not all the same
+		const byTask = new Map();
+		candidates.forEach(x => {
+			const k = x.task + '|' + x.w;
+			if (!byTask.has(k)) byTask.set(k, []);
+			byTask.get(k).push(x);
+		});
+		byTask.forEach(list => {
+			if (new Set(list.map(x => x.word)).size >= 3 && new Set(list.map(x => x.a)).size >= 2) list.forEach(x => hits.add(x));
+		});
+		hits.forEach(x => { x.keys = new Set(['bet_kokias']); });
+	}
+	// how much of it there is: in 4+ different words → said in the summary and the "!" in the teacher's list (not a share of
+	// the mistakes - many real mistakes would hide it). "dažnai" when it is in 2+ tasks and in at least a fifth of the tasks
+	// whose mistakes are known (3 tasks of 60 is "kartais"; one task filled with any letters too)
+	const RANDOM_WORDS = 4, RANDOM_OFTEN_TASKS = 2, RANDOM_OFTEN_SHARE = 0.2;
+	function randomSummary(insights, total, tasksKnown) {
+		const g = insights.find(i => i.key === 'bet_kokias');
+		if (!g) return { flagged: false, often: false, words: 0, share: 0, tasks: 0 };
+		const share = total > 0 ? g.raw / total * 100 : 0;
+		const often = g.taskCount >= RANDOM_OFTEN_TASKS && g.taskCount >= RANDOM_OFTEN_SHARE * Math.max(tasksKnown || 0, g.taskCount);
+		return { flagged: g.wordCount >= RANDOM_WORDS, often, words: g.wordCount, share, tasks: g.taskCount, tasksKnown, example: g.examples[0] || null };
+	}
+	// one student's tasks (as the page gives them) → the same verdict as their summary's: { flagged, words, share, tasks }
+	async function randomLettersOf(tasks, opts = {}) {
+		let list = (tasks || []).map(t => normalizeTask(t, opts.kindOf)).filter(t => t && t.subject === 'grammar' && t.answers > 0 && t.date);
+		list = dropTeacherCopies(list);
+		const entries = [];
+		list.forEach((t, i) => t.detail.forEach(item => entries.push({ item, task: i })));
+		if (!entries.length) return { flagged: false, often: false, words: 0, share: 0, tasks: 0 };
+		const g = await analyzeGrammarMistakes(entries, list.filter(t => !t.mistakes || t.detail.length).length);
+		return g ? g.randomLetters : { flagged: false, often: false, words: 0, share: 0, tasks: 0 };
 	}
 
 	// ---------------------------------------------------------------- the short summary: what the time went to
@@ -1027,7 +1125,7 @@
 	}
 	// which kinds of mistakes a question could get: the typical wrong answers (a letter or letters swapped, one added or
 	// left out) classified as the mistakes are; the ones made on it are added by the caller
-	const ANY_QUESTION = new Set(['nedemesys', 'atskiri', 'kita']);   // (any word can get these)
+	const ANY_QUESTION = new Set(['nedemesys', 'bet_kokias', 'atskiri', 'kita']);   // (any word can get these)
 	const WRONG_PARTS = ['', 'a', 'ą', 'e', 'ę', 'ė', 'i', 'į', 'y', 'u', 'ų', 'ū', 'o', 'uo', 'ie', 'ei', 'ia', 'ią', 'iu', 'iū', 'eu', 'iau', 'au', 'ai',
 		'ui', 'uj', 'j', 'd', 'dž', 'dz', 'z', 'ž', 's', 'š', 't', 'b', 'p', 'g', 'k', 'c', 'č', 'h', 'ch', 'f', 'v', 'm', 'n', 'l', 'r', 'iai', 'ėje', 'oje', 'iaja'];
 	const possibleCache = new Map();
@@ -2484,7 +2582,7 @@
 			f.noDetailNotSent = list.filter(t => t.mistakes > 0 && !t.detail.length && t.detailNotSent).length;
 			const entries = [];
 			list.forEach((t, i) => t.detail.forEach(item => entries.push({ item, task: i })));
-			f.grammar = entries.length ? await analyzeGrammarMistakes(entries) : null;
+			f.grammar = entries.length ? await analyzeGrammarMistakes(entries, list.filter(t => !t.mistakes || t.detail.length).length) : null;
 			if (f.grammar) f.grammar.detailsFrom = detailsFrom;
 			rankPatterns(f.grammar, list, 'grammar');
 		}
@@ -3012,7 +3110,12 @@
 		}
 		if (!g || !g.insights.length) return out;
 		// (plain groupings - other ×÷, all + or all − - are listed in the patterns, but say nothing in a sentence)
-		let named = g.insights.filter(i => i.key !== 'kita' && i.key !== 'm_muldiv' && !i.key.startsWith('m_op_'));
+		const randomSaid = f.subject === 'grammar' && !f.isClass && g.randomLetters && g.randomLetters.flagged;
+		if (randomSaid) {
+			// (one task's card: it is said of that task, so "dažnai")
+			out.push(`Panašu, kad ${f.mode === 'task' || g.randomLetters.often ? 'dažnai' : 'kartais'} įrašinėjamos bet kokios raidės.`);
+		}
+		let named = g.insights.filter(i => i.key !== 'kita' && i.key !== 'm_muldiv' && !i.key.startsWith('m_op_') && !(randomSaid && i.key === 'bet_kokias'));
 		if (f.subject === 'math') named = mergeNotation(named);
 		if (!named.length) return out;
 		const example = i => !details || !i.examples || !i.examples[0] ? '' : i.examples[0].text ? ` (pvz., ${i.examples[0].text})` : i.examples[0].w ? ` (pvz., ${exampleText(i.examples[0])})` : '';
@@ -4137,7 +4240,7 @@
 				+ ` Juosta rodo, kiek ši klaida pasikartoja, palyginti su labiausiai pasikartojančia: atsižvelgiama į jos dažnį, duomenų kiekį ir į tai, kiek skirtingų ${grammar ? 'žodžių' : 'veiksmų'} ji paliečia. Dėsningumai surikiuoti pagal tai.`
 				+ (p.approx ? ' Skaičiai apytiksliai: įrašuose nenurodyta, kiek kurios rūšies klausimų buvo užduotyje, todėl jie padalyti po lygiai.' : '');
 		};
-		const item = (p, i) => `<div class="ins-pat" data-i="${i}">
+		const item = (p, i) => `<div class="ins-pat" data-i="${i}" data-key="${esc(p.key || '')}">
 			<button type="button" class="ins-pat-head" aria-expanded="false">
 				<div class="ins-pl"><span class="ins-pn">${esc(p.label)}</span><span class="ins-pc">${rateHtml(p)}</span></div>
 				${p.note ? `<div class="ins-pnote">${esc(p.note)}</div>` : ''}
@@ -4230,5 +4333,5 @@
 		return render(el, Array.isArray(row) ? row : [row], { ...opts, mode: 'task', scope: 'period' });
 	}
 
-	window.SudInsights = { OUTLIER, showInfo, enabled, analyze, describe, renderPeriod, renderTask, showLoading, classifyAnswer, form, trend, verdict, tPValue, INSIGHTS, mathComposition, windowTest, windowChanges, WIN };
+	window.SudInsights = { OUTLIER, showInfo, enabled, analyze, describe, randomLettersOf, renderPeriod, renderTask, showLoading, classifyAnswer, form, trend, verdict, tPValue, INSIGHTS, mathComposition, windowTest, windowChanges, WIN };
 })();
