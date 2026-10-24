@@ -552,12 +552,45 @@
 		return Array.isArray(entry) ? entry : null;
 	}
 	let wordsDbPromise = null;
+	let wordsDbHash = null;   // (its text's fingerprint: what is kept from it in the browser - see keptReplays)
 	function loadWordsDb() {
 		if (!wordsDbPromise) {
 			wordsDbPromise = fetch(ROOT + 'databases/rasyba_suitable_words.json')
-				.then(r => (r.ok ? r.json() : null)).catch(() => null);
+				.then(r => (r.ok ? r.text() : null)).then(text => { if (text == null) return null; wordsDbHash = String(hashString(text)); return JSON.parse(text); }).catch(() => null);
 		}
 		return wordsDbPromise;
+	}
+	/* What is kept in the browser between visits (worked out from these files, so valid exactly while they stay the same):
+	 * a file's fingerprint is that of its text - fetched again, from the browser's cache - so a changed file drops what was
+	 * kept from it, with or without a new ?v=. null: not known (then nothing is kept). */
+	const fileHashes = new Map();
+	function fileHash(url) {
+		if (!url) return Promise.resolve(null);
+		if (!fileHashes.has(url)) fileHashes.set(url, fetch(url).then(r => (r.ok ? r.text() : null)).then(text => (text == null ? null : String(hashString(text)))).catch(() => null));
+		return fileHashes.get(url);
+	}
+	const scriptUrl = part => { const el = document.querySelector(`script[src*="${part}"]`); return el ? el.src : null; };
+	// (IndexedDB "sudInsights": store "kept" - key → value; every failure is just "not kept")
+	let keptDbPromise = null;
+	function keptDb() {
+		if (!keptDbPromise) keptDbPromise = new Promise(resolve => {
+			try {
+				const req = indexedDB.open('sudInsights', 1);
+				req.onupgradeneeded = () => req.result.createObjectStore('kept');
+				req.onsuccess = () => resolve(req.result);
+				req.onerror = req.onblocked = () => resolve(null);
+			} catch (e) { resolve(null); }
+		});
+		return keptDbPromise;
+	}
+	function keptRequest(db, mode, work) {
+		return new Promise(resolve => {
+			try {
+				const tx = db.transaction('kept', mode), out = work(tx.objectStore('kept'));
+				tx.oncomplete = () => resolve(out && 'result' in out ? out.result : true);
+				tx.onerror = tx.onabort = () => resolve(null);
+			} catch (e) { resolve(null); }
+		});
 	}
 	let patternsDbPromise = null;
 	function loadPatternsDb() {
@@ -748,7 +781,10 @@
 					const kids = new Map();
 					const childrenOf = n => { let k = kids.get(n); if (!k) kids.set(n, k = dawg.children(n)); return k; };
 					for (const [a, n1] of childrenOf(0)) for (const [b, n2] of childrenOf(n1)) trigrams.add('^' + a + b);
+					let sliceStart = Date.now();
 					for (let n = 0; n < dawg.nodes; n++) {
+						// (in slices: the page stays free while the table is built)
+						if ((n & 1023) === 0 && Date.now() - sliceStart > 8) { await breathe(); sliceStart = Date.now(); }
 						for (const [a, n1] of childrenOf(n)) for (const [b, n2] of childrenOf(n1)) {
 							if (dawg.isWord(n2)) trigrams.add(a + b + '$');
 							for (const [c] of childrenOf(n2)) trigrams.add(a + b + c);
@@ -1121,16 +1157,64 @@
 	let replayDbPromise = null;
 	function loadReplayDb() {
 		if (!replayDbPromise) {
-			const json = file => fetch(ROOT + 'databases/' + file).then(r => (r.ok ? r.json() : null)).catch(() => null);
+			const hashes = [];
+			const json = file => fetch(ROOT + 'databases/' + file).then(r => (r.ok ? r.text() : null))
+				.then(text => { if (text == null) return null; hashes.push(file + ':' + hashString(text)); return JSON.parse(text); }).catch(() => null);
 			replayDbPromise = Promise.all([json('1_2_klase_gramatika_tekstai.json'), json('3_4_klase_gramatika_tekstai.json'),
 				json('rasyba_suitable_words_patterns.json'), loadWordsDb()])
 				.then(([c75, c76, patterns, words]) => {
 					const G = window.SudRasybaGenerator;
 					if (!G || !c75 || !c76 || !patterns || !words) return null;
-					return { G, texts: { C75: c75, C76: c76 }, words, patterns, precomputed: G.buildPrecomputedWordPatterns(words, patterns) };
+					return { G, texts: { C75: c75, C76: c76 }, words, patterns, precomputed: G.buildPrecomputedWordPatterns(words, patterns),
+						filesHash: wordsDbHash ? hashes.sort().join('|') + '|words:' + wordsDbHash : null };
 				}).catch(() => null);
 		}
 		return replayDbPromise;
+	}
+	/* The replays kept in the browser (IndexedDB): a stream's first sentences - as many as a task with that many answers
+	 * uses - for the very same files (this one, the generator's, the texts and the words: keptReplays' version; any change
+	 * and they are not used any more). At most REPLAY_KEEP streams (more: all dropped and kept anew). */
+	const REPLAY_KEEP = 6000;
+	let keptReplaysPromise = null;
+	function keptReplays(db) {
+		if (!keptReplaysPromise) keptReplaysPromise = (async () => {
+			if (!db.filesHash) return null;
+			const parts = await Promise.all([fileHash(SCRIPT), fileHash(scriptUrl('rasyba-generator'))]);
+			if (parts.some(x => !x)) return null;
+			const version = String(hashString(parts.join('|') + '|' + db.filesHash));
+			const idb = await keptDb();
+			if (!idb) return null;
+			// (each kept stream carries its version: one kept for other files - e.g. by a tab with a newer page - is never
+			// used, and is removed here)
+			const map = await new Promise(resolve => {
+				try {
+					const tx = idb.transaction('kept', 'readwrite'), found = new Map(), req = tx.objectStore('kept').openCursor();
+					req.onsuccess = () => {
+						const c = req.result;
+						if (!c) return;
+						if (typeof c.key === 'string' && c.key.startsWith('replay|')) {
+							if (c.value && c.value.v === version) found.set(c.key.slice(7), c.value); else c.delete();
+						}
+						c.continue();
+					};
+					tx.oncomplete = () => resolve(found);
+					tx.onerror = tx.onabort = () => resolve(null);
+				} catch (e) { resolve(null); }
+			});
+			if (!map) return null;
+			return { idb, map, version };
+		})().catch(() => null);
+		return keptReplaysPromise;
+	}
+	function keepReplay(kept, key, sentences, answers, ended) {
+		if (!kept) return;
+		// (the sentences up to the one where the answers are reached - what replayedQuestions reads for up to that many)
+		let gaps = 0, n = 0;
+		while (n < sentences.length && gaps < answers) gaps += sentences[n++].length;
+		const entry = { v: kept.version, sentences: sentences.slice(0, n), cover: answers, done: ended && n === sentences.length };
+		if (kept.map.size >= REPLAY_KEEP) { kept.map.clear(); keptRequest(kept.idb, 'readwrite', store => { store.clear(); }); return; }
+		kept.map.set(key, entry);
+		keptRequest(kept.idb, 'readwrite', store => { store.put(entry, 'replay|' + key); });
 	}
 	// the generated sentences' gaps, in the order asked: [[{ cat, b, a, s, coords }, ...] per sentence]
 	const streamCache = new Map();
@@ -1138,6 +1222,9 @@
 		const key = JSON.stringify([seed, grade, info, textsMax, textsHash]);
 		const cached = streamCache.get(key);
 		if (cached && (cached.done || cached.sentences.length >= sentencesNeeded)) return cached.sentences;
+		const kept = await keptReplays(db);
+		const k = kept && kept.map.get(key);
+		if (k && Array.isArray(k.sentences) && (k.done || k.cover >= sentencesNeeded)) return k.sentences;
 		// the texts the task had: those up to its highest text id (texts added later left out), and the same ids
 		let texts = db.texts[info[3]];
 		if (texts && Number.isInteger(textsMax)) {
@@ -1166,6 +1253,7 @@
 			coords: q['zodzio-id']
 		})));
 		streamCache.set(key, { sentences, done: sentences.length < target });
+		keepReplay(kept, key, sentences, sentencesNeeded, sentences.length < target);
 		return sentences;
 	}
 	// the task's questions from a stream, or null when it does not check out
@@ -1926,42 +2014,114 @@
 	 * is a different question of a batch), so this is the task's mix, up to its last unfinished batch. → { ops: {A: share,
 	 * …}, keys: {pattern key: share} } or null (no generator on the page, or it gives nothing for these settings). */
 	const compositionCache = new Map();
+	/* (kept in the browser between visits too - working them out is the slowest part of a first math summary: valid while
+	 * neither this file's version nor the question generator - its file's version and its code - changes; at most
+	 * COMPOSITION_KEEP settings, the oldest dropped; an unusable store is simply not used) */
+	const COMPOSITION_KEEP = 300, COMPOSITION_STORE = 'sudInsightsMix';
+	let compositionStoreVersion = null, compositionSaveTimer = null;
+	let compositionsLoading = null;
+	function loadKeptCompositions() {
+		if (!compositionsLoading) compositionsLoading = (async () => {
+			if (typeof generateCombinations !== 'function') return;
+			const parts = await Promise.all([fileHash(SCRIPT), fileHash(scriptUrl('mental-arithmetic-combinations'))]);
+			if (parts.some(x => !x)) return;
+			compositionStoreVersion = String(hashString(parts.join('|')));
+			readKeptCompositions();
+		})().catch(() => {});
+		return compositionsLoading;
+	}
+	function readKeptCompositions() {
+		try {
+			const kept = JSON.parse(localStorage.getItem(COMPOSITION_STORE) || 'null');
+			if (kept && kept.version === compositionStoreVersion && Array.isArray(kept.items)) {
+				kept.items.forEach(([key, value]) => { if (!compositionCache.has(key) && value && value.ops && value.keys) compositionCache.set(key, value); });
+			}
+		} catch (e) { /* (worked out again) */ }
+	}
+	function keepCompositions() {
+		if (compositionStoreVersion === null || compositionSaveTimer) return;
+		compositionSaveTimer = setTimeout(() => {
+			compositionSaveTimer = null;
+			const items = [...compositionCache].filter(([, value]) => value).slice(-COMPOSITION_KEEP);
+			try { localStorage.setItem(COMPOSITION_STORE, JSON.stringify({ version: compositionStoreVersion, items })); }
+			catch (e) { try { localStorage.removeItem(COMPOSITION_STORE); } catch (e2) { /* (not kept) */ } }
+		}, 1000);
+	}
+	// (the compositions of tasks' settings not worked out yet, each in its own slice of time; alive() false stops it)
+	async function warmMathCompositions(tasks, alive) {
+		await loadKeptCompositions();
+		const seen = new Set();
+		let sliceStart = Date.now();
+		for (const t of tasks) {
+			const info = t && t.info;
+			if (!Array.isArray(info) || info[0] !== 'math') continue;
+			const key = JSON.stringify(info.slice(1, 9));
+			if (seen.has(key) || compositionCache.has(key)) continue;
+			seen.add(key);
+			const steps = compositionSteps(info);
+			while (!steps.next().done) {
+				if (Date.now() - sliceStart > 8) {
+					await breathe();
+					if (alive && !alive()) throw CANCELLED;
+					sliceStart = Date.now();
+				}
+			}
+		}
+	}
 	function mathComposition(info) {
 		if (!Array.isArray(info) || info[0] !== 'math') return null;
 		const cacheKey = JSON.stringify(info.slice(1, 9));
 		if (compositionCache.has(cacheKey)) return compositionCache.get(cacheKey);
+		const steps = compositionSteps(info);
+		let step;
+		do { step = steps.next(); } while (!step.done);
+		return step.value;
+	}
+	// (the work itself; yields between the generator's runs and every 100 questions - the page's controller is always back
+	// in place when it yields - and keeps the result in compositionCache)
+	function* compositionSteps(info) {
+		const cacheKey = JSON.stringify(info.slice(1, 9));
 		let out = null;
 		if (typeof generateCombinations === 'function' && typeof controller !== 'undefined') {
-			const saved = controller;
 			const questions = [];
-			try {
-				for (let run = 0; run < 40 && questions.length < 600; run++) {
-					// (the generator reads these settings from the page's controller: a stand-in for the run, put back after)
+			let failed = false;
+			for (let run = 0; run < 40 && questions.length < 600; run++) {
+				// (the generator reads these settings from the page's controller: a stand-in for the run, put back after)
+				const saved = controller;
+				let batch = [];
+				try {
 					controller = { modeChoice1: info[1], modeChoice2: info[2], modeChoice3: info[3] === 'C37', selectedNumbers: Array.isArray(info[7]) ? info[7] : [],
 						withRemainder: info[8] === true, combinations: [] };
 					generateCombinations();
-					const batch = Array.isArray(controller.combinations) ? controller.combinations : [];
-					if (!batch.length) break;
-					questions.push(...batch);
+					batch = Array.isArray(controller.combinations) ? controller.combinations : [];
+				} catch (e) {
+					failed = true;
+				} finally {
+					controller = saved;
 				}
-			} catch (e) {
-				questions.length = 0;
-			} finally {
-				controller = saved;
+				if (failed || !batch.length) break;
+				questions.push(...batch);
+				yield;
 			}
+			if (failed) questions.length = 0;
 			const valid = questions.filter(q => Array.isArray(q) && 'ASMD'.includes(q[2]));
 			if (valid.length) {
 				const ops = {}, keys = {};
 				const unknown = info[4] === 'C42';
-				valid.forEach(q => {
+				for (let n = 0; n < valid.length; n++) {
+					const q = valid[n];
 					ops[q[2]] = (ops[q[2]] || 0) + 1 / valid.length;
 					mathExampleKeys({ a: Number(q[0]), b: Number(q[1]), op: q[2], unknown: unknown ? 'F' : null }, null, info)
 						.forEach(([key, , part]) => { if (!/^m_unknown_/.test(key)) keys[key] = (keys[key] || 0) + part / valid.length; });
-				});
-				out = { ops, keys };
+					if (n % 100 === 99) yield;
+				}
+				// (rounded: a result kept in the browser is then exactly the same as one worked out now)
+				const round = shares => { Object.keys(shares).forEach(k => { shares[k] = Math.round(shares[k] * 1e6) / 1e6; }); return shares; };
+				out = { ops: round(ops), keys: round(keys) };
 			}
 		}
 		compositionCache.set(cacheKey, out);
+		if (out) keepCompositions();
 		return out;
 	}
 
@@ -2261,6 +2421,29 @@
 		}
 		return d > 0 && isFinite(d) ? d : null;
 	}
+	/* The class values below come from a handful of classmates, so they are uncertain too: the same comparison over the
+	 * classmates resampled (PEER_BOOT times, seeded - the same data give the same text) gives that spread, added to the
+	 * student's own; degrees of freedom by Welch-Satterthwaite (the student's tasks and the classmates). */
+	const PEER_BOOT = 999;
+	const PEER_TEST = { method: 'new' };   // ('old': the class values taken as exact - only to compare the two; SudInsights._PEER_TEST)
+	const welchDf = (v1, df1, v2, df2) => Math.max(1, (v1 + v2) ** 2 / (v1 ** 2 / Math.max(1, df1) + v2 ** 2 / Math.max(1, df2) || 1));
+	// kinds: [{ vals: each classmate's value in the kind (null: not done), cv: the class value }]; statOf(class values) → number
+	function classSpread(kinds, statOf, key) {
+		if (PEER_TEST.method === 'old' || !kinds.length) return { v: 0, pool: 0 };
+		const users = [];
+		for (let i = 0; i < kinds[0].vals.length; i++) if (kinds.some(k => k.vals[i] != null)) users.push(i);
+		const rnd = seededRandom(hashString(key));
+		let s = 0, s2 = 0, n = 0;
+		const pick = new Array(users.length), v = [];
+		for (let b = 0; b < PEER_BOOT; b++) {
+			for (let j = 0; j < users.length; j++) pick[j] = users[Math.floor(rnd() * users.length)];
+			// (a kind with fewer than 3 of its classmates drawn: the median of those there are - none: the class value)
+			const cvs = kinds.map(k => { v.length = 0; for (const i of pick) if (k.vals[i] != null) v.push(k.vals[i]); return v.length ? median(v) : k.cv; });
+			const x = statOf(cvs);
+			if (isFinite(x)) { s += x; s2 += x * x; n++; }
+		}
+		return { v: n > 1 ? Math.max(0, (s2 - s * s / n) / (n - 1)) : 0, pool: users.length };
+	}
 	function comparePeers(list, peers, subject, opts, value, speedOf) {
 		const out = {};
 		// each classmate's results in this subject (the page passes those of the same period and record kinds)
@@ -2303,12 +2486,17 @@
 		// the time - and for texts' minutes per text its texts)
 		const speedWeight = t => (subject === 'text' ? t.answers : t.minutes);
 		const wmeanBy = (arr, f, wf) => { const w = arr.reduce((s, t) => s + wf(t), 0); return w ? arr.reduce((s, t) => s + f(t) * wf(t), 0) / w : null; };
-		const classValue = (g, f, timedOnly) => {
-			const vals = peerLists.map(peer => { const theirs = peer.filter(o => isSimilar(g[0], o) && (!timedOnly || o.minutes > 0)); return theirs.length ? (timedOnly ? wmeanBy(theirs, f, speedWeight) : wmean(theirs, f)) : null; })
-				.filter(v => v != null && isFinite(v) && v >= 0);
-			return vals.length >= 3 ? median(vals) : null;
-		};
+		// (each classmate's own value in a kind - null when they did none of it; the class value: their median, at least 3)
+		const peerValues = (g, f, timedOnly) => peerLists.map(peer => {
+			const theirs = peer.filter(o => isSimilar(g[0], o) && (!timedOnly || o.minutes > 0));
+			const v = theirs.length ? (timedOnly ? wmeanBy(theirs, f, speedWeight) : wmean(theirs, f)) : null;
+			return v != null && isFinite(v) && v >= 0 ? v : null;
+		});
+		const valueOf = vals => { const v = vals.filter(x => x != null); return v.length >= 3 ? median(v) : null; };
+		const classValue = (g, f, timedOnly) => valueOf(peerValues(g, f, timedOnly));
 		const rows = [], speedRows = [], classPoints = [], classTimedPoints = [];
+		// (the kinds compared, for the class values' uncertainty: the student's answers / time in each)
+		const mistakeKinds = [], speedKinds = [];
 		// (the graph's class curve on the student's mix of kinds: a kind's classmate tasks together weigh as much as the
 		// student's answers in it - the same mix as the text's class average)
 		const mixed = (g, pick, f, target, wf) => {
@@ -2318,28 +2506,34 @@
 			return out;
 		};
 		groups.forEach(g => {
-			const cv = classValue(g, value, false);
+			const vals = peerValues(g, value, false), cv = valueOf(vals);
+			if (cv != null) mistakeKinds.push({ vals, cv, w: g.reduce((a, t) => a + t.answers, 0) });
 			if (cv != null) classPoints.push(...mixed(g, () => true, value, g.reduce((a, t) => a + t.answers, 0), o => o.answers));
 			const timedMine = g.filter(t => t.minutes > 0 && speedOf(t) > 0);
 			if (timedMine.length && classValue(timedMine, speedOf, true) > 0) classTimedPoints.push(...mixed(g, o => o.minutes > 0 && speedOf(o) > 0, speedOf, timedMine.reduce((a, t) => a + speedWeight(t), 0), speedWeight));
 			if (cv != null) g.forEach(t => rows.push({ w: t.answers, y: t.mistakes, mu: t.answers * cv / (subject === 'text' ? 1 : 100), mine: value(t), cls: cv, d: value(t) - cv, date: t.date }));
 			const timedG = g.filter(t => t.minutes > 0 && speedOf(t) > 0);
-			const cs = timedG.length ? classValue(timedG, speedOf, true) : null;
-			if (cs > 0) timedG.forEach(t => speedRows.push({ w: speedWeight(t), mine: speedOf(t), cls: cs, d: Math.log(speedOf(t) / cs), date: t.date }));
+			const speedVals = timedG.length ? peerValues(timedG, speedOf, true) : null;
+			const cs = speedVals ? valueOf(speedVals) : null;
+			if (cs > 0) {
+				timedG.forEach(t => speedRows.push({ w: speedWeight(t), mine: speedOf(t), cls: cs, d: Math.log(speedOf(t) / cs), date: t.date }));
+				speedKinds.push({ vals: speedVals, cv: cs, w: timedG.reduce((a, t) => a + speedWeight(t), 0) });
+			}
 		});
-		const judge = (rs, big) => {
+		const judge = (rs, big, spread) => {
 			if (rs.length < 3 || new Set(rs.map(r => r.date)).size < 2) return { verdict: 'unknown' };
 			const W = rs.reduce((a, r) => a + r.w, 0), W2 = rs.reduce((a, r) => a + r.w * r.w, 0);
 			const D = rs.reduce((a, r) => a + r.w * r.d, 0) / W;
 			const s2 = rs.reduce((a, r) => a + r.w * (r.d - D) ** 2, 0) / Math.max(1e-9, W - W2 / W);
-			const se = Math.sqrt(s2 * W2) / W;
-			const p = se > 0 ? tPValue(D / se, rs.length - 1) : (D === 0 ? 1 : 0);
+			const varStudent = s2 * W2 / W / W, varClass = spread ? spread.v : 0;
+			const se = Math.sqrt(varStudent + varClass);
+			const p = se > 0 ? tPValue(D / se, welchDf(varStudent, rs.length - 1, varClass, spread ? spread.pool - 1 : 1)) : (D === 0 ? 1 : 0);
 			const verdict = !big(D) ? 'similar' : p < 0.05 ? (D > 0 ? 'more' : 'less') : 'unknown';
 			return { verdict, D, mine: rs.reduce((a, r) => a + r.w * r.mine, 0) / W, cls: rs.reduce((a, r) => a + r.w * r.cls, 0) / W };
 		};
 		/* mistakes are counts: the student's total against what the class's rates would give on the same tasks
 		 * (quasi-Poisson rate ratio, the dispersion from the tasks themselves, at least 1; Student's t with n - 1) */
-		const judgeCounts = (rs, big) => {
+		const judgeCounts = (rs, big, spread) => {
 			if (!rs.length) return { verdict: 'none' };   // (no kind of task the classmates did too: nothing to compare)
 			const O = rs.reduce((a, r) => a + r.y, 0), E = rs.reduce((a, r) => a + r.mu, 0), A = rs.reduce((a, r) => a + r.w, 0);
 			const scale = subject === 'text' ? 1 : 100;
@@ -2349,16 +2543,25 @@
 			if (!(E > 0) || !(O > 0)) return { verdict: big(out1.D) ? 'unknown' : 'similar', ...out1 };
 			const rr = O / E;
 			const phi = Math.max(1, rs.reduce((a, r) => a + (r.mu > 0 ? (r.y - rr * r.mu) ** 2 / (rr * r.mu) : 0), 0) / (rs.length - 1));
-			const p = tPValue(Math.log(rr) / Math.sqrt(phi / O), rs.length - 1);
+			const varStudent = phi / O, varClass = spread ? spread.v : 0;
+			const p = tPValue(Math.log(rr) / Math.sqrt(varStudent + varClass), welchDf(varStudent, rs.length - 1, varClass, spread ? spread.pool - 1 : 1));
 			return { verdict: !big(out1.D) ? 'similar' : p < 0.05 ? (out1.D > 0 ? 'more' : 'less') : 'unknown', ...out1 };
 		};
 		/* The numbers said are the ones tested: the student's overall rate on these tasks (mistakes / answers; answers /
 		 * minutes) against the typical classmate's (the median of the classmates' overall rates) on the same mix of tasks. */
-		const m = judgeCounts(rows, d => Math.abs(d) >= (subject === 'text' ? 0.3 : 5));
+		// (the uncertainty: the expected mistakes (log) and the class's average speed (log, by the student's time) over
+		// resampled classmates; only when there is a test to run)
+		const scale = subject === 'text' ? 1 : 100;
+		const seedKey = subject + '|' + rows.map(r => r.y + '/' + r.w).join(',') + '|' + speedRows.length;
+		const testable = rs => rs.length >= 3 && new Set(rs.map(r => r.date)).size >= 2;
+		const mistakeSpread = testable(rows) ? classSpread(mistakeKinds, cvs => Math.log(cvs.reduce((a, cv, k) => a + mistakeKinds[k].w * cv / scale, 0) + 0.5), 'm|' + seedKey) : null;
+		const speedW = speedKinds.reduce((a, k) => a + k.w, 0);
+		const speedSpread = testable(speedRows) ? classSpread(speedKinds, cvs => cvs.reduce((a, cv, k) => a + speedKinds[k].w * Math.log(cv), 0) / speedW, 's|' + seedKey) : null;
+		const m = judgeCounts(rows, d => Math.abs(d) >= (subject === 'text' ? 0.3 : 5), mistakeSpread);
 		out.mistakes = m.verdict;
 		out.mistakesBy = m.D || 0;
 		out.myGroupValue = m.mine != null ? m.mine : null;   // (the class's value over the same tasks: myGroupValue - mistakesBy)
-		const sp = judge(speedRows, d => Math.abs(d) >= Math.log(1.2));
+		const sp = judge(speedRows, d => Math.abs(d) >= Math.log(1.2), speedSpread);
 		// (speed: answers per minute up = faster; texts: minutes per text)
 		out.speed = sp.verdict;
 		out.speedBy = sp.D != null ? Math.exp(sp.D) : 1;
@@ -2497,36 +2700,78 @@
 		(res.insights || []).forEach(i => { if (i.perTaskQ && i.perTaskQ.size) out.set(i.key, { wrong: i.wrong, e: i.questions, tasks: [...i.perTaskQ].map(([idx, q]) => [(i.perTaskWrong && i.perTaskWrong.get(idx)) || 0, q]) }); });
 		return out;
 	}
+	/* One mistake category, a student against the class (comparePatterns). rows: the student's tasks [{ y: wrong, q: chances,
+	 * date }]; have / enough: the classmates' { wrong, e: chances } (enough: at least FEW chances).
+	 * The class's value: the median classmate's rate (at least 3 classmates with enough chances), else all the classmates'
+	 * together. The student's mistakes against what that rate gives on the student's own chances: a rate ratio on the log
+	 * scale (a half added to both: a category never got wrong can still be "rečiau"), its variance from the student's
+	 * tasks (quasi-Poisson: at least the Poisson one) PLUS the class value's own uncertainty - the class value is an
+	 * estimate from a handful of classmates who differ a lot, so it is bootstrapped (the classmates resampled 999 times,
+	 * seeded: the same data give the same text); t with Welch-Satterthwaite degrees of freedom. (Simulated 2026-10-24: with
+	 * no real difference, reported 1.7% - the class value taken as exact before: 5.4%, up to 20% in small, varied classes.)
+	 * → { ref, O, Q, p } or null (too little) */
+	const PATTERN_BOOT = 999;
+	function patternClassTest(rows, have, enough, key) {
+		const pooledE = have.reduce((a, v) => a + v.e, 0);
+		const mode = enough.length >= 3 ? 'median' : have.length >= 3 && pooledE >= 3 * FEW ? 'pooled' : null;
+		if (!mode) return null;
+		const pool = mode === 'median' ? enough : have;
+		const refOf = set => (mode === 'median' ? median(set.map(v => v.wrong / v.e)) : set.reduce((a, v) => a + v.wrong, 0) / set.reduce((a, v) => a + v.e, 0));
+		const ref = refOf(pool);
+		if (rows.length < 3 || new Set(rows.map(r => r.date)).size < 2) return null;
+		const O = rows.reduce((a, r) => a + r.y, 0), Q = rows.reduce((a, r) => a + r.q, 0), E = Q * ref;
+		if (!(E > 0) || !(Q > 0)) return null;
+		const rr = (O + 0.5) / (E + 0.5);
+		const phi = Math.max(1, rows.reduce((a, r) => { const mu = r.q * ref; return a + (mu > 0 ? (r.y - rr * mu) ** 2 / (rr * mu) : 0); }, 0) / (rows.length - 1));
+		const varStudent = phi / (O + 0.5);
+		// the class value's uncertainty: log(expected) over resampled classmates
+		const rnd = seededRandom(hashString(key + '|' + pool.map(v => v.wrong + ':' + Math.round(v.e)).join(',') + '|' + Math.round(Q)));
+		let s = 0, s2 = 0;
+		for (let b = 0; b < PATTERN_BOOT; b++) {
+			const sample = pool.map(() => pool[Math.floor(rnd() * pool.length)]);
+			const l = Math.log(Q * refOf(sample) + 0.5);
+			s += l; s2 += l * l;
+		}
+		const varClass = Math.max(0, (s2 - s * s / PATTERN_BOOT) / (PATTERN_BOOT - 1));
+		// (degrees of freedom: Welch-Satterthwaite for the two variances - the student's tasks and the classmates)
+		const df = Math.max(1, (varStudent + varClass) ** 2 / (varStudent ** 2 / Math.max(1, rows.length - 1) + varClass ** 2 / Math.max(1, pool.length - 1) || 1));
+		return { ref, O, Q, p: tPValue(Math.log(rr) / Math.sqrt(varStudent + varClass), df) };
+	}
 	async function comparePatterns(f, list, subject, opts) {
 		const res = f.grammar || f.math;
 		const peerStats = [];
-		for (const p of opts.peers) { const st = await patternStatsOf(p.tasks, subject, opts); if (st) peerStats.push(st); }
+		for (const p of opts.peers) {
+			await breathe();   // (one classmate at a time, the page free in between; stopped if not wanted any more)
+			if (opts.alive && !opts.alive()) throw CANCELLED;
+			const st = await patternStatsOf(p.tasks, subject, opts);
+			if (st) peerStats.push(st);
+		}
 		if (peerStats.length < 3) { const none = []; none.why = `classmates with patterns: ${peerStats.length}`; return none; }
 		const tests = [];
 		// (not "kita", nor a broad "sudėtyje" / "atimtyje" when its split by crossing ten is there too - it only repeats them)
 		const keys = new Set(res.insights.map(i => i.key));
 		const repeats = i => /^m_op_[AS]$/.test(i.key) && (keys.has('m_cross_' + i.key.slice(-1)) || keys.has('m_plain_' + i.key.slice(-1)));
-		res.insights.filter(i => i.key !== 'kita' && !repeats(i) && i.perTaskQ && i.perTaskQ.size && !i.few && i.area).forEach(i => {
+		for (const i of res.insights.filter(i => i.key !== 'kita' && !repeats(i) && i.perTaskQ && i.perTaskQ.size && !i.few && i.area)) {
+			await breathe();   // (one category at a time)
+			if (opts.alive && !opts.alive()) throw CANCELLED;
 			// (the class's value: the median of the classmates with enough chances each - at least 3 of them; otherwise all the
 			// classmates' together, when at least 3 have it and they have at least 3·FEW chances together)
 			const have = peerStats.map(st => st.get(i.key)).filter(v => v && v.e > 0);
 			const enough = have.filter(v => v.e >= FEW);
-			const pooledE = have.reduce((a, v) => a + v.e, 0);
-			let ref;
-			if (enough.length >= 3) ref = median(enough.map(v => v.wrong / v.e));
-			else if (have.length >= 3 && pooledE >= 3 * FEW) ref = have.reduce((a, v) => a + v.wrong, 0) / pooledE;
-			else return;
-			const rows = [...i.perTaskQ].map(([idx, q]) => ({ y: (i.perTaskWrong && i.perTaskWrong.get(idx)) || 0, mu: q * ref, q, date: list[idx].date }));
-			if (rows.length < 3 || new Set(rows.map(r => r.date)).size < 2) return;
-			const O = rows.reduce((a, r) => a + r.y, 0), E = rows.reduce((a, r) => a + r.mu, 0), Q = rows.reduce((a, r) => a + r.q, 0);
-			if (!(E > 0) || !(Q > 0)) return;
-			// (with a half added to both: a pattern never got wrong can still be "rečiau")
-			const rr = (O + 0.5) / (E + 0.5);
-			const phi = Math.max(1, rows.reduce((a, r) => a + (r.mu > 0 ? (r.y - rr * r.mu) ** 2 / (rr * r.mu) : 0), 0) / (rows.length - 1));
-			const pv = tPValue(Math.log(rr) / Math.sqrt(phi / (O + 0.5)), rows.length - 1);
+			const rows = [...i.perTaskQ].map(([idx, q]) => ({ y: (i.perTaskWrong && i.perTaskWrong.get(idx)) || 0, q, date: list[idx].date }));
+			const t = patternClassTest(rows, have, enough, i.key);
+			if (!t) continue;
+			const { ref, O, Q, p: pv } = t;
+			// (the class's spread: the same classmates the class value comes from, each counting equally - their tasks shared out
+			// by chances within that - so one classmate with very many chances doesn't stand for the whole class)
+			const usedPeers = enough.length >= 3 ? enough : have;
+			const clsDist = usedPeers.flatMap(v => {
+				const own = (v.tasks || []).filter(([, q]) => q > 0), total = own.reduce((a, [, q]) => a + q, 0);
+				return total > 0 ? own.map(([y, q]) => ({ v: y / q * 100, w: q / total })) : [];
+			});
 			tests.push({ key: i.key, area: i.area, p: pv, mine: O / Q * 100, cls: ref * 100,
-				dist: { mine: rows.filter(r => r.q > 0).map(r => ({ v: r.y / r.q * 100, w: r.q })), cls: have.flatMap(v => (v.tasks || []).filter(([, q]) => q > 0).map(([y, q]) => ({ v: y / q * 100, w: q }))), mineMean: O / Q * 100, clsMean: ref * 100 } });
-		});
+				dist: { mine: rows.filter(r => r.q > 0).map(r => ({ v: r.y / r.q * 100, w: r.q })), cls: clsDist, mineMean: O / Q * 100, clsMean: ref * 100 } });
+		}
 		// Holm over the patterns tested
 		const order = tests.slice().sort((a, b) => a.p - b.p), found = [];
 		found.tested = tests;   // (for checking)
@@ -2547,6 +2792,9 @@
 		// spelling: the questions asked, replayed from the seed where it checks out (before the totals: a task narrowed by the
 		// filters gets its exact answers)
 		if (subject === 'grammar') await replayGrammarTasks(list, opts.gradeOf);
+		// maths: every task's (and the classmates' tasks') question mix worked out first, one setting at a time with the page
+		// free in between - the parts below then find them ready instead of generating them all in one long block
+		if (subject === 'math') await warmMathCompositions([...list, ...(Array.isArray(opts.peers) ? opts.peers.flatMap(p => (p.tasks || []).map(t => normalizeTask(t, opts.kindOf)).filter(Boolean)) : [])], opts.alive);
 
 		const sum = (arr, k) => arr.reduce((s, t) => s + t[k], 0);
 		f.answers = sum(list, 'answers');
@@ -3734,6 +3982,7 @@
 		const style = document.createElement('style');
 		style.id = 'sud-insights-style';
 		style.textContent = `
+.ins-busy{opacity:.45;pointer-events:none;transition:opacity .15s}
 .ins-card{margin:0 0 14px;padding:12px 14px 14px;border-radius:14px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.65);color:#1f2a30;font-size:14.5px;line-height:1.5;text-align:left}
 .ins-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
 .ins-title{font-size:15px;font-weight:600;color:#1d566e}
@@ -4407,30 +4656,37 @@
 		injectStyle();
 		const token = String(Math.random());
 		el.dataset.insToken = token;
-		el.innerHTML = summary ? cardHtml('<div class="ins-loading" role="status" aria-label="Ruošiamas apibendrinimas"><span class="ins-spinner"></span></div>', false) : '';
+		// (opts.keep: a card already drawn stays, greyed, until the new one is ready - no spinner in between)
+		if (summary && opts.keep && hasCard(el)) el.classList.add('ins-busy');
+		else { el.classList.remove('ins-busy'); el.innerHTML = summary ? cardHtml(LOADING_HTML, false) : ''; }
 		let f;
 		try {
 			f = await analyze(tasks, { ...opts, alive: () => el.dataset.insToken === token && (!opts.alive || opts.alive()) });
 		} catch (error) {
 			if (error === CANCELLED) return;   // (a newer render, or the page moved on)
 			console.error('SudInsights: analysis failed', error);
-			if (el.dataset.insToken === token) { el.innerHTML = ''; if (views) renderMistakeViews(null, views); }
+			if (el.dataset.insToken === token) { el.classList.remove('ins-busy'); el.innerHTML = ''; if (views) renderMistakeViews(null, views); }
 			return;
 		}
 		if (el.dataset.insToken !== token) return;   // a newer render has started
 		f.openTasks = opts.openTasks;   // (the page's list of tasks - the excluded ones' link)
 		el._insFacts = f;   // (also for checking in the console)
 		if (views) renderMistakeViews(f, views);
+		el.classList.remove('ins-busy');
 		if (!summary) return;
 		cards.add(el);
 		drawCard(el);
 	}
-	// a spinner in the card while the page is still gathering what the text needs
-	function showLoading(el) {
+	const LOADING_HTML = '<div class="ins-loading" role="status" aria-label="Ruošiamas apibendrinimas"><span class="ins-spinner"></span></div>';
+	const hasCard = el => Boolean(el.querySelector('.ins-card')) && !el.querySelector('.ins-loading');
+	// a spinner in the card while the page is still gathering what the text needs (opts.keep: a drawn card stays, greyed)
+	function showLoading(el, opts = {}) {
 		if (!el || !enabled('period')) return;
 		injectStyle();
 		el.dataset.insToken = String(Math.random());   // (a render in progress is dropped)
-		el.innerHTML = cardHtml('<div class="ins-loading" role="status" aria-label="Ruošiamas apibendrinimas"><span class="ins-spinner"></span></div>', false);
+		if (opts.keep && hasCard(el)) { el.classList.add('ins-busy'); return; }
+		el.classList.remove('ins-busy');
+		el.innerHTML = cardHtml(LOADING_HTML, false);
 	}
 	function renderPeriod(el, tasks, opts = {}) {
 		return render(el, tasks, { ...opts, mode: 'period' });
@@ -4440,5 +4696,5 @@
 		return render(el, Array.isArray(row) ? row : [row], { ...opts, mode: 'task', scope: 'period' });
 	}
 
-	window.SudInsights = { _randomSign: randomSign, _markRandomLetters: markRandomLetters, _analyzeGrammar: analyzeGrammarMistakes, _keyboardSlip: keyboardSlip, _loadLexicon: loadLexicon, OUTLIER, showInfo, enabled, analyze, describe, randomLettersOf, renderPeriod, renderTask, showLoading, classifyAnswer, form, trend, verdict, tPValue, INSIGHTS, mathComposition, windowTest, windowChanges, windowChangesAsync, WIN, CANCELLED };
+	window.SudInsights = { _comparePeers: comparePeers, _PEER_TEST: PEER_TEST, _randomSign: randomSign, _markRandomLetters: markRandomLetters, _analyzeGrammar: analyzeGrammarMistakes, _keyboardSlip: keyboardSlip, _loadLexicon: loadLexicon, OUTLIER, showInfo, enabled, analyze, describe, randomLettersOf, renderPeriod, renderTask, showLoading, classifyAnswer, form, trend, verdict, tPValue, INSIGHTS, mathComposition, windowTest, windowChanges, windowChangesAsync, WIN, CANCELLED };
 })();

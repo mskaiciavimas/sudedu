@@ -6139,6 +6139,7 @@
         white-space: nowrap;
     }
     #teacher-gui .tc .due-chip .ti { font-size: 14px; }
+    #teacher-gui .tc .due-chip.started { background: rgba(64, 201, 169, 0.2); color: #17614f; }
     #teacher-gui .tc .due-chip.today { background: rgba(50, 136, 172, 0.24); font-weight: 500; }
     #teacher-gui .tc .due-chip.late { background: rgba(232, 197, 71, 0.32); color: #6b5410; }
     #teacher-gui .tc .due-chip.very-late { background: rgba(213, 126, 126, 0.28); color: #7b2a2a; }
@@ -6239,6 +6240,13 @@
 
     /* a teacher task's result open: the student list shows that task's state (applyArchivePopupStudentStates) */
     #teacher-gui .student-name-indicator-dot.green { background: #40c9a9; }
+    /* started, not yet done: half grey, half the colour it would have (as the student sees it) */
+    #teacher-gui .student-name-indicator-dot.started-neutral,
+    #teacher-gui .student-name-indicator-dot.started-yellow,
+    #teacher-gui .student-name-indicator-dot.started-pink { background: conic-gradient(rgba(31, 42, 48, 0.18) 0 50%, var(--started-half-color) 50% 100%); }
+    #teacher-gui .student-name-indicator-dot.started-neutral { --started-half-color: #40c9a9; }
+    #teacher-gui .student-name-indicator-dot.started-yellow { --started-half-color: #eed202; }
+    #teacher-gui .student-name-indicator-dot.started-pink { --started-half-color: #d57e7e; }
     #teacher-gui .student-name-indicator-dot.not-assigned {
         background: transparent;
         box-shadow: inset 0 0 0 1.5px rgba(31, 42, 48, 0.38);
@@ -6970,9 +6978,15 @@
     .tq-loading { display: flex; align-items: center; justify-content: center; min-height: 120px; padding: 20px 0; }
     /* Analizė: its data still coming - one spinner instead of the (empty / previous) subjects */
     #analysis-loading { display: none; }
-    body.ana-loading #analysis-loading { display: flex; min-height: 220px; }
-    body.ana-loading #student-statistics-math, body.ana-loading #student-statistics-lang-grammar,
-    body.ana-loading #student-statistics-lang-text-comprahension { display: none !important; }
+    body.ana-loading:not(.ana-holding) #analysis-loading { display: flex; min-height: 220px; }
+    body.ana-loading:not(.ana-holding) #student-statistics-math, body.ana-loading:not(.ana-holding) #student-statistics-lang-grammar,
+    body.ana-loading:not(.ana-holding) #student-statistics-lang-text-comprahension { display: none !important; }
+    /* another student / the class chosen in Analizė: the analysis shown stays, greyed and inactive, until the new one is
+       there (analysisHold) */
+    body.ana-stale #teacher-analysis-content { opacity: 0.45; pointer-events: none; transition: opacity 0.15s; }
+    /* …with the loading spinner in the middle of the part of the subject that is on the screen (placeHoldSpinner) */
+    /* (the holder is centred; the spinner inside it turns - its own rotation would replace a centring transform) */
+    .ana-hold-spinner { position: fixed; z-index: 50; display: flex; padding: 12px; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 4px 18px rgba(31, 42, 48, 0.12); }
     .tq-spinner { width: 40px; height: 40px; border: 4px solid rgba(50, 172, 147, 0.2); border-top-color: #32ac93; border-radius: 50%; animation: tq-spin 0.8s linear infinite; }
     @keyframes tq-spin { to { transform: rotate(360deg); } }
     @media (prefers-reduced-motion: reduce) { .tq-spinner { animation-duration: 2.4s; } }
@@ -8096,7 +8110,7 @@
 	<script src="../mental-arithmetic-combinations.js?v=20261017"></script>
     <script src="../parameter_dictionary.js?v=20261024e"></script>
     <script src="../rasyba-generator.js?v=20261018r"></script>
-    <script src="../sudedu-insights.js?v=20261024l"></script>
+    <script src="../sudedu-insights.js?v=20261024r"></script>
     <script src="../sudedu-auto-tasks.js?v=20261018r"></script>
     <script src="../klase-invites.js?v=20261018r"></script>
     <script src="../main-nav-bar.js"></script>
@@ -11988,6 +12002,27 @@ async function confirmAutoAssign() {
 
 // ----- due dates on the teacher's task cards -----
 // a card's chip: "iki spalio 20 d." (tinted when the task is late; "iki šiandien" on the day itself)
+// a given task the student has started: "Pradėta · atsakyta 5/20" (or the time left of a timed one) - '' otherwise
+function teacherTaskProgressText(task, long = false) {
+    if (!task || task.completed || !task.startedAt) return '';
+    let detail = '';
+    try {
+        const duration = typeof task.duration === 'string' ? JSON.parse(task.duration) : task.duration;
+        if (Array.isArray(duration) && duration[0] === 'C39') {
+            const left = Math.max(0, Math.round((Number(duration[1]) || 0) * 60 - (Number(task.secondsElapsed) || 0)));
+            detail = `liko ${Math.floor(left / 60)} min ${left % 60} s`;
+        } else if (Array.isArray(duration)) {
+            const total = Array.isArray(duration[1]) ? duration[1].length : Number(duration[1]) || 0;
+            detail = `atsakyta ${Number(task.answeredCount) || 0}${total ? `/${total}` : ''}`;
+        }
+    } catch (error) { detail = ''; }
+    const day = String(task.startedAt).slice(0, 10);
+    return long ? `Pradėta ${day}${detail ? `, ${detail}` : ''}` : `Pradėta${detail ? ` · ${detail}` : ''}`;
+}
+function taskProgressChipHtml(task) {
+    const text = teacherTaskProgressText(task);
+    return text ? `<span class="due-chip started" title="${escapeTeacherHtml(teacherTaskProgressText(task, true))}"><i class="ti ti-player-play" aria-hidden="true"></i>${escapeTeacherHtml(text)}</span>` : '';
+}
 function taskDueChipHtml(task) {
     const day = taskDueDay(task);
     if (!day) return '';
@@ -13721,12 +13756,18 @@ function focusTaskListSection() {
 
     async function selectTeacherStudent(student) {
         if (!student) return;
+        const ticket = ++teacherViewTicket;
+        startAnalysisHold();   // (Analizė: the view stays where it is, the old analysis greyed until the new one is there)
         document.querySelectorAll('.selection-option').forEach(el => el.classList.remove('selected-option'));
         document.querySelector('.teacher-home-button')?.classList.remove('selected-option');
         document.querySelector(`.student-name[data-student-id="${student.id}"]`)?.classList.add('selected-option');
+        // (new results since: one small request, then only what is new)
+        await resultsCheckBeforeView(student.id);
+        if (ticket !== teacherViewTicket) return;   // (another student or the class chosen meanwhile)
         const statisticsTasks = [...(student.tasks || []), ...(student.archiveTasks || [])];
         const uniqueTasks = Array.from(new Map(statisticsTasks.map(task => [task.taskKey || `assignment:${task.assignmentId}`, task])).values());
         displayStudentStatistics([student.id, student.nickname, student.knowledgeLvl, student.stats || {}, student.username], uniqueTasks);
+        analysisViewStarted();
         openSidebar();
         toggleMainBrowser(true);
     }
@@ -15133,10 +15174,13 @@ let taskHistoryCurrentTask = null;
         document.querySelectorAll('.selection-option').forEach(task => task.classList.remove('selected-option'));
         document.querySelector(".teacher-home-button").classList.add('selected-option');
         const toTaskList = focusTaskListAfterHomeRender;
-        displayTeacherHome();
+        // (new results since: one small request, then only what is new - the class drawn after it)
+        const ticket = ++teacherViewTicket;
+        startAnalysisHold();   // (Analizė: the view stays where it is, the old analysis greyed until the class's is there)
+        resultsCheckBeforeView(null).then(() => { if (ticket === teacherViewTicket) { displayTeacherHome(); analysisViewStarted(); } });
         if (currentAction !== "new-task") openSidebar();
         toggleMainBrowser(true);
-        if (!toTaskList) document.querySelector('.sidebar').scrollTo({ top: 0, behavior: 'smooth' });
+        if (!toTaskList && !analysisHold) document.querySelector('.sidebar').scrollTo({ top: 0, behavior: 'smooth' });
     });
     
     // HISTORY VIEW TABS
@@ -15355,7 +15399,6 @@ function formatTaskLabel(rawTaskInfoJson) {
 }
 
 const embeddedArchiveCache = {};
-const EMBEDDED_ARCHIVE_CACHE_TTL = 30 * 60 * 1000;
 let currentEmbeddedArchiveStudentId = null;
 let classEmbeddedArchiveStudents = null;
 let classEmbeddedArchiveRows = [];
@@ -15667,7 +15710,7 @@ function renderPendingTasksAccordion(tasks, container, classOverview = false) {
                     onclick="togglePendingTaskDescription(this, event)">
             <div class="tr unfinished-task-main">
         <span class="tl unfinished-task-group">${task.group || 'Mokytojo skirta užduotis'}${taskDueIndicator(task) ? `<span class="student-task-indicator ${taskDueIndicator(task)}" title="${escapeTeacherHtml(taskLateTitle(task))}"></span>` : ''}</span>
-        ${taskDueChipHtml(task)}
+        ${taskDueChipHtml(task)}${classOverview ? '' : taskProgressChipHtml(task)}
         <span class="td unfinished-task-date">Priskirta ${dateStr || '—'}</span>
             </div>
             <div class="task-card-details">${descriptionHtml}</div>
@@ -15830,13 +15873,150 @@ let analysisDrawPending = false;
 // twice); its summary cards show the loading spinner meanwhile.
 let analysisDrawQueued = false;
 // one spinner for the whole section while the analysis waits for its data (a student's or the class's results)
+/* Analizė: another student or the class chosen without the view jumping about. Until the subject shown has its new
+ * analysis, the old one stays in place, greyed and inactive (not hidden behind a spinner), and the part being read stays
+ * where it is on the screen: the landmark of the analysis nearest above the upper third of the panel (the panel's head,
+ * the subject, its summary, its mistake tabs, its tables) is pinned - after every change of the page (MutationObserver /
+ * ResizeObserver, before the browser paints) the panel is scrolled by as much as the landmark moved. Over when nothing
+ * is loading any more and the page has been still for HOLD_QUIET ms (at most HOLD_MAX ms); the teacher scrolling ends the
+ * pinning at once. */
+const HOLD_QUIET = 300, HOLD_READY = 150, HOLD_MAX = 15000;
+let analysisHold = null;
+function analysisScroller() {
+    let el = document.getElementById('teacher-analysis-panel');
+    while (el && el !== document.body) {
+        const style = getComputedStyle(el);
+        if (/(auto|scroll)/.test(style.overflowY) && el.scrollHeight > el.clientHeight + 1) return el;
+        el = el.parentElement;
+    }
+    return document.scrollingElement;
+}
+function analysisLandmarks() {
+    const subject = ['math', 'grammar', 'text'].includes(teacherAnalysisSubject) ? teacherAnalysisSubject : 'math';
+    const section = { math: 'student-statistics-math', grammar: 'student-statistics-lang-grammar', text: 'student-statistics-lang-text-comprahension' }[subject];
+    return ['#teacher-analysis-panel', `#${section}`, `#insights-${subject}`, `#insights-${subject}-mistakes .ins-tabs`,
+        subject === 'math' ? '#mathStatisticsMistakesTitle' : subject === 'grammar' ? '#grammarStatisticsMistakesTitle' : '#student-statistics-komponavimas-error-frequency',
+        subject === 'math' ? '#summary-table' : subject === 'grammar' ? '#summary-table-grammar' : '#student-statistics-isdestymas-error-frequency'];
+}
+function startAnalysisHold() {
+    if (typeof teacherSection === 'undefined' || teacherSection !== 'analysis') return;
+    const scroller = analysisScroller();
+    const viewTop = () => (scroller === document.scrollingElement ? 0 : scroller.getBoundingClientRect().top);
+    if (!analysisHold) {
+        // (the landmark being read: the last one above the panel's upper third)
+        const limit = viewTop() + scroller.clientHeight * 0.35;
+        let pick = null;
+        analysisLandmarks().forEach(selector => {
+            const el = document.querySelector(selector);
+            if (!el || !el.offsetParent) return;
+            const top = el.getBoundingClientRect().top;
+            if (!pick || top <= limit) pick = { selector, top };
+        });
+        if (!pick) return;
+        const hold = { scroller, selector: pick.selector, offset: pick.top - viewTop(), pinning: true, started: Date.now(), changed: Date.now() };
+        hold.pin = () => {
+            hold.changed = Date.now();
+            if (!hold.pinning) return;
+            const el = document.querySelector(hold.selector);
+            if (!el || !el.offsetParent) return;
+            const moved = el.getBoundingClientRect().top - viewTop() - hold.offset;
+            if (Math.abs(moved) >= 1) scroller.scrollTop += moved;
+        };
+        // (the teacher scrolling: their position from now on)
+        hold.release = () => { hold.pinning = false; };
+        ['wheel', 'touchstart', 'mousedown'].forEach(type => scroller.addEventListener(type, hold.release, { passive: true }));
+        document.addEventListener('keydown', hold.release);
+        hold.mutations = new MutationObserver(hold.pin);
+        hold.mutations.observe(scroller, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style', 'hidden'] });
+        hold.sizes = new ResizeObserver(hold.pin);
+        [...scroller.children].forEach(child => hold.sizes.observe(child));
+        const content = document.getElementById('teacher-analysis-content');
+        if (content) hold.sizes.observe(content);
+        hold.timer = setInterval(() => analysisHoldTick(), 100);
+        analysisHold = hold;
+    }
+    analysisHold.started = Date.now();
+    analysisHold.changed = Date.now();
+    analysisHold.waitingView = true;   // (until the chosen view starts drawing - see analysisViewStarted)
+    analysisHold.idleSince = 0;
+    document.body.classList.add('ana-holding', 'ana-stale');
+    if (!analysisHold.spinner) {
+        const spinner = document.createElement('div');
+        spinner.className = 'ana-hold-spinner';
+        spinner.innerHTML = '<span class="tq-spinner"></span>';
+        spinner.setAttribute('role', 'status');
+        spinner.setAttribute('aria-label', 'Kraunama');
+        document.body.appendChild(spinner);
+        analysisHold.spinner = spinner;
+        analysisHold.scroller.addEventListener('scroll', placeHoldSpinner, { passive: true });
+        window.addEventListener('resize', placeHoldSpinner);
+    }
+    placeHoldSpinner();
+}
+// the student's / the class's view has started drawing (after the check for new results): from now on its own loading counts
+function analysisViewStarted() {
+    if (analysisHold) { analysisHold.waitingView = false; analysisHold.changed = Date.now(); }
+}
+// the spinner while greyed: in the middle of the visible part of the subject shown (hidden when none of it is visible)
+function placeHoldSpinner() {
+    const hold = analysisHold;
+    if (!hold || !hold.spinner) return;
+    const subject = ['math', 'grammar', 'text'].includes(teacherAnalysisSubject) ? teacherAnalysisSubject : 'math';
+    const section = document.getElementById({ math: 'student-statistics-math', grammar: 'student-statistics-lang-grammar', text: 'student-statistics-lang-text-comprahension' }[subject]);
+    const box = section && section.offsetParent ? section.getBoundingClientRect() : null;
+    const view = hold.scroller === document.scrollingElement ? { top: 0, bottom: window.innerHeight, left: 0, right: window.innerWidth } : hold.scroller.getBoundingClientRect();
+    const top = box ? Math.max(box.top, view.top) : 0, bottom = box ? Math.min(box.bottom, view.bottom) : 0;
+    if (!box || bottom - top < 48) { hold.spinner.style.display = 'none'; return; }
+    hold.spinner.style.display = '';
+    hold.spinner.style.top = `${(top + bottom) / 2}px`;
+    hold.spinner.style.left = `${(Math.max(box.left, view.left) + Math.min(box.right, view.right)) / 2}px`;
+}
+function removeHoldSpinner(hold) {
+    if (!hold || !hold.spinner) return;
+    hold.spinner.remove();
+    hold.spinner = null;
+    hold.scroller.removeEventListener('scroll', placeHoldSpinner);
+    window.removeEventListener('resize', placeHoldSpinner);
+}
+// still loading: the data, a draw waiting, the subject's summary card
+function analysisStillLoading() {
+    if ((analysisHold && analysisHold.waitingView) || resultsCheckJob) return true;
+    if (document.body.classList.contains('ana-loading') || analysisDrawQueued) return true;
+    const subject = ['math', 'grammar', 'text'].includes(teacherAnalysisSubject) ? teacherAnalysisSubject : 'math';
+    const card = document.getElementById(`insights-${subject}`);
+    return Boolean(card && (card.classList.contains('ins-busy') || card.querySelector('.ins-loading')));
+}
+function analysisHoldTick() {
+    const hold = analysisHold;
+    if (!hold) return;
+    // (greyed once: back to normal when nothing has been loading for HOLD_READY ms - and not greyed again in between)
+    const loading = analysisStillLoading();
+    if (loading) hold.idleSince = 0;
+    else if (!hold.idleSince) hold.idleSince = Date.now();
+    else if (Date.now() - hold.idleSince >= HOLD_READY) { document.body.classList.remove('ana-stale'); removeHoldSpinner(hold); }
+    placeHoldSpinner();
+    if (teacherSection !== 'analysis' || Date.now() - hold.started > HOLD_MAX || (!loading && Date.now() - hold.changed > HOLD_QUIET)) endAnalysisHold();
+}
+function endAnalysisHold() {
+    const hold = analysisHold;
+    if (!hold) return;
+    analysisHold = null;
+    clearInterval(hold.timer);
+    hold.mutations.disconnect();
+    hold.sizes.disconnect();
+    ['wheel', 'touchstart', 'mousedown'].forEach(type => hold.scroller.removeEventListener(type, hold.release));
+    document.removeEventListener('keydown', hold.release);
+    document.body.classList.remove('ana-holding', 'ana-stale');
+    removeHoldSpinner(hold);
+}
+
 function updateAnalysisLoading() {
     const waiting = teacherSection === 'analysis' && (currentStatisticsIsClass ? classArchivePending : analysisArchivePending);
     document.body.classList.toggle('ana-loading', Boolean(waiting));
 }
 function scheduleAnalysisDraw() {
     if (teacherSection !== 'analysis') { analysisDrawPending = true; return; }
-    if (window.SudInsights && SudInsights.showLoading) ['insights-math', 'insights-grammar', 'insights-text'].forEach(id => { const card = document.getElementById(id); if (card) SudInsights.showLoading(card); });
+    if (window.SudInsights && SudInsights.showLoading) ['insights-math', 'insights-grammar', 'insights-text'].forEach(id => { const card = document.getElementById(id); if (card) SudInsights.showLoading(card, { keep: Boolean(analysisHold) }); });
     if (analysisDrawQueued) return;
     analysisDrawQueued = true;
     requestAnimationFrame(() => setTimeout(() => {
@@ -15899,21 +16079,16 @@ async function refreshDisplayedStatistics() {
         const studentId = currentEmbeddedArchiveStudentId;
         analysisArchivePending = true;
         updateAnalysisLoading();
-        let response = null;
+        let rows = null;
         try {
-            response = await apiFetch(`${apiBase}students/task-history/${studentId}?teacherOnly=false`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
+            rows = await openedStudentRows(studentId);
         } finally {
             analysisArchivePending = false;
             updateAnalysisLoading();
         }
         // (another student may have been opened meanwhile)
         if (studentId !== currentEmbeddedArchiveStudentId || currentStatisticsIsClass) return;
-        if (response?.ok) {
-            analysisArchiveRows = normalizeArchiveRows(await response.json(), studentId);
-        }
+        if (rows) analysisArchiveRows = rows;
     }
 
     scheduleAnalysisDraw();
@@ -16036,7 +16211,7 @@ function renderAnalysisInsights(tasks) {
     // (the subject on the screen first; each card stops when a newer analysis starts or the teacher leaves Analizė)
     const alive = () => run === analysisInsightsRun && teacherSection === 'analysis';
     const draw = async peers => {
-        ['insights-math', 'insights-grammar', 'insights-text'].forEach(id => { const card = document.getElementById(id); if (card) SudInsights.showLoading(card); });
+        ['insights-math', 'insights-grammar', 'insights-text'].forEach(id => { const card = document.getElementById(id); if (card) SudInsights.showLoading(card, { keep: Boolean(analysisHold) }); });
         const subjects = [['math', 'insights-math', { subject: 'math', mistakeViews: mathViews }], ['grammar', 'insights-grammar', { subject: 'grammar', mistakeViews }], ['text', 'insights-text', { subject: 'text' }]];
         while (subjects.length) {
             // (the subject on the screen now - the teacher may have switched meanwhile - else the next one)
@@ -16047,7 +16222,7 @@ function renderAnalysisInsights(tasks) {
                 if (run === analysisInsightsRun) analysisDrawPending = true;   // (left Analizė: drawn when it is opened again)
                 return;
             }
-            try { await SudInsights.renderPeriod(document.getElementById(id), tasks, { ...options, ...extra, peers, alive }); } catch (error) { console.error('insights:', error); }
+            try { await SudInsights.renderPeriod(document.getElementById(id), tasks, { ...options, ...extra, peers, alive, keep: Boolean(analysisHold) }); } catch (error) { console.error('insights:', error); }
             if (!alive()) {
                 if (run === analysisInsightsRun) analysisDrawPending = true;
                 return;
@@ -16055,7 +16230,7 @@ function renderAnalysisInsights(tasks) {
         }
     };
     const cards = ['insights-math', 'insights-grammar', 'insights-text'].map(id => document.getElementById(id));
-    const waiting = () => cards.forEach(card => SudInsights.showLoading(card));
+    const waiting = () => cards.forEach(card => SudInsights.showLoading(card, { keep: Boolean(analysisHold) }));
     // still coming: a student's archive rows (asked for when the analysis opens) / the class's rows - drawn when they come
     if (isClass ? classArchivePending : (currentEmbeddedArchiveStudentId && (analysisArchivePending || analysisArchiveLoadedFor !== currentEmbeddedArchiveStudentId))) {
         waiting();
@@ -16178,48 +16353,203 @@ function patternMistakesTable(items, id, subject = 'grammar') {
     box?.addEventListener('change', () => setTimeout(relabel));   // (the words / categories switch draws the table again)
 }
 
+/* Every student's results (archive rows), loaded once and served to whatever needs them: an entry serves any request it
+ * covers - every kind is always asked for, and it covers a start date it was loaded from or later ('' = all dates) - so a
+ * change of the filters (period, record kinds, "žiūrėti senesnes") asks the server only when more is needed.
+ * Kept up to date at every click on a student or the house button (checkNewResults): the server tells each student's
+ * newest result id, and only the results added since are loaded (results are only ever added; when some were deleted
+ * the archive's epoch changes and everything is loaded anew). */
+const PEER_ROW_KINDS = ['game', 'legacy', 'self', 'teacher'];
+const studentRowsStore = new Map();   // student id → { from, kinds, maxId, generation, rows: Promise<rows | null> }
+var peerRowsGeneration = 0;           // (var: a change of it drops everything kept)
+function storedStudentRows(id, from, kindList) {
+    const c = studentRowsStore.get(String(id));
+    const ok = c && c.generation === peerRowsGeneration && (!c.from || (from && c.from <= from)) && kindList.every(k => c.kinds.has(k));
+    return ok ? c.rows : null;
+}
+function loadStudentRows(id, from) {
+    const key = String(id);
+    const params = new URLSearchParams({ kinds: PEER_ROW_KINDS.join(',') });
+    if (from) params.set('from', from);
+    const ask = async () => {
+        const response = await apiFetch(`${apiBase}students/task-history/${id}?${params.toString()}`, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+        if (!response || !response.ok) throw new Error(`task-history ${id}: ${response ? response.status : 'no response'}`);
+        return normalizeArchiveRows(await response.json(), id);
+    };
+    // (the newest result it has: the newest row's id - or, with none from that start, the newest the last check knew of;
+    // unknown (null) - then the next check that finds any result loads it anew)
+    const known = resultsState ? resultsState.newest.get(key) : undefined;
+    const entry = { from: from || '', kinds: new Set(PEER_ROW_KINDS), maxId: undefined, generation: peerRowsGeneration, rows: null };
+    entry.rows = ask().catch(ask).then(rows => {
+        const top = rows.reduce((m, row) => Math.max(m, Number(row.id) || 0), known ?? 0);
+        entry.maxId = rows.length || known !== undefined ? top : null;
+        return rows;
+    }).catch(error => {
+        console.warn('results not loaded:', error);
+        if (studentRowsStore.get(key) === entry) studentRowsStore.delete(key);   // (asked again next time)
+        return null;
+    });
+    studentRowsStore.set(key, entry);
+    return entry.rows;
+}
+// the student opened: all their results (each user gets its own copies of the rows)
+async function openedStudentRows(id) {
+    await resultsCheckDone;
+    const rows = await (storedStudentRows(id, '', PEER_ROW_KINDS) || loadStudentRows(id, ''));
+    return rows ? rows.map(row => ({ ...row })) : null;
+}
+
+/* New results: one small request (each student's newest result id), then task-history ?afterId= for the students with
+ * newer results than kept - only those rows. Students added to or gone from the class: the page's data loaded again.
+ * → Set of the students whose results changed, or null when the check failed. A check finished less than
+ * RESULTS_CHECK_REUSE ms ago is not repeated; the loads wait for one in progress (at most RESULTS_CHECK_WAIT ms). */
+const RESULTS_CHECK_REUSE = 2000, RESULTS_CHECK_WAIT = 4000;
+var resultsState = null;                    // { epoch, newest: Map id → newest result id } (the last check's answer)
+let resultsCheckJob = null, resultsCheckedAt = 0;
+var resultsCheckDone = Promise.resolve();   // (var: read by loads that may start before this line is read)
+var teacherViewTicket = 0;                  // (a newer click wins: the view of an older one is not drawn after it)
+function checkNewResults() {
+    if (resultsCheckJob) return resultsCheckJob;
+    if (Date.now() - resultsCheckedAt < RESULTS_CHECK_REUSE) return Promise.resolve(new Set());
+    resultsCheckJob = (async () => {
+        const response = await apiFetch(`${apiBase}students/results-state`, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+        if (!response || !response.ok) throw new Error(`results-state: ${response ? response.status : 'no response'}`);
+        const body = await response.json();
+        const newest = new Map((body.students || []).map(([id, top]) => [String(id), Number(top) || 0]));
+        const assignmentKeys = new Map((body.students || []).filter(row => row.length > 2).map(([id, , key]) => [String(id), String(key)]));
+        const changed = new Set();
+        const before = resultsState;
+        resultsState = { epoch: body.epoch, newest };
+        // (students joined or left the class: everything loaded again, as after any change of the class)
+        const known = new Set((studentList || []).map(student => String(student.id)));
+        if (known.size !== newest.size || [...newest.keys()].some(id => !known.has(id))) {
+            peerRowsGeneration++;
+            studentRowsStore.clear();
+            fetchDataForTeachers();
+            newest.forEach((top, id) => changed.add(id));
+            return changed;
+        }
+        // (results deleted somewhere - an admin's cleanup, a deleted account: all kept results loaded anew)
+        if (before && JSON.stringify(before.epoch) !== JSON.stringify(body.epoch)) {
+            peerRowsGeneration++;
+            studentRowsStore.clear();
+            newest.forEach((top, id) => changed.add(id));
+            return changed;
+        }
+        const behind = [];
+        studentRowsStore.forEach((entry, id) => {
+            const top = newest.get(id) || 0;
+            if (entry.generation !== peerRowsGeneration || entry.maxId === undefined) return;   // (still loading: as new)
+            if (entry.maxId === null) { if (top > 0) { studentRowsStore.delete(id); changed.add(id); } return; }
+            if (top > entry.maxId) behind.push([id, entry]);
+        });
+        const addNewer = async ([id, entry]) => {
+            const params = new URLSearchParams({ kinds: PEER_ROW_KINDS.join(','), afterId: String(entry.maxId) });
+            let added = null;
+            try {
+                const r = await apiFetch(`${apiBase}students/task-history/${id}?${params.toString()}`, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+                if (r && r.ok) added = normalizeArchiveRows(await r.json(), Number(id));
+            } catch (error) { added = null; }
+            changed.add(id);
+            if (!added) { if (studentRowsStore.get(id) === entry) studentRowsStore.delete(id); return; }   // (loaded anew when needed)
+            const old = await entry.rows;
+            if (studentRowsStore.get(id) !== entry || !old) return;
+            // (only the newer ones - also when a server of the version before sends them all)
+            const fresh = added.filter(row => Number(row.id) > entry.maxId);
+            if (!fresh.length) return;
+            entry.rows = Promise.resolve([...fresh.filter(row => !entry.from || String(row.date) >= entry.from), ...old]);
+            entry.maxId = fresh.reduce((m, row) => Math.max(m, Number(row.id)), entry.maxId);
+            addCompletedTeacherTasks(id, fresh);
+        };
+        for (let i = 0; i < behind.length; i += 4) await Promise.all(behind.slice(i, i + 4).map(addNewer));
+        // given tasks started, worked on, done or given: the changed students' given tasks (one request)
+        const moved = (studentList || []).filter(student => assignmentKeys.has(String(student.id)) && student.assignmentKey !== undefined && assignmentKeys.get(String(student.id)) !== student.assignmentKey);
+        if (moved.length) {
+            try {
+                const r = await apiFetch(`${apiBase}students/pending-tasks?ids=${moved.map(student => student.id).join(',')}`, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+                if (r && r.ok) ((await r.json()).students || []).forEach(([id, given, key]) => { replaceGivenTasks(id, given, key); changed.add(String(id)); });
+            } catch (error) { console.warn('given tasks not checked:', error); }
+        }
+        return changed;
+    })().catch(error => { console.warn('new results not checked:', error); return null; })
+        .finally(() => { resultsCheckJob = null; resultsCheckedAt = Date.now(); });
+    resultsCheckDone = Promise.race([resultsCheckJob, new Promise(resolve => setTimeout(resolve, RESULTS_CHECK_WAIT))]);
+    return resultsCheckJob;
+}
+// a teacher's task newly done: in the student's task list as done (as the server lists it), and the class's task board
+// fetched again when it is shown
+function addCompletedTeacherTasks(id, rows) {
+    const student = (studentList || []).find(s => String(s.id) === String(id));
+    const teacherRows = rows.filter(row => row.teacherTaskId);
+    if (!student || !teacherRows.length) return;
+    teacherRows.slice().reverse().forEach(row => {
+        const taskKey = `teacher:${row.teacherTaskId}`;
+        const done = {
+            assignmentId: row.id, taskKey, completed: true, group: row.group, duration: row.duration, taskDescription: row.taskInfo,
+            completionDate: row.date, dueDate: row.dueDate || null, onTime: row.onTime ?? null,
+            result: { correct: row.correct, mistakes: row.mistakes, totalAnswers: row.totalAnswers, answerRate: row.answerRate, mistakesDetail: row.mistakesDetail }
+        };
+        const tasks = (student.tasks || []).filter(task => task.taskKey !== taskKey);
+        const pending = tasks.filter(task => !task.completed), completed = tasks.filter(task => task.completed);
+        student.tasks = [...pending, done, ...completed];
+        student.archiveTasks = [{ ...done, assignmentDate: null }, ...(student.archiveTasks || []).filter(task => task.taskKey !== taskKey)];
+        student.pendingTaskCount = pending.length;
+    });
+    classTeacherTasksStale = true;
+}
+// a student's given tasks as they are now (with their progress); the done ones stay as they were
+function replaceGivenTasks(id, given, key) {
+    const student = (studentList || []).find(s => String(s.id) === String(id));
+    if (!student || !Array.isArray(given)) return;
+    const before = new Map((student.tasks || []).filter(task => !task.completed).map(task => [task.taskKey, task]));
+    const pending = given.map(task => ({ ...task, indicator: task.indicator ?? before.get(task.taskKey)?.indicator ?? null }));
+    student.tasks = [...pending, ...(student.tasks || []).filter(task => task.completed)];
+    student.pendingTaskCount = pending.length;
+    student.assignmentKey = key;
+    classTeacherTasksStale = true;
+}
+// before a student's or the class's view: the check (waited for at most RESULTS_CHECK_WAIT ms); when it fails, the
+// student's results are loaded anew as before
+async function resultsCheckBeforeView(studentId) {
+    const result = await Promise.race([checkNewResults(), new Promise(resolve => setTimeout(() => resolve('slow'), RESULTS_CHECK_WAIT))]);
+    if (result === null && studentId != null) studentRowsStore.delete(String(studentId));
+}
 // The classmates' results for the comparison in the written summary: their assigned tasks (already on the page) and
-// archive rows of the same period and record kinds. Loaded once per period and kinds, at most 4 requests at a time.
-const peerTaskCache = new Map();
+// archive rows of the same period and record kinds - every student but the one analysed. At most 4 requests at a time;
+// a classmate whose rows could not be loaded is left out (not counted as having done nothing).
+async function peerRowsFor(student, period, kindList) {
+    await resultsCheckDone;
+    return storedStudentRows(student.id, period.start, kindList) || loadStudentRows(student.id, period.start);
+}
 function loadPeerTasks(studentId, period, kinds) {
     const others = (studentList || []).filter(student => Number(student.id) !== Number(studentId));
     if (others.length < 4) return Promise.resolve(null);
     const kindList = [...kinds].sort();
-    const key = `${period.start}|${period.end}|${kindList.join(',')}`;
-    if (!peerTaskCache.has(key)) {
-        const inPeriod = date => (!period.start || date >= period.start) && (!period.end || date <= period.end);
-        const load = async student => {
-            const params = new URLSearchParams({ kinds: kindList.join(',') });
-            if (period.start) params.set('from', period.start);
-            let rows = [];
-            try {
-                const response = await apiFetch(`${apiBase}students/task-history/${student.id}?${params.toString()}`, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
-                if (response && response.ok) rows = normalizeArchiveRows(await response.json(), student.id);
-            } catch (error) { rows = []; }
-            const tasks = [];
-            const keys = new Set();
-            (student.tasks || []).forEach(task => {
-                const date = String(task.completionDate || '').slice(0, 10);
-                if (!task.completed || !inPeriod(date) || !kinds.has(resultKindOf(task))) return;
-                if (task.taskKey) keys.add(task.taskKey);
-                tasks.push({ ...task, studentId: student.id });
-            });
-            rows.forEach(row => {
-                const date = String(row.date || '').slice(0, 10);
-                if (!inPeriod(date) || !kinds.has(resultKindOf(row))) return;     // (a server of the version before ignores kinds and from)
-                if (row.teacherTaskId && keys.has(`teacher:${row.teacherTaskId}`)) return;
-                tasks.push({ ...row, resultKind: resultKindOf(row), studentId: student.id });
-            });
-            return { studentId: student.id, tasks };
-        };
-        const job = (async () => {
-            const results = [];
-            for (let i = 0; i < others.length; i += 4) results.push(...await Promise.all(others.slice(i, i + 4).map(load)));
-            return results;
-        })().catch(() => null);
-        peerTaskCache.set(key, job);
-    }
-    return peerTaskCache.get(key);
+    const inPeriod = date => (!period.start || date >= period.start) && (!period.end || date <= period.end);
+    const load = async student => {
+        const rows = await peerRowsFor(student, period, kindList);
+        if (!rows) return null;
+        const tasks = [];
+        const keys = new Set();
+        (student.tasks || []).forEach(task => {
+            const date = String(task.completionDate || '').slice(0, 10);
+            if (!task.completed || !inPeriod(date) || !kinds.has(resultKindOf(task))) return;
+            if (task.taskKey) keys.add(task.taskKey);
+            tasks.push({ ...task, studentId: student.id });
+        });
+        rows.forEach(row => {
+            const date = String(row.date || '').slice(0, 10);
+            if (!inPeriod(date) || !kinds.has(resultKindOf(row))) return;     // (a server of the version before ignores kinds and from)
+            if (row.teacherTaskId && keys.has(`teacher:${row.teacherTaskId}`)) return;
+            tasks.push({ ...row, resultKind: resultKindOf(row), studentId: student.id });
+        });
+        return { studentId: student.id, tasks };
+    };
+    return (async () => {
+        const results = [];
+        for (let i = 0; i < others.length; i += 4) results.push(...await Promise.all(others.slice(i, i + 4).map(load)));
+        return results.filter(Boolean);
+    })().catch(() => null);
 }
 
 function getEmbeddedArchiveTaskKey(row) {
@@ -16669,7 +16999,7 @@ async function loadClassEmbeddedTaskArchive(students) {
 }
 
 // (the class's results, per student: loaded once for the students, kinds and period shown - see fetchDataForTeachers)
-let classArchiveCache = null, classArchiveStale = false;
+let classArchiveStale = false;
 async function fetchAndRenderClassEmbeddedArchive() {
     const container = document.getElementById("embedded-archive-table-container");
     if (!container || !classEmbeddedArchiveStudents) return;
@@ -16680,28 +17010,22 @@ async function fetchAndRenderClassEmbeddedArchive() {
     const startDate = document.getElementById("embeddedArchiveStartDate").value;
     const endDate = document.getElementById("embeddedArchiveEndDate").value;
 
-    const cacheKey = JSON.stringify([classEmbeddedArchiveStudents.map(student => student.id), withSelf, embeddedArchiveShowingOlder, statisticsStartDateISO()]);
+    const students = classEmbeddedArchiveStudents;
+    const from = embeddedArchiveShowingOlder ? '' : statisticsStartDateISO();
     try {
-        const cached = !classArchiveStale && classArchiveCache && classArchiveCache.key === cacheKey ? classArchiveCache.rowsByStudent : null;
-        if (!cached) container.innerHTML = '<div class="tq-loading" role="status" aria-label="Kraunama"><span class="tq-spinner"></span></div>';
-        const rowsByStudent = cached || await Promise.all(classEmbeddedArchiveStudents.map(async student => {
-            const params = new URLSearchParams({ kinds: withSelf ? 'game,legacy,self,teacher' : 'game,legacy,teacher' });
-            if (!embeddedArchiveShowingOlder) params.set('from', statisticsStartDateISO());
-            const response = await apiFetch(`${apiBase}students/task-history/${student.id}?${params.toString()}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            if (!response || !response.ok) throw new Error(`Could not load archive for student ${student.id}`);
-            const rows = normalizeArchiveRows(await response.json(), student.id)
-                .filter(row => (withSelf || resultKindOf(row) !== 'self') && (embeddedArchiveShowingOlder || String(row.date) >= statisticsStartDateISO()));
-            return rows.map(row => ({
-                ...row,
-                studentId: student.id,
-                studentName: student.nickname || student.username
-            }));
-        }));
-        classArchiveCache = { key: cacheKey, rowsByStudent };
+        // (the students' kept results - every kind, from that start or earlier; the others loaded - each time narrowed to
+        // what is wanted now)
+        await resultsCheckDone;
+        const kept = students.map(student => storedStudentRows(student.id, from, PEER_ROW_KINDS));
+        if (kept.some(rows => !rows)) container.innerHTML = '<div class="tq-loading" role="status" aria-label="Kraunama"><span class="tq-spinner"></span></div>';
+        const loaded = await Promise.all(students.map((student, i) => kept[i] || loadStudentRows(student.id, from)));
+        const missing = loaded.findIndex(rows => !rows);
+        if (missing >= 0) throw new Error(`Could not load archive for student ${students[missing].id}`);
+        if (students !== classEmbeddedArchiveStudents) return;   // (another view opened meanwhile)
         classArchiveStale = false;
+        const rowsByStudent = loaded.map((rows, i) => rows
+            .filter(row => (withSelf || resultKindOf(row) !== 'self') && (!from || String(row.date) >= from))
+            .map(row => ({ ...row, studentId: students[i].id, studentName: students[i].nickname || students[i].username })));
 
         // (own practice: for the analysis only - not rows of the results table)
         const classSelfRows = rowsByStudent.flat().filter(row => resultKindOf(row) === 'self');
@@ -16765,20 +17089,6 @@ async function fetchAndRenderClassEmbeddedArchive() {
     }
 }
 
-// a student's results already loaded with the class's (the class overview loads every student's): the same rows, when
-// they were asked for the same period and with every kind wanted here (no second request on a click on the student)
-function classArchiveRowsFor(studentId, kinds) {
-    if (!classArchiveCache || classArchiveStale || embeddedArchiveShowingOlder) return null;
-    let key;
-    try { key = JSON.parse(classArchiveCache.key); } catch (e) { return null; }
-    const [ids, withSelf, older, from] = key;
-    if (older || from !== statisticsStartDateISO()) return null;
-    if (String(kinds).split(',').includes('self') && !withSelf) return null;
-    const i = ids.findIndex(id => String(id) === String(studentId));
-    if (i < 0 || !Array.isArray(classArchiveCache.rowsByStudent[i])) return null;
-    return classArchiveCache.rowsByStudent[i].map(({ studentName, ...row }) => row);
-}
-
 async function fetchAndRenderEmbeddedArchive() {
     const container = document.getElementById("embedded-archive-table-container");
     if (!container || !currentEmbeddedArchiveStudentId) return;
@@ -16794,26 +17104,16 @@ async function fetchAndRenderEmbeddedArchive() {
         const cached = embeddedArchiveCache[cacheKey];
         const now = Date.now();
 
-        const fromClass = classArchiveRowsFor(currentEmbeddedArchiveStudentId, kinds);
-        if (cached && (now - cached.cachedAt) < EMBEDDED_ARCHIVE_CACHE_TTL) {
-            allRows = cached.rows;
-        } else if (fromClass) {
-            allRows = fromClass;
-            embeddedArchiveCache[cacheKey] = { rows: allRows, cachedAt: now };
-        } else {
-            container.innerHTML = '<div class="task-archive-empty">Kraunama...</div>';
-            const params = new URLSearchParams();
-            if (!embeddedArchiveShowingOlder) params.set('from', statisticsStartDateISO());
-            params.set('kinds', kinds);
-            const url = `${apiBase}students/task-history/${currentEmbeddedArchiveStudentId}?${params.toString()}`;
-            const response = await apiFetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
-
-            if (!response || !response.ok) {
+        // (the student's results, every kind and date - kept, shared with the analysis; the table picks its own)
+        {
+            const studentId = currentEmbeddedArchiveStudentId;
+            if (!storedStudentRows(studentId, '', PEER_ROW_KINDS)) container.innerHTML = '<div class="task-archive-empty">Kraunama...</div>';
+            allRows = await openedStudentRows(studentId);
+            if (studentId !== currentEmbeddedArchiveStudentId) return;   // (another student opened meanwhile)
+            if (!allRows) {
                 container.innerHTML = '<div class="task-archive-empty">Klaida gaunant duomenis.</div>';
                 return;
             }
-
-            allRows = normalizeArchiveRows(await response.json(), currentEmbeddedArchiveStudentId);
             embeddedArchiveCache[cacheKey] = { rows: allRows, cachedAt: now };
         }
 
@@ -16883,12 +17183,10 @@ async function renderStatisticsAnalysisTaskList() {
     const { start, end } = analysisDateRange();
     let rows = classEmbeddedArchiveStudents ? classEmbeddedArchiveRows : analysisArchiveRows;
     if (!classEmbeddedArchiveStudents && currentEmbeddedArchiveStudentId && rows.length === 0) {
-        const response = await apiFetch(`${apiBase}students/task-history/${currentEmbeddedArchiveStudentId}?teacherOnly=false`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        if (!response || !response.ok) return;
-        analysisArchiveRows = normalizeArchiveRows(await response.json(), currentEmbeddedArchiveStudentId);
+        const studentId = currentEmbeddedArchiveStudentId;
+        const loaded = await openedStudentRows(studentId);
+        if (!loaded || studentId !== currentEmbeddedArchiveStudentId || classEmbeddedArchiveStudents) return;
+        analysisArchiveRows = loaded;
         rows = analysisArchiveRows;
     }
 
@@ -17262,6 +17560,7 @@ function applyArchivePopupStudentStates(teacherTaskId) {
     paintArchivePopupStudentDots(student => {
         const { state, task } = teacherTaskStateOf(student, teacherTaskId);
         if (state === 'completed') return { colour: 'green', title: task.onTime === false ? 'Užduotis atlikta pavėluotai' : 'Užduotis atlikta' };
+        if (state === 'pending' && task.startedAt) return { colour: `started-${taskDueIndicator(task) || 'neutral'}`, title: `${teacherTaskProgressText(task, true)}, dar neatlikta.${taskDueIndicator(task) ? ` ${taskLateTitle(task)}` : ''}` };
         if (state === 'pending' && taskDueIndicator(task)) return { colour: taskDueIndicator(task), title: `Užduotis neatlikta. ${taskLateTitle(task)}` };
         if (state === 'none') return { colour: 'not-assigned', title: 'Ši užduotis nebuvo skirta' };
         return { colour: 'neutral', title: 'Užduotis skirta, dar neatlikta' };
@@ -17303,6 +17602,7 @@ async function applyArchivePopupSameTask(row) {
         const pending = pendingGroupTaskOf(student, archivePopupSameTask.group);
         if (pending) {
             const late = taskDueIndicator(pending);
+            if (pending.startedAt) return { colour: `started-${late || 'neutral'}`, title: `${teacherTaskProgressText(pending, true)}, dar neatlikta.${late ? ` ${taskLateTitle(pending)}` : ''}` };
             return { colour: late || 'neutral', title: late ? `Užduotis neatlikta. ${taskLateTitle(pending)}` : 'Užduotis skirta, dar neatlikta' };
         }
         return { colour: 'not-assigned', title: 'Šios užduoties rezultato nėra' };
@@ -17350,7 +17650,8 @@ function showArchivePopupPending(student, task) {
     const assigned = task.assignmentDate ? localDayString(new Date(task.assignmentDate)) : '';
     const details = [
         due ? `Atlikti iki ${formatDueDay(due, true)}${late ? ` <span class="archive-popup-late ${late}">vėluojama</span>` : ''}` : '',
-        assigned ? `Priskirta ${assigned}` : ''
+        assigned ? `Priskirta ${assigned}` : '',
+        escapeTeacherHtml(teacherTaskProgressText(task, true))
     ].filter(Boolean).map(line => `<span>${line}</span>`).join('');
     showArchivePopupStudentMessage(student, `<div class="archive-popup-status not-done${late ? ` ${late}` : ''}">
             <i class="ti ti-hourglass-high" aria-hidden="true"></i>

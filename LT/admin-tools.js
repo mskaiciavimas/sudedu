@@ -134,6 +134,9 @@
                 <label>Your admin password <input type="password" class="at-pw-admin" autocomplete="current-password"></label>
                 <button type="button" class="btn btn-danger small-btn at-pw-set">Set password</button>
             </div>
+            <p class="at-pw-note">Or, when they don't get the password e-mail: a link to send them yourself - they choose a new password
+            there. It is valid for 24 hours and works once.</p>
+            <div class="at-pw-row"><button type="button" class="btn small-btn at-pw-link">🔗 Create reset link</button></div>
             <div class="at-pw-result"></div>
         </div>`;
     }
@@ -164,6 +167,28 @@
                 if (copy) copy.addEventListener('click', () => navigator.clipboard && navigator.clipboard.writeText(body.generatedPassword).then(() => { copy.textContent = 'Copied'; }));
             };
             panel.querySelector('.at-pw-set').addEventListener('click', () => run(false));
+            // a reset link to send the user (the admin's password above confirms it)
+            panel.querySelector('.at-pw-link').addEventListener('click', async () => {
+                const adminPassword = panel.querySelector('.at-pw-admin').value;
+                if (!adminPassword) { out.innerHTML = '<div class="message error">Enter your admin password to confirm.</div>'; return; }
+                out.innerHTML = '<div class="loading">Creating…</div>';
+                const res = await apiFetch(`${apiBase}admin/user/${userId}/reset-link`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adminPassword })
+                });
+                const body = res ? await res.json().catch(() => ({})) : {};
+                panel.querySelector('.at-pw-admin').value = '';
+                if (!res || !res.ok) { out.innerHTML = `<div class="message error">${esc(body.message || 'Not created')}</div>`; return; }
+                const until = new Date(body.expiresAt).toLocaleString('lt-LT', { dateStyle: 'short', timeStyle: 'short' });
+                out.innerHTML = `<div class="message success">Reset link for ${esc(body.username)} - valid until ${esc(until)}, works once:
+                    <div class="at-pw-linkrow"><input type="text" class="at-pw-linkbox" readonly value="${esc(body.link)}"><button type="button" class="btn small-btn at-pw-copy">Copy</button></div></div>`;
+                const box = out.querySelector('.at-pw-linkbox'), copy = out.querySelector('.at-pw-copy');
+                box.addEventListener('focus', () => box.select());
+                copy.addEventListener('click', () => {
+                    const done = () => { copy.textContent = 'Copied'; };
+                    if (navigator.clipboard) navigator.clipboard.writeText(body.link).then(done, () => { box.select(); document.execCommand('copy'); done(); });
+                    else { box.select(); document.execCommand('copy'); done(); }
+                });
+            });
             panel.querySelector('.at-pw-gen').addEventListener('click', () => run(true));
         });
     }
@@ -541,6 +566,8 @@
         .at-pw-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:8px}
         .at-pw-row label{display:flex;flex-direction:column;gap:4px;font-size:13px}
         .at-pw-row input{padding:7px 10px;border-radius:8px;border:1px solid rgba(0,0,0,.15);font:inherit;min-width:220px}
+        .at-pw-linkrow{display:flex;gap:8px;align-items:center;margin-top:6px}
+        .at-pw-linkbox{flex:1;min-width:0;padding:6px 8px;border-radius:8px;border:1px solid rgba(0,0,0,.15);font:inherit;font-size:12px;background:#fff}
         .at-pw-code{font-size:16px;padding:2px 8px;background:#fff;border-radius:6px;user-select:all}
         .at-access{margin-top:20px;padding:16px;border-radius:14px;background:rgba(255,255,255,.35)}
         .at-ask{width:min(440px,100%)}
