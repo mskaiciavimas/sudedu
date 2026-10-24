@@ -6968,6 +6968,11 @@
     .tx-list[hidden] { display: none; }
     /* loading: the pet room's spinner (the teacher's task list and results while their data comes) */
     .tq-loading { display: flex; align-items: center; justify-content: center; min-height: 120px; padding: 20px 0; }
+    /* Analizė: its data still coming - one spinner instead of the (empty / previous) subjects */
+    #analysis-loading { display: none; }
+    body.ana-loading #analysis-loading { display: flex; min-height: 220px; }
+    body.ana-loading #student-statistics-math, body.ana-loading #student-statistics-lang-grammar,
+    body.ana-loading #student-statistics-lang-text-comprahension { display: none !important; }
     .tq-spinner { width: 40px; height: 40px; border: 4px solid rgba(50, 172, 147, 0.2); border-top-color: #32ac93; border-radius: 50%; animation: tq-spin 0.8s linear infinite; }
     @keyframes tq-spin { to { transform: rotate(360deg); } }
     @media (prefers-reduced-motion: reduce) { .tq-spinner { animation-duration: 2.4s; } }
@@ -7767,6 +7772,8 @@
                                     <div class="col-12" id="student-task-completion-date"></div>
                                     <div class="col-12 panel pending-panel" id="student-statistics-completed-tasks" style="display: none;"></div>
 
+                                    <!-- Analizė while its data is still coming (updateAnalysisLoading) -->
+                                    <div id="analysis-loading" class="tq-loading" role="status" aria-label="Kraunama"><span class="tq-spinner"></span></div>
                                     <div id="student-statistics-math">
                                         <div class="collapsible-section-header" id="mathStatisticsCollapseHeader">
                                             <div class="student-statistics-label">Matematika</div>
@@ -8089,7 +8096,7 @@
 	<script src="../mental-arithmetic-combinations.js?v=20261017"></script>
     <script src="../parameter_dictionary.js?v=20261024e"></script>
     <script src="../rasyba-generator.js?v=20261018r"></script>
-    <script src="../sudedu-insights.js?v=20261024j"></script>
+    <script src="../sudedu-insights.js?v=20261024k"></script>
     <script src="../sudedu-auto-tasks.js?v=20261018r"></script>
     <script src="../klase-invites.js?v=20261018r"></script>
     <script src="../main-nav-bar.js"></script>
@@ -12573,8 +12580,9 @@ function setTeacherSection(section) {
         analysisArchiveLoadedFor = currentEmbeddedArchiveStudentId;
         refreshDisplayedStatistics();
     } else if (analysisVisible && analysisDrawPending) {
-        drawAnalysis();
+        scheduleAnalysisDraw();
     }
+    updateAnalysisLoading();
     // (the results table drawn while its tab was hidden waited for it)
     const archiveBox = document.getElementById('embedded-archive-table-container');
     if (section === 'completed' && archiveBox && archiveBox._deferred) {
@@ -15821,6 +15829,11 @@ let analysisDrawPending = false;
 // the lists - at once), and once even when several things ask for it in the same moment (switching to the class asks
 // twice); its summary cards show the loading spinner meanwhile.
 let analysisDrawQueued = false;
+// one spinner for the whole section while the analysis waits for its data (a student's or the class's results)
+function updateAnalysisLoading() {
+    const waiting = teacherSection === 'analysis' && (currentStatisticsIsClass ? classArchivePending : analysisArchivePending);
+    document.body.classList.toggle('ana-loading', Boolean(waiting));
+}
 function scheduleAnalysisDraw() {
     if (teacherSection !== 'analysis') { analysisDrawPending = true; return; }
     if (window.SudInsights && SudInsights.showLoading) ['insights-math', 'insights-grammar', 'insights-text'].forEach(id => { const card = document.getElementById(id); if (card) SudInsights.showLoading(card); });
@@ -15885,6 +15898,7 @@ async function refreshDisplayedStatistics() {
         (!Array.isArray(analysisArchiveRows) || analysisArchiveRows.length === 0)) {
         const studentId = currentEmbeddedArchiveStudentId;
         analysisArchivePending = true;
+        updateAnalysisLoading();
         let response = null;
         try {
             response = await apiFetch(`${apiBase}students/task-history/${studentId}?teacherOnly=false`, {
@@ -15893,6 +15907,7 @@ async function refreshDisplayedStatistics() {
             });
         } finally {
             analysisArchivePending = false;
+            updateAnalysisLoading();
         }
         // (another student may have been opened meanwhile)
         if (studentId !== currentEmbeddedArchiveStudentId || currentStatisticsIsClass) return;
@@ -16018,12 +16033,25 @@ function renderAnalysisInsights(tasks) {
     // the three cards one after another, the page drawn in between (a newer analysis stops an older one)
     const run = ++analysisInsightsRun;
     const breathe = () => new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)));
+    // (the subject on the screen first; each card stops when a newer analysis starts or the teacher leaves Analizė)
+    const alive = () => run === analysisInsightsRun && teacherSection === 'analysis';
     const draw = async peers => {
         ['insights-math', 'insights-grammar', 'insights-text'].forEach(id => { const card = document.getElementById(id); if (card) SudInsights.showLoading(card); });
-        for (const [id, extra] of [['insights-math', { subject: 'math', mistakeViews: mathViews }], ['insights-grammar', { subject: 'grammar', mistakeViews }], ['insights-text', { subject: 'text' }]]) {
+        const subjects = [['math', 'insights-math', { subject: 'math', mistakeViews: mathViews }], ['grammar', 'insights-grammar', { subject: 'grammar', mistakeViews }], ['text', 'insights-text', { subject: 'text' }]];
+        while (subjects.length) {
+            // (the subject on the screen now - the teacher may have switched meanwhile - else the next one)
+            const at = Math.max(0, subjects.findIndex(sub => sub[0] === teacherAnalysisSubject));
+            const [, id, extra] = subjects.splice(at, 1)[0];
             await breathe();
-            if (run !== analysisInsightsRun) return;
-            try { await SudInsights.renderPeriod(document.getElementById(id), tasks, { ...options, ...extra, peers }); } catch (error) { console.error('insights:', error); }
+            if (!alive()) {
+                if (run === analysisInsightsRun) analysisDrawPending = true;   // (left Analizė: drawn when it is opened again)
+                return;
+            }
+            try { await SudInsights.renderPeriod(document.getElementById(id), tasks, { ...options, ...extra, peers, alive }); } catch (error) { console.error('insights:', error); }
+            if (!alive()) {
+                if (run === analysisInsightsRun) analysisDrawPending = true;
+                return;
+            }
         }
     };
     const cards = ['insights-math', 'insights-grammar', 'insights-text'].map(id => document.getElementById(id));
@@ -16646,6 +16674,7 @@ async function fetchAndRenderClassEmbeddedArchive() {
     const container = document.getElementById("embedded-archive-table-container");
     if (!container || !classEmbeddedArchiveStudents) return;
     classArchivePending = true;
+    updateAnalysisLoading();
     const withSelf = activeResultKinds('analysis').has('self');
 
     const startDate = document.getElementById("embeddedArchiveStartDate").value;
@@ -16725,11 +16754,13 @@ async function fetchAndRenderClassEmbeddedArchive() {
         renderStatisticsAnalysisTaskList();
         // the class analysis counts game results and older rows too: draw it again now that they are here
         classArchivePending = false;
+        updateAnalysisLoading();
         if (currentStatisticsIsClass) refreshDisplayedStatistics();
     } catch (error) {
         console.error('Could not load class task archive', error);
         container.innerHTML = '<div class="task-archive-empty">Klaida gaunant duomenis.</div>';
         classArchivePending = false;
+        updateAnalysisLoading();
         if (currentStatisticsIsClass) refreshDisplayedStatistics();
     }
 }

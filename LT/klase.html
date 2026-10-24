@@ -1116,12 +1116,15 @@
         }
 
 
+        /* the leaders (wider) and the last winners side by side when both fit (≥ 360 + 240 px), else one under the other */
         .class-challenge-leaders-div {
         display: flex;
         flex-wrap: wrap;
-        gap: 16px;
-        align-items: flex-start;
+        gap: 8px;
+        align-items: stretch;
         }
+        .class-challenge-leaders-div > .podium-container-outer { flex: 2 1 360px; min-width: 0; }
+        .class-challenge-leaders-div > .previous-challenge-winners-holder-outer { flex: 1 1 240px; min-width: 0; }
 
         .my-score-holder {
             display: flex;
@@ -1155,6 +1158,7 @@
             flex-direction: column;
             justify-content: start;
         }
+        .previous-challenge-winners-holder-outer > .previous-challenge-winners-holder { flex: 1; }
 
         .previous-challenge-winners-holder {
             display: flex;
@@ -5235,44 +5239,7 @@ async function initClassPage() {
 
 initClassPage();
 
-function positionWeekChallengeItems() {
-  const container = document.querySelector('.class-challenge-leaders-div');
-  if (!container) return;
-  
-  const items = [...container.children];
-  if (items.length < 2) return;
-
-  // Reset styles to measure natural width
-  items.forEach(el => {
-    el.style.width = 'auto';
-    el.style.justifyContent = "start";
-  });
-  container.style.justifyContent = 'space-between';
-
-  // Calculate total width including gap
-  const gap = parseInt(getComputedStyle(container).gap) || 0;
-  const totalItemsWidth = items.reduce((sum, el) => sum + el.offsetWidth, 0) + gap;
-
-  if (totalItemsWidth > container.clientWidth) {
-    // Items can't fit → stack
-    items.forEach(el => {
-      el.style.width = '100%';
-      el.style.justifyContent = "center";
-    });
-    container.style.justifyContent = 'center';
-  } else {
-    // Items fit → side by side
-    items.forEach(el => {
-      el.style.width = 'auto';
-      el.style.marginInline = '0';
-    });
-    container.style.justifyContent = 'space-between';
-  }
-}
-
-// Run on load and resize
-window.addEventListener('resize', positionWeekChallengeItems);
-window.addEventListener('load', positionWeekChallengeItems);
+// (the leaders' and the last winners' panels share a row whenever both fit: CSS, .class-challenge-leaders-div)
 
 
 function completeWeekChlTask() {

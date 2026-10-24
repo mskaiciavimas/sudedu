@@ -1609,6 +1609,9 @@
 	 * 4. All conditions of one card (overall mistakes and speed, every task set, every mistake pattern) share one 5% budget
 	 *    (weighted Holm: the overall two half of it); only what passes is said. */
 	const WIN = { days: 3, mistakes: 300, speed: 60, pattern: 150, share: 1 / 3, B: 1999, alpha: 0.05, tau: 0.5 };
+	// (long work in slices: a pause for the page; an analysis whose card is not wanted any more stops with CANCELLED)
+	const breathe = () => new Promise(resolve => setTimeout(resolve, 0));
+	const CANCELLED = { cancelled: true };
 	// a small seeded generator: the same data give the same text on every render
 	function seededRandom(seed) {
 		let a = seed >>> 0;
@@ -1619,6 +1622,13 @@
 	/* points: [{ x: day, y: count, e: exposure, s: stratum }] → null (too little) or { p, z, early, late, ratio,
 	 * windows: [[from, to], [from, to]], blocks } (rates per unit of exposure) */
 	function windowTest(points, target, key) {
+		const steps = windowTestSteps(points, target, key);
+		let step;
+		do { step = steps.next(); } while (!step.done);
+		return step.value;
+	}
+	// (the same, pausing about every 8 ms of work - yield - so a page stays responsive; windowChangesAsync drives it)
+	function* windowTestSteps(points, target, key) {
 		// (stratum, day) blocks
 		const blocks = new Map();
 		points.forEach(q => {
@@ -1670,30 +1680,43 @@
 		if (lnArr < Math.log(2 / WIN.alpha)) return null;
 		const used = strata.flatMap(([a, b]) => [...a, ...b]);
 		if (used.reduce((t, b) => t + b.y, 0) === 0) return null;   // (no counts at all: nothing to compare)
-		// the statistic for an assignment of each stratum's blocks to the late window
-		const pools = strata.map(([a, b]) => ({ blocks: [...a, ...b], nLate: b.length }));
-		const stat = late => {
+		// the statistic for an assignment of each stratum's blocks to the late window (each pool's counts and exposures in
+		// typed arrays, its totals summed once in the blocks' order, the late ones summed in that same order - the same
+		// numbers as summing everything per arrangement, without building arrays 1999 times)
+		const pools = strata.map(([a, b]) => {
+			const blocks = [...a, ...b], n = blocks.length;
+			const ys = new Float64Array(n), es = new Float64Array(n);
+			let Y = 0, E = 0;
+			blocks.forEach((bl, j) => { ys[j] = bl.y; es[j] = bl.e; Y += bl.y; E += bl.e; });
+			return { n, nLate: b.length, ys, es, Y, E, flag: new Uint8Array(n), idx: new Int32Array(n) };
+		});
+		const stat = () => {
 			let U = 0, V = 0;
-			pools.forEach((pl, i) => {
-				let Y = 0, E = 0, yR = 0, eR = 0;
-				pl.blocks.forEach((b, j) => { Y += b.y; E += b.e; if (late[i][j]) { yR += b.y; eR += b.e; } });
-				if (!(E > 0)) return;
+			for (const pl of pools) {
+				let yR = 0, eR = 0;
+				for (let j = 0; j < pl.n; j++) if (pl.flag[j]) { yR += pl.ys[j]; eR += pl.es[j]; }
+				const { Y, E } = pl;
+				if (!(E > 0)) continue;
 				U += yR - Y * eR / E; V += Y * (eR / E) * (1 - eR / E);
-			});
+			}
 			return V > 0 ? U / Math.sqrt(V) : 0;
 		};
-		const observed = pools.map(pl => pl.blocks.map((_, j) => j >= pl.blocks.length - pl.nLate));
-		const z = stat(observed);
+		pools.forEach(pl => { for (let j = 0; j < pl.n; j++) pl.flag[j] = j >= pl.n - pl.nLate ? 1 : 0; });
+		const z = stat();
 		const rnd = seededRandom(hashString(key + '|' + used.map(b => b.x + ':' + b.y + ':' + Math.round(b.e)).join(',')));
 		let ge = 0;
+		const clock = typeof performance !== 'undefined' ? () => performance.now() : () => Date.now();
+		let sliceStart = clock();
 		for (let r = 0; r < WIN.B; r++) {
-			const late = pools.map(pl => {
-				const idx = pl.blocks.map((_, j) => j);
-				for (let j = idx.length - 1; j > 0; j--) { const k = Math.floor(rnd() * (j + 1)); [idx[j], idx[k]] = [idx[k], idx[j]]; }
-				const flag = new Array(idx.length).fill(false); idx.slice(0, pl.nLate).forEach(j => { flag[j] = true; });
-				return flag;
-			});
-			if (Math.abs(stat(late)) >= Math.abs(z) - 1e-12) ge++;
+			for (const pl of pools) {
+				const idx = pl.idx;
+				for (let j = 0; j < pl.n; j++) idx[j] = j;
+				for (let j = pl.n - 1; j > 0; j--) { const k = Math.floor(rnd() * (j + 1)); const t = idx[j]; idx[j] = idx[k]; idx[k] = t; }
+				pl.flag.fill(0);
+				for (let j = 0; j < pl.nLate; j++) pl.flag[idx[j]] = 1;
+			}
+			if (Math.abs(stat()) >= Math.abs(z) - 1e-12) ge++;
+			if ((r & 31) === 31 && clock() - sliceStart > 8) { yield; sliceStart = clock(); }
 		}
 		// the sizes: both windows' rates with the same weights (Mantel-Haenszel)
 		let wEarly = 0, wLate = 0, W = 0;
@@ -1720,7 +1743,25 @@
 	/* All the conditions of a card, each { key, metric, group: 'overall' | 'set' | 'pattern', label, points, target },
 	 * tested and filtered by the weighted Holm procedure → the significant ones, with their direction. */
 	function windowChanges(conditions) {
-		const tested = conditions.map(c => ({ ...c, test: windowTest(c.points, c.target, c.key) })).filter(c => c.test);
+		return chooseChanges(conditions.map(c => ({ ...c, test: windowTest(c.points, c.target, c.key) })).filter(c => c.test));
+	}
+	// (the same, a little at a time with the page free in between; alive() false - the card is not wanted any more - stops it)
+	async function windowChangesAsync(conditions, alive) {
+		const tested = [];
+		for (const c of conditions) {
+			const steps = windowTestSteps(c.points, c.target, c.key);
+			let step;
+			for (;;) {
+				step = steps.next();
+				if (step.done) break;
+				await breathe();
+				if (alive && !alive()) throw CANCELLED;
+			}
+			if (step.value) tested.push({ ...c, test: step.value });
+		}
+		return chooseChanges(tested);
+	}
+	function chooseChanges(tested) {
 		windowChanges.tested = tested.length;   // (how many conditions had enough data - for the text)
 		windowChanges.all = tested;   // (every tested condition, for checking)
 		if (!tested.length) return [];
@@ -2692,9 +2733,10 @@
 			});
 			// (a task set or pattern whose comparison is the overall one - the same tasks in its groups - adds nothing)
 			const exposureOf = c => c.test.blocks.reduce((t, b) => t + b.e, 0);
-			// (the heaviest part - the page may draw first: a class's change tests take a few hundred ms)
-			await new Promise(resolve => setTimeout(resolve, 0));
-			const found0 = windowChanges(conds);
+			// (the heaviest part - done a little at a time, the page answering clicks meanwhile; stopped if not wanted any more)
+			await breathe();
+			if (opts.alive && !opts.alive()) throw CANCELLED;
+			const found0 = await windowChangesAsync(conds, opts.alive);
 			f.changesTested = windowChanges.tested;
 			f.changesAll = windowChanges.all;
 			/* (a mistake pattern's change must not rest on a word or two - which words came up, not how the students do: in the
@@ -4369,8 +4411,9 @@
 		el.innerHTML = summary ? cardHtml('<div class="ins-loading" role="status" aria-label="Ruošiamas apibendrinimas"><span class="ins-spinner"></span></div>', false) : '';
 		let f;
 		try {
-			f = await analyze(tasks, opts);
+			f = await analyze(tasks, { ...opts, alive: () => el.dataset.insToken === token && (!opts.alive || opts.alive()) });
 		} catch (error) {
+			if (error === CANCELLED) return;   // (a newer render, or the page moved on)
 			console.error('SudInsights: analysis failed', error);
 			if (el.dataset.insToken === token) { el.innerHTML = ''; if (views) renderMistakeViews(null, views); }
 			return;
@@ -4398,5 +4441,5 @@
 		return render(el, Array.isArray(row) ? row : [row], { ...opts, mode: 'task', scope: 'period' });
 	}
 
-	window.SudInsights = { _randomSign: randomSign, _markRandomLetters: markRandomLetters, _analyzeGrammar: analyzeGrammarMistakes, _keyboardSlip: keyboardSlip, _loadLexicon: loadLexicon, OUTLIER, showInfo, enabled, analyze, describe, randomLettersOf, renderPeriod, renderTask, showLoading, classifyAnswer, form, trend, verdict, tPValue, INSIGHTS, mathComposition, windowTest, windowChanges, WIN };
+	window.SudInsights = { _randomSign: randomSign, _markRandomLetters: markRandomLetters, _analyzeGrammar: analyzeGrammarMistakes, _keyboardSlip: keyboardSlip, _loadLexicon: loadLexicon, OUTLIER, showInfo, enabled, analyze, describe, randomLettersOf, renderPeriod, renderTask, showLoading, classifyAnswer, form, trend, verdict, tPValue, INSIGHTS, mathComposition, windowTest, windowChanges, windowChangesAsync, WIN, CANCELLED };
 })();

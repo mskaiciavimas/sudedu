@@ -92,7 +92,7 @@
             <div class="form-group"><label>Text on the board <span class="am-muted">(short; HTML works, e.g. &lt;b&gt;…&lt;/b&gt;, &lt;a href="apie.html"&gt;…&lt;/a&gt;)</span></label>
                 <textarea class="nw-f-text" rows="2" maxlength="3000">${esc(item.text)}</textarea></div>
             <div class="form-group"><label>Full text in the pop-up <span class="am-muted">(HTML)</span></label>
-                <div class="nw-tools">${[['b', '<b>B</b>'], ['i', '<i>I</i>'], ['a', '🔗 Link'], ['ul', '• List'], ['br', '↵ New line']].map(([t, s]) => `<button type="button" class="nw-tool" data-t="${t}">${s}</button>`).join('')}</div>
+                <div class="nw-tools">${[['b', '<b>B</b>'], ['i', '<i>I</i>'], ['a', '🔗 Link'], ['ul', '• List'], ['br', '↵ New line'], ['img', '🖼 Picture']].map(([t, s]) => `<button type="button" class="nw-tool" data-t="${t}">${s}</button>`).join('')}</div>
                 <textarea class="nw-f-full" rows="7" maxlength="30000">${esc(item.fullText.replace(/^\s*\n|\n\s*$/g, ''))}</textarea></div>
             <div class="nw-row">
                 <div class="form-group"><label>Date</label><input type="date" class="nw-f-date" value="${esc(item.date)}"></div>
@@ -107,10 +107,21 @@
         box.addEventListener('input', live);
         live();
         // the small HTML helpers: wrap the selection (or insert)
-        $('.nw-tools').addEventListener('click', e => {
+        $('.nw-tools').addEventListener('click', async e => {
             const b = e.target.closest('.nw-tool');
             if (!b) return;
             const ta = $('.nw-f-full'), s = ta.selectionStart, en = ta.selectionEnd, sel = ta.value.slice(s, en);
+            // a picture (uploaded to / picked from the site's images/messages, like the messages' pictures): centred, 70% wide -
+            // its width / place can be changed in the HTML (style="width:…")
+            if (b.dataset.t === 'img') {
+                const p = await MessageImages.pick();
+                if (!p) return;
+                const width = p.w && p.h && p.h > p.w * 1.3 ? 45 : 70;
+                ta.setRangeText(`\n<div style="text-align:center;margin:10px 0">${SudeduNotices.imageTag(p.name, `style="width:${width}%;max-width:100%;height:auto;border-radius:10px"`)}</div>\n`, s, en, 'end');
+                ta.focus();
+                ta.dispatchEvent(new Event('input', { bubbles: true }));
+                return;
+            }
             let ins;
             if (b.dataset.t === 'b' || b.dataset.t === 'i') ins = `<${b.dataset.t}>${sel || 'tekstas'}</${b.dataset.t}>`;
             else if (b.dataset.t === 'a') { const url = prompt('Link address (e.g. apie.html#zaidimai or https://…):', 'https://'); if (!url) return; ins = `<a href="${url}"${/^https?:/.test(url) ? ' target="_blank" rel="noopener noreferrer"' : ''}>${sel || 'čia'}</a>`; }
