@@ -612,12 +612,16 @@ const insightsMistakePatterns = {
             tip: '' },
         priebalses: { area: 'painiojant panašiai skambančias priebalses', label: 'Maišo panašiai skambančias priebalses', topic: 'panašiai skambančių priebalsių painiojimas',
             tip: 'Klaidos, kai painiojamos skardžiosios ir duslios priebalsės („b“–„p“, „d“–„t“, „g“–„k“, „z“–„s“, „ž“–„š“).' },
+        svilp: { area: 'painiojant švilpiamąsias ir šnypščiamąsias priebalses', label: 'Maišo švilpiamąsias ir šnypščiamąsias priebalses (s–š, z–ž, c–č)', topic: 'švilpiamųjų ir šnypščiamųjų priebalsių painiojimas',
+            tip: 'Klaidos, kai painiojamos švilpiamosios ir šnypščiamosios priebalsės („s“–„š“, „z“–„ž“, „c“–„č“, „dz“–„dž“).' },
         atskiri: { area: 'skaitant pavienius žodžius jų nesiejant sakinyje', label: 'Skaito pavienius žodžius, nesieja žodžių sakinyje', topic: 'tikri, bet sakiniui netinkami žodžiai',
             tip: 'Klaidingas atsakymas sudaro tikrą žodį, tik netinkamą sakiniui. Apima ir atvejus, kai tiktų keli atsakymai, bet teisingu laikomas tik tas, kuris yra originaliame tekste.' },
         nedemesys: { area: 'įrašant netinkamas raides dėl dėmesio stokos', label: 'Nekreipia dėmesio, ką rašo, arba netyčia įrašė ne tą raidę', topic: 'netyčia ar neatidžiai įrašytos raidės',
             tip: 'Įrašytos raidės nesudaro tikro žodžio ir neatitinka tipinių klaidų (pvz., viena raidė pakeista kita ar įrašyta du kartus).' },
         bet_kokias: { area: 'įrašinėjant bet kokias raides', label: 'Įrašinėja bet kokias raides', topic: 'bet kokios įrašytos raidės',
-            tip: 'Įrašytos raidės aiškiai nėra bandymas parašyti žodį: neįprasti raidžių junginiai (pvz., „hįh“), lietuvių kalboje nevartojamos raidės, ta pati raidė kelis kartus iš eilės, daug daugiau raidžių nei reikia, didžioji raidė žodžio viduryje arba tas pats atsakymas įrašytas į daug skirtingų žodžių.' },
+            tip: 'Įrašytos raidės aiškiai nėra bandymas teisingai atlikti užduotį: neįprasti raidžių junginiai (pvz., „hįh“), lietuvių kalboje nevartojamos raidės ar ženklai, ta pati raidė kelis kartus iš eilės, neteisinga didžioji raidė žodžio viduryje, vien priebalsės vietoje balsės arba tas pats neteisingas atsakymas įrašytas į daugumą užduoties žodžių.' },
+        didziosios: { area: 'rašant didžiąsias raides', label: 'Neteisingas didžiųjų raidžių naudojimas', topic: 'didžiųjų raidžių naudojimas',
+            tip: 'Raidės įrašytos teisingai, tačiau netinkamai panaudotos didžiosios raidės: didžioji raidė neparašyta ten, kur jos reikia (pvz., sakinio pradžioje ar varde), arba parašyta ten, kur jos nereikia.' },
         kita: { area: 'kitais atvejais', label: 'Kitos klaidos', topic: 'kitos klaidos', tip: '' }
     
 };

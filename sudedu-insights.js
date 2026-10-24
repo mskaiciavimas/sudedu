@@ -456,6 +456,8 @@
 		// h / ch / f
 		if ((a === 'h' && w === 'ch') || (a === 'ch' && w === 'h') || (a === 'f' && (w === 'h' || w === 'ch'))) hits.add('raides');
 		if ((a === 'h' && w === 'g') || (a === 'ch' && w === 'k') || (a === 'f' && w === 'p')) hits.add('garsai');
+		// švilpiamosios / šnypščiamosios priebalsės mixed up (z for ž, š for s, c for č; dz / dž too)
+		if (pairSwap(a, w, [['s', 'š'], ['z', 'ž'], ['c', 'č']])) hits.add('svilp');
 		// minkštumo ženklas: i left out, i added after j, an unneeded soft i
 		if (SOFT.includes(a.slice(0, 2)) && w === a.slice(1)) hits.add('minkst');
 		if (SOFT.includes(a.slice(0, 2)) && pairSwap(a.slice(1), w, [['u', 'ū']])) hits.add('ilgi');
@@ -605,12 +607,16 @@
 		entries.forEach(({ item, task }) => {
 			if (!Array.isArray(item) || !Array.isArray(item[0])) return;
 			const [b, a, s] = item[0].map(x => String(x ?? '').toLowerCase());
+			const aRaw = String(item[0][1] ?? '').replace(/\s+/g, '');
 			const cat = String(item[1] || '').split('-')[0];
 			const counter = Number(item[2] && item[2][0]) || 1;
 			const raws = (item[2] && Array.isArray(item[2][1]) ? item[2][1] : []).map(x => String(x ?? '').replace(/\s+/g, '')).filter(Boolean);
 			const wrongs = raws.map(x => x.toLowerCase());
 			const weight = wrongs.length ? counter / wrongs.length : 0;
-			wrongs.forEach((w, k) => { if (w !== a) answers.push({ cat, b, a, s, w, raw: raws[k], weight, task, counter, word: b + a + s, item }); });
+			wrongs.forEach((w, k) => {
+				// (the right letters, only the capitals wrong: "Neteisingas didžiųjų raidžių naudojimas")
+				if (w !== a || raws[k] !== aRaw) answers.push({ cat, b, a, s, w, raw: raws[k], weight, task, counter, word: b + a + s, item, caseOnly: w === a });
+			});
 			if (!wrongs.length) answers.push({ cat, b, a, s, w: null, weight: counter, task, counter, word: b + a + s, item });
 		});
 		if (!answers.length) return null;
@@ -620,6 +626,7 @@
 		await loadSoftDb();
 		answers.forEach(x => {
 			if (x.w === null) { x.keys = new Set(); return; }
+			if (x.caseOnly) { x.keys = new Set(['didziosios']); return; }
 			// (the gap's categories: the one it was asked in and every other the word database gives the same letters)
 			const morph = morphOf(db, x.word);
 			x.keys = new Set();
@@ -681,55 +688,72 @@
 		return { total: Math.round(total), insights, repeatedWords, retried: retried.size, randomLetters: randomSummary(insights, total, tasksKnown || new Set(entries.map(e => e.task)).size) };
 	}
 
-	/* "Įrašinėja bet kokias raides": answers that are clearly not an attempt at the word - only among those no spelling rule
-	 * explains and that make no real word (nothing else is ever moved here). Strong signs in one answer: letters Lithuanian
-	 * doesn't use (q, w, x, digits, signs), a letter 3+ times in a row, a capital letter inside the word, 2+ letters more
-	 * than the gap needs, or (2+ letters typed) a combination of three letters no common word has. And across one task: the
-	 * same answer typed into 3+ different words whose right letters differ (the same key pressed to fill every gap). Kept as
-	 * "nekreipia dėmesio" (a slip): one wrong letter, a letter typed twice where the word is otherwise right. */
+	/* "Įrašinėja bet kokias raides": answers that are clearly not an attempt at the word. Only answers no spelling rule
+	 * explains and that make no word at all are looked at (not even a rare one in the full SUDEDU_legit_words lists), and
+	 * only plain nonsense is moved here - a wrong but possible attempt (ai for ei, uoju for ą, įje for į) stays where it is:
+	 *   - signs Lithuanian has no use for: q, w, x, digits, punctuation (iuw)
+	 *   - the same letter 3+ times in a row, at least two of them typed (aaa)
+	 *   - a capital letter inside the word (not its first letter) - only with wrong letters (vG, knIga); the right letters
+	 *     with wrong capitals are "Neteisingas didžiųjų raidžių naudojimas" (didziosios)
+	 *   - 2+ typed letters, no vowel among them and none of them in the right answer, where the answer has a vowel (vg for a)
+	 *   - 3+ letter combinations that no Lithuanian word form has (of ~28 million in SUDEDU_legit_words), at least half of
+	 *     those the typed letters touch (thyhįh)
+	 *   - the same answer filling a task: in 5+ different words with 3+ different right answers, and at least 60% of the
+	 *     task's wrong answers (the same key pressed in every gap to get to the answers)
+	 * Kept as "nekreipia dėmesio" (a slip): a letter typed twice where the word is otherwise right. */
 	const LT_LETTERS = /^[aąbcčdeęėfghiįyjklmnoprsštuųūvzž]+$/;
-	let trigramsPromise = null;
-	// the three-letter combinations ('^' / '$' = the word's start / end) of the common words - those in 2+ words count
-	function loadTrigrams() {
-		if (!trigramsPromise) {
-			trigramsPromise = loadSudWords().then(async words => {
+	const LT_VOWELS = /[aąeęėiįyouųū]/;
+	const RANDOM_ODD_MIN = 3, RANDOM_FILL_WORDS = 5, RANDOM_FILL_ANSWERS = 3, RANDOM_FILL_SHARE = 0.6;
+	let lexiconPromise = null;
+	// the word lists for this: every legitimate word form (to leave real words alone) and every three-letter combination
+	// in them ('^' / '$' = a word's start / end), worked out from the list's structure (each node once, ~1 s at most)
+	function loadLexicon() {
+		if (!lexiconPromise) {
+			lexiconPromise = loadSudWords().then(async words => {
 				if (!words) return null;
-				const dawg = await words.load('freqCommon');
-				const seen = new Map();
-				for (const w of dawg.words(dawg.node(''), '')) {
-					const p = '^' + w + '$', mine = new Set();
-					for (let i = 0; i + 3 <= p.length; i++) mine.add(p.slice(i, i + 3));
-					mine.forEach(t => seen.set(t, (seen.get(t) || 0) + 1));
+				const [legit, extra] = await Promise.all([words.load('legit'), words.load('legitExtra')]);
+				const trigrams = new Set();
+				for (const dawg of [legit, extra]) {
+					const kids = new Map();
+					const childrenOf = n => { let k = kids.get(n); if (!k) kids.set(n, k = dawg.children(n)); return k; };
+					for (const [a, n1] of childrenOf(0)) for (const [b, n2] of childrenOf(n1)) trigrams.add('^' + a + b);
+					for (let n = 0; n < dawg.nodes; n++) {
+						for (const [a, n1] of childrenOf(n)) for (const [b, n2] of childrenOf(n1)) {
+							if (dawg.isWord(n2)) trigrams.add(a + b + '$');
+							for (const [c] of childrenOf(n2)) trigrams.add(a + b + c);
+						}
+					}
 				}
-				const common = new Set();
-				seen.forEach((n, t) => { if (n >= 2) common.add(t); });
-				return common;
+				return { isWord: w => legit.has(w) || extra.has(w), trigrams };
 			}).catch(() => null);
 		}
-		return trigramsPromise;
+		return lexiconPromise;
 	}
 	// a letter typed twice where the word would otherwise be right (n-uuo-lat): a slip of the hand
 	function typedTwice(cw, ww) {
 		for (let i = 0; i < ww.length - 1; i++) if (ww[i] === ww[i + 1] && ww.slice(0, i) + ww.slice(i + 1) === cw) return true;
 		return false;
 	}
-	function randomSign(x, trigrams) {
+	function randomSign(x, lexicon) {
 		const ww = x.b + x.w + x.s, cw = x.b + x.a + x.s;
 		if (typedTwice(cw, ww)) return false;
-		if (!LT_LETTERS.test(x.w)) return true;                                   // q, w, x, digits, signs
-		if (/(.)\1\1/.test(ww)) return true;                                       // a letter 3+ times in a row
-		const raw = String(x.raw || '');
-		if (/[A-ZĄČĘĖĮŠŲŪŽ]/.test(raw) && (x.b || /[A-ZĄČĘĖĮŠŲŪŽ]/.test(raw.slice(1)))) return true;   // a capital inside the word
-		if (x.w.length >= x.a.length + 2) return true;                            // 2+ letters too many
-		// the right letters in another order (ou for uo): a slip, not random
-		if ([...x.w].sort().join('') === [...x.a].sort().join('')) return false;
-		if (trigrams && x.w.length >= 2) {
-			// (the triples touching a typed letter: the typed letters are p[from + 1 … from + length]); one unusual triple is
-			// enough for 3+ typed letters, two letters need two (a rare but real combination alone is not random)
-			const p = '^' + ww + '$', from = x.b.length, last = x.b.length + x.w.length;
-			let odd = 0;
-			for (let i = Math.max(0, from - 1); i + 3 <= p.length && i <= last; i++) if (!trigrams.has(p.slice(i, i + 3))) odd++;
-			if (odd >= (x.w.length >= 3 ? 1 : 2)) return true;
+		if (!LT_LETTERS.test(x.w)) return true;                                      // q, w, x, digits, signs
+		if ([...String(x.raw || '')].some((ch, k) => x.b.length + k > 0 && /[A-ZĄČĘĖĮŠŲŪŽ]/.test(ch))) return true;   // a capital inside the word
+		if (lexicon && lexicon.isWord(ww)) return false;                             // a (rare) real word
+		// a letter 3+ times in a row, at least two of them typed
+		const from = x.b.length, to = x.b.length + x.w.length;
+		for (const m of ww.matchAll(/(.)\1\1+/g)) {
+			const typed = Math.min(to, m.index + m[0].length) - Math.max(from, m.index);
+			if (typed >= 2) return true;
+		}
+		// consonants only, none of them from the right answer, where the answer has a vowel
+		if (x.w.length >= 2 && !LT_VOWELS.test(x.w) && LT_VOWELS.test(x.a) && ![...x.w].some(ch => x.a.includes(ch))) return true;
+		// combinations no word form has: the triples touching a typed letter (typed letters are p[from + 1 … to])
+		if (lexicon) {
+			const p = '^' + ww + '$';
+			let odd = 0, all = 0;
+			for (let i = Math.max(0, from - 1); i <= to && i + 3 <= p.length; i++) { all++; if (!lexicon.trigrams.has(p.slice(i, i + 3))) odd++; }
+			if (odd >= RANDOM_ODD_MIN && odd * 2 >= all) return true;
 		}
 		return false;
 	}
@@ -737,17 +761,20 @@
 		const open = x => x.w !== null && x.keys.size === 1 && x.keys.has('nedemesys');
 		const candidates = answers.filter(open);
 		if (!candidates.length) return;
-		const trigrams = await loadTrigrams();
-		const hits = new Set(candidates.filter(x => randomSign(x, trigrams)));
-		// the same answer in 3+ different words of a task, their right letters not all the same
-		const byTask = new Map();
-		candidates.forEach(x => {
+		const lexicon = await loadLexicon();
+		const hits = new Set(candidates.filter(x => randomSign(x, lexicon)));
+		// the same answer filling a task
+		const wrongInTask = new Map(), byTask = new Map();
+		answers.forEach(x => { if (x.w !== null) wrongInTask.set(x.task, (wrongInTask.get(x.task) || 0) + 1); });
+		answers.forEach(x => {
+			if (x.w === null) return;
 			const k = x.task + '|' + x.w;
 			if (!byTask.has(k)) byTask.set(k, []);
 			byTask.get(k).push(x);
 		});
 		byTask.forEach(list => {
-			if (new Set(list.map(x => x.word)).size >= 3 && new Set(list.map(x => x.a)).size >= 2) list.forEach(x => hits.add(x));
+			if (new Set(list.map(x => x.word)).size >= RANDOM_FILL_WORDS && new Set(list.map(x => x.a)).size >= RANDOM_FILL_ANSWERS
+				&& list.length >= RANDOM_FILL_SHARE * wrongInTask.get(list[0].task)) list.forEach(x => { if (open(x)) hits.add(x); });
 		});
 		hits.forEach(x => { x.keys = new Set(['bet_kokias']); });
 	}
@@ -1125,7 +1152,7 @@
 	}
 	// which kinds of mistakes a question could get: the typical wrong answers (a letter or letters swapped, one added or
 	// left out) classified as the mistakes are; the ones made on it are added by the caller
-	const ANY_QUESTION = new Set(['nedemesys', 'bet_kokias', 'atskiri', 'kita']);   // (any word can get these)
+	const ANY_QUESTION = new Set(['nedemesys', 'bet_kokias', 'atskiri', 'didziosios', 'kita']);   // (any word can get these)
 	const WRONG_PARTS = ['', 'a', 'ą', 'e', 'ę', 'ė', 'i', 'į', 'y', 'u', 'ų', 'ū', 'o', 'uo', 'ie', 'ei', 'ia', 'ią', 'iu', 'iū', 'eu', 'iau', 'au', 'ai',
 		'ui', 'uj', 'j', 'd', 'dž', 'dz', 'z', 'ž', 's', 'š', 't', 'b', 'p', 'g', 'k', 'c', 'č', 'h', 'ch', 'f', 'v', 'm', 'n', 'l', 'r', 'iai', 'ėje', 'oje', 'iaja'];
 	const possibleCache = new Map();
@@ -4333,5 +4360,5 @@
 		return render(el, Array.isArray(row) ? row : [row], { ...opts, mode: 'task', scope: 'period' });
 	}
 
-	window.SudInsights = { OUTLIER, showInfo, enabled, analyze, describe, randomLettersOf, renderPeriod, renderTask, showLoading, classifyAnswer, form, trend, verdict, tPValue, INSIGHTS, mathComposition, windowTest, windowChanges, WIN };
+	window.SudInsights = { _randomSign: randomSign, _markRandomLetters: markRandomLetters, _analyzeGrammar: analyzeGrammarMistakes, _loadLexicon: loadLexicon, OUTLIER, showInfo, enabled, analyze, describe, randomLettersOf, renderPeriod, renderTask, showLoading, classifyAnswer, form, trend, verdict, tPValue, INSIGHTS, mathComposition, windowTest, windowChanges, WIN };
 })();

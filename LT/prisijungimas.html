@@ -719,6 +719,7 @@
 				'RESET_005': 'Nuoroda galioja.',
 				'ERR_001': 'Serverio klaida. Bandykite vėliau.',
 				'ERR_002': 'Trūksta duomenų',
+				'ERR_004': 'Neteisingas el. pašto adresas. Patikrinkite, ar jis įrašytas teisingai (pvz., vardas@gmail.com).',
 				'ERR_003': retryAfter 
 				? `Per didelis prašymų srautas. Bandykite vėliau (anksčiausiai po ${formatRetryTime(retryAfter)}).`
 				: 'Per didelis prašymų srautas. Bandykite vėliau.'
@@ -824,6 +825,11 @@
 			showError('Neteisingas elektroninio pašto formatas'); 
 			return; 
 		}
+		// (a new account: an address letters can be sent to - name@domain.lt; logging in accepts what was registered)
+		if (isRegistration && !/^[a-z0-9._%+-]+@[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i.test(emailVal)) {
+			showError(getMsg('ERR_004'));
+			return;
+		}
 		if (!nicknameVal && isRegistration) { 
 			showError('Įveskite vardą'); 
 			return; 
@@ -879,7 +885,7 @@
 			const data = await response.json();
 
 			// Check for errors FIRST (before success)
-			if (data.code === 'ERR_003' || data.code === 'ERR_001' || data.code === 'ERR_002') {
+			if (data.code === 'ERR_003' || data.code === 'ERR_001' || data.code === 'ERR_002' || data.code === 'ERR_004') {
 				showError(getMsg(data.code, emailVal, data.retryAfter));
 				isAuthenticating = false;
 				authBtn.innerText = isRegistration ? 'Prisiregistruoti' : 'Prisijungti';

@@ -10,7 +10,9 @@
  * A designed message (notice.layout) is a card with text blocks and pictures placed freely (made on the admin page with
  * admin-message-designer.js, which draws it with the same layoutHtml / itemHtml): positions and sizes are % of the
  * card, text sizes px at the card's design width (container query units), so the card scales to any screen as one
- * picture. Pictures come from <apiBase>notice-images/<id> (cached by the browser for a year). */
+ * picture. A plain message may have pictures between its lines: a line [[img:<file>|<width %>]] (formatBody).
+ * Pictures are files in the site's images/messages/ (committed there by the server through the GitHub API) and come from
+ * GitHub Pages; for the minute after an upload, before Pages has published a new one, from GitHub's raw file server. */
 (function () {
     'use strict';
     const PAGES = ['index', 'uzduotys', 'augintiniai', 'klase', 'veiksmai', 'rasyba', 'teksto-suvokimas', 'apie'];
@@ -27,6 +29,30 @@
             .replace(/\n/g, '<br>');
     }
 
+    // the admin's text with pictures: a line [[img:<file>|<width %>]] is a picture of its own, as wide as that share of the
+    // text (centred); the other lines as formatText
+    const IMAGE_LINE = /^\[\[img:([\w.-]+)\|(\d{1,3})\]\]$/;
+    function formatBody(text) {
+        const lines = String(text ?? '').split('\n');
+        let out = '';
+        lines.forEach((line, i) => {
+            const m = line.trim().match(IMAGE_LINE);
+            if (m) { out += `<span class="sn-img-line">${imageTag(m[1], `class="sn-img" style="width:${Math.max(10, Math.min(100, Number(m[2])))}%"`)}</span>`; return; }
+            out += formatText(line);
+            const next = lines[i + 1];
+            if (next !== undefined && !IMAGE_LINE.test(next.trim())) out += '<br>';
+        });
+        return out;
+    }
+
+    // ------------------------------------------------------------ pictures (the site's images/messages on GitHub)
+    const IMAGES = 'https://www.sudedu.lt/images/messages/';
+    const IMAGES_RAW = 'https://raw.githubusercontent.com/mskaiciavimas/sudedu/main/images/messages/';
+    const imageUrl = name => IMAGES + encodeURIComponent(name);
+    const imageRawUrl = name => IMAGES_RAW + encodeURIComponent(name);
+    // an <img> of a message picture: if the site doesn't have it yet (just uploaded), from the raw file server
+    const imageTag = (name, attrs = '') => `<img src="${imageUrl(name)}" alt="" ${attrs} onerror="this.onerror=null;this.src='${imageRawUrl(name)}'">`;
+
     // ------------------------------------------------------------ a designed card
     const FONTS = {
         base: 'inherit',
@@ -35,13 +61,12 @@
         hand: "'Comic Sans MS','Comic Neue','Chalkboard SE',cursive",
         pixel: "'Pixelify Sans',monospace"
     };
-    const imageUrl = id => (typeof apiBase !== 'undefined' ? apiBase : '') + 'notice-images/' + Number(id);
     const hexA = (hex, a) => { const n = parseInt(String(hex).slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
     // one piece of a card (the editor adds data-i and its own handles around it)
     function itemHtml(it, L, extra = '') {
         const pos = `left:${it.x}%;top:${it.y}%;width:${it.w}%;height:${it.h}%;${it.rot ? `transform:rotate(${it.rot}deg);` : ''}`;
         if (it.t === 'img') {
-            return `<div class="sn-it sn-it-img" style="${pos}" ${extra}><img src="${imageUrl(it.img)}" alt="" draggable="false" style="object-fit:${it.fit === 'cover' || it.fit === 'contain' ? it.fit : 'fill'};border-radius:${Number(it.radius) || 0}%;opacity:${it.opacity ?? 1}"></div>`;
+            return `<div class="sn-it sn-it-img" style="${pos}" ${extra}>${imageTag(String(it.src || ''), `draggable="false" style="object-fit:${it.fit === 'cover' || it.fit === 'contain' ? it.fit : 'fill'};border-radius:${Number(it.radius) || 0}%;opacity:${it.opacity ?? 1}"`)}</div>`;
         }
         const style = [`font-size:calc(${Number(it.size) || 24} / ${L.w} * 100cqw)`, `color:${it.color || '#1f2a30'}`, `font-family:${FONTS[it.font] || 'inherit'}`,
             `font-weight:${it.bold || it.font === 'bold' ? 800 : 400}`, `font-style:${it.italic ? 'italic' : 'normal'}`, `text-align:${it.align || 'center'}`,
@@ -66,6 +91,8 @@
         style.textContent = `
 .sn-body{font-size:1.05rem;line-height:1.6;color:#1f2a30;overflow-wrap:anywhere}
 .sn-body a{color:#286D8A}
+.sn-img-line{display:block;text-align:center;margin:10px 0;line-height:0}
+.sn-img{display:inline-block;max-width:100%;height:auto;border-radius:10px}
 .sn-gift{display:flex;flex-direction:column;align-items:center;gap:6px;margin:14px 0 4px}
 .sn-gift-stage{position:relative;width:120px;height:120px}
 .sn-gift-box{position:absolute;inset:0;background:center/contain no-repeat;animation:sn-box-out .3s forwards 1.2s}
@@ -160,7 +187,7 @@
 
             // a designed card instead of the text, in a pop-up as wide as the card was designed (or the screen)
             const L = notice.layout && Array.isArray(notice.layout.items) && notice.layout.items.length ? notice.layout : null;
-            const bodyHtml = L ? layoutHtml(L) : `<div class="sn-body">${formatText(notice.body)}</div>`;
+            const bodyHtml = L ? layoutHtml(L) : `<div class="sn-body">${formatBody(notice.body)}</div>`;
             const popupOpts = L ? { width: `min(94vw, ${Math.max(320, L.w + 56)}px)`, maxWidth: '94vw' } : {};
             if (!poll) {
                 root.innerHTML = `${bodyHtml}${notice.giftId != null ? giftHtml(notice, false) : ''}`;
@@ -268,7 +295,7 @@
         });
     }
 
-    window.SudeduNotices = { preview, run, formatText, layoutHtml, itemHtml, imageUrl, injectStyle };
+    window.SudeduNotices = { preview, run, formatText, formatBody, layoutHtml, itemHtml, imageUrl, imageRawUrl, imageTag, IMAGE_LINE, injectStyle };
     const start = () => setTimeout(run, 1200);
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();

@@ -7,22 +7,22 @@
  *
  * Mouse / touch: drag a piece to move it (it snaps to the card's edges and centre and to the other pieces - guide lines
  * show it), the 8 handles resize it (pictures keep their proportions on the corners unless Shift is held), the round
- * handle above turns it (Shift: 15° steps). Double-click a text to type in it. Pictures: "🖼 Picture", drop files on the
- * card, or paste one (Ctrl+V). Keys: Delete, arrows (Shift: bigger steps), Ctrl+D duplicate, Ctrl+Z / Ctrl+Y.
- * Pictures are uploaded at once (POST admin/notices/images); big photos are shrunk to WebP first, GIFs go as they are. */
+ * handle above turns it (Shift: 15° steps). Double-click a text to type in it. Pictures: "🖼 Picture" (upload one or
+ * pick one uploaded before), drop files on the card, or paste one (Ctrl+V). Keys: Delete, arrows (Shift: bigger steps),
+ * Ctrl+D duplicate, Ctrl+Z / Ctrl+Y.
+ * Pictures go to the site's GitHub repository at once (admin-message-images.js); a picture piece keeps its file name
+ * (src) - its width × height are in the name. */
 (function () {
     'use strict';
     const PRESETS = [['600x450', 'Landscape 4:3'], ['600x600', 'Square'], ['640x360', 'Wide 16:9'], ['480x640', 'Portrait 3:4'], ['420x740', 'Tall (phone)']];
     const SWATCHES = ['#ffffff', '#fff3d6', '#ffe4ec', '#e6f4ff', '#e8f8e8', '#f3e8ff', '#1f2a30', '#3288AC', '#ff7a59', '#ffd43b', '#51cf66', '#845ef7'];
     const FONTS = [['base', 'Site font'], ['round', 'Rounded'], ['bold', 'Heavy'], ['hand', 'Handwritten'], ['pixel', 'Pixel']];
-    const PHOTO_MAX = 1600;            // px: bigger photos are shrunk before uploading
     const SNAP_PX = 7;                 // snapping distance on the screen
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const kb = n => n >= 1024 * 1024 ? (n / 1024 / 1024).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
     const clone = o => JSON.parse(JSON.stringify(o));
     const r2 = v => Math.round(v * 100) / 100;
     const blank = () => ({ v: 1, w: 600, h: 450, bg: '#fff3d6', items: [] });
-    const imgMeta = new Map();         // picture id → { w, h, size } (known for uploads; looked up for older ones)
 
     function create(container, initial) {
         let L = initial ? clone(initial) : blank();
@@ -32,7 +32,7 @@
         <div class="md" tabindex="-1">
             <div class="md-bar">
                 <button type="button" class="md-btn" data-a="text">＋ Text</button>
-                <label class="md-btn md-file">🖼 Picture<input type="file" accept="image/png,image/jpeg,image/gif,image/webp" multiple hidden></label>
+                <button type="button" class="md-btn" data-a="pic">🖼 Picture</button>
                 <span class="md-sep"></span>
                 <label class="md-lab">Card <select class="md-preset">${PRESETS.map(([v, n]) => `<option value="${v}">${n}</option>`).join('')}<option value="custom" hidden>Custom</option></select></label>
                 <label class="md-lab">Background <input type="color" class="md-bg"></label>
@@ -54,7 +54,6 @@
         </div>`;
         const root = container.querySelector('.md');
         const stage = root.querySelector('.md-stage'), props = root.querySelector('.md-props'), msg = root.querySelector('.md-msg');
-        const fileInput = root.querySelector('.md-file input');
         const say = (text, bad) => { msg.textContent = text || ''; msg.classList.toggle('bad', !!bad); };
 
         // ---------------- history
@@ -88,10 +87,6 @@
             stage.style.background = L.bg;
             stage.style.width = phone ? '340px' : `min(100%, ${L.w}px)`;
             stage.innerHTML = L.items.map((it, i) => SudeduNotices.itemHtml(it, L, `data-i="${i}"`)).join('') + '<div class="md-guides"></div>' + selHtml();
-            stage.querySelectorAll('.sn-it-img img').forEach(im => im.addEventListener('load', () => {
-                const id = Number(im.closest('.sn-it').dataset.i) >= 0 ? L.items[Number(im.closest('.sn-it').dataset.i)].img : null;
-                if (id && !imgMeta.has(id)) { imgMeta.set(id, { w: im.naturalWidth, h: im.naturalHeight, size: null }); weigh(); }
-            }, { once: true }));
             if (editing >= 0) startEditing(editing, true);
             root.querySelector('.md-bg').value = L.bg;
             const preset = `${L.w}x${L.h}`, opt = root.querySelector(`.md-preset option[value="${preset}"]`);
@@ -122,23 +117,20 @@
             }
         }
 
-        // the downloads a user makes for this card (each picture once; the browser keeps them)
+        // the downloads a user makes for this card (each picture once; the browser keeps them) - sizes from the library
+        let sizesAsked = false;
         function weigh() {
-            const ids = [...new Set(L.items.filter(it => it.t === 'img').map(it => it.img))];
-            ids.filter(id => !imgMeta.has(id) || imgMeta.get(id).size == null).forEach(id => {
-                if ((imgMeta.get(id) || {}).asked) return;
-                imgMeta.set(id, Object.assign(imgMeta.get(id) || {}, { asked: true }));
-                fetch(SudeduNotices.imageUrl(id), { method: 'HEAD' }).then(r => {
-                    const n = Number(r.headers.get('content-length'));
-                    if (n) { imgMeta.get(id).size = n; weigh(); }
-                }).catch(() => {});
-            });
-            const sizes = ids.map(id => (imgMeta.get(id) || {}).size).filter(n => n != null);
+            const names = [...new Set(L.items.filter(it => it.t === 'img').map(it => it.src))];
+            if (!sizesAsked && names.some(n => MessageImages.sizeOf(n) == null)) {
+                sizesAsked = true;
+                MessageImages.list().then(weigh).catch(() => {});
+            }
+            const sizes = names.map(n => MessageImages.sizeOf(n)).filter(n => n != null);
             const total = sizes.reduce((a, b) => a + b, 0);
             const el = root.querySelector('.md-weight');
-            el.textContent = ids.length ? `Pictures: ${kb(total)}${sizes.length < ids.length ? '+' : ''} per user` : '';
+            el.textContent = names.length ? `Pictures: ${kb(total)}${sizes.length < names.length ? '+' : ''} per user` : '';
             el.classList.toggle('heavy', total > 1.5 * 1024 * 1024);
-            el.title = 'Each user downloads the pictures once (the browser keeps them). Keep it small: hundreds of users × this size go through the server.';
+            el.title = 'Each user downloads the pictures once (from GitHub Pages; the browser keeps them). Keep it small for phones on mobile data.';
         }
 
         // ---------------- the properties panel
@@ -183,7 +175,7 @@
                     <div class="md-row"><span>Behind it</span><label class="md-chk"><input type="checkbox" class="md-fill-on"${it.fill ? ' checked' : ''}> colour</label><input type="color" data-k="fill" value="${it.fill || '#ffffff'}"${it.fill ? '' : ' disabled'}><input type="range" data-k="fillA" min="0.1" max="1" step="0.05" value="${it.fillA ?? 0.8}" title="How solid"${it.fill ? '' : ' disabled'}></div>
                     ${common}`;
             } else {
-                const meta = imgMeta.get(it.img) || {};
+                const meta = { ...MessageImages.dims(it.src), size: MessageImages.sizeOf(it.src) };
                 props.innerHTML = `<div class="md-ptitle">Picture <span class="md-tip">${meta.w ? `${meta.w}×${meta.h}` : ''}${meta.size ? ' · ' + kb(meta.size) : ''}</span></div>
                     <div class="md-row"><span>Fit</span><select data-k="fit">${[['fill', 'Stretch to the box'], ['cover', 'Fill the box (crop)'], ['contain', 'Whole picture']].map(([v, n]) => `<option value="${v}"${it.fit === v ? ' selected' : ''}>${n}</option>`).join('')}</select></div>
                     <div class="md-row"><span>Corners</span><input type="range" data-k="radius" min="0" max="50" step="1" value="${it.radius || 0}"><b>${it.radius || 0}%</b></div>
@@ -233,7 +225,7 @@
             }
             if (p === 'cx') it.x = r2(50 - it.w / 2);
             if (p === 'cy') it.y = r2(50 - it.h / 2);
-            if (p === 'ratio') { const m = imgMeta.get(it.img); if (m && m.w) it.h = r2(it.w * L.w / L.h * m.h / m.w); }
+            if (p === 'ratio') { const m = MessageImages.dims(it.src); if (m.w) it.h = r2(it.w * L.w / L.h * m.h / m.w); }
             if (p === 'fillcard') { Object.assign(it, { x: 0, y: 0, w: 100, h: 100, rot: 0, fit: 'cover' }); const [x] = L.items.splice(sel, 1); L.items.unshift(x); sel = 0; }
             draw(); commit();
         });
@@ -276,44 +268,28 @@
             draw();
         }
 
-        // ---------------- pictures: shrink big photos, upload, place
-        async function readSize(file) {
-            try { const b = await createImageBitmap(file); const s = { w: b.width, h: b.height, bmp: b }; return s; } catch { return null; }
-        }
-        async function prepare(file) {
-            if (!/^image\/(png|jpeg|gif|webp)$/.test(file.type)) throw new Error(`${file.name}: only PNG, JPEG, GIF or WebP pictures`);
-            const dim = await readSize(file);
-            if (!dim) throw new Error(`${file.name}: can't read this picture`);
-            // GIFs (animations) are sent as they are; other pictures are shrunk when big
-            if (file.type === 'image/gif' || (Math.max(dim.w, dim.h) <= PHOTO_MAX && file.size <= 350 * 1024)) return { blob: file, type: file.type, w: dim.w, h: dim.h };
-            const k = Math.min(1, PHOTO_MAX / Math.max(dim.w, dim.h));
-            const c = document.createElement('canvas');
-            c.width = Math.round(dim.w * k); c.height = Math.round(dim.h * k);
-            c.getContext('2d').drawImage(dim.bmp, 0, 0, c.width, c.height);
-            const blob = await new Promise(res => c.toBlob(res, 'image/webp', 0.86));
-            if (!blob || blob.size >= file.size) return { blob: file, type: file.type, w: dim.w, h: dim.h };
-            return { blob, type: 'image/webp', w: c.width, h: c.height };
+        // ---------------- pictures (uploaded to GitHub by MessageImages), placed on the card
+        function placePicture(p, at) {
+            // 40% of the card's width (less for tall pictures), its own proportions, centred (or where it was dropped)
+            const pw = p.w || 4, ph = p.h || 3;
+            let w = 40, h = r2(w * L.w / L.h * ph / pw);
+            if (h > 80) { h = 80; w = r2(h * L.h / L.w * pw / ph); }
+            const x = at ? at[0] - w / 2 : 50 - w / 2, y = at ? at[1] - h / 2 : 50 - h / 2;
+            add({ t: 'img', src: p.name, x: r2(x), y: r2(y), w, h, rot: 0, fit: 'fill', radius: 0, opacity: 1 });
+            say(p.size > 1024 * 1024 ? `${kb(p.size)} - quite big for every user to download.` : '', p.size > 1024 * 1024);
         }
         async function addPictures(files, at) {
             files = [...files].filter(f => f && f.type && f.type.startsWith('image/'));
-            if (!files.length) return;
             for (const file of files) {
-                say(`Uploading ${file.name}…`);
-                try {
-                    const p = await prepare(file);
-                    if (p.blob.size > 3 * 1024 * 1024) throw new Error(`${file.name} is ${kb(p.blob.size)} - at most 3 MB (make the GIF shorter or smaller)`);
-                    const res = await apiFetch(`${apiBase}admin/notices/images?w=${p.w}&h=${p.h}`, { method: 'POST', headers: { 'Content-Type': p.type }, body: p.blob });
-                    const body = res ? await res.json().catch(() => ({})) : {};
-                    if (!res || !res.ok) throw new Error(body.message || 'Upload failed');
-                    imgMeta.set(body.id, { w: p.w, h: p.h, size: body.size });
-                    // 40% of the card's width (less for tall pictures), its own proportions, centred (or where it was dropped)
-                    let w = 40, h = r2(w * L.w / L.h * p.h / p.w);
-                    if (h > 80) { h = 80; w = r2(h * L.h / L.w * p.w / p.h); }
-                    const x = at ? at[0] - w / 2 : 50 - w / 2, y = at ? at[1] - h / 2 : 50 - h / 2;
-                    add({ t: 'img', img: body.id, x: r2(x), y: r2(y), w, h, rot: 0, fit: 'fill', radius: 0, opacity: 1 });
-                    say(p.blob.size > 1024 * 1024 ? `${file.name}: ${kb(p.blob.size)} - quite big for every user to download.` : '', p.blob.size > 1024 * 1024);
-                } catch (err) { say(err.message, true); }
+                say(`Uploading ${file.name || 'the picture'} to GitHub…`);
+                try { placePicture(await MessageImages.upload(file), at); }
+                catch (err) { say(`Not uploaded: ${err.message}`, true); }
             }
+        }
+        async function pickPicture() {
+            say('');
+            const p = await MessageImages.pick();
+            if (p) placePicture(p);
         }
 
         // ---------------- typing on the card
@@ -463,11 +439,11 @@
             if (!b) return;
             const a = b.dataset.a;
             if (a === 'text') addText();
+            else if (a === 'pic') pickPicture();
             else if (a === 'undo') travel(undo, redo);
             else if (a === 'redo') travel(redo, undo);
             else if (a === 'phone') { phone = !phone; draw(); }
         });
-        fileInput.addEventListener('change', () => { addPictures(fileInput.files); fileInput.value = ''; });
         root.querySelector('.md-preset').addEventListener('change', e => {
             if (e.target.value === 'custom') return;
             const [w, h] = e.target.value.split('x').map(Number);
@@ -525,7 +501,6 @@
         .md-btn:hover{background:#fff}
         .md-btn:disabled{opacity:.4;cursor:default}
         .md-btn.on{background:#3288AC;color:#fff;border-color:#3288AC}
-        .md-file{display:inline-flex;align-items:center}
         .md-sep{width:1px;height:24px;background:rgba(0,0,0,.15);margin:0 4px}
         .md-lab{display:inline-flex!important;align-items:center;gap:6px;margin:0!important;font-size:14px;font-weight:600!important}
         .md-lab select{width:auto;padding:6px 8px}

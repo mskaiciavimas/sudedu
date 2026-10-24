@@ -6,8 +6,10 @@
  * a chosen page (or the first page the user opens), optionally from / until a date, optionally with a pet game gift
  * (picked from the items; a poll gives it after the answer), optionally also for accounts created while it is active.
  * Each user sees it once. Preview shows it exactly as users will.
- * The look: plain text, or a designed card (admin-message-designer.js: text blocks and pictures - GIFs too - placed,
- * sized and turned freely; the card scales to every screen).
+ * The look: plain text with pictures between the lines (admin-message-text.js), or a designed card
+ * (admin-message-designer.js: text blocks and pictures - GIFs too - placed, sized and turned freely; the card scales to
+ * every screen). Pictures are uploaded to the site's GitHub repository or picked from those uploaded before
+ * (admin-message-images.js); if GitHub can't be reached, nothing is uploaded or sent.
  * Sent: the numbers (sent / seen / waiting, poll answers), results with bars per answer (all, students, teachers), the
  * written answers, a CSV; pause / resume, edit the text and dates, send to more users, copy into a new one, delete
  * (deleting removes it from everyone who has not seen it yet, with its answers). */
@@ -35,7 +37,7 @@
     };
 
     let root = null, mounted = false, list = [];
-    const state = { kind: 'message', options: ['', ''], gift: null, audience: null, look: 'text', designer: null };
+    const state = { kind: 'message', options: ['', ''], gift: null, audience: null, look: 'text', designer: null, text: null };
 
     // ------------------------------------------------------------ who: everyone / students / teachers / class / users
     // → { el, value() → { type, ids }, set(type, users) }; onChange is called after any change
@@ -205,12 +207,9 @@
                 <div class="am-col">
                     <div class="form-group"><label for="am-title">Title</label><input id="am-title" maxlength="120" value="${DEFAULT_TITLE.message}"></div>
                     <div class="form-group">
-                        <div class="am-look-row"><label for="am-body" class="am-body-label">Message</label>
+                        <div class="am-look-row"><label class="am-body-label">Message</label>
                             <div class="am-seg am-look"><button type="button" class="am-seg-btn on" data-look="text">✏️ Plain text</button><button type="button" class="am-seg-btn" data-look="design">🎨 Designed card</button></div></div>
-                        <div class="am-text-part">
-                            <textarea id="am-body" rows="5" maxlength="5000" placeholder="Sveiki! …"></textarea>
-                            <small class="am-muted">New lines, **bold** and links (https://…) work. Users see it in the site's pop-up.</small>
-                        </div>
+                        <div class="am-text-part"></div>
                         <small class="am-muted am-design-note" hidden>Design the card below - it is what users see (a poll's answers come under it).</small>
                     </div>
                     <div class="form-group am-poll" hidden>
@@ -281,8 +280,9 @@
         const title = root.querySelector('#am-title').value.trim();
         const design = state.look === 'design';
         const layout = design && state.designer ? state.designer.get() : null;
-        const body = design ? '' : root.querySelector('#am-body').value.trim();
+        const body = design ? '' : state.text.get();
         if (!title) return { error: 'Add a title.' };
+        if (body.length > 5000) return { error: `The text is too long (${body.length} of 5000 characters).` };
         if (design && !layout) return { error: 'The card is empty - add a text or a picture.' };
         if (!design && !body) return { error: state.kind === 'poll' ? 'Write the question.' : 'Write the message.' };
         const n = {
@@ -334,7 +334,7 @@
         btn.disabled = false;
     }
     function resetForm() {
-        root.querySelector('#am-body').value = '';
+        state.text.set('');
         if (state.designer) state.designer.set(null);
         root.querySelector('#am-title').value = DEFAULT_TITLE[state.kind];
         root.querySelector('#am-starts').value = '';
@@ -351,7 +351,7 @@
     function copyIntoForm(m) {
         setKind(m.kind);
         root.querySelector('#am-title').value = m.title;
-        root.querySelector('#am-body').value = m.layout ? '' : m.body;
+        state.text.set(m.layout ? '' : m.body);
         setLook(m.layout ? 'design' : 'text');
         if (m.layout) state.designer.set(m.layout);
         root.querySelector('#am-page').value = m.page;
@@ -404,7 +404,7 @@
                     <span class="am-status ${cls}">${esc(label)}</span>
                     <b class="am-item-title">${esc(m.title)}</b>
                 </div>
-                <div class="am-item-body">${esc(m.body.length > 180 ? m.body.slice(0, 180) + '…' : m.body)}</div>
+                <div class="am-item-body">${esc(shortBody(m.body))}</div>
                 <div class="am-item-meta">
                     <span>👥 ${esc(audienceText(m))}</span><span>📍 ${esc(PAGE_NAMES[m.page] || m.page)}</span>
                     ${gift ? `<span>${gift}</span>` : ''}
@@ -477,12 +477,17 @@
         a.click();
         setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     }
+    // the list's short text: a picture line as 🖼, at most 180 characters
+    function shortBody(body) {
+        const text = String(body || '').split('\n').map(l => (SudeduNotices.IMAGE_LINE.test(l.trim()) ? '🖼' : l)).join('\n');
+        return text.length > 180 ? text.slice(0, 180) + '…' : text;
+    }
     function editPanel(m, panel) {
         panel.innerHTML = `
             <div class="form-group"><label>Title</label><input class="am-e-title" maxlength="120" value="${esc(m.title)}"></div>
             ${m.layout ? `<div class="form-group"><label>The card</label><div class="am-e-designer"></div>
                 <small class="am-muted">Users who have not seen it yet get the new card${m.kind === 'poll' ? ' (the answers stay as they are)' : ''}.</small></div>`
-            : `<div class="form-group"><label>${m.kind === 'poll' ? 'Question' : 'Message'}</label><textarea class="am-e-body" rows="4" maxlength="5000">${esc(m.body)}</textarea>
+            : `<div class="form-group"><label>${m.kind === 'poll' ? 'Question' : 'Message'}</label><div class="am-e-text"></div>
                 <small class="am-muted">Users who have not seen it yet get the new text${m.kind === 'poll' ? ' (the answers stay as they are)' : ''}.</small></div>`}
             <div class="am-dates">
                 <div class="form-group"><label>Show from</label><input type="datetime-local" class="am-e-starts" value="${localInput(m.startsAt)}"></div>
@@ -492,12 +497,13 @@
             <div class="am-e-out"></div>
             <div class="am-actions"><button type="button" class="btn small-btn btn-secondary am-e-cancel">Cancel</button><button type="button" class="btn small-btn am-e-save">Save</button></div>`;
         const designer = m.layout ? MessageDesigner.create(panel.querySelector('.am-e-designer'), m.layout) : null;
+        const text = m.layout ? null : MessageText.create(panel.querySelector('.am-e-text'), m.body);
         panel.querySelector('.am-e-cancel').addEventListener('click', () => { panel.hidden = true; });
         panel.querySelector('.am-e-save').addEventListener('click', async () => {
             const v = s => panel.querySelector(s).value;
             if (designer && !designer.get()) { panel.querySelector('.am-e-out').innerHTML = '<div class="message error">The card is empty.</div>'; return; }
             const body = {
-                title: v('.am-e-title').trim(), ...(designer ? { layout: designer.get(), body: '' } : { body: v('.am-e-body').trim() }),
+                title: v('.am-e-title').trim(), ...(designer ? { layout: designer.get(), body: '' } : { body: text.get() }),
                 startsAt: v('.am-e-starts') ? new Date(v('.am-e-starts')).toISOString() : null,
                 expiresAt: v('.am-e-ends') ? new Date(v('.am-e-ends')).toISOString() : null
             };
@@ -561,6 +567,7 @@
         if (!root) return;
         mounted = true;
         root.innerHTML = formHtml();
+        state.text = MessageText.create(root.querySelector('.am-text-part'), '', { placeholder: 'Sveiki! …' });
         let recount = () => {};
         state.audience = audiencePicker(() => recount());
         recount = countInto(state.audience);
@@ -608,7 +615,7 @@
         if (btn) btn.click();
         mount();
         state.audience.set('users', [user]);
-        root.querySelector('#am-body').focus();
+        state.text.focus();
         root.querySelector('.am-compose').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
