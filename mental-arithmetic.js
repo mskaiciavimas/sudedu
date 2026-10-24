@@ -57,7 +57,84 @@ function mistakeTableShowsAnswers() {
 function escapeMistakeText(value) {
   return String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 }
-
+// the wrong answers in brackets after a word / an example: the most frequent first - at most 10, and only as many as
+// fit on one line with "+N" (more of them, a narrow screen); "+N" shows the rest in place (it doesn't open the word's
+// sentences). The fitting is redone when a table appears (a collapsed one is measured when it opens) or its width changes.
+const WRONG_ANSWERS_MAX = 10;
+function wrongAnswersHtml(answers) {
+  const count = new Map();
+  (answers || []).forEach(a => { const k = String(a); count.set(k, (count.get(k) || 0) + 1); });
+  const list = [...count.keys()].sort((x, y) => count.get(y) - count.get(x));   // (a stable sort: ties keep their order)
+  if (!list.length) return '';
+  setUpWrongAnswers();
+  const items = list.map((a, i) => `<span class="wa-i"${i >= WRONG_ANSWERS_MAX ? ' hidden' : ''}>${i ? '<span class="wa-sep">, </span>' : ''}<span class="wa">${escapeMistakeText(a)}</span></span>`).join('');
+  const rest = list.length - Math.min(WRONG_ANSWERS_MAX, list.length);
+  const more = list.length > 1 ? `<span class="wa-mi"${rest ? '' : ' hidden'}><span class="wa-sep">, </span><button type="button" class="wa-more" title="Rodyti visus įrašytus atsakymus (${list.length})">+${rest}</button></span>` : '';
+  return ` <span class="word-wrong-answers">(${items}${more})</span>`;
+}
+// as many as fit on one line (the brackets' own line), the first 10 at most
+function fitWrongAnswers(group) {
+  if (group.classList.contains('wa-all') || !group.getClientRects().length) return;   // (opened, or not on the screen)
+  const items = [...group.querySelectorAll('.wa-i')], mi = group.querySelector('.wa-mi'), btn = mi && mi.querySelector('.wa-more');
+  for (let k = Math.min(WRONG_ANSWERS_MAX, items.length); k >= 1; k--) {
+    items.forEach((it, i) => { it.hidden = i >= k; });
+    if (mi) { mi.hidden = k >= items.length; btn.textContent = `+${items.length - k}`; }
+    if (onOneLine(group)) return;
+  }
+}
+// (an inline element's boxes: several on one line are possible - one line = all of them at the same height)
+function onOneLine(el) {
+  const rects = [...el.getClientRects()].filter(r => r.width > 0);
+  if (rects.length <= 1) return true;
+  const tops = rects.map(r => r.top), h = Math.min(...rects.map(r => r.height));
+  return Math.max(...tops) - Math.min(...tops) < h * 0.5;
+}
+let wrongAnswersSetUp = false, wrongAnswersResize = null, wrongAnswersScan = 0;
+const wrongAnswersByBox = new Map();   // the cell a group sits in → its groups
+function scanWrongAnswers() {
+  wrongAnswersScan = 0;
+  document.querySelectorAll('.word-wrong-answers:not([data-fit])').forEach(group => {
+    group.dataset.fit = '1';
+    const box = group.closest('td, th, li, p, div') || group.parentElement;
+    if (!wrongAnswersByBox.has(box)) { wrongAnswersByBox.set(box, new Set()); wrongAnswersResize.observe(box); }
+    wrongAnswersByBox.get(box).add(group);
+    fitWrongAnswers(group);
+  });
+}
+function setUpWrongAnswers() {
+  // (the groups are put on the page by whoever asked for the html - looked for once it is there)
+  if (wrongAnswersSetUp) { if (!wrongAnswersScan) wrongAnswersScan = requestAnimationFrame(scanWrongAnswers); return; }
+  wrongAnswersSetUp = true;
+  const style = document.createElement('style');
+  style.textContent = `
+    .word-wrong-answers{white-space:normal;overflow-wrap:anywhere}
+    .word-wrong-answers [hidden]{display:none!important}
+    .wa-more{display:inline-block;border:none;margin:0 1px;padding:0 6px;border-radius:999px;background:rgba(192,96,90,.14);color:#a5453f;font:inherit;font-size:.85em;font-weight:700;line-height:1.5;cursor:pointer;vertical-align:baseline}
+    .wa-more:hover,.wa-more:focus-visible{background:rgba(192,96,90,.26);outline:none}`;
+  document.head.appendChild(style);
+  wrongAnswersResize = new ResizeObserver(entries => entries.forEach(e => {
+    const groups = wrongAnswersByBox.get(e.target);
+    if (!groups) return;
+    groups.forEach(g => { if (!g.isConnected) groups.delete(g); else fitWrongAnswers(g); });
+    if (!groups.size) { wrongAnswersByBox.delete(e.target); wrongAnswersResize.unobserve(e.target); }
+  }));
+  // (capture: before the row's own click, which opens the sentences)
+  document.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('.wa-more');
+    if (!b) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const group = b.closest('.word-wrong-answers');
+    if (!group) return;
+    group.classList.add('wa-all');
+    group.querySelectorAll('.wa-i').forEach(it => { it.hidden = false; });
+    b.closest('.wa-mi').hidden = true;
+  }, true);
+  document.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.closest && e.target.closest('.wa-more')) { e.preventDefault(); e.stopPropagation(); e.target.click(); }
+  }, true);
+  wrongAnswersScan = requestAnimationFrame(scanWrongAnswers);
+}
 
 const animationStepsAndDurationNumberDict = {
     "cat-1-sits-idle": [10, 2],
@@ -2845,9 +2922,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
 
       // Convert the data to an array of objects
       // (EXPERIMENTAL pages: the answers given, next to the example)
-      const answersHtml = key => mathAnswersByKey[key] && mathAnswersByKey[key].size
-        ? ` <span class="word-wrong-answers">(${[...mathAnswersByKey[key]].map(a => `<span class="wa">${escapeMistakeText(a)}</span>`).join(', ')})</span>`
-        : '';
+      const answersHtml = key => mathAnswersByKey[key] && mathAnswersByKey[key].size ? wrongAnswersHtml([...mathAnswersByKey[key]]) : '';
       // every example (in a row, with an unknown number): the right number in green where the box was, the wrong
       // answers in brackets after it (in the mistakes' pink). Only an example done in columns opens "Sprendimas"
       // (its layout); its wrong answers are shown there.
@@ -3059,9 +3134,8 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
     const [prefix, answer, suffix] = wordParts;
 
     // EXPERIMENTAL (testers' pages only, html.experimental-on): the wrong answers next to the word, e.g. "pažinsi (q, ž)"
-    const wrongAnswers = mistakeTableShowsAnswers()
-      ? [...new Set(occurrences.flatMap(occ => occ.usersMistakes[1] || []))].map(escapeMistakeText)
-      : [];
+    // (every answer as often as it was given - the most frequent come first)
+    const wrongAnswers = mistakeTableShowsAnswers() ? occurrences.flatMap(occ => occ.usersMistakes[1] || []) : [];
 
     // Create highlighted word form with all occurrence data
     const highlightedWord = `
@@ -3069,7 +3143,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
             data-word-parts='${JSON.stringify(wordParts)}'
             data-category="${decodedWordCategory}"
             data-occurrences='${encodeURIComponent(JSON.stringify(occurrences))}'>
-        ${prefix}<span class="incorrect-part">${answer}</span>${suffix}${wrongAnswers.length ? ` <span class="word-wrong-answers">(${wrongAnswers.map(w => `<span class="wa">${w}</span>`).join(', ')})</span>` : ''}
+        ${prefix}<span class="incorrect-part">${answer}</span>${suffix}${wrongAnswersHtml(wrongAnswers)}
       </span>
     `;
     

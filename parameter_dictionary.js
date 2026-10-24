@@ -617,7 +617,7 @@ const insightsMistakePatterns = {
         atskiri: { area: 'skaitant pavienius žodžius jų nesiejant sakinyje', label: 'Skaito pavienius žodžius, nesieja žodžių sakinyje', topic: 'tikri, bet sakiniui netinkami žodžiai',
             tip: 'Klaidingas atsakymas sudaro tikrą žodį, tik netinkamą sakiniui. Apima ir atvejus, kai tiktų keli atsakymai, bet teisingu laikomas tik tas, kuris yra originaliame tekste.' },
         nedemesys: { area: 'įrašant netinkamas raides dėl dėmesio stokos', label: 'Nekreipia dėmesio, ką rašo, arba netyčia įrašė ne tą raidę', topic: 'netyčia ar neatidžiai įrašytos raidės',
-            tip: 'Įrašytos raidės nesudaro tikro žodžio ir neatitinka tipinių klaidų (pvz., viena raidė pakeista kita ar įrašyta du kartus).' },
+            tip: 'Įrašytos raidės nesudaro tikro žodžio ir neatitinka tipinių klaidų (pvz., paspausta gretima klaviatūros raidė, viena raidė pakeista kita ar įrašyta du kartus).' },
         bet_kokias: { area: 'įrašinėjant bet kokias raides', label: 'Įrašinėja bet kokias raides', topic: 'bet kokios įrašytos raidės',
             tip: 'Įrašytos raidės aiškiai nėra bandymas teisingai atlikti užduotį: neįprasti raidžių junginiai (pvz., „hįh“), lietuvių kalboje nevartojamos raidės ar ženklai, ta pati raidė kelis kartus iš eilės, neteisinga didžioji raidė žodžio viduryje, vien priebalsės vietoje balsės arba tas pats neteisingas atsakymas įrašytas į daugumą užduoties žodžių.' },
         didziosios: { area: 'rašant didžiąsias raides', label: 'Neteisingas didžiųjų raidžių naudojimas', topic: 'didžiųjų raidžių naudojimas',

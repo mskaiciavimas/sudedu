@@ -641,6 +641,7 @@
 			let common = null, names = null;
 			try { [common, names] = words ? await Promise.all([words.load('freqCommon'), words.load('names')]) : [null, null]; } catch (e) { common = names = null; }
 			for (const x of unexplained) {
+				if (keyboardSlip(x.a, x.w)) { x.keys.add('nedemesys'); continue; }
 				let verdict = null;
 				try {
 					if (common && names) { const w = words.normalize(x.b + x.w + x.s); verdict = !w || !/^[aąbcčdeęėfghiįyjklmnoprsštuųūvzž]+$/.test(w) ? 'invalid' : common.has(w) && !names.has(w) ? 'ok' : 'unknown'; }
@@ -663,11 +664,11 @@
 			if (!g.parts.has(x.item)) g.parts.set(x.item, { weight: 0, wrongs: [], task: x.task });
 			const part = g.parts.get(x.item);
 			part.weight += x.weight;
-			if (x.w !== null) part.wrongs.push(x.w);
+			if (x.w !== null) part.wrongs.push(x.caseOnly ? x.raw : x.w);   // (capitals: as typed - "F" for "f")
 			g.perTask.set(x.task, (g.perTask.get(x.task) || 0) + x.weight);   // for the change of this kind of mistake
 			if (x.cat) g.cats.add(x.cat);
 			g.tasks.add(x.task);
-			if (!g.words.has(x.word) && g.examples.length < 3) g.examples.push({ b: x.b, a: x.a, s: x.s, w: x.w });
+			if (!g.words.has(x.word) && g.examples.length < 3) g.examples.push({ b: x.b, a: x.caseOnly ? String(x.item[0][1]) : x.a, s: x.s, w: x.caseOnly ? x.raw : x.w });
 			g.words.add(x.word);
 		}));
 		const insights = [...byKey.values()].map(g => ({ ...g, raw: g.count, count: Math.max(1, Math.round(g.count)), share: total > 0 ? g.count / total * 100 : 0, wordCount: g.words.size, taskCount: g.tasks.size,
@@ -703,6 +704,37 @@
 	 * Kept as "nekreipia dėmesio" (a slip): a letter typed twice where the word is otherwise right. */
 	const LT_LETTERS = /^[aąbcčdeęėfghiįyjklmnoprsštuųūvzž]+$/;
 	const LT_VOWELS = /[aąeęėiįyouųū]/;
+	/* A slip of the finger: the wrong letters are keys right next to the right ones on a Lithuanian keyboard (QWERTY with
+	 * ą č ę ė į š ų ū on the number row), in any direction - y for t, r for e, rn for en - or one extra key next to its
+	 * neighbour (ty for t). Only for answers no spelling rule explains (ė sits above e and r: e / ė stays a spelling
+	 * mistake). Such answers are "netyčia įrašė ne tą raidę", never "bet kokios raidės". */
+	const KEY_AT = (() => {
+		const rows = [['ąčęėįšųū', 0], ['qwertyuiop', 0.5], ['asdfghjkl', 0.75], ['zxcvbnm', 1.25]];
+		const at = new Map();
+		rows.forEach(([keys, shift], y) => [...keys].forEach((k, i) => at.set(k, [i + shift, y])));
+		return at;
+	})();
+	function keysNextTo(x, y) {
+		const p = KEY_AT.get(x), q = KEY_AT.get(y);
+		if (!p || !q || x === y) return false;
+		const dx = Math.abs(p[0] - q[0]), dy = Math.abs(p[1] - q[1]);
+		return (dy === 0 && dx <= 1) || (dy === 1 && dx <= 0.75);
+	}
+	function keyboardSlip(a, w) {
+		a = String(a).toLowerCase(); w = String(w).toLowerCase();
+		if (!a || !w || a === w) return false;
+		if (w.length === a.length) {
+			const diff = [...w].map((ch, i) => [ch, a[i]]).filter(([ch, r]) => ch !== r);
+			return diff.length <= 2 && diff.every(([ch, r]) => keysNextTo(ch, r));
+		}
+		if (w.length === a.length + 1) {
+			for (let i = 0; i < w.length; i++) {
+				if (w.slice(0, i) + w.slice(i + 1) !== a) continue;
+				if (keysNextTo(w[i], w[i - 1]) || keysNextTo(w[i], w[i + 1])) return true;
+			}
+		}
+		return false;
+	}
 	const RANDOM_ODD_MIN = 3, RANDOM_FILL_WORDS = 5, RANDOM_FILL_ANSWERS = 3, RANDOM_FILL_SHARE = 0.6;
 	let lexiconPromise = null;
 	// the word lists for this: every legitimate word form (to leave real words alone) and every three-letter combination
@@ -736,7 +768,7 @@
 	}
 	function randomSign(x, lexicon) {
 		const ww = x.b + x.w + x.s, cw = x.b + x.a + x.s;
-		if (typedTwice(cw, ww)) return false;
+		if (typedTwice(cw, ww) || keyboardSlip(x.a, x.w)) return false;
 		if (!LT_LETTERS.test(x.w)) return true;                                      // q, w, x, digits, signs
 		if ([...String(x.raw || '')].some((ch, k) => x.b.length + k > 0 && /[A-ZĄČĘĖĮŠŲŪŽ]/.test(ch))) return true;   // a capital inside the word
 		if (lexicon && lexicon.isWord(ww)) return false;                             // a (rare) real word
@@ -789,10 +821,14 @@
 		const often = g.taskCount >= RANDOM_OFTEN_TASKS && g.taskCount >= RANDOM_OFTEN_SHARE * Math.max(tasksKnown || 0, g.taskCount);
 		return { flagged: g.wordCount >= RANDOM_WORDS, often, words: g.wordCount, share, tasks: g.taskCount, tasksKnown, example: g.examples[0] || null };
 	}
-	// one student's tasks (as the page gives them) → the same verdict as their summary's: { flagged, words, share, tasks }
+	// one student's tasks (as the page gives them) → the same verdict as their summary's: { flagged, words, share, tasks }.
+	// The same tasks as their card: the outliers (implausibly many mistakes) left out the way analyze does - against
+	// opts.peers (the classmates' tasks, as the card gets them), so the "!" is never shown for mistakes the card leaves out
 	async function randomLettersOf(tasks, opts = {}) {
 		let list = (tasks || []).map(t => normalizeTask(t, opts.kindOf)).filter(t => t && t.subject === 'grammar' && t.answers > 0 && t.date);
 		list = dropTeacherCopies(list);
+		const isOutlier = outlierRule(list, opts, 'grammar');
+		list = list.filter(t => !isOutlier(t));
 		const entries = [];
 		list.forEach((t, i) => t.detail.forEach(item => entries.push({ item, task: i })));
 		if (!entries.length) return { flagged: false, often: false, words: 0, share: 0, tasks: 0 };
@@ -2656,6 +2692,8 @@
 			});
 			// (a task set or pattern whose comparison is the overall one - the same tasks in its groups - adds nothing)
 			const exposureOf = c => c.test.blocks.reduce((t, b) => t + b.e, 0);
+			// (the heaviest part - the page may draw first: a class's change tests take a few hundred ms)
+			await new Promise(resolve => setTimeout(resolve, 0));
 			const found0 = windowChanges(conds);
 			f.changesTested = windowChanges.tested;
 			f.changesAll = windowChanges.all;
@@ -4360,5 +4398,5 @@
 		return render(el, Array.isArray(row) ? row : [row], { ...opts, mode: 'task', scope: 'period' });
 	}
 
-	window.SudInsights = { _randomSign: randomSign, _markRandomLetters: markRandomLetters, _analyzeGrammar: analyzeGrammarMistakes, _loadLexicon: loadLexicon, OUTLIER, showInfo, enabled, analyze, describe, randomLettersOf, renderPeriod, renderTask, showLoading, classifyAnswer, form, trend, verdict, tPValue, INSIGHTS, mathComposition, windowTest, windowChanges, WIN };
+	window.SudInsights = { _randomSign: randomSign, _markRandomLetters: markRandomLetters, _analyzeGrammar: analyzeGrammarMistakes, _keyboardSlip: keyboardSlip, _loadLexicon: loadLexicon, OUTLIER, showInfo, enabled, analyze, describe, randomLettersOf, renderPeriod, renderTask, showLoading, classifyAnswer, form, trend, verdict, tPValue, INSIGHTS, mathComposition, windowTest, windowChanges, WIN };
 })();

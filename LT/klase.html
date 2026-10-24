@@ -937,10 +937,19 @@
             margin-bottom: 20px;
         }
 
+        /* the leaders: a glass panel like "Praėjusio iššūkio laimėtojai" next to it, its title inside */
         .podium-container-outer {
             display: flex;
+            flex-direction: column;
             flex: 1;
-            padding-bottom: 15px;
+            padding: 18px 18px 15px;
+            background: rgba(255, 255, 255, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            border-radius: 16px;
+            box-sizing: border-box;
+        }
+        .podium-container-outer .leaders-title {
+            margin-bottom: 10px;
         }
 
         .podium-container {
@@ -2496,9 +2505,9 @@
                                 </div>
                             </div>
                         
-                        <div class="section-title">Iššūkio lyderiai</div>
                                     <div class="class-challenge-leaders-div">
                                         <div class="podium-container-outer">
+                                        <div class="previous-challenge-winners-title leaders-title">Iššūkio lyderiai</div>
                                         <div id="podium-container" class="podium-container">
                                             <div class="podium-place second">
                                                 <div class="podium-student"></div>
@@ -3361,10 +3370,10 @@
     </div>
     </div>
 
-    <script src="../mental-arithmetic.js?v=20261020c"></script>
-    <script src="../sudedu-notices.js?v=20261024b"></script>
+    <script src="../mental-arithmetic.js?v=20261024b"></script>
+    <script src="../sudedu-notices.js?v=20261024c"></script>
     <script src="../main-nav-bar.js"></script>
-    <script src="../parameter_dictionary.js?v=20261024d"></script>
+    <script src="../parameter_dictionary.js?v=20261024e"></script>
     <script src="../mental-arithmetic-combinations.js"></script>
     <!-- class games: lobby client, Praktika's task settings (math only here) and the Žaidimai section -->
     <script src="../game-client.js?v=20261018r"></script>
@@ -3380,17 +3389,18 @@
     <script src="../klase-auction.js?v=20261024a"></script>
     <script src="../klase-invites.js?v=20261018r"></script>
     <script type="module">
-        const weekChallengeWinningsTotalPrizeCoins = 90;
+        // the weekly challenge's prizes: 30 / 20 / 10 coins (a pool of 60 split 3:2:1; the same in the server's classRoutes.js)
+        const weekChallengeWinningsTotalPrizeCoins = 60;
         const weekChallengeWinningsWeights = {
-            "firstPlace": 0.444,
-            "secondPlace": 0.333,
-            "thirdPlace": 0.222
+            "firstPlace": 0.5,
+            "secondPlace": 0.3333,
+            "thirdPlace": 0.1667
         }
 
         const weekChallengeWinningsMaxCoinsPerPosition = {
-            "firstPlace": 40,
-            "secondPlace": 30,
-            "thirdPlace": 20
+            "firstPlace": 30,
+            "secondPlace": 20,
+            "thirdPlace": 10
         }
 
         let userData;
@@ -4804,7 +4814,7 @@ async function renderClassWeekChallenge () {
         document.querySelector("#complete-task-btn").style.display = "none";
 
         document.querySelector(".podium-container-outer").style.display = "none";
-        document.querySelector(".section-title").style.display = "none";
+        document.querySelector(".leaders-title")?.style.setProperty("display", "none");
         document.querySelector('.class-challenge-content-grid').style.gap = '0';
 
     } else {
@@ -4839,7 +4849,7 @@ async function renderClassWeekChallenge () {
 
         if (classDataCache.top3WeekChl.length === 0) {
                 document.querySelector(".podium-container-outer").style.display = "none";
-                document.querySelector(".section-title").style.display = "none";
+                document.querySelector(".leaders-title")?.style.setProperty("display", "none");
             } else {
                 const allStudents = classDataCache.remainingStudents.concat(classDataCache.requestingStudent);
                 

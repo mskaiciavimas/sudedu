@@ -892,6 +892,7 @@
             <button class="tab-btn active" onclick="showTab('lookup', event)">👤 User Lookup</button>
             <button class="tab-btn" onclick="showTab('bulk', event)">⚡ Bulk Operations</button>
             <button class="tab-btn" onclick="showTab('messages', event)">💌 Messages</button>
+            <button class="tab-btn" onclick="showTab('news', event)">📰 Naujienos</button>
             <button class="tab-btn" onclick="showTab('itemlookup', event)">🔍 Item Lookup</button>
             <button class="tab-btn" onclick="showTab('statistics', event)">📊 Statistics</button>
             <button class="tab-btn" onclick="showTab('taskstorage', event)">💾 Task Storage</button>
@@ -1150,6 +1151,12 @@
             </div>
         </div>
 
+        <!-- The news on the front page (Naujienos): read from / saved into LT/index.html on GitHub (admin-news.js) -->
+        <div id="news-tab" class="tab-content">
+            <h2 class="send-gifts-title">Naujienos (front page)</h2>
+            <div id="news-app"></div>
+        </div>
+
         <!-- Messages, polls and gifts for the site's users (admin-messages.js; the site shows them with sudedu-notices.js) -->
         <div id="messages-tab" class="tab-content">
             <h2 class="send-gifts-title">Messages, polls and gifts</h2>
@@ -1202,10 +1209,10 @@
         </div>
     </div>
 
-    <script src="../mental-arithmetic.js?v=20261020c"></script>
-    <script src="../sudedu-notices.js?v=20261024b"></script>
+    <script src="../mental-arithmetic.js?v=20261024b"></script>
+    <script src="../sudedu-notices.js?v=20261024c"></script>
     <script src="../main-nav-bar.js"></script>
-    <script src="../parameter_dictionary.js?v=20261024d"></script>
+    <script src="../parameter_dictionary.js?v=20261024e"></script>
     <script>
         // Global variables
         let gameAssetIndex = null;
@@ -1627,6 +1634,8 @@
                 loadStatistics();
             } else if (tabName === 'taskstorage') {
                 loadTaskStorage();
+            } else if (tabName === 'news') {
+                AdminNews.mount();
             } else if (tabName === 'points') {
                 AdminPoints.mount();
             } else if (tabName === 'gamestats') {
@@ -4500,8 +4509,9 @@ document.addEventListener('DOMContentLoaded', function() {
     <script src="admin-points.js"></script>
     <script src="admin-tools.js?v=20261024a"></script>
     <script src="admin-message-images.js?v=20261024b"></script>
-    <script src="admin-message-text.js?v=20261024b"></script>
+    <script src="admin-message-text.js?v=20261024c"></script>
     <script src="admin-message-designer.js?v=20261024b"></script>
-    <script src="admin-messages.js?v=20261024b"></script>
+    <script src="admin-messages.js?v=20261024c"></script>
+    <script src="admin-news.js?v=20261024a"></script>
 </body>
 </html>

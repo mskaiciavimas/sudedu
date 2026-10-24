@@ -8084,12 +8084,12 @@
 </div>
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="../mental-arithmetic.js?v=20261020c"></script>
-	<script src="../sudedu-notices.js?v=20261024b"></script>
+	<script src="../mental-arithmetic.js?v=20261024b"></script>
+	<script src="../sudedu-notices.js?v=20261024c"></script>
 	<script src="../mental-arithmetic-combinations.js?v=20261017"></script>
-    <script src="../parameter_dictionary.js?v=20261024d"></script>
+    <script src="../parameter_dictionary.js?v=20261024e"></script>
     <script src="../rasyba-generator.js?v=20261018r"></script>
-    <script src="../sudedu-insights.js?v=20261024h"></script>
+    <script src="../sudedu-insights.js?v=20261024j"></script>
     <script src="../sudedu-auto-tasks.js?v=20261018r"></script>
     <script src="../klase-invites.js?v=20261018r"></script>
     <script src="../main-nav-bar.js"></script>
@@ -15817,15 +15817,27 @@ function placePendingTasksBeforeArchive() {
 // it hidden - on every switch to the class overview, and again when the class's results came - made the page lag. A
 // change while it is hidden only marks it; opening it draws it from the data then (setTeacherSection).
 let analysisDrawPending = false;
+// The analysis is drawn after the browser has shown what changed (a student or "Klasės apžvalga" picked: the header,
+// the lists - at once), and once even when several things ask for it in the same moment (switching to the class asks
+// twice); its summary cards show the loading spinner meanwhile.
+let analysisDrawQueued = false;
 function scheduleAnalysisDraw() {
-    if (teacherSection === 'analysis') drawAnalysis();
-    else analysisDrawPending = true;
+    if (teacherSection !== 'analysis') { analysisDrawPending = true; return; }
+    if (window.SudInsights && SudInsights.showLoading) ['insights-math', 'insights-grammar', 'insights-text'].forEach(id => { const card = document.getElementById(id); if (card) SudInsights.showLoading(card); });
+    if (analysisDrawQueued) return;
+    analysisDrawQueued = true;
+    requestAnimationFrame(() => setTimeout(() => {
+        analysisDrawQueued = false;
+        if (teacherSection === 'analysis') drawAnalysis();
+        else analysisDrawPending = true;
+    }, 0));
 }
 function drawAnalysis() {
     analysisDrawPending = false;
     const analysedTasks = getTasksForStatistics(getCurrentStatisticsTasksForAnalysis());
     const categorizedTasks = processStudentTasks(analysedTasks);
-    renderAnalysisInsights(analysedTasks);
+    // (the summary cards after the tables below have been drawn - they take longer)
+    setTimeout(() => renderAnalysisInsights(analysedTasks), 0);
     studentStatisticsMathDiv.style.display = "block";
     studentStatisticsLangDiv.style.display = "block";
     studentStatisticsTextComprahensionDiv.style.display = "block";
@@ -15968,6 +15980,7 @@ function openExcludedTasksPopup(tasks) {
     document.addEventListener('keydown', excludedTasksKey);
 }
 
+let analysisInsightsRun = 0;
 function renderAnalysisInsights(tasks) {
     if (!window.SudInsights || !SudInsights.enabled('period')) return;
     const isClass = Boolean(currentStatisticsIsClass);
@@ -16002,10 +16015,16 @@ function renderAnalysisInsights(tasks) {
         idPrefix: 'insights-math-table',
         tableFor: (items, id) => patternMistakesTable(items, id, 'math')
     };
-    const draw = peers => {
-        SudInsights.renderPeriod(document.getElementById('insights-math'), tasks, { ...options, subject: 'math', mistakeViews: mathViews, peers });
-        SudInsights.renderPeriod(document.getElementById('insights-grammar'), tasks, { ...options, subject: 'grammar', mistakeViews, peers });
-        SudInsights.renderPeriod(document.getElementById('insights-text'), tasks, { ...options, subject: 'text', peers });
+    // the three cards one after another, the page drawn in between (a newer analysis stops an older one)
+    const run = ++analysisInsightsRun;
+    const breathe = () => new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)));
+    const draw = async peers => {
+        ['insights-math', 'insights-grammar', 'insights-text'].forEach(id => { const card = document.getElementById(id); if (card) SudInsights.showLoading(card); });
+        for (const [id, extra] of [['insights-math', { subject: 'math', mistakeViews: mathViews }], ['insights-grammar', { subject: 'grammar', mistakeViews }], ['insights-text', { subject: 'text' }]]) {
+            await breathe();
+            if (run !== analysisInsightsRun) return;
+            try { await SudInsights.renderPeriod(document.getElementById(id), tasks, { ...options, ...extra, peers }); } catch (error) { console.error('insights:', error); }
+        }
     };
     const cards = ['insights-math', 'insights-grammar', 'insights-text'].map(id => document.getElementById(id));
     const waiting = () => cards.forEach(card => SudInsights.showLoading(card));
@@ -16043,7 +16062,11 @@ async function updateRandomLetterFlags(groups) {
     if (!window.SudInsights || !SudInsights.randomLettersOf || !groups.length) return;
     const run = ++randomLetterRun;
     for (const { studentId, tasks } of groups) {
-        try { randomLetterFlags.set(Number(studentId), await SudInsights.randomLettersOf(tasks, { kindOf: resultKindOf })); } catch (error) { /* (never in the way) */ }
+        await new Promise(resolve => setTimeout(resolve, 0));   // (one student at a time, the page free in between)
+        if (run !== randomLetterRun) return;
+        // (the others' tasks: the pool the card judges "implausibly many mistakes" against)
+        const peers = groups.filter(g => g.studentId !== studentId);
+        try { randomLetterFlags.set(Number(studentId), await SudInsights.randomLettersOf(tasks, { kindOf: resultKindOf, peers })); } catch (error) { /* (never in the way) */ }
         if (run !== randomLetterRun) return;          // (newer results are being worked out)
     }
     paintRandomLetterFlags();
@@ -16087,7 +16110,12 @@ async function openRandomLetters(studentId) {
         };
         tick();
     });
-    if (!row) return;
+    if (!row) {
+        // (the card shows no such mistakes after all: no "!" for this student)
+        randomLetterFlags.set(studentId, { flagged: false });
+        paintRandomLetterFlags();
+        return;
+    }
     // open it and bring it to the top; the analysis may still be drawn again (e.g. when the classmates' results come) -
     // for a few seconds a new row is opened and brought up the same way
     const show = el => {

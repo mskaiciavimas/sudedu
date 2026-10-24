@@ -3,9 +3,10 @@
  * { placeholder }) → { get() → body text, set(body), focus(), el }.
  *
  * The text is stored as before (new lines, **bold**, links); a picture is a line of its own [[img:<file>|<width %>]]
- * (sudedu-notices.js formatBody shows it to users, the server checks it - utils/notices.js bodyImages). Pictures come from
- * MessageImages.pick() (upload or the library on GitHub); "🖼 Picture" puts one where the cursor is. A picture: drag its
- * corner to make it bigger or smaller (or −/+), × removes it. */
+ * or [[img:<file>|<width %>|left|right]] (sudedu-notices.js formatBody shows it to users, the server checks it -
+ * utils/notices.js bodyImages). Pictures come from MessageImages.pick() (upload or the library on GitHub); "🖼 Picture"
+ * puts one where the cursor is. A picture: drag its corner to make it bigger or smaller (or −/+), ⯇ ≡ ⯈ put it on the
+ * left / in the middle / on the right, × removes it. */
 (function () {
     'use strict';
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -45,18 +46,20 @@
             return t;
         }
         function grow(t) { t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }
-        function pictureBlock(name, width) {
+        function pictureBlock(name, width, align = 'center') {
             const f = document.createElement('div');
             f.className = 'ate-img';
             f.tabIndex = 0;
             f.dataset.name = name;
             f.dataset.w = clampW(width);
             f.innerHTML = `<div class="ate-frame" style="width:${f.dataset.w}%">${SudeduNotices.imageTag(name, 'draggable="false"')}
-                <span class="ate-tools"><button type="button" data-a="less" title="Smaller">−</button><b class="ate-pct">${f.dataset.w}%</b><button type="button" data-a="more" title="Bigger">+</button><button type="button" data-a="del" title="Remove the picture">×</button></span>
+                <span class="ate-tools">${[['left', '⯇', 'On the left'], ['center', '≡', 'In the middle'], ['right', '⯈', 'On the right']].map(([v, s, t]) => `<button type="button" data-a="align" data-v="${v}" title="${t}">${s}</button>`).join('')}<span class="ate-gap"></span><button type="button" data-a="less" title="Smaller">−</button><b class="ate-pct">${f.dataset.w}%</b><button type="button" data-a="more" title="Bigger">+</button><button type="button" data-a="del" title="Remove the picture">×</button></span>
                 <i class="ate-rs" title="Drag to resize"></i></div>`;
+            setAlign(f, align);
             f.addEventListener('click', e => {
-                const a = e.target.closest('button') && e.target.closest('button').dataset.a;
+                const b = e.target.closest('button'), a = b && b.dataset.a;
                 if (a === 'del') removePicture(f);
+                else if (a === 'align') setAlign(f, b.dataset.v);
                 else if (a === 'less') setWidth(f, Number(f.dataset.w) - 10);
                 else if (a === 'more') setWidth(f, Number(f.dataset.w) + 10);
             });
@@ -65,18 +68,24 @@
                 else if (e.key === '-' || e.key === 'ArrowLeft') { e.preventDefault(); setWidth(f, Number(f.dataset.w) - 5); }
                 else if (e.key === '+' || e.key === '=' || e.key === 'ArrowRight') { e.preventDefault(); setWidth(f, Number(f.dataset.w) + 5); }
             });
-            // resizing: the picture stays centred, so the corner moves half as much as the width changes
+            // resizing: a centred picture grows on both sides, so the corner moves half as much as the width changes
             f.querySelector('.ate-rs').addEventListener('pointerdown', e => {
                 e.preventDefault();
                 const frame = f.querySelector('.ate-frame'), full = doc.clientWidth - 24;
                 const startX = e.clientX, startW = frame.getBoundingClientRect().width;
-                const move = ev => setWidth(f, (startW + 2 * (ev.clientX - startX)) / full * 100);
+                const k = f.dataset.align === 'center' ? 2 : f.dataset.align === 'right' ? -1 : 1;
+                const move = ev => setWidth(f, (startW + k * (ev.clientX - startX)) / full * 100);
                 const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); f.classList.remove('sizing'); };
                 f.classList.add('sizing');
                 window.addEventListener('pointermove', move);
                 window.addEventListener('pointerup', up);
             });
             return f;
+        }
+        function setAlign(f, align) {
+            f.dataset.align = ['left', 'right'].includes(align) ? align : 'center';
+            f.style.textAlign = f.dataset.align;
+            f.querySelectorAll('[data-a="align"]').forEach(b => b.classList.toggle('on', b.dataset.v === f.dataset.align));
         }
         function setWidth(f, w) {
             f.dataset.w = clampW(w);
@@ -136,7 +145,7 @@
         function get() {
             const parts = [];
             [...doc.children].forEach(el => {
-                if (el.classList.contains('ate-img')) parts.push(`[[img:${el.dataset.name}|${el.dataset.w}]]`);
+                if (el.classList.contains('ate-img')) parts.push(`[[img:${el.dataset.name}|${el.dataset.w}${el.dataset.align !== 'center' ? '|' + el.dataset.align : ''}]]`);
                 else if (el.value.trim()) parts.push(el.value.replace(/\s+$/, ''));
             });
             return parts.join('\n').trim();
@@ -147,7 +156,7 @@
             const flush = () => { if (buf.length) doc.appendChild(textBlock(buf.join('\n'))); buf = []; };
             String(body || '').split('\n').forEach(line => {
                 const m = line.trim().match(SudeduNotices.IMAGE_LINE);
-                if (m) { flush(); doc.appendChild(pictureBlock(m[1], Number(m[2]))); }
+                if (m) { flush(); doc.appendChild(pictureBlock(m[1], Number(m[2]), m[3])); }
                 else buf.push(line);
             });
             flush();
@@ -185,6 +194,8 @@
         .ate-img:focus .ate-tools,.ate-frame:hover .ate-tools,.ate-img.sizing .ate-tools{display:inline-flex}
         .ate-tools button{border:none;background:rgba(0,0,0,.07);width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:15px;line-height:1}
         .ate-tools button[data-a="del"]{background:rgba(179,38,30,.12);color:#b3261e}
+        .ate-tools button.on{background:#3288AC;color:#fff}
+        .ate-gap{width:6px}
         .ate-pct{font-size:12px;min-width:34px;text-align:center}
         .ate-rs{position:absolute;right:-7px;bottom:-7px;width:16px;height:16px;border-radius:4px;background:#3288AC;border:2px solid #fff;cursor:nwse-resize;display:none;touch-action:none}
         .ate-img:focus .ate-rs,.ate-frame:hover .ate-rs,.ate-img.sizing .ate-rs{display:block}

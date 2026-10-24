@@ -30,14 +30,14 @@
     }
 
     // the admin's text with pictures: a line [[img:<file>|<width %>]] is a picture of its own, as wide as that share of the
-    // text (centred); the other lines as formatText
-    const IMAGE_LINE = /^\[\[img:([\w.-]+)\|(\d{1,3})\]\]$/;
+    // text - centred, or on the left / right with |left / |right after the width; the other lines as formatText
+    const IMAGE_LINE = /^\[\[img:([\w.-]+)\|(\d{1,3})(?:\|(left|center|right))?\]\]$/;
     function formatBody(text) {
         const lines = String(text ?? '').split('\n');
         let out = '';
         lines.forEach((line, i) => {
             const m = line.trim().match(IMAGE_LINE);
-            if (m) { out += `<span class="sn-img-line">${imageTag(m[1], `class="sn-img" style="width:${Math.max(10, Math.min(100, Number(m[2])))}%"`)}</span>`; return; }
+            if (m) { out += `<span class="sn-img-line" style="text-align:${m[3] || 'center'}">${imageTag(m[1], `class="sn-img" style="width:${Math.max(10, Math.min(100, Number(m[2])))}%"`)}</span>`; return; }
             out += formatText(line);
             const next = lines[i + 1];
             if (next !== undefined && !IMAGE_LINE.test(next.trim())) out += '<br>';
