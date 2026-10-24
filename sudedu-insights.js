@@ -3240,8 +3240,8 @@
 	function classRateSentence(f) {
 		const v = round(f.classStats.rate, f.perText ? 1 : 0);
 		return f.perText
-			? `Vienas mokinys, dėliodamas tekstą, vidutiniškai daro ${count(v, ['klaidą', 'klaidas', 'klaidų', 'klaidos'])}.`
-			: `Vienas mokinys vidutiniškai daro ${count(v, ['klaidą', 'klaidas', 'klaidų', 'klaidos'])} ${PER_100[f.subject]}.`;
+			? `Tipinis klasės mokinys, dėliodamas tekstą, padaro ${count(v, ['klaidą', 'klaidas', 'klaidų', 'klaidos'])}.`
+			: `Tipinis klasės mokinys padaro ${count(v, ['klaidą', 'klaidas', 'klaidų', 'klaidos'])} ${PER_100[f.subject]}.`;
 	}
 	/* Tendencijos: the changes from the start to the end of the period that passed (windowChanges) - only increases and
 	 * decreases. The words of each change open its graph; the numbers (Didelis) are the graph's lines. */
@@ -3547,61 +3547,65 @@
 		const mistakeNums = details ? ` (skirtumas – apie ${valueText(f, Math.abs(c.mistakesBy))})` : '';
 		const out = { links: [] };
 		// time and how often against what is usual in the class (its middle half; the numbers are the class's median):
-		// "Įdėtos pastangos panašios į klasės vidurkį (2 val., 5 dienos per savaitę).", "Bendras mokymosi laikas panašus į
-		// klasės vidurkį (2 val.), tačiau mokytasi rečiau nei vidutiniškai klasėje (5 dienos per savaitę)." … (the class's
-		// value: its median - the typical student; "different": outside the classmates' middle half)
+		// "Pastangų įdėta maždaug tiek pat, kiek įprasta klasėje (2 val., 5 dienos per savaitę; tipinis klasės rodiklis – …).",
+		// "Mokytasi maždaug tiek pat laiko (…), bet rečiau nei įprasta klasėje (3 dienos per savaitę; tipinis …)." … (the
+		// class's value: its median - the typical student, "įprasta klasėje"; "different": outside the classmates' middle half)
 		const oneDay = f.from === f.to;
-		const tNum = details ? ` (${timeBrief(c.median)})` : '';
-		const dNum = details && !oneDay ? ` (${perWeekText(f, c.dayMedian, Math.max(c.myDays, c.dayMedian), ['diena', 'dienos', 'dienų', 'dienos'])})` : '';
-		const both = details ? ` (${timeBrief(c.median)}${oneDay ? '' : `, ${perWeekText(f, c.dayMedian, Math.max(c.myDays, c.dayMedian), ['diena', 'dienos', 'dienų', 'dienos'])}`})` : '';
+		// (the numbers: the student's, then the class's - "(3 val.; tipinis klasės rodiklis – 2 val.)", as for mistakes and speed)
+		const perWeek = days => perWeekText(f, days, Math.max(c.myDays, c.dayMedian), ['diena', 'dienos', 'dienų', 'dienos']);
+		const tNum = details ? ` (${timeBrief(c.mine)}; tipinis klasės rodiklis – ${timeBrief(c.median)})` : '';
+		const dNum = details && !oneDay ? ` (${perWeek(c.myDays)}; tipinis klasės rodiklis – ${perWeek(c.dayMedian)})` : '';
+		const both = details ? ` (${timeBrief(c.mine)}${oneDay ? '' : `, ${perWeek(c.myDays)}`}; tipinis klasės rodiklis – ${timeBrief(c.median)}${oneDay ? '' : `, ${perWeek(c.dayMedian)}`})` : '';
 		const longer = c.time === 'more', shorter = c.time === 'less';
 		// (worded only when used: a word of degree is spent once)
-		const timeAdj = () => `${howMuch(c.mine / c.median)}${longer ? 'ilgesnis' : 'trumpesnis'}`;
+		const timeAdj = () => `${howMuch(c.mine / c.median)}${longer ? 'ilgiau' : 'trumpiau'}`;
 		const daysAdv = () => `${degree(ratioOf(c.myDays, c.dayMedian))}${c.days === 'more' ? 'dažniau' : 'rečiau'}`;
 		if (oneDay || c.days === 'similar') {
 			out.compare = c.time === 'similar'
-				? (oneDay ? `Mokymosi laikas panašus į klasės vidurkį${tNum}.` : `Įdėtos pastangos panašios į klasės vidurkį${both}.`)
-				: oneDay ? `Mokymosi laikas ${timeAdj()} nei klasės vidurkis${tNum}.`
-				: `Mokymosi laikas ${timeAdj()} nei klasės vidurkis${tNum}, o mokytasi taip pat reguliariai${dNum}.`;
+				? (oneDay ? `Mokytasi maždaug tiek pat laiko, kiek įprasta klasėje${tNum}.` : `Pastangų įdėta maždaug tiek pat, kiek įprasta klasėje${both}.`)
+				: oneDay ? `Mokytasi ${timeAdj()} nei įprasta klasėje${tNum}.`
+				// (longer and just as regular: "ir"; shorter, yet just as regular: "bet")
+				: `Mokytasi ${timeAdj()} nei įprasta klasėje${tNum}${longer ? ' ir' : ', bet'} taip pat reguliariai${dNum}.`;
 		} else if (c.time === 'similar') {
-			out.compare = `Bendras mokymosi laikas panašus į klasės vidurkį${tNum}, tačiau mokytasi ${daysAdv()} nei vidutiniškai klasėje${dNum}.`;
+			// ("nei įprasta klasėje" once: it is said of both)
+			out.compare = `Mokytasi maždaug tiek pat laiko${tNum}, bet ${daysAdv()} nei įprasta klasėje${dNum}.`;
 		} else if ((longer && c.days === 'more') || (shorter && c.days === 'less')) {
-			out.compare = `Įdėta ${degree(Math.min(ratioOf(c.mine, c.median), ratioOf(c.myDays, c.dayMedian)))}${longer ? 'daugiau' : 'mažiau'} pastangų nei klasės vidurkis${both}.`;
+			out.compare = `Pastangų įdėta ${degree(Math.min(ratioOf(c.mine, c.median), ratioOf(c.myDays, c.dayMedian)))}${longer ? 'daugiau' : 'mažiau'} nei įprasta klasėje${both}.`;
 		} else {
-			out.compare = `Mokymosi laikas ${timeAdj()} nei klasės vidurkis${tNum}, tačiau mokytasi ${daysAdv()}${dNum}.`;
+			out.compare = `Mokytasi ${timeAdj()} nei įprasta klasėje${tNum}, bet ${daysAdv()}${dNum}.`;
 		}
 		// (the class's value in the same kinds of tasks: the student's there less the typical difference)
 		const classMistakes = Math.max(0, (c.myGroupValue != null ? c.myGroupValue : f.mistakeValue) - c.mistakesBy);
 		// (both numbers from the same kinds of tasks - the student's there may differ from the overall rate said before)
 		const mineMistakes = c.myGroupValue != null ? c.myGroupValue : f.mistakeValue;
 		const digits = f.perText ? 1 : 0;
-		const classNums = details ? ` (${count(round(mineMistakes, digits), ['klaida', 'klaidos', 'klaidų'])} ${f.perText ? 'vienam tekstui' : PER_100[f.subject]}, klasės vidurkis – ${num(round(classMistakes, digits))})` : '';
+		const classNums = details ? ` (${count(round(mineMistakes, digits), ['klaida', 'klaidos', 'klaidų'])} ${f.perText ? 'vienam tekstui' : PER_100[f.subject]}; tipinis klasės rodiklis – ${num(round(classMistakes, digits))})` : '';
 		const mistakesBy = classMistakes > 0 ? howMuch(mineMistakes / classMistakes) : '';
 		// (not clear: what it looks like, said as such; nothing comparable in the class: said too)
 		const big = Math.abs(c.mistakesBy || 0) >= (f.perText ? 0.3 : 5);
-		const looks = !big ? 'tiek pat, kiek klasės vidurkis' : c.mistakesBy > 0 ? 'daugiau nei klasės vidurkis' : 'mažiau nei klasės vidurkis';
+		const looks = !big ? 'tiek pat, kiek įprasta klasėje' : c.mistakesBy > 0 ? 'daugiau nei įprasta klasėje' : 'mažiau nei įprasta klasėje';
 		// (the comparison's words open the graph of the student's and the class's tasks)
-		const mistakeWords = c.mistakes === 'unknown' ? looks : { more: `${mistakesBy}daugiau nei klasės vidurkis`, less: `${mistakesBy}mažiau nei klasės vidurkis`, similar: 'tiek pat, kiek klasės vidurkis' }[c.mistakes];
+		const mistakeWords = c.mistakes === 'unknown' ? looks : { more: `${mistakesBy}daugiau nei įprasta klasėje`, less: `${mistakesBy}mažiau nei įprasta klasėje`, similar: 'tiek pat, kiek įprasta klasėje' }[c.mistakes];
 		// ("tiek pat" is not a button: only more / less)
 		if (mistakeWords && c.dist && c.dist.mistakes && c.mistakes !== 'none' && c.mistakes !== 'similar' && !(c.mistakes === 'unknown' && !big)) out.links.push({ text: mistakeWords, key: 'peer:mistakes', after: 'klaidų daroma' });
-		out.mistakes = c.mistakes === 'none' ? 'Su klasės vidurkiu palyginti negalima – tokių pačių užduočių atliko per mažai klasės draugų.'
-			: c.mistakes === 'unknown' ? (c.myGroupValue != null ? `Patikimai palyginti su klasės vidurkiu duomenų nepakanka, tačiau panašu, kad analogiškose užduotyse klaidų daroma ${looks}${classNums}.` : '')
-			: { more: `Analogiškose užduotyse klaidų daroma ${mistakesBy}daugiau nei klasės vidurkis${classNums}.`, less: `Analogiškose užduotyse klaidų daroma ${mistakesBy}mažiau nei klasės vidurkis${classNums}.`,
-			similar: `Analogiškose užduotyse klaidų daroma tiek pat, kiek klasės vidurkis${classNums}.` }[c.mistakes];
-		// "Analogiškos užduotys sprendžiamos greičiau nei klasės vidurkis (18 atsakymų per minutę, klasės vidurkis – 4,5)."
+		out.mistakes = c.mistakes === 'none' ? 'Duomenų patikimam palyginimui su klase nepakanka – tokių pačių užduočių atliko per mažai klasės draugų.'
+			: c.mistakes === 'unknown' ? (c.myGroupValue != null ? `Duomenų patikimam palyginimui su klase nepakanka, tačiau panašu, kad analogiškose užduotyse klaidų daroma ${looks}${classNums}.` : '')
+			: { more: `Analogiškose užduotyse klaidų daroma ${mistakesBy}daugiau nei įprasta klasėje${classNums}.`, less: `Analogiškose užduotyse klaidų daroma ${mistakesBy}mažiau nei įprasta klasėje${classNums}.`,
+			similar: `Analogiškose užduotyse klaidų daroma tiek pat, kiek įprasta klasėje${classNums}.` }[c.mistakes];
+		// "Analogiškos užduotys sprendžiamos greičiau nei įprasta klasėje (18 atsakymų per minutę; tipinis klasės rodiklis – 4,5)."
 		// (the verdict is from the matched tasks; the overall numbers and the percent only when they go the same way)
 		const overallFaster = c.mySpeed > 0 && c.peerSpeed > 0 && (f.perText ? c.mySpeed < c.peerSpeed : c.mySpeed > c.peerSpeed);
 		const overallAgrees = c.mySpeed > 0 && c.peerSpeed > 0 && c.mySpeed !== c.peerSpeed && overallFaster === (f.perText ? c.speed === 'less' : c.speed === 'more');
 		const speedNums = !details || !overallAgrees ? ''
-			: f.perText ? ` (${timeShortNom(c.mySpeed)} vienam tekstui, klasės vidurkis – ${timeShortNom(c.peerSpeed)})`
-			: ` (${count(round(c.mySpeed, 1), SUBJECTS[f.subject].unit)} per minutę, klasės vidurkis – ${num(c.peerSpeed)})`;
+			: f.perText ? ` (${timeShortNom(c.mySpeed)} vienam tekstui; tipinis klasės rodiklis – ${timeShortNom(c.peerSpeed)})`
+			: ` (${count(round(c.mySpeed, 1), SUBJECTS[f.subject].unit)} per minutę; tipinis klasės rodiklis – ${num(c.peerSpeed)})`;
 		const faster = f.perText ? c.speed === 'less' : c.speed === 'more';
 		const speedDegree = overallAgrees ? howMuch(f.perText ? c.peerSpeed / c.mySpeed : c.mySpeed / c.peerSpeed) : '';
-		if (!(c.speed === 'similar' || c.speed === 'unknown') && c.dist && c.dist.speed) out.links.push({ text: `${speedDegree}${faster ? 'greičiau' : 'lėčiau'} nei klasės vidurkis`, key: 'peer:speed', after: f.perText ? 'Analogiškose užduotyse tekstai dėliojami' : 'Analogiškos užduotys sprendžiamos' });
+		if (!(c.speed === 'similar' || c.speed === 'unknown') && c.dist && c.dist.speed) out.links.push({ text: `${speedDegree}${faster ? 'greičiau' : 'lėčiau'} nei įprasta klasėje`, key: 'peer:speed', after: f.perText ? 'Analogiškose užduotyse tekstai dėliojami' : 'Analogiškos užduotys sprendžiamos' });
 		out.speed = c.speed === 'similar' || c.speed === 'unknown' ? ''
-			: `${f.perText ? 'Analogiškose užduotyse tekstai dėliojami' : 'Analogiškos užduotys sprendžiamos'} ${speedDegree}${faster ? 'greičiau' : 'lėčiau'} nei klasės vidurkis${speedNums}.`;
+			: `${f.perText ? 'Analogiškose užduotyse tekstai dėliojami' : 'Analogiškos užduotys sprendžiamos'} ${speedDegree}${faster ? 'greičiau' : 'lėčiau'} nei įprasta klasėje${speedNums}.`;
 		// the tasks' difficulty, only when clearly different from the class's
-		const diffWords = `${degree(c.difficultyBy >= 1 ? c.difficultyBy : 1 / c.difficultyBy)}${c.difficulty === 'more' ? 'sudėtingesnės' : 'lengvesnės'} nei klasės vidurkis`;
+		const diffWords = `${degree(c.difficultyBy >= 1 ? c.difficultyBy : 1 / c.difficultyBy)}${c.difficulty === 'more' ? 'sudėtingesnės' : 'lengvesnės'} nei įprasta klasėje`;
 		if ((c.difficulty === 'more' || c.difficulty === 'less') && c.dist && c.dist.difficulty) out.links.push({ text: diffWords, key: 'peer:difficulty', after: 'Atliekamos užduotys' });
 		out.difficulty = c.difficulty === 'similar' || c.difficulty === 'unknown' || !c.difficulty ? ''
 			: `Atliekamos užduotys ${diffWords}${details ? ` (santykinis sudėtingumas – ${num(c.difficultyBy, 1)})` : ''}.`;
@@ -3643,15 +3647,15 @@
 		const daysEach = c.daysMedian || 0;
 		const howOften = f.from === f.to ? '' : span < 7 ? ` ir mokėsi ${count(round(daysEach, daysEach % 1 ? 1 : 0), ['dieną', 'dienas', 'dienų', 'dienos'])} iš ${span}` : `; ${often}`;
 		const during = f.from === f.to || short ? '' : 'per šį laikotarpį ';   // (Mažas: the dates are said just before)
-		const whoPractised = !several ? cap(`${during}praktikuotasi`) : part ? `Mokiniai, kurie mokėsi, ${during}vidutiniškai praktikavosi` : cap(`${during}vienas mokinys vidutiniškai praktikavosi`);
+		const whoPractised = !several ? cap(`${during}praktikuotasi`) : part ? `Mokiniai, kurie mokėsi, ${during}įprastai skyrė` : cap(`${during}tipinis klasės mokinys mokėsi`);
 		const text = `${f.from === f.to ? 'šią dieną ' : ''}laiko skyrė ${who}. ${whoPractised} ${minutesText(c.minutes)}${amount}${howOften}.`;
-		// "Vienas mokinys vidutiniškai atlieka 8,5 veiksmo per minutę." (not in the short version)
+		// "Tipinis klasės mokinys atlieka 8,5 veiksmo per minutę." (not in the short version)
 		let speed = '';
 		if (!short && c.speed > 0) {
 			const v = round(c.speed, c.speed < 10 ? 1 : 0);
 			// (one student: impersonal, as the sentence before; said after the kinds of tasks)
-			speed = (f.perText ? `Vienam tekstui sudėlioti ${several ? 'vienas mokinys vidutiniškai skiria' : 'vidutiniškai skiriama'} ${shortTime(c.speed)}.`
-				: several ? `Vienas mokinys vidutiniškai ${f.subject === 'math' ? 'atlieka' : 'pateikia'} ${count(v, S.unit)} per minutę.`
+			speed = (f.perText ? `Vienam tekstui sudėlioti ${several ? 'tipinis klasės mokinys skiria' : 'vidutiniškai skiriama'} ${shortTime(c.speed)}.`
+				: several ? `Tipinis klasės mokinys ${f.subject === 'math' ? 'atlieka' : 'pateikia'} ${count(v, S.unit)} per minutę.`
 				: `Vidutiniškai ${f.subject === 'math' ? 'atliekama' : 'pateikiama'} ${count(v, S.unit)} per minutę.`);
 		}
 		return { text, speed };
@@ -3784,13 +3788,13 @@
 			if (details) mistakes.push(f.isClass && f.classStats ? classRateSentence(f) : mistakeRateSentence(f));
 			mistakes.push(...mistakeSentences(f, details));
 			if (cmp) mistakes.push(cmp.mistakes);
-			// "Palyginti su klasės vidurkiu, dažniau klystama minkštumo ženklo rašyboje (24% atvejų, klasės vidurkis – 10%), rečiau – …"
+			// "Dažniau nei įprasta klasėje klystama minkštumo ženklo rašyboje (24% atvejų, tipinis klasės rodiklis – 10%), rečiau – …"
 			const pp = f.patternPeers || [];
 			if (pp.length) {
-				const part = x => `${x.area}${details ? ` (${pct(x.mine)} atvejų, klasės vidurkis – ${pct(x.cls)})` : ''}`;
+				const part = x => `${x.area}${details ? ` (${pct(x.mine)} atvejų, tipinis klasės rodiklis – ${pct(x.cls)})` : ''}`;
 				const more = pp.filter(x => x.direction === 'more').map(part), less = pp.filter(x => x.direction === 'less').map(part);
 				const join = details ? joinList : joinAreas;
-				mistakes.push(`Palyginti su klasės vidurkiu, ${[more.length ? `dažniau klystama ${join(more)}` : '', less.length ? `${more.length ? 'rečiau –' : 'rečiau klystama'} ${join(less)}` : ''].filter(Boolean).join(', ')}.`);
+				mistakes.push(`${[more.length ? `Dažniau nei įprasta klasėje klystama ${join(more)}` : '', less.length ? `${more.length ? 'rečiau –' : 'Rečiau nei įprasta klasėje klystama'} ${join(less)}` : ''].filter(Boolean).join(', ')}.`);
 			}
 		}
 		if (details && f.outliers && f.outliers.length) {   // (said only with all the details - Didelis)
@@ -3801,7 +3805,8 @@
 		}
 		const said = mistakes.filter(Boolean);
 		const mistakeLinks = (cmp ? cmp.links.filter(l => l.key === 'peer:mistakes') : [])
-			.concat((f.patternPeers || []).filter(x => x.dist).map(x => ({ text: x.area, key: 'peerpat:' + x.key, after: 'Palyginti su klasės vidurkiu' })))
+			.concat((f.patternPeers || []).filter(x => x.dist).map(x => ({ text: x.area, key: 'peerpat:' + x.key,
+				after: (f.patternPeers || []).some(y => y.direction === 'more') ? 'Dažniau nei įprasta klasėje klystama' : 'Rečiau nei įprasta klasėje klystama' })))
 			// (the excluded tasks: the words open their list, when the page can show it)
 			.concat(details && f.outliers && f.outliers.length && typeof f.openTasks === 'function'
 				? [{ text: count(f.outliers.length, W.task), key: 'outliers', after: 'Į klaidų ir greičio analizę', list: true }] : []);
@@ -4518,7 +4523,7 @@
 			<p class="ins-chart-title">${esc(title)}</p>
 			<p class="ins-chart-sub">${esc(periodText(f.from, f.to))}</p>
 			<div class="ins-range">${svg}</div>
-			<p class="ins-chart-note">Apskritimas – vidurkis. Storoje juostoje – pusė visų užduočių, plonoje linijoje – 80% užduočių. Lyginamos tik tokios pačios užduotys.</p>
+			<p class="ins-chart-note">${esc(`Apskritimas rodo mokinio visų užduočių bendrą ${key === 'peer:speed' ? 'sprendimo greitį' : 'klaidų dažnį'}, o klasės – tipinio klasės mokinio bendrą ${key === 'peer:speed' ? 'sprendimo greitį' : 'klaidų dažnį'}.`)} Stora juosta apima pusę užduočių, plona linija – 80% užduočių. Lyginamos tik tokios pačios užduotys.</p>
 		</div>`;
 		document.body.appendChild(back);
 		const close = () => { back.remove(); document.removeEventListener('keydown', onKey); if (opener && opener.isConnected) opener.focus(); };
