@@ -8096,7 +8096,7 @@
 	<script src="../mental-arithmetic-combinations.js?v=20261017"></script>
     <script src="../parameter_dictionary.js?v=20261024e"></script>
     <script src="../rasyba-generator.js?v=20261018r"></script>
-    <script src="../sudedu-insights.js?v=20261024k"></script>
+    <script src="../sudedu-insights.js?v=20261024l"></script>
     <script src="../sudedu-auto-tasks.js?v=20261018r"></script>
     <script src="../klase-invites.js?v=20261018r"></script>
     <script src="../main-nav-bar.js"></script>
@@ -17295,9 +17295,23 @@ async function applyArchivePopupSameTask(row) {
         if (archivePopupSameTask !== context) return;   // (closed or another result opened meanwhile)
     }
     const rows = archivePopupSameTask.rows;
-    paintArchivePopupStudentDots(student => rows.has(String(student.id))
-        ? { colour: 'green', title: `Šios užduoties rezultatas: ${rows.get(String(student.id)).date}` }
-        : { colour: 'not-assigned', title: 'Šios užduoties rezultato nėra' });
+    // (a student without a result may have the task given and not done yet: a task of the same name and due day)
+    archivePopupSameTask.group = teacherGroupOf(row);
+    paintArchivePopupStudentDots(student => {
+        const done = rows.get(String(student.id));
+        if (done) return { colour: 'green', title: `Šios užduoties rezultatas: ${done.date}${done.onTime === false ? ' (atlikta pavėluotai)' : ''}` };
+        const pending = pendingGroupTaskOf(student, archivePopupSameTask.group);
+        if (pending) {
+            const late = taskDueIndicator(pending);
+            return { colour: late || 'neutral', title: late ? `Užduotis neatlikta. ${taskLateTitle(pending)}` : 'Užduotis skirta, dar neatlikta' };
+        }
+        return { colour: 'not-assigned', title: 'Šios užduoties rezultato nėra' };
+    });
+}
+// a student's given, not yet done task of a group (name + due day), or null
+function pendingGroupTaskOf(student, group) {
+    if (!group || !student) return null;
+    return (student.tasks || []).find(task => !task.completed && teacherGroupOf(task) === group) || null;
 }
 function showArchivePopupNoResult(student) {
     showArchivePopupStudentMessage(student, `<div class="archive-popup-status not-assigned">
@@ -17373,7 +17387,10 @@ function attachArchivePopupStudentSelection() {
                 archivePopupRowOverride = { ...sameTaskRow, studentId: other.id };
                 openEmbeddedArchiveTaskPopup(sameTaskRow.id);
             } else if (other) {
-                showArchivePopupNoResult(other);
+                // (given and not done yet - the same name and due day: its description and how late it is)
+                const pending = pendingGroupTaskOf(other, archivePopupSameTask.group);
+                if (pending) showArchivePopupPending(other, pending);
+                else showArchivePopupNoResult(other);
             }
             return;
         }

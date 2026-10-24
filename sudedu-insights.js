@@ -641,7 +641,6 @@
 			let common = null, names = null;
 			try { [common, names] = words ? await Promise.all([words.load('freqCommon'), words.load('names')]) : [null, null]; } catch (e) { common = names = null; }
 			for (const x of unexplained) {
-				if (keyboardSlip(x.a, x.w)) { x.keys.add('nedemesys'); continue; }
 				let verdict = null;
 				try {
 					if (common && names) { const w = words.normalize(x.b + x.w + x.s); verdict = !w || !/^[aąbcčdeęėfghiįyjklmnoprsštuųūvzž]+$/.test(w) ? 'invalid' : common.has(w) && !names.has(w) ? 'ok' : 'unknown'; }
