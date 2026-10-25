@@ -3393,12 +3393,29 @@
 	 * right after it. */
 	function joinOperations(items, example = () => '') {
 		const sets = [];
+		// (said together only what differs just in the operation - or in regrouping, said "tiek …, tiek …" below; two kinds
+		// of task that differ otherwise - e.g. "dalybos užduotyse, kai dalmenyje yra 0" and all "dalybos užduotyse" - each
+		// keep their whole name: joined, the second one read as a kind of its own)
+		const sameKind = (a, b) => a === b || a.replace(' pergrupuojant skaičių skyrius', ' nepergrupuojant skaičių skyrių') === b || b.replace(' pergrupuojant skaičių skyrius', ' nepergrupuojant skaičių skyrių') === a;
 		items.forEach(i => {
 			const p = i.opParts;
-			let set = p && sets.find(x => x.before === p.before && !x.items.some(y => y.opParts.op === p.op && y.opParts.after === p.after));
+			let set = p && sets.find(x => x.before === p.before && x.items.every(y => sameKind(y.opParts.after, p.after)) && !x.items.some(y => y.opParts.op === p.op && y.opParts.after === p.after));
 			if (!set) { set = { before: p ? p.before : null, items: [] }; sets.push(set); }
 			set.items.push(i);
 		});
+		// the same operation in a kind of task and in its special case ("…dalybos užduotyse" and "…dalybos užduotyse, kai
+		// dalmenyje yra 0,"): one name - "…dalybos užduotyse (įprastose ir kai dalmenyje yra 0)"
+		for (let a = 0; a < sets.length; a++) {
+			const x = sets[a].items.length === 1 && sets[a].items[0];
+			if (!x || !x.opParts) continue;
+			const b = sets.findIndex((s2, k) => k !== a && s2.items.length === 1 && s2.items[0].opParts && s2.items[0].opParts.before === x.opParts.before
+				&& s2.items[0].opParts.op === x.opParts.op && s2.items[0].opParts.after.startsWith(x.opParts.after + ','));
+			if (b < 0) continue;
+			const special = sets[b].items[0].opParts.after.slice(x.opParts.after.length + 1).replace(/,\s*$/, '').trim();
+			sets[a].items[0] = { ...x, area: x.area + ` (įprastose ir ${special})`, examples: [], opParts: null };
+			sets.splice(b, 1);
+			if (b < a) a--;
+		}
 		const others = sets.length > 1;
 		return sets.map(set => {
 			if (set.items.length < 2) return set.items[0];
@@ -4701,5 +4718,5 @@
 		return render(el, Array.isArray(row) ? row : [row], { ...opts, mode: 'task', scope: 'period' });
 	}
 
-	window.SudInsights = { _comparePeers: comparePeers, _PEER_TEST: PEER_TEST, _randomSign: randomSign, _markRandomLetters: markRandomLetters, _analyzeGrammar: analyzeGrammarMistakes, _keyboardSlip: keyboardSlip, _loadLexicon: loadLexicon, OUTLIER, showInfo, enabled, analyze, describe, randomLettersOf, renderPeriod, renderTask, showLoading, classifyAnswer, form, trend, verdict, tPValue, INSIGHTS, mathComposition, windowTest, windowChanges, windowChangesAsync, WIN, CANCELLED };
+	window.SudInsights = { _joinOperations: joinOperations, _comparePeers: comparePeers, _PEER_TEST: PEER_TEST, _randomSign: randomSign, _markRandomLetters: markRandomLetters, _analyzeGrammar: analyzeGrammarMistakes, _keyboardSlip: keyboardSlip, _loadLexicon: loadLexicon, OUTLIER, showInfo, enabled, analyze, describe, randomLettersOf, renderPeriod, renderTask, showLoading, classifyAnswer, form, trend, verdict, tPValue, INSIGHTS, mathComposition, windowTest, windowChanges, windowChangesAsync, WIN, CANCELLED };
 })();

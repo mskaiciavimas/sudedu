@@ -1105,10 +1105,13 @@
                 <div class="operation-card">
                     <h3>📚 Increase Knowledge Level</h3>
                     <p style="color: #666; margin-bottom: 15px;">
-                        Increase knowledge level by 1 for all students (0→1, 1→2, etc., max 5). Students with "Class Unassigned" (-1) will be skipped.
+                        The yearly move up: +1 (0→1, 1→2 …, max 5) for every student whose level has <b>not changed since 1 June</b>
+                        (the last month of the last school year) - so classes a teacher already moved up, or students already increased by
+                        this button, are not raised again. Students without a level are skipped. Shows what it would do first; every increase
+                        is kept in the students' level history as a system change.
                     </p>
                     <div id="knowledge-message"></div>
-                    <button class="btn" onclick="increaseKnowledgeLevel()">Increase For All Students</button>
+                    <button class="btn" onclick="increaseKnowledgeLevel()">Check and increase…</button>
                 </div>
 
                 <div class="operation-card">
@@ -1209,7 +1212,7 @@
         </div>
     </div>
 
-    <script src="../mental-arithmetic.js?v=20261024b"></script>
+    <script src="../mental-arithmetic.js?v=20261025a"></script>
     <script src="../sudedu-notices.js?v=20261024c"></script>
     <script src="../main-nav-bar.js"></script>
     <script src="../parameter_dictionary.js?v=20261024e"></script>
@@ -2560,37 +2563,38 @@
             }
         }
 
-        // Increase knowledge level for all students
+        // The yearly knowledge level increase: first what it would do (apply: false), then - confirmed - the increase
         async function increaseKnowledgeLevel() {
-            if (!confirm('Increase knowledge level by 1 for all students?\n\nThis will:\n- Move 0 → 1, 1 → 2, 2 → 3, etc.\n- Keep level 5 students at 5\n- Skip unassigned students (-1)')) return;
-
-            // Show loading message
-            showMessage('knowledge-message', 
-                '<div class="loading">Processing knowledge level increases...</div>', 
-                'info'
-            );
-
-            try {
+            const ask = async apply => {
                 const response = await apiFetch(`${apiBase}admin/bulk/increase-knowledge`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ apply })
                 });
-
-                if (!response || !response.ok) {
-                    const data = await response.json();
-                    throw new Error(data.message || 'Failed to increase knowledge levels');
+                const data = response ? await response.json().catch(() => ({})) : {};
+                if (!response || !response.ok) throw new Error(data.message || 'Failed to increase knowledge levels');
+                return data;
+            };
+            showMessage('knowledge-message', '<div class="loading">Checking the students…</div>', 'info');
+            try {
+                const preview = await ask(false);
+                const skipped = `Changed since ${preview.cutoff} (by a teacher, or already increased): ${preview.changedSince}<br>` +
+                    `Already at level 5: ${preview.alreadyMaxCount}<br>Without a level: ${preview.unassignedCount}`;
+                if (!preview.toIncrease) {
+                    showMessage('knowledge-message', `Nothing to increase - every student's level has changed since ${preview.cutoff} or cannot be raised.<br><br>${skipped}`, 'info');
+                    return;
                 }
+                if (!confirm(`Increase the knowledge level by 1 for ${preview.toIncrease} students?
 
-                const data = await response.json();
-                
-                let message = `✅ ${data.message}<br><br>` +
-                            `Updated: ${data.updatedCount} students<br>` +
-                            `Already at max (5): ${data.alreadyMaxCount} students<br>` +
-                            `Unassigned (skipped): ${data.unassignedCount} students<br>` +
-                            `Total processed: ${data.totalProcessed} students`;
-                
-                showMessage('knowledge-message', message, 'success');
-                
+Skipped:
+- changed since ${preview.cutoff} (by a teacher, or already increased): ${preview.changedSince}
+- already at level 5: ${preview.alreadyMaxCount}
+- without a level: ${preview.unassignedCount}`)) {
+                    showMessage('knowledge-message', `Not increased.<br><br>Would increase: ${preview.toIncrease}<br>${skipped}`, 'info');
+                    return;
+                }
+                showMessage('knowledge-message', '<div class="loading">Increasing…</div>', 'info');
+                const done = await ask(true);
+                showMessage('knowledge-message', `✅ Increased: ${done.toIncrease} students<br><br>Skipped:<br>` +
+                    `Changed since ${done.cutoff}: ${done.changedSince}<br>Already at level 5: ${done.alreadyMaxCount}<br>Without a level: ${done.unassignedCount}`, 'success');
             } catch (error) {
                 showMessage('knowledge-message', `❌ Error: ${error.message}`, 'error');
             }

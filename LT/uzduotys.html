@@ -44,7 +44,7 @@
     gtag('config', 'G-96Q83PW8XY');
     </script>
     <script src="../refresh-token.js"></script>
-    <script src="../reveal-expanded.js?v=20261018r"></script>
+    <script src="../reveal-expanded.js?v=20261025a"></script>
     <script src="../game-names.js?v=20261018r"></script>
 
     <style>
@@ -3077,12 +3077,7 @@
             grid-template-columns: 1.3fr 1fr 1fr;
             gap: 8px;
         }
-        #teacher-gui .head.class-overview .h2 {
-            grid-template-columns: 1fr 1fr;
-        }
-        #teacher-gui .head.class-overview #student-task-student-knowledge-level {
-            display: none !important;
-        }
+        /* (the class overview: its own "Klasės žinių lygis" in the first column - renderClassKnowledgeLevel) */
         #teacher-gui .stt {
             min-width: 0;
             min-height: 60px;
@@ -3113,6 +3108,19 @@
             font-size: 17px;
             font-weight: 500;
         }
+        /* the class's level: a "!" when some students have another one (renderClassKnowledgeLevel) */
+        #teacher-gui .stt .knowledge-level-select-text { display: inline-flex; align-items: center; gap: 6px; }
+        .kl-flag { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 16px; height: 16px; padding: 0;
+            border: 1px solid rgba(194,87,12,.35); border-radius: 50%; background: #fdebdc; color: #b4530f; font: inherit; font-size: 11px; font-weight: 700;
+            line-height: 1; letter-spacing: 0; cursor: pointer; transition: background .15s, color .15s; }
+        .kl-flag:hover, .kl-flag:focus-visible { background: #f6c9a5; color: #8f3f0a; outline: none; box-shadow: 0 0 0 3px rgba(194,87,12,.18); }
+        .kl-odd { text-align: left; }
+        .kl-odd-text { margin: 0 0 12px; color: #1f2a30; font-size: 15px; line-height: 1.45; }
+        .kl-odd-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+        .kl-odd-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 10px; border-radius: 10px; background: rgba(255,255,255,.6); }
+        .kl-odd-list li.kl-saved { background: rgba(64,201,169,.18); }
+        .kl-odd-name { font-size: 15px; color: #1f2a30; }
+        .kl-odd-list select { min-width: 150px; height: 30px; border: 1px solid rgba(31,42,48,.18); border-radius: 8px; background: #fff; font: inherit; font-size: 14.5px; }
         #teacher-gui #knowledge-level-select {
             width: 100%;
             height: 26px;
@@ -3997,25 +4005,27 @@
         #teacher-gui #statisticsAnalysisTaskList tbody {
             max-height: 240px;
         }
-        /* Column layouts: 3 / 4 columns, plus a leading checkbox column */
+        /* Column layouts: 3 / 4 columns, plus a leading checkbox column. The date: as wide as a date (2026-10-25 is about
+           81px) and a little room - the rest goes to the group's and the task's names */
+        #teacher-gui, #excluded-tasks-overlay { --task-date-col: 88px; }
         :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) tr,
         #teacher-gui #statisticsAnalysisTaskList tr {
             display: grid;
-            grid-template-columns: minmax(78px, 0.8fr) minmax(90px, 1fr) minmax(140px, 2.2fr);
+            grid-template-columns: var(--task-date-col) minmax(90px, 1fr) minmax(140px, 2.2fr);
             align-items: center;
             gap: 6px;
         }
         :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) table:has(th:nth-child(4)) tr,
         #teacher-gui #statisticsAnalysisTaskList table:has(th:nth-child(4)) tr {
-            grid-template-columns: minmax(78px, 0.8fr) minmax(90px, 1fr) minmax(56px, 0.5fr) minmax(140px, 2.2fr);
+            grid-template-columns: var(--task-date-col) minmax(90px, 1fr) minmax(56px, 0.5fr) minmax(140px, 2.2fr);
         }
         :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) table:has(.analysis-task-checkbox-cell):has(th:nth-child(4)) tr,
         #teacher-gui #statisticsAnalysisTaskList table:has(.analysis-task-checkbox-cell):has(th:nth-child(4)) tr {
-            grid-template-columns: 30px minmax(78px, 0.8fr) minmax(90px, 1fr) minmax(140px, 2.2fr);
+            grid-template-columns: 30px var(--task-date-col) minmax(90px, 1fr) minmax(140px, 2.2fr);
         }
         :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) table:has(.analysis-task-checkbox-cell):has(th:nth-child(5)) tr,
         #teacher-gui #statisticsAnalysisTaskList table:has(.analysis-task-checkbox-cell):has(th:nth-child(5)) tr {
-            grid-template-columns: 30px minmax(78px, 0.8fr) minmax(90px, 1fr) minmax(56px, 0.5fr) minmax(140px, 2.2fr);
+            grid-template-columns: 30px var(--task-date-col) minmax(90px, 1fr) minmax(56px, 0.5fr) minmax(140px, 2.2fr);
         }
         /* Header row */
         :is(#teacher-gui #embedded-archive-table-container, #excluded-tasks-table) thead tr,
@@ -6942,7 +6952,7 @@
     /* (the Atliktos table's flexible body has no height of its own here: the list is as tall as its rows, the panel scrolls) */
     #excluded-tasks-overlay #excluded-tasks-table table, #excluded-tasks-overlay #excluded-tasks-table tbody { display: block; flex: none; min-height: 0; max-height: none; overflow: visible; }
     /* (the class: date | student | group | task) */
-    #excluded-tasks-overlay #excluded-tasks-table table:has(th:nth-child(4)) tr { grid-template-columns: minmax(78px, 0.8fr) minmax(80px, 0.8fr) minmax(90px, 1fr) minmax(140px, 2.2fr); }
+    #excluded-tasks-overlay #excluded-tasks-table table:has(th:nth-child(4)) tr { grid-template-columns: var(--task-date-col) minmax(80px, 0.8fr) minmax(90px, 1fr) minmax(140px, 2.2fr); }
     /* "Sudėlioti tekstai" (displayComletedTextIdsForTextComp): one row per text, in a scrolling box */
     .tx-box { display: flex; flex-direction: column; gap: 4px; margin: 6px 0 4px; }
     .tx-summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; color: #3c4f59; font-size: 13.5px; }
@@ -8105,12 +8115,12 @@
 </div>
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="../mental-arithmetic.js?v=20261024b"></script>
+	<script src="../mental-arithmetic.js?v=20261025a"></script>
 	<script src="../sudedu-notices.js?v=20261024c"></script>
 	<script src="../mental-arithmetic-combinations.js?v=20261017"></script>
     <script src="../parameter_dictionary.js?v=20261024e"></script>
     <script src="../rasyba-generator.js?v=20261018r"></script>
-    <script src="../sudedu-insights.js?v=20261024t"></script>
+    <script src="../sudedu-insights.js?v=20261025a"></script>
     <script src="../sudedu-auto-tasks.js?v=20261018r"></script>
     <script src="../klase-invites.js?v=20261018r"></script>
     <script src="../main-nav-bar.js"></script>
@@ -12757,15 +12767,7 @@ function displayStudentStatistics(student, studentTasks) {
         `;
     studentTaskStudentEmail.innerHTML = student[4];
 
-    const knowledgeOptions = [
-        { value: -1, label: "Nustatykite lygį", hidden: true }, // placeholder, shown only if -1
-        { value: 0, label: "Priešmokyklinis" },
-        { value: 1, label: "1 klasė" },
-        { value: 2, label: "2 klasė" },
-        { value: 3, label: "3 klasė" },
-        { value: 4, label: "4 klasė" },
-        { value: 5, label: "Aukštesnis" },
-    ];
+    const knowledgeOptions = KNOWLEDGE_LEVELS;
 
     // Build the dropdown
     let selectHTML = `<div class="categories-dropdown-holder">
@@ -13143,6 +13145,118 @@ function applyTeacherStudentIndicators(students) {
     list.forEach(student => { student.indicator = computeTeacherStudentIndicator(student); });
 }
 
+// the knowledge levels (a student's "Žinių lygis", the class's)
+const KNOWLEDGE_LEVELS = [
+    { value: -1, label: "Nustatykite lygį", hidden: true }, // placeholder, shown only if -1
+    { value: 0, label: "Priešmokyklinis" },
+    { value: 1, label: "1 klasė" },
+    { value: 2, label: "2 klasė" },
+    { value: 3, label: "3 klasė" },
+    { value: 4, label: "4 klasė" },
+    { value: 5, label: "Aukštesnis" },
+];
+const knowledgeLabel = level => (KNOWLEDGE_LEVELS.find(option => option.value === Number(level)) || KNOWLEDGE_LEVELS[0]).label;
+const knowledgeOptionsHtml = selected => KNOWLEDGE_LEVELS.map(option =>
+    `<option value="${option.value}"${option.hidden ? ' hidden' : ''}${option.value === Number(selected) ? ' selected' : ''}>${option.label}</option>`).join('');
+/* Klasės apžvalga → "Klasės žinių lygis": the class's most common level (of the students with one set; equally common
+ * ones - e.g. two students on two levels: the lowest of them; -1: none set). Changed: for every student of the class, after
+ * a confirmation. A "!" next to it when some students have another level (or none): a pop-up lists them, each with its
+ * own choice. */
+function classKnowledgeLevel(students) {
+    const counts = new Map();
+    (students || []).forEach(student => {
+        const level = Number(student.knowledgeLvl);
+        if (Number.isInteger(level) && level >= 0) counts.set(level, (counts.get(level) || 0) + 1);
+    });
+    let best = -1, most = 0;
+    [...counts].sort((a, b) => a[0] - b[0]).forEach(([level, n]) => { if (n > most) { best = level; most = n; } });
+    return best;
+}
+function studentsWithOtherKnowledgeLevel() {
+    const level = classKnowledgeLevel(studentList);
+    return level < 0 ? [] : (studentList || []).filter(student => Number(student.knowledgeLvl) !== level);
+}
+function renderClassKnowledgeLevel() {
+    if (!currentStatisticsIsClass) return;
+    const students = studentList || [];
+    const level = classKnowledgeLevel(students);
+    const others = studentsWithOtherKnowledgeLevel();
+    const flagTitle = 'Kai kurių mokinių žinių lygis skiriasi nuo daugumos klasės mokinių';
+    studentStatisticsKnowledgeLevel.innerHTML = `<div class="categories-dropdown-holder">
+        <div class="knowledge-level-select-text">Klasės žinių lygis${others.length ? ` <button type="button" class="kl-flag" title="${flagTitle}" aria-label="${flagTitle} – parodyti juos">!</button>` : ''}</div>
+        <select id="knowledge-level-select" aria-label="Klasės žinių lygis">${knowledgeOptionsHtml(level)}</select>
+    </div>`;
+    studentStatisticsKnowledgeLevel.style.display = students.length ? 'block' : 'none';
+    studentStatisticsKnowledgeLevel.querySelector('.kl-flag')?.addEventListener('click', openOtherKnowledgeLevels);
+    const select = document.getElementById('knowledge-level-select');
+    select.addEventListener('change', () => {
+        const to = Number(select.value);
+        select.value = String(level);   // (shown as it is until confirmed)
+        if (!Number.isInteger(to) || to < 0) return;
+        showCustomConfirm(`Ar tikrai norite visiems klasės mokiniams (${students.length}) nustatyti žinių lygį „${escapeTeacherHtml(knowledgeLabel(to))}“?`, async () => {
+            try {
+                const response = await apiFetch(apiBase + 'students/knowledge-level/class', {
+                    method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ knowledgeLvl: to })
+                });
+                if (!response) return;
+                if (!response.ok) throw new Error('Nepavyko atnaujinti lygio');
+                const data = await response.json();
+                const changed = new Set((data.studentIds || []).map(Number));
+                (studentList || []).forEach(student => { if (changed.has(Number(student.id))) student.knowledgeLvl = data.knowledgeLvl; });
+                renderClassKnowledgeLevel();
+                messageToTheUser('Visų klasės mokinių žinių lygis atnaujintas!', false);
+            } catch (error) {
+                console.error('Error updating the class knowledge level:', error);
+                messageToTheUser('Nepavyko atnaujinti žinių lygio. Bandykite vėliau vėl');
+            }
+        });
+    });
+}
+// one student's level (the "!" pop-up) → true when saved
+async function saveStudentKnowledgeLevel(studentId, level) {
+    try {
+        const response = await apiFetch(apiBase + 'students/knowledge-level', {
+            method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ studentId: Number(studentId), knowledgeLvl: Number(level) })
+        });
+        if (!response || !response.ok) throw new Error('Nepavyko atnaujinti lygio');
+        const data = await response.json();
+        const student = (studentList || []).find(s => Number(s.id) === Number(studentId));
+        if (student) student.knowledgeLvl = data.knowledgeLvl;
+        return true;
+    } catch (error) {
+        console.error('Error updating knowledge level:', error);
+        messageToTheUser('Nepavyko atnaujinti žinių lygio. Bandykite vėliau vėl');
+        return false;
+    }
+}
+function openOtherKnowledgeLevels() {
+    const level = classKnowledgeLevel(studentList);
+    const others = studentsWithOtherKnowledgeLevel();
+    if (!others.length) return;
+    const box = document.createElement('div');
+    box.className = 'kl-odd';
+    box.innerHTML = `<p class="kl-odd-text">Šių mokinių žinių lygis skiriasi nuo daugumos klasės mokinių (${escapeTeacherHtml(knowledgeLabel(level))}).</p>
+        <ul class="kl-odd-list">${others.map(student => `<li data-id="${Number(student.id)}">
+            <span class="kl-odd-name">${escapeTeacherHtml(student.nickname || student.username || 'Mokinys')}</span>
+            <select aria-label="${escapeTeacherHtml(student.nickname || 'Mokinys')} – žinių lygis">${knowledgeOptionsHtml(student.knowledgeLvl)}</select>
+        </li>`).join('')}</ul>`;
+    box.querySelectorAll('.kl-odd-list li').forEach(row => {
+        const select = row.querySelector('select');
+        let saved = Number(select.value);
+        select.addEventListener('change', async () => {
+            const to = Number(select.value);
+            select.disabled = true;
+            const ok = await saveStudentKnowledgeLevel(row.dataset.id, to);
+            select.disabled = false;
+            if (!ok) { select.value = String(saved); return; }
+            saved = to;
+            row.classList.add('kl-saved');
+            renderClassKnowledgeLevel();
+        });
+    });
+    openObjectPopup(box, 'Skirtingas žinių lygis', '');
+}
+
 async function displayTeacherHome(selectedGroupNames=null) {
     const focusList = focusTaskListAfterHomeRender;
     focusTaskListAfterHomeRender = false;
@@ -13175,6 +13289,7 @@ async function displayTeacherHome(selectedGroupNames=null) {
         `;
 
 
+    renderClassKnowledgeLevel();
     studentStatisticsPerformanceMean.innerHTML = `<div class="student-points-holder"><div class="student-points-label">Vidutiniai taškai</div> <div class="student-points">${classScoreMedian}</div></div>`;
     studentStatisticsPerformanceMean.style.display = "block";
 
@@ -13798,7 +13913,8 @@ function captureTaskInfoScroll() {
 
 function restoreTaskInfoScroll(scrollPosition) {
     const container = document.getElementById('student-task-info-container-inner');
-    const sidebar = document.getElementById('sidebar') || document.querySelector('.sidebar');
+    // (Analizė keeping its view in place - analysisHold, also the "!" - scrolls the panel itself: not set back here)
+    const sidebar = typeof analysisHold !== 'undefined' && analysisHold ? null : (document.getElementById('sidebar') || document.querySelector('.sidebar'));
     if (!container && !sidebar) return;
     requestAnimationFrame(() => {
         if (container) container.scrollTop = scrollPosition.containerTop;
@@ -15898,20 +16014,24 @@ function analysisLandmarks() {
         subject === 'math' ? '#mathStatisticsMistakesTitle' : subject === 'grammar' ? '#grammarStatisticsMistakesTitle' : '#student-statistics-komponavimas-error-frequency',
         subject === 'math' ? '#summary-table' : subject === 'grammar' ? '#summary-table-grammar' : '#student-statistics-isdestymas-error-frequency'];
 }
-function startAnalysisHold() {
+// (quiet: only the pinning - nothing greyed, no spinner, no view to wait for; see aimAnalysisHold)
+function startAnalysisHold({ quiet = false } = {}) {
     if (typeof teacherSection === 'undefined' || teacherSection !== 'analysis') return;
     const scroller = analysisScroller();
     const viewTop = () => (scroller === document.scrollingElement ? 0 : scroller.getBoundingClientRect().top);
     if (!analysisHold) {
-        // (the landmark being read: the last one above the panel's upper third)
-        const limit = viewTop() + scroller.clientHeight * 0.35;
-        let pick = null;
+        // (the landmark being read: of those on the screen, the one nearest the panel's upper third - where the eye is;
+        // none on the screen: the last one above it)
+        const top0 = viewTop(), bottom0 = top0 + scroller.clientHeight, limit = top0 + scroller.clientHeight * 0.35;
+        let pick = null, above = null;
         analysisLandmarks().forEach(selector => {
             const el = document.querySelector(selector);
             if (!el || !el.offsetParent) return;
             const top = el.getBoundingClientRect().top;
-            if (!pick || top <= limit) pick = { selector, top };
+            if (top >= top0 && top < bottom0 && (!pick || Math.abs(top - limit) < Math.abs(pick.top - limit))) pick = { selector, top };
+            if (!above || top <= limit) above = { selector, top };
         });
+        pick = pick || above;
         if (!pick) return;
         const hold = { scroller, selector: pick.selector, offset: pick.top - viewTop(), pinning: true, started: Date.now(), changed: Date.now() };
         hold.pin = () => {
@@ -15937,6 +16057,7 @@ function startAnalysisHold() {
     }
     analysisHold.started = Date.now();
     analysisHold.changed = Date.now();
+    if (quiet) { document.body.classList.add('ana-holding'); return; }
     analysisHold.waitingView = true;   // (until the chosen view starts drawing - see analysisViewStarted)
     analysisHold.idleSince = 0;
     document.body.classList.add('ana-holding', 'ana-stale');
@@ -15952,6 +16073,20 @@ function startAnalysisHold() {
         window.addEventListener('resize', placeHoldSpinner);
     }
     placeHoldSpinner();
+}
+// a place to keep instead of the one being read (the "!": its category's row near the top) - from now on that is what
+// stays put while the analysis loads; a hold is started for it when none is on. false: not in Analizė
+// (reveal-expanded.js: no scrolling to an opened item while the view is kept in place - the hold scrolls)
+window.revealExpandedHeld = () => Boolean(analysisHold && analysisHold.pinning);
+function aimAnalysisHold(selector, offset) {
+    if (!analysisHold) startAnalysisHold({ quiet: true });
+    const hold = analysisHold;
+    if (!hold) return false;
+    hold.selector = selector;
+    hold.offset = offset;
+    hold.pinning = true;
+    hold.pin();
+    return true;
 }
 // the student's / the class's view has started drawing (after the check for new results): from now on its own loading counts
 function analysisViewStarted() {
@@ -16302,43 +16437,54 @@ async function openRandomLetters(studentId) {
     setTeacherSection('analysis');
     applyTeacherAnalysisSubject();
     document.getElementById('langGrammarCollapseBody')?.classList.remove('collapsed');
-    // the student's categories come when their results are in: wait for this category's row (a new one, if switching)
+    // the student's categories come when their results are in: wait for this category's row (a new one, if switching) -
+    // as long as the analysis is still loading (at most RL_WAIT_MAX ms); loaded and still none: the card has no such row
+    const RL_WAIT_MAX = 60000, RL_SETTLED = 1500;
+    const ticket = teacherViewTicket;   // (another student or the class chosen meanwhile: this one is over)
+    const selector = '#insights-grammar-mistakes .ins-pat[data-key="bet_kokias"]';
     const started = Date.now();
+    let idleSince = 0;
     const row = await new Promise(resolve => {
         const tick = () => {
+            if (ticket !== teacherViewTicket) return resolve(undefined);
             const el = host && host.querySelector('.ins-pat[data-key="bet_kokias"]');
-            if (el && (!switching || el !== old)) resolve(el);
-            else if (Date.now() - started > 20000) resolve(null);
-            else setTimeout(tick, 200);
+            if (el && (!switching || el !== old) && Number(currentEmbeddedArchiveStudentId) === studentId) return resolve(el);
+            const loading = analysisStillLoading();
+            idleSince = loading ? 0 : (idleSince || Date.now());
+            if (Date.now() - started > RL_WAIT_MAX || (idleSince && Date.now() - idleSince > RL_SETTLED)) return resolve(null);
+            setTimeout(tick, 150);
         };
         tick();
     });
+    if (row === undefined) return;
     if (!row) {
         // (the card shows no such mistakes after all: no "!" for this student)
         randomLetterFlags.set(studentId, { flagged: false });
         paintRandomLetterFlags();
         return;
     }
-    // open it and bring it to the top; the analysis may still be drawn again (e.g. when the classmates' results come) -
-    // for a few seconds a new row is opened and brought up the same way
-    const show = el => {
+    // open it and keep it near the top: the view's hold now keeps this row in place (not the place read before the
+    // click) while the analysis is still loading; drawn anew (e.g. when the classmates' results come) - the new row is
+    // opened again; over when the teacher scrolls, chooses another view, or all has loaded and been still for a moment
+    const open = el => {
         const tab = host.querySelector('.ins-tab[data-view="patterns"]');
         if (tab && !tab.classList.contains('on')) tab.click();
         const head = el.querySelector('.ins-pat-head');
         if (head && head.getAttribute('aria-expanded') !== 'true') head.click();
-        el.classList.add('rl-highlight');
-        setTimeout(() => el.classList.remove('rl-highlight'), 2400);
-        setTimeout(() => revealAtTop(el), 120);
     };
+    open(row);
+    row.classList.add('rl-highlight');
+    setTimeout(() => row.classList.remove('rl-highlight'), 2400);
+    if (!aimAnalysisHold(selector, 10)) setTimeout(() => revealAtTop(row), 120);
+    const hold = analysisHold;
     let shown = row;
-    show(row);
-    const until = Date.now() + 5000;
     const watch = () => {
+        if (ticket !== teacherViewTicket || Date.now() - started > RL_WAIT_MAX) return;
         const now = host.querySelector('.ins-pat[data-key="bet_kokias"]');
-        if (now && now !== shown) { shown = now; show(now); }
-        if (Date.now() < until) setTimeout(watch, 250);
+        if (now && now !== shown) { shown = now; open(now); if (analysisHold && analysisHold.pinning) analysisHold.pin(); }
+        if (analysisHold && analysisHold === hold) setTimeout(watch, 150);
     };
-    setTimeout(watch, 250);
+    setTimeout(watch, 150);
 }
 
 // A pattern's mistakes table ("Klaidų dėsningumai"): the shares are of that pattern's mistakes

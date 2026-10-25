@@ -21,6 +21,8 @@
 
 	function reveal(el) {
 		if (!el || !el.isConnected || !el.getClientRects().length) return;
+		// (a page keeping something in place itself just then - Užduotys' Analizė while it loads - is left alone)
+		if (typeof window.revealExpandedHeld === 'function' && window.revealExpandedHeld()) return;
 		const box = scrollerOf(el);
 		const page = box === document.scrollingElement || box === document.documentElement;
 		// the visible part of the scrolling parent (also limited to the window)

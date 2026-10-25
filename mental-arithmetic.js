@@ -2944,7 +2944,8 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
         const right = String(correct), quotient = right.split(' ')[0];
         const wrong = [...(mathAnswersByKey[key] || [])].filter(a => String(a) !== right && String(a) !== quotient);
         const slot = `<span class="mm-unk"><span class="mm-ok">${escapeMistakeText(right)}</span>${wrong.length ? ` <span class="mm-wrongs">(${wrong.map(a => `<span class="mm-wa">${escapeMistakeText(a)}</span>`).join(', ')})</span>` : ''}</span>`;
-        return key.replace('&#x25fb', slot);
+        // (one inline piece: the cell lays out its parts as a flex row, which would drop the spaces around the answer)
+        return `<span class="mm-expr">${key.replace(/ {2,}/g, ' ').replace('&#x25fb', slot)}</span>`;   // (stored padded for columns: "57 +  9")
       };
       const mmRowOpens = records => (records || []).some(r => mathMistakeHasDetail(r) && r[3] && Array.isArray(r[3].f));
       const summaryData = Object.entries(performanceData).map(([veiksmas, mistakes]) => ({
