@@ -3335,6 +3335,18 @@
 		});
 		// ("… veiksmuose su nuliu bei veiksmuose su nežinomu dėmeniu": the same word twice - the unknown one "užduotyse")
 		if (items.filter(t => / ?veiksmuose /.test(' ' + t)).length > 1) items = items.map(t => t.replace(/(^|\s)veiksmuose su nežinomu /, '$1užduotyse su nežinomu '));
+		// (several multiplication tables said as one: "skaičių 4 ir 8 daugybos lentelėse (pvz., 4 · 7 = 27, 8 · 6 = 46)")
+		const TABLE = /^skaičiaus (\d+) daugybos lentelėje(?: \(pvz\., (.+)\))?$/;
+		const tables = items.filter(t => TABLE.test(t));
+		if (tables.length > 1) {
+			const found = tables.map(t => TABLE.exec(t));
+			const nums = found.map(m => m[1]).sort((a, b) => a - b);
+			const examples = found.map(m => m[2]).filter(Boolean);
+			const merged = `skaičių ${inner(nums)} daugybos lentelėse${examples.length ? ` (pvz., ${examples.join(', ')})` : ''}`;
+			const at = items.indexOf(tables[0]);
+			items = items.filter(t => !tables.includes(t));
+			items.splice(Math.min(at, items.length), 0, merged);
+		}
 		// ("A, B bei C" - "bei" joins the last two; the parts inside an item use "ir")
 		return items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')} bei ${items[items.length - 1]}`;
 	}
