@@ -13235,7 +13235,7 @@ function openOtherKnowledgeLevels() {
     if (!others.length) return;
     const box = document.createElement('div');
     box.className = 'kl-odd';
-    box.innerHTML = `<p class="kl-odd-text">Šių mokinių žinių lygis skiriasi nuo daugumos klasės mokinių (${escapeTeacherHtml(knowledgeLabel(level))}).</p>
+    box.innerHTML = `<p class="kl-odd-text">Šių mokinių žinių lygis skiriasi nuo daugumos klasės mokinių.</p>
         <ul class="kl-odd-list">${others.map(student => `<li data-id="${Number(student.id)}">
             <span class="kl-odd-name">${escapeTeacherHtml(student.nickname || student.username || 'Mokinys')}</span>
             <select aria-label="${escapeTeacherHtml(student.nickname || 'Mokinys')} – žinių lygis">${knowledgeOptionsHtml(student.knowledgeLvl)}</select>
