@@ -89,7 +89,8 @@
         box.hidden = false;
         box.innerHTML = `
             <div class="form-group"><label>Title <span class="am-muted">(the pop-up's heading)</span></label><input class="nw-f-title" maxlength="200" value="${esc(item.title)}"></div>
-            <div class="form-group"><label>Text on the board <span class="am-muted">(short; HTML works, e.g. &lt;b&gt;…&lt;/b&gt;, &lt;a href="apie.html"&gt;…&lt;/a&gt;)</span></label>
+            <div class="form-group"><label>Text on the board <span class="am-muted">(short; HTML works - select words → 🔗 Link)</span></label>
+                <div class="nw-tools nw-tools-board">${[['b', '<b>B</b>'], ['a', '🔗 Link']].map(([t, s]) => `<button type="button" class="nw-tool" data-t="${t}">${s}</button>`).join('')}</div>
                 <textarea class="nw-f-text" rows="2" maxlength="3000">${esc(item.text)}</textarea></div>
             <div class="form-group"><label>Full text in the pop-up <span class="am-muted">(HTML)</span></label>
                 <div class="nw-tools">${[['b', '<b>B</b>'], ['i', '<i>I</i>'], ['a', '🔗 Link'], ['ul', '• List'], ['br', '↵ New line'], ['img', '🖼 Picture']].map(([t, s]) => `<button type="button" class="nw-tool" data-t="${t}">${s}</button>`).join('')}</div>
@@ -106,8 +107,18 @@
         const live = () => { const v = read(); $('.nw-live').innerHTML = `<div class="nw-board-text">${v.text || '<span class="am-muted">(the text on the board)</span>'}</div><div class="nw-board-date">${esc(boardDate(v.date))}</div>`; };
         box.addEventListener('input', live);
         live();
+        // the board text's helpers: bold / a link on the selected words
+        $('.nw-tools-board').addEventListener('click', e => {
+            const b = e.target.closest('.nw-tool');
+            if (!b) return;
+            const ta = $('.nw-f-text'), s = ta.selectionStart, en = ta.selectionEnd, sel = ta.value.slice(s, en);
+            if (b.dataset.t === 'a') { if (!MessageText.wrapLink(ta, true)) say('Select the words to make a link first (or the link was cancelled).', 'info'); return; }
+            ta.setRangeText(`<b>${sel || 'tekstas'}</b>`, s, en, 'end');
+            ta.focus();
+            ta.dispatchEvent(new Event('input', { bubbles: true }));
+        });
         // the small HTML helpers: wrap the selection (or insert)
-        $('.nw-tools').addEventListener('click', async e => {
+        $('.nw-tools:not(.nw-tools-board)').addEventListener('click', async e => {
             const b = e.target.closest('.nw-tool');
             if (!b) return;
             const ta = $('.nw-f-full'), s = ta.selectionStart, en = ta.selectionEnd, sel = ta.value.slice(s, en);
@@ -124,7 +135,11 @@
             }
             let ins;
             if (b.dataset.t === 'b' || b.dataset.t === 'i') ins = `<${b.dataset.t}>${sel || 'tekstas'}</${b.dataset.t}>`;
-            else if (b.dataset.t === 'a') { const url = prompt('Link address (e.g. apie.html#zaidimai or https://…):', 'https://'); if (!url) return; ins = `<a href="${url}"${/^https?:/.test(url) ? ' target="_blank" rel="noopener noreferrer"' : ''}>${sel || 'čia'}</a>`; }
+            else if (b.dataset.t === 'a') {
+                if (sel.trim()) { if (!MessageText.wrapLink(ta, true)) say('The link was cancelled.', 'info'); return; }
+                const url = MessageText.askLink(''); if (!url) return;
+                ins = `<a href="${url.replace(/"/g, '%22')}"${/^https?:/.test(url) ? ' target="_blank" rel="noopener noreferrer"' : ''}>čia</a>`;
+            }
             else if (b.dataset.t === 'ul') ins = `<ul>\n${(sel || 'pirmas\nantras').split('\n').map(l => `<li>${l}</li>`).join('\n')}\n</ul>`;
             else ins = '<br>\n';
             ta.setRangeText(ins, s, en, 'end');

@@ -21,9 +21,14 @@
     const pageName = (location.pathname.split('/').pop() || 'index.html').replace(/\.html?$/i, '') || 'index';
 
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-    // the admin's text: new lines, **bold**, links (www… / http…); everything else as plain text
+    // the admin's text: new lines, **bold**, links with words of their own - [words](address) - and bare addresses
+    // (www… / http…); everything else as plain text. An address: http(s), mailto, or a page of the site (apie.html#…,
+    // /LT/…); anything else (e.g. javascript:) stays text. Outside the site: a new tab.
+    const SAFE_LINK = /^(?:https?:\/\/|mailto:|\/|#|[\w.-]+\.html(?:[#?]|$))/i;
     function formatText(text) {
         return esc(text)
+            .replace(/\[([^\]\n]+)\]\(([^()\s]+)\)/g, (m, words, url) => (SAFE_LINK.test(url)
+                ? `<a href="${url}"${/^https?:/i.test(url) ? ' target="_blank" rel="noopener"' : ''}>${words}</a>` : m))
             .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
             .replace(/(^|[\s(])((?:https?:\/\/|www\.)[^\s<)]+)/g, (m, pre, url) => `${pre}<a href="${url.startsWith('www.') ? 'https://' + url : url}" target="_blank" rel="noopener">${url}</a>`)
             .replace(/\n/g, '<br>');

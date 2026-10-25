@@ -18,7 +18,8 @@
             <div class="ate">
                 <div class="ate-bar">
                     <button type="button" class="btn small-btn btn-secondary ate-add">🖼 Picture</button>
-                    <span class="am-muted">New lines, **bold** and links (https://…) work. A picture goes where the cursor is.</span>
+                    <button type="button" class="btn small-btn btn-secondary ate-link" title="Select words in the text, then click">🔗 Link</button>
+                    <span class="am-muted">New lines, **bold** and links work: select words → 🔗 Link. A picture goes where the cursor is.</span>
                 </div>
                 <div class="ate-doc"></div>
                 <div class="ate-msg" role="status"></div>
@@ -135,6 +136,13 @@
             const next = f.nextElementSibling;
             if (next) { next.focus(); next.setSelectionRange(0, 0); }
         }
+        // a link on the words selected in the text box last typed in: [words](address)
+        root.querySelector('.ate-link').addEventListener('click', () => {
+            say('');
+            const t = lastText && lastText.isConnected ? lastText : doc.querySelector('.ate-t');
+            if (!t) return;
+            if (!wrapLink(t)) say('Select the words to make a link first (or the link was cancelled).');
+        });
         root.querySelector('.ate-add').addEventListener('click', async () => {
             say('');
             const p = await MessageImages.pick();
@@ -175,6 +183,38 @@
         return { get, set, focus: () => { const t = doc.querySelector('.ate-t'); if (t) t.focus(); }, el: root };
     }
 
+    /* The link's address, asked for the words chosen (null: cancelled). www.… and a bare domain (sudedu.lt/…) get https://;
+     * a page of the site (apie.html#zaidimai, /LT/klase.html) stays as it is; ( ) are written %28 %29 (they would end the
+     * [words](address) form); spaces / javascript: are refused. */
+    function askLink(words) {
+        const raw = prompt(`Link address${words ? ` for "${words.slice(0, 60)}"` : ''}:\n(https://…, www.…, or a page of the site, e.g. apie.html#zaidimai)`, /^(https?:\/\/|www\.)/i.test(words || '') ? words : 'https://');
+        if (raw == null) return null;
+        let url = raw.trim();
+        if (!url || /^https?:\/\/$/i.test(url)) return null;
+        if (/^www\./i.test(url)) url = 'https://' + url;
+        else if (!/^(https?:\/\/|mailto:|\/|#)/i.test(url) && !/^[\w.-]+\.html(?:[#?]|$)/i.test(url) && /^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(url)) url = 'https://' + url;
+        if (/\s/.test(url) || /^javascript:/i.test(url) || !/^(https?:\/\/|mailto:|\/|#|[\w.-]+\.html(?:[#?]|$))/i.test(url)) {
+            alert('This does not look like a link address: use https://…, www.…, mailto:… or a page of the site (e.g. apie.html).');
+            return null;
+        }
+        return url.replace(/\(/g, '%28').replace(/\)/g, '%29');
+    }
+    // a text box's selected words → [words](address) (or html: <a href="…">words</a>); false when nothing was done
+    function wrapLink(textarea, html = false) {
+        const s = textarea.selectionStart, e = textarea.selectionEnd;
+        const words = textarea.value.slice(s, e).trim();
+        if (!words) return false;
+        const url = askLink(words);
+        if (!url) return false;
+        const out = html
+            ? `<a href="${url.replace(/"/g, '%22')}"${/^https?:/i.test(url) ? ' target="_blank" rel="noopener noreferrer"' : ''}>${words}</a>`
+            : `[${words.replace(/[\[\]]/g, '')}](${url})`;
+        textarea.setRangeText(out, s, e, 'end');
+        textarea.focus();
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        return true;
+    }
+
     let styled = false;
     function injectStyle() {
         if (styled) return;
@@ -205,5 +245,5 @@
         document.head.appendChild(style);
     }
 
-    window.MessageText = { create };
+    window.MessageText = { create, askLink, wrapLink };
 })();

@@ -159,6 +159,7 @@
             if (it.t === 'text') {
                 props.innerHTML = `<div class="md-ptitle">Text</div>
                     <textarea class="md-text" rows="3" maxlength="1500" placeholder="Your text">${esc(it.text)}</textarea>
+                    <div class="md-row md-btns"><button type="button" class="md-mini md-wide md-link" title="Select words in the text above, then click">🔗 Link the selected words</button></div>
                     <p class="md-tip">New lines, **bold** and links work. Tip: double-click the text on the card to type there.</p>
                     <div class="md-row"><span>Size</span><input type="range" data-k="size" min="8" max="140" step="1" value="${it.size}"><b>${it.size}</b></div>
                     <div class="md-row"><span>Colour</span><input type="color" data-k="color" value="${it.color}"><span class="md-sw">${SWATCHES.map(c => `<button type="button" class="md-swatch" data-color="${c}" style="background:${c}" aria-label="${c}"></button>`).join('')}</span></div>
@@ -187,6 +188,12 @@
                     ${common}`;
             }
         }
+        // a link on the words selected in the text box: [words](address)
+        props.addEventListener('click', e => {
+            if (!e.target.closest('.md-link')) return;
+            const ta = props.querySelector('.md-text');
+            if (ta && !MessageText.wrapLink(ta)) alert('Select the words to make a link in the text box first.');
+        });
         props.addEventListener('input', e => {
             const it = L.items[sel];
             if (!it) {
