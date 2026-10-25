@@ -17,8 +17,8 @@
   var GAME_NAMES = window.SUDEDU_GAME_NAMES || { td: 'Tvirtovės gynyba', ghost: 'Vaiduoklis' };   // game-names.js
   // who may host each game (the same rule as the game server): 'teacher', 'student' or 'both'
   var GAME_HOSTS = { td: 'teacher', ghost: 'both' };
-  var GHOST_DICT = { easy: 'lengvas', medium: 'vidutinis', hard: 'sunkus', expert: 'ekspertas' };
-  var GHOST_BOT = { easy: 'lengvas', normal: 'normalus', hard: 'sunkus' };
+  var GHOST_DICT = { easy: 'ribotas', medium: 'vidutinis', hard: 'platus', expert: 'turtingas' };
+  var GHOST_BOT = { easy: 'lengvas', normal: 'vidutinis', hard: 'sunkus' };
   var MODE_TEXT = { timed: 'Atlaikyti nustatytą laiką', endless: 'Atsilaikyti kuo ilgiau (vis stipresnės bangos)' };
   var DIFF_TEXT = { easy: 'lengvas', normal: 'vidutinis', hard: 'sunkus', extreme: 'labai sunkus' };
   var ERR = {

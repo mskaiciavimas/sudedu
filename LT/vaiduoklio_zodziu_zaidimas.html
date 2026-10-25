@@ -890,17 +890,17 @@
 				<div>
 					<div class="vg-label">Botų žodynas</div>
 					<div class="vg-seg" data-setting="dict">
-						<button data-v="easy">Lengvas</button>
+						<button data-v="easy">Ribotas</button>
 						<button data-v="medium">Vidutinis</button>
-						<button data-v="hard">Sunkus</button>
-						<button data-v="expert">Ekspertas</button>
+						<button data-v="hard">Platus</button>
+						<button data-v="expert">Turtingas</button>
 					</div>
 				</div>
 				<div>
 					<div class="vg-label">Botų lygis</div>
 					<div class="vg-seg" data-setting="bot">
 						<button data-v="easy">Lengvas</button>
-						<button data-v="normal">Normalus</button>
+						<button data-v="normal">Vidutinis</button>
 						<button data-v="hard">Sunkus</button>
 					</div>
 				</div>
@@ -1063,7 +1063,7 @@
 	// ---------- config ----------
 	// Bot knowledge per "Botų žodynas" level (SudWords list names, see sudedu-words.js). Lengvas / Vidutinis / Sunkus:
 	// the easy / medium / hard word lists (with their other forms) from grades 1-2 or grades 3-4 texts, chosen by
-	// the median knowledge level of the player's class (classGrade). Ekspertas: all common words (the same for every grade).
+	// the median knowledge level of the player's class (classGrade). Turtingas: all common words (the same for every grade).
 	// Bots only use words that also pass the word check (so never names or shortened forms).
 	const BOT_LISTS = {
 		g12: { easy: 'freq12_easy', medium: 'freq12_medium', hard: 'freq12_hard' },
@@ -1114,7 +1114,7 @@
 		{ name: 'Slogutis', av: '🦇' }
 	];
 
-	const DEFAULTS = { mode: 'solo', dict: 'medium', bot: 'normal', lives: '3', bots: '2', time: '0', max: '4' };
+	const DEFAULTS = { mode: 'solo', dict: 'easy', bot: 'normal', lives: '3', bots: '2', time: '0', max: '4' };
 	const SETTINGS_KEY = 'vaiduoklisSettings';
 
 	// ---------- helpers ----------
@@ -1193,10 +1193,10 @@
 		})();
 		return gradePromise;
 	}
-	// the setup screen says which grade's words the bots play with (Ekspertas: all words)
+	// the setup screen says which grade's words the bots play with (Turtingas: all words)
 	classGrade().then(g => {
 		const note = $('setupNote');
-		note.textContent = note.dataset.text = `Žodžiai tikrinami SUDEDU žodyne. Botai žaidžia ${g >= 3 ? '3–4' : '1–2'} klasių žodžiais (Ekspertas – visais dažnais žodžiais).`;
+		note.textContent = note.dataset.text = `Žodžiai tikrinami SUDEDU žodyne. Botai žaidžia ${g >= 3 ? '3–4' : '1–2'} klasių žodžiais (Turtingas – visais dažnais žodžiais).`;
 	});
 
 	// ---------- state ----------
@@ -2382,11 +2382,11 @@
 		const set = boardSetup.settings || {};
 		openGameView();
 		$('status').textContent = 'Kraunamas žodynas…';
-		const dict = await loadDict(set.dict || 'medium', null, set.grade);
+		const dict = await loadDict(set.dict || 'easy', null, set.grade);
 		if (!dict) { notice('Nepavyko įkelti žodyno', 'Patikrinkite ryšį ir bandykite dar kartą.'); return; }
 		const players = boardSetup.students.map((p, i) => ({ id: 'p' + p.id, name: p.name, av: PEOPLE_AV[i % PEOPLE_AV.length] }));
 		BOTS.slice(0, Math.min(4, Number(set.bots) || 0)).forEach((b, i) => players.push({ id: 'b' + i, name: b.name, av: b.av, bot: true }));
-		runLocal({ players: GhostGame.shuffle(players), lives: Number(set.lives) || 3, timeLimit: Number(set.time) || 0, botLevel: set.bot || 'normal', dict }, null, true, { dict: set.dict || 'medium', bot: set.bot || 'normal', lives: Number(set.lives) || 3, time: Number(set.time) || 0 });
+		runLocal({ players: GhostGame.shuffle(players), lives: Number(set.lives) || 3, timeLimit: Number(set.time) || 0, botLevel: set.bot || 'normal', dict }, null, true, { dict: set.dict || 'easy', bot: set.bot || 'normal', lives: Number(set.lives) || 3, time: Number(set.time) || 0 });
 	}
 
 	// a message instead of a game (with the way back)
