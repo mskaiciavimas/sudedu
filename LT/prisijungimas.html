@@ -11,14 +11,8 @@
 	<link rel="stylesheet" href="../main-nav-bar.css">
 	<script src="../refresh-token.js"></script>
 
-	<!-- Google tag (gtag.js) -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-96Q83PW8XY"></script>
-	<script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag() { dataLayer.push(arguments); }
-		gtag('js', new Date());
-		gtag('config', 'G-96Q83PW8XY');
-	</script>
+	<!-- Google Analytics only with consent, the privacy notice for signed-in users (sudedu-consent.js) -->
+<script src="../sudedu-consent.js?v=20261026a"></script>
 
 	<style>
 		* {
@@ -194,6 +188,7 @@
 			width: 20px;
 			height: 20px;
 			cursor: pointer;
+			flex-shrink: 0;   /* (a label over two lines - the privacy consent - mustn't squeeze the box) */
 		}
 
 		input[type="checkbox"]:not(:checked) {
@@ -615,6 +610,19 @@
 				</div>
 			</div>
 
+			<!-- (sign-up only: the password typed again, so a typo can't make an account nobody can log in to) -->
+			<div class="form-group" id="password-repeat-group" style="display: none;">
+				<div class="input-wrapper">
+					<input type="password" id="passwordRepeatInput" placeholder="Pakartokite slaptažodį" />
+					<button type="button" class="password-toggle" onclick="togglePasswordVisibility('passwordRepeatInput')">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+							<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
+							<path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+						</svg>
+					</button>
+				</div>
+			</div>
+
 			<div class="form-group" id="nickname-group" style="display: none;">
 				<input type="text" id="nickname" placeholder="Vardas" />
 			</div>
@@ -622,6 +630,12 @@
 			<div class="checkbox-wrapper" id="is-teacher-div" style="display: none;">
 				<input type="checkbox" id="is-teacher" onchange="changeInIsTeacherOption(this)"/>
 				<label for="is-teacher">Aš esu mokytoja(as)</label>
+			</div>
+
+			<!-- (sign-up only: the privacy notice agreed to - a student's parents / guardians agree; the text follows "Aš esu mokytoja(as)") -->
+			<div class="checkbox-wrapper" id="privacy-consent-div" style="display: none;">
+				<input type="checkbox" id="privacy-consent"/>
+				<label for="privacy-consent" id="privacy-consent-label"></label>
 			</div>
 
 			<div class="form-group" id="class-select-group" style="display: none;">
@@ -684,6 +698,16 @@
 		const errorField = document.getElementById('error');
 		const nickname = document.getElementById('nickname');
 		const nicknameGroup = document.getElementById('nickname-group');
+		const passwordRepeat = document.getElementById('passwordRepeatInput');
+		const passwordRepeatGroup = document.getElementById('password-repeat-group');
+		const privacyConsent = document.getElementById('privacy-consent');
+		const privacyConsentDiv = document.getElementById('privacy-consent-div');
+		function setPrivacyConsentText() {
+			const link = '<a href="privatumas.html" target="_blank" rel="noopener">privatumo pranešimu</a>';
+			document.getElementById('privacy-consent-label').innerHTML = isTeacher.checked
+				? `Susipažinau su ${link} ir sutinku.`
+				: `Mano tėvai (globėjai) susipažino su ${link} ir sutinka, kad naudočiausi SUDEDU.`;
+		}
 		const isTeacherDiv = document.getElementById('is-teacher-div');
 		const isTeacher = document.getElementById('is-teacher');
 		const classSelectDropdown = document.getElementById('class-select');
@@ -720,6 +744,7 @@
 				'ERR_001': 'Serverio klaida. Bandykite vėliau.',
 				'ERR_002': 'Trūksta duomenų',
 				'ERR_004': 'Neteisingas el. pašto adresas. Patikrinkite, ar jis įrašytas teisingai (pvz., vardas@gmail.com).',
+				'ERR_005': 'Norint sukurti paskyrą, reikia sutikti su privatumo pranešimu (pažymėkite langelį).',
 				'ERR_003': retryAfter 
 				? `Per didelis prašymų srautas. Bandykite vėliau (anksčiausiai po ${formatRetryTime(retryAfter)}).`
 				: 'Per didelis prašymų srautas. Bandykite vėliau.'
@@ -783,6 +808,11 @@
 			logInTitle.innerHTML = isRegistration ? 'Registracija' : 'Prisijungimas';
 			authBtn.innerHTML = isRegistration ? 'Prisiregistruoti' : 'Prisijungti';
 			nicknameGroup.style.display = isRegistration ? 'block' : 'none';
+			passwordRepeatGroup.style.display = isRegistration ? 'block' : 'none';
+			passwordRepeat.value = '';
+			privacyConsentDiv.style.display = isRegistration ? 'flex' : 'none';
+			privacyConsent.checked = false;
+			setPrivacyConsentText();
 			isTeacherDiv.style.display = isRegistration ? 'flex' : 'none';
 			classSelectGroup.style.display = (isRegistration && !isTeacher.checked) ? 'block' : 'none';
 			forgotPasswordOuterDiv.style.display = isRegistration ? 'none' : 'flex';
@@ -794,6 +824,7 @@
 		}
 
 		function changeInIsTeacherOption(checkbox) {
+			setPrivacyConsentText();
 			if (checkbox.checked) {
 				classSelectGroup.style.display = "none";
 			} else {
@@ -821,6 +852,10 @@
 			showError('Slaptažodis turi būti nuo 6 iki 20 simbolių'); 
 			return;
 		}
+		if (isRegistration && passwordRepeat.value.trim() !== passVal) {
+			showError('Slaptažodžiai nesutampa. Įveskite tą patį slaptažodį abiejuose laukeliuose.');
+			return;
+		}
 		if (!emailVal.includes('@')) { 
 			showError('Neteisingas elektroninio pašto formatas'); 
 			return; 
@@ -840,6 +875,10 @@
 		}
 		if (isRegistration && !isTeacherVal && classValue === -1) {
 			showError('Pasirink savo klasę'); 
+			return;
+		}
+		if (isRegistration && !privacyConsent.checked) {
+			showError(getMsg('ERR_005'));
 			return;
 		}
 
@@ -869,7 +908,8 @@
 					password: passVal, 
 					nickname: nicknameVal, 
 					isTeacher: isTeacherVal,
-					class: isTeacherVal ? null : classValue
+					class: isTeacherVal ? null : classValue,
+					privacyAccepted: privacyConsent.checked
 				}),
 				signal: AbortSignal.timeout(10000)
 				});
@@ -885,7 +925,7 @@
 			const data = await response.json();
 
 			// Check for errors FIRST (before success)
-			if (data.code === 'ERR_003' || data.code === 'ERR_001' || data.code === 'ERR_002' || data.code === 'ERR_004') {
+			if (data.code === 'ERR_003' || data.code === 'ERR_001' || data.code === 'ERR_002' || data.code === 'ERR_004' || data.code === 'ERR_005') {
 				showError(getMsg(data.code, emailVal, data.retryAfter));
 				isAuthenticating = false;
 				authBtn.innerText = isRegistration ? 'Prisiregistruoti' : 'Prisijungti';
@@ -897,7 +937,8 @@
 			if (isRegistration) {
 				if (data.code === 'REG_001' || data.code === 'REG_002') {
 				email.value = ''; 
-				password.value = ''; 
+				password.value = '';
+				passwordRepeat.value = ''; 
 				nickname.value = ''; 
 				isTeacher.checked = false;
 				classSelectDropdown.value = '-1';
@@ -958,7 +999,8 @@
 					emailVerified: data.emailVerified,
 					petOnWalk: data.petOnWalk || '',
 					petStats: data.petStats || '[]',
-					knowledgeLvl: data.knowledgeLvl !== undefined ? data.knowledgeLvl : -1
+					knowledgeLvl: data.knowledgeLvl !== undefined ? data.knowledgeLvl : -1,
+					privacyVersion: data.privacyVersion ?? 0
 				};
 				
 				localStorage.setItem('userData', JSON.stringify(userData));
@@ -1023,7 +1065,8 @@
 				emailVerified: data.emailVerified,
 				petOnWalk: data.petOnWalk || '',
 				petStats: data.petStats || '[]',
-				knowledgeLvl: data.knowledgeLvl !== undefined ? data.knowledgeLvl : -1
+				knowledgeLvl: data.knowledgeLvl !== undefined ? data.knowledgeLvl : -1,
+				privacyVersion: data.privacyVersion ?? 0
 			};
 
 			// Save locally
@@ -1054,8 +1097,8 @@
 			showError(msg || 'Nepavyko prisijungti.');
 		}
 
-		function togglePasswordVisibility() {
-			const input = document.getElementById('passwordInput');
+		function togglePasswordVisibility(id = 'passwordInput') {
+			const input = document.getElementById(id);
 			input.type = input.type === 'password' ? 'text' : 'password';
 		}
 

@@ -34,15 +34,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-96Q83PW8XY"></script>
-    <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-96Q83PW8XY');
-    </script>
+    <!-- Google Analytics only with consent, the privacy notice for signed-in users (sudedu-consent.js) -->
+<script src="../sudedu-consent.js?v=20261026a"></script>
     <script src="../refresh-token.js"></script>
     <script src="../reveal-expanded.js?v=20261025a"></script>
     <script src="../game-names.js?v=20261018r"></script>
@@ -12340,14 +12333,14 @@ async function deleteTaskGroup(key) {
     const members = (classTeacherTasks || []).filter(item => classTaskGroupKey(item) === key);
     if (!members.length) return;
     const count = members.length;
-    const confirmed = await requestTaskDeletionConfirmation(`Ar tikrai norite ištrinti visą grupę „${members[0].group}“ (${count} ${ltCountForm(count, 'užduotis', 'užduotys', 'užduočių')})?`);
+    const confirmed = await requestTaskDeletionConfirmation(`Ar tikrai norite ištrinti visą grupę „${escapeTeacherHtml(members[0].group)}“ (${count} ${ltCountForm(count, 'užduotis', 'užduotys', 'užduočių')})?`);
     if (!confirmed) return;
     try {
         for (const item of members) {
             const response = await apiFetch(apiBase + `tasks/${item.id}`, { method: 'DELETE' });
             if (!response || !response.ok) throw new Error('Nepavyko ištrinti užduoties.');
         }
-        messageToTheUser(`${ltCountForm(count, 'Ištrinta', 'Ištrintos', 'Ištrinta')} ${count} ${ltCountForm(count, 'užduotis', 'užduotys', 'užduočių')} „${members[0].group}“.`, false);
+        messageToTheUser(`${ltCountForm(count, 'Ištrinta', 'Ištrintos', 'Ištrinta')} ${count} ${ltCountForm(count, 'užduotis', 'užduotys', 'užduočių')} „${escapeTeacherHtml(members[0].group)}“.`, false);
         expandedClassTaskGroups.delete(key);
         await fetchClassTeacherTasks();
         if (currentStatisticsIsClass) renderClassTeacherTasks();
@@ -13415,7 +13408,7 @@ function focusTaskListSection() {
                 `;
             studentTaskStudentEmail.innerHTML = student[2];
 
-            studentTaskGroup.innerHTML = `Užduotis: ${task.group}`;
+            studentTaskGroup.innerHTML = `Užduotis: ${escapeTeacherHtml(task.group)}`;
             teacherDispalyStudentTaskIndicator.style.backgroundColor = task.completed ? greenCircleColorCode : redCircleColorCode;
             if (task.completed) {
                 studentTaskCompletionDate.innerHTML = `<span class="task-info-subtitle">Data</span>: ${task.completionDate.split('T')[0]}`
@@ -13540,7 +13533,7 @@ function focusTaskListSection() {
 
             const formattedTaskDescription = getOptionTextFromValues(parsedTaskDescription, currentTaskDuration);
 
-            studentTaskGroupForStudent.innerHTML = `Užduotis: ${task.group}`;
+            studentTaskGroupForStudent.innerHTML = `Užduotis: ${escapeTeacherHtml(task.group)}`;
 
             const assignedRaw = studentTaskAssignmentDate(task);
             const assignedOn = assignedRaw ? String(assignedRaw).split('T')[0] : '';
@@ -13848,7 +13841,7 @@ function focusTaskListSection() {
             const indicator = ['yellow', 'pink'].includes(student.indicator) ? student.indicator : 'neutral';
             const indicatorTitle = indicator === 'pink' ? 'Vėluoja atlikti užduotį (nuo praėjusios savaitės ar anksčiau)'
                 : (indicator === 'yellow' ? 'Vėluoja atlikti užduotį (šią savaitę)' : '');
-            name.innerHTML = `<span class="sd student-name-indicator-dot ${indicator}" aria-hidden="true"${indicatorTitle ? ` title="${indicatorTitle}"` : ''}></span><span class="student-list-name">${student.nickname || 'Mokinys'}</span>`;
+            name.innerHTML = `<span class="sd student-name-indicator-dot ${indicator}" aria-hidden="true"${indicatorTitle ? ` title="${indicatorTitle}"` : ''}></span><span class="student-list-name">${escapeTeacherHtml(student.nickname || 'Mokinys')}</span>`;
             name.addEventListener('click', () => {
                 // while tasks are being given, the name ticks / unticks its box (a done student's locked box stays as it is)
                 if (addingNewTask && checkbox.style.display !== 'none') {
@@ -15825,7 +15818,7 @@ function renderPendingTasksAccordion(tasks, container, classOverview = false) {
                     data-task-key="${taskKey}"
                     onclick="togglePendingTaskDescription(this, event)">
             <div class="tr unfinished-task-main">
-        <span class="tl unfinished-task-group">${task.group || 'Mokytojo skirta užduotis'}${taskDueIndicator(task) ? `<span class="student-task-indicator ${taskDueIndicator(task)}" title="${escapeTeacherHtml(taskLateTitle(task))}"></span>` : ''}</span>
+        <span class="tl unfinished-task-group">${escapeTeacherHtml(task.group || 'Mokytojo skirta užduotis')}${taskDueIndicator(task) ? `<span class="student-task-indicator ${taskDueIndicator(task)}" title="${escapeTeacherHtml(taskLateTitle(task))}"></span>` : ''}</span>
         ${taskDueChipHtml(task)}${classOverview ? '' : taskProgressChipHtml(task)}
         <span class="td unfinished-task-date">Priskirta ${dateStr || '—'}</span>
             </div>

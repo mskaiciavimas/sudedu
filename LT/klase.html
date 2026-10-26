@@ -24,14 +24,8 @@
     <link rel="stylesheet" href="../main-nav-bar.css">
     <script src="../refresh-token.js"></script>
     <script src="../reveal-expanded.js?v=20261025a"></script>
-    <!-- Google tag (gtag.js) -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-96Q83PW8XY"></script>
-	<script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag() { dataLayer.push(arguments); }
-		gtag('js', new Date());
-		gtag('config', 'G-96Q83PW8XY');
-	</script>
+    <!-- Google Analytics only with consent, the privacy notice for signed-in users (sudedu-consent.js) -->
+<script src="../sudedu-consent.js?v=20261026a"></script>
     <style>
         @font-face {
             font-family: "SFpro";
@@ -2286,6 +2280,8 @@
         .delete-account-link { align-self: flex-start; margin-top: 18px; padding: 4px 0; border: 0; background: none; color: #b0544a; font-family: inherit; font-size: 0.9rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; opacity: 0.8; }
         .delete-account-link:hover { opacity: 1; }
         .delete-account-link.hidden { display: none; }
+        .cookie-settings-link { align-self: flex-start; margin-top: 10px; padding: 4px 0; border: 0; background: none; color: inherit; font-family: inherit; font-size: 0.9rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; opacity: 0.7; }
+        .cookie-settings-link:hover { opacity: 1; }
         .da-pop { display: flex; flex-direction: column; gap: 12px; font-size: 15px; line-height: 1.5; color: #1f2a30; }
         .da-pop p { margin: 0; }
         .da-pop ul { margin: 0; padding-left: 20px; }
@@ -3366,6 +3362,9 @@
                                 <button class="cancel-btn hidden" id="cancelBtn">Atšaukti</button>
                             </div>
                             <button type="button" class="delete-account-link" id="deleteAccountBtn">Ištrinti paskyrą</button>
+                            <!-- (statistics cookies on / off - sudedu-consent.js) -->
+                            <button type="button" class="cookie-settings-link" onclick="window.SudConsent && SudConsent.openSettings()">Slapukų nustatymai</button>
+                            <a class="cookie-settings-link" href="privatumas.html" target="_blank" rel="noopener">Privatumo pranešimas</a>
                         </div>
                     </div>
                 </div>
@@ -4203,13 +4202,13 @@ function renderMembers() {
     
     if (userData) {
     if (userData.teacher !== '' && userData.accType === "student") {
-        teacherName.innerHTML = `<span class="teachers-name">Mok. ${userData.teacher.split("(ID:")[0]}</span><span class="teachers-id">ID: ${userData.teacher.split("(ID:")[1].replace(/[^a-zA-Z0-9]/g, "")}</span>`
+        teacherName.innerHTML = `<span class="teachers-name">Mok. ${escapeMistakeText(userData.teacher.split("(ID:")[0])}</span><span class="teachers-id">ID: ${userData.teacher.split("(ID:")[1].replace(/[^a-zA-Z0-9]/g, "")}</span>`
         addTeacherInput.style.display = "none";
         addTeacherButton.style.display = "none";
         changeTeacherToggleButton.style.display = "flex";
         pupilsListTitle.innerHTML = "Klasiokai";
     } else if (userData.accType === "teacher") {
-        teacherName.innerHTML = `<span class="teachers-name">Mok. ${userData.nickname}</span><span class="teachers-id">ID: ${userData.userId}</span>`
+        teacherName.innerHTML = `<span class="teachers-name">Mok. ${escapeMistakeText(userData.nickname)}</span><span class="teachers-id">ID: ${userData.userId}</span>`
         addTeacherInput.style.display = "none";
         addTeacherButton.style.display = "none";
         changeTeacherToggleButton.style.display = "none";
@@ -4261,7 +4260,7 @@ function renderMembers() {
     
     avatarOuterDiv.appendChild(avatarDiv);
 
-    let nameHTML = `<span class="students-name">${member.nickname.toUpperCase()}</span><span class="students-id">ID: ${member.id}</span>`;
+    let nameHTML = `<span class="students-name">${escapeMistakeText(member.nickname.toUpperCase())}</span><span class="students-id">ID: ${member.id}</span>`;
     if (isYou) {
         const isYouDiv = document.createElement('div');
         isYouDiv.className = 'is-you-div';
@@ -5039,7 +5038,7 @@ async function renderClassWeekChallenge () {
 
                         const podiumName = document.createElement('div');
                         podiumName.className = "podium-name";
-                        podiumName.innerHTML = studentInfo.nickname;
+                        podiumName.textContent = studentInfo.nickname;
 
                         const podiumId = document.createElement('div');
                         podiumId.className = "podium-id";
@@ -5187,7 +5186,7 @@ if (classDataCache.weekChlWinnerStudentId && classDataCache.weekChlWinnerStudent
         const lastWinnerName = document.createElement('div');
         lastWinnerName.className = "last-winner-name";
         lastWinnerName.innerHTML = `
-            ${student.nickname} (ID: ${student.id})
+            ${escapeMistakeText(student.nickname)} (ID: ${student.id})
             <div class="coin-display-chl-winners">
                 <span class="coin-icon">
                     <img src="../images/icons/icon-sudedu-coin.png" alt="coin">

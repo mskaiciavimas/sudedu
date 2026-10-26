@@ -1769,7 +1769,7 @@
 
                         <div class="info-item">
                             <strong>Nickname</strong>
-                            <input type="text" id="edit-nickname" value="${user.nickname}">
+                            <input type="text" id="edit-nickname" value="${escapeMistakeText(user.nickname)}">
                         </div>
 
                         <div class="info-item">
@@ -1879,7 +1879,7 @@
                         <div class="task-item">
                             <div>
                                 ${taskDescription}
-                                <small>Group: ${assignment.task.group} | Status: ${assignment.status ? '✅ Complete' : '⏳ Pending'}</small>
+                                <small>Group: ${escapeMistakeText(assignment.task.group)} | Status: ${assignment.status ? '✅ Complete' : '⏳ Pending'}</small>
                                 ${assignment.completionDate ? `<br><small>Completed: ${new Date(assignment.completionDate).toLocaleString()}</small>` : ''}
                             </div>
                             <button class="btn btn-danger small-btn" onclick="deleteTaskAssignment(${assignment.id})">Delete</button>
@@ -1906,7 +1906,7 @@
                 user.teacherStudentsAsTeacher.forEach(ts => {
                     html += `
                         <div class="student-item">
-                            <a href="#" class="user-link" data-id="${ts.student.id}" title="Open the student's card">${ts.student.username} (${ts.student.nickname}) - ID: ${ts.student.id}</a>
+                            <a href="#" class="user-link" data-id="${ts.student.id}" title="Open the student's card">${escapeMistakeText(ts.student.username)} (${escapeMistakeText(ts.student.nickname)}) - ID: ${ts.student.id}</a>
                             <button class="btn btn-danger small-btn" onclick="removeStudentFromTeacher(${ts.id})">Remove</button>
                         </div>
                     `;
@@ -1960,7 +1960,7 @@
                         <div class="task-item">
                             <div>
                                 ${taskDescription}
-                                <small>Group: ${task.group} | Assigned to: ${assignedCount} students</small>
+                                <small>Group: ${escapeMistakeText(task.group)} | Assigned to: ${assignedCount} students</small>
                             </div>
                             <button class="btn btn-danger small-btn" onclick="deleteTeacherTask(${task.id})">Delete</button>
                         </div>
