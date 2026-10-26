@@ -1680,6 +1680,15 @@ function loadNextTextBatch() {
         checkAnswerBtn.disabled = true;
         controller.randomSelection = [];
         localStorage.setItem("controller", JSON.stringify(controller));
+        // the last text done: the task finishes now, as in math - not on "Kitas" (the progress already says all
+        // done, so a page closed before that click left the task pending, and resuming served more texts)
+        if (controller.modeChoice4 === "C40" && controller.answeredQuestionTracker >= controller.questionNumber) {
+          controller.taskCompleted = true;
+          localStorage.setItem("elapsedTime", timerDisplay.textContent);
+          formatFinalMessageForTextcomprehension();
+          controller.questionsStopped = true;
+          localStorage.setItem('controller', JSON.stringify(controller));
+        }
       } else {
         trackHelpButtonCounter();
         controller.mistakesTracker++;
@@ -1955,9 +1964,23 @@ function loadNextTextBatch() {
         }
         
         localStorage.setItem("controller", JSON.stringify(controller));
-        
+
+        // A resumed teacher's task with all its texts done already: the progress is saved when the last text is
+        // checked, the task finishes only on "Kitas" - the page closed in between (or the results not saved) left it
+        // pending, and resuming served one more text, the count past the total for good. It finishes now instead
+        // (no text drawn: that would add an empty attempt to the results).
+        const allTextsDone = controller.modeChoice4 === "C40" && controller.task && controller.task[0] === "setTask" && !controller.questionsStopped
+            && controller.questionNumber > 0 && controller.answeredQuestionTracker >= controller.questionNumber;
+        if (allTextsDone) {
+            const seconds = Number(controller.resumeData && controller.resumeData.secondsElapsed) || 0;
+            localStorage.setItem("elapsedTime", [Math.floor(seconds / 3600), Math.floor(seconds / 60) % 60, seconds % 60].map(n => String(n).padStart(2, '0')).join(':'));
+            controller.taskCompleted = true;
+            controller.questionsStopped = true;
+            localStorage.setItem("controller", JSON.stringify(controller));
+        }
+
         clearInputFields();
-        displayQuestion();
+        if (!allTextsDone) displayQuestion();
 
         if (!controller.questionsStopped) {
             if (controller.modeChoice4 === "C39") {
@@ -2041,7 +2064,7 @@ function loadNextTextBatch() {
       helpTracker = 0;
       clearInputFields()
       if (controller.modeChoice4 === "C40") {
-          if (controller.answeredQuestionTracker === controller.questionNumber) {
+          if (controller.answeredQuestionTracker >= controller.questionNumber) {
             controller.taskCompleted = true;
             localStorage.setItem("elapsedTime", timerDisplay.textContent);
             formatFinalMessageForTextcomprehension();

@@ -12023,7 +12023,7 @@ function teacherTaskProgressText(task, long = false) {
             detail = `liko ${Math.floor(left / 60)} min ${left % 60} s`;
         } else if (Array.isArray(duration)) {
             const total = Array.isArray(duration[1]) ? duration[1].length : Number(duration[1]) || 0;
-            detail = `atsakyta ${Number(task.answeredCount) || 0}${total ? `/${total}` : ''}`;
+            detail = `atsakyta ${Number(task.doneCount ?? task.answeredCount) || 0}${total ? `/${total}` : ''}`;
         }
     } catch (error) { detail = ''; }
     const day = String(task.startedAt).slice(0, 10);
@@ -13578,7 +13578,7 @@ function focusTaskListSection() {
                     progressLine = `<div class="task-progress-row task-progress-remaining"><span class="task-info-subtitle">Liko:</span> <span class="task-progress-value">${remainingMinutesPart} min ${remainingSecondsPart} s</span></div>`;
                 } else {
                     const totalCount = Array.isArray(currentTaskDuration[1]) ? currentTaskDuration[1].length : Number(currentTaskDuration[1]) || 0;
-                    progressLine = `<div class="task-progress-row task-progress-answered"><span class="task-info-subtitle">Atsakyta:</span> <span class="task-progress-value">${Number(task.answeredCount) || 0}/${totalCount}</span></div>`;
+                    progressLine = `<div class="task-progress-row task-progress-answered"><span class="task-info-subtitle">Atsakyta:</span> <span class="task-progress-value">${Number(task.progress && typeof task.progress.sequencePosition === 'number' ? task.progress.sequencePosition : task.answeredCount) || 0}/${totalCount}</span></div>`;
                 }
                 studentTaskProgressForStudents.innerHTML =
                     `<div class="task-progress-row task-progress-started"><span class="task-info-subtitle">Pradėta:</span> <span class="task-progress-value">${startedOn}</span></div>${progressLine}`;

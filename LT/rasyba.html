@@ -1647,6 +1647,18 @@ async function initiateTheProgram() {
             localStorage.setItem("controller", JSON.stringify(controller));
         }
 
+        // A resumed task with all its sentences done already (the page closed before the results were sent, or they
+        // were not saved): it finishes now - there is nothing left to show.
+        if (controller.modeChoice4 === "C40" && resuming && controller.questionNumber > 0 && resumeSkipCount >= controller.questionNumber) {
+            const seconds = Number(controller.resumeData.secondsElapsed) || 0;
+            timerDisplay.textContent = [Math.floor(seconds / 3600), Math.floor(seconds / 60) % 60, seconds % 60].map(n => String(n).padStart(2, '0')).join(':');
+            controller.taskCompleted = true;
+            await formatFinalMessageForGrammar();
+            controller.questionsStopped = true;
+            localStorage.setItem('controller', JSON.stringify(controller));
+            return;
+        }
+
         await displaySentences();
 
         if (!controller.questionsStopped) {
@@ -1963,6 +1975,10 @@ function checkAnswers() {
 		setTimeout(function() {
 			container.classList.remove('pulse');
 		}, 800);
+
+		// the last sentences done: the task finishes now, as in math - not on "Kitas" (the progress already says all
+		// done, so a page closed before that click left the task pending)
+		if (controller.modeChoice4 === "C40" && controller.randomSelection[2] >= controller.questionNumber) nextQuestion();
 	} else {
 		currentAnswerAttempts += 1;
 		allModified = false;
@@ -2024,7 +2040,7 @@ function showAnswers() {
 
 			async function nextQuestion() {
 				if (controller.modeChoice4 === "C40") {
-					if (controller.randomSelection[2] === controller.questionNumber) {
+					if (controller.randomSelection[2] >= controller.questionNumber) {
 						localStorage.setItem("elapsedTime", timerDisplay.textContent);
 						controller.taskCompleted = true;
 						await formatFinalMessageForGrammar();
