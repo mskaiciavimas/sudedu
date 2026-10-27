@@ -551,21 +551,28 @@ var SHOT_DELAY=.8;
 // class size, how hard the tasks are, how fast these children are and their towers' levels. Inside the range a director
 // steers the village's health toward a planned curve (ending at `end` %): more pressure while the village is doing
 // better than planned, less when it is behind, but never outside the chosen range, so Hard never turns into Easy.
-// Losing stays possible on every level: the measured firepower forgets slowly (a class that slows down keeps the
-// pressure it earned) and never drops below a minimum pace (`pace`: seconds per correct answer per student).
+// Losing stays possible on every level: the measured firepower forgets over ~45 s (a class that slows down keeps
+// some of the pressure it earned) and never drops below a minimum pace (`pace`: seconds per correct answer per student).
+// The minimum is low on purpose: real classes on hard tasks (4-digit sums, 20 pupils) answer only every 40-170 s, and
+// a higher minimum sent them several times more enemies than they could shoot (lost in 70-150 s on every level).
 // Only the towers near an enemy can shoot it, so enemies start getting through at about P 0.45-0.55 (measured in
 // simulated games with 6-28 pupils answering every 4-15 s) and swamp the village by about 0.7; the ranges sit around that.
+// Easy and Normal reach up to 0.62 / 0.68 (raised 2026-10-27): with the damage cap (`loss`) a class there feels the
+// pressure but loses only gradually, and a class that can't keep up still wins (simulated: every class 6-21 pupils,
+// one answer per pupil every 3-150 s, won on Normal, mostly ending at 60-80 %).
 // castle = share of an enemy's damage the village takes; lvl = how early the stronger enemies come;
-// boss = seconds between bosses; bossHp = boss health multiplier.
+// boss = seconds between bosses; bossHp = boss health multiplier; loss = how much of the village it can lose in about
+// 10 s before the strikes at the gates weaken (see gateHit), so a defeat always comes gradually, never in one swoop.
 var DIFF={
-  easy:   {name:'Lengvas',     lo:.22,hi:.55,end:75,castle:.4,pace:16,lvl:0,  boss:150,bossHp:.7},
-  normal: {name:'Vidutinis',   lo:.3, hi:.6, end:50,castle:.5,pace:13,lvl:.1, boss:120,bossHp:.85},
-  hard:   {name:'Sunkus',      lo:.36,hi:.66,end:25,castle:.6,pace:11,lvl:.2, boss:95, bossHp:1},
-  extreme:{name:'Labai sunkus',lo:.42,hi:.72,end:8, castle:.7,pace:10,lvl:.35,boss:75, bossHp:1.2}};
+  easy:   {name:'Lengvas',     lo:.22,hi:.62,end:75,castle:.4,pace:150,lvl:0,  boss:150,bossHp:.7, loss:6},
+  normal: {name:'Vidutinis',   lo:.3, hi:.68,end:50,castle:.5,pace:120,lvl:.1, boss:120,bossHp:.85,loss:8},
+  hard:   {name:'Sunkus',      lo:.36,hi:.66,end:25,castle:.6,pace:80,lvl:.2, boss:95, bossHp:1,  loss:10},
+  extreme:{name:'Labai sunkus',lo:.42,hi:.72,end:8, castle:.7,pace:55,lvl:.35,boss:75, bossHp:1.2,loss:12}};
 function diff(){return DIFF[HS&&HS.difficulty]||DIFF.normal}
-// the director's state; firepower starts from a guess (one correct answer per student every 6 s) until answers come in
-function dirInit(){G.dir={adj:0,dps:students.length/6,ans:students.length/6,acc:0,nacc:0,t1:0,t5:0,x:0,P:diff().lo,leaked:0,hist:[],
-  strikes:3,n70:2,nGate:1,pend:0,calm:0,depth:[]}}
+// the director's state; firepower starts from a modest guess (one correct answer per student every 20 s; it rises within ~12 s) until answers
+// come in; lost10 = recent damage to the village (see gateHit)
+function dirInit(){G.dir={adj:0,dps:students.length/20,ans:students.length/20,acc:0,nacc:0,t1:0,t5:0,x:0,P:diff().lo,leaked:0,hist:[],
+  strikes:3,n70:2,nGate:1,pend:0,calm:0,depth:[],lost10:0}}
 // Damage the enemies now on the field are still expected to do to the gates (in % of the fortress), learnt from this
 // game: an enemy at a gate makes about D.strikes strikes before it falls (minus those already made); an enemy in the
 // last 30% of its road gets there as often as recently (D.nGate / D.n70) and then does the same.
@@ -575,12 +582,12 @@ function pendingDamage(){var D=G.dir,reach=Math.min(1,D.nGate/Math.max(1,D.n70))
     else if(x.d>x.rt.len*.7)sum+=hit*D.strikes*reach});
   return sum}
 // A class whose pupils answer rarely gets less out of its firepower than the average suggests: its few towers by the
-// gates fire too seldom to clear a crowd there. So firepower counts fully at one answer per pupil every 6 s or faster,
-// and less below that (x0.5 at 15 s, never under x0.35); this puts the point where enemies swamp the village at about
-// the same pressure for quick and slow classes. A small class (under 12) has few towers, so the roads and gates are
-// thinly covered: its firepower counts less too (x0.7 with 6 pupils).
+// gates fire too seldom to clear a crowd there. So firepower counts fully at one answer per pupil every 8 s or faster,
+// and less below that (x0.6 at 18 s, x0.38 at 40 s, x0.27 at 70 s, never under x0.22); this puts the point where
+// enemies swamp the village at about the same pressure for quick and slow classes. A small class (under 12) has few
+// towers, so the roads and gates are thinly covered: its firepower counts less too (x0.7 with 6 pupils).
 function classDps(){var n=students.length,D=G.dir,every=n/Math.max(D.ans,n/diff().pace,.01);
-  return Math.max(D.dps,n/diff().pace)*Math.max(.35,Math.min(1,Math.pow(6/every,.75)))*Math.min(1,Math.sqrt(n/12))}
+  return Math.max(D.dps,n/diff().pace)*Math.max(.22,Math.min(1,Math.pow(8/every,.6)))*Math.min(1,Math.sqrt(n/12))}
 // how far into the game we are, 0..1 (timed: share of the time; until defeat: the first 6 minutes)
 function gameProg(){return HS.mode==='timed'?Math.min(1,1-G.left/(HS.minutes*60)):Math.min(1,G.played/360)}
 // planned fortress health (now, or `ahead` seconds from now): high early on, sinking towards the difficulty's end
@@ -588,10 +595,11 @@ function gameProg(){return HS.mode==='timed'?Math.min(1,1-G.left/(HS.minutes*60)
 function targetHp(ahead){var d=diff(),p=Math.min(1,gameProg()+(ahead||0)/(HS.mode==='timed'?HS.minutes*60:360));
   return 100-(100-d.end)*Math.pow(p,HS.mode==='timed'?1.3:1)}
 function dirUpdate(dt){var D=G.dir,d=diff();
-  // firepower: rises within ~12 s when the class speeds up, forgets only over ~2.5 min when it slows down
+  // firepower: rises within ~12 s when the class speeds up and forgets over ~45 s when it slows down
   // (the answer rate is followed the same way)
+  D.lost10*=Math.exp(-dt/10);
   D.t1+=dt;if(D.t1>=1){var inst=D.acc/D.t1,na=D.nacc/D.t1;D.acc=0;D.nacc=0;D.t1=0;
-    D.dps+=(inst-D.dps)/(inst>D.dps?12:150);D.ans+=(na-D.ans)/(na>D.ans?12:150)}
+    D.dps+=(inst-D.dps)/(inst>D.dps?12:45);D.ans+=(na-D.ans)/(na>D.ans?12:45)}
   // Every 2.5 s the director looks ahead, always from the *expected* health: health now minus the damage the enemies
   // already on the field are still going to do (pendingDamage: those at a gate and those about to reach one).
   //  - Heading below the planned end (at the loss rate of the last 30 s), below the planned curve, about to lose
@@ -635,16 +643,25 @@ function cost(type){var T=ETYPE[type];return T.hp+(T.split?ETYPE[T.split].hp*(T.
 // ordinary enemies get tougher over the game; with a very strong class they also get tougher instead of ever more of them
 // (at most about 1.2 a second: only the few towers by the gates can stop the ones that get through, whatever the class size)
 function hpMul(){var rate=G.dir.P*classDps()/4.5;return Math.max(1+.4*gameProg(),rate/1.2)}
-function bossHp(type){var T=ETYPE[type];return Math.max(T.minHp,Math.round(classDps()*T.bossS*diff().bossHp))}
+// (a boss's minimum health is at most 3x what the class's firepower calls for: a class landing a hit every 15 s
+// could never bring down the full minimum, and the boss would wear the village down at the gate unopposed)
+function bossHp(type){var T=ETYPE[type],hp=classDps()*T.bossS*diff().bossHp;
+  return Math.max(Math.min(T.minHp,Math.ceil(3*hp)),2,Math.round(hp))}
 // a boss "costs" its health plus what it brings along; ordinary enemies pause until most of that is paid back
 function bossCost(type){var T=ETYPE[type];return .7*bossHp(type)*(T.split?1.3:T.hives?1.5:1)}
 function nextBoss(){return BOSS_ORDER[(G.bossI++)%BOSS_ORDER.length]}
+// A boss comes only if the class can bring it down, with what it leaves behind (the king's little ones, about one
+// hive of the queen's), in about 30 s of its measured firepower; otherwise this boss is skipped. A very slow class
+// (hard tasks) still gets ordinary enemies, but no boss that would stand at the gate until the village falls.
+function bossFits(type){var T=ETYPE[type],all=bossHp(type)+(T.split?ETYPE[T.split].hp*(T.splitN||2):0)+(T.hives?11:0);
+  return all<=Math.max(G.dir.dps,students.length/diff().pace)*30}
 // bosses come in through one of the entrances with the longest road, so the whole class gets a go at them
 function farSpawn(){var far=M.spawns.map(function(s){return M.dist[M.graph.key([XW(s.tail[0]),YW(s.tail[1])])]||0}),
   top=Math.max.apply(null,far),best=[];far.forEach(function(d,i){if(d>=top-1)best.push(i)});return best[rnd(best.length)]}
 // until defeat: a wave holds about 22-42 s of pressure; every third wave brings a boss (and fewer ordinary enemies)
 // (a wave has at least 3 enemies; for a small class the wave then takes longer, so the pressure stays the same)
 function endlessWave(k){var flow=G.dir.P*classDps(),dur=22+2*Math.min(k,10),budget=flow*dur,list=[],hm=hpMul(),boss=(k+1)%3===0?nextBoss():null,spent=0;
+  if(boss&&!bossFits(boss))boss=null;
   if(boss){budget-=bossCost(boss);spent+=bossCost(boss)}
   while(budget>0||list.length<3){var t=pickType(strength()),c=cost(t)*hm;list.push(t);budget-=c;spent+=c}
   if(boss)list.splice(Math.floor(list.length/3),0,boss);
@@ -812,6 +829,11 @@ function atGate(e){var T=ETYPE[e.type],side=e.x<M.cx?-1:1;
   if(G.dir){G.dir.leaked++;G.dir.nGate++;G.dir.calm=0}
   if(G.met)G.met.g++;
   feed('<b style="color:var(--bad)">'+T.name.charAt(0).toUpperCase()+T.name.slice(1)+' puola tvirtovės vartus!</b>');dirty=true}
+// What one strike takes off the village. Once the village has lost about half its difficulty's `loss` in the last ~10 s,
+// further strikes weaken (down to 15% at 1.35 × loss), so a flood at the gates wears the village down over a minute or
+// more instead of in a few seconds: the class sees it coming and can still answer its way out.
+function gateHit(T){var full=T.castle*diff().castle*SIEGE_HIT,D=G.dir;if(!D)return full;
+  var f=Math.max(.15,Math.min(1,1.5-D.lost10/diff().loss));D.lost10+=full*f;return full*f}
 // Only the first GATE_FRONT enemies to reach each gate strike it; the rest crowd behind and wait, and step up to the
 // gate when one in front falls (so the damage a crowd does has a ceiling and the class can win it back)
 var GATE_FRONT=3;
@@ -828,7 +850,7 @@ function siege(e,dt){var T=ETYPE[e.type],side=e.side,
   if(!front){e.atkT=Math.max(e.atkT,.4);return}
   if((e.atkT-=dt)>0||G.phase==='win'||G.phase==='lose')return;
   e.atkT=1+Math.random()*.3;e.t=0;e.strikes=(e.strikes||0)+1;   // e.t = 0 restarts the attack animation
-  G.hp=Math.max(0,G.hp-T.castle*diff().castle*SIEGE_HIT);G[e.x<M.cx?'hitL':'hitR']=.25;
+  G.hp=Math.max(0,G.hp-gateHit(T));G[e.x<M.cx?'hitL':'hitR']=.25;
   burst(M.cx+(e.x<M.cx?-1:1)*(VHW-8),M.cy-20+Math.random()*30,['#c08a5a','#7a5a3a'],3,60);dirty=true}
 // time is up and the village held: every enemy still on the field falls at once
 function clearField(){corpses.forEach(function(c){c.e.splitLeft=0});
@@ -879,7 +901,7 @@ function hostUpdate(dt){
     if(G.budget>=c){G.budget-=c;spawn(G.nextT,(G.rr++)%M.spawns.length,hm);G.nextT=null}
     // bosses from 60 s (or 30% of the game) on, at the difficulty's interval, never in the last 30 s;
     // a boss takes its cost out of the budget, so fewer ordinary enemies come with it
-    if(G.played>=G.bossT&&G.left>30){var b=nextBoss();G.budget-=bossCost(b);spawn(b,farSpawn());G.bossT+=diff().boss}
+    if(G.played>=G.bossT&&G.left>30){var b=nextBoss();if(bossFits(b)){G.budget-=bossCost(b);spawn(b,farSpawn())}G.bossT+=diff().boss}
     if(G.left<=0){G.left=0;G.phase='win';G.t=0;clearField();feed('<b style="color:var(--good)">Pergalė! Tvirtovė apginta.</b>');if(HOST)finishHost('win');else logResult('win')}
     return true}
   if(G.phase==='intro'&&G.t>2.2){G.phase='spawn';G.t=0;G.spawnI=0;G.sched=schedule(waves[G.wave]);
@@ -917,9 +939,14 @@ function clockNow(){SudGame.connect().then(sendClock).catch(function(){})}
 // a correct answer from a student: their unit in the tower gets one more shot to fire (at most 6 waiting). The class's
 // measured firepower grows by that tower's damage × reach (a tower that reaches further gets more of the road to shoot
 // at), but only for a shot that could be queued: answers piling up in a tower with nothing to shoot at don't count.
+// A student adds to it at most once per FP_GAP seconds of play: answers that arrive in a heap (the big screen's tab was
+// in the background, so the game stood still while answers kept coming; one real game logged 646 in "10 s") would
+// otherwise multiply the measured firepower, and with it the enemies, for minutes.
+var FP_GAP=1.5;
 function hostShot(s,eq){var tw=towers[s.team],un=tw.units.filter(function(u){return u.si===s.i})[0];
   s.correct++;tw.correct++;dirty=true;var room=un.queue.length<6;if(room)un.queue.push({si:s.i,eq:eq||'',at:G.anim+SHOT_DELAY});
-  if(G.dir){if(room)G.dir.acc+=lv(tw).dmg*(lv(tw).reach||1);G.dir.nacc++}
+  if(G.dir){var fresh=s.fpAt==null||G.played-s.fpAt>=FP_GAP;if(fresh)s.fpAt=G.played;
+    if(room&&fresh)G.dir.acc+=lv(tw).dmg*(lv(tw).reach||1);if(fresh)G.dir.nacc++}
   if(G.met)G.met.c++;
   floater(tw.x+un.off*2,feetY(tw)-36,fitText(s.name,90,FLOAT_FONT(11))+' ✓',tw.col,11)}
 // ten correct in a row: the student's tower goes up a level (up to 4)
