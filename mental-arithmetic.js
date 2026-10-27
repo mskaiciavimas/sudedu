@@ -696,9 +696,19 @@ async function sendSetTaskResultsToDatabase() {
       storedElapsedTimeMs = Number(storedElapsedTime);
     }
   }
-  const taskElapsedTime = Number.isFinite(elapsedTime) && elapsedTime > 0
-    ? elapsedTime
-    : storedElapsedTimeMs;
+  // A timed task ("C39") runs a countdown, not the stopwatch, so elapsedTime stays 0 and the stored "elapsedTime" is
+  // the countdown's display (00:00:00 at the end): its time spent is the limit minus what was left on the countdown.
+  // (Before 2026-10-27 such results were saved with answerRate 0, so the teacher saw "Trukmė: 0".)
+  let countdownSpentMs = 0;
+  if (controller.modeChoice4 === "C39" && Number(controller.timerLimit) > 0) {
+    const left = parseInt(localStorage.getItem("remainingTime"), 10);
+    countdownSpentMs = Number(controller.timerLimit) * 60000 - Math.max(0, Number.isFinite(left) ? left : 0);
+  }
+  const taskElapsedTime = countdownSpentMs > 0
+    ? countdownSpentMs
+    : Number.isFinite(elapsedTime) && elapsedTime > 0
+      ? elapsedTime
+      : storedElapsedTimeMs;
 
 
   if (document.querySelector("#stopButton")) {
