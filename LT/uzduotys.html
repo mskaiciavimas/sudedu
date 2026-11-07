@@ -6,7 +6,7 @@
         // EXPERIMENTAL FEATURES (elements with class "experimental-features", e.g. the written results summary
         // "Apibendrinimas" from sudedu-insights.js) are hidden from everyone except the approved tester teachers listed
         // here (by user ID) and the students linked to them. Same mechanism and list as at the top of LT/klase.html.
-        var EXPERIMENTAL_TESTER_TEACHER_IDS = [22, 3428];
+        var EXPERIMENTAL_TESTER_TEACHER_IDS = [22, 3428, 15386];   // 15386: the demo class (mokytojas1@sudedu.lt)
         (function () {
             try {
                 var u = JSON.parse(localStorage.getItem('userData')) || {};
@@ -8110,7 +8110,7 @@
 </div>
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="../mental-arithmetic.js?v=20261107a"></script>
+	<script src="../mental-arithmetic.js?v=20261107c"></script>
 	<script src="../sudedu-notices.js?v=20261025a"></script>
 	<script src="../mental-arithmetic-combinations.js?v=20261017"></script>
     <script src="../parameter_dictionary.js?v=20261024e"></script>
@@ -19504,8 +19504,9 @@ document.querySelectorAll('input[type="number"]').forEach(input => {
         if (word) { toggleSentence(word); return; }
         // everything else in a copy (e.g. the "Žodžiai / Kategorijos" switch): pass the click to the original
         if (!target.closest('.mt-h, .mt-cell')) return;
+        // (up to the nearest original that can be clicked: a part of an icon - an SVG path - has no click())
         let element = target;
-        while (element && !element._original && !element.classList.contains('mt')) element = element.parentElement;
+        while (element && !(element._original && typeof element._original.click === 'function') && !(element.classList && element.classList.contains('mt'))) element = element.parentElement;
         if (element && element._original && typeof element._original.click === 'function') element._original.click();
     });
     document.addEventListener('change', event => {

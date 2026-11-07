@@ -2667,8 +2667,10 @@ function mathMistakeHasDetail(record) {
 const MM_OP = { A: '+', S: '\u2212', M: '\u00D7', D: ':' };
 // the row's "Sprendimas" button: a small round icon (an example worked in columns), the word in its title for the hover
 // and for screen readers - a text pill wrapped and crowded the example in narrow cells
+// (the icon: a sum worked in a column - two numbers, the plus, the line, the result; its styles are on the page from the
+// start, injectMathMistakeStyle below - before, an unstyled icon showed until the first click)
 const MM_BTN_HTML = '<button type="button" class="mm-btn" aria-expanded="false" aria-label="Sprendimas" title="Sprendimas">' +
-  '<svg class="mm-ico" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6.5 3.5h6M2.5 7.5h3M4 6v3M8 7.5h4.5M2.5 10.5h10M6.5 13h6"/></svg></button>';
+  '<svg class="mm-ico" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M7.5 3h5.5M7.5 7h5.5M2.5 5h3.4M4.2 3.3v3.4"/><path class="mm-ico-bar" d="M2.5 10h10.5"/><path d="M6 13h7"/></svg></button>';
 function mmEsc(v) { return escapeMistakeText(String(v)); }
 function mmWrongList(values) {
   return values.map(v => `<span class="mm-w">${mmEsc(v)}</span>`).join('');
@@ -2810,7 +2812,8 @@ function injectMathMistakeStyle() {
 .mm-btn:hover{background:rgba(40,109,138,.22)}
 .mm-btn:focus-visible{outline:2px solid #286D8A;outline-offset:2px}
 .mm-btn[aria-expanded="true"]{background:#286D8A;color:#fff}   /* (the attribute: the page's copies of the table keep it) */
-.mm-ico{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
+.mm-ico{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;pointer-events:none}   /* (clicks land on the button: an SVG part has no click()) */
+.mm-ico .mm-ico-bar{stroke-width:1.3;opacity:.75}
 .mm-detail{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px 22px;margin:6px 0 2px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.6);text-align:left;overflow-x:auto;cursor:default}
 .mm-detail.mm-cols{display:block}
 .mm-flow{display:flex;align-items:stretch}
@@ -2855,6 +2858,8 @@ function injectMathMistakeStyle() {
 .mm-unk .mm-wa{color:#D57E7E;font-weight:700}`;
   document.head.appendChild(st);
 }
+// (on the page from the start: the buttons drawn by any of the tables look right before anything is clicked)
+if (document.head) injectMathMistakeStyle(); else document.addEventListener('DOMContentLoaded', injectMathMistakeStyle);
 function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=null, customDivForGrammarSummaryTable=null, usePercentage=false) {  controller = JSON.parse(localStorage.getItem('controller'));
 
   mistakes = [];
