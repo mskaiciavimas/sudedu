@@ -8110,7 +8110,7 @@
 </div>
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="../mental-arithmetic.js?v=20261107c"></script>
+	<script src="../mental-arithmetic.js?v=20261107d"></script>
 	<script src="../sudedu-notices.js?v=20261025a"></script>
 	<script src="../mental-arithmetic-combinations.js?v=20261017"></script>
     <script src="../parameter_dictionary.js?v=20261024e"></script>
@@ -11563,7 +11563,7 @@ function aaShortLabel(info) {
     }
     if (info[0] === 'lang' && info[1] === 'C83') {
         const cats = Object.keys(info[4] || {});
-        return cats.length <= 2 ? cats.map(c => parameterDictionary[c]?.insightsListLabel || c).join(', ') : `${cats.length} rašybos taisyklės`;
+        return cats.length <= 2 ? cats.map(c => parameterDictionary[c]?.insightsListLabel || c).join(', ') : `${cats.length} rašybos ${ltCountForm(cats.length, 'taisyklė', 'taisyklės', 'taisyklių')}`;
     }
     if (info[0] === 'lang' && info[1] === 'C49') {
         const level = { C58: 'lengvi', C59: 'vidutiniai', C60: 'sunkūs' }[info[6]] || '';

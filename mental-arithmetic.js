@@ -2758,6 +2758,13 @@ const MM_SHOWN = 4;
 function mathMistakeDetailHtml(records) {
   // (the same example from several tasks / students: once, the wrong answers together)
   const merged = new Map();
+  // (an answer that cannot be meant - over 2 digits longer than the right one, or a number like "1e+25" from before such
+  // answers were left out when saved, recordMistakes - is not shown)
+  const plausible = r => x => {
+    const s = String(x), right = String((mathMistakeRightAnswers(r) || [])[0] || '');
+    return !/e/i.test(s) && s.replace(/\D/g, '').length <= right.replace(/\D/g, '').length + 2;
+  };
+  records = records.map(r => (mathMistakeHasDetail(r) ? [r[0], r[1], [r[2][0], r[2][1].filter(plausible(r))], r[3]] : r));
   records.filter(mathMistakeHasDetail).forEach(r => {
     const key = JSON.stringify([r[0], r[1], r[3] && Array.isArray(r[3].f) ? r[3].f.map(f => f[0]) : null]);
     const m = merged.get(key);
@@ -2815,16 +2822,19 @@ function injectMathMistakeStyle() {
 .mm-ico{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;pointer-events:none}   /* (clicks land on the button: an SVG part has no click()) */
 .mm-ico .mm-ico-bar{stroke-width:1.3;opacity:.75}
 .mm-detail{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px 22px;margin:6px 0 2px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.6);text-align:left;overflow-x:auto;cursor:default}
+.mm-detail{box-sizing:border-box;max-width:100%;min-width:0;scrollbar-width:thin}   /* (never wider than its cell: what does not fit scrolls sideways) */
+.mm-detail::-webkit-scrollbar{height:6px}
+.mm-detail::-webkit-scrollbar-thumb{border-radius:3px;background:rgba(40,109,138,.35)}
+/* (the working under the example at every width - beside it, in a narrow column it crushed the example to a letter per
+   line and was cut off) */
+.mt-cell:has(> .mm-detail){flex-wrap:wrap}
+.mt-cell > .mm-detail{flex:1 0 100%}
 .mm-detail.mm-cols{display:block}
 .mm-flow{display:flex;align-items:stretch}
 .mm-flow .mm-item{flex:0 0 auto;padding:2px 18px}
 .mm-flow .mm-item:first-child{padding-left:4px}
 .mm-flow .mm-item + .mm-item{border-left:1px dashed rgba(40,109,138,.35)}
 .mm-flow .mm-more{align-self:center;padding-left:14px}
-@media (max-width:991px){   /* (a phone, an upright tablet: the working under the example - beside it, it crushed the example to a letter per line) */
-  .mt-cell:has(> .mm-detail){flex-wrap:wrap}
-  .mt-cell > .mm-detail{flex:1 0 100%;max-width:100%}
-}
 @media (max-width:575px){   /* (a phone: one under another) */
   .mm-flow{flex-direction:column;align-items:flex-start}
   .mm-flow .mm-item,.mm-flow .mm-item:first-child{align-self:stretch;padding:8px 4px}
