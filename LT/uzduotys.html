@@ -8116,7 +8116,7 @@
     <script src="../parameter_dictionary.js?v=20261024e"></script>
     <script src="../rasyba-generator.js?v=20261107b"></script>
     <script src="../sudedu-insights.js?v=20261107c"></script>
-    <script src="../sudedu-auto-tasks.js?v=20261107b"></script>
+    <script src="../sudedu-auto-tasks.js?v=20261107c"></script>
     <script src="../klase-invites.js?v=20261018r"></script>
     <script src="../main-nav-bar.js"></script>
     <script src="matematika_options.js?v=20261018r"></script>
@@ -12173,6 +12173,10 @@ function setPendingTasksBadge(count) {
     const badge = document.getElementById('teacher-pending-count');
     if (badge) badge.textContent = String(Number(count) || 0);
 }
+// the "Užduotos" count: active task groups, not tasks - a group (one name and due day, its differentiated tasks) is one
+function activeTaskGroupCount(tasks) {
+    return new Set((tasks || []).map(task => teacherGroupOf(task) || `t:${task.id ?? task.taskKey ?? ''}`)).size;
+}
 function isTaskCardInteractiveClick(event, card) {
     const target = event && event.target;
     if (!target || !target.closest || !card) return false;
@@ -12323,7 +12327,7 @@ function renderClassTeacherTasks(tasks = classTeacherTasks) {
     });
     const rows = [...groups.entries()].map(([key, members]) => members.length > 1 ? classTaskGroupHtml(key, members, cardHtml) : cardHtml(members[0])).join('');
     container.style.display = 'flex';
-    setPendingTasksBadge((tasks || []).filter(task => Number(task.totalAssigned || 0) - Number(task.totalCompleted || 0) > 0).length);
+    setPendingTasksBadge(activeTaskGroupCount((tasks || []).filter(task => Number(task.totalAssigned || 0) - Number(task.totalCompleted || 0) > 0)));
     container.innerHTML = `
         <div class="pt week-pt" id="teacher-week-head">${teacherWeekHeadHtml()}</div>
         <div class="teacher-week" id="teacher-week">${teacherWeekHtml()}</div>
@@ -15883,7 +15887,7 @@ function renderPendingTasksAccordion(tasks, container, classOverview = false) {
     }).join('');
 
     container.style.display = "flex";
-    setPendingTasksBadge(classOverview ? pendingGroups.length : pendingGroups.reduce((sum, item) => sum + item.pending, 0));
+    setPendingTasksBadge(activeTaskGroupCount(pendingGroups.map(item => item.task)));
     // (the class overview before its tasks have come: the list's own title, loading)
     const classLoading = classOverview && !classTeacherTasksLoaded && !pendingGroups.length;
     const title = classLoading ? 'Aktyvių užduočių sąrašas' : `Neatliktos užduotys${pendingGroups.length
@@ -19924,12 +19928,12 @@ function teacherWeekHtml() {
     const items = teacherWeekItems();
     const chip = item => {
         const many = item.ids.length > 1;
-        const label = `${item.name || 'Užduotis'}${many ? ` (${ltTaskCount(item.ids.length)})` : ''} – ${item.done}/${item.total} atliko${item.archived ? ' (visi mokiniai atliko)' : ''}`;
+        const label = `${item.name || 'Užduotis'} – ${item.done}/${item.total} atliko${item.archived ? ' (visi mokiniai atliko)' : ''}`;
         const target = item.archived ? `data-tw-done="${item.ids.join(',')}"` : many ? `data-tw-group="${escapeTeacherHtml(item.groupKey)}"` : `data-tw-task="${item.id}"`;
         const key = item.archived ? `twDone:${item.ids.join(',')}` : many ? `twGroup:${item.groupKey}` : `twTask:${item.id}`;
         return `<button type="button" class="sw-task sw-mini s-${item.subject}${item.complete ? ' done' : ''}${many ? ' many' : ''}${weekBlockSelected === key ? ' on' : ''}"
             ${target} title="${escapeTeacherHtml(label)}" aria-label="${escapeTeacherHtml(label)}">
-            ${weekRingHtml(item.subject, item.complete ? 1 : item.total ? item.done / item.total : 0, item.state, item.ids.length)}</button>`;
+            ${weekRingHtml(item.subject, item.complete ? 1 : item.total ? item.done / item.total : 0, item.state)}</button>`;   // (one block per group, without how many tasks it holds)
     };
     // (every block the same size: just the ring - how many did it is in its title)
     const chips = items.filter(i => i.due >= v.start && i.due <= v.end).sort(activeTaskOrder)
