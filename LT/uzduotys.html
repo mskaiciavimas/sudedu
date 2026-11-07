@@ -8112,8 +8112,8 @@
 	<script src="../sudedu-notices.js?v=20261025a"></script>
 	<script src="../mental-arithmetic-combinations.js?v=20261017"></script>
     <script src="../parameter_dictionary.js?v=20261024e"></script>
-    <script src="../rasyba-generator.js?v=20261018r"></script>
-    <script src="../sudedu-insights.js?v=20261025b"></script>
+    <script src="../rasyba-generator.js?v=20261107b"></script>
+    <script src="../sudedu-insights.js?v=20261107b"></script>
     <script src="../sudedu-auto-tasks.js?v=20261018r"></script>
     <script src="../klase-invites.js?v=20261018r"></script>
     <script src="../main-nav-bar.js"></script>
@@ -16335,6 +16335,8 @@ function renderAnalysisInsights(tasks) {
     };
     // the three cards one after another, the page drawn in between (a newer analysis stops an older one)
     const run = ++analysisInsightsRun;
+    // (the spelling part's question replays started now, in workers alongside the maths: ready when that part is drawn)
+    if (typeof SudInsights.prepare === 'function') SudInsights.prepare(tasks, options);
     const breathe = () => new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)));
     // (the subject on the screen first; each card stops when a newer analysis starts or the teacher leaves Analizė)
     const alive = () => run === analysisInsightsRun && teacherSection === 'analysis';

@@ -504,6 +504,29 @@ function drainAllCategories(categories, items, taskFrequency = {}) {
 }
 
 
+// The digits a word carries in the texts (a word's marker, e.g. "namas2") taken off outside the HTML tags: the same
+// result as sentence.replace(/(\p{L}+)(\d+)(?![^<]*>)/gu, '$1'), but in one pass. That regex re-read the rest of the
+// text from every letter (the lookahead) and ran after each gap of each sentence: 95% of the generator's time - on a
+// phone over two minutes for a class's analysis (2026-11-07). A letter's digits stay when a ">" comes before the next
+// "<" (they are inside a tag).
+const DIGIT_RUN = /\d+/g, IS_LETTER = /^\p{L}$/u;
+function stripWordDigits(s) {
+    DIGIT_RUN.lastIndex = 0;
+    let out = '', from = 0, m, lt = -2, gt = -2;   // (the next "<" and ">" - found again only once passed)
+    while ((m = DIGIT_RUN.exec(s))) {
+        const digitsFrom = m.index, end = digitsFrom + m[0].length;
+        if (!digitsFrom) continue;
+        // (the character before the digits: a letter? - one outside the basic plane is two code units)
+        const low = s.charCodeAt(digitsFrom - 1);
+        const prev = low >= 0xDC00 && low <= 0xDFFF && digitsFrom >= 2 ? s.slice(digitsFrom - 2, digitsFrom) : s[digitsFrom - 1];
+        if (!IS_LETTER.test(prev)) continue;
+        if (lt !== -1 && lt < end) lt = s.indexOf('<', end);
+        if (gt !== -1 && gt < end) gt = s.indexOf('>', end);
+        if (!(gt !== -1 && (lt === -1 || gt < lt))) { out += s.slice(from, digitsFrom); from = end; }
+    }
+    return from ? out + s.slice(from) : s;
+}
+
 function processSentences(extractedSentences, sessionSeed, passNumber, config, state) {
     const {
         precomputedWordPatterns,
@@ -637,12 +660,14 @@ function processSentences(extractedSentences, sessionSeed, passNumber, config, s
 
 				let wordHTML;
 
-				if (selectedCategory === "C67") {
+				if (config.answersOnly) {
+					// (a replay - the results analysis - reads only the answers: no sentence HTML is built)
+				} else if (selectedCategory === "C67") {
 					const constantHelpSpan = config.generateConstantHelpSpans(answerLetters[0], "C67")
 					wordHTML = `<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${wordStart}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="6" id="id-${currentQuestionId}" class="question-input middle"></textarea>${wordEnd}<span class="pagalba-div-constant">${constantHelpSpan}</span></span>`;
 				} else {
 					wordHTML = `<span class="question-word-span middle" style="display: inline; white-space: nowrap;">${wordStart}<textarea autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="6" id="id-${currentQuestionId}" class="question-input middle"></textarea>${wordEnd}<span class="pagalba-div">${item.helpSpans[selectedCategory]}</span></span>`;
-				}                
+				}
                 sentenceAnswers[`id-${currentQuestionId}`] = {};
                 sentenceAnswers[`id-${currentQuestionId}`]["klausimas"] = [wordStart, wordEnd];
                 sentenceAnswers[`id-${currentQuestionId}`]["atsakymas"] = [answerLetters];
@@ -650,11 +675,10 @@ function processSentences(extractedSentences, sessionSeed, passNumber, config, s
                 sentenceAnswers[`id-${currentQuestionId}`]["zodzio-id"] = item.coords;
                 currentQuestionId++;
 
-                sentenceDiv = sentenceDiv.replace(item.word, wordHTML);
-				sentenceDiv = sentenceDiv.replace(
-					/(\p{L}+)(\d+)(?![^<]*>)/gu,
-					'$1'
-				);
+                if (!config.answersOnly) {
+                    sentenceDiv = sentenceDiv.replace(item.word, wordHTML);
+                    sentenceDiv = stripWordDigits(sentenceDiv);
+                }
             }
         }
 
@@ -791,9 +815,45 @@ function buildPrecomputedWordPatterns(suitableWords, suitableWordPatterns) {
     return precomputedWordPatterns;
 }
 
+// A finished task's questions again (the results analysis, sudedu-insights.js - on the page or in its replay workers,
+// rasyba-replay-worker.js): the gaps of the sentences the task page made from that seed, in the order asked -
+// [[{ cat, b, a, s, coords }, ...] per sentence] - and the target it was made for; null when it can't be made (the texts
+// changed since, other settings). db: { texts: { C75, C76 }, words, patterns, precomputed }.
+async function replayStream(db, seed, info, grade, sentencesNeeded, textsMax, textsHash) {
+    // the texts the task had: those up to its highest text id (texts added later left out), and the same ids
+    let texts = db.texts[info[3]];
+    if (texts && Number.isInteger(textsMax)) {
+        texts = Object.fromEntries(Object.entries(texts).filter(([id]) => Number(id) <= textsMax));
+        if (textsHash && textIdsFingerprint(Object.keys(texts)) !== textsHash) return null;
+    }
+    const conditions = info[4] && typeof info[4] === 'object' && !Array.isArray(info[4]) ? info[4] : null;
+    if (!texts || !conditions) return null;
+    const g = Number(grade);
+    const config = {
+        textsForGrammar: texts, suitableWords: db.words, suitableWordPatterns: db.patterns, codedConditions: conditions,
+        precomputedWordPatterns: db.precomputed, conditionsSet: null,
+        allowAdjacentEndlessWords: info[5] === 'C74' ? true : info[5] === 'C73' ? false : undefined,
+        MAX_SENTENCE_CHARACTER_NUMBER_FOR_GRADES_0_to_1: 45, MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_0_to_1: 3, MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_2_to_5: 4,
+        PRIORITIZED_TASK_CATEGORIES: ['C66-C76', 'C66-C75', 'C64'],
+        userInPreSchool: g === 0, userInFirstGrade: g === 1, userInSecondGrade: g === 2, userInThirdGrade: g === 3, userInFourthGrade: g === 4, userInHigherGrade: g === 5,
+        generateHelpSpans: () => '', generateConstantHelpSpans: () => '',
+        classChoice: info[3], maximumQuestionFrequencyPerWord: info[6], taskFrequency: { 'C91-4': 0.35, 'C91-5': 0.35, 'C91-6': 0.35 }, quiet: true,
+        answersOnly: true   // (the same questions; the sentences' HTML is not built - not used here)
+    };
+    const state = { categories: new Map(), items: new Map(), questionIdRef: { value: 1 }, counterRef: { value: 0 }, sakiniaiAndAtsakymai: [] };
+    const target = Math.max(sentencesNeeded, 200);
+    try { await prepareSentences(String(seed), 0, target, config, state); } catch (e) { return null; }
+    const sentences = state.sakiniaiAndAtsakymai.map(entry => Object.values(entry.answers || {}).map(q => ({
+        cat: String(q['kl-grupe'] || '').split('-')[0],
+        b: String((q.klausimas || [])[0] ?? ''), a: String(((q.atsakymas || [])[0] || [])[0] ?? ''), s: String((q.klausimas || [])[1] ?? ''),
+        coords: q['zodzio-id']
+    })));
+    return { sentences, target };
+}
+
 window.SudRasybaGenerator = {
     SeededRandom, parseSeed, buildCategoryToTextsIndex, extractSentencesWithCoords, findSentenceEnd, indexSentenceWords,
     processAdjacentEndlessWords, reduceToQuestionQuota, pickRandomPatterns, addSentenceToCategorisedSentences,
-    drainAllCategories, processSentences, prepareSentences, buildPrecomputedWordPatterns, textIdsFingerprint, seedRules
+    drainAllCategories, processSentences, prepareSentences, buildPrecomputedWordPatterns, textIdsFingerprint, seedRules, replayStream
 };
 })();

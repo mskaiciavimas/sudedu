@@ -537,10 +537,11 @@
 
 	// the softness signs of the words (databases/rasyba_softness_signs.json: word (homonyms numbered as in the words
 	// database) -> the letter index of each softness "i"); null until loaded or when missing - then the letter rules only
-	let softDb = null, softDbPromise = null;
+	let softDb = null, softDbPromise = null, softDbHash = null;   // (softDbHash: its text's fingerprint - see possibleVersion)
 	function loadSoftDb() {
 		if (!softDbPromise) {
-			softDbPromise = fetch(ROOT + 'databases/rasyba_softness_signs.json').then(r => (r.ok ? r.json() : null)).catch(() => null)
+			softDbPromise = fetch(ROOT + 'databases/rasyba_softness_signs.json').then(r => (r.ok ? r.text() : null))
+				.then(text => { if (text == null) return null; const json = JSON.parse(text); softDbHash = String(hashString(text)); return json; }).catch(() => null)
 				.then(json => { softDb = json; return json; });
 		}
 		return softDbPromise;
@@ -553,10 +554,11 @@
 	}
 	let wordsDbPromise = null;
 	let wordsDbHash = null;   // (its text's fingerprint: what is kept from it in the browser - see keptReplays)
+	let wordsDbText = null;   // (and the text itself: the spelling replay workers get exactly this)
 	function loadWordsDb() {
 		if (!wordsDbPromise) {
 			wordsDbPromise = fetch(ROOT + 'databases/rasyba_suitable_words.json')
-				.then(r => (r.ok ? r.text() : null)).then(text => { if (text == null) return null; wordsDbHash = String(hashString(text)); return JSON.parse(text); }).catch(() => null);
+				.then(r => (r.ok ? r.text() : null)).then(text => { if (text == null) return null; wordsDbHash = String(hashString(text)); wordsDbText = text; return JSON.parse(text); }).catch(() => null);
 		}
 		return wordsDbPromise;
 	}
@@ -619,12 +621,13 @@
 		return entry ? new Set(entry.morphInfo || []) : null;
 	}
 	let sudWordsPromise = null;
+	const SUD_WORDS_URL = ROOT + 'sudedu-words.js?v=20261024a';
 	function loadSudWords() {
 		if (window.SudWords) return Promise.resolve(window.SudWords);
 		if (!sudWordsPromise) {
 			sudWordsPromise = new Promise(resolve => {
 				const s = document.createElement('script');
-				s.src = ROOT + 'sudedu-words.js?v=20261024a';
+				s.src = SUD_WORDS_URL;
 				s.onload = () => resolve(window.SudWords || null);
 				s.onerror = () => resolve(null);
 				document.head.appendChild(s);
@@ -776,6 +779,11 @@
 			lexiconPromise = loadSudWords().then(async words => {
 				if (!words) return null;
 				const [legit, extra] = await Promise.all([words.load('legit'), words.load('legitExtra')]);
+				const isWord = w => legit.has(w) || extra.has(w);
+				// (kept in the browser from an earlier visit - for exactly these lists and this file: see lexiconVersion)
+				const version = await lexiconVersion(legit, extra);
+				const kept = version && await keptLexicon(version);
+				if (kept) return { isWord, trigrams: kept };
 				const trigrams = new Set();
 				for (const dawg of [legit, extra]) {
 					const kids = new Map();
@@ -791,10 +799,40 @@
 						}
 					}
 				}
-				return { isWord: w => legit.has(w) || extra.has(w), trigrams };
+				if (version) keepLexicon(version, trigrams);
+				return { isWord, trigrams };
 			}).catch(() => null);
 		}
 		return lexiconPromise;
+	}
+	/* The three-letter table kept in the browser (IndexedDB "sudInsights", key "lexicon"): it follows only from the two
+	 * word lists and the code here and in sudedu-words.js, so it is used while all of them stay byte for byte the same
+	 * (their fingerprints: lexiconVersion), else built anew. A phone saves about a second on every later analysis. */
+	async function lexiconVersion(legit, extra) {
+		try {
+			const parts = await Promise.all([fileHash(SCRIPT), fileHash(SUD_WORDS_URL)]);
+			if (parts.some(x => !x)) return null;
+			const bytes = dawg => {
+				const v = dawg && dawg.view;
+				if (!v) return null;
+				const a = new Uint8Array(v.buffer, v.byteOffset, v.byteLength);
+				let h = 2166136261;
+				for (let i = 0; i < a.length; i++) { h ^= a[i]; h = Math.imul(h, 16777619); }
+				return (h >>> 0) + ':' + a.length;
+			};
+			const lists = [bytes(legit), bytes(extra)];
+			if (lists.some(x => !x)) return null;
+			return [...parts, ...lists].join('|');
+		} catch (e) { return null; }
+	}
+	async function keptLexicon(version) {
+		const idb = await keptDb();
+		if (!idb) return null;
+		const value = await keptRequest(idb, 'readonly', store => store.get('lexicon'));
+		return value && value.v === version && Array.isArray(value.t) ? new Set(value.t) : null;
+	}
+	function keepLexicon(version, trigrams) {
+		keptDb().then(idb => { if (idb) keptRequest(idb, 'readwrite', store => { store.put({ v: version, t: [...trigrams] }, 'lexicon'); }); }).catch(() => {});
 	}
 	// a letter typed twice where the word would otherwise be right (n-uuo-lat): a slip of the hand
 	function typedTwice(cw, ww) {
@@ -1158,15 +1196,18 @@
 	function loadReplayDb() {
 		if (!replayDbPromise) {
 			const hashes = [];
+			const raw = {};   // (the files' texts: the replay workers get exactly these)
 			const json = file => fetch(ROOT + 'databases/' + file).then(r => (r.ok ? r.text() : null))
-				.then(text => { if (text == null) return null; hashes.push(file + ':' + hashString(text)); return JSON.parse(text); }).catch(() => null);
+				.then(text => { if (text == null) return null; hashes.push(file + ':' + hashString(text)); raw[file] = text; return JSON.parse(text); }).catch(() => null);
 			replayDbPromise = Promise.all([json('1_2_klase_gramatika_tekstai.json'), json('3_4_klase_gramatika_tekstai.json'),
 				json('rasyba_suitable_words_patterns.json'), loadWordsDb()])
 				.then(([c75, c76, patterns, words]) => {
 					const G = window.SudRasybaGenerator;
 					if (!G || !c75 || !c76 || !patterns || !words) return null;
 					return { G, texts: { C75: c75, C76: c76 }, words, patterns, precomputed: G.buildPrecomputedWordPatterns(words, patterns),
-						filesHash: wordsDbHash ? hashes.sort().join('|') + '|words:' + wordsDbHash : null };
+						filesHash: wordsDbHash ? hashes.sort().join('|') + '|words:' + wordsDbHash : null,
+						files: wordsDbText ? { c75: raw['1_2_klase_gramatika_tekstai.json'], c76: raw['3_4_klase_gramatika_tekstai.json'],
+							patterns: raw['rasyba_suitable_words_patterns.json'], words: wordsDbText } : null };
 				}).catch(() => null);
 		}
 		return replayDbPromise;
@@ -1218,43 +1259,159 @@
 	}
 	// the generated sentences' gaps, in the order asked: [[{ cat, b, a, s, coords }, ...] per sentence]
 	const streamCache = new Map();
-	async function questionStream(db, seed, info, grade, sentencesNeeded, textsMax, textsHash) {
-		const key = JSON.stringify([seed, grade, info, textsMax, textsHash]);
+	const streamKey = (seed, info, grade, textsMax, textsHash) => JSON.stringify([seed, grade, info, textsMax, textsHash]);
+	// (a stream already known: worked out on this page or kept in the browser, for at least that many answers)
+	function knownStream(kept, key, sentencesNeeded) {
 		const cached = streamCache.get(key);
 		if (cached && (cached.done || cached.sentences.length >= sentencesNeeded)) return cached.sentences;
-		const kept = await keptReplays(db);
 		const k = kept && kept.map.get(key);
 		if (k && Array.isArray(k.sentences) && (k.done || k.cover >= sentencesNeeded)) return k.sentences;
-		// the texts the task had: those up to its highest text id (texts added later left out), and the same ids
-		let texts = db.texts[info[3]];
-		if (texts && Number.isInteger(textsMax)) {
-			texts = Object.fromEntries(Object.entries(texts).filter(([id]) => Number(id) <= textsMax));
-			if (textsHash && db.G.textIdsFingerprint(Object.keys(texts)) !== textsHash) return null;
-		}
-		const conditions = info[4] && typeof info[4] === 'object' && !Array.isArray(info[4]) ? info[4] : null;
-		if (!texts || !conditions) return null;
-		const g = Number(grade);
-		const config = {
-			textsForGrammar: texts, suitableWords: db.words, suitableWordPatterns: db.patterns, codedConditions: conditions,
-			precomputedWordPatterns: db.precomputed, conditionsSet: null,
-			allowAdjacentEndlessWords: info[5] === 'C74' ? true : info[5] === 'C73' ? false : undefined,
-			MAX_SENTENCE_CHARACTER_NUMBER_FOR_GRADES_0_to_1: 45, MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_0_to_1: 3, MIN_SENTENCE_WORD_NUMBER_FOR_GRADES_2_to_5: 4,
-			PRIORITIZED_TASK_CATEGORIES: ['C66-C76', 'C66-C75', 'C64'],
-			userInPreSchool: g === 0, userInFirstGrade: g === 1, userInSecondGrade: g === 2, userInThirdGrade: g === 3, userInFourthGrade: g === 4, userInHigherGrade: g === 5,
-			generateHelpSpans: () => '', generateConstantHelpSpans: () => '',
-			classChoice: info[3], maximumQuestionFrequencyPerWord: info[6], taskFrequency: { 'C91-4': 0.35, 'C91-5': 0.35, 'C91-6': 0.35 }, quiet: true
+		return null;
+	}
+	let replayPool = null;   // (while replays are being worked out side by side: the workers - see prefetchReplays)
+	const replaysInFlight = new Map();   // (a replay being worked out: whoever needs the same one meanwhile waits for it)
+	// prefetch: only filling the caches ahead (prefetchReplays) - a replay a worker could not do is then left as it is
+	async function questionStream(db, seed, info, grade, sentencesNeeded, textsMax, textsHash, prefetch = false) {
+		const key = streamKey(seed, info, grade, textsMax, textsHash);
+		const kept = await keptReplays(db);
+		const known = knownStream(kept, key, sentencesNeeded);
+		if (known) return known;
+		const keep = made => {
+			if (!made || made === NOT_DONE) return made === NOT_DONE ? NOT_DONE : null;
+			const { sentences, target } = made;
+			streamCache.set(key, { sentences, done: sentences.length < target });
+			keepReplay(kept, key, sentences, sentencesNeeded, sentences.length < target);
+			return sentences;
 		};
-		const state = { categories: new Map(), items: new Map(), questionIdRef: { value: 1 }, counterRef: { value: 0 }, sakiniaiAndAtsakymai: [] };
-		const target = Math.max(sentencesNeeded, 200);
-		try { await db.G.prepareSentences(String(seed), 0, target, config, state); } catch (e) { return null; }
-		const sentences = state.sakiniaiAndAtsakymai.map(entry => Object.values(entry.answers || {}).map(q => ({
-			cat: String(q['kl-grupe'] || '').split('-')[0],
-			b: String((q.klausimas || [])[0] ?? ''), a: String(((q.atsakymas || [])[0] || [])[0] ?? ''), s: String((q.klausimas || [])[1] ?? ''),
-			coords: q['zodzio-id']
-		})));
-		streamCache.set(key, { sentences, done: sentences.length < target });
-		keepReplay(kept, key, sentences, sentencesNeeded, sentences.length < target);
-		return sentences;
+		// the generator's replay (rasyba-generator.js replayStream): in a worker while there are some, else here
+		const args = [seed, info, grade, sentencesNeeded, textsMax, textsHash];
+		const flightKey = key + '|' + Math.max(sentencesNeeded, 200);
+		let flight = replaysInFlight.get(flightKey);
+		if (!flight) {
+			flight = (async () => keep(replayPool ? await replayPool.run(args) : await db.G.replayStream(db, ...args)))();
+			replaysInFlight.set(flightKey, flight);
+			const done = () => { if (replaysInFlight.get(flightKey) === flight) replaysInFlight.delete(flightKey); };
+			flight.then(done, done);
+		}
+		let out = await flight;
+		// (a worker could not do it, and the analysis needs it now: worked out here, as without workers)
+		if (out === NOT_DONE && !prefetch) out = keep(await db.G.replayStream(db, ...args));
+		return out === NOT_DONE ? null : out;
+	}
+	/* Replays worked out side by side: a few workers (rasyba-replay-worker.js, each with the same generator file and the
+	 * same data files' texts as this page) take them one by one. Anything a worker can't do - it does not start (an old
+	 * browser, too little memory), fails, throws or takes over a minute - comes back NOT_DONE: it is left for
+	 * replayGrammarTasks, which then works it out here one task at a time, as without workers. */
+	const NOT_DONE = {};
+	function startReplayPool(db, size) {
+		const genUrl = scriptUrl('rasyba-generator');
+		if (typeof Worker !== 'function' || !db.files || !genUrl) return null;
+		const workerUrl = new URL('rasyba-replay-worker.js' + new URL(genUrl).search, genUrl).href;
+		const queue = [], workers = [];
+		let nextId = 1, closed = false;
+		const onPage = job => job.resolve(NOT_DONE);
+		const pump = () => {
+			if (!workers.some(w => !w.dead)) { while (queue.length) onPage(queue.shift()); return; }
+			workers.forEach(w => {
+				if (w.dead || !w.ready || w.job || !queue.length) return;
+				const job = w.job = queue.shift();
+				job.id = nextId++;
+				w.timer = setTimeout(() => fail(w), 60000);
+				w.worker.postMessage({ type: 'run', id: job.id, args: job.args });
+			});
+		};
+		const fail = w => {
+			if (w.dead) return;
+			w.dead = true;
+			clearTimeout(w.timer);
+			try { w.worker.terminate(); } catch (e) { /* (gone anyway) */ }
+			if (w.job) { onPage(w.job); w.job = null; }
+			pump();
+		};
+		for (let i = 0; i < size; i++) {
+			let worker;
+			try { worker = new Worker(workerUrl); } catch (e) { break; }
+			const w = { worker, ready: false, dead: false, job: null, timer: 0 };
+			worker.onmessage = e => {
+				const m = e.data || {};
+				if (m.type === 'ready') { w.ready = true; pump(); return; }
+				if (m.type === 'failed') { fail(w); return; }
+				if ((m.type === 'done' || m.type === 'error') && w.job && w.job.id === m.id) {
+					const job = w.job;
+					w.job = null;
+					clearTimeout(w.timer);
+					if (m.type === 'done') job.resolve(m.result); else onPage(job);
+					pump();
+				}
+			};
+			worker.onerror = () => fail(w);
+			worker.postMessage({ type: 'init', generatorUrl: genUrl, files: db.files });
+			workers.push(w);
+		}
+		if (!workers.length) return null;
+		return {
+			run: args => new Promise(resolve => {
+				const job = { args, resolve };
+				if (closed) onPage(job); else { queue.push(job); pump(); }
+			}),
+			alive: () => !closed && workers.some(w => !w.dead),
+			close: () => { closed = true; while (queue.length) onPage(queue.shift()); workers.forEach(w => { if (!w.job) { w.dead = true; try { w.worker.terminate(); } catch (e) { /* (gone) */ } } }); }
+		};
+	}
+	// the replays a list of tasks will need and that are not known yet, worked out side by side before replayGrammarTasks
+	// goes through the tasks one by one (then from streamCache: the same questions, only sooner); a few only - here
+	const REPLAY_WORKERS_FROM = 3;
+	async function prefetchReplays(db, seeded) {
+		const kept = await keptReplays(db);
+		const jobs = new Map();
+		for (const t of seeded) {
+			const from = t.replayFrom || { info: t.info, answers: t.answers, duration: t.duration };
+			const [, , seed, grade, textsMax, textsHash] = from.duration;
+			for (const g of Number.isInteger(grade) ? [grade] : GRADE_GROUPS) {
+				const key = streamKey(seed, from.info, g, textsMax, textsHash);
+				if (knownStream(kept, key, from.answers)) continue;
+				const id = key + '|' + Math.max(from.answers, 200);
+				if (!jobs.has(id)) jobs.set(id, [db, seed, from.info, g, from.answers, textsMax, textsHash]);
+			}
+		}
+		if (jobs.size < REPLAY_WORKERS_FROM) return;
+		const pool = acquireReplayPool(db);
+		if (!pool) return;
+		replayPool = pool;
+		try { await Promise.all([...jobs.values()].map(args => questionStream(...args, true).catch(() => null))); }
+		finally { releaseReplayPool(); }
+	}
+	// One set of workers for every prefetch on the page - the class and then, one by one, its pupils - kept for a little
+	// while after the last one (their start, with the data files, costs time on a phone), then closed.
+	const REPLAY_POOL_IDLE = 10000;
+	let sharedPool = null, poolUsers = 0, poolIdleTimer = 0;
+	function acquireReplayPool(db) {
+		clearTimeout(poolIdleTimer);
+		if (!sharedPool || !sharedPool.alive()) {
+			const cores = Math.max(1, (navigator.hardwareConcurrency || 2) - 1);
+			sharedPool = startReplayPool(db, Math.min(navigator.deviceMemory && navigator.deviceMemory <= 2 ? 2 : 4, cores));
+		}
+		if (sharedPool) poolUsers++;
+		return sharedPool;
+	}
+	function releaseReplayPool() {
+		if (--poolUsers > 0) return;
+		replayPool = null;
+		poolIdleTimer = setTimeout(() => { if (!poolUsers && sharedPool) { sharedPool.close(); sharedPool = null; } }, REPLAY_POOL_IDLE);
+	}
+	// the spelling tasks a replay can be tried for (those with a seed in their duration)
+	const seededTasks = list => list.filter(t => (t.replayFrom || Array.isArray(t.duration)) && (t.replayFrom ? t.replayFrom.duration : t.duration)?.[2]);
+	/* Started as soon as the analysis is asked for (the page's renderAnalysisInsights): the spelling replays the analysis
+	 * will need, in workers while the page works out the maths - then the spelling part finds them ready. Only fills the
+	 * caches; the analysis itself goes on exactly as without it. */
+	function prepare(tasks, opts = {}) {
+		try {
+			if (!enabled('period') || !window.SudRasybaGenerator) return;
+			const list = dropTeacherCopies((tasks || []).map(t => normalizeTask(t, opts.kindOf)).filter(t => t && t.subject === 'grammar' && t.answers > 0 && t.date));
+			const seeded = seededTasks(list);
+			if (!seeded.length) return;
+			loadReplayDb().then(db => db && prefetchReplays(db, seeded)).catch(() => {});
+		} catch (e) { /* (only a head start) */ }
 	}
 	// the task's questions from a stream, or null when it does not check out
 	function replayedQuestions(sentences, answers, detail) {
@@ -1279,6 +1436,34 @@
 	const WRONG_PARTS = ['', 'a', 'ą', 'e', 'ę', 'ė', 'i', 'į', 'y', 'u', 'ų', 'ū', 'o', 'uo', 'ie', 'ei', 'ia', 'ią', 'iu', 'iū', 'eu', 'iau', 'au', 'ai',
 		'ui', 'uj', 'j', 'd', 'dž', 'dz', 'z', 'ž', 's', 'š', 't', 'b', 'p', 'g', 'k', 'c', 'č', 'h', 'ch', 'f', 'v', 'm', 'n', 'l', 'r', 'iai', 'ėje', 'oje', 'iaja'];
 	const possibleCache = new Map();
+	/* What a question could get, kept in the browser (IndexedDB "sudInsights", key "possible") between visits: it follows
+	 * only from the question, this file's rules and the word and softness files, so it is used while those stay byte
+	 * for byte the same (possibleVersion), else worked out anew - never kept when the softness file did not load. */
+	const POSSIBLE_KEEP = 30000;
+	let possibleKeptPromise = null, possibleStored = 0;
+	function possibleVersion() {
+		return fileHash(SCRIPT).then(h => (h && wordsDbHash && softDbHash ? [h, wordsDbHash, softDbHash].join('|') : null)).catch(() => null);
+	}
+	function loadKeptPossible() {
+		if (!possibleKeptPromise) possibleKeptPromise = (async () => {
+			const version = await possibleVersion(), idb = version && await keptDb();
+			if (!idb) return null;
+			const value = await keptRequest(idb, 'readonly', store => store.get('possible'));
+			if (value && value.v === version && Array.isArray(value.items)) {
+				value.items.forEach(([key, kinds]) => { if (!possibleCache.has(key) && Array.isArray(kinds)) possibleCache.set(key, new Set(kinds)); });
+			}
+			possibleStored = possibleCache.size;
+			return { idb, version };
+		})().catch(() => null);
+		return possibleKeptPromise;
+	}
+	async function keepPossible() {
+		const kept = await loadKeptPossible();
+		if (!kept || possibleCache.size === possibleStored) return;
+		possibleStored = possibleCache.size;
+		const items = [...possibleCache].slice(-POSSIBLE_KEEP).map(([key, kinds]) => [key, [...kinds]]);
+		keptRequest(kept.idb, 'readwrite', store => { store.put({ v: kept.version, items }, 'possible'); });
+	}
 	function possibleMistakes(q, morphDb) {
 		const b = q.b.toLowerCase(), a = q.a.toLowerCase(), s = q.s.toLowerCase();
 		const key = [q.cat, b, a, s].join('|');
@@ -1300,12 +1485,17 @@
 	async function replayGrammarTasks(list, gradeOf) {
 		// (a grade's group in the generator: 0-1, 2-5, none)
 		const groupOf = g => (g === 0 || g === 1) ? 1 : (g >= 2 && g <= 5) ? 2 : -1;
-		const seeded = list.filter(t => (t.replayFrom || Array.isArray(t.duration)) && (t.replayFrom ? t.replayFrom.duration : t.duration)?.[2]);
+		const seeded = seededTasks(list);
 		if (!seeded.length) return;
 		const db = await loadReplayDb();
 		if (!db) return;
 		await loadSoftDb();   // (what a question could get: with its softness signs)
+		await loadKeptPossible();   // (and what was worked out on an earlier visit)
+		await prefetchReplays(db, seeded);   // (the replays not known yet, side by side in workers: then known below)
+		let sliceStart = Date.now();
 		for (const t of seeded) {
+			// (the page free in between - each replay worked out here takes a while on a phone - at least every 8 ms)
+			if (Date.now() - sliceStart > 8) { await breathe(); sliceStart = Date.now(); }
 			const from = t.replayFrom || { info: t.info, answers: t.answers, detail: t.detail, duration: t.duration };
 			const [, , seed, grade, textsMax, textsHash] = from.duration;
 			const grades = Number.isInteger(grade) ? [grade] : GRADE_GROUPS;
@@ -1341,6 +1531,7 @@
 			}
 			t.asked = asked;
 		}
+		keepPossible();   // (what was worked out now: kept for the next visit)
 	}
 	// a spelling task's questions where mistake pattern i could happen: [count, exact?] - from the replayed questions, or
 	// (no replay) the task's answers in the categories where it happened, split evenly between the task's categories
@@ -1697,7 +1888,17 @@
 	 *    (weighted Holm: the overall two half of it); only what passes is said. */
 	const WIN = { days: 3, mistakes: 300, speed: 60, pattern: 150, share: 1 / 3, B: 1999, alpha: 0.05, tau: 0.5 };
 	// (long work in slices: a pause for the page; an analysis whose card is not wanted any more stops with CANCELLED)
-	const breathe = () => new Promise(resolve => setTimeout(resolve, 0));
+	// a short pause for the page between slices of work: scheduler.yield() where the browser has it, else a message to
+	// itself - both without the at least 4 ms a repeated setTimeout(0) waits (on a phone hundreds of them add up)
+	const breathe = (() => {
+		if (typeof scheduler !== 'undefined' && scheduler && typeof scheduler.yield === 'function') return () => scheduler.yield();
+		if (typeof MessageChannel === 'function') {
+			const channel = new MessageChannel(), waiting = [];
+			channel.port1.onmessage = () => { const resolve = waiting.shift(); if (resolve) resolve(); };
+			return () => new Promise(resolve => { waiting.push(resolve); channel.port2.postMessage(0); });
+		}
+		return () => new Promise(resolve => setTimeout(resolve, 0));
+	})();
 	const CANCELLED = { cancelled: true };
 	// a small seeded generator: the same data give the same text on every render
 	function seededRandom(seed) {
@@ -1835,7 +2036,15 @@
 	// (the same, a little at a time with the page free in between; alive() false - the card is not wanted any more - stops it)
 	async function windowChangesAsync(conditions, alive) {
 		const tested = [];
+		await loadKeptWindows();
 		for (const c of conditions) {
+			// (a test already done on the very same numbers - this visit or an earlier one - is not done again)
+			const id = keptWindowId(c);
+			if (id !== null && keptWindows.has(id)) {
+				const kept = keptWindows.get(id);
+				if (kept) tested.push({ ...c, test: structuredClone(kept) });
+				continue;
+			}
 			const steps = windowTestSteps(c.points, c.target, c.key);
 			let step;
 			for (;;) {
@@ -1844,9 +2053,38 @@
 				await breathe();
 				if (alive && !alive()) throw CANCELLED;
 			}
+			if (id !== null) { keptWindows.set(id, step.value ? structuredClone(step.value) : null); keepWindows(); }
 			if (step.value) tested.push({ ...c, test: step.value });
 		}
 		return chooseChanges(tested);
+	}
+	/* The tests' results kept in the browser (IndexedDB "sudInsights", key "windows"): a test follows only from its
+	 * numbers (points, target, key - its random draws are seeded from them) and this file, so a result is used again for
+	 * exactly the same numbers while this file stays byte for byte the same; anything else is tested anew. At most
+	 * WINDOW_KEEP (the latest). Without structuredClone (an old browser) nothing is kept. */
+	const WINDOW_KEEP = 3000, keptWindows = new Map();
+	let keptWindowsPromise = null, keptWindowsTimer = 0;
+	const keptWindowId = c => (typeof structuredClone === 'function' ? JSON.stringify([c.points, c.target, c.key]) : null);
+	function loadKeptWindows() {
+		if (!keptWindowsPromise) keptWindowsPromise = (async () => {
+			const version = typeof structuredClone === 'function' && await fileHash(SCRIPT), idb = version && await keptDb();
+			if (!idb) return null;
+			const value = await keptRequest(idb, 'readonly', store => store.get('windows'));
+			if (value && value.v === version && Array.isArray(value.items)) value.items.forEach(([id, r]) => { if (!keptWindows.has(id)) keptWindows.set(id, r); });
+			return { idb, version };
+		})().catch(() => null);
+		return keptWindowsPromise;
+	}
+	function keepWindows() {
+		if (keptWindowsTimer) return;
+		keptWindowsTimer = setTimeout(() => {
+			keptWindowsTimer = 0;
+			loadKeptWindows().then(kept => {
+				if (!kept) return;
+				const items = [...keptWindows].slice(-WINDOW_KEEP);
+				keptRequest(kept.idb, 'readwrite', store => { store.put({ v: kept.version, items }, 'windows'); });
+			});
+		}, 1000);
 	}
 	function chooseChanges(tested) {
 		windowChanges.tested = tested.length;   // (how many conditions had enough data - for the text)
@@ -1903,32 +2141,48 @@
 	const crossingChoiceCache = new Map();
 	let crossingProbe = false;
 	function crossingIsChoice(op, range, opCode) {
+		const steps = crossingSteps(op, range, opCode);
+		let step;
+		do { step = steps.next(); } while (!step.done);
+		return step.value;
+	}
+	// (the work itself; yields between the generator's runs - with the page's controller always back in place, and the
+	// probe flag only up while the generator runs - so the maths' warm-up can do it in slices: see compositionSteps)
+	function* crossingSteps(op, range, opCode) {
 		const cacheKey = op + '|' + range + '|' + opCode;
 		if (crossingChoiceCache.has(cacheKey)) return crossingChoiceCache.get(cacheKey);
 		if (typeof generateCombinations !== 'function' || typeof controller === 'undefined' || crossingProbe) return true;
-		crossingProbe = true;
-		const saved = controller;
 		const shares = [];
-		try {
-			for (const setting of ['C37', 'C38']) {
-				let crossed = 0, all = 0;
-				for (let run = 0; run < 20 && all < 300; run++) {
+		let failed = false;
+		for (const setting of ['C37', 'C38']) {
+			let crossed = 0, all = 0;
+			for (let run = 0; run < 20 && all < 300; run++) {
+				const saved = controller;
+				let batch = [];
+				crossingProbe = true;
+				try {
 					controller = { modeChoice1: opCode || (op === 'A' ? 'C1' : 'C2'), modeChoice2: range, modeChoice3: setting === 'C37', selectedNumbers: [], withRemainder: false, combinations: [] };
 					generateCombinations();
-					const batch = Array.isArray(controller.combinations) ? controller.combinations : [];
-					if (!batch.length) break;
-					batch.forEach(q => { if (Array.isArray(q) && q[2] === op) { all++; if (mathCrossed({ a: Number(q[0]), b: Number(q[1]), op }).length) crossed++; } });
+					batch = Array.isArray(controller.combinations) ? controller.combinations : [];
+					if (batch.length) batch.forEach(q => { if (Array.isArray(q) && q[2] === op) { all++; if (mathCrossed({ a: Number(q[0]), b: Number(q[1]), op }).length) crossed++; } });
+				} catch (e) {
+					failed = true;
+				} finally {
+					controller = saved;
+					crossingProbe = false;
 				}
-				shares.push(all ? crossed / all : null);
+				if (failed || !batch.length) break;
+				yield;
 			}
-		} catch (e) {
-			shares.length = 0;
-		} finally {
-			controller = saved;
-			crossingProbe = false;
+			if (failed) break;
+			shares.push(all ? crossed / all : null);
 		}
+		if (failed) shares.length = 0;
+		// (worked out meanwhile by a call that could not wait: that answer stands)
+		if (crossingChoiceCache.has(cacheKey)) return crossingChoiceCache.get(cacheKey);
 		const choice = shares.length !== 2 || shares[0] == null || shares[1] == null || shares[1] - shares[0] >= 0.5;
 		crossingChoiceCache.set(cacheKey, choice);
+		keepCompositions();   // (kept in the browser with the compositions: the next visit finds it ready)
 		return choice;
 	}
 	function mathSetKey(x, info) {
@@ -2035,6 +2289,8 @@
 			const kept = JSON.parse(localStorage.getItem(COMPOSITION_STORE) || 'null');
 			if (kept && kept.version === compositionStoreVersion && Array.isArray(kept.items)) {
 				kept.items.forEach(([key, value]) => { if (!compositionCache.has(key) && value && value.ops && value.keys) compositionCache.set(key, value); });
+				// (and whether crossing ten is a choice in a set - crossingIsChoice: worked out the same way, kept alike)
+				if (Array.isArray(kept.crossing)) kept.crossing.forEach(([key, value]) => { if (!crossingChoiceCache.has(key) && typeof value === 'boolean') crossingChoiceCache.set(key, value); });
 			}
 		} catch (e) { /* (worked out again) */ }
 	}
@@ -2043,7 +2299,7 @@
 		compositionSaveTimer = setTimeout(() => {
 			compositionSaveTimer = null;
 			const items = [...compositionCache].filter(([, value]) => value).slice(-COMPOSITION_KEEP);
-			try { localStorage.setItem(COMPOSITION_STORE, JSON.stringify({ version: compositionStoreVersion, items })); }
+			try { localStorage.setItem(COMPOSITION_STORE, JSON.stringify({ version: compositionStoreVersion, items, crossing: [...crossingChoiceCache] })); }
 			catch (e) { try { localStorage.removeItem(COMPOSITION_STORE); } catch (e2) { /* (not kept) */ } }
 		}, 1000);
 	}
@@ -2106,6 +2362,10 @@
 			if (failed) questions.length = 0;
 			const valid = questions.filter(q => Array.isArray(q) && 'ASMD'.includes(q[2]));
 			if (valid.length) {
+				// (whether crossing ten is a choice for these questions - mathExampleKeys asks - worked out here in slices first)
+				for (const op of new Set(valid.map(q => q[2]))) {
+					if ((op === 'A' || op === 'S') && !['C8', 'C31'].includes(info[2])) yield* crossingSteps(op, info[2], info[1]);
+				}
 				const ops = {}, keys = {};
 				const unknown = info[4] === 'C42';
 				for (let n = 0; n < valid.length; n++) {
@@ -4730,5 +4990,5 @@
 		return render(el, Array.isArray(row) ? row : [row], { ...opts, mode: 'task', scope: 'period' });
 	}
 
-	window.SudInsights = { _joinOperations: joinOperations, _comparePeers: comparePeers, _PEER_TEST: PEER_TEST, _randomSign: randomSign, _markRandomLetters: markRandomLetters, _analyzeGrammar: analyzeGrammarMistakes, _keyboardSlip: keyboardSlip, _loadLexicon: loadLexicon, OUTLIER, showInfo, enabled, analyze, describe, randomLettersOf, renderPeriod, renderTask, showLoading, classifyAnswer, form, trend, verdict, tPValue, INSIGHTS, mathComposition, windowTest, windowChanges, windowChangesAsync, WIN, CANCELLED };
+	window.SudInsights = { prepare, _joinOperations: joinOperations, _comparePeers: comparePeers, _PEER_TEST: PEER_TEST, _randomSign: randomSign, _markRandomLetters: markRandomLetters, _analyzeGrammar: analyzeGrammarMistakes, _keyboardSlip: keyboardSlip, _loadLexicon: loadLexicon, OUTLIER, showInfo, enabled, analyze, describe, randomLettersOf, renderPeriod, renderTask, showLoading, classifyAnswer, form, trend, verdict, tPValue, INSIGHTS, mathComposition, windowTest, windowChanges, windowChangesAsync, WIN, CANCELLED };
 })();
