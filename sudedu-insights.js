@@ -924,6 +924,17 @@
 	 *     first), all, kinds: "užduočių rūšių" | "rašybos kategorijų", classes: Map(text class → time share), mine } */
 	const TEXT_TYPES_GEN = { C51: 'turinio komponavimo', C52: 'struktūros išdėstymo' };
 	const TABLE_OP_GEN = { C4: 'daugybos', C5: 'dalybos', C6: 'daugybos ir dalybos' };
+	// (math) a number set without a range ("daugiaženklio skaičiaus su dviženkliu …") practised in several operations: its
+	// scope named with all of them - "… daugybos ir dalybos užduotims", not the first task's operation only
+	function setScopeNames(scope) {
+		scope.forEach(s => {
+			if (!s.letters || s.letters.size < 2) return;
+			const letters = 'ASMD'.split('').filter(l => s.letters.has(l));
+			const code = Object.keys(MATH_OPS).find(c => MATH_OPS[c].map(o => OP_LETTERS[o]).join('') === letters.join(''));
+			const op = (code && dictField(code, 'insightsOperationGenitive')) || joinList(letters.map(l => SET_OP_GEN[l]));
+			s.dat = s.tpl.replace('{op}', op).replace('lengvesnėse', 'lengvesnėms').replace('užduotyse', 'užduotims').replace(/,$/, '');
+		});
+	}
 	function practiceFocus(list, minutesOf, subject, gradeOf, isClass, textLibrary) {
 		const fine = new Map(), scope = new Map(), ops = new Map(), separate = new Map(), classes = new Map();
 		let total = 0, allTime = 0;
@@ -950,11 +961,13 @@
 				const upTo = (tpl.match(/iki ([\d ]+\d)/) || [])[1];
 				const group = upTo ? `iki ${upTo}` : `set:${info[2]}`;
 				const e = add(fine, `${info[1]}|${info[2]}`, { dat, group, opDat: op ? `${op} užduotims` : dat }, time);
-				add(scope, group, { dat: upTo ? `skaičių iki ${upTo} užduotims` : dat }, time);
+				const letters = (MATH_OPS[info[1]] || []).map(o => OP_LETTERS[o]);
+				const s = add(scope, group, { dat: upTo ? `skaičių iki ${upTo} užduotims` : dat }, time);
+				// (a set without a range of numbers: named with all its operations practised - setScopeNames)
+				if (!upTo && tpl) { s.tpl = tpl; s.letters = s.letters || new Set(); letters.forEach(l => s.letters.add(l)); }
 				add(ops, String(info[1]), { dat: op ? `${op} užduotims` : dat }, time);
 				// the settings: crossing per + / − (its share of the task's questions as generated), the unknown, columns,
 				// remainder, the multiplication tables
-				const letters = (MATH_OPS[info[1]] || []).map(o => OP_LETTERS[o]);
 				const comp = mathComposition(info);
 				letters.forEach(o => {
 					if ((o !== 'A' && o !== 'S') || ['C8', 'C31'].includes(info[2])) return;
@@ -1002,6 +1015,7 @@
 			}
 			if (info[5]) classes.set(info[5], (classes.get(info[5]) || 0) + time);
 		});
+		if (subject === 'math') setScopeNames(scope);
 		const out = map => (total ? [...map.values()].map(e => ({ ...e, share: e.time / total })).sort((a, b) => b.share - a.share) : []);
 		const shares = new Map([...classes].map(([k, v]) => [k, total ? v / total : 0]));
 		return {
@@ -4103,10 +4117,7 @@
 		// Tendencijos: the changes from the start to the end of the period that passed the test (the words open the graph), then
 		// what the rest showed - "not detected", not "no change" - or that there was too little data to look at all
 		const trend = trendSentences(f, details);
-		const closing = trend.sentences.length ? 'Kitų patikimų klaidų dažnio ar atlikimo greičio pokyčių neaptikta.'
-			: f.changesTested ? 'Nustatytu laikotarpiu patikimų klaidų dažnio ar atlikimo greičio pokyčių neaptikta.'
-			: 'Pokyčiams nustatyti duomenų nepakanka.';
-		if (f.changesTested != null) blocks.push({ h: 'Tendencijos' }, { p: [...trend.sentences, closing].join(' '), links: trend.links });
+		if (f.changesTested != null) blocks.push({ h: 'Tendencijos' }, { p: [...trend.sentences, trendClosing(f, trend.sentences.length)].join(' '), links: trend.links });
 		return blocks;
 	}
 
@@ -4178,26 +4189,109 @@
 		const g = f.subject === 'math' ? f.math : f.grammar;
 		let named = g && g.insights ? g.insights.filter(i => i.key !== 'kita' && i.key !== 'm_muldiv' && !i.key.startsWith('m_op_')) : [];
 		if (f.subject === 'math') named = mergeNotation(named);
-		const recurring = named.filter(i => i.wordCount >= 2 || i.count >= 3).slice(0, 2);
-		// (a "kind of mistake" that is only the very task practised - its name said just before - tells nothing more)
+		const top = named.filter(i => i.wordCount >= 2 || i.count >= 3).slice(0, 2);
+		// (math: of the kinds of mistake that recur most, the very kinds of task practised (almost) all the time are not named
+		// again - see focusMistakes - when their mistakes are spread evenly (only the others, if any), and when one has clearly
+		// more, only that one)
+		const fx = f.subject === 'math' && top.length ? focusMistakes(f) : null;
+		const even = Boolean(fx && fx.even);
+		let recurring = top;
+		if (even) recurring = top.filter(i => !fx.inFocus(i));
+		else if (fx && top.some(fx.worse)) recurring = top.filter(i => !fx.inFocus(i) || fx.worse(i));
+		// (spelling: a "kind of mistake" that is only the very task practised - its name said just before - tells nothing more)
 		const stem = area => String(area).replace(/\s+\S+$/, '').toLowerCase();
 		const said = recurring.length ? (f.subject === 'math' ? joinOperations(recurring, () => '') : recurring) : [];
-		const standsOut = said.length && !(focus && said.every(i => focus.toLowerCase().includes(stem(i.area))));
+		const sameAsFocus = f.subject === 'grammar' && said.length && focus && said.every(i => focus.toLowerCase().includes(stem(i.area)));
+		// (the focus sentence says "Visas / Beveik visas laikas buvo skirtas …": the mistakes said of those very tasks)
+		const evenText = even || (sameAsFocus && /^(Visas|Beveik visas) laikas/.test(focus));
 		if (low) {
 			if (!named.length) return 'Klaidų padaryta nedaug.';   // (no details of the mistakes to tell their kind)
-			return standsOut ? `Klaidų padaryta nedaug, daugiausia klystama ${joinAreas(said.map(i => i.area))}.`
+			if (said.length && !sameAsFocus) return `Klaidų padaryta nedaug, daugiausia klystama ${joinAreas(said.map(i => i.area))}.`;
+			return evenText ? 'Klaidų padaryta nedaug, jos pasiskirsčiusios gana tolygiai – išskirtinio klaidų pobūdžio nėra.'
 				: 'Klaidų padaryta nedaug ir vieno vyraujančio klaidų tipo nenustatyta.';
 		}
-		if (!recurring.length) return named.length ? 'Klaidos pavienės – pasikartojančių klaidų nepastebėta.' : '';
-		if (!standsOut) return 'Klaidų pasitaikė įvairių – vieno vyraujančio klaidų tipo nenustatyta.';
+		if (!recurring.length) {
+			if (even) return 'Šiose užduotyse klaidos pasiskirsčiusios gana tolygiai – išskirtinio klaidų pobūdžio nėra.';
+			return named.length ? 'Klaidos pavienės – pasikartojančių klaidų nepastebėta.' : '';
+		}
+		if (sameAsFocus) return evenText ? 'Šiose užduotyse klaidos pasiskirsčiusios gana tolygiai – išskirtinio klaidų pobūdžio nėra.'
+			: 'Klaidų pasitaikė įvairių – vieno vyraujančio klaidų tipo nenustatyta.';
 		return `Dažniausiai klystama ${joinAreas(said.map(i => i.area))}.`;
 	}
-	// Mažas: the changes found - mistakes and answering speed (one kind of task practised: without its name again)
+	// (math) the kinds of task the focus sentence says took (almost) all the time ("Visas / Beveik visas laikas buvo skirtas
+	// …") - its fine areas, by the same choices as focusText; otherwise null
+	function wholeFocus(f) {
+		const F = f.focus, areas = F && F.fine;
+		if (f.subject !== 'math' || !areas || !areas.length) return null;
+		const top = areas[0].share;
+		if (top >= FOCUS.almostAll) return [areas[0]];
+		if (areas.length === 1) return null;
+		if (F.scope) {
+			const g = F.scope.find(x => x.key === areas[0].group);
+			const sets = areas.filter(a => a.group === areas[0].group);
+			if (g && sets.length > 1 && g.share >= top + FOCUS.scopeGain) return g.share >= FOCUS.almostAll ? sets : null;
+		}
+		const n = areas.filter(a => a.share >= 0.02).length;
+		if (top >= FOCUS.concentrated || n <= 3) return null;
+		if (F.ops && F.ops[0].share >= FOCUS.most) return F.ops[0].share >= FOCUS.almostAll ? areas.filter(a => a.key.split('|')[0] === F.ops[0].key) : null;
+		return null;
+	}
+	/* (math) Mažas: how the mistakes spread over what took (almost) all the time. The kinds of task in it - number set,
+	 * operation and, for + / −, regrouping - that had a tenth of that time or more, each with its mistakes and questions (both
+	 * notations together), every one of them with mistakes recorded (one without: the others stand out - null); each kind's
+	 * mistake rate against the rest (two-sided binomial test, 5%, as in mergeNotation). even: none clearly different - then
+	 * "Dažniausiai klystama …" would only repeat the focus sentence; worse(i): pattern i is of a kind clearly above the rest.
+	 * { even, inFocus(i), worse(i) } or null. */
+	function focusMistakes(f) {
+		const whole = wholeFocus(f);
+		const g = f.math;
+		if (!whole || !g || !g.insights) return null;
+		const KEY = /^m_set_([ASMD])_(C\d+)_([xp-])c?r?$/;
+		const total = whole.reduce((s, a) => s + a.time, 0);
+		const kinds = new Map();
+		whole.forEach(a => {
+			const [opCode, set] = a.key.split('|');
+			const letters = (MATH_OPS[opCode] || []).map(o => OP_LETTERS[o]);
+			const cross = a.attrs && a.attrs.cross;
+			letters.forEach(o => {
+				const byCross = (o === 'A' || o === 'S') && !['C8', 'C31'].includes(set) && cross
+					? ['x', 'p'].map(c => [c, cross.get(c + o) || 0]) : [['-', a.time / letters.length]];
+				byCross.forEach(([c, time]) => {
+					const k = `${o}_${set}_${c}`;
+					kinds.set(k, (kinds.get(k) || 0) + time);
+				});
+			});
+		});
+		const practised = new Map([...kinds].filter(([, time]) => time >= total * 0.1).map(([k]) => [k, { y: 0, e: 0 }]));
+		const kindOf = i => { const m = KEY.exec(i.key); return m ? `${m[1]}_${m[2]}_${m[3]}` : null; };
+		g.insights.forEach(i => {
+			const x = practised.get(kindOf(i));
+			if (!x) return;
+			x.y += i.raw != null ? i.raw : i.count;
+			x.e += (i.questions || 0) + (i.otherNotationQuestions || 0);
+		});
+		const list = [...practised.values()];
+		if (!list.length || list.some(x => !(x.y > 0 && x.e > 0))) return null;
+		const Y = list.reduce((s, x) => s + x.y, 0), E = list.reduce((s, x) => s + x.e, 0);
+		list.forEach(x => { x.worse = list.length > 1 && x.y / x.e > Y / E && binomTwoSided(Math.round(x.y), Math.round(Y), x.e / E) < 0.05; });
+		const differs = list.length > 1 && list.some(x => binomTwoSided(Math.round(x.y), Math.round(Y), x.e / E) < 0.05);
+		return { even: !differs, inFocus: i => practised.has(kindOf(i)), worse: i => Boolean((practised.get(kindOf(i)) || {}).worse) };
+	}
+	// after the changes found (Vidutinis, Didelis and Mažas alike): what the rest showed - "not detected", not "no change" -
+	// or that there was too little data to look at all
+	function trendClosing(f, found) {
+		return found ? 'Kitų patikimų klaidų dažnio ar atlikimo greičio pokyčių neaptikta.'
+			: f.changesTested ? 'Nustatytu laikotarpiu patikimų klaidų dažnio ar atlikimo greičio pokyčių neaptikta.'
+			: 'Pokyčiams nustatyti duomenų nepakanka.';
+	}
+	// Mažas: the changes found - mistakes and answering speed (one kind of task practised: without its name again) - and
+	// the closing sentence (none where the changes were not looked at)
 	function shortTrends(f) {
 		const tr = trendSentences(f, false);
 		const oneKind = Boolean(f.onlySet) || (f.focus && f.focus.fine && f.focus.fine.length === 1);
-		return tr.sentences.map(t => !oneKind || /^Klaidų /.test(t) ? t
+		const found = tr.sentences.map(t => !oneKind || /^Klaidų /.test(t) ? t
 			: t.replace(/^.*? klaidų dažnis /, 'Klaidų dažnis ').replace(/^.*? atlikimo greitis /, 'Atlikimo greitis '));
+		return f.changesTested != null ? [...found, trendClosing(f, found.length)] : found;
 	}
 	/* Mažas: fewer repeated words - where both approved words fit, "užduotims" / "veiksmams" and "užduotyse" / "veiksmuose"
 	 * (after an operation: "sudėties ir atimties užduotims" → "… veiksmams"; "užduotyse su nežinomu dėmeniu"), the one less
@@ -4467,17 +4561,46 @@
 			: b.ol ? `<ol class="ins-ol">${b.ol.map(item => `<li>${esc(item)}</li>`).join('')}</ol>`
 			: `<p class="ins-p">${linked(esc(b.p.replace(/\.\.(?!\.)/g, '.')), b.links)}</p>`).join('');   // ("min." at a sentence end)
 	}
+	// a card's text as plain text that keeps its shape: headings on their own line, paragraphs apart, the lists numbered
+	// (1., 2. ...) or marked (–) and their sub-lists indented; what is folded up ("Kitos užduotys") as it shows
+	function cardPlainText(body) {
+		if (!body) return '';
+		const lines = [];
+		const flat = s => String(s || '').replace(/\s+/g, ' ').trim();
+		const itemText = li => flat([...li.childNodes].filter(n => !(n.nodeType === 1 && /^(OL|UL)$/.test(n.tagName))).map(n => n.textContent).join(''));
+		const list = (listEl, depth) => {
+			let i = 0;
+			[...listEl.children].forEach(li => {
+				if (li.tagName !== 'LI') return;
+				i++;
+				lines.push('   '.repeat(depth) + (listEl.tagName === 'OL' ? i + '. ' : '– ') + itemText(li));
+				[...li.children].filter(c => /^(OL|UL)$/.test(c.tagName) && !c.hidden).forEach(sub => list(sub, depth + 1));
+			});
+		};
+		[...body.children].forEach(el => {
+			if (/^(OL|UL)$/.test(el.tagName)) { list(el, 0); lines.push(''); return; }
+			const t = flat(el.textContent);
+			if (!t) return;
+			if (el.classList.contains('ins-h') || el.classList.contains('ins-h2')) {
+				if (lines.length && lines[lines.length - 1] !== '') lines.push('');
+				lines.push(t);
+			} else lines.push(t, '');
+		});
+		return lines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+	}
 	function drawCard(el) {
 		const f = el._insFacts;
 		if (!f) { el.innerHTML = ''; return; }
 		if (!f.n) { el.innerHTML = cardHtml('<p class="ins-p ins-muted">Šioje srityje pagal pasirinktus nustatymus užduočių nebuvo atlikta.</p>', false); return; }
 		// (one task: one version, with all its details - no toggle)
 		const single = f.mode === 'task';
-		el.innerHTML = cardHtml(blocksHtml(describe(f, { detail: single ? 'high' : detailLevel })), !single, notesFor(f), !single && detailLevel === 'low');
-		// Mažas: the paragraph copied as plain text (for the records), the icon a check for a moment
+		el.innerHTML = cardHtml(blocksHtml(describe(f, { detail: single ? 'high' : detailLevel })), !single, notesFor(f), !single);
+		// copied as plain text, the icon a check for a moment: Mažas - the paragraph on one line (for the records);
+		// Vidutinis and Didelis - with their headings, paragraphs and numbered lists kept (cardPlainText)
 		el.querySelector('.ins-copy')?.addEventListener('click', async event => {
 			const btn = event.currentTarget;
-			const text = (el.querySelector('.ins-body')?.innerText || '').replace(/\s+/g, ' ').trim();
+			const body = el.querySelector('.ins-body');
+			const text = detailLevel === 'low' ? (body?.innerText || '').replace(/\s+/g, ' ').trim() : cardPlainText(body);
 			let ok = false;
 			try { await navigator.clipboard.writeText(text); ok = true; } catch (_) {
 				const area = document.createElement('textarea');

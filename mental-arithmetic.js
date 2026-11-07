@@ -2665,6 +2665,10 @@ function mathMistakeHasDetail(record) {
     Boolean(record[3] && Array.isArray(record[3].f));
 }
 const MM_OP = { A: '+', S: '\u2212', M: '\u00D7', D: ':' };
+// the row's "Sprendimas" button: a small round icon (an example worked in columns), the word in its title for the hover
+// and for screen readers - a text pill wrapped and crowded the example in narrow cells
+const MM_BTN_HTML = '<button type="button" class="mm-btn" aria-expanded="false" aria-label="Sprendimas" title="Sprendimas">' +
+  '<svg class="mm-ico" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6.5 3.5h6M2.5 7.5h3M4 6v3M8 7.5h4.5M2.5 10.5h10M6.5 13h6"/></svg></button>';
 function mmEsc(v) { return escapeMistakeText(String(v)); }
 function mmWrongList(values) {
   return values.map(v => `<span class="mm-w">${mmEsc(v)}</span>`).join('');
@@ -2759,10 +2763,17 @@ function mathMistakeDetailHtml(records) {
     r[2][1].forEach(x => { if (!m[2][1].map(String).includes(String(x))) m[2][1].push(x); });
     if (m[3] && r[3]) r[3].f.forEach((f, i) => f[1].forEach(w => { if (!m[3].f[i][1].includes(w)) m[3].f[i][1].push(w); }));
   });
-  const list = [...merged.values()];
-  const shown = list.slice(0, MM_SHOWN).map(r => `<div class="mm-item">${mathMistakeVisual(r)}</div>`).join('');
-  const more = list.length > MM_SHOWN ? `<div class="mm-more">dar ${list.length - MM_SHOWN}</div>` : '';
-  return `<div class="mm-detail">${shown}${more}</div>`;
+  // "Sprendimas" is the working in columns (stulpeliu / kampu): the attempts done in a row are left out - the table's
+  // row already shows the example and its wrong answers. Only if none of them can be laid out in columns, as before.
+  const all = [...merged.values()];
+  const columns = all.filter(r => r[3] && Array.isArray(r[3].f) && !r[0][2])
+    .map(r => mmColumnHtml(Number(r[0][0]), Number(r[0][1]), r[1], r[3].f, r[2][1]))
+    .filter(Boolean);
+  const visuals = columns.length ? columns : all.map(mathMistakeVisual);
+  const shown = visuals.slice(0, MM_SHOWN).map(html => `<div class="mm-item">${html}</div>`).join('');
+  const more = visuals.length > MM_SHOWN ? `<div class="mm-more">dar ${visuals.length - MM_SHOWN}</div>` : '';
+  // (several column layouts: side by side with a dashed line between them, or one under another where it is narrow)
+  return columns.length ? `<div class="mm-detail mm-cols"><div class="mm-flow">${shown}${more}</div></div>` : `<div class="mm-detail">${shown}${more}</div>`;
 }
 // the records of each row that can open (one registry for the page; a row keeps its id)
 const MM_RECORDS = new Map();
@@ -2795,11 +2806,29 @@ function injectMathMistakeStyle() {
   st.id = 'mm-style';
   st.textContent = `
 .mm-toggle{cursor:pointer}
-.mm-btn{display:inline-flex;align-items:center;gap:4px;margin:0 8px 0 8px;padding:2px 9px 2px 7px;border:0;border-radius:999px;background:rgba(40,109,138,.12);color:#1d566e;font-family:inherit;font-size:12px;font-weight:600;line-height:1.5;vertical-align:middle;cursor:pointer;transition:background .15s}
-.mm-btn:hover,.mm-toggle.open .mm-btn{background:rgba(40,109,138,.22)}
-.mm-btn .mm-chev{display:inline-block;font-size:10px;transition:transform .15s}
-.mm-toggle.open .mm-btn .mm-chev{transform:rotate(90deg)}
+.mm-btn{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:24px;height:24px;margin:0 8px;padding:0;border:0;border-radius:50%;background:rgba(40,109,138,.12);color:#1d566e;vertical-align:middle;cursor:pointer;transition:background .15s,color .15s}
+.mm-btn:hover{background:rgba(40,109,138,.22)}
+.mm-btn:focus-visible{outline:2px solid #286D8A;outline-offset:2px}
+.mm-btn[aria-expanded="true"]{background:#286D8A;color:#fff}   /* (the attribute: the page's copies of the table keep it) */
+.mm-ico{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
 .mm-detail{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px 22px;margin:6px 0 2px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.6);text-align:left;overflow-x:auto;cursor:default}
+.mm-detail.mm-cols{display:block}
+.mm-flow{display:flex;align-items:stretch}
+.mm-flow .mm-item{flex:0 0 auto;padding:2px 18px}
+.mm-flow .mm-item:first-child{padding-left:4px}
+.mm-flow .mm-item + .mm-item{border-left:1px dashed rgba(40,109,138,.35)}
+.mm-flow .mm-more{align-self:center;padding-left:14px}
+@media (max-width:991px){   /* (a phone, an upright tablet: the working under the example - beside it, it crushed the example to a letter per line) */
+  .mt-cell:has(> .mm-detail){flex-wrap:wrap}
+  .mt-cell > .mm-detail{flex:1 0 100%;max-width:100%}
+}
+@media (max-width:575px){   /* (a phone: one under another) */
+  .mm-flow{flex-direction:column;align-items:flex-start}
+  .mm-flow .mm-item,.mm-flow .mm-item:first-child{align-self:stretch;padding:8px 4px}
+  .mm-flow .mm-item:first-child{padding-top:2px}
+  .mm-flow .mm-item + .mm-item{border-left:0;border-top:1px dashed rgba(40,109,138,.35)}
+  .mm-flow .mm-more{align-self:flex-start;padding:6px 4px 0}
+}
 .mm-detail,.mm-detail *{font-size:13px !important;line-height:1.3 !important;letter-spacing:0 !important;text-transform:none !important}
 .mm-detail .mm-lbl,.mm-detail .mm-more{font-size:12px !important}
 .mm-detail .mm-w{font-size:12.5px !important}
@@ -3010,7 +3039,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
                             }
                             
                             return `<tr>
-                                <td${mmRowOpens(mathRecordsByKey[row.key]) ? ` class="mm-toggle" data-mm-id="${mmRegister(mathRecordsByKey[row.key])}" title="Rodyti, kaip spręsta"` : ''}>${row["Veiksmai"]}${mmRowOpens(mathRecordsByKey[row.key]) ? '<button type="button" class="mm-btn" aria-expanded="false"><span class="mm-chev" aria-hidden="true">\u25B8</span>Sprendimas</button>' : ''}</td>
+                                <td${mmRowOpens(mathRecordsByKey[row.key]) ? ` class="mm-toggle" data-mm-id="${mmRegister(mathRecordsByKey[row.key])}" title="Rodyti, kaip spręsta"` : ''}>${row["Veiksmai"]}${mmRowOpens(mathRecordsByKey[row.key]) ? MM_BTN_HTML : ''}</td>
                                 <td>${displayValue}</td>
                                 <td>
                                     <div class="bar" style="width: ${barWidth}; background-color: ${barColor};"></div>
@@ -3051,7 +3080,7 @@ function generateSummaryTable(type, mistakeList=null, customDivForSummaryTable=n
                               }
                               
                               return `<tr>
-                                  <td${mmRowOpens(mathRecordsByKey[row.key]) ? ` class="mm-toggle" data-mm-id="${mmRegister(mathRecordsByKey[row.key])}" title="Rodyti, kaip spręsta"` : ''}>${row["Veiksmai"]}${mmRowOpens(mathRecordsByKey[row.key]) ? '<button type="button" class="mm-btn" aria-expanded="false"><span class="mm-chev" aria-hidden="true">\u25B8</span>Sprendimas</button>' : ''}</td>
+                                  <td${mmRowOpens(mathRecordsByKey[row.key]) ? ` class="mm-toggle" data-mm-id="${mmRegister(mathRecordsByKey[row.key])}" title="Rodyti, kaip spręsta"` : ''}>${row["Veiksmai"]}${mmRowOpens(mathRecordsByKey[row.key]) ? MM_BTN_HTML : ''}</td>
                                   <td>${displayValue}</td>
                                   <td>
                                       <div class="bar" style="width: ${barWidth}; background-color: ${barColor};"></div>

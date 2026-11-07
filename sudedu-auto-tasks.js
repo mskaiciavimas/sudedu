@@ -896,11 +896,14 @@ const TASK_DIFFICULTY_RANKING = {
         if (info[0] === 'lang' && info[1] === 'C49') return 'text';
         return null;
     }
-    // the challenge lists' math tasks without their notation: it is chosen at the end (COLUMN_SHARE)
+    // the challenge lists' math tasks without their notation: it is chosen at the end (COLUMN_SHARE); × ÷ and mixed tasks as
+    // the lists have them - no regrouping - though a saved task carries the form's "C37" there (toFormInfo), so that a
+    // student's results of such a task are counted for the same kind of task as in the lists
     function normalizeInfo(info) {
         if (subjectOf(info) !== 'math') return info;
         const copy = info.slice();
         copy[6] = 'C47';
+        if (['C4', 'C5', 'C6', 'C7'].includes(copy[1]) && copy[3] === 'C37') copy[3] = '';
         return copy;
     }
     // the kind of a task: what makes it what it is, without its length, notation or table numbers
@@ -1066,11 +1069,153 @@ const TASK_DIFFICULTY_RANKING = {
         return { math: { ...math, ops: [...math.ops], ranges: [...math.ranges] }, grammar: { cats: [...cats] }, text: { types: [...types] } };
     }
 
+    // ---------------------------------------------------------------- one operation of two (sudėtis / atimtis, daugyba / dalyba)
+    /* A task's questions by "cell": the operation (A + / S − / M × / D ÷) and, in an equation with an unknown, for − and ÷
+     * the unknown's place (F - the first number: turinys / dalinys; S - the second: atėminys / daliklis); + and × have one
+     * cell each (dėmuo, dauginamasis). The questions split evenly between a task's operations, and in "−" or "÷" of a
+     * two-operation equation task between the two places (the task's own generator is not run here). */
+    const OP_LETTER = { C1: 'A', C2: 'S', C4: 'M', C5: 'D' };
+    const SPLIT_OPS = ['C3', 'C6'];
+    function cellShares(info) {
+        const letters = (OP_NEEDS[info[1]] || []).map(c => OP_LETTER[c]);
+        if (!letters.length) return null;
+        const equation = info[4] === 'C42';
+        const out = {};
+        letters.forEach(l => {
+            const share = 1 / letters.length;
+            if (!equation || (l !== 'S' && l !== 'D')) { out[l] = share; return; }
+            if (letters.length === 1) out[l + (info[5] === (l === 'S' ? 'C44' : 'C46') ? 'S' : 'F')] = share;
+            else { out[l + 'F'] = share / 2; out[l + 'S'] = share / 2; }
+        });
+        return out;
+    }
+    // a mistake's cell (detail item [[a, b, unknown 'F' | 'S' | null], op, [tries, answers]])
+    function mistakeCell(info, d) {
+        const l = d[1];
+        if (info[4] !== 'C42' || (l !== 'S' && l !== 'D')) return l;
+        return d[0][2] === 'F' || d[0][2] === 'S' ? l + d[0][2] : null;
+    }
+    // a cell as a single-operation task: the operation, its unknown (equations) and the range where it differs
+    // (lentelinė sudėtis ir atimtis iki 20 → lentelinė sudėtis C9; lentelinė atimtis alone does not exist - null)
+    const CELL_TASK = { A: ['C1', 'C43'], S: ['C2', null], SF: ['C2', 'C43'], SS: ['C2', 'C44'], M: ['C4', 'C45'], D: ['C5', null], DF: ['C5', 'C45'], DS: ['C5', 'C46'] };
+    function cellTask(info, cell) {
+        const [op, unknown] = CELL_TASK[cell];
+        const copy = info.slice();
+        copy[1] = op;
+        if (info[2] === 'C17') { if (op !== 'C1') return null; copy[2] = 'C9'; }
+        if (info[4] === 'C42') { if (!unknown) return null; copy[5] = unknown; }
+        return copy;
+    }
+    const CELL_WORDS = { A: 'sudėtyje', S: 'atimtyje', M: 'daugyboje', D: 'dalyboje', SF: 'ieškant turinio', SS: 'ieškant atėminio',
+        DF: 'ieškant dalinio', DS: 'ieškant daliklio' };
+    const EQ_WORDS = { A: 'ieškant dėmens', M: 'ieškant dauginamojo' };
+    const CELL_TASK_NAME = { A: 'sudėtis', S: 'atimtis', M: 'daugyba', D: 'dalyba', SF: 'atimtis su nežinomu turiniu', SS: 'atimtis su nežinomu atėminiu',
+        DF: 'dalyba su nežinomu daliniu', DS: 'dalyba su nežinomu dalikliu' };
+    const EQ_TASK_NAMES = { A: 'sudėtis su nežinomu dėmeniu', M: 'daugyba su nežinomu dauginamuoju' };
+    // two-sided exact binomial test: k of n where p was expected
+    function binomTwoSided(k, n, p) {
+        if (n <= 0 || p <= 0 || p >= 1) return 1;
+        const lg = x => { let s = 0; for (let i = 2; i <= x; i++) s += Math.log(i); return s; };
+        const lgn = lg(n);
+        const pmf = i => Math.exp(lgn - lg(i) - lg(n - i) + i * Math.log(p) + (n - i) * Math.log(1 - p));
+        const obs = pmf(k);
+        let total = 0;
+        for (let i = 0; i <= n; i++) { const q = pmf(i); if (q <= obs * (1 + 1e-9)) total += q; }
+        return Math.min(1, total);
+    }
+    /* A two-operation task (sudėtis ir atimtis, daugyba ir dalyba - with or without an unknown) narrowed to the one part a
+     * student clearly makes more mistakes in, from their results in the same topic unit (unitOf) over the period looked at:
+     * the cell (operation, in equations with the unknown's place) with the highest mistake rate, when it is clearly above the
+     * rest - a two-sided binomial test at 5%, at least 4 wrong tries in it and a rate at least 1.5 times the rest's; else, in
+     * an equation task, the operation the same way (its unknown: the place with more mistakes). Otherwise null - the task
+     * stays as it is. → { info, cell, text } */
+    const NARROW_MIN_MISTAKES = 4, NARROW_MIN_RATIO = 1.5, NARROW_P = 0.05;
+    function narrowOperation(info, st, covered) {
+        if (!SPLIT_OPS.includes(info[1]) || !st || !st.cells) return null;
+        const cells = st.cells.get(unitOf(normalizeInfo(info)));
+        if (!cells) return null;
+        const shares = cellShares(info);
+        const list = Object.keys(shares).map(key => ({ key, ...(cells.get(key) || { e: 0, y: 0 }) })).filter(x => x.e > 0);
+        if (list.length < 2) return null;
+        const clearly = (group, rest) => {
+            const y = group.reduce((s, x) => s + x.y, 0), e = group.reduce((s, x) => s + x.e, 0);
+            const ry = rest.reduce((s, x) => s + x.y, 0), re = rest.reduce((s, x) => s + x.e, 0);
+            if (y < NARROW_MIN_MISTAKES || !re) return false;
+            const rate = y / e, restRate = ry / re;
+            if (rate < NARROW_MIN_RATIO * restRate) return false;
+            return binomTwoSided(Math.round(y), Math.round(y + ry), e / (e + re)) < NARROW_P;
+        };
+        const rateOf = x => x.y / x.e;
+        const ranked = list.slice().sort((a, b) => rateOf(b) - rateOf(a));
+        let cell = null;
+        if (clearly([ranked[0]], ranked.slice(1))) cell = ranked[0].key;
+        else if (info[4] === 'C42') {
+            // (the operation: both places of − or ÷ together against the other operation)
+            const byOp = l => list.filter(x => x.key[0] === l);
+            const ops = [...new Set(list.map(x => x.key[0]))];
+            const worse = ops.find(l => clearly(byOp(l), list.filter(x => x.key[0] !== l)));
+            if (worse) cell = byOp(worse).sort((a, b) => rateOf(b) - rateOf(a))[0].key;
+        }
+        if (!cell) return null;
+        const narrowed = cellTask(info, cell);
+        // (covered: the algorithm's tasks keep to the covered topics; a teacher's template task - null - is theirs already)
+        if (!narrowed || (covered && !coveredVariant(narrowed, covered))) return null;
+        // the words: "atimtyje 30% klaidų, sudėtyje 8%"
+        const word = key => (info[4] === 'C42' && EQ_WORDS[key]) || CELL_WORDS[key];
+        const pctOf = x => Math.min(100, pct(rateOf(x)));
+        const mine = list.find(x => x.key === cell);
+        const others = list.filter(x => x.key !== cell).sort((a, b) => rateOf(b) - rateOf(a));
+        const name = info[4] === 'C42' && EQ_TASK_NAMES[cell] ? EQ_TASK_NAMES[cell] : CELL_TASK_NAME[cell];
+        const text = `skiriama tik ${name}: ${word(cell)} ${pctOf(mine)}% klaidų, ${others.map(x => `${word(x.key)} ${pctOf(x)}%`).join(', ')}`;
+        return { info: narrowed, cell, text };
+    }
+
+    /* Only a share of a student's tasks is narrowed (NARROW_SHARE - like the spelling focus tasks, a third): the original
+     * task stays the main one and the narrowed one comes in between, so the part with more mistakes is practised more
+     * often but the rest is not left out. Counted over the weeks (revisionCount) - with one such task a week, every third
+     * week; the narrowed ones spread evenly between the others. narrowOf(pick) → the narrowed pick or null. */
+    const NARROW_SHARE = 1 / 3;
+    function narrowSome(picks, narrowOf, week) {
+        const candidates = picks.map((p, i) => ({ i, narrowed: narrowOf(p) })).filter(x => x.narrowed);
+        const count = revisionCount(candidates.length, week || 0, NARROW_SHARE);
+        if (!count) return picks;
+        const chosen = new Map();
+        for (let j = 0; j < count; j++) { const c = candidates[Math.min(candidates.length - 1, Math.floor((j + 0.5) * candidates.length / count))]; chosen.set(c.i, c.narrowed); }
+        return picks.map((p, i) => chosen.get(i) || p);
+    }
+    /* (spelling) A task with several rules narrowed, for one student, to the rules among them they clearly make more mistakes
+     * in: each rule against the task's other rules together (its questions - the task's answers split evenly between its
+     * rules, statsOf - and wrong tries by the rule asked), kept when at least 4 wrong tries, a rate at least 1.5 times the
+     * others' and a two-sided binomial test at 5%. Rules without results do not count; none kept (or all) - null, the task
+     * stays as it is. → { info, text } */
+    function narrowGrammar(info, st) {
+        const keys = Object.keys((info[4] && typeof info[4] === 'object') ? info[4] : {});
+        if (keys.length < 2 || !st || !st.cats) return null;
+        const base = k => k.split('-')[0];
+        const known = keys.map(k => ({ key: k, ...(st.cats.get(base(k)) || { asked: 0, wrong: 0 }) })).filter(x => x.asked > 0);
+        if (known.length < 2) return null;
+        const restOf = x => { const rest = known.filter(y => y !== x); return { wrong: rest.reduce((s, y) => s + y.wrong, 0), asked: rest.reduce((s, y) => s + y.asked, 0) }; };
+        const kept = known.filter(x => {
+            const rest = restOf(x);
+            if (x.wrong < NARROW_MIN_MISTAKES || !rest.asked) return false;
+            if (x.wrong / x.asked < NARROW_MIN_RATIO * (rest.wrong / rest.asked)) return false;
+            return binomTwoSided(Math.round(x.wrong), Math.round(x.wrong + rest.wrong), x.asked / (x.asked + rest.asked)) < NARROW_P;
+        });
+        if (!kept.length || kept.length === keys.length) return null;
+        const copy = info.slice();
+        copy[4] = Object.fromEntries(keys.filter(k => kept.some(x => x.key === k)).map(k => [k, info[4][k]]));
+        const others = known.filter(x => !kept.includes(x));
+        const otherRate = others.reduce((s, x) => s + x.wrong, 0) / (others.reduce((s, x) => s + x.asked, 0) || 1);
+        const rate = x => Math.min(100, pct(x.wrong / x.asked));
+        const text = `skiriama tik ${kept.length === 1 ? 'taisyklė' : 'taisyklės'}, kuriose daugiausia klaidų: ${kept.map(x => `${catName(base(x.key))} (${rate(x)}%)`).join(', ')}; kitose šios užduoties taisyklėse – ${Math.min(100, pct(otherRate))}%`;
+        return { info: copy, text: kept.length === 1 ? text.replace('kuriose', 'kurioje') : text };
+    }
+
     // ---------------------------------------------------------------- what the results say
     // rows: { date, taskInfo, totalAnswers, mistakes, mistakesDetail } of the target's students; assigned: the task
     // settings ({ taskInfo }) of their tasks given and not done yet
     function statsOf(rows, today, assigned = []) {
-        const st = { kinds: new Map(), subject: {}, table: new Map(), tableTotal: 0, cats: new Map(), pending: new Set() };
+        const st = { kinds: new Map(), subject: {}, table: new Map(), tableTotal: 0, cats: new Map(), pending: new Set(), cells: new Map() };
         assigned.forEach(a => { const info = parseJson(a.taskInfo); if (subjectOf(info)) st.pending.add(kindOf(normalizeInfo(info))); });
         SUBJECTS.forEach(s => { st.subject[s] = { answers: 0, mistakes: 0, perTask: [] }; });
         rows.forEach(row => {
@@ -1094,6 +1239,20 @@ const TASK_DIFFICULTY_RANKING = {
             s.answers += w * answers; s.mistakes += w * mistakes; s.perTask.push(answers);
             const detail = Array.isArray(parseJson(row.mistakesDetail)) ? parseJson(row.mistakesDetail) : [];
             if (subject === 'math') {
+                // (per operation - and in equations per unknown - the questions and the wrong tries: opCells)
+                const shares = cellShares(norm);
+                if (shares) {
+                    const unit = unitOf(norm);
+                    if (!st.cells.has(unit)) st.cells.set(unit, new Map());
+                    const cells = st.cells.get(unit);
+                    const cell = key => { if (!cells.has(key)) cells.set(key, { e: 0, y: 0 }); return cells.get(key); };
+                    Object.entries(shares).forEach(([key, share]) => { cell(key).e += w * answers * share; });
+                    detail.forEach(d => {
+                        if (!Array.isArray(d) || !Array.isArray(d[0]) || !'ASMD'.includes(d[1])) return;
+                        const key = mistakeCell(norm, d);
+                        if (key && key in shares) cell(key).y += w * (Array.isArray(d[2]) ? Math.max(1, Number(d[2][0]) || 1) : 1);
+                    });
+                }
                 detail.forEach(d => {
                     if (!Array.isArray(d) || !Array.isArray(d[0]) || (d[1] !== 'M' && d[1] !== 'D')) return;
                     const a = Number(d[0][0]), b = Number(d[0][1]);
@@ -1280,7 +1439,20 @@ const TASK_DIFFICULTY_RANKING = {
         for (let i = 0; byGroup.some(list => list.length > i); i++) byGroup.forEach(list => { if (list[i]) ranked.push(list[i]); });
         // (and every single kind of the units - e.g. atimtis alone - after them)
         current.forEach(x => { if (!ranked.some(r => r.kind === x.kind)) ranked.push({ ...x, group: x.problem ? 'practised' : 'new', reason: `${topic} (${x.problem ? `spręsta, ${pct(x.problem.rate)}% klaidų` : 'dar nespręsta'})` }); });
-        return { picks: ordered.map((p, i) => finishMath(p, focus, ctx, target, subject, i)), ranked: ranked.map((p, i) => finishMath(p, focus, ctx, target, subject, 100 + i)) };
+        let finished = ordered.map((p, i) => finishMath(p, focus, ctx, target, subject, i));
+        // (a student's own tasks: some of the two-operation ones with only the operation - in equations with the unknown -
+        // their mistakes clearly point to; narrowOperation, narrowSome)
+        if (target.students && target.students.length === 1) finished = narrowSome(finished, p => {
+            const narrow = narrowOperation(p.info, st, ctx.covered);
+            return narrow ? { ...p, info: narrow.info, kind: kindOf(normalizeInfo(narrow.info)), id: JSON.stringify(narrow.info), reason: `${p.reason}; ${narrow.text}`, narrowed: true } : null;
+        }, ctx.week);
+        return { picks: finished, ranked: ranked.map((p, i) => finishMath(p, focus, ctx, target, subject, 100 + i)) };
+    }
+    // one reason for students who got the same task for reasons with different numbers: what they share, without the
+    // numbers in brackets and the per-student notes after ";" ("Ankstesnio laikotarpio tema, kurioje daug klaidų")
+    function sharedReason(a, b) {
+        const plain = s => String(s || '').split(';')[0].replace(/\s*\([^)]*\)/g, '').trim();
+        return plain(a) === plain(b) ? `${plain(a)} (kiekvienam mokiniui – pagal jo rezultatus)` : 'Parinkta pagal kiekvieno mokinio rezultatus';
     }
     // the extra ones spread evenly between the main ones: 3 + 1 → main, extra, main, main
     function interleave(main, extra) {
@@ -1330,8 +1502,12 @@ const TASK_DIFFICULTY_RANKING = {
         const problems = grammarProblems(st, allowed);
         const full = { ...base, group: 'current', reason: `Šio laikotarpio rašybos taisyklės (${Object.keys(base.info[4]).length})` };
         const focusCats = problems.slice(0, 3);
-        const focus = focusCats.length ? { ...grammarWithCats(base, focusCats.map(x => x.code)), group: 'weak',
+        let focus = focusCats.length ? { ...grammarWithCats(base, focusCats.map(x => x.code)), group: 'weak',
             reason: `Taisyklės, kuriose daugiausia klaidų: ${focusCats.map(x => `${catName(x.code)} (${pct(x.rate)}%)`).join(', ')}` } : null;
+        // (a student's own focus task: the period task's rules their mistakes clearly point to - narrowGrammar - when the
+        // results show them; the other tasks stay the whole task)
+        const narrow = target.students && target.students.length === 1 ? narrowGrammar(full.info, st) : null;
+        if (narrow) focus = { ...full, info: narrow.info, id: JSON.stringify(narrow.info), group: 'weak', reason: `${cap(narrow.text)}`, narrowed: true };
         const focusCount = focus ? Math.min(n, revisionCount(n, week, GRAMMAR_FOCUS_SHARE)) : 0;
         const picks = interleave(Array.from({ length: n - focusCount }, () => full), Array.from({ length: focusCount }, () => focus));
         // other choices: every rule of the class level (always), all covered ones, each problematic category alone
@@ -1492,10 +1668,18 @@ const TASK_DIFFICULTY_RANKING = {
             (picksBySubject[subject] || []).forEach(({ target, picks }) => {
                 const pick = picks.length ? picks[(n - 1) % picks.length] : null;
                 if (!pick) return;
-                const id = JSON.stringify([pick.info, pick.duration]);
+                // (the notation chosen per day and kind of task, not per student: the same task for several students is
+                // one variant - with a notation drawn for each student, identical-looking tasks split into many)
+                const info = subject === 'math' ? withNotation(pick.info, covered, `${opts.seed}|${subject}|${n}|${kindOf(normalizeInfo(pick.info))}`) : pick.info;
+                const id = JSON.stringify([info, pick.duration]);
                 const existing = variants.find(v => v.id === id);
-                if (existing) { existing.students.push(...target.students); existing.targets.push(target.key); return; }
-                variants.push({ id, info: pick.info, duration: pick.duration, students: [...target.students], targets: [target.key],
+                if (existing) {
+                    existing.students.push(...target.students); existing.targets.push(target.key);
+                    // (each target's own numbers differ: the reason without them - "…, kurioje daug klaidų")
+                    if (existing.reason !== pick.reason) existing.reason = sharedReason(existing.reason, pick.reason);
+                    return;
+                }
+                variants.push({ id, info, duration: pick.duration, students: [...target.students], targets: [target.key],
                     grade: target.grade, reason: pick.reason, group: pick.group });
             });
             if (variants.length) slots.push({ day, subject, order, variants });
@@ -1603,7 +1787,10 @@ const TASK_DIFFICULTY_RANKING = {
             picksBySubject[subject] = [...groups.values()].map(target => {
                 const given = givenCount(target.students);
                 const per = target.students.length;
-                const st = template.prioritize ? statsOf(target.students.flatMap(id => rowsOf.get(id) || []), today) : null;
+                // (one student's tasks are narrowed to what their mistakes point to - so their results are always read)
+                const single = individual && target.students.length === 1;
+                const st = template.prioritize || single ? statsOf(target.students.flatMap(id => rowsOf.get(id) || []), today) : null;
+                const narrowOf = info => (subject === 'grammar' ? narrowGrammar(info, st) : subject === 'math' ? narrowOperation(info, st, null) : null);
                 const scored = target.items.map((item, order) => {
                     const p = st ? problemOf(st, subject, kindOf(normalizeInfo(item.info))) : null;
                     // (the difference from the average counted twice: 30% more mistakes -> ×1.6, 80% more -> ×2.6; never below 1)
@@ -1620,10 +1807,13 @@ const TASK_DIFFICULTY_RANKING = {
                     picks.push({ info: c.item.info, duration: c.item.duration, reason: reasonOf(c), group: 'template' });
                     c.picked += 1;
                 }
+                // (a student's own tasks: some of them with only the part their mistakes clearly point to - narrowSome)
+                const week = Math.floor(daysBetween('2024-01-01', weekStart) / 7);
+                const final = single ? narrowSome(picks, p => { const r = narrowOf(p.info); return r ? { ...p, info: r.info, reason: `${p.reason} · ${r.text}`, narrowed: true } : null; }, week) : picks;
                 (alternatives[target.key] = alternatives[target.key] || {})[subject] = scored.slice()
                     .sort((a, b) => score(a) - score(b) || a.order - b.order)
                     .map(c => ({ id: JSON.stringify(c.item.info), info: c.item.info, duration: c.item.duration, reason: reasonOf(c), group: 'template' }));
-                return { target, picks };
+                return { target, picks: final };
             });
         });
 
@@ -1637,7 +1827,12 @@ const TASK_DIFFICULTY_RANKING = {
                 if (!pick) return;
                 const id = JSON.stringify([pick.info, pick.duration]);
                 const existing = variants.find(v => v.id === id);
-                if (existing) { existing.students.push(...target.students); existing.targets.push(target.key); return; }
+                if (existing) {
+                    existing.students.push(...target.students); existing.targets.push(target.key);
+                    // (each target's own numbers differ: the reason without them - "…, kurioje daug klaidų")
+                    if (existing.reason !== pick.reason) existing.reason = sharedReason(existing.reason, pick.reason);
+                    return;
+                }
                 variants.push({ id, info: pick.info, duration: pick.duration, students: [...target.students], targets: [target.key],
                     grade: null, reason: pick.reason, group: pick.group });
             });
@@ -1651,6 +1846,6 @@ const TASK_DIFFICULTY_RANKING = {
         PERIODS, SUBJECTS, SUBJECT_NAMES, WEEKDAYS, WEEKDAYS_SHORT, DIFFICULTY_SOURCE, GRAMMAR_CLASS_CATS, MIXED_RANGE, COLUMN_SHARE, REVISION_SHARE, GRAMMAR_FOCUS_SHARE,
         TEMPLATE_MAX_WEIGHT, TEMPLATE_MAX_PER_SUBJECT,
         periodOf, isoWeek, taskNameBase, taskName, taskNameUndated, usedNumber, toFormInfo, classGrade, defaultSettings, mondayOf, addDays, dayString, slotTasks, kindOf, normalizeInfo, coveredVariant, curriculumCovered, withNotation,
-        taskDifficulty, statsOf, problemOf, tableFocus, grammarProblems, chooseTasks, scheduleWeek, finishSlots, planWeek, normalizeTemplate, planTemplateWeek, subjectOf
+        taskDifficulty, statsOf, problemOf, tableFocus, grammarProblems, chooseTasks, scheduleWeek, finishSlots, planWeek, normalizeTemplate, planTemplateWeek, subjectOf, narrowOperation, narrowGrammar
     };
 })();

@@ -6822,7 +6822,8 @@
     .aa-task:hover { box-shadow: 0 0 0 2px var(--aa-line); }
     .aa-task.on { box-shadow: 0 0 0 2px var(--aa-ink); }
     .aa-task-subject { display: inline-flex; align-items: center; gap: 4px; color: var(--aa-ink); font-size: 13px; font-weight: 600; }
-    .aa-task-label { color: #2b3a42; font-size: 13px; line-height: 1.25; overflow-wrap: anywhere; }
+    /* (words split at their syllables with a "-" - ltHyphenate; a word still too long for the box breaks anywhere) */
+    .aa-task-label { color: #2b3a42; font-size: 13px; line-height: 1.25; overflow-wrap: break-word; hyphens: manual; -webkit-hyphens: manual; }
     .aa-task-subject .ti { flex: none; }
     .aa-task { position: relative; min-width: 0; overflow: hidden; }
     .aa-task-subject { min-width: 0; flex-wrap: wrap; }
@@ -6883,6 +6884,7 @@
     .aa-variants { display: flex; flex-direction: column; gap: 8px; }
     .aa-variant { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-left: 3px solid var(--aa-line); border-radius: 12px; background: #fff; }
     .aa-variant-label { font-size: 14.5px; }
+    .aa-variant-details { margin-top: -2px; color: #5b6f79; font-size: 13px; }
     .aa-variant-who, .aa-variant-why { display: flex; gap: 6px; color: #3c4f59; font-size: 14px; line-height: 1.35; }
     .aa-variant-who .ti, .aa-variant-why .ti { flex: none; margin-top: 2px; color: #5f7480; }
     .aa-variant-who > span { min-width: 0; overflow-wrap: anywhere; }
@@ -7678,7 +7680,7 @@
                                                         </div>
                                                         <div class="sa-list-head">
                                                             <div class="sa-list-title">Užduotys <span class="sa-list-count" id="statisticsAnalysisTaskCount"></span></div>
-                                                            <button type="button" id="statisticsAnalysisTasksButton" class="statistics-analysis-secondary-button">Pasirinkti specifines užduotis</button>
+                                                            <button type="button" id="statisticsAnalysisTasksButton" class="statistics-analysis-secondary-button">Pasirinkti atrinktas užduotis</button>
                                                         </div>
                                                         <div id="statisticsAnalysisTaskList" class="statistics-analysis-task-list" style="display:none;"></div>
                                                         <div class="statistics-analysis-actions">
@@ -8108,13 +8110,13 @@
 </div>
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="../mental-arithmetic.js?v=20261027a"></script>
+	<script src="../mental-arithmetic.js?v=20261107a"></script>
 	<script src="../sudedu-notices.js?v=20261025a"></script>
 	<script src="../mental-arithmetic-combinations.js?v=20261017"></script>
     <script src="../parameter_dictionary.js?v=20261024e"></script>
     <script src="../rasyba-generator.js?v=20261107b"></script>
-    <script src="../sudedu-insights.js?v=20261107b"></script>
-    <script src="../sudedu-auto-tasks.js?v=20261018r"></script>
+    <script src="../sudedu-insights.js?v=20261107c"></script>
+    <script src="../sudedu-auto-tasks.js?v=20261107b"></script>
     <script src="../klase-invites.js?v=20261018r"></script>
     <script src="../main-nav-bar.js"></script>
     <script src="matematika_options.js?v=20261018r"></script>
@@ -11501,11 +11503,60 @@ function aaRenderPlan() {
             ${modes ? `<div class="aa-row"><div class="aa-label">Užduočių individualizavimas</div><div class="aa-modes">${modes}</div></div>` : ''}
         </div>`;
 }
+// a math task's settings beyond its operation and range - what tells apart variants with the same label: regrouping, the
+// unknown (which one), remainder, notation, the table's numbers
+const AA_UNKNOWN_NAMES = { C1: { C43: 'dėmuo' }, C2: { C43: 'turinys', C44: 'atėminys' }, C3: { C43: 'dėmuo / turinys / atėminys' },
+    C4: { C45: 'dauginamasis' }, C5: { C45: 'dalinys', C46: 'daliklis' }, C6: { C45: 'dauginamasis / dalinys / daliklis' } };
+function aaTaskDetails(info) {
+    if (!Array.isArray(info) || info[0] !== 'math') return [];
+    // (regrouping only for + and −: × and ÷ carry "C37" as the form's filler)
+    const addSub = ['C1', 'C2', 'C3'].includes(info[1]);
+    const crossing = !addSub || ['C9', 'C17'].includes(info[2]) ? '' : info[3] === 'C38' ? 'pergrupuojant' : info[3] === 'C37' ? 'nepergrupuojant' : '';
+    const unknownName = (AA_UNKNOWN_NAMES[info[1]] || {})[info[5]];
+    const unknown = info[4] === 'C42' ? (unknownName ? `nežinomas ${unknownName}` : 'su nežinomuoju') : '';
+    const table = info[2] === 'C18' && Array.isArray(info[7]) ? `lentelė ${info[7][0]}–${info[7][1]}` : '';
+    return [crossing, unknown, info[8] === true ? 'su liekana' : '', table, info[6] === 'C48' ? (['C4', 'C5', 'C6'].includes(info[1]) ? 'kampu' : 'stulpeliu') : 'eilute'].filter(Boolean);
+}
+/* Soft hyphens (U+00AD) at Lithuanian syllable breaks, so a wrapped word is split as in Lithuanian - "dvi-žen-kliai",
+ * with a "-" shown only where it is split (browsers do not hyphenate Lithuanian by themselves: Chrome on Windows has no
+ * dictionary for it). The rules: a run of vowels - a diphthong (ai, au, ei, ie, ui, uo) or i that only softens the
+ * consonant before it (čiau, kliai) - is one nucleus; between two nuclei one consonant goes to the next syllable (ma-ma),
+ * of more the first stays (kal-nas, ses-tra); ch, dz, dž are one sound; no single letter left at a line's start or end.
+ * Words of 5 letters or more only; anything with digits or other signs stays as it is. */
+const LT_VOWELS = 'aąeęėiįyouųū';
+function ltHyphenate(text) {
+    return String(text).replace(/\p{L}{5,}/gu, word => {
+        const lower = word.toLowerCase();
+        const isVowel = i => LT_VOWELS.includes(lower[i]);
+        // the nuclei: [start, end) of each vowel run
+        const nuclei = [];
+        for (let i = 0; i < lower.length; i++) {
+            if (!isVowel(i)) continue;
+            let j = i;
+            while (j < lower.length && isVowel(j)) j++;
+            nuclei.push([i, j]);
+            i = j - 1;
+        }
+        const breaks = [];
+        for (let k = 0; k + 1 < nuclei.length; k++) {
+            const from = nuclei[k][1], to = nuclei[k + 1][0];   // the consonants between
+            const count = to - from;
+            let at = count <= 1 ? from : from + 1;
+            // (ch, dz, dž are not split)
+            if (count >= 2 && /^(ch|dz|dž)$/.test(lower.slice(at - 1, at + 1))) at = count > 2 ? at + 1 : from;
+            if (at >= 2 && word.length - at >= 2) breaks.push(at);
+        }
+        let out = '', last = 0;
+        breaks.forEach(at => { out += word.slice(last, at) + '­'; last = at; });
+        return out + word.slice(last);
+    });
+}
 function aaShortLabel(info) {
     if (!Array.isArray(info)) return '';
     if (info[0] === 'math') {
         const ops = { C1: 'Sudėtis', C2: 'Atimtis', C3: 'Sudėtis ir atimtis', C4: 'Daugyba', C5: 'Dalyba', C6: 'Daugyba ir dalyba', C7: 'Įvairūs veiksmai' };
         const range = info[2] === 'C18' ? `lentelė ${info[7][0]}–${info[7][1]}` : (info[1] === 'C7' ? (parameterDictionary[info[2]]?.decodedParameterText || '').toLowerCase() : (AA_SHORT_RANGE[info[2]] || parameterDictionary[info[2]]?.insightsListLabel || '').toLowerCase());
+        // (short - the week's calendar; the full details are in the task's window, aaTaskDetails)
         const crossing = info[3] === 'C38' && !['C9', 'C17'].includes(info[2]) ? 'pergrupuojant' : '';
         const extra = [crossing, info[4] === 'C42' ? 'su nežinomuoju' : '', info[8] === true ? 'su liekana' : '', info[6] === 'C48' ? (['C4', 'C5', 'C6'].includes(info[1]) ? 'kampu' : 'stulpeliu') : ''].filter(Boolean).join(', ');
         return `${ops[info[1]] || ''} · ${range}${extra ? ` · ${extra}` : ''}`;
@@ -11579,7 +11630,7 @@ function aaRenderPreview() {
                 return `<button type="button" class="aa-task s-${slot.subject}${changed ? ' changed' : ''}" data-aa-slot="${index}"${fine ? ' draggable="true"' : ''} title="${escapeTeacherHtml(slot.name)}">
                     ${/ \d$/.test(slot.name) ? `<b class="aa-num" title="${slot.name.slice(-1)}-oji tos dienos ${SudAutoTasks.SUBJECT_NAMES[slot.subject].toLowerCase()} užduotis">${slot.name.slice(-1)}</b>` : ''}
                     <span class="aa-task-subject"><i class="ti ${AA_SUBJECT_ICON[slot.subject]}" aria-hidden="true"></i><span>${SudAutoTasks.SUBJECT_NAMES[slot.subject]}</span></span>
-                    <span class="aa-task-label">${escapeTeacherHtml(label)}</span></button>`;
+                    <span class="aa-task-label">${escapeTeacherHtml(ltHyphenate(label))}</span></button>`;
             }).join('')}</div>`;
     }).join('');
     el.innerHTML = `
@@ -11640,6 +11691,7 @@ function aaOpenTask(index, expand = null) {
         const open = expand === vi;
         return `<div class="aa-variant s-${slot.subject}">
             <div class="aa-variant-label">${typeof formatTaskLabel === 'function' ? formatTaskLabel(JSON.stringify(v.info)) : escapeTeacherHtml(aaShortLabel(v.info))}</div>
+            ${typeof formatTaskLabel === 'function' && aaTaskDetails(v.info).length ? `<div class="aa-variant-details">${escapeTeacherHtml(aaTaskDetails(v.info).join(' · '))}</div>` : ''}
             <div class="aa-variant-who"><i class="ti ti-users" aria-hidden="true"></i><span>${escapeTeacherHtml(who)}</span></div>
             <div class="aa-variant-why"><i class="ti ti-bulb" aria-hidden="true"></i>${escapeTeacherHtml(v.reason || '')}</div>
             <div class="aa-variant-btns">
@@ -15741,7 +15793,7 @@ function initializeStatisticsAnalysisControls() {
         const button = document.getElementById('statisticsAnalysisTasksButton');
         button.textContent = statisticsAnalysisMode === 'tasks'
             ? 'Pasirinkti visas užduotis'
-            : 'Pasirinkti specifines užduotis';
+            : 'Pasirinkti atrinktas užduotis';
         if (statisticsAnalysisMode === 'period') {
             statisticsAnalysisSpecificTaskKeys.clear();
         }
@@ -15919,13 +15971,7 @@ function showPendingTaskInStudentOverview(student, task) {
     ).values());
 
     const updateExpandedTask = () => {
-        document.querySelectorAll('.pending-task-description').forEach(row => {
-            row.classList.remove('task-temporarily-highlighted');
-            if (row._taskHighlightTimeout) {
-                clearTimeout(row._taskHighlightTimeout);
-                row._taskHighlightTimeout = null;
-            }
-        });
+        flashTaskHighlight(null);   // (any task marked before: unmarked now)
         document.querySelectorAll('.pending-task-description').forEach(row => row.classList.add('collapsed'));
         const key = task.taskKey || `assignment:${task.assignmentId}`;
         expandedPendingTaskKey = key;
@@ -15934,7 +15980,7 @@ function showPendingTaskInStudentOverview(student, task) {
         if (row) {
             row.classList.remove('collapsed');
             const scrollToTask = () => {
-                row.classList.add('task-temporarily-highlighted');
+                flashTaskHighlight(row);
                 const scrollContainer = document.getElementById('student-task-info-container-inner');
                 if (scrollContainer) {
                     const rowTop = row.getBoundingClientRect().top;
@@ -15946,10 +15992,6 @@ function showPendingTaskInStudentOverview(student, task) {
                 }
             };
             requestAnimationFrame(scrollToTask);
-            row._taskHighlightTimeout = setTimeout(() => {
-                row.classList.remove('task-temporarily-highlighted');
-                row._taskHighlightTimeout = null;
-            }, 2000);
         }
     };
 
@@ -17305,7 +17347,7 @@ function refreshEmbeddedAnalysisSelection() {
     if (button) {
         button.textContent = statisticsAnalysisMode === 'tasks'
             ? 'Pasirinkti visas užduotis'
-            : 'Pasirinkti specifines užduotis';
+            : 'Pasirinkti atrinktas užduotis';
     }
     if (currentEmbeddedArchiveStudentId || classEmbeddedArchiveStudents) {
         refreshEmbeddedArchive();
@@ -19952,6 +19994,21 @@ function renderPupilWeek() {
     const head = document.getElementById('pupil-week-head');
     if (head) head.innerHTML = pupilWeekHeadHtml();
 }
+// briefly marks a task (a row, a card or a group) - the one shown last only: a quick click on another task in the week
+// overview takes the mark off the previous one at once instead of leaving two marked
+function flashTaskHighlight(el, ms = 2000) {
+    document.querySelectorAll('.task-temporarily-highlighted').forEach(other => {
+        other.classList.remove('task-temporarily-highlighted');
+        clearTimeout(other._taskHighlightTimeout);
+        other._taskHighlightTimeout = null;
+    });
+    if (!el) return;
+    el.classList.add('task-temporarily-highlighted');
+    el._taskHighlightTimeout = setTimeout(() => {
+        el.classList.remove('task-temporarily-highlighted');
+        el._taskHighlightTimeout = null;
+    }, ms);
+}
 // a task in one student's "Užduotos" list: opened and shown from its top
 function showPendingTaskRow(key) {
     const row = [...document.querySelectorAll('#student-statistics-completed-tasks .pending-task-description')].find(r => r.dataset.taskKey === key);
@@ -19960,8 +20017,7 @@ function showPendingTaskRow(key) {
     row.classList.remove('collapsed');
     expandedPendingTaskKey = key;
     revealAtTop(row);
-    row.classList.add('task-temporarily-highlighted');
-    setTimeout(() => row.classList.remove('task-temporarily-highlighted'), 2000);
+    flashTaskHighlight(row);
 }
 let weekBoardResizeTimer = null;
 window.addEventListener('resize', () => {
@@ -19992,8 +20048,7 @@ function showClassTaskGroup(key) {
     group.classList.remove('collapsed');
     expandedClassTaskGroups.add(key);
     revealAtTop(group);
-    group.classList.add('task-temporarily-highlighted');
-    setTimeout(() => group.classList.remove('task-temporarily-highlighted'), 2000);
+    flashTaskHighlight(group);
 }
 function showClassTaskCard(taskId) {
     const card = document.querySelector(`.class-task-card[data-task-id="${taskId}"]`);
@@ -20003,8 +20058,7 @@ function showClassTaskCard(taskId) {
     card.classList.remove('collapsed');
     if (typeof expandedClassTeacherTaskIds !== 'undefined') expandedClassTeacherTaskIds.add(Number(taskId));
     revealAtTop(card);
-    card.classList.add('task-temporarily-highlighted');
-    setTimeout(() => card.classList.remove('task-temporarily-highlighted'), 2000);
+    flashTaskHighlight(card);
 }
 document.addEventListener('click', event => {
     const nav = event.target.closest && event.target.closest('[data-sw-board][data-sw-week]');
