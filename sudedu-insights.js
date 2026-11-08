@@ -4290,6 +4290,30 @@
 			: f.changesTested ? 'Nustatytu laikotarpiu patikimų klaidų dažnio ar atlikimo greičio pokyčių neaptikta.'
 			: 'Pokyčiams nustatyti duomenų nepakanka.';
 	}
+	/* Mažas: mistakes and speed against the class, in one short sentence without numbers - only the clear findings
+	 * (comparePeers: "similar" = a difference too small to matter; "more"/"less" = big and p < 0.05; "unknown" = too few
+	 * tasks or not significant - said as too little data; "none" = too few classmates did the same tasks) */
+	function shortPeers(f) {
+		const c = f.peers;
+		if (!c) return '';
+		const m = c.mistakes, s = c.speed;
+		if (m === 'none') return 'Su klase palyginti negalima – tokių pačių užduočių atliko per mažai klasės draugų.';
+		const mOk = m === 'more' || m === 'less' || m === 'similar', sOk = s === 'more' || s === 'less' || s === 'similar';
+		if (!mOk && !sOk) return 'Duomenų palyginimui su klase nepakanka.';
+		const fast = s === 'similar' ? 0 : (f.perText ? s === 'less' : s === 'more') ? 1 : -1;   // (texts: minutes per text)
+		const mWord = { more: 'daugiau', less: 'mažiau' }[m];
+		const sWord = fast > 0 ? 'greičiau' : 'lėčiau';
+		// (speed first: the mistakes may come from rushing - "sprendžiamos greičiau …, tačiau klaidų daroma daugiau")
+		const lead = f.perText ? 'Analogiškose užduotyse tekstai dėliojami' : 'Analogiškos užduotys sprendžiamos';
+		if (!sOk) return `Analogiškose užduotyse klaidų daroma ${m === 'similar' ? 'tiek pat, kiek įprasta klasėje' : `${mWord} nei įprasta klasėje`}; greičiui palyginti duomenų nepakanka.`;
+		if (!mOk) return `${lead} ${fast ? `${sWord} nei` : 'taip pat greitai, kaip'} įprasta klasėje; klaidų dažniui palyginti duomenų nepakanka.`;
+		if (m === 'similar' && !fast) return `${lead} taip pat greitai ir su tiek pat klaidų, kaip įprasta klasėje.`;
+		if (m === 'similar') return `${lead} ${sWord} nei įprasta klasėje, o klaidų daroma tiek pat.`;
+		if (!fast) return `${lead} taip pat greitai, kaip įprasta klasėje, o klaidų daroma ${mWord}.`;
+		// (both differ: "ir su" when they go the same way - faster and fewer, slower and more - otherwise "tačiau")
+		const sameWay = (m === 'less') === (fast > 0);
+		return sameWay ? `${lead} ${sWord} ir su ${mWord} klaidų nei įprasta klasėje.` : `${lead} ${sWord} nei įprasta klasėje, tačiau klaidų daroma ${mWord}.`;
+	}
 	// Mažas: the changes found - mistakes and answering speed (one kind of task practised: without its name again) - and
 	// the closing sentence (none where the changes were not looked at)
 	function shortTrends(f) {
@@ -4367,6 +4391,8 @@
 		if (f.peers && f.peers.difficulty === 'less') { const cmp = peerParts(f, false); if (cmp && cmp.difficulty) out.push(cmp.difficulty); }
 		const mistakes = shortMistakes(f, focus);
 		if (mistakes) out.push(mistakes);
+		const peers = shortPeers(f);
+		if (peers) out.push(peers);
 		// the changes found (mistakes - overall, per task set, per kind of mistake - and the answering speed; only changes,
 		// never the speed itself); one kind of task practised: its name is said above - "Klaidų dažnis sumažėjo 40%"
 		out.push(...shortTrends(f));
