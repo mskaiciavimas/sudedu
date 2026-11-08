@@ -171,6 +171,12 @@
 			const desc = taskType(t).desc;
 			return desc ? `rašybos užduotyse (${desc})` : '';
 		}
+		if (t.subject === 'text') {
+			// "vidutinio lygio struktūros išdėstymo užduotyse" (as the time sentence says it - focusText), not the label
+			// "Struktūros išdėstymas (vidutinis lygis)" in quotes
+			const type = TEXT_TYPES_GEN[info[2]], level = LEVEL_GEN[info[6]];
+			return type ? `${level ? `${level} lygio ` : ''}${type} užduotyse` : '';
+		}
 		return '';
 	}
 	const lowerFirst = text => text && !/^[„"]/.test(text) && !/^[A-ZĄČĘĖĮŠŲŪŽ]{2}/.test(text) ? text.charAt(0).toLowerCase() + text.slice(1) : text;
@@ -924,7 +930,7 @@
 	 *     first), all, kinds: "užduočių rūšių" | "rašybos kategorijų", classes: Map(text class → time share), mine } */
 	const TEXT_TYPES_GEN = { C51: 'turinio komponavimo', C52: 'struktūros išdėstymo' };
 	const TABLE_OP_GEN = { C4: 'daugybos', C5: 'dalybos', C6: 'daugybos ir dalybos' };
-	// (math) a number set without a range ("daugiaženklio skaičiaus su dviženkliu …") practised in several operations: its
+	// (math) a number set without a range ("daugiaženklio skaičiaus … iš dviženklio") practised in several operations: its
 	// scope named with all of them - "… daugybos ir dalybos užduotims", not the first task's operation only
 	function setScopeNames(scope) {
 		scope.forEach(s => {
@@ -2146,7 +2152,7 @@
 	}
 	/* A kind of task as a mistake category (insightsMathPatterns.m_set): the task's number set with the example's
 	 * operation (insightsTaskSetLocative), and what makes it harder - crossing ten or not (the example itself), columns,
-	 * a remainder: "Triženklio skaičiaus su vienaženkliu dalybos užduotys, su liekana, kampu" / "… užduotyse, …". */
+	 * a remainder: "Triženklio skaičiaus dalybos iš vienaženklio užduotys, su liekana, kampu" / "… užduotyse, …". */
 	const SET_OP_GEN = { A: 'sudėties', S: 'atimties', M: 'daugybos', D: 'dalybos' };
 	/* Whether crossing ten is a choice in a number set: the page's question generator run for the task's operation and
 	 * set with crossing off (C37) and on (C38) - a choice when turning it on makes clearly more examples cross (by half
@@ -4289,8 +4295,11 @@
 	function shortTrends(f) {
 		const tr = trendSentences(f, false);
 		const oneKind = Boolean(f.onlySet) || (f.focus && f.focus.fine && f.focus.fine.length === 1);
+		// (only a sentence that is the one of its kind - the only speed change, the only mistake-rate change - loses its
+		// name: two of them, e.g. for two levels of one text type, would both read "Atlikimo greitis augo …")
+		const speedN = tr.sentences.filter(t => / atlikimo greitis /.test(t)).length, rateN = tr.sentences.filter(t => / klaidų dažnis /.test(t)).length;
 		const found = tr.sentences.map(t => !oneKind || /^Klaidų /.test(t) ? t
-			: t.replace(/^.*? klaidų dažnis /, 'Klaidų dažnis ').replace(/^.*? atlikimo greitis /, 'Atlikimo greitis '));
+			: t.replace(/^.*? klaidų dažnis /, m => (rateN === 1 ? 'Klaidų dažnis ' : m)).replace(/^.*? atlikimo greitis /, m => (speedN === 1 ? 'Atlikimo greitis ' : m)));
 		return f.changesTested != null ? [...found, trendClosing(f, found.length)] : found;
 	}
 	/* Mažas: fewer repeated words - where both approved words fit, "užduotims" / "veiksmams" and "užduotyse" / "veiksmuose"

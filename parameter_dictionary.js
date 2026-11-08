@@ -130,50 +130,50 @@ const parameterDictionary = {
     "C19": {
         "parameter": "daugdvivien",
         "decodedParameterText": "DVIŽENKLIO IŠ VIENAŽENKLIO",
-        "insightsListLabel": "Dviženklis skaičius su vienaženkliu",
-        "insightsTaskSetLocative": "dviženklio skaičiaus su vienaženkliu {op} užduotyse"
+        "insightsListLabel": "Dviženklio iš vienaženklio",
+        "insightsTaskSetLocative": "dviženklio skaičiaus {op} iš vienaženklio užduotyse"
     },
     "C20": {
         "parameter": "daugtrivien",
         "decodedParameterText": "TRIŽENKLIO IŠ VIENAŽENKLIO",
-        "insightsListLabel": "Triženklis skaičius su vienaženkliu",
-        "insightsTaskSetLocative": "triženklio skaičiaus su vienaženkliu {op} užduotyse"
+        "insightsListLabel": "Triženklio iš vienaženklio",
+        "insightsTaskSetLocative": "triženklio skaičiaus {op} iš vienaženklio užduotyse"
     },
     "C21": {
         "parameter": "daugketvien",
         "decodedParameterText": "KETURŽENKLIO IŠ VIENAŽENKLIO",
-        "insightsListLabel": "Keturženklis skaičius su vienaženkliu",
-        "insightsTaskSetLocative": "keturženklio skaičiaus su vienaženkliu {op} užduotyse"
+        "insightsListLabel": "Keturženklio iš vienaženklio",
+        "insightsTaskSetLocative": "keturženklio skaičiaus {op} iš vienaženklio užduotyse"
     },
     "C22": {
         "parameter": "daugdaugvien",
         "decodedParameterText": "DAUGIAŽENKLIO IŠ VIENAŽENKLIO",
-        "insightsListLabel": "Daugiaženklis skaičius su vienaženkliu",
-        "insightsTaskSetLocative": "daugiaženklio skaičiaus su vienaženkliu {op} užduotyse"
+        "insightsListLabel": "Daugiaženklio iš vienaženklio",
+        "insightsTaskSetLocative": "daugiaženklio skaičiaus {op} iš vienaženklio užduotyse"
     },
     "C23": {
         "parameter": "daugdvidvi",
         "decodedParameterText": "DVIŽENKLIO IŠ DVIŽENKLIO",
-        "insightsListLabel": "Dviženklis skaičius su dviženkliu",
-        "insightsTaskSetLocative": "dviženklio skaičiaus su dviženkliu {op} užduotyse"
+        "insightsListLabel": "Dviženklio iš dviženklio",
+        "insightsTaskSetLocative": "dviženklio skaičiaus {op} iš dviženklio užduotyse"
     },
     "C24": {
         "parameter": "daugtridvi",
         "decodedParameterText": "TRIŽENKLIO IŠ DVIŽENKLIO",
-        "insightsListLabel": "Triženklis skaičius su dviženkliu",
-        "insightsTaskSetLocative": "triženklio skaičiaus su dviženkliu {op} užduotyse"
+        "insightsListLabel": "Triženklio iš dviženklio",
+        "insightsTaskSetLocative": "triženklio skaičiaus {op} iš dviženklio užduotyse"
     },
     "C25": {
         "parameter": "daugketdvi",
         "decodedParameterText": "KETURŽENKLIO IŠ DVIŽENKLIO",
-        "insightsListLabel": "Keturženklis skaičius su dviženkliu",
-        "insightsTaskSetLocative": "keturženklio skaičiaus su dviženkliu {op} užduotyse"
+        "insightsListLabel": "Keturženklio iš dviženklio",
+        "insightsTaskSetLocative": "keturženklio skaičiaus {op} iš dviženklio užduotyse"
     },
     "C26": {
         "parameter": "daugdaugdvi",
         "decodedParameterText": "DAUGIAŽENKLIO IŠ DVIŽENKLIO",
-        "insightsListLabel": "Daugiaženklis skaičius su dviženkliu",
-        "insightsTaskSetLocative": "daugiaženklio skaičiaus su dviženkliu {op} užduotyse"
+        "insightsListLabel": "Daugiaženklio iš dviženklio",
+        "insightsTaskSetLocative": "daugiaženklio skaičiaus {op} iš dviženklio užduotyse"
     },
     "C27": {
         "parameter": "daugdaug",
@@ -196,8 +196,8 @@ const parameterDictionary = {
     "C30": {
         "parameter": "daugdaugviendalmnul",
         "decodedParameterText": "DAUGIAŽENKLIO IŠ VIENAŽENKLIO (DALMENYJE 0)",
-        "insightsListLabel": "Daugiaženklis skaičius su vienaženkliu (dalmenyje 0)",
-        "insightsTaskSetLocative": "daugiaženklio skaičiaus su vienaženkliu {op} užduotyse, kai dalmenyje yra 0,"
+        "insightsListLabel": "Daugiaženklio iš vienaženklio (dalmenyje 0)",
+        "insightsTaskSetLocative": "daugiaženklio skaičiaus {op} iš vienaženklio užduotyse, kai dalmenyje yra 0,"
     },
     "C31": {
         "parameter": "iki10",
@@ -634,7 +634,7 @@ const insightsMistakePatterns = {
  * "daliklis"). tip_A / tip_S: the advice for addition / subtraction (not shown on the cards).
  * m_set - a kind of task (a mistake is put under the task it was made in, unless it is a multiplication table fact):
  *   {Set} / {set} - the task's number set with the operation, from insightsTaskSetLocative without "užduotyse"
- *   ("Triženklio skaičiaus su vienaženkliu dalybos"), {more} - what follows "užduotyse" there (", kai turinyje yra
+ *   ("Triženklio skaičiaus dalybos iš vienaženklio"), {more} - what follows "užduotyse" there (", kai turinyje yra
  *   gretimų nulių"), {details} - " pergrupuojant skaičių skyrius" / " nepergrupuojant skaičių skyrių", " su liekana", " stulpeliu" /
  *   " kampu", no commas: "… užduotyse pergrupuojant skaičių skyrius stulpeliu" (addition / subtraction keep the crossing advice of
  *   m_cross / m_plain as their tip).
