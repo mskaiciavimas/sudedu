@@ -6065,7 +6065,7 @@
     #teacher-gui #student-stats-graph-empty .progress-empty-title { margin: 0; font-weight: 600; color: #1d566e; }
     #teacher-gui #student-stats-graph-empty .progress-empty-text { margin: 0; max-width: 460px; color: #3c4f59; line-height: 1.45; }
 
-    /* ---------- Due dates ("Atlikti iki") ---------------------------------------------------------- */
+    /* ---------- Due dates ("Atlikti") ------------------------------------------------------------ */
     /* the task form: an optional due date under the name, looking like the form's selects */
     /* (looks like the dropdowns under it: same pill, centred upper-case text, a chevron; "be termino" by default) */
     .task-due-field {
@@ -6211,8 +6211,28 @@
     #student-gui .task-list-separator.today-section::before,
     #student-gui .task-list-separator.today-section::after { background: rgba(50, 136, 172, 0.4); }
     #student-gui #student-tasks-list > .task-list-separator:first-child { margin-top: 10px; }
+    #student-gui .task-list-separator.future-section { color: rgba(31, 42, 48, 0.55); }
 
-    /* the student's task: "Atlikti iki" tile (only when the task has a due date) */
+    /* a task of a later day: inactive button, the day it can be done instead of the coins */
+    #student-gui .task-not-yet-note {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #1d566e;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: right;
+    }
+    #student-gui .task-not-yet-note .ti { font-size: 17px; }
+    #student-gui #complete-task-button:disabled,
+    #student-gui #complete-task-button:disabled:hover {
+        background: rgba(31, 42, 48, 0.18);
+        color: rgba(31, 42, 48, 0.55);
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* the student's task: "Atlikti" tile (only when the task has a due date) */
     #student-gui #student-task-due-date-for-students:not(:empty) {
         display: flex;
         flex-wrap: wrap;
@@ -7181,7 +7201,7 @@
                                 <input type="text" id="group_name" placeholder="Užduočių grupės pavadinimas" class="form-control">
                                 <!-- optional due date; hidden together with the name field (task history search uses the same form) -->
                                 <div class="task-due-field" id="task-due-field">
-                                    <input type="text" id="task_due_date" class="task-due-input" placeholder="Atlikti iki: šiandien" aria-label="Atlikti iki" readonly autocomplete="off">
+                                    <input type="text" id="task_due_date" class="task-due-input" placeholder="Atlikti: šiandien" aria-label="Atlikti" readonly autocomplete="off">
                                     <i class="ti ti-chevron-down task-due-chevron" aria-hidden="true"></i>
                                 </div>
                             </div>
@@ -10901,7 +10921,7 @@ function preselectTextsInBrowser(textIds) {
         checkbox.checked = selectedIds.includes(Number(checkbox.dataset.textId));
     });
 }
-// ----- "Atlikti iki": the optional due date of the task being created or edited -----
+// ----- "Atlikti": the day the task being created or edited can be done (not before it; late after it) -----
 // the latest due day: the same day next month (the 31st → the month's last day); the server keeps a task 35 days
 function taskDueMaxDay(fromDay) {
     const from = dayToLocalDate(fromDay);
@@ -10954,7 +10974,7 @@ function initTaskDuePicker() {
         position: 'auto center',
         // the field shows "spalio 20 d., antradienis"; everything else is flatpickr's own formatting
         formatDate: (date, format) => format === 'due'
-            ? `Atlikti iki: ${formatDueDay(localDayString(date), window.innerWidth >= 480)}`   // (the weekday only where it fits)
+            ? `Atlikti: ${formatDueDay(localDayString(date), window.innerWidth >= 480)}`   // (the weekday only where it fits)
             : flatpickr.formatDate(date, format, flatpickr.l10ns && flatpickr.l10ns.lt),
         minDate: 'today',
         maxDate: taskDueMaxDay(localDayString()),
@@ -11737,7 +11757,7 @@ function aaOpenTask(index, expand = null) {
                 closeObjectPopup();
             }
         },
-        slot.dueDate ? `Atlikti iki ${formatDueDay(slot.dueDate, true)}` : 'Be atlikimo termino');
+        slot.dueDate ? `Atlikti ${formatDueDay(slot.dueDate, true)}` : 'Be atlikimo termino');
 }
 function aaMoveSlot(index, day) {
     const slot = autoAssign.plan && autoAssign.plan.slots[index];
@@ -12056,7 +12076,7 @@ async function confirmAutoAssign() {
 }
 
 // ----- due dates on the teacher's task cards -----
-// a card's chip: "iki spalio 20 d." (tinted when the task is late; "iki šiandien" on the day itself)
+// a card's chip: "spalio 20 d." (tinted when the task is late; "šiandien" on the day itself)
 // a given task the student has started: "Pradėta · atsakyta 5/20" (or the time left of a timed one) - '' otherwise
 function teacherTaskProgressText(task, long = false) {
     if (!task || task.completed || !task.startedAt) return '';
@@ -12082,10 +12102,10 @@ function taskDueChipHtml(task) {
     const day = taskDueDay(task);
     if (!day) return '';
     const status = taskDueStatus({ dueDate: day }) || 'upcoming';
-    const text = status === 'today' ? 'iki šiandien' : `iki ${formatDueDay(day)}`;
+    const text = status === 'today' ? 'šiandien' : formatDueDay(day);
     const title = status === 'late' || status === 'very-late'
         ? taskLateTitle({ dueDate: day })
-        : `Atlikti iki ${formatDueDay(day, true)}`;
+        : `Atlikti ${formatDueDay(day, true)}`;
     return `<span class="due-chip ${status}" title="${escapeTeacherHtml(title)}"><i class="ti ti-calendar-event" aria-hidden="true"></i>${text}</span>`;
 }
 // Lithuanian number agreement: 1 / 21 ... -> one, 2-9 / 22-29 ... -> few, 0 / 10-20 / 30 ... -> many
@@ -12133,7 +12153,7 @@ async function openTeacherTaskStudents(taskId) {
             <span class="task-students-name">${escapeTeacherHtml(row.name)}</span>
             <span class="task-students-state ${row.stateClass}">${row.state}</span>
         </div>`).join('');
-    const subtitle = `Atliko ${task.totalCompleted} iš ${task.totalAssigned}${due ? ` · atlikti iki ${formatDueDay(due, true)}` : ''}`;
+    const subtitle = `Atliko ${task.totalCompleted} iš ${task.totalAssigned}${due ? ` · atlikti ${formatDueDay(due, true)}` : ''}`;
     openObjectPopup(`<div class="task-students-popup">${legend}${list || '<div class="statistics-empty-message">Mokinių nėra.</div>'}</div>`,
         escapeTeacherHtml(task.group || 'Mokytojo skirta užduotis'), subtitle);
 }
@@ -13600,8 +13620,9 @@ function focusTaskListSection() {
                 studentTaskCompletionDateForStudents.innerHTML = `<span class="task-info-subtitle">Atlikimo data:</span> ${task.completionDate.split('T')[0]}`
             }
 
-            // "Atlikti iki" only when the teacher gave the task a due date (a done task: whether it was done in time)
+            // "Atlikti" (the day the task can be done) only when the task has a date (a done task: whether it was done in time)
             const dueDay = taskDueDay(task);
+            const notYet = taskNotYetAvailable(task);
             let dueState = '';
             if (dueDay && task.completed) {
                 if (task.onTime === true) dueState = '<span class="due-state on-time">Atlikta laiku</span>';
@@ -13612,7 +13633,7 @@ function focusTaskListSection() {
                 else if (status === 'late' || status === 'very-late') dueState = `<span class="due-state ${status}">Vėluojama</span>`;
             }
             document.getElementById('student-task-due-date-for-students').innerHTML = dueDay
-                ? `<span class="task-info-subtitle">Atlikti iki:</span> ${formatDueDay(dueDay, true)}${dueState}`
+                ? `<span class="task-info-subtitle">Atlikti:</span> ${formatDueDay(dueDay, true)}${dueState}`
                 : '';
 
             const studentTaskProgressForStudents = document.getElementById('student-task-progress-for-students');
@@ -13639,6 +13660,7 @@ function focusTaskListSection() {
                 completeTaskButtonHolder.style.display = "none";
             } else {
                 completeTaskButtonHolder.style.display = "flex";
+                completeTaskButton.disabled = notYet;
 
                 let numberOfQuestions;
                 let answeringMode;
@@ -13724,7 +13746,10 @@ function focusTaskListSection() {
                         `
                 }
 
-                document.querySelector(".coin-display-holder").innerHTML = earningsDiplay
+                // a task of a later day: the button stays inactive and, instead of the coins, the day it can be done
+                if (notYet) earningsDiplay = `<div class="task-not-yet-note"><i class="ti ti-calendar-event" aria-hidden="true"></i>Šią užduotį galėsi atlikti ${formatDueDayOn(dueDay)}</div>`;
+                if (currentTask === task)      // (not when another task was opened while the coins were counted)
+                    document.querySelector(".coin-display-holder").innerHTML = earningsDiplay
             }
 
             if (task.completed && task.result) {
@@ -13996,20 +14021,23 @@ function restoreTaskInfoScroll(scrollPosition) {
             });
         }
 
-        // The student's list in sections: Vėluojama (past the due date), Šiandienos užduotys (due today),
-        // Neatliktos užduotys (the rest) and Atliktos užduotys. Tasks with a due date go by it (the earliest
-        // first); those without one after them, the ones given earliest first (activeTaskOrder).
+        // The student's list in sections. A task's date ("Atlikti") is the day it can be done (not before; after it, it is late):
+        // Šiandienos užduotys (today's), Vėluojančios užduotys (its day has passed), Neatliktos užduotys (old tasks without
+        // a date - can be done any time), Numatytos užduotys (a later day - cannot be done yet) and Atliktos užduotys.
+        // Within a section the earliest date first; those without one after them, the ones given earliest first (activeTaskOrder).
         function studentTaskSection(task) {
             if (task.completed) return 'completed';
             const status = taskDueStatus(task);
             if (status === 'late' || status === 'very-late') return 'late';
+            if (status === 'upcoming') return 'future';
             return status === 'today' ? 'today' : 'pending';
         }
         const STUDENT_TASK_SECTIONS = [
-            { key: 'late', label: 'Vėluojama', className: 'late-section' },
-            { key: 'today', label: 'Šiandienos užduotys', className: 'today-section' },
-            { key: 'pending', label: 'Neatliktos užduotys', className: '' },
-            { key: 'completed', label: 'Atliktos užduotys', className: '' }
+            { key: 'today', label: 'Šiandienos', className: 'today-section' },
+            { key: 'late', label: 'Vėluojančios', className: 'late-section' },
+            { key: 'pending', label: 'Neatliktos', className: '' },
+            { key: 'future', label: 'Numatytos', className: 'future-section' },
+            { key: 'completed', label: 'Atliktos', className: '' }
         ];
         function sortStudentTasksByDueDate(tasks) {
             const active = tasks.filter(task => !task.completed).sort(activeTaskOrder);
@@ -14087,12 +14115,13 @@ function restoreTaskInfoScroll(scrollPosition) {
                 studentTasksList.appendChild(taskWrapper);
             }));
 
+            // "neatlikta": only the tasks that can be done now (today's, late, without a date) - not the planned ones
             const totalTasks = tasksList.length;
-            const completedTasks = tasksList.filter(task => task.completed === true).length;
+            const doableTasks = tasksList.filter(task => task.completed !== true && !taskNotYetAvailable(task)).length;
             if (totalTasks === 0) {
                 taskListTitleForStudents.innerHTML = "Užduotys:"
             } else {
-                taskListTitleForStudents.innerHTML = `Užduotys (neatlikta: ${totalTasks - completedTasks}):`
+                taskListTitleForStudents.innerHTML = `Užduotys (neatlikta: ${doableTasks}):`
             }
         }
 
@@ -14736,6 +14765,7 @@ function restoreTaskInfoScroll(scrollPosition) {
     }
 
     function completeTask() {
+        if (currentTask && taskNotYetAvailable(currentTask)) return;   // (a task of a later day: not before its day)
         const parsedCurrentTaskInstructions = JSON.parse(currentTaskInstructions);
 
             if (localStorage.getItem('controller') !== null) {
@@ -17836,7 +17866,7 @@ function showArchivePopupPending(student, task) {
     const late = taskDueIndicator(task);
     const assigned = task.assignmentDate ? localDayString(new Date(task.assignmentDate)) : '';
     const details = [
-        due ? `Atlikti iki ${formatDueDay(due, true)}${late ? ` <span class="archive-popup-late ${late}">vėluojama</span>` : ''}` : '',
+        due ? `Atlikti ${formatDueDay(due, true)}${late ? ` <span class="archive-popup-late ${late}">vėluojama</span>` : ''}` : '',
         assigned ? `Priskirta ${assigned}` : '',
         escapeTeacherHtml(teacherTaskProgressText(task, true))
     ].filter(Boolean).map(line => `<span>${line}</span>`).join('');
@@ -19557,7 +19587,7 @@ function studentTaskAssignmentDate(task) {
     return null;
 }
 // ---------------------------------------------------------------------------------------------
-// Due dates ("Atlikti iki"). A task may have a due day ('YYYY-MM-DD', from the server; null = none).
+// Due dates ("Atlikti" - the day a task can be done; after it, it is late). A task may have a due day ('YYYY-MM-DD', from the server; null = none).
 // The yellow / pink dots (teacher's student list, a student's task cards, the student's own list) only
 // mean lateness: an unfinished task whose due day has passed is
 //   yellow - while it is still the due day's week (Monday-Sunday),
@@ -19588,6 +19618,16 @@ function taskDueStatus(task) {
     if (due > today) return 'upcoming';
     if (due === today) return 'today';
     return mondayOfDay(due) === mondayOfDay(today) ? 'late' : 'very-late';
+}
+// The date is the day the task can be done ("Atlikti"): a student cannot start it before that day.
+function taskNotYetAvailable(task) {
+    return taskDueStatus(task) === 'upcoming';
+}
+// "lapkričio 12 d., trečiadienį" (the weekday in the accusative, for "galėsite atlikti …")
+function formatDueDayOn(day) {
+    if (!day) return '';
+    const weekday = dayToLocalDate(day).toLocaleDateString('lt-LT', { weekday: 'long' }).replace(/is$/, 'į');
+    return `${formatDueDay(day)}, ${weekday}`;
 }
 function taskDueIndicator(task) {
     const status = taskDueStatus(task);
@@ -19620,8 +19660,8 @@ function taskLateTitle(task) {
     if (!indicator) return '';
     const due = formatDueDay(taskDueDay(task));
     return indicator === 'pink'
-        ? `Vėluojama: reikėjo atlikti iki ${due} (praėjusią savaitę ar anksčiau)`
-        : `Vėluojama: reikėjo atlikti iki ${due}`;
+        ? `Vėluojama: reikėjo atlikti ${due} (praėjusią savaitę ar anksčiau)`
+        : `Vėluojama: reikėjo atlikti ${due}`;
 }
 // ---------------------------------------------------------------------------------------------
 // The student's week (above the task in "Užduotys"): the tasks with due dates, each on its due day; the arrows move

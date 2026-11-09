@@ -1508,21 +1508,21 @@
 				<div class="info-card">
                     <div class="section-upper-header" id="mokinio-paskyra">Mokinio paskyra</div>
                     <p>
-                        Savo paskyroje kiekvienas mokinys mato mokytojo skirtų užduočių sąrašą, kuris gali būti suskirstytas į keturias grupes: 
+                        Savo paskyroje kiekvienas mokinys mato mokytojo skirtų užduočių sąrašą. Kiekviena užduotis turi atlikimo dieną – anksčiau jos atlikti negalima, o vėliau ji tampa vėluojančia. Sąrašas gali būti suskirstytas į keturias grupes:
                         <ul>
-                            <li><strong>Vėluojama</strong> – užduotys, kurių atlikimo terminas jau praėjo;</li>
-                            <li><strong>Šiandienos užduotys</strong> – užduotys, kurių terminas pasibaigia šiandien;</li>
-                            <li><strong>Neatliktos užduotys</strong> – užduotys, kurios nebuvo pradėtos, bet jų atlikimo terminas dar neatėjo;</li>
+                            <li><strong>Šiandienos užduotys</strong> – užduotys, kurias reikia atlikti šiandien;</li>
+                            <li><strong>Vėluojančios užduotys</strong> – neatliktos užduotys, kurių atlikimo diena jau praėjo;</li>
+                            <li><strong>Numatytos užduotys</strong> – užduotys, kurių atlikimo diena dar neatėjo (jas galima peržiūrėti, bet atlikti bus galima tik nurodytą dieną);</li>
                             <li><strong>Atliktos užduotys</strong> – naujausiai atliktų užduočių sąrašas su rezultatais.</li>
                         </ul>
                         Užduotys taip pat gali būti matomos savaitės kalendoriuje.
                         Spalvotas skritulys šalia užduoties rodo, kokia jos būsena:
                     </p>
                     <ul>
-                        <li><span class="student-list-task-indicatior" style="background-color: rgba(31, 42, 48, 0.18);"></span> – užduotis dar neatlikta, jos terminas dar neatėjo;</li>
+                        <li><span class="student-list-task-indicatior" style="background-color: rgba(31, 42, 48, 0.18);"></span> – užduotis dar neatlikta, bet ji nevėluoja (jos atlikimo diena – šiandien arba dar neatėjo);</li>
                         <li><span class="student-list-task-indicatior" style="background: conic-gradient(#eed202 0 50%, rgba(31, 42, 48, 0.18) 50% 100%);"></span> – užduotis pradėta, bet nebaigta (jei ji vėluoja, pusė skritulio būna geltonas arba rožinis);</li>
-                        <li><span class="student-list-task-indicatior" style="background-color: #eed202;"></span> – užduotis vėluoja (terminas baigėsi šią savaitę);</li>
-                        <li><span class="student-list-task-indicatior" style="background-color: #d57e7e;"></span> – užduotis vėluoja ilgiau (terminas baigėsi praėjusią savaitę arba dar anksčiau);</li>
+                        <li><span class="student-list-task-indicatior" style="background-color: #eed202;"></span> – užduotis vėluoja (jos atlikimo diena buvo šią savaitę);</li>
+                        <li><span class="student-list-task-indicatior" style="background-color: #d57e7e;"></span> – užduotis vėluoja ilgiau (jos atlikimo diena buvo praėjusią savaitę arba dar anksčiau);</li>
                         <li><span class="student-list-task-indicatior" style="background-color: #40c9a9;"></span> – užduotis atlikta.</li>
                     </ul>
 
@@ -1584,10 +1584,10 @@
                     <div class="section-header" id="mokiniu-zymes">Spalviniai indikatoriai</div>
                     <p>Spalvoti skrituliai yra naudojami nurodyti užduočių atlikimo būseną. Jei mokinys neatlieka užduočių laiku, indikatorius šalia jo vardo mokinių sąraše taip pat pakeičia spalvą.</p>
                     <ul>
-                        <li><span class="student-list-task-indicatior" style="background-color: rgba(31, 42, 48, 0.18);"></span> <strong>pilkas</strong> – užduotis neatlikta, bet terminas dar nesibaigė;</li>
+                        <li><span class="student-list-task-indicatior" style="background-color: rgba(31, 42, 48, 0.18);"></span> <strong>pilkas</strong> – užduotis neatlikta, bet jos atlikimo diena dar nepraėjo;</li>
                         <li><span class="student-list-task-indicatior" style="background-color: #40c9a9;"></span> <strong>žalias</strong> – užduotis atlikta;</li>
-                        <li><span class="student-list-task-indicatior" style="background-color: #eed202;"></span> <strong>geltonas</strong> – užduoties atlikimas vėluoja, jos terminas baigėsi šią savaitę;</li>
-                        <li><span class="student-list-task-indicatior" style="background-color: #d57e7e;"></span> <strong>rožinis</strong> – užduoties atlikimas vėluoja, jos terminas baigėsi praėjusią savaitę ar dar anksčiau.</li>
+                        <li><span class="student-list-task-indicatior" style="background-color: #eed202;"></span> <strong>geltonas</strong> – užduoties atlikimas vėluoja, jos atlikimo diena buvo šią savaitę;</li>
+                        <li><span class="student-list-task-indicatior" style="background-color: #d57e7e;"></span> <strong>rožinis</strong> – užduoties atlikimas vėluoja, jos atlikimo diena buvo praėjusią savaitę ar dar anksčiau.</li>
                     </ul>
 
                     <div class="section-header" id="uzduociu-skyrimas">Užduočių skyrimas</div>
@@ -1599,10 +1599,10 @@
                         <li>„<strong>Kelios užduotys vienu metu</strong>“ – visos savaitės užduotys, kurias SUDEDU parenka pagal jūsų pasirinktus nustatymus, klasės išeitas temas ir mokinių rezultatus (plačiau <a href="#kelios-uzduotys">čia</a>).</li>
                        </ul>
                     </p>
-                    Kuriant užduotis, privaloma nurodyti atlikimo terminą (dieną, iki kurios užduotis turi būti atlikta).
+                    Kuriant užduotis, privaloma nurodyti atlikimo dieną – dieną, kurią mokiniai galės užduotį atlikti (anksčiau jos atlikti negalima, o vėliau ji laikoma vėluojančia).
                     Taip pat galima nurodyti „<strong>užduočių grupės pavadinimą</strong>“, pavyzdžiui, „Daugybos lentelė 6–9“. Jei jo neįrašysite, užduotis bus pavadinta automatiškai, naudojant šį formatą:
                             metų savaitė, savaitės diena, iki kurios reikia užduotį atlikti, ir užduoties tema („Sav. 43 – treč. – matematika“). Skirtingas užduotis (pavyzdžiui diferencijuojant pagal mokinių gebėjimus) galima pavadinti vienodai.
-                            Užduotys su vienodu pavadinimu ir atlikimo terminu yra grupuojamos ir jas galima lengvai ištrinti arba peržiūrėti vienu metu. 
+                            Užduotys su vienodu pavadinimu ir atlikimo diena yra grupuojamos ir jas galima lengvai ištrinti arba peržiūrėti vienu metu. 
 
                     <p>
                     Teksto suvokimo ir rašybos užduotims skirtoms vienu metu, visiems mokiniams parenkami tie patys tekstai ir sakiniai.
