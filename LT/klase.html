@@ -2233,7 +2233,6 @@
         }
         .member-coins { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding-top: 3px; font-weight: 700; color: #bf9b30; }
         .member-coins img { width: 20px; height: 20px; }
-        .member-name .member-coins-label { padding-top: 5px; font-weight: 700; color: #bf9b30; }
         .nav-badge { position: absolute; top: -10px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 99px; background: #e74c3c; color: #F5F5F7; font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; justify-content: center; line-height: 1; }
         .nav-item.active .nav-badge { box-shadow: 0 0 0 2px #F5F5F7; }
         .nav-badge[hidden] { display: none; }
@@ -2270,7 +2269,7 @@
             .au-coins-label { font-size: 1.05rem; }
             .au-coin { width: 26px; height: 26px; vertical-align: -6px; }
             .nav-badge { min-width: 24px; height: 24px; font-size: 0.95rem; }
-            .member-coins, .member-name .member-coins-label { font-size: 1.2rem; }
+            .member-coins { font-size: 1.2rem; }
             .au-valid { font-size: 1.05rem; }
             .zg-stepper .control-btn { width: 54px; height: 54px; font-size: 1.6rem; }
             #zg-minutes { width: 70px; font-size: 1.5rem; }
@@ -4274,9 +4273,8 @@ function renderMembers() {
         nameHTML += `<span class="top-students-points">${points} ${pointsLabel}</span>`;
     }
 
-    // the student's SUDEDU coins: the teacher sees everyone's, a student only their own (under a "Monetos" label)
+    // the student's SUDEDU coins: the teacher sees everyone's, a student only their own
     if ((isTeacher || isYou) && coinsById.has(member.id)) {
-        if (!isTeacher) nameHTML += `<span class="member-coins-label">Monetos</span>`;
         nameHTML += `<span class="member-coins"><img src="../images/icons/icon-sudedu-coin.png" alt="monetos">${coinsById.get(member.id).toLocaleString('lt-LT')}</span>`;
     }
 
