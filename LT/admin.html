@@ -542,15 +542,20 @@
         position: relative;
     }
 
-    .item-preview:not(.pet) {
+    /* (only in the admin's own boxes - not the gift in a message preview, which sizes itself: sudedu-notices.js) */
+    .item-preview-holder .item-preview:not(.pet) {
         width: 100% !important;
         height: 100% !important;
-        background-size: contain;
         background-repeat: no-repeat;
+    }
+    /* as in the shop: "contain" unless the item has its own ".item-preview" rule (an animated item's sprite sheet
+       then shows its first frame, not the whole sheet) - so this must not be more specific than ".x.item-preview" */
+    .item-preview {
+        background-size: contain;
         background-position: center;
     }
 
-    .item-preview.pet {
+    .item-preview-holder .item-preview.pet {
         width: 100% !important;
         height: 100% !important;
         margin: 0 !important;
@@ -1213,7 +1218,7 @@
     </div>
 
     <script src="../mental-arithmetic.js?v=20261107d"></script>
-    <script src="../sudedu-notices.js?v=20261025a"></script>
+    <script src="../sudedu-notices.js?v=20261109a"></script>
     <script src="../main-nav-bar.js"></script>
     <script src="../parameter_dictionary.js?v=20261108a"></script>
     <script>

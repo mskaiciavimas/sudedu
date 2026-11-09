@@ -102,8 +102,10 @@
 .sn-gift-stage{position:relative;width:120px;height:120px}
 .sn-gift-box{position:absolute;inset:0;background:center/contain no-repeat;animation:sn-box-out .3s forwards 1.2s}
 .sn-gift-item{position:absolute;inset:10px;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.5);animation:sn-item-in .6s ease-out forwards 1.3s;--unit-size:10px;--pet-size:100px}
-.sn-gift-item .item-preview{position:static!important;width:100%!important;height:100%!important;margin:0!important;background-repeat:no-repeat;background-position:center}
-.sn-gift-item .item-preview:not(.pet){background-size:contain!important}
+.sn-gift-item .item-preview{position:static!important;margin:0!important;background-repeat:no-repeat}
+.sn-gift-item .item-preview.pet{width:100%!important;height:100%!important}
+:where(.sn-gift-item) .item-preview{background-size:contain;background-position:center}
+.sn-gift-item .item-preview:not(.pet){flex:none;max-width:none!important;max-height:none!important;transform:scale(var(--sn-fit,1))}
 .sn-gift.wrapped .sn-gift-box,.sn-gift.wrapped .sn-gift-item{animation:none}
 .sn-gift.wrapped .sn-gift-item{opacity:0}
 .sn-gift-name{font-weight:600;text-align:center}
@@ -149,17 +151,35 @@
                 const link = document.createElement('link');
                 link.rel = 'stylesheet';
                 link.href = '../' + css;
-                document.head.appendChild(link);
+                // (before this script's own styles: an item's own rules must lose to the gift's "contain" default the way
+                // they do on the shop page, while its ".item-preview" sprite-frame rules still win)
+                document.head.insertBefore(link, style && style.parentNode === document.head ? style : null);
+                await new Promise(resolve => { link.onload = link.onerror = resolve; });
             }
         }
         return assetIndex;
+    }
+
+    // the gift's item at its own size (as in the shop - an animated item's sprite sheet then shows one frame), scaled
+    // to fit its 100 px place
+    function fitGiftItems(root) {
+        root.querySelectorAll('.sn-gift-item .item-preview:not(.pet)').forEach(el => {
+            const box = el.parentElement;
+            const w = el.offsetWidth, h = el.offsetHeight;
+            if (!w || !h) { el.style.width = el.style.height = '100%'; return; }
+            el.style.setProperty('--sn-fit', Math.min(box.clientWidth / w, box.clientHeight / h, 4));
+        });
     }
 
     function giftHtml(notice, wrapped) {
         const item = (assetIndex || {})[notice.giftId] || {};
         const qty = notice.giftQty > 1 ? ` × ${notice.giftQty}` : '';
         const box = `../images/pet-game/gift-box-${1 + Math.floor(Math.random() * 3)}.png`;
-        const where = pageName === 'augintiniai' ? 'Ją rasite savo augintinio kambaryje.' : 'Ją rasite <a href="augintiniai.html">augintinio kambaryje</a>.';
+        // (room items go into the "Baldai" section of the pets page, pets / their food / looks into "Augintiniai")
+        const section = item.petAsset ? 'Augintiniai' : 'Baldai';
+        const where = pageName === 'augintiniai'
+            ? `Ją rasite skiltyje „${section}“.`
+            : `Ją rasite puslapio <a href="augintiniai.html">„Augintiniai“</a> skiltyje „${section}“.`;
         return `<div class="sn-gift${wrapped ? ' wrapped' : ''}">
             <div class="sn-gift-stage"><div class="sn-gift-box" style="background-image:url('${box}')"></div>
             <div class="sn-gift-item"><div class="item-preview ${esc(item['css-class'] || '')}"></div></div></div>
@@ -197,6 +217,7 @@
             if (!poll) {
                 root.innerHTML = `${bodyHtml}${notice.giftId != null ? giftHtml(notice, false) : ''}`;
                 openObjectPopup(root, esc(notice.title), '', finish, true, popupOpts);
+                fitGiftItems(root);
                 server.seen(notice).then(r => { if (r && r.gift && typeof window.sudeduGiftReceived === 'function') window.sudeduGiftReceived(r.gift, notice); });
             } else {
                 const multi = !!poll.multiple;
@@ -236,6 +257,7 @@
                 });
                 // closing without answering: allowed only when the poll may be closed (then it does not come back)
                 openObjectPopup(root, esc(notice.title), '', () => { if (!done && !root.querySelector('.sn-thanks')) server.seen(notice); finish(); }, true, popupOpts);
+                fitGiftItems(root);
                 // (the admin's preview keeps its close button)
                 if (poll.required && !server.preview) overlay()?.classList.add('sn-required');
             }

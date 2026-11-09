@@ -2233,6 +2233,7 @@
         }
         .member-coins { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding-top: 3px; font-weight: 700; color: #bf9b30; }
         .member-coins img { width: 20px; height: 20px; }
+        .member-name .member-coins-label { padding-top: 5px; font-weight: 700; color: #bf9b30; }
         .nav-badge { position: absolute; top: -10px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 99px; background: #e74c3c; color: #F5F5F7; font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; justify-content: center; line-height: 1; }
         .nav-item.active .nav-badge { box-shadow: 0 0 0 2px #F5F5F7; }
         .nav-badge[hidden] { display: none; }
@@ -2269,7 +2270,7 @@
             .au-coins-label { font-size: 1.05rem; }
             .au-coin { width: 26px; height: 26px; vertical-align: -6px; }
             .nav-badge { min-width: 24px; height: 24px; font-size: 0.95rem; }
-            .member-coins { font-size: 1.2rem; }
+            .member-coins, .member-name .member-coins-label { font-size: 1.2rem; }
             .au-valid { font-size: 1.05rem; }
             .zg-stepper .control-btn { width: 54px; height: 54px; font-size: 1.6rem; }
             #zg-minutes { width: 70px; font-size: 1.5rem; }
@@ -3374,7 +3375,7 @@
     </div>
 
     <script src="../mental-arithmetic.js?v=20261107d"></script>
-    <script src="../sudedu-notices.js?v=20261025a"></script>
+    <script src="../sudedu-notices.js?v=20261109a"></script>
     <script src="../main-nav-bar.js"></script>
     <script src="../parameter_dictionary.js?v=20261108a"></script>
     <script src="../mental-arithmetic-combinations.js"></script>
@@ -4273,8 +4274,9 @@ function renderMembers() {
         nameHTML += `<span class="top-students-points">${points} ${pointsLabel}</span>`;
     }
 
-    // teacher only: the student's SUDEDU coins
-    if (isTeacher && coinsById.has(member.id)) {
+    // the student's SUDEDU coins: the teacher sees everyone's, a student only their own (under a "Monetos" label)
+    if ((isTeacher || isYou) && coinsById.has(member.id)) {
+        if (!isTeacher) nameHTML += `<span class="member-coins-label">Monetos</span>`;
         nameHTML += `<span class="member-coins"><img src="../images/icons/icon-sudedu-coin.png" alt="monetos">${coinsById.get(member.id).toLocaleString('lt-LT')}</span>`;
     }
 
@@ -4342,59 +4344,13 @@ function renderMembers() {
     });
 
   } else {
-    // === STUDENT VIEW: Top 3 with medals, requesting student, then random others without points ===
-    const rankedStudents = [];
-    let currentRank = 0;
-    let previousPoints = null;
-    let medalIndex = 0;
+    // === STUDENT VIEW (2026-11-09): the student's own card first (with their SUDEDU coins), then every classmate
+    // in alphabetical order - no points, no medals ===
+    if (requestingStudent) createMemberCard(requestingStudent, 'member-card-requesting', null, null, true);
 
-    for (let i = 0; i < topEntries.length; i++) {
-      const entry = topEntries[i];
-      const currentPoints = Number(entry.totalPoints);
-      
-      if (previousPoints === null || currentPoints < previousPoints) {
-        currentRank++;
-        if (currentRank > 3) break;
-        medalIndex = currentRank - 1;
-      }
-
-      rankedStudents.push({
-        ...entry,
-        medalPath: medalPaths[medalIndex] || null
-      });
-
-      previousPoints = currentPoints;
-    }
-
-    // Render top 3 students with medals
-    const topIds = [];
-    rankedStudents.forEach((entry) => {
-      const member = studentMap[entry.id];
-      if (member) {
-        const isYou = requestingStudent && member.id === requestingStudent.id;
-        const extraClass = isYou ? 'member-card-top3 member-card-requesting' : 'member-card-top3';
-        createMemberCard(member, extraClass, entry.totalPoints, entry.medalPath, isYou);
-        topIds.push(entry.id);
-      }
-    });
-
-    // Render requesting student if not in top 3
-    if (requestingStudent && !topIds.includes(requestingStudent.id)) {
-      createMemberCard(requestingStudent, 'member-card-requesting', classDataCache.requestingStudentTotalPoints || 0, null, true);
-    }
-
-    // Render remaining students (no points shown, random order)
-    const remaining = students.filter(s => !topIds.includes(s.id) && (!requestingStudent || s.id !== requestingStudent.id));
-
-    // Shuffle remaining
-    for (let i = remaining.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [remaining[i], remaining[j]] = [remaining[j], remaining[i]];
-    }
-
-    remaining.forEach(member => {
-      createMemberCard(member); // No points displayed
-    });
+    const classmates = students.filter(s => !requestingStudent || s.id !== requestingStudent.id);
+    classmates.sort((a, b) => String(a.nickname || '').localeCompare(String(b.nickname || ''), 'lt', { sensitivity: 'base' }) || a.id - b.id);
+    classmates.forEach(member => createMemberCard(member));
   }
 }
     
@@ -4467,7 +4423,7 @@ async function fetchClassData() {
       requestingStudentWeekChlScore,
       weekChlId,
       weekChlWinnerStudentId,
-      studentCoins = []   // [[studentId, coins]] - only sent to the teacher
+      studentCoins = []   // [[studentId, coins]] - every student's for the teacher, a student gets only their own
     ] = raw;
 
     const requestingStudentData = allStudents.find(s => s[0] === userData.userId);
