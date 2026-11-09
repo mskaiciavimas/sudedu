@@ -12118,16 +12118,20 @@ function ltCountForm(count, one, few, many) {
 const studentsDative = count => `${count} ${ltCountForm(count, 'mokiniui', 'mokiniams', 'mokinių')}`;
 
 // "x/y atliko" opens the task's students (A-Z): green = done, grey = not done (no due date / not late),
-// yellow / pink = late (see taskDueStatus)
-async function openTeacherTaskStudents(taskId) {
-    let task = classTeacherTasks.find(item => Number(item.id) === Number(taskId));
-    if (!task) {
+// yellow / pink = late (see taskDueStatus). With groupKey: the students of all the group's tasks (classTaskGroupKey).
+async function openTeacherTaskStudents(taskId, groupKey = null) {
+    const pick = () => classTeacherTasks.filter(item => groupKey ? classTaskGroupKey(item) === groupKey : Number(item.id) === Number(taskId));
+    let tasks = pick();
+    if (!tasks.length) {
         await fetchClassTeacherTasks();
-        task = classTeacherTasks.find(item => Number(item.id) === Number(taskId));
+        tasks = pick();
     }
-    if (!task) return;
+    if (!tasks.length) return;
+    const task = tasks[0];
+    const totalCompleted = tasks.reduce((sum, t) => sum + (Number(t.totalCompleted) || 0), 0);
+    const totalAssigned = tasks.reduce((sum, t) => sum + (Number(t.totalAssigned) || 0), 0);
     const name = student => student.nickname || student.username || 'Mokinys';
-    const rows = [
+    const rows = tasks.flatMap(task => [
         ...(task.completedStudents || []).map(student => {
             const day = student.completionDate ? String(student.completionDate).slice(0, 10) : '';
             const late = student.onTime === false ? ', pavėluotai' : '';
@@ -12139,7 +12143,7 @@ async function openTeacherTaskStudents(taskId) {
             const state = dot === 'pink' ? 'vėluoja ilgiau' : (dot === 'yellow' ? 'vėluoja' : 'neatliko');
             return { name: name(student), dot, state, stateClass: dot === 'neutral' ? '' : status };
         })
-    ].sort((a, b) => a.name.localeCompare(b.name, 'lt', { sensitivity: 'base' }));
+    ]).sort((a, b) => a.name.localeCompare(b.name, 'lt', { sensitivity: 'base' }));
 
     const due = taskDueDay(task);
     // the legend names only the colours in the list (pink: late since an earlier week than the due date's)
@@ -12153,7 +12157,7 @@ async function openTeacherTaskStudents(taskId) {
             <span class="task-students-name">${escapeTeacherHtml(row.name)}</span>
             <span class="task-students-state ${row.stateClass}">${row.state}</span>
         </div>`).join('');
-    const subtitle = `Atliko ${task.totalCompleted} iš ${task.totalAssigned}${due ? ` · atlikti ${formatDueDay(due, true)}` : ''}`;
+    const subtitle = `Atliko ${totalCompleted} iš ${totalAssigned}${due ? ` · atlikti ${formatDueDay(due, true)}` : ''}`;
     openObjectPopup(`<div class="task-students-popup">${legend}${list || '<div class="statistics-empty-message">Mokinių nėra.</div>'}</div>`,
         escapeTeacherHtml(task.group || 'Mokytojo skirta užduotis'), subtitle);
 }
@@ -12298,7 +12302,7 @@ function classTaskGroupHtml(key, members, cardHtml) {
             <div class="tr class-task-card-header">
                 <span class="tl class-task-card-title">${escapeTeacherHtml(first.group || 'Mokytojo skirta užduotis')}</span>
                 <span class="chip class-task-group-count">${ltTaskCount(members.length)}</span>
-                <span class="chip class-task-card-meta">${done}/${total} atliko</span>
+                <button type="button" class="chip chip-button class-task-card-meta" title="Kas atliko grupės užduotis?" onclick="event.stopPropagation(); openTeacherTaskStudents(null, this.closest('.class-task-group').dataset.groupKey)">${done}/${total} atliko</button>
                 ${dueTask ? taskDueChipHtml(dueTask) : ''}
                 <span class="td">Priskirta ${date}</span>
             </div>
