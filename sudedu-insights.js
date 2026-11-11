@@ -459,8 +459,8 @@
 			if (ww[i] === ww[i + 1] && ww.slice(0, i) + ww.slice(i + 1) === cw) return new Set(['nedemesys']);
 		}
 
-		// h / ch / f
-		if ((a === 'h' && w === 'ch') || (a === 'ch' && w === 'h') || (a === 'f' && (w === 'h' || w === 'ch'))) hits.add('raides');
+		// h / ch / f ("hc" - ch with its letters the wrong way round - counts as ch: user, 2026-11-11)
+		if ((a === 'h' && (w === 'ch' || w === 'hc')) || (a === 'ch' && (w === 'h' || w === 'hc')) || (a === 'f' && (w === 'h' || w === 'ch' || w === 'hc'))) hits.add('raides');
 		if ((a === 'h' && w === 'g') || (a === 'ch' && w === 'k') || (a === 'f' && w === 'p')) hits.add('garsai');
 		// švilpiamosios / šnypščiamosios priebalsės mixed up (z for ž, š for s, c for č; dz / dž too)
 		if (pairSwap(a, w, [['s', 'š'], ['z', 'ž'], ['c', 'č']])) hits.add('svilp');
