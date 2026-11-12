@@ -536,6 +536,17 @@
 				font-size: 1.4rem;
 			}
 		}
+
+		/* while a request is on its way: the fields are locked, the button stays readable (it counts the seconds) */
+		.container input:disabled,
+		.container select:disabled {
+			opacity: 0.6;
+			cursor: wait;
+		}
+		#authBtn.waiting:disabled {
+			opacity: 0.85;
+			cursor: wait;
+		}
 	</style>
 </head>
 
@@ -785,7 +796,34 @@
 			errorField.style.display = 'block';
 		}
 
+		// (the form's fields are locked together with the buttons, so nothing changes while a request is on its way)
+		function setFieldsDisabled(off) {
+			document.querySelectorAll('.container input, .container select').forEach(el => { el.disabled = off; });
+		}
+
+		// The sign-in button counts the seconds while waiting for the server ("Laukiama serverio... 7 s"), so it is
+		// clear the page is still working. waitLabel changes on a retry. Stopped by enableButtons().
+		let waitTicker = null;
+		let waitLabel = 'Laukiama serverio';
+		function startWaitTicker() {
+			stopWaitTicker();
+			const startedAt = Date.now();
+			waitLabel = 'Laukiama serverio';
+			authBtn.classList.add('waiting');
+			waitTicker = setInterval(() => {
+				if (!isAuthenticating) return stopWaitTicker();
+				const s = Math.floor((Date.now() - startedAt) / 1000);
+				if (s >= 3) authBtn.innerText = `${waitLabel}... ${s} s`;
+			}, 1000);
+		}
+		function stopWaitTicker() {
+			if (waitTicker) clearInterval(waitTicker);
+			waitTicker = null;
+			authBtn.classList.remove('waiting');
+		}
+
 		function disableButtons() {
+			setFieldsDisabled(true);
 			if (authBtn) authBtn.disabled = true;
 			if (registerBtn) registerBtn.disabled = true;
 			if (forgotPasswordBtn) forgotPasswordBtn.disabled = true;
@@ -794,6 +832,8 @@
 		}
 
 		function enableButtons() {
+			stopWaitTicker();
+			setFieldsDisabled(false);
 			if (authBtn) authBtn.disabled = false;
 			if (registerBtn) registerBtn.disabled = false;
 			if (forgotPasswordBtn) forgotPasswordBtn.disabled = false;
@@ -892,9 +932,13 @@
 		disableButtons();
 
 		// RETRY LOGIC
-		const maxRetries = 2;
+		// (logging in: when many sign in at once the server queues them, so each try waits up to a minute and a busy,
+		// unreachable or silent server is tried 3 times before "Nepavyko pasiekti duomenų". Registration is retried only
+		// when the request never left - it must not create the account twice.)
+		const maxRetries = isRegistration ? 2 : 3;
 		let lastError = null;
-		
+		startWaitTicker();
+
 		for (let attempt = 0; attempt < maxRetries; attempt++) {
 			try {
 			let response;
@@ -911,17 +955,23 @@
 					class: isTeacherVal ? null : classValue,
 					privacyAccepted: privacyConsent.checked
 				}),
-				signal: AbortSignal.timeout(10000)
+				signal: AbortSignal.timeout(60000)
 				});
 			} else {
 				response = await fetch(apiBase + 'auth/login', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ username: emailVal, password: passVal }),
-				signal: AbortSignal.timeout(10000)
+				signal: AbortSignal.timeout(60000)
 				});
+				// (503 = the server is busy; 502/504 = Render's proxy got no answer, e.g. while the server restarts)
+				if ([502, 503, 504].includes(response.status)) {
+					const busy = new Error('Server busy (' + response.status + ')');
+					busy.name = 'ServerBusy';
+					throw busy;
+				}
 			}
-			
+
 			const data = await response.json();
 
 			// Check for errors FIRST (before success)
@@ -1019,9 +1069,12 @@
 			console.log(`Attempt ${attempt + 1}/${maxRetries} failed:`, err.message);
 			
 			if (attempt < maxRetries - 1 && 
-				(err.name === 'TypeError' || err.message.includes('Failed to fetch'))) {
-				await new Promise(resolve => setTimeout(resolve, 1000));
-				authBtn.innerText = 'Bandoma dar kartą...';
+				(err.name === 'TypeError' || err.message.includes('Failed to fetch') ||
+				(!isRegistration && ['TimeoutError', 'ServerBusy', 'SyntaxError'].includes(err.name)))) {
+				// (the request never left, or - logging in - the server was busy / silent / answered with a proxy page)
+				await new Promise(resolve => setTimeout(resolve, attempt === 0 ? 2000 : 5000));
+				waitLabel = `Bandoma dar kartą (${attempt + 2}/${maxRetries})`;
+				authBtn.innerText = waitLabel + '...';
 				continue;
 			}
 			
@@ -1029,7 +1082,7 @@
 			console.log('Error fetching auth:', err);
 			}
 		}
-		
+
 		isAuthenticating = false;
 		authBtn.innerText = isRegistration ? 'Prisiregistruoti' : 'Prisijungti';
 		enableButtons();
